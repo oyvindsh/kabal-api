@@ -3,12 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val exposedVersion = "0.21.1"
 val mockkVersion = "1.9.3"
 val h2Version = "1.4.200"
-val pamGeographyVersion = "2.4"
 val tokenValidationVersion = "1.3.0"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
-val pdfboxVersion = "2.0.19"
-val tikaVersion = "1.24.1"
 val springSleuthVersion = "2.2.3.RELEASE"
 
 val githubUser: String by project
@@ -46,11 +43,11 @@ dependencies {
 
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
 
-    implementation("org.flywaydb:flyway-core")
-    implementation("com.zaxxer:HikariCP")
-    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
-    implementation("org.postgresql:postgresql")
+//    implementation("org.flywaydb:flyway-core")
+//    implementation("com.zaxxer:HikariCP")
+//    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
+//    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+//    implementation("org.postgresql:postgresql")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("ch.qos.logback:logback-classic")
