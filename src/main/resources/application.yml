@@ -1,0 +1,37 @@
+spring:
+  main:
+    banner-mode: OFF
+  codec:
+    max-in-memory-size: 10MB
+  sleuth:
+    propagation-keys:
+      - Nav-Callid
+      - Nav-Consumer-Id
+    log:
+      slf4j:
+        whitelisted-mdc-keys:
+          - Nav-Callid
+          - Nav-Consumer-Id
+
+server:
+  port: 7081
+  error:
+    whitelabel:
+      enabled: false
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints.web:
+    exposure:
+      include: info, health, metrics, prometheus
+    base-path: "/internal"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+SERVICE_USER_USERNAME: srvklage-dittnav

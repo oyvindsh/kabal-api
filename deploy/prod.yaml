@@ -1,0 +1,7 @@
+ingress: https://klage-oppgave-api.nav.no
+externalHosts:
+  - hooks.slack.com
+springProfile: prod-gcp
+
+
+
