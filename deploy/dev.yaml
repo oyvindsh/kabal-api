@@ -3,3 +3,4 @@ externalHosts:
   - login.microsoftonline.com
   - hooks.slack.com
 springProfile: dev-gcp
+tenant: trygdeetaten.no

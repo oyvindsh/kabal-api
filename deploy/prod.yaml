@@ -3,3 +3,4 @@ externalHosts:
   - login.microsoftonline.com
   - hooks.slack.com
 springProfile: prod-gcp
+tenant: nav.no
