@@ -2,6 +2,8 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
+import no.nav.klage.oppgave.clients.OppgaveClient
+import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Service
@@ -11,11 +13,12 @@ class OppgaveService(
     val clientConfigurationProperties: ClientConfigurationProperties,
     val oAuth2AccessTokenService: OAuth2AccessTokenService,
     val axsysClient: AxsysClient,
-    val microsoftGraphClient: MicrosoftGraphClient
+    val microsoftGraphClient: MicrosoftGraphClient,
+    val oppgaveClient: OppgaveClient
 ) {
 
-    fun getOppgaver() {
-        //TODO
+    fun getOppgaver(): OppgaveResponse {
+        return oppgaveClient.getOppgaver()
     }
 
     fun getTilgangerForSaksbehandler() =

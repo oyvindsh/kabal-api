@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.api.OppgaveController.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
@@ -33,6 +34,12 @@ class OppgaveController(
     @GetMapping("/tilganger")
     fun getTilganger(): Tilganger {
         return oppgaveService.getTilgangerForSaksbehandler()
+    }
+
+    @GetMapping("/oppgaver")
+    fun getOppgaver(): OppgaveResponse {
+        logger.debug("getOppgaver is requested")
+        return oppgaveService.getOppgaver()
     }
 
 }
