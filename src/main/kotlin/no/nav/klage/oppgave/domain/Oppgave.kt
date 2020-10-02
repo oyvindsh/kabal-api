@@ -38,11 +38,11 @@ data class Oppgave(
     val aktivDato: String?,
     val opprettetTidspunkt: String?,
     val ferdigstiltTidspunkt: String?,
-    val endretTidspunkt: String
+    val endretTidspunkt: String?
 ) {
     data class Ident(
         val ident: String?,
-        val gruppe: Gruppe
+        val gruppe: Gruppe?
     )
 
     enum class Gruppe {
