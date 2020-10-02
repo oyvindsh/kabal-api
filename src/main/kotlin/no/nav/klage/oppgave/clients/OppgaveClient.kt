@@ -34,7 +34,7 @@ class OppgaveClient(
                     .build()
             }
             .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+//            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
             .retrieve()
             .bodyToMono<OppgaveResponse>()

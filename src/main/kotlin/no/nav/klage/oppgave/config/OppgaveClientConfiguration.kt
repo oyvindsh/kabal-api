@@ -24,6 +24,7 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
     fun oppgaveWebClient(): WebClient {
         return webClientBuilder
             .defaultHeader("x-nav-apiKey", apiKey)
+            .defaultHeader("X-Correlation-ID", "klage1234")
             .baseUrl(oppgaveServiceURL)
             .build()
     }
