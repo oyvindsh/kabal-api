@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
-import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -33,11 +32,13 @@ class OppgaveClient(
             .uri { uriBuilder ->
                 uriBuilder
                     //Try to limit amount when testing
-                    .queryParam("opprettetFom", "2020-10-01T07:00:00")
+                    .queryParam("opprettetFom", "2020-09-01T07:00:00")
+                    .queryParam("statuskategori", "AAPEN")
+                    .queryParam("tema", "SYK")
                     .build()
             }
             .header("Authorization", "Bearer $oidcToken")
-//            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
             .retrieve()
             .bodyToMono<String>()
