@@ -17,7 +17,7 @@ class OppgaveService(
     val oppgaveClient: OppgaveClient
 ) {
 
-    fun getOppgaver(): OppgaveResponse {
+    fun getOppgaver(): String {
         return oppgaveClient.getOppgaver()
     }
 

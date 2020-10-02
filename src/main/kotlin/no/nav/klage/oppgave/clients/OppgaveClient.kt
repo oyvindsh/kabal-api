@@ -23,7 +23,7 @@ class OppgaveClient(
     @Value("\${spring.application.name}")
     lateinit var applicationName: String
 
-    fun getOppgaver(): OppgaveResponse {
+    fun getOppgaver(): String {
         logger.debug("Fetching oppgaver")
 
         val oidcToken = stsClient.oidcToken()
@@ -40,7 +40,7 @@ class OppgaveClient(
 //            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
             .retrieve()
-            .bodyToMono<OppgaveResponse>()
+            .bodyToMono<String>()
             .block() ?: throw RuntimeException("Oppgaver could not be fetched")
     }
 }
