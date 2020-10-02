@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
+import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -22,11 +23,8 @@ class OppgaveClient(
     @Value("\${spring.application.name}")
     lateinit var applicationName: String
 
-    fun getOppgaver(): String {
+    fun getOppgaver(): OppgaveResponse {
         logger.debug("Fetching oppgaver")
-
-        val oidcToken = stsClient.oidcToken()
-        logger.debug("oidc token: {}", oidcToken)
 
         return oppgaveWebClient.get()
             .uri { uriBuilder ->
@@ -37,11 +35,11 @@ class OppgaveClient(
                     .queryParam("tema", "SYK")
                     .build()
             }
-            .header("Authorization", "Bearer $oidcToken")
+            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
             .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
             .retrieve()
-            .bodyToMono<String>()
+            .bodyToMono<OppgaveResponse>()
             .block() ?: throw RuntimeException("Oppgaver could not be fetched")
     }
 }

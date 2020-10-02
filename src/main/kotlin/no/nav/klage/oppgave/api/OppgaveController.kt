@@ -37,7 +37,7 @@ class OppgaveController(
     }
 
     @GetMapping("/oppgaver")
-    fun getOppgaver(): String {
+    fun getOppgaver(): OppgaveResponse {
         logger.debug("getOppgaver is requested")
         return oppgaveService.getOppgaver()
     }
