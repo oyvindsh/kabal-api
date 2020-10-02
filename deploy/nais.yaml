@@ -51,7 +51,7 @@ spec:
         - host: {{host}}
       {{/each}}
   envFrom:
-    - secret: srvklage-dittnav
+    - secret: srvklage-saksbeh
     - secret: sts-apikey
     - secret: oppgave-apikey
     - secret: slack-url
