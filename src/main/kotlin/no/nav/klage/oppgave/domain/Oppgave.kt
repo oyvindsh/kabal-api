@@ -33,7 +33,7 @@ data class Oppgave(
     val endretAv: String?,
     val prioritet: Prioritet?,
     val status: Status?,
-    val metadata: String?,
+    val metadata: Map<String, String>?,
     val fristFerdigstillelse: String?,
     val aktivDato: String?,
     val opprettetTidspunkt: String?,
