@@ -48,5 +48,6 @@
 
     <logger name="no.nav.klage" level="debug"/>
     <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
+    <logger name="reactor.netty.http.client" level="debug"/>
 
 </configuration>
