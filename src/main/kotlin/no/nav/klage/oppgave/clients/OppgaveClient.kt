@@ -26,6 +26,9 @@ class OppgaveClient(
     fun getOppgaver(): OppgaveResponse {
         logger.debug("Fetching oppgaver")
 
+        val oidcToken = stsClient.oidcToken()
+        logger.debug("oidc token: {}", oidcToken)
+
         return oppgaveWebClient.get()
             .uri { uriBuilder ->
                 uriBuilder
@@ -33,7 +36,7 @@ class OppgaveClient(
                     .queryParam("opprettetFom", "2020-10-01T07:00:00")
                     .build()
             }
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+            .header("Authorization", "Bearer $oidcToken")
 //            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
             .retrieve()
