@@ -50,12 +50,16 @@ class OppgaveService(
         }
     }
 
-    private fun getBruker(aktoerId: String): Bruker {
-        val person = pdlClient.getPersonInfo(aktoerId).data?.hentPerson
-        return Bruker(
-            fnr = person?.folkeregisteridentifikator?.firstOrNull()?.identifikasjonsnummer ?: "mangler",
-            navn = person?.navn?.firstOrNull()?.toName() ?: "mangler"
-        )
+    private fun getBruker(aktoerId: String?): Bruker {
+        return if (aktoerId == null) {
+            Bruker("Mangler aktoerId", "Mangler aktoerId")
+        } else {
+            val person = pdlClient.getPersonInfo(aktoerId).data?.hentPerson
+            return Bruker(
+                fnr = person?.folkeregisteridentifikator?.firstOrNull()?.identifikasjonsnummer ?: "mangler",
+                navn = person?.navn?.firstOrNull()?.toName() ?: "mangler"
+            )
+        }
     }
 
     private fun Navn.toName(): String {

@@ -17,7 +17,7 @@ data class Oppgave(
     val saksreferanse: String?,
     val bnr: String?,
     val samhandlernr: String?,
-    val aktoerId: String,
+    val aktoerId: String?,
     val identer: Array<Ident>?,
     val orgnr: String?,
     val tilordnetRessurs: String?,
