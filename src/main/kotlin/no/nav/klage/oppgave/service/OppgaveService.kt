@@ -3,7 +3,9 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.OppgaveClient
+import no.nav.klage.oppgave.clients.PdlClient
 import no.nav.klage.oppgave.domain.OppgaveResponse
+import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.OppgaveView
 import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
@@ -17,7 +19,8 @@ class OppgaveService(
     val oAuth2AccessTokenService: OAuth2AccessTokenService,
     val axsysClient: AxsysClient,
     val microsoftGraphClient: MicrosoftGraphClient,
-    val oppgaveClient: OppgaveClient
+    val oppgaveClient: OppgaveClient,
+    val pdlClient: PdlClient
 ) {
 
     fun getOppgaver(): List<OppgaveView> {
@@ -37,10 +40,7 @@ class OppgaveService(
         return oppgaver.map {
             OppgaveView(
                 id = it.id,
-                bruker = Bruker(
-                    fnr = "aktørId pr nå: " + it.aktoerId,
-                    navn = "TODO navn"
-                ),
+                bruker = getBruker(it.aktoerId),
                 type = "TODO Klage/Anke",
                 ytelse = it.tema,
                 hjemmel = listOf("TODO hjemmel"),
@@ -49,5 +49,18 @@ class OppgaveService(
             )
         }
     }
+
+    private fun getBruker(aktoerId: String): Bruker {
+        val person = pdlClient.getPersonInfo(aktoerId).data?.hentPerson
+        return Bruker(
+            fnr = person?.folkeregisteridentifikator?.firstOrNull()?.identifikasjonsnummer ?: "mangler",
+            navn = person?.navn?.firstOrNull()?.toName() ?: "mangler"
+        )
+    }
+
+    private fun Navn.toName(): String {
+        return "$fornavn $etternavn"
+    }
 }
+
 
