@@ -4,9 +4,12 @@ import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.domain.OppgaveResponse
+import no.nav.klage.oppgave.domain.view.OppgaveView
+import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OppgaveService(
@@ -17,8 +20,8 @@ class OppgaveService(
     val oppgaveClient: OppgaveClient
 ) {
 
-    fun getOppgaver(): OppgaveResponse {
-        return oppgaveClient.getOppgaver()
+    fun getOppgaver(): List<OppgaveView> {
+        return oppgaveClient.getOppgaver().toView()
     }
 
     fun getTilgangerForSaksbehandler() =
@@ -30,4 +33,21 @@ class OppgaveService(
         return response.accessToken
     }
 
+    private fun OppgaveResponse.toView(): List<OppgaveView> {
+        return oppgaver.map {
+            OppgaveView(
+                id = it.id,
+                bruker = Bruker(
+                    fnr = "aktørId pr nå: " + it.aktoerId,
+                    navn = "TODO navn"
+                ),
+                type = "TODO Klage/Anke",
+                ytelse = it.tema,
+                hjemmel = listOf("TODO hjemmel"),
+                frist = LocalDate.parse(it.fristFerdigstillelse),
+                saksbehandler = "TODO saksbehandler"
+            )
+        }
+    }
 }
+

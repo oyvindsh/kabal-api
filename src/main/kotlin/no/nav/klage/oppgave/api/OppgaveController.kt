@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.api.OppgaveController.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.domain.Tilganger
+import no.nav.klage.oppgave.domain.view.OppgaveView
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -18,6 +18,7 @@ class OppgaveController(
 ) {
 
     companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         const val ISSUER_AAD = "aad"
     }
@@ -37,7 +38,7 @@ class OppgaveController(
     }
 
     @GetMapping("/oppgaver")
-    fun getOppgaver(): OppgaveResponse {
+    fun getOppgaver(): List<OppgaveView> {
         logger.debug("getOppgaver is requested")
         return oppgaveService.getOppgaver()
     }

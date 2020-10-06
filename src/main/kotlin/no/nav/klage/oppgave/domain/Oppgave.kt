@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.domain
 
 data class OppgaveResponse(
     val antallTreffTotalt: Int,
-    val oppgaver: Array<Oppgave>?
+    val oppgaver: Array<Oppgave>
 )
 
 data class Oppgave(
@@ -17,13 +17,13 @@ data class Oppgave(
     val saksreferanse: String?,
     val bnr: String?,
     val samhandlernr: String?,
-    val aktoerId: String?,
+    val aktoerId: String,
     val identer: Array<Ident>?,
     val orgnr: String?,
     val tilordnetRessurs: String?,
     val beskrivelse: String?,
     val temagruppe: String?,
-    val tema: String?,
+    val tema: String,
     val behandlingstema: String?,
     val oppgavetype: String?,
     val behandlingstype: String?,
