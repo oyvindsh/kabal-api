@@ -1,2 +1,3 @@
 TENANT_ID: 62366534-1ec3-4962-8869-9b5535279d0b
 SECURITY_TOKEN_SERVICE_REST_URL: https://api-gw.oera.no/security-token-service
+PDL_BASE_URL: https://api-gw.oera.no/pdl-api/graphql

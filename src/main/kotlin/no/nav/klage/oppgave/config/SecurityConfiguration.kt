@@ -7,4 +7,9 @@ import org.springframework.context.annotation.Configuration
 @EnableJwtTokenValidation
 @EnableOAuth2Client(cacheEnabled = true)
 @Configuration
-internal class SecurityConfiguration
+internal class SecurityConfiguration {
+
+    companion object {
+        const val ISSUER_AAD = "aad"
+    }
+}
