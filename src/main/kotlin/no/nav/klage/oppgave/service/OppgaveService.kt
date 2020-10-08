@@ -11,7 +11,6 @@ import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class OppgaveService(
@@ -44,7 +43,7 @@ class OppgaveService(
                 type = "TODO Klage/Anke",
                 ytelse = it.tema,
                 hjemmel = listOf("TODO hjemmel"),
-                frist = LocalDate.parse(it.fristFerdigstillelse),
+                frist = it.fristFerdigstillelse,
                 saksbehandler = "TODO saksbehandler"
             )
         }
@@ -66,5 +65,3 @@ class OppgaveService(
         return "$fornavn $etternavn"
     }
 }
-
-

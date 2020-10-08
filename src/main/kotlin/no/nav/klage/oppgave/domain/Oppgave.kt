@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.domain
 
+import java.time.LocalDate
+
 
 data class OppgaveResponse(
     val antallTreffTotalt: Int,
@@ -34,7 +36,7 @@ data class Oppgave(
     val prioritet: Prioritet?,
     val status: Status?,
     val metadata: Map<String, String>?,
-    val fristFerdigstillelse: String?,
+    val fristFerdigstillelse: LocalDate?,
     val aktivDato: String?,
     val opprettetTidspunkt: String?,
     val ferdigstiltTidspunkt: String?,
