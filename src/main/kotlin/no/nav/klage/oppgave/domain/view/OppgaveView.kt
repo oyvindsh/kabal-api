@@ -8,7 +8,7 @@ data class OppgaveView(
     val type: String,
     val ytelse: String,
     val hjemmel: List<String>,
-    val frist: LocalDate,
+    val frist: LocalDate?,
     val saksbehandler: String
 ) {
     data class Bruker(

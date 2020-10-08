@@ -12,16 +12,14 @@ import org.springframework.web.reactive.function.client.bodyToMono
 class OppgaveClient(
     private val oppgaveWebClient: WebClient,
     private val stsClient: StsClient,
-    private val tracer: Tracer
+    private val tracer: Tracer,
+    @Value("\${spring.application.name}") val applicationName: String
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
-
-    @Value("\${spring.application.name}")
-    lateinit var applicationName: String
 
     fun getOppgaver(): OppgaveResponse {
         logger.debug("Fetching oppgaver")
