@@ -42,7 +42,7 @@ class OppgaveService(
                 bruker = getBruker(it.aktoerId),
                 type = it.beskrivelse ?: "",
                 ytelse = it.tema,
-                hjemmel = listOf("TODO hjemmel"),
+                hjemmel = it.metadata.toHjemmel(),
                 frist = it.fristFerdigstillelse,
                 saksbehandler = "TODO saksbehandler"
             )
@@ -64,4 +64,9 @@ class OppgaveService(
     private fun Navn.toName(): String {
         return "$fornavn $etternavn"
     }
+
+    private fun Map<String, String>?.toHjemmel(): List<String> {
+        return listOf(this?.get("HJEMMEL") ?: "Mangler hjemmel")
+    }
 }
+
