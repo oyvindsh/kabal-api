@@ -19,6 +19,11 @@ class OppgaveClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        const val BEHANDLINGSTYPE_KLAGE = "ae0058"
+        const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
+        const val TEMA_SYK = "SYK"
+        const val STATUSKATEGORI_AAPEN = "AAPEN"
     }
 
     fun getOppgaver(): OppgaveResponse {
@@ -27,10 +32,10 @@ class OppgaveClient(
         return oppgaveWebClient.get()
             .uri { uriBuilder ->
                 uriBuilder
-                    //Try to limit amount when testing
-                    .queryParam("opprettetFom", "2020-09-01T07:00:00")
-                    .queryParam("statuskategori", "AAPEN")
-                    .queryParam("tema", "SYK")
+                    .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
+                    .queryParam("tema", TEMA_SYK)
+                    .queryParam("behandlingstype", BEHANDLINGSTYPE_KLAGE)
+                    .queryParam("behandlingstype", BEHANDLINGSTYPE_FEILUTBETALING)
                     .build()
             }
             .header("Authorization", "Bearer ${stsClient.oidcToken()}")
