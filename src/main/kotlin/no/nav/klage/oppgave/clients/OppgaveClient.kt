@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
-import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
-import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
-import no.nav.klage.oppgave.domain.OppgaveResponse
+import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
+import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component

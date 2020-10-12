@@ -4,13 +4,16 @@ import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
-import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
-import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
-import no.nav.klage.oppgave.domain.Oppgave
-import no.nav.klage.oppgave.domain.OppgaveResponse
+import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
+import no.nav.klage.oppgave.domain.gosys.Oppgave
+import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.domain.pdl.Navn
+import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.OppgaveView
 import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
+import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Service
@@ -69,14 +72,14 @@ class OppgaveService(
     }
 
     private fun Map<String, String>?.toHjemmel(): List<String> {
-        return listOf(this?.get("HJEMMEL") ?: "mangler")
+        return listOf(this?.get(HJEMMEL) ?: "mangler")
     }
 
     private fun Oppgave.toType(): String {
         return if (behandlingstema == null) {
             when (behandlingstype) {
-                BEHANDLINGSTYPE_KLAGE -> "klage"
-                BEHANDLINGSTYPE_FEILUTBETALING -> "feilutbetaling"
+                BEHANDLINGSTYPE_KLAGE -> TYPE_KLAGE
+                BEHANDLINGSTYPE_FEILUTBETALING -> TYPE_FEILUTBETALING
                 else -> "mangler"
             }
         } else "mangler"
