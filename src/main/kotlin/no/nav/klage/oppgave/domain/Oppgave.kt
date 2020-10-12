@@ -2,6 +2,8 @@ package no.nav.klage.oppgave.domain
 
 import java.time.LocalDate
 
+const val BEHANDLINGSTYPE_KLAGE = "ae0058"
+const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
 
 data class OppgaveResponse(
     val antallTreffTotalt: Int,

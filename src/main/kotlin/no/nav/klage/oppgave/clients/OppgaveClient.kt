@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
 import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -19,6 +21,9 @@ class OppgaveClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        const val TEMA_SYK = "SYK"
+        const val STATUSKATEGORI_AAPEN = "AAPEN"
     }
 
     fun getOppgaver(): OppgaveResponse {
@@ -27,10 +32,10 @@ class OppgaveClient(
         return oppgaveWebClient.get()
             .uri { uriBuilder ->
                 uriBuilder
-                    //Try to limit amount when testing
-                    .queryParam("opprettetFom", "2020-09-01T07:00:00")
-                    .queryParam("statuskategori", "AAPEN")
-                    .queryParam("tema", "SYK")
+                    .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
+                    .queryParam("tema", TEMA_SYK)
+                    .queryParam("behandlingstype", BEHANDLINGSTYPE_KLAGE)
+                    .queryParam("behandlingstype", BEHANDLINGSTYPE_FEILUTBETALING)
                     .build()
             }
             .header("Authorization", "Bearer ${stsClient.oidcToken()}")

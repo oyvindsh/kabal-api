@@ -4,6 +4,9 @@ import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
+import no.nav.klage.oppgave.domain.Oppgave
 import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.OppgaveView
@@ -40,9 +43,9 @@ class OppgaveService(
             OppgaveView(
                 id = it.id,
                 bruker = getBruker(it.aktoerId),
-                type = it.beskrivelse ?: "",
+                type = it.toType(),
                 ytelse = it.tema,
-                hjemmel = listOf("TODO hjemmel"),
+                hjemmel = it.metadata.toHjemmel(),
                 frist = it.fristFerdigstillelse,
                 saksbehandler = "TODO saksbehandler"
             )
@@ -64,4 +67,19 @@ class OppgaveService(
     private fun Navn.toName(): String {
         return "$fornavn $etternavn"
     }
+
+    private fun Map<String, String>?.toHjemmel(): List<String> {
+        return listOf(this?.get("HJEMMEL") ?: "mangler")
+    }
+
+    private fun Oppgave.toType(): String {
+        return if (behandlingstema == null) {
+            when (behandlingstype) {
+                BEHANDLINGSTYPE_KLAGE -> "klage"
+                BEHANDLINGSTYPE_FEILUTBETALING -> "feilutbetaling"
+                else -> "mangler"
+            }
+        } else "mangler"
+    }
 }
+
