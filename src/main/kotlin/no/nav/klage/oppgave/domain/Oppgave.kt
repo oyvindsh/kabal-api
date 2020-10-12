@@ -7,46 +7,46 @@ const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
 
 data class OppgaveResponse(
     val antallTreffTotalt: Int,
-    val oppgaver: Array<Oppgave>
+    val oppgaver: List<Oppgave>
 )
 
 data class Oppgave(
     val id: Int,
-    val tildeltEnhetsnr: String?,
-    val endretAvEnhetsnr: String?,
-    val opprettetAvEnhetsnr: String?,
-    val journalpostId: String?,
-    val journalpostkilde: String?,
-    val behandlesAvApplikasjon: String?,
-    val saksreferanse: String?,
-    val bnr: String?,
-    val samhandlernr: String?,
-    val aktoerId: String?,
-    val identer: Array<Ident>?,
-    val orgnr: String?,
-    val tilordnetRessurs: String?,
-    val beskrivelse: String?,
-    val temagruppe: String?,
+    val tildeltEnhetsnr: String? = null,
+    val endretAvEnhetsnr: String? = null,
+    val opprettetAvEnhetsnr: String? = null,
+    val journalpostId: String? = null,
+    val journalpostkilde: String? = null,
+    val behandlesAvApplikasjon: String? = null,
+    val saksreferanse: String? = null,
+    val bnr: String? = null,
+    val samhandlernr: String? = null,
+    val aktoerId: String? = null,
+    val identer: List<Ident>? = null,
+    val orgnr: String? = null,
+    val tilordnetRessurs: String? = null,
+    val beskrivelse: String? = null,
+    val temagruppe: String? = null,
     val tema: String,
-    val behandlingstema: String?,
-    val oppgavetype: String?,
-    val behandlingstype: String?,
-    val versjon: Int?,
-    val mappeId: Long?,
-    val opprettetAv: String?,
-    val endretAv: String?,
-    val prioritet: Prioritet?,
-    val status: Status?,
-    val metadata: Map<String, String>?,
+    val behandlingstema: String? = null,
+    val oppgavetype: String? = null,
+    val behandlingstype: String? = null,
+    val versjon: Int? = null,
+    val mappeId: Long? = null,
+    val opprettetAv: String? = null,
+    val endretAv: String? = null,
+    val prioritet: Prioritet? = null,
+    val status: Status? = null,
+    val metadata: Map<String, String>? = null,
     val fristFerdigstillelse: LocalDate?,
-    val aktivDato: String?,
-    val opprettetTidspunkt: String?,
-    val ferdigstiltTidspunkt: String?,
-    val endretTidspunkt: String?
+    val aktivDato: String? = null,
+    val opprettetTidspunkt: String? = null,
+    val ferdigstiltTidspunkt: String? = null,
+    val endretTidspunkt: String? = null
 ) {
     data class Ident(
-        val ident: String?,
-        val gruppe: Gruppe?
+        val ident: String? = null,
+        val gruppe: Gruppe? = null
     )
 
     enum class Gruppe {
