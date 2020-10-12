@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
 import no.nav.klage.oppgave.domain.OppgaveResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -20,8 +22,6 @@ class OppgaveClient(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
 
-        const val BEHANDLINGSTYPE_KLAGE = "ae0058"
-        const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
         const val TEMA_SYK = "SYK"
         const val STATUSKATEGORI_AAPEN = "AAPEN"
     }
