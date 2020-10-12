@@ -18,59 +18,37 @@ internal class OppgaveServiceTest {
 
     @Test
     fun `type is klage`() {
-        val oppgaveClient = mockk<OppgaveClient>()
-        every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithType(BEHANDLINGSTYPE_KLAGE)
-
-        val oppgaveService = OppgaveService(
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            oppgaveClient,
-            mockk()
-        )
-
+        val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_KLAGE)
         assertThat(oppgaveService.getOppgaver().first().type).isEqualTo(TYPE_KLAGE)
     }
 
     @Test
     fun `type is feilutbetaling`() {
-        val oppgaveClient = mockk<OppgaveClient>()
-        every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithType(BEHANDLINGSTYPE_FEILUTBETALING)
-
-        val oppgaveService = OppgaveService(
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            oppgaveClient,
-            mockk()
-        )
-
+        val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_FEILUTBETALING)
         assertThat(oppgaveService.getOppgaver().first().type).isEqualTo(TYPE_FEILUTBETALING)
     }
 
     @Test
     fun `unknown type`() {
-        val oppgaveClient = mockk<OppgaveClient>()
-        every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithType("somethingelse")
-
-        val oppgaveService = OppgaveService(
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            oppgaveClient,
-            mockk()
-        )
-
+        val oppgaveService = oppgaveServiceWithType("somethingelse")
         assertThat(oppgaveService.getOppgaver().first().type).isEqualTo("mangler")
     }
 
     @Test
     fun `hjemmel is set correctly`() {
-        val oppgaveClient = mockk<OppgaveClient>()
         val hjemmel = "8-1"
+        val oppgaveService = oppgaveServiceWithHjemmel(hjemmel)
+        assertThat(oppgaveService.getOppgaver().first().hjemmel.first()).isEqualTo(hjemmel)
+    }
+
+    @Test
+    fun `missing hjemmel does not fail`() {
+        val oppgaveService = oppgaveServiceWithType("something")
+        assertThat(oppgaveService.getOppgaver().first().hjemmel.first()).isEqualTo("mangler")
+    }
+
+    private fun oppgaveServiceWithHjemmel(hjemmel: String): OppgaveService {
+        val oppgaveClient = mockk<OppgaveClient>()
         every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithHjemmel(hjemmel)
 
         val oppgaveService = OppgaveService(
@@ -81,16 +59,14 @@ internal class OppgaveServiceTest {
             oppgaveClient,
             mockk()
         )
-
-        assertThat(oppgaveService.getOppgaver().first().hjemmel.first()).isEqualTo(hjemmel)
+        return oppgaveService
     }
 
-    @Test
-    fun `missing hjemmel does not fail`() {
+    private fun oppgaveServiceWithType(type: String): OppgaveService {
         val oppgaveClient = mockk<OppgaveClient>()
-        every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithType("something")
+        every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithType(type)
 
-        val oppgaveService = OppgaveService(
+        return OppgaveService(
             mockk(),
             mockk(),
             mockk(),
@@ -98,8 +74,6 @@ internal class OppgaveServiceTest {
             oppgaveClient,
             mockk()
         )
-
-        assertThat(oppgaveService.getOppgaver().first().hjemmel.first()).isEqualTo("mangler")
     }
 
     private fun getOppgaveResponseWithType(type: String) = OppgaveResponse(
