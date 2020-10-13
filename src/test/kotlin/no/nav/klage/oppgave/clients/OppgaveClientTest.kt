@@ -4,7 +4,7 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.klage.oppgave.domain.OppgaveResponse
+import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach

@@ -2,6 +2,10 @@ package no.nav.klage.oppgave.domain.view
 
 import java.time.LocalDate
 
+const val HJEMMEL = "HJEMMEL"
+const val TYPE_KLAGE = "klage"
+const val TYPE_FEILUTBETALING = "feilutbetaling"
+
 data class OppgaveView(
     val id: Int,
     val bruker: Bruker,
