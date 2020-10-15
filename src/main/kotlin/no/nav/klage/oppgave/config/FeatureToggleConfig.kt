@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.config
 
-import no.finn.unleash.*
+import no.finn.unleash.DefaultUnleash
+import no.finn.unleash.FakeUnleash
+import no.finn.unleash.Unleash
 import no.finn.unleash.strategy.UserWithIdStrategy
 import no.finn.unleash.util.UnleashConfig
 import no.nav.klage.oppgave.service.unleash.ByProfileStrategy
@@ -23,16 +25,13 @@ class FeatureToggleConfig {
 
     @Bean
     @Profile("dev-gcp", "prod-gcp")
-    fun unleash(
-        byIdentStrategy: UserWithIdStrategy,
-        byProfileStrategy: ByProfileStrategy
-    ): Unleash? {
+    fun unleash(byProfileStrategy: ByProfileStrategy): Unleash? {
         val unleashConfig = UnleashConfig.builder()
             .appName(appName)
             .instanceId(instance)
             .unleashAPI(unleashUrl)
             .build()
-        return DefaultUnleash(unleashConfig, byProfileStrategy, byIdentStrategy)
+        return DefaultUnleash(unleashConfig, byProfileStrategy, UserWithIdStrategy())
     }
 
     @Bean
@@ -42,7 +41,4 @@ class FeatureToggleConfig {
         fakeUnleash.enableAll()
         return fakeUnleash
     }
-
-    @Bean
-    fun userWithIdStrategy(): UserWithIdStrategy = UserWithIdStrategy()
 }
