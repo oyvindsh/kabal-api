@@ -40,9 +40,11 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
         identerNotInCache.removeAll(saksbehandlerNameCache.keys)
         logger.debug("Fetching identer not in cache: {}", identerNotInCache)
 
-        identerNotInCache.map {
-            it to getDisplayName(it, accessToken)
-        }.toMap()
+        saksbehandlerNameCache.putAll(
+            identerNotInCache.map {
+                it to getDisplayName(it, accessToken)
+            }.toMap()
+        )
 
         return saksbehandlerNameCache
     }
