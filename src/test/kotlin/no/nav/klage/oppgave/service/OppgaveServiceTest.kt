@@ -9,6 +9,8 @@ import no.nav.klage.oppgave.domain.pdl.*
 import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
+import no.nav.security.token.support.client.core.ClientProperties
+import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -55,11 +57,15 @@ internal class OppgaveServiceTest {
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(listOf(fnr)) } returns getHentPersonResponse()
 
+        val clientConfigurationPropertiesMock = mockk<ClientConfigurationProperties>()
+        val clientPropertiesMock = mockk<ClientProperties>()
+        every { clientConfigurationPropertiesMock.registration[any()] } returns clientPropertiesMock
+
         val oppgaveService = OppgaveService(
+            clientConfigurationPropertiesMock,
+            mockk(relaxed = true),
             mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
+            mockk(relaxed = true),
             oppgaveClient,
             pdlClientMock
         )
@@ -98,11 +104,15 @@ internal class OppgaveServiceTest {
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
 
+        val clientConfigurationPropertiesMock = mockk<ClientConfigurationProperties>()
+        val clientPropertiesMock = mockk<ClientProperties>()
+        every { clientConfigurationPropertiesMock.registration[any()] } returns clientPropertiesMock
+
         val oppgaveService = OppgaveService(
+            clientConfigurationPropertiesMock,
+            mockk(relaxed = true),
             mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
+            mockk(relaxed = true),
             oppgaveClientMock,
             pdlClientMock
         )
@@ -116,11 +126,15 @@ internal class OppgaveServiceTest {
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
 
+        val clientConfigurationPropertiesMock = mockk<ClientConfigurationProperties>()
+        val clientPropertiesMock = mockk<ClientProperties>()
+        every { clientConfigurationPropertiesMock.registration[any()] } returns clientPropertiesMock
+
         return OppgaveService(
+            clientConfigurationPropertiesMock,
+            mockk(relaxed = true),
             mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
+            mockk(relaxed = true),
             oppgaveClientMock,
             pdlClientMock
         )

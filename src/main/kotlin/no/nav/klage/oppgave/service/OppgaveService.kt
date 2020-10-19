@@ -60,15 +60,17 @@ class OppgaveService(
     private fun OppgaveResponse.toView(): List<OppgaveView> {
 
         val brukere = getBrukere(getFnr(this.oppgaver))
+        val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(oppgaver))
 
         return oppgaver.map {
-            toView(it, brukere)
+            toView(it, brukere, saksbehandlere)
         }
     }
 
     private fun toView(
         it: Oppgave,
-        brukere: Map<String, Bruker>
+        brukere: Map<String, Bruker>,
+        saksbehandlere: Map<String, OppgaveView.Saksbehandler>
     ): OppgaveView {
         return OppgaveView(
             id = it.id,
@@ -77,14 +79,32 @@ class OppgaveService(
             ytelse = it.tema,
             hjemmel = it.metadata.toHjemmel(),
             frist = it.fristFerdigstillelse,
-            saksbehandler = "todo"
+            saksbehandler = saksbehandlere[it.tilordnetRessurs]
         )
+    }
+
+    private fun getSaksbehandlere(identer: Set<String>): Map<String, OppgaveView.Saksbehandler> {
+        logger.debug("Getting names for saksbehandlere")
+        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, getTokenWithGraphScope())
+        return namesForSaksbehandlere.map {
+            it.key to OppgaveView.Saksbehandler(
+                ident = it.key,
+                navn = it.value
+            )
+        }.toMap().also {
+            logger.debug("Names returned: {}", it)
+        }
     }
 
     private fun getFnr(oppgaver: List<Oppgave>) =
         oppgaver.mapNotNull {
             it.getFnrForBruker()
         }
+
+    private fun getSaksbehandlerIdenter(oppgaver: List<Oppgave>) =
+        oppgaver.mapNotNull {
+            it.tilordnetRessurs
+        }.toSet()
 
     private fun getBrukere(fnrList: List<String>): Map<String, Bruker> {
         val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk
