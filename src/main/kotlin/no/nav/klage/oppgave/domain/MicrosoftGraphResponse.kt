@@ -1,3 +1,5 @@
 package no.nav.klage.oppgave.domain
 
-data class MicrosoftGraphResponse(val onPremisesSamAccountName: String)
+data class MicrosoftGraphIdentResponse(val onPremisesSamAccountName: String)
+
+data class MicrosoftGraphNameResponse(val displayName: String)
