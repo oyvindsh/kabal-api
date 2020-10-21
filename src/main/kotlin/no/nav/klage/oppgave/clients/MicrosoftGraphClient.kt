@@ -37,28 +37,33 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph. Identer: {}", identer)
 
         val identerNotInCache = identer.toMutableSet()
-        identerNotInCache.removeAll(saksbehandlerNameCache.keys)
+        identerNotInCache -= saksbehandlerNameCache.keys
         logger.debug("Fetching identer not in cache: {}", identerNotInCache)
 
-        saksbehandlerNameCache.putAll(
+        saksbehandlerNameCache +=
             identerNotInCache.map {
                 it to getDisplayName(it, accessToken)
             }.toMap()
-        )
 
         return saksbehandlerNameCache
     }
 
     private fun getDisplayName(ident: String, accessToken: String): String {
-        return microsoftGraphWebClient.get()
-            .uri { uriBuilder ->
-                uriBuilder
-                    .path("/users/{ident}")
-                    .queryParam("\$select", "displayName")
-                    .build(ident)
-            }.header("Authorization", "Bearer $accessToken")
-            .retrieve()
-            .bodyToMono<MicrosoftGraphNameResponse>()
-            .block()?.displayName ?: "mangler"
+        return try {
+            microsoftGraphWebClient.get()
+                .uri { uriBuilder ->
+                    uriBuilder
+                        .path("/users")
+                        .queryParam("\$filter", "mailnickname eq '$ident'")
+                        .queryParam("\$select", "displayName")
+                        .build()
+                }.header("Authorization", "Bearer $accessToken")
+                .retrieve()
+                .bodyToMono<MicrosoftGraphNameResponse>()
+                .block()?.displayName ?: "mangler"
+        } catch (e: Exception) {
+            logger.warn("Could not fetch displayname for ident $ident", e)
+            "mangler grunnet exception"
+        }
     }
 }
