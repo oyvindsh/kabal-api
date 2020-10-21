@@ -61,6 +61,12 @@ class OppgaveService(
         return response.accessToken
     }
 
+    private fun getAppTokenWithGraphScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["app"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     private fun OppgaveResponse.toView(): List<OppgaveView> {
 
         val brukere = getBrukere(getFnr(this.oppgaver))
@@ -89,7 +95,7 @@ class OppgaveService(
 
     private fun getSaksbehandlere(identer: Set<String>): Map<String, OppgaveView.Saksbehandler> {
         logger.debug("Getting names for saksbehandlere")
-        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, stsClient.oidcToken())
+        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
         return namesForSaksbehandlere.map {
             it.key to OppgaveView.Saksbehandler(
                 ident = it.key,
