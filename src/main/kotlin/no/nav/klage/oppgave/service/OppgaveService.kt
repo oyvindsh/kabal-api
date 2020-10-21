@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.clients.AxsysClient
-import no.nav.klage.oppgave.clients.MicrosoftGraphClient
-import no.nav.klage.oppgave.clients.OppgaveClient
-import no.nav.klage.oppgave.clients.PdlClient
+import no.nav.klage.oppgave.clients.*
 import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
 import no.nav.klage.oppgave.domain.gosys.Oppgave
@@ -27,7 +24,8 @@ class OppgaveService(
     val axsysClient: AxsysClient,
     val microsoftGraphClient: MicrosoftGraphClient,
     val oppgaveClient: OppgaveClient,
-    val pdlClient: PdlClient
+    val pdlClient: PdlClient,
+    val stsClient: StsClient
 ) {
 
     companion object {
@@ -66,7 +64,7 @@ class OppgaveService(
 
     private fun getSaksbehandlere(identer: Set<String>): Map<String, OppgaveView.Saksbehandler> {
         logger.debug("Getting names for saksbehandlere")
-        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, getTokenWithGraphScope())
+        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, stsClient.oidcToken())
         return namesForSaksbehandlere.map {
             it.key to OppgaveView.Saksbehandler(
                 ident = it.key,
