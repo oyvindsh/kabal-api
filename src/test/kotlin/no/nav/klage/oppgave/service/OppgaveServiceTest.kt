@@ -67,8 +67,7 @@ internal class OppgaveServiceTest {
             mockk(),
             mockk(relaxed = true),
             oppgaveClient,
-            pdlClientMock,
-            mockk(relaxed = true)
+            pdlClientMock
         )
 
         assertThat(oppgaveService.getOppgaver().first().bruker.fnr).isEqualTo(fnr)
@@ -115,8 +114,7 @@ internal class OppgaveServiceTest {
             mockk(),
             mockk(relaxed = true),
             oppgaveClientMock,
-            pdlClientMock,
-            mockk(relaxed = true)
+            pdlClientMock
         )
         return oppgaveService
     }
@@ -138,8 +136,7 @@ internal class OppgaveServiceTest {
             mockk(),
             mockk(relaxed = true),
             oppgaveClientMock,
-            pdlClientMock,
-            mockk(relaxed = true)
+            pdlClientMock
         )
     }
 

@@ -4,11 +4,8 @@ import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
-import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
-import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
-import no.nav.klage.oppgave.domain.gosys.Oppgave
-import no.nav.klage.oppgave.domain.gosys.Oppgave.Gruppe.FOLKEREGISTERIDENT
-import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
+import no.nav.klage.oppgave.domain.gosys.*
+import no.nav.klage.oppgave.domain.gosys.Gruppe.FOLKEREGISTERIDENT
 import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.OppgaveView
@@ -30,8 +27,7 @@ class OppgaveService(
     val axsysClient: AxsysClient,
     val microsoftGraphClient: MicrosoftGraphClient,
     val oppgaveClient: OppgaveClient,
-    val pdlClient: PdlClient,
-    val stsClient: StsClient
+    val pdlClient: PdlClient
 ) {
 
     companion object {
@@ -149,14 +145,14 @@ class OppgaveService(
         }
         val brukere = getBrukere(getFnr(oppgaver))
         return oppgaver.map {
-            toView(it, brukere)
+            toView(it, brukere, emptyMap())
         }
     }
 
     fun setHjemmel(oppgaveId: Int, hjemmel: String): OppgaveView {
         val oppgave = oppgaveClient.endreHjemmel(oppgaveId, hjemmel)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
-        return toView(oppgave, brukere)
+        return toView(oppgave, brukere, emptyMap())
     }
 
     fun getOppgave(oppgaveId: Int): OppgaveView {
