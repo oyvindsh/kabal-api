@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.clients
 
 import no.nav.klage.oppgave.domain.MicrosoftGraphIdentResponse
-import no.nav.klage.oppgave.domain.MicrosoftGraphNameResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -59,8 +58,8 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
                         .build()
                 }.header("Authorization", "Bearer $accessToken")
                 .retrieve()
-                .bodyToMono<MicrosoftGraphNameResponse>()
-                .block()?.displayName ?: "mangler"
+                .bodyToMono<String>()
+                .block().also { logger.debug("getDisplayName returned {}", it) } ?: "mangler"
         } catch (e: Exception) {
             logger.warn("Could not fetch displayname for ident $ident", e)
             "mangler grunnet exception"
