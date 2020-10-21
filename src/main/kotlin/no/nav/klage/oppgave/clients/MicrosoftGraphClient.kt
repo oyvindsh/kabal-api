@@ -48,6 +48,8 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
     }
 
     private fun getDisplayName(ident: String, accessToken: String): String {
+        //TODO remove debug
+        logger.debug("token for debugging: {}", accessToken)
         return try {
             microsoftGraphWebClient.get()
                 .uri { uriBuilder ->
