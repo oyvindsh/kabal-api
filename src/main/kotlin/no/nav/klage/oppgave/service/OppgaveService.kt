@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.OppgaveView
 import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
+import no.nav.klage.oppgave.domain.view.OppgaveView.Saksbehandler
 import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
 import no.nav.klage.oppgave.util.getLogger
@@ -76,7 +77,7 @@ class OppgaveService(
     private fun toView(
         it: Oppgave,
         brukere: Map<String, Bruker>,
-        saksbehandlere: Map<String, OppgaveView.Saksbehandler>
+        saksbehandlere: Map<String, Saksbehandler>
     ): OppgaveView {
         return OppgaveView(
             id = it.id,
@@ -89,11 +90,11 @@ class OppgaveService(
         )
     }
 
-    private fun getSaksbehandlere(identer: Set<String>): Map<String, OppgaveView.Saksbehandler> {
+    private fun getSaksbehandlere(identer: Set<String>): Map<String, Saksbehandler> {
         logger.debug("Getting names for saksbehandlere")
         val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
         return namesForSaksbehandlere.map {
-            it.key to OppgaveView.Saksbehandler(
+            it.key to Saksbehandler(
                 ident = it.key,
                 navn = it.value
             )
