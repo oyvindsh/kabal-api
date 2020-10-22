@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.OppgaveView
 import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
+import no.nav.klage.oppgave.domain.view.OppgaveView.Saksbehandler
 import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
 import no.nav.klage.oppgave.util.getLogger
@@ -57,18 +58,26 @@ class OppgaveService(
         return response.accessToken
     }
 
+    private fun getAppTokenWithGraphScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["app"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     private fun OppgaveResponse.toView(): List<OppgaveView> {
 
         val brukere = getBrukere(getFnr(this.oppgaver))
+        val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(oppgaver))
 
         return oppgaver.map {
-            toView(it, brukere)
+            toView(it, brukere, saksbehandlere)
         }
     }
 
     private fun toView(
         it: Oppgave,
-        brukere: Map<String, Bruker>
+        brukere: Map<String, Bruker>,
+        saksbehandlere: Map<String, Saksbehandler>
     ): OppgaveView {
         return OppgaveView(
             id = it.id,
@@ -77,14 +86,30 @@ class OppgaveService(
             ytelse = it.tema,
             hjemmel = it.metadata.toHjemmel(),
             frist = it.fristFerdigstillelse,
-            saksbehandler = "todo"
+            saksbehandler = saksbehandlere[it.tilordnetRessurs]
         )
+    }
+
+    private fun getSaksbehandlere(identer: Set<String>): Map<String, Saksbehandler> {
+        logger.debug("Getting names for saksbehandlere")
+        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
+        return namesForSaksbehandlere.map {
+            it.key to Saksbehandler(
+                ident = it.key,
+                navn = it.value
+            )
+        }.toMap()
     }
 
     private fun getFnr(oppgaver: List<Oppgave>) =
         oppgaver.mapNotNull {
             it.getFnrForBruker()
         }
+
+    private fun getSaksbehandlerIdenter(oppgaver: List<Oppgave>) =
+        oppgaver.mapNotNull {
+            it.tilordnetRessurs
+        }.toSet()
 
     private fun getBrukere(fnrList: List<String>): Map<String, Bruker> {
         val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk
@@ -119,14 +144,14 @@ class OppgaveService(
         }
         val brukere = getBrukere(getFnr(oppgaver))
         return oppgaver.map {
-            toView(it, brukere)
+            toView(it, brukere, emptyMap())
         }
     }
 
     fun setHjemmel(oppgaveId: Int, hjemmel: String): OppgaveView {
         val oppgave = oppgaveClient.endreHjemmel(oppgaveId, hjemmel)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
-        return toView(oppgave, brukere)
+        return toView(oppgave, brukere, emptyMap())
     }
 
     fun getOppgave(oppgaveId: Int): OppgaveView {
