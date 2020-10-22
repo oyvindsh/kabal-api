@@ -98,7 +98,7 @@ data class EndreOppgave(
     val mappeId: Long? = null,
     val prioritet: Prioritet? = null,
     val status: Status? = null,
-    var metadata: MutableMap<String, String>?,
+    var metadata: MutableMap<String, String>? = null,
     val fristFerdigstillelse: LocalDate?,
     val aktivDato: String? = null
 )
