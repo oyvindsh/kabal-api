@@ -16,6 +16,8 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
         private val logger = getLogger(javaClass.enclosingClass)
 
         val saksbehandlerNameCache = mutableMapOf<String, String>()
+
+        const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
 
     fun getNavIdent(accessToken: String): String {
@@ -35,16 +37,14 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
     }
 
     fun getNamesForSaksbehandlere(identer: Set<String>, accessToken: String): Map<String, String> {
-        logger.debug("Fetching names for saksbehandlere from Microsoft Graph. Identer: {}", identer)
-
-        //TODO remove
-        logger.debug("accessToken for fetching names: {}", accessToken)
+        logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
 
         val identerNotInCache = identer.toMutableSet()
         identerNotInCache -= saksbehandlerNameCache.keys
-        logger.debug("Fetching identer not in cache: {}", identerNotInCache)
+        logger.debug("Only fetching identer not in cache: {}", identerNotInCache)
 
-        val chunkedList = identerNotInCache.chunked(15)
+        val chunkedList = identerNotInCache.chunked(MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY)
+
         val measuredTimeMillis = measureTimeMillis {
             chunkedList.forEach {
                 saksbehandlerNameCache += getDisplayNames(it, accessToken)
@@ -70,7 +70,7 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
                 }.header("Authorization", "Bearer $accessToken")
                 .retrieve()
                 .bodyToMono<MicrosoftGraphNameResponse>()
-                .block().also { logger.debug("getDisplayName returned {}", it) }
+                .block()
 
             response?.value?.mapNotNull {
                 if (it.onPremisesSamAccountName == null || it.displayName == null) {

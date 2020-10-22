@@ -98,9 +98,7 @@ class OppgaveService(
                 ident = it.key,
                 navn = it.value
             )
-        }.toMap().also {
-            logger.debug("Names returned: {}", it)
-        }
+        }.toMap()
     }
 
     private fun getFnr(oppgaver: List<Oppgave>) =
