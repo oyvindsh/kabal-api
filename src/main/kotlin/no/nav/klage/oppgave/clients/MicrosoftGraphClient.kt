@@ -44,15 +44,18 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
         identerNotInCache -= saksbehandlerNameCache.keys
         logger.debug("Fetching identer not in cache: {}", identerNotInCache)
 
+        val chunkedList = identerNotInCache.chunked(15)
         val measuredTimeMillis = measureTimeMillis {
-            saksbehandlerNameCache += getDisplayNames(identerNotInCache, accessToken)
+            chunkedList.forEach {
+                saksbehandlerNameCache += getDisplayNames(it, accessToken)
+            }
         }
-        logger.debug("It took {} millis to fetch names", measuredTimeMillis)
+        logger.debug("It took {} millis to fetch all names", measuredTimeMillis)
 
         return saksbehandlerNameCache
     }
 
-    private fun getDisplayNames(idents: Set<String>, accessToken: String): Map<String, String> {
+    private fun getDisplayNames(idents: List<String>, accessToken: String): Map<String, String> {
         return try {
             val response = microsoftGraphWebClient.get()
                 .uri { uriBuilder ->
