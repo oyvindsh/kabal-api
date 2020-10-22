@@ -42,11 +42,7 @@ class OppgaveService(
 
     fun searchOppgaver(oppgaveSearchCriteria: OppgaveSearchCriteria): List<OppgaveView> {
         return oppgaveClient.searchOppgaver(oppgaveSearchCriteria).toView()
-            .filter { containsCorrectHjemmel(it.hjemmel, oppgaveSearchCriteria.hjemmel) }
-    }
-
-    private fun containsCorrectHjemmel(actualHjemler: List<String>, expectedHjemmel: String?): Boolean {
-        return expectedHjemmel?.let { actualHjemler.contains(it) } ?: true
+            .filter { it.hjemmel == oppgaveSearchCriteria.hjemmel }
     }
 
     fun getTilgangerForSaksbehandler() =
@@ -124,7 +120,7 @@ class OppgaveService(
 
     private fun Navn.toName() = "$fornavn $etternavn"
 
-    private fun Map<String, String>?.toHjemmel() = listOf(this?.get(HJEMMEL) ?: "mangler")
+    private fun Map<String, String>?.toHjemmel() = this?.get(HJEMMEL) ?: "mangler"
 
     private fun Oppgave.toType(): String {
         return if (behandlingstema == null) {
@@ -139,9 +135,12 @@ class OppgaveService(
     private fun Oppgave.getFnrForBruker() = identer?.find { i -> i.gruppe == FOLKEREGISTERIDENT }?.ident
 
     fun assignRandomHjemler(): List<OppgaveView> {
-        val oppgaver = getOppgaver().map {
-            oppgaveClient.endreHjemmel(it.id, hjemler.random())
-        }
+        val oppgaver = oppgaveClient.getOppgaver().oppgaver
+            .map { it.toEndreOppgave() }
+            .map {
+                it.setHjemmel(hjemler.random())
+                oppgaveClient.putOppgave(it.id, it)
+            }
         val brukere = getBrukere(getFnr(oppgaver))
         return oppgaver.map {
             toView(it, brukere, emptyMap())
@@ -149,17 +148,40 @@ class OppgaveService(
     }
 
     fun setHjemmel(oppgaveId: Int, hjemmel: String): OppgaveView {
-        val oppgave = oppgaveClient.endreHjemmel(oppgaveId, hjemmel)
+        var oppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
+        oppgave.setHjemmel(hjemmel)
+        return updateAndReturn(oppgaveId, oppgave)
+    }
+
+    private fun EndreOppgave.setHjemmel(hjemmel: String) {
+        if (metadata == null) {
+            metadata = mutableMapOf()
+        }
+        logger.info("Endrer hjemmel for oppgave {} fra {} til {}", id, metadata?.get(HJEMMEL), hjemmel)
+        metadata!![HJEMMEL] = hjemmel
+    }
+
+    fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?): OppgaveView {
+        var oppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
+        logger.info("Endrer tilordnetRessurs for oppgave {} fra {} til {}", oppgave.id, oppgave.tilordnetRessurs, saksbehandlerIdent)
+        oppgave.tilordnetRessurs = saksbehandlerIdent
+
+        return updateAndReturn(oppgaveId, oppgave)
+    }
+
+    fun getOppgave(oppgaveId: Int): OppgaveView {
+        val oppgave = oppgaveClient.getOppgave(oppgaveId)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
         return toView(oppgave, brukere, emptyMap())
     }
 
-    fun getOppgave(oppgaveId: Int): OppgaveView {
-        //TODO: Må implementeres bedre enn dette.. :)
-        return getOppgaver().firstOrNull { it.id == oppgaveId } ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Oppgave ikke funnet"
-        )
+    private fun updateAndReturn(
+        oppgaveId: Int,
+        oppgave: EndreOppgave
+    ): OppgaveView {
+        val endretOppgave = oppgaveClient.putOppgave(oppgaveId, oppgave)
+        val brukere = getBrukere(getFnr(listOf(endretOppgave)))
+        return toView(endretOppgave, brukere, emptyMap())
     }
 }
 

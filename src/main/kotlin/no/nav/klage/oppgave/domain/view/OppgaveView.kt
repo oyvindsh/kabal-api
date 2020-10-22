@@ -11,7 +11,7 @@ data class OppgaveView(
     val bruker: Bruker,
     val type: String,
     val ytelse: String,
-    val hjemmel: List<String>,
+    val hjemmel: String,
     val frist: LocalDate?,
     val saksbehandler: Saksbehandler? = null
 ) {

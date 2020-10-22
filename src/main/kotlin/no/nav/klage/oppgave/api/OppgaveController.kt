@@ -59,6 +59,16 @@ class OppgaveController(val oppgaveService: OppgaveService) {
         return ResponseEntity.ok().location(uri).body(oppgave)
     }
 
+    @PutMapping("/oppgaver/{id}/saksbehandler")
+    fun setAssignedSaksbehandler(@PathVariable("id") oppgaveId: Int, @RequestBody ident: String): ResponseEntity<OppgaveView> {
+        logger.debug("setAssignedSaksbehandler is requested")
+        val oppgave = oppgaveService.assignOppgave(oppgaveId, ident)
+        val uri = MvcUriComponentsBuilder
+            .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
+            .buildAndExpand(oppgaveId).toUri()
+        return ResponseEntity.ok().location(uri).body(oppgave)
+    }
+
     @GetMapping("/oppgaver/randomhjemler")
     fun endreHjemlerAtRandomViolatingGetRpcStyleAndTotallyNotRestish(): List<OppgaveView> {
         logger.debug("endreHjemlerAtRandomViolatingGetRpcStyleAndTotallyNotRestish is requested")

@@ -43,8 +43,38 @@ data class Oppgave(
     val opprettetTidspunkt: String? = null,
     val ferdigstiltTidspunkt: String? = null,
     val endretTidspunkt: String? = null
-)
+) {
+    fun toEndreOppgave() = EndreOppgave(
+        id = id,
+        tildeltEnhetsnr = tildeltEnhetsnr,
+        endretAvEnhetsnr = endretAvEnhetsnr,
+        journalpostId = journalpostId,
+        journalpostkilde = journalpostkilde,
+        behandlesAvApplikasjon = behandlesAvApplikasjon,
+        saksreferanse = saksreferanse,
+        bnr = bnr,
+        samhandlernr = samhandlernr,
+        aktoerId = aktoerId,
+        orgnr = orgnr,
+        tilordnetRessurs = tilordnetRessurs,
+        beskrivelse = beskrivelse,
+        temagruppe = temagruppe,
+        tema = tema,
+        behandlingstema = behandlingstema,
+        oppgavetype = oppgavetype,
+        behandlingstype = behandlingstype,
+        versjon = versjon,
+        mappeId = mappeId,
+        prioritet = prioritet,
+        status = status,
+        metadata = metadata?.toMutableMap(),
+        fristFerdigstillelse = fristFerdigstillelse,
+        aktivDato = aktivDato
+    )
 
+}
+
+// De feltene som skal kunne endres må gjøres mutable/defineres som var isf val
 data class EndreOppgave(
     val id: Int,
     val tildeltEnhetsnr: String? = null,
@@ -57,7 +87,7 @@ data class EndreOppgave(
     val samhandlernr: String? = null,
     val aktoerId: String? = null,
     val orgnr: String? = null,
-    val tilordnetRessurs: String? = null,
+    var tilordnetRessurs: String? = null,
     val beskrivelse: String? = null,
     val temagruppe: String? = null,
     val tema: String,
@@ -68,7 +98,7 @@ data class EndreOppgave(
     val mappeId: Long? = null,
     val prioritet: Prioritet? = null,
     val status: Status? = null,
-    var metadata: MutableMap<String, String>? = null,
+    var metadata: MutableMap<String, String>?,
     val fristFerdigstillelse: LocalDate?,
     val aktivDato: String? = null
 )
