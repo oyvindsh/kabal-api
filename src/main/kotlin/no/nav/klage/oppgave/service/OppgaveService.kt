@@ -162,7 +162,7 @@ class OppgaveService(
     }
 
     fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?): OppgaveView {
-        var oppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
+        val oppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
         logger.info("Endrer tilordnetRessurs for oppgave {} fra {} til {}", oppgave.id, oppgave.tilordnetRessurs, saksbehandlerIdent)
         oppgave.tilordnetRessurs = saksbehandlerIdent
 
