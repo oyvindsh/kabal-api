@@ -58,7 +58,10 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
                 .uri { uriBuilder ->
                     uriBuilder
                         .path("/users")
-                        .queryParam("\$filter", "mailnickname in '${idents.joinToString()}'")
+                        .queryParam(
+                            "\$filter",
+                            "mailnickname in ${idents.joinToString(separator = "','", prefix = "('", postfix = "')")}"
+                        )
                         .queryParam("\$select", "onPremisesSamAccountName,displayName")
                         .build()
                 }.header("Authorization", "Bearer $accessToken")
