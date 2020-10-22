@@ -80,7 +80,7 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
                 }
             }?.toMap() ?: emptyMap()
         } catch (e: Exception) {
-            logger.warn("Could not fetch displayname for idents $idents", e)
+            logger.warn("Could not fetch displayname for idents: $idents", e)
             emptyMap()
         }
     }
