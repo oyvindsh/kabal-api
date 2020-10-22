@@ -126,7 +126,7 @@ class OppgaveClient(
     fun endreHjemmel(oppgaveId: Int, hjemmel: String): Oppgave {
         var oppgave = oppgaveWebClient.get()
             .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}}").build(oppgaveId)
+                uriBuilder.pathSegment("{id}").build(oppgaveId)
             }
             .header("Authorization", "Bearer ${stsClient.oidcToken()}")
             .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
@@ -142,7 +142,7 @@ class OppgaveClient(
 
         return oppgaveWebClient.put()
             .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}}").build(oppgaveId)
+                uriBuilder.pathSegment("{id}").build(oppgaveId)
             }
             .contentType(MediaType.APPLICATION_JSON)
             .header("Authorization", "Bearer ${stsClient.oidcToken()}")
