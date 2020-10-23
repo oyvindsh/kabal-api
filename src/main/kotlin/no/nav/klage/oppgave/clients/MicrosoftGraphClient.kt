@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.clients
 import no.nav.klage.oppgave.domain.MicrosoftGraphIdentResponse
 import no.nav.klage.oppgave.domain.MicrosoftGraphNameResponse
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -20,6 +21,7 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
         const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
 
+    @Retryable
     fun getNavIdent(accessToken: String): String {
         logger.debug("Fetching navIdent from Microsoft Graph")
 
@@ -36,6 +38,7 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
             .block()?.onPremisesSamAccountName ?: throw RuntimeException("NavIdent could not be fetched")
     }
 
+    @Retryable
     fun getNamesForSaksbehandlere(identer: Set<String>, accessToken: String): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
 

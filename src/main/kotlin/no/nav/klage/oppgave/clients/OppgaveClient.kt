@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
@@ -33,6 +34,7 @@ class OppgaveClient(
 
     }
 
+    @Retryable
     fun getOppgaver(): OppgaveResponse {
         logger.debug("Fetching oppgaver")
 
@@ -84,6 +86,7 @@ class OppgaveClient(
             .block() ?: throw RuntimeException("Oppgaver could not be fetched")
     }
 
+    @Retryable
     fun searchOppgaver(oppgaveSearchCriteria: OppgaveSearchCriteria): OppgaveResponse {
         logger.debug("Searching for oppgaver")
 
@@ -124,6 +127,7 @@ class OppgaveClient(
         return TEMA_SYK
     }
 
+    @Retryable
     fun putOppgave(
         oppgaveId: Int,
         oppgave: EndreOppgave
@@ -142,6 +146,7 @@ class OppgaveClient(
             .block() ?: throw RuntimeException("Oppgave could not be put")
     }
 
+    @Retryable
     fun getOppgave(oppgaveId: Int): Oppgave {
         return oppgaveWebClient.get()
             .uri { uriBuilder ->

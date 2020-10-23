@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients
 
 import no.nav.klage.oppgave.domain.OidcToken
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -15,6 +16,7 @@ class StsClient(private val stsWebClient: WebClient) {
         private var cachedOidcToken: OidcToken? = null
     }
 
+    @Retryable
     fun oidcToken(): String {
         if (cachedOidcToken.shouldBeRenewed()) {
             logger.debug("Getting token from STS")
