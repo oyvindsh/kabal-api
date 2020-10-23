@@ -25,7 +25,7 @@ class MicrosoftGraphClientConfiguration(
     fun microsoftGraphWebClient(): WebClient {
         return webClientBuilder
             .baseUrl(microsoftGraphServiceURL)
-            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .build()
     }
 }

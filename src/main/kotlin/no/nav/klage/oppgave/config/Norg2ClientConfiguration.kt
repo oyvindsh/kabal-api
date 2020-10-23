@@ -21,6 +21,6 @@ class Norg2ClientConfiguration(private val webClientBuilder: WebClient.Builder) 
         webClientBuilder
             .baseUrl(url)
             .defaultHeader("x-nav-apiKey", apiKey)
-            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .build()
 }

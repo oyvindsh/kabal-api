@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.body
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -135,7 +136,7 @@ class OppgaveClient(
             .header("Authorization", "Bearer ${stsClient.oidcToken()}")
             .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
-            .body(Mono.just(oppgave))
+            .bodyValue(oppgave)
             .retrieve()
             .bodyToMono<Oppgave>()
             .block() ?: throw RuntimeException("Oppgave could not be put")

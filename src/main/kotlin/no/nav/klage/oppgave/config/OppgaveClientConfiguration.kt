@@ -27,7 +27,7 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
         return webClientBuilder
             .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(oppgaveServiceURL)
-            .clientConnector(ReactorClientHttpConnector(newConnection().compress(true)))
+            .clientConnector(ReactorClientHttpConnector(newConnection()))
             .build()
     }
 }

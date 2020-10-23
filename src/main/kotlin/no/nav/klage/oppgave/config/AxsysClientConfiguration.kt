@@ -29,7 +29,7 @@ class AxsysClientConfiguration(
         return webClientBuilder
             .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(axsysServiceURL)
-            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .build()
     }
 }

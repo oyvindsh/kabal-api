@@ -34,7 +34,7 @@ class StsClientConfiguration(private val webClientBuilder: WebClient.Builder) {
     fun stsWebClient(): WebClient {
         return webClientBuilder
             .baseUrl("$stsUrl/rest/v1/sts/token")
-            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic ${credentials()}")
             .defaultHeader("x-nav-apiKey", apiKey)
             .build()

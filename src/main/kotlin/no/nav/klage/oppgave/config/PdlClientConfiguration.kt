@@ -25,7 +25,7 @@ class PdlClientConfiguration(private val webClientBuilder: WebClient.Builder) {
     fun pdlWebClient(): WebClient {
         return webClientBuilder
             .baseUrl(pdlUrl)
-            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection().compress(true)))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("Nav-Consumer-Id", username)
