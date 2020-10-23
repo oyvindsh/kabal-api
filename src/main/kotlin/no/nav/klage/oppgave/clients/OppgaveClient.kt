@@ -123,23 +123,10 @@ class OppgaveClient(
         return TEMA_SYK
     }
 
-    fun endreHjemmel(oppgaveId: Int, hjemmel: String): Oppgave {
-        var oppgave = oppgaveWebClient.get()
-            .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}").build(oppgaveId)
-            }
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .retrieve()
-            .bodyToMono<EndreOppgave>()
-            .block() ?: throw RuntimeException("Oppgave could not be fetched")
-        logger.info("Endrer hjemmel for oppgave {} fra {} til {}", oppgave.id, oppgave.metadata?.get(HJEMMEL), hjemmel)
-        if (oppgave.metadata == null) {
-            oppgave.metadata = mutableMapOf()
-        }
-        oppgave.metadata!![HJEMMEL] = hjemmel
-
+    fun putOppgave(
+        oppgaveId: Int,
+        oppgave: EndreOppgave
+    ): Oppgave {
         return oppgaveWebClient.put()
             .uri { uriBuilder ->
                 uriBuilder.pathSegment("{id}").build(oppgaveId)
@@ -152,6 +139,19 @@ class OppgaveClient(
             .retrieve()
             .bodyToMono<Oppgave>()
             .block() ?: throw RuntimeException("Oppgave could not be put")
+    }
+
+    fun getOppgave(oppgaveId: Int): Oppgave {
+        return oppgaveWebClient.get()
+            .uri { uriBuilder ->
+                uriBuilder.pathSegment("{id}").build(oppgaveId)
+            }
+            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+            .header("Nav-Consumer-Id", applicationName)
+            .retrieve()
+            .bodyToMono<Oppgave>()
+            .block() ?: throw RuntimeException("Oppgave could not be fetched")
     }
 
 }

@@ -39,13 +39,13 @@ internal class OppgaveServiceTest {
     fun `hjemmel is set correctly`() {
         val hjemmel = "8-1"
         val oppgaveService = oppgaveServiceWithHjemmel(hjemmel)
-        assertThat(oppgaveService.getOppgaver().first().hjemmel.first()).isEqualTo(hjemmel)
+        assertThat(oppgaveService.getOppgaver().first().hjemmel).isEqualTo(hjemmel)
     }
 
     @Test
     fun `missing hjemmel does not fail`() {
         val oppgaveService = oppgaveServiceWithType("something")
-        assertThat(oppgaveService.getOppgaver().first().hjemmel.first()).isEqualTo("mangler")
+        assertThat(oppgaveService.getOppgaver().first().hjemmel).isEqualTo("mangler")
     }
 
     @Test
