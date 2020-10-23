@@ -8,6 +8,7 @@ val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
 val springSleuthVersion = "2.2.3.RELEASE"
 val unleashVersion = "3.3.3"
+val problemSpringWebStartVersion = "0.26.2"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -63,6 +64,7 @@ dependencies {
     implementation("no.nav.slackposter:simple-slack-poster:5")
 
     implementation("no.finn.unleash:unleash-client-java:$unleashVersion")
+    implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.h2database:h2:$h2Version")
