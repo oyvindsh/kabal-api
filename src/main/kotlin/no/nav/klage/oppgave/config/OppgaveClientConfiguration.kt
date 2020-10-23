@@ -4,7 +4,9 @@ import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.http.client.HttpClient.newConnection
 
 @Configuration
 class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder) {
@@ -25,6 +27,7 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
         return webClientBuilder
             .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(oppgaveServiceURL)
+            .clientConnector(ReactorClientHttpConnector(newConnection().compress(true)))
             .build()
     }
 }
