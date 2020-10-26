@@ -107,6 +107,11 @@ class OppgaveService(
             it.tilordnetRessurs
         }.toSet()
 
+    private fun getSaksbehandlerIdenterForEndring(oppgaver: List<EndreOppgave>) =
+        oppgaver.mapNotNull {
+            it.tilordnetRessurs
+        }.toSet()
+
     private fun getBrukere(fnrList: List<String>): Map<String, Bruker> {
         val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk
         return people?.map {
@@ -142,8 +147,10 @@ class OppgaveService(
                 oppgaveClient.putOppgave(it.id, it)
             }
         val brukere = getBrukere(getFnr(oppgaver))
+        val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(oppgaver))
+
         return oppgaver.map {
-            toView(it, brukere, emptyMap())
+            toView(it, brukere, saksbehandlere)
         }
     }
 
@@ -172,7 +179,8 @@ class OppgaveService(
     fun getOppgave(oppgaveId: Int): OppgaveView {
         val oppgave = oppgaveClient.getOppgave(oppgaveId)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
-        return toView(oppgave, brukere, emptyMap())
+        val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(listOf(oppgave)))
+        return toView(oppgave, brukere, saksbehandlere)
     }
 
     private fun updateAndReturn(
@@ -181,7 +189,8 @@ class OppgaveService(
     ): OppgaveView {
         val endretOppgave = oppgaveClient.putOppgave(oppgaveId, oppgave)
         val brukere = getBrukere(getFnr(listOf(endretOppgave)))
-        return toView(endretOppgave, brukere, emptyMap())
+        val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenterForEndring(listOf(oppgave)))
+        return toView(endretOppgave, brukere, saksbehandlere)
     }
 }
 
