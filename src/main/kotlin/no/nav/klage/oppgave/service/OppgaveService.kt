@@ -79,19 +79,32 @@ class OppgaveService(
     }
 
     private fun toView(
-        it: Oppgave,
+        oppgave: Oppgave,
         brukere: Map<String, Bruker>,
         saksbehandlere: Map<String, Saksbehandler>
     ): OppgaveView {
         return OppgaveView(
-            id = it.id,
-            bruker = brukere[it.getFnrForBruker()] ?: Bruker("Mangler fnr", "Mangler fnr"),
-            type = it.toType(),
-            ytelse = it.tema,
-            hjemmel = it.metadata.toHjemmel(),
-            frist = it.fristFerdigstillelse,
-            saksbehandler = saksbehandlere[it.tilordnetRessurs]
+            id = oppgave.id,
+            bruker = brukere[oppgave.getFnrForBruker()] ?: Bruker("Mangler fnr", "Mangler fnr"),
+            type = oppgave.toType(),
+            ytelse = oppgave.tema,
+            hjemmel = oppgave.metadata.toHjemmel(),
+            frist = oppgave.fristFerdigstillelse,
+            saksbehandler = getSaksbehandler(oppgave, saksbehandlere)
         )
+    }
+
+    private fun getSaksbehandler(oppgave: Oppgave, saksbehandlere: Map<String, Saksbehandler>): Saksbehandler? {
+        return when (oppgave.tilordnetRessurs) {
+            null -> null
+            else -> {
+                saksbehandlere[oppgave.tilordnetRessurs]
+                    ?: Saksbehandler(
+                        ident = oppgave.tilordnetRessurs,
+                        navn = "Navn mangler"
+                    )
+            }
+        }
     }
 
     private fun getSaksbehandlere(identer: Set<String>): Map<String, Saksbehandler> {
