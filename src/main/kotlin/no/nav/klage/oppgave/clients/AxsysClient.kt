@@ -4,6 +4,7 @@ import brave.Tracer
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -19,6 +20,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
     @Value("\${spring.application.name}")
     lateinit var applicationName: String
 
+    @Retryable
     fun getTilgangerForSaksbehandler(navIdent: String): Tilganger {
         logger.debug("Fetching tilganger for saksbehandler with Nav-Ident {}", navIdent)
 

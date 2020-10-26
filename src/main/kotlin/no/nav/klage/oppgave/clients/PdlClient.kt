@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.domain.pdl.HentPersonResponse
 import no.nav.klage.oppgave.domain.pdl.hentPersonQuery
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.http.HttpHeaders
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -16,6 +17,7 @@ class PdlClient(
     private val stsClient: StsClient
 ) {
 
+    @Retryable
     fun getPersonInfo(fnrList: List<String>): HentPersonResponse {
         return pdlWebClient.post()
             .header(

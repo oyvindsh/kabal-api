@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service.unleash
 
 import no.nav.klage.oppgave.clients.MicrosoftGraphClient
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Service
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service
 class TokenUtils(
     val clientConfigurationProperties: ClientConfigurationProperties,
     val oAuth2AccessTokenService: OAuth2AccessTokenService,
-    val microsoftGraphClient: MicrosoftGraphClient
+    val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
     private fun getTokenWithGraphScope(): String {
@@ -19,6 +20,6 @@ class TokenUtils(
     }
 
     fun getInnloggetIdent(): String {
-        return microsoftGraphClient.getNavIdent(getTokenWithGraphScope())
+        return saksbehandlerRepository.getNavIdent(getTokenWithGraphScope())
     }
 }

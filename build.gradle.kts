@@ -10,6 +10,8 @@ val springSleuthVersion = "2.2.3.RELEASE"
 val unleashVersion = "3.3.3"
 val problemSpringWebStartVersion = "0.26.2"
 
+val springRetryVersion = "1.3.0"
+
 val githubUser: String by project
 val githubPassword: String by project
 
@@ -62,7 +64,7 @@ dependencies {
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
 
     implementation("no.nav.slackposter:simple-slack-poster:5")
-
+    implementation("org.springframework.retry:spring-retry:$springRetryVersion")
     implementation("no.finn.unleash:unleash-client-java:$unleashVersion")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
 
