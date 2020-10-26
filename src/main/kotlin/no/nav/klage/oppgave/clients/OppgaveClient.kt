@@ -75,6 +75,7 @@ class OppgaveClient(
     }
 
     private fun OppgaveSearchCriteria.buildUri(origUriBuilder: UriBuilder, offset: Int): URI {
+        logger.debug("Searchcriteria: {}", this)
         var uriBuilder = origUriBuilder
             .queryParam("statuskategori", OppgaveClient.STATUSKATEGORI_AAPEN)
             .queryParam("limit", 100)
@@ -84,8 +85,9 @@ class OppgaveClient(
         this.ytelse?.let { uriBuilder = uriBuilder.queryParam("tema", mapYtelseTilTema(it)) }
         this.erTildeltSaksbehandler?.let { uriBuilder = uriBuilder.queryParam("tildeltRessurs", it) }
         this.saksbehandler?.let { uriBuilder = uriBuilder.queryParam("tilordnetRessurs", it) }
-
-        return uriBuilder.build()
+        val uri = uriBuilder.build()
+        logger.info("Making searchrequest with query {}", uri.query)
+        return uri
     }
 
     private fun mapType(type: String): String {

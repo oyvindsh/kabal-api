@@ -26,7 +26,7 @@ class OppgaveRepository(private val oppgaveClient: OppgaveClient) {
             val onePage = oppgaveClient.getOnePage(numberOfOppgaverRetrieved)
             allOppgaver += onePage.oppgaver
             numberOfOppgaverRetrieved += onePage.oppgaver.size
-            logger.debug("Retrieved {} of {} oppgaver", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)
+            logger.debug("Retrieved {} of {} oppgaver in get", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)
         } while (numberOfOppgaverRetrieved < onePage.antallTreffTotalt)
 
         return OppgaveResponse(numberOfOppgaverRetrieved, allOppgaver)
@@ -40,9 +40,10 @@ class OppgaveRepository(private val oppgaveClient: OppgaveClient) {
 
         do {
             val onePage = oppgaveClient.getOneSearchPage(oppgaveSearchCriteria, numberOfOppgaverRetrieved)
+            logger.debug("One page in search returned {} oppgaver with total {}", onePage.oppgaver.size, onePage.antallTreffTotalt)
             allOppgaver += onePage.oppgaver
             numberOfOppgaverRetrieved += onePage.oppgaver.size
-            logger.debug("Retrieved {} of {} oppgaver", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)
+            logger.debug("Retrieved {} of {} oppgaver in search", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)
         } while (numberOfOppgaverRetrieved < onePage.antallTreffTotalt)
 
         return OppgaveResponse(numberOfOppgaverRetrieved, allOppgaver)
