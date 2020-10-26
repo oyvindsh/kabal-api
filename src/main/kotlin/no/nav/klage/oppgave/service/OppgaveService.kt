@@ -40,7 +40,17 @@ class OppgaveService(
 
     fun searchOppgaver(oppgaveSearchCriteria: OppgaveSearchCriteria): List<OppgaveView> {
         return oppgaveRepository.searchOppgaver(oppgaveSearchCriteria).toView()
-            .filter { it.hjemmel == oppgaveSearchCriteria.hjemmel }
+            .filter {
+                filterOnHjemmel(it, oppgaveSearchCriteria.hjemmel)
+            }
+    }
+
+    private fun filterOnHjemmel(oppgave: OppgaveView, hjemmel: String?): Boolean {
+        return if (hjemmel != null) {
+            oppgave.hjemmel == hjemmel
+        } else {
+            true
+        }
     }
 
     fun getTilgangerForSaksbehandler() =
@@ -86,7 +96,8 @@ class OppgaveService(
 
     private fun getSaksbehandlere(identer: Set<String>): Map<String, Saksbehandler> {
         logger.debug("Getting names for saksbehandlere")
-        val namesForSaksbehandlere = saksbehandlerRepository.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
+        val namesForSaksbehandlere =
+            saksbehandlerRepository.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
         return namesForSaksbehandlere.map {
             it.key to Saksbehandler(
                 ident = it.key,
@@ -168,7 +179,12 @@ class OppgaveService(
 
     fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?): OppgaveView {
         val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
-        logger.info("Endrer tilordnetRessurs for oppgave {} fra {} til {}", oppgave.id, oppgave.tilordnetRessurs, saksbehandlerIdent)
+        logger.info(
+            "Endrer tilordnetRessurs for oppgave {} fra {} til {}",
+            oppgave.id,
+            oppgave.tilordnetRessurs,
+            saksbehandlerIdent
+        )
         oppgave.tilordnetRessurs = saksbehandlerIdent
 
         return updateAndReturn(oppgaveId, oppgave)
