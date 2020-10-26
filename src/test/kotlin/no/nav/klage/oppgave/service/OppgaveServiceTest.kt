@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.pdl.*
 import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
+import no.nav.klage.oppgave.repositories.OppgaveRepository
 import no.nav.security.token.support.client.core.ClientProperties
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.assertj.core.api.Assertions.assertThat
@@ -51,8 +52,8 @@ internal class OppgaveServiceTest {
     @Test
     fun `fnr is mapped correctly`() {
         val fnr = "12345678910"
-        val oppgaveClient = mockk<OppgaveClient>()
-        every { oppgaveClient.getOppgaver() } returns getOppgaveResponseWithIdenter(fnr)
+        val oppgaveRepository = mockk<OppgaveRepository>()
+        every { oppgaveRepository.getOppgaver() } returns getOppgaveResponseWithIdenter(fnr)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(listOf(fnr)) } returns getHentPersonResponse()
@@ -65,9 +66,9 @@ internal class OppgaveServiceTest {
             clientConfigurationPropertiesMock,
             mockk(relaxed = true),
             mockk(),
-            mockk(relaxed = true),
-            oppgaveClient,
-            pdlClientMock
+            oppgaveRepository,
+            pdlClientMock,
+            mockk(relaxed = true)
         )
 
         assertThat(oppgaveService.getOppgaver().first().bruker.fnr).isEqualTo(fnr)
@@ -98,8 +99,8 @@ internal class OppgaveServiceTest {
     }
 
     private fun oppgaveServiceWithHjemmel(hjemmel: String): OppgaveService {
-        val oppgaveClientMock = mockk<OppgaveClient>()
-        every { oppgaveClientMock.getOppgaver() } returns getOppgaveResponseWithHjemmel(hjemmel)
+        val oppgaveRepositoryMock = mockk<OppgaveRepository>()
+        every { oppgaveRepositoryMock.getOppgaver() } returns getOppgaveResponseWithHjemmel(hjemmel)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
@@ -112,16 +113,16 @@ internal class OppgaveServiceTest {
             clientConfigurationPropertiesMock,
             mockk(relaxed = true),
             mockk(),
-            mockk(relaxed = true),
-            oppgaveClientMock,
-            pdlClientMock
+            oppgaveRepositoryMock,
+            pdlClientMock,
+            mockk(relaxed = true)
         )
         return oppgaveService
     }
 
     private fun oppgaveServiceWithType(type: String): OppgaveService {
-        val oppgaveClientMock = mockk<OppgaveClient>()
-        every { oppgaveClientMock.getOppgaver() } returns getOppgaveResponseWithType(type)
+        val oppgaveRepositoryMock = mockk<OppgaveRepository>()
+        every { oppgaveRepositoryMock.getOppgaver() } returns getOppgaveResponseWithType(type)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
@@ -134,9 +135,9 @@ internal class OppgaveServiceTest {
             clientConfigurationPropertiesMock,
             mockk(relaxed = true),
             mockk(),
-            mockk(relaxed = true),
-            oppgaveClientMock,
-            pdlClientMock
+            oppgaveRepositoryMock,
+            pdlClientMock,
+            mockk(relaxed = true)
         )
     }
 

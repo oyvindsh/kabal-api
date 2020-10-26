@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.AxsysClient
-import no.nav.klage.oppgave.clients.MicrosoftGraphClient
-import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.gosys.Gruppe.FOLKEREGISTERIDENT
@@ -13,12 +11,12 @@ import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
 import no.nav.klage.oppgave.domain.view.OppgaveView.Saksbehandler
 import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
+import no.nav.klage.oppgave.repositories.OppgaveRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.server.ResponseStatusException
 
 
 @Service
@@ -26,9 +24,9 @@ class OppgaveService(
     val clientConfigurationProperties: ClientConfigurationProperties,
     val oAuth2AccessTokenService: OAuth2AccessTokenService,
     val axsysClient: AxsysClient,
-    val microsoftGraphClient: MicrosoftGraphClient,
-    val oppgaveClient: OppgaveClient,
-    val pdlClient: PdlClient
+    val oppgaveRepository: OppgaveRepository,
+    val pdlClient: PdlClient,
+    val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
     companion object {
@@ -37,16 +35,16 @@ class OppgaveService(
     }
 
     fun getOppgaver(): List<OppgaveView> {
-        return oppgaveClient.getOppgaver().toView().also { logger.info("Returnerer {} oppgaver", it.size) }
+        return oppgaveRepository.getOppgaver().toView().also { logger.info("Returnerer {} oppgaver", it.size) }
     }
 
     fun searchOppgaver(oppgaveSearchCriteria: OppgaveSearchCriteria): List<OppgaveView> {
-        return oppgaveClient.searchOppgaver(oppgaveSearchCriteria).toView()
+        return oppgaveRepository.searchOppgaver(oppgaveSearchCriteria).toView()
             .filter { it.hjemmel == oppgaveSearchCriteria.hjemmel }
     }
 
     fun getTilgangerForSaksbehandler() =
-        axsysClient.getTilgangerForSaksbehandler(microsoftGraphClient.getNavIdent(getTokenWithGraphScope()))
+        axsysClient.getTilgangerForSaksbehandler(saksbehandlerRepository.getNavIdent(getTokenWithGraphScope()))
 
     private fun getTokenWithGraphScope(): String {
         val clientProperties = clientConfigurationProperties.registration["onbehalfof"]
@@ -88,7 +86,7 @@ class OppgaveService(
 
     private fun getSaksbehandlere(identer: Set<String>): Map<String, Saksbehandler> {
         logger.debug("Getting names for saksbehandlere")
-        val namesForSaksbehandlere = microsoftGraphClient.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
+        val namesForSaksbehandlere = saksbehandlerRepository.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
         return namesForSaksbehandlere.map {
             it.key to Saksbehandler(
                 ident = it.key,
@@ -135,11 +133,11 @@ class OppgaveService(
     private fun Oppgave.getFnrForBruker() = identer?.find { i -> i.gruppe == FOLKEREGISTERIDENT }?.ident
 
     fun assignRandomHjemler(): List<OppgaveView> {
-        val oppgaver = oppgaveClient.getOppgaver().oppgaver
+        val oppgaver = oppgaveRepository.getOppgaver().oppgaver
             .map { it.toEndreOppgave() }
             .map {
                 it.setHjemmel(hjemler.random())
-                oppgaveClient.putOppgave(it.id, it)
+                oppgaveRepository.updateOppgave(it.id, it)
             }
         val brukere = getBrukere(getFnr(oppgaver))
         return oppgaver.map {
@@ -148,7 +146,7 @@ class OppgaveService(
     }
 
     fun setHjemmel(oppgaveId: Int, hjemmel: String): OppgaveView {
-        var oppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
+        var oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         oppgave.setHjemmel(hjemmel)
         return updateAndReturn(oppgaveId, oppgave)
     }
@@ -162,7 +160,7 @@ class OppgaveService(
     }
 
     fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?): OppgaveView {
-        val oppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
+        val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         logger.info("Endrer tilordnetRessurs for oppgave {} fra {} til {}", oppgave.id, oppgave.tilordnetRessurs, saksbehandlerIdent)
         oppgave.tilordnetRessurs = saksbehandlerIdent
 
@@ -170,7 +168,7 @@ class OppgaveService(
     }
 
     fun getOppgave(oppgaveId: Int): OppgaveView {
-        val oppgave = oppgaveClient.getOppgave(oppgaveId)
+        val oppgave = oppgaveRepository.getOppgave(oppgaveId)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
         return toView(oppgave, brukere, emptyMap())
     }
@@ -179,7 +177,7 @@ class OppgaveService(
         oppgaveId: Int,
         oppgave: EndreOppgave
     ): OppgaveView {
-        val endretOppgave = oppgaveClient.putOppgave(oppgaveId, oppgave)
+        val endretOppgave = oppgaveRepository.updateOppgave(oppgaveId, oppgave)
         val brukere = getBrukere(getFnr(listOf(endretOppgave)))
         return toView(endretOppgave, brukere, emptyMap())
     }

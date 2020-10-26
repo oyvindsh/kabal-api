@@ -8,12 +8,10 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.body
 import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.UriBuilder
-import reactor.core.publisher.Mono
+import java.lang.System.currentTimeMillis
 import java.net.URI
 
 @Component
@@ -35,33 +33,33 @@ class OppgaveClient(
     }
 
     @Retryable
-    fun getOppgaver(): OppgaveResponse {
-        logger.debug("Fetching oppgaver")
-
-        val allOppgaver = mutableListOf<Oppgave>()
-        var numberOfOppgaverRetrieved: Int = 0
-
-        do {
-            val onePage = getOnePage(numberOfOppgaverRetrieved)
-            allOppgaver += onePage.oppgaver
-            numberOfOppgaverRetrieved += onePage.oppgaver.size
-            logger.debug("Retrieved {} of {} oppgaver", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)
-        } while (numberOfOppgaverRetrieved < onePage.antallTreffTotalt)
-
-        return OppgaveResponse(numberOfOppgaverRetrieved, allOppgaver)
+    fun getOnePage(offset: Int): OppgaveResponse {
+        return logTiming {
+            oppgaveWebClient.get()
+                .uri { uriBuilder ->
+                    buildDefaultUri(uriBuilder, offset)
+                }
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .retrieve()
+                .bodyToMono<OppgaveResponse>()
+                .block() ?: throw RuntimeException("Oppgaver could not be fetched")
+        }
     }
 
-    private fun getOnePage(offset: Int): OppgaveResponse {
-        return oppgaveWebClient.get()
-            .uri { uriBuilder ->
-                buildDefaultUri(uriBuilder, offset)
-            }
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .retrieve()
-            .bodyToMono<OppgaveResponse>()
-            .block() ?: throw RuntimeException("Oppgaver could not be fetched")
+    @Retryable
+    fun getOneSearchPage(oppgaveSearchCriteria: OppgaveSearchCriteria, offset: Int): OppgaveResponse {
+        return logTiming {
+            oppgaveWebClient.get()
+                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .retrieve()
+                .bodyToMono<OppgaveResponse>()
+                .block() ?: throw RuntimeException("Oppgaver could not be fetched")
+        }
     }
 
     private fun buildDefaultUri(uriBuilder: UriBuilder, offset: Int): URI {
@@ -73,34 +71,6 @@ class OppgaveClient(
             .queryParam("limit", 100)
             .queryParam("offset", offset)
             .build()
-    }
-
-    private fun getOneSearchPage(oppgaveSearchCriteria: OppgaveSearchCriteria, offset: Int): OppgaveResponse {
-        return oppgaveWebClient.get()
-            .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .retrieve()
-            .bodyToMono<OppgaveResponse>()
-            .block() ?: throw RuntimeException("Oppgaver could not be fetched")
-    }
-
-    @Retryable
-    fun searchOppgaver(oppgaveSearchCriteria: OppgaveSearchCriteria): OppgaveResponse {
-        logger.debug("Searching for oppgaver")
-
-        val allOppgaver = mutableListOf<Oppgave>()
-        var numberOfOppgaverRetrieved: Int = 0
-
-        do {
-            val onePage = getOneSearchPage(oppgaveSearchCriteria, numberOfOppgaverRetrieved)
-            allOppgaver += onePage.oppgaver
-            numberOfOppgaverRetrieved += onePage.oppgaver.size
-            logger.debug("Retrieved {} of {} oppgaver", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)
-        } while (numberOfOppgaverRetrieved < onePage.antallTreffTotalt)
-
-        return OppgaveResponse(numberOfOppgaverRetrieved, allOppgaver)
     }
 
     private fun OppgaveSearchCriteria.buildUri(origUriBuilder: UriBuilder, offset: Int): URI {
@@ -158,6 +128,17 @@ class OppgaveClient(
             .retrieve()
             .bodyToMono<Oppgave>()
             .block() ?: throw RuntimeException("Oppgave could not be fetched")
+    }
+
+    private fun logTiming(function: () -> OppgaveResponse): OppgaveResponse {
+        val start: Long = currentTimeMillis()
+        try {
+            return function.invoke()
+        } finally {
+            val end: Long = currentTimeMillis()
+            logger.info("It took {} millis to retrieve one page of Oppgaver", (end - start))
+        }
+
     }
 
 }

@@ -15,10 +15,6 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-
-        val saksbehandlerNameCache = mutableMapOf<String, String>()
-
-        const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
 
     @Retryable
@@ -39,26 +35,7 @@ class MicrosoftGraphClient(private val microsoftGraphWebClient: WebClient) {
     }
 
     @Retryable
-    fun getNamesForSaksbehandlere(identer: Set<String>, accessToken: String): Map<String, String> {
-        logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
-
-        val identerNotInCache = identer.toMutableSet()
-        identerNotInCache -= saksbehandlerNameCache.keys
-        logger.debug("Only fetching identer not in cache: {}", identerNotInCache)
-
-        val chunkedList = identerNotInCache.chunked(MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY)
-
-        val measuredTimeMillis = measureTimeMillis {
-            chunkedList.forEach {
-                saksbehandlerNameCache += getDisplayNames(it, accessToken)
-            }
-        }
-        logger.debug("It took {} millis to fetch all names", measuredTimeMillis)
-
-        return saksbehandlerNameCache
-    }
-
-    private fun getDisplayNames(idents: List<String>, accessToken: String): Map<String, String> {
+    fun getDisplayNames(idents: List<String>, accessToken: String): Map<String, String> {
         return try {
             val response = microsoftGraphWebClient.get()
                 .uri { uriBuilder ->

@@ -56,7 +56,7 @@ internal class OppgaveClientTest {
             "appName"
         )
 
-        return oppgaveClient.getOppgaver()
+        return oppgaveClient.getOnePage(0)
     }
 
     @Language("json")
