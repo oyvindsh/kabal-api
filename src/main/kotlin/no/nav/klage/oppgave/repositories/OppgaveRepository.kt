@@ -6,7 +6,6 @@ import no.nav.klage.oppgave.domain.gosys.Oppgave
 import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 
 @Service
