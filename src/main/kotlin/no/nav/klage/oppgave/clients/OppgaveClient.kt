@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients
 
 import brave.Tracer
 import no.nav.klage.oppgave.domain.gosys.*
+import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -113,7 +114,7 @@ class OppgaveClient(
             .bodyValue(oppgave)
             .retrieve()
             .bodyToMono<Oppgave>()
-            .block() ?: throw RuntimeException("Oppgave could not be put")
+            .block() ?: throw OppgaveNotFoundException("Oppgave could not be put")
     }
 
     @Retryable
@@ -127,7 +128,7 @@ class OppgaveClient(
             .header("Nav-Consumer-Id", applicationName)
             .retrieve()
             .bodyToMono<Oppgave>()
-            .block() ?: throw RuntimeException("Oppgave could not be fetched")
+            .block() ?: throw OppgaveNotFoundException("Oppgave could not be fetched")
     }
 
     private fun logTiming(function: () -> OppgaveResponse): OppgaveResponse {
