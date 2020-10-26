@@ -9,6 +9,9 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 
 @Component
 class MicrosoftGraphClient(
@@ -40,33 +43,45 @@ class MicrosoftGraphClient(
     }
 
     @Retryable
-    fun getDisplayNames(idents: List<String>): Map<String, String> {
+    fun getAll(idents: List<List<String>>): Map<String, String> {
+        val queryString = idents.map {
+            it.joinToString(separator = "','", prefix = "('", postfix = "')")
+        }
+
+        val data = Flux.fromIterable(queryString)
+            .parallel()
+            .runOn(Schedulers.elastic())
+            .flatMap {
+                getDisplayNames(it)
+            }
+            .ordered { u1: MicrosoftGraphNameResponse, u2: MicrosoftGraphNameResponse -> 1 }.toIterable()
+
+        return data.flatMap {
+            it.value ?: emptyList()
+        }.mapNotNull {
+            if (it.onPremisesSamAccountName == null || it.displayName == null) {
+                null
+            } else {
+                it.onPremisesSamAccountName to it.displayName
+            }
+        }.toMap()
+    }
+
+    private fun getDisplayNames(idents: String): Mono<MicrosoftGraphNameResponse> {
         return try {
-            val response = microsoftGraphWebClient.get()
+            microsoftGraphWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder
                         .path("/users")
-                        .queryParam(
-                            "\$filter",
-                            "mailnickname in ${idents.joinToString(separator = "','", prefix = "('", postfix = "')")}"
-                        )
+                        .queryParam("\$filter", "mailnickname in $idents")
                         .queryParam("\$select", "onPremisesSamAccountName,displayName")
                         .build()
                 }.header("Authorization", "Bearer ${getAppTokenWithGraphScope()}")
                 .retrieve()
-                .bodyToMono<MicrosoftGraphNameResponse>()
-                .block()
-
-            response?.value?.mapNotNull {
-                if (it.onPremisesSamAccountName == null || it.displayName == null) {
-                    null
-                } else {
-                    it.onPremisesSamAccountName to it.displayName
-                }
-            }?.toMap() ?: emptyMap()
+                .bodyToMono()
         } catch (e: Exception) {
             logger.warn("Could not fetch displayname for idents: $idents", e)
-            emptyMap()
+            Mono.empty()
         }
     }
 
