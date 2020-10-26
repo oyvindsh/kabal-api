@@ -11,9 +11,7 @@ import kotlin.system.measureTimeMillis
 @Service
 class SaksbehandlerRepository(
     private val client: MicrosoftGraphClient,
-    private val axsysClient: AxsysClient,
-    private val clientConfigurationProperties: ClientConfigurationProperties,
-    private val oAuth2AccessTokenService: OAuth2AccessTokenService
+    private val axsysClient: AxsysClient
 ) {
 
     companion object {
@@ -31,7 +29,6 @@ class SaksbehandlerRepository(
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
 
-        val appAccessToken = getAppTokenWithGraphScope()
         val identerNotInCache = identer.toMutableSet()
         identerNotInCache -= saksbehandlerNameCache.keys
         logger.debug("Only fetching identer not in cache: {}", identerNotInCache)
@@ -40,17 +37,11 @@ class SaksbehandlerRepository(
 
         val measuredTimeMillis = measureTimeMillis {
             chunkedList.forEach {
-                saksbehandlerNameCache += client.getDisplayNames(it, appAccessToken)
+                saksbehandlerNameCache += client.getDisplayNames(it)
             }
         }
         logger.debug("It took {} millis to fetch all names", measuredTimeMillis)
 
         return saksbehandlerNameCache
-    }
-
-    private fun getAppTokenWithGraphScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["app"]
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
     }
 }
