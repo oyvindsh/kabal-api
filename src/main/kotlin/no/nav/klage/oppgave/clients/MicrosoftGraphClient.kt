@@ -43,7 +43,7 @@ class MicrosoftGraphClient(
     }
 
     @Retryable
-    fun getAll(idents: List<List<String>>): Map<String, String> {
+    fun getAllDisplayNames(idents: List<List<String>>): Map<String, String> {
         val queryString = idents.map {
             it.joinToString(separator = "','", prefix = "('", postfix = "')")
         }

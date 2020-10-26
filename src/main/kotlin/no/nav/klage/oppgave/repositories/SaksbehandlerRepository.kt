@@ -34,7 +34,7 @@ class SaksbehandlerRepository(
         val chunkedList = identerNotInCache.chunked(MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY)
 
         val measuredTimeMillis = measureTimeMillis {
-            saksbehandlerNameCache += client.getAll(chunkedList)
+            saksbehandlerNameCache += client.getAllDisplayNames(chunkedList)
         }
         logger.debug("It took {} millis to fetch all names", measuredTimeMillis)
 
