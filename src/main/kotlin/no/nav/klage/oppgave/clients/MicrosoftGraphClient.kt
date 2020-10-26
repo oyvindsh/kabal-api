@@ -9,7 +9,6 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import kotlin.system.measureTimeMillis
 
 @Component
 class MicrosoftGraphClient(
@@ -26,7 +25,6 @@ class MicrosoftGraphClient(
     @Retryable
     fun getNavIdentForAuthenticatedUser(): String {
         logger.debug("Fetching navIdent from Microsoft Graph")
-        val saksbehandlerAccessToken = getSaksbehandlerTokenWithGraphScope()
 
         return microsoftGraphWebClient.get()
             .uri { uriBuilder ->
@@ -34,7 +32,7 @@ class MicrosoftGraphClient(
                     .path("/me")
                     .queryParam("\$select", "onPremisesSamAccountName")
                     .build()
-            }.header("Authorization", "Bearer $saksbehandlerAccessToken")
+            }.header("Authorization", "Bearer ${getSaksbehandlerTokenWithGraphScope()}")
 
             .retrieve()
             .bodyToMono<MicrosoftGraphIdentResponse>()
@@ -43,7 +41,6 @@ class MicrosoftGraphClient(
 
     @Retryable
     fun getDisplayNames(idents: List<String>): Map<String, String> {
-        val appAccessToken = getAppTokenWithGraphScope()
         return try {
             val response = microsoftGraphWebClient.get()
                 .uri { uriBuilder ->
@@ -55,7 +52,7 @@ class MicrosoftGraphClient(
                         )
                         .queryParam("\$select", "onPremisesSamAccountName,displayName")
                         .build()
-                }.header("Authorization", "Bearer $appAccessToken")
+                }.header("Authorization", "Bearer ${getAppTokenWithGraphScope()}")
                 .retrieve()
                 .bodyToMono<MicrosoftGraphNameResponse>()
                 .block()
