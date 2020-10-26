@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.api
 
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
-import no.nav.klage.oppgave.service.unleash.TokenUtils
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class FeatureToggleController(private val unleash: Unleash, private val tokenUtils: TokenUtils) {
+class FeatureToggleController(private val unleash: Unleash, private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -33,7 +33,7 @@ class FeatureToggleController(private val unleash: Unleash, private val tokenUti
         UnleashContext.builder().userId(getIdent()).build()
 
     private fun getIdent() = try {
-        tokenUtils.getInnloggetIdent()
+        innloggetSaksbehandlerRepository.getInnloggetIdent()
     } catch (e: Exception) {
         logger.info("Not able to retrieve token", e)
         "UINNLOGGET"

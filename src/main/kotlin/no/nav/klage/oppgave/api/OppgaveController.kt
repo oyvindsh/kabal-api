@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.domain.view.OppgaveView
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
@@ -13,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 @RestController
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class OppgaveController(val oppgaveService: OppgaveService) {
+class OppgaveController(val oppgaveService: OppgaveService, val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -22,7 +23,7 @@ class OppgaveController(val oppgaveService: OppgaveService) {
 
     @GetMapping("/tilganger")
     fun getTilganger(): Tilganger {
-        return oppgaveService.getTilgangerForSaksbehandler()
+        return innloggetSaksbehandlerRepository.getTilgangerForSaksbehandler()
     }
 
     @GetMapping("/oppgaver")

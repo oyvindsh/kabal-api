@@ -2,12 +2,12 @@ package no.nav.klage.oppgave.service.unleash
 
 import no.finn.unleash.UnleashContext
 import no.finn.unleash.strategy.Strategy
-import no.nav.klage.oppgave.clients.AxsysClient
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class ByEnhetStrategy(val axsys: AxsysClient) : Strategy {
+class ByEnhetStrategy(val saksbehandlerRepository: SaksbehandlerRepository) : Strategy {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -37,7 +37,7 @@ class ByEnhetStrategy(val axsys: AxsysClient) : Strategy {
         }
 
     private fun getSaksbehandlersEnheter(unleashContext: UnleashContext) =
-        axsys.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter.asList().map { it.enhetId }
+        saksbehandlerRepository.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter.asList().map { it.enhetId }
 
     private fun getEnabledEnheter(parameters: Map<String, String>?): List<String>? =
         parameters?.get("PARAM")?.split(',')

@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.clients.AxsysClient
 import no.nav.klage.oppgave.clients.PdlClient
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.gosys.Gruppe.FOLKEREGISTERIDENT
@@ -14,16 +13,11 @@ import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
 import no.nav.klage.oppgave.repositories.OppgaveRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
-import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Service
 
 
 @Service
 class OppgaveService(
-    val clientConfigurationProperties: ClientConfigurationProperties,
-    val oAuth2AccessTokenService: OAuth2AccessTokenService,
-    val axsysClient: AxsysClient,
     val oppgaveRepository: OppgaveRepository,
     val pdlClient: PdlClient,
     val saksbehandlerRepository: SaksbehandlerRepository
@@ -51,21 +45,6 @@ class OppgaveService(
         } else {
             true
         }
-    }
-
-    fun getTilgangerForSaksbehandler() =
-        axsysClient.getTilgangerForSaksbehandler(saksbehandlerRepository.getNavIdent(getTokenWithGraphScope()))
-
-    private fun getTokenWithGraphScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["onbehalfof"]
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
-    }
-
-    private fun getAppTokenWithGraphScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["app"]
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
     }
 
     private fun OppgaveResponse.toView(): List<OppgaveView> {
@@ -110,7 +89,7 @@ class OppgaveService(
     private fun getSaksbehandlere(identer: Set<String>): Map<String, Saksbehandler> {
         logger.debug("Getting names for saksbehandlere")
         val namesForSaksbehandlere =
-            saksbehandlerRepository.getNamesForSaksbehandlere(identer, getAppTokenWithGraphScope())
+            saksbehandlerRepository.getNamesForSaksbehandlere(identer)
         return namesForSaksbehandlere.map {
             it.key to Saksbehandler(
                 ident = it.key,
