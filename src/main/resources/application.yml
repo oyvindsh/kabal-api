@@ -10,6 +10,10 @@ spring:
         whitelisted-mdc-keys:
           - Nav-Callid
           - Nav-Consumer-Id
+  resources:
+    add-mappings: false
+  mvc:
+    throw-exception-if-no-handler-found: true
 
 server:
   port: 7081
