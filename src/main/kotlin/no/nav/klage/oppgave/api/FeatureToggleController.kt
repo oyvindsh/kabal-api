@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class FeatureToggleController(private val unleash: Unleash, private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository) {
+class FeatureToggleController(
+    private val unleash: Unleash,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")

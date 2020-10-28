@@ -40,7 +40,11 @@ class OppgaveRepository(private val oppgaveClient: OppgaveClient) {
 
         do {
             val onePage = oppgaveClient.getOneSearchPage(oppgaveSearchCriteria, numberOfOppgaverRetrieved)
-            logger.debug("One page in search returned {} oppgaver with total {}", onePage.oppgaver.size, onePage.antallTreffTotalt)
+            logger.debug(
+                "One page in search returned {} oppgaver with total {}",
+                onePage.oppgaver.size,
+                onePage.antallTreffTotalt
+            )
             allOppgaver += onePage.oppgaver
             numberOfOppgaverRetrieved += onePage.oppgaver.size
             logger.debug("Retrieved {} of {} oppgaver in search", numberOfOppgaverRetrieved, onePage.antallTreffTotalt)

@@ -51,7 +51,10 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
     }
 
     @PutMapping("/oppgaver/{id}/hjemmel")
-    fun setHjemmel(@PathVariable("id") oppgaveId: Int, @RequestBody hjemmelUpdate: HjemmelUpdate): ResponseEntity<OppgaveView> {
+    fun setHjemmel(
+        @PathVariable("id") oppgaveId: Int,
+        @RequestBody hjemmelUpdate: HjemmelUpdate
+    ): ResponseEntity<OppgaveView> {
         logger.debug("setHjemmel is requested")
         val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmelUpdate.hjemmel, hjemmelUpdate.versjon)
         val uri = MvcUriComponentsBuilder
