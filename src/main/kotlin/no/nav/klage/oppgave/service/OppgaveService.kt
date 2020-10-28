@@ -69,7 +69,8 @@ class OppgaveService(
             ytelse = oppgave.tema,
             hjemmel = oppgave.metadata.toHjemmel(),
             frist = oppgave.fristFerdigstillelse,
-            saksbehandler = getSaksbehandler(oppgave, saksbehandlere)
+            saksbehandler = getSaksbehandler(oppgave, saksbehandlere),
+            versjon = oppgave.versjon
         )
     }
 
@@ -155,9 +156,13 @@ class OppgaveService(
         }
     }
 
-    fun setHjemmel(oppgaveId: Int, hjemmel: String): OppgaveView {
+    fun setHjemmel(oppgaveId: Int, hjemmel: String, oppgaveVersjon: Int?): OppgaveView {
         var oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
-        oppgave.setHjemmel(hjemmel)
+        oppgave.apply {
+            setHjemmel(hjemmel)
+            versjon = oppgaveVersjon
+        }
+
         return updateAndReturn(oppgaveId, oppgave)
     }
 
@@ -169,7 +174,7 @@ class OppgaveService(
         metadata!![HJEMMEL] = hjemmel
     }
 
-    fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?): OppgaveView {
+    fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?, oppgaveVersjon: Int?): OppgaveView {
         val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         logger.info(
             "Endrer tilordnetRessurs for oppgave {} fra {} til {}",
@@ -177,7 +182,10 @@ class OppgaveService(
             oppgave.tilordnetRessurs,
             saksbehandlerIdent
         )
-        oppgave.tilordnetRessurs = saksbehandlerIdent
+        oppgave.apply {
+            tilordnetRessurs = saksbehandlerIdent;
+            versjon = oppgaveVersjon
+        }
 
         return updateAndReturn(oppgaveId, oppgave)
     }

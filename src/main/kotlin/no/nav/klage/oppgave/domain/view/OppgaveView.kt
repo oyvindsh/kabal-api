@@ -13,7 +13,8 @@ data class OppgaveView(
     val ytelse: String,
     val hjemmel: String,
     val frist: LocalDate?,
-    val saksbehandler: Saksbehandler? = null
+    val saksbehandler: Saksbehandler? = null,
+    val versjon: Int?
 ) {
     data class Bruker(
         val fnr: String,

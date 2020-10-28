@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.domain.view.OppgaveView
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -52,9 +51,9 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
     }
 
     @PutMapping("/oppgaver/{id}/hjemmel")
-    fun setHjemmel(@PathVariable("id") oppgaveId: Int, @RequestBody hjemmel: String): ResponseEntity<OppgaveView> {
+    fun setHjemmel(@PathVariable("id") oppgaveId: Int, @RequestBody hjemmelUpdate: HjemmelUpdate): ResponseEntity<OppgaveView> {
         logger.debug("setHjemmel is requested")
-        val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmel)
+        val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmelUpdate.hjemmel, hjemmelUpdate.versjon)
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -64,10 +63,10 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
     @PutMapping("/oppgaver/{id}/saksbehandler")
     fun setAssignedSaksbehandler(
         @PathVariable("id") oppgaveId: Int,
-        @RequestBody saksbehandler: SaksbehandlerIdent
+        @RequestBody saksbehandlerUpdate: SaksbehandlerUpdate
     ): ResponseEntity<OppgaveView> {
         logger.debug("setAssignedSaksbehandler is requested")
-        val oppgave = oppgaveService.assignOppgave(oppgaveId, saksbehandler.ident)
+        val oppgave = oppgaveService.assignOppgave(oppgaveId, saksbehandlerUpdate.ident, saksbehandlerUpdate.versjon)
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -81,4 +80,6 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
     }
 }
 
-data class SaksbehandlerIdent(val ident: String)
+data class HjemmelUpdate(val hjemmel: String, val versjon: Int? = null)
+
+data class SaksbehandlerUpdate(val ident: String, val versjon: Int? = null)
