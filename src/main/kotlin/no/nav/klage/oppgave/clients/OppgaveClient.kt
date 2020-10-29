@@ -38,7 +38,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOnePage(offset: Int): OppgaveResponse {
-        return logTimingAndWebClientResponseException {
+        return logTimingAndWebClientResponseException("getOnePage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder ->
                     buildDefaultUri(uriBuilder, offset)
@@ -54,7 +54,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOneSearchPage(oppgaveSearchCriteria: OppgaveSearchCriteria, offset: Int): OppgaveResponse {
-        return logTimingAndWebClientResponseException {
+        return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
                 .header("Authorization", "Bearer ${stsClient.oidcToken()}")
@@ -108,7 +108,7 @@ class OppgaveClient(
         oppgaveId: Int,
         oppgave: EndreOppgave
     ): Oppgave {
-        return logTimingAndWebClientResponseException {
+        return logTimingAndWebClientResponseException("putOppgave") {
             oppgaveWebClient.put()
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
@@ -126,7 +126,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOppgave(oppgaveId: Int): Oppgave {
-        return logTimingAndWebClientResponseException {
+        return logTimingAndWebClientResponseException("getOppgave") {
             oppgaveWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
@@ -140,7 +140,7 @@ class OppgaveClient(
         }
     }
 
-    private fun <T> logTimingAndWebClientResponseException(function: () -> T): T {
+    private fun <T> logTimingAndWebClientResponseException(methodName: String, function: () -> T): T {
         val start: Long = currentTimeMillis()
         try {
             return function.invoke()
@@ -171,7 +171,7 @@ class OppgaveClient(
             }
         } finally {
             val end: Long = currentTimeMillis()
-            logger.info("It took {} millis to retrieve one page of Oppgaver", (end - start))
+            logger.info("Method {} took {} millis", methodName, (end - start))
         }
     }
 }
