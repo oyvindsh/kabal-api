@@ -158,7 +158,7 @@ class OppgaveService(
 
     fun setHjemmel(oppgaveId: Int, hjemmel: String, oppgaveVersjon: Int?): OppgaveView {
         var oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
-        oppgave.apply {
+        with(oppgave) {
             setHjemmel(hjemmel)
             versjon = oppgaveVersjon
         }
@@ -182,7 +182,7 @@ class OppgaveService(
             oppgave.tilordnetRessurs,
             saksbehandlerIdent
         )
-        oppgave.apply {
+        with(oppgave) {
             tilordnetRessurs = saksbehandlerIdent;
             versjon = oppgaveVersjon
         }
