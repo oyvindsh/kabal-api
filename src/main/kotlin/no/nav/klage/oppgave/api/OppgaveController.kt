@@ -45,14 +45,14 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
     }
 
     @GetMapping("/oppgaver/{id}")
-    fun getOppgave(@PathVariable("id") oppgaveId: Int): OppgaveView {
+    fun getOppgave(@PathVariable("id") oppgaveId: String): OppgaveView {
         logger.debug("getOppgave is requested")
         return oppgaveService.getOppgave(oppgaveId)
     }
 
     @PutMapping("/oppgaver/{id}/hjemmel")
     fun setHjemmel(
-        @PathVariable("id") oppgaveId: Int,
+        @PathVariable("id") oppgaveId: String,
         @RequestBody hjemmelUpdate: HjemmelUpdate
     ): ResponseEntity<OppgaveView> {
         logger.debug("setHjemmel is requested")
@@ -65,7 +65,7 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
 
     @PutMapping("/oppgaver/{id}/saksbehandler")
     fun setAssignedSaksbehandler(
-        @PathVariable("id") oppgaveId: Int,
+        @PathVariable("id") oppgaveId: String,
         @RequestBody saksbehandlerUpdate: SaksbehandlerUpdate
     ): ResponseEntity<OppgaveView> {
         logger.debug("setAssignedSaksbehandler is requested")

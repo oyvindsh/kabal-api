@@ -11,7 +11,7 @@ data class OppgaveResponse(
 )
 
 data class Oppgave(
-    val id: Int,
+    val id: Long,
     val tildeltEnhetsnr: String? = null,
     val endretAvEnhetsnr: String? = null,
     val opprettetAvEnhetsnr: String? = null,
@@ -76,7 +76,7 @@ data class Oppgave(
 
 // De feltene som skal kunne endres må gjøres mutable/defineres som var isf val
 data class EndreOppgave(
-    val id: Int,
+    val id: Long,
     val tildeltEnhetsnr: String? = null,
     val endretAvEnhetsnr: String? = null,
     val journalpostId: String? = null,

@@ -102,7 +102,7 @@ class OppgaveClient(
 
     @Retryable
     fun putOppgave(
-        oppgaveId: Int,
+        oppgaveId: Long,
         oppgave: EndreOppgave
     ): Oppgave {
         return oppgaveWebClient.put()
@@ -120,7 +120,7 @@ class OppgaveClient(
     }
 
     @Retryable
-    fun getOppgave(oppgaveId: Int): Oppgave {
+    fun getOppgave(oppgaveId: Long): Oppgave {
         return oppgaveWebClient.get()
             .uri { uriBuilder ->
                 uriBuilder.pathSegment("{id}").build(oppgaveId)
