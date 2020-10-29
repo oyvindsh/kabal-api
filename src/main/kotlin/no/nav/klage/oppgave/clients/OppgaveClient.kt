@@ -10,6 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.UriBuilder
 import java.lang.System.currentTimeMillis
@@ -35,7 +36,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOnePage(offset: Int): OppgaveResponse {
-        return logTiming {
+        return logTimingAndWebClientResponseException {
             oppgaveWebClient.get()
                 .uri { uriBuilder ->
                     buildDefaultUri(uriBuilder, offset)
@@ -51,7 +52,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOneSearchPage(oppgaveSearchCriteria: OppgaveSearchCriteria, offset: Int): OppgaveResponse {
-        return logTiming {
+        return logTimingAndWebClientResponseException {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
                 .header("Authorization", "Bearer ${stsClient.oidcToken()}")
@@ -133,10 +134,13 @@ class OppgaveClient(
             .block() ?: throw OppgaveNotFoundException("Oppgave could not be fetched")
     }
 
-    private fun logTiming(function: () -> OppgaveResponse): OppgaveResponse {
+    private fun logTimingAndWebClientResponseException(function: () -> OppgaveResponse): OppgaveResponse {
         val start: Long = currentTimeMillis()
         try {
             return function.invoke()
+        } catch(ex: WebClientResponseException) {
+            logger.error("Got a {} error calling Oppgave {} {} with message {}", ex.statusCode, ex.request.method, ex.request.uri, ex.responseBodyAsString)
+            throw ex
         } finally {
             val end: Long = currentTimeMillis()
             logger.info("It took {} millis to retrieve one page of Oppgaver", (end - start))
