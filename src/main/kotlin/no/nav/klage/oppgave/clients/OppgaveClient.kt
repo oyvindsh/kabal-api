@@ -140,16 +140,36 @@ class OppgaveClient(
         val start: Long = currentTimeMillis()
         try {
             return function.invoke()
-        } catch(ex: WebClientResponseException) {
-            securelogger.error("Got a {} error calling Oppgave {} {} with message {}", ex.statusCode, ex.request.method, ex.request.uri, ex.responseBodyAsString)
+        } catch (ex: WebClientResponseException) {
+            securelogger.error(
+                "Got a {} error calling Oppgave {} {} with message {}",
+                ex.statusCode,
+                ex.request?.method ?: "-",
+                ex.request?.uri ?: "-",
+                ex.responseBodyAsString
+            )
             throw ex
+        } catch (rtex: RuntimeException) {
+            if (rtex.cause is WebClientResponseException) {
+                logger.debug("WebClientResponseException is wrapped in RuntimeException", rtex)
+                val cause: WebClientResponseException = rtex.cause as WebClientResponseException
+                securelogger.error(
+                    "Got a {} error calling Oppgave {} {} with message {}",
+                    cause.statusCode,
+                    cause.request?.method ?: "-",
+                    cause.request?.uri ?: "-",
+                    cause.responseBodyAsString
+                )
+                throw cause
+            } else {
+                logger.debug("Caught runtimeexception", rtex)
+                throw rtex
+            }
         } finally {
             val end: Long = currentTimeMillis()
             logger.info("It took {} millis to retrieve one page of Oppgaver", (end - start))
         }
-
     }
-
 }
 
 
