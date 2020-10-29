@@ -11,6 +11,7 @@ val unleashVersion = "3.3.3"
 val problemSpringWebStartVersion = "0.26.2"
 
 val springRetryVersion = "1.3.0"
+val mockitoVersion = "3.3.3"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -69,6 +70,8 @@ dependencies {
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.mockito:mockito-junit-jupiter:$mockitoVersion")
+
     testImplementation("com.h2database:h2:$h2Version")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")
