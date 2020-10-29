@@ -108,35 +108,39 @@ class OppgaveClient(
         oppgaveId: Int,
         oppgave: EndreOppgave
     ): Oppgave {
-        return oppgaveWebClient.put()
-            .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}").build(oppgaveId)
-            }
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .bodyValue(oppgave)
-            .retrieve()
-            .bodyToMono<Oppgave>()
-            .block() ?: throw OppgaveNotFoundException("Oppgave could not be put")
+        return logTimingAndWebClientResponseException {
+            oppgaveWebClient.put()
+                .uri { uriBuilder ->
+                    uriBuilder.pathSegment("{id}").build(oppgaveId)
+                }
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .bodyValue(oppgave)
+                .retrieve()
+                .bodyToMono<Oppgave>()
+                .block() ?: throw OppgaveNotFoundException("Oppgave could not be put")
+        }
     }
 
     @Retryable
     fun getOppgave(oppgaveId: Int): Oppgave {
-        return oppgaveWebClient.get()
-            .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}").build(oppgaveId)
-            }
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .retrieve()
-            .bodyToMono<Oppgave>()
-            .block() ?: throw OppgaveNotFoundException("Oppgave could not be fetched")
+        return logTimingAndWebClientResponseException {
+            oppgaveWebClient.get()
+                .uri { uriBuilder ->
+                    uriBuilder.pathSegment("{id}").build(oppgaveId)
+                }
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .retrieve()
+                .bodyToMono<Oppgave>()
+                .block() ?: throw OppgaveNotFoundException("Oppgave could not be fetched")
+        }
     }
 
-    private fun logTimingAndWebClientResponseException(function: () -> OppgaveResponse): OppgaveResponse {
+    private fun <T> logTimingAndWebClientResponseException(function: () -> T): T {
         val start: Long = currentTimeMillis()
         try {
             return function.invoke()
