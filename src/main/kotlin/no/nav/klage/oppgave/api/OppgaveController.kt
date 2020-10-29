@@ -56,7 +56,7 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @RequestBody hjemmelUpdate: HjemmelUpdate
     ): ResponseEntity<OppgaveView> {
         logger.debug("setHjemmel is requested")
-        val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmelUpdate.hjemmel, hjemmelUpdate.oppgaveVersjon)
+        val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmelUpdate.hjemmel, hjemmelUpdate.versjon)
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -69,7 +69,7 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @RequestBody saksbehandlerUpdate: SaksbehandlerUpdate
     ): ResponseEntity<OppgaveView> {
         logger.debug("setAssignedSaksbehandler is requested")
-        val oppgave = oppgaveService.assignOppgave(oppgaveId, saksbehandlerUpdate.ident, saksbehandlerUpdate.oppgaveVersjon)
+        val oppgave = oppgaveService.assignOppgave(oppgaveId, saksbehandlerUpdate.ident, saksbehandlerUpdate.versjon)
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -83,6 +83,6 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
     }
 }
 
-data class HjemmelUpdate(val hjemmel: String, val oppgaveVersjon: Int? = null)
+data class HjemmelUpdate(val hjemmel: String, val versjon: Int? = null)
 
-data class SaksbehandlerUpdate(val ident: String, val oppgaveVersjon: Int? = null)
+data class SaksbehandlerUpdate(val ident: String, val versjon: Int? = null)
