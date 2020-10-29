@@ -27,6 +27,7 @@ class OppgaveClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val securelogger : getSecureLogger()
 
         const val TEMA_SYK = "SYK"
         const val STATUSKATEGORI_AAPEN = "AAPEN"
@@ -139,7 +140,7 @@ class OppgaveClient(
         try {
             return function.invoke()
         } catch(ex: WebClientResponseException) {
-            logger.error("Got a {} error calling Oppgave {} {} with message {}", ex.statusCode, ex.request.method, ex.request.uri, ex.responseBodyAsString)
+            securelogger.error("Got a {} error calling Oppgave {} {} with message {}", ex.statusCode, ex.request.method, ex.request.uri, ex.responseBodyAsString)
             throw ex
         } finally {
             val end: Long = currentTimeMillis()
