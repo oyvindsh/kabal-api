@@ -18,3 +18,16 @@ fun createShortCircuitWebClient(jsonResponse: String): WebClient {
 
     return WebClient.builder().exchangeFunction(shortCircuitingExchangeFunction).build()
 }
+
+fun createShortCircuitWebClientWithStatus(jsonResponse: String, status: HttpStatus): WebClient {
+    val clientResponse: ClientResponse = ClientResponse
+        .create(status)
+        .header("Content-Type", "application/json")
+        .body(jsonResponse).build()
+
+    val shortCircuitingExchangeFunction = ExchangeFunction {
+        Mono.just(clientResponse)
+    }
+
+    return WebClient.builder().exchangeFunction(shortCircuitingExchangeFunction).build()
+}

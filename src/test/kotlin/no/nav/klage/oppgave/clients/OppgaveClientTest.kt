@@ -4,12 +4,16 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import no.nav.klage.oppgave.domain.gosys.Oppgave
 import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.http.HttpStatus
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.LocalDate
 import java.time.Month
 
@@ -48,6 +52,13 @@ internal class OppgaveClientTest {
         assertThat(oppgaveResponse.oppgaver.first().fristFerdigstillelse).isNull()
     }
 
+    @Test
+    fun `404 results in NotFound`() {
+        Assertions.assertThrows(WebClientResponseException.NotFound::class.java) {
+            getNonExistingOppgave()
+        }
+    }
+
     fun getOppgaver(jsonResponse: String): OppgaveResponse {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClient(jsonResponse),
@@ -57,6 +68,17 @@ internal class OppgaveClientTest {
         )
 
         return oppgaveClient.getOnePage(0)
+    }
+
+    fun getNonExistingOppgave(): Oppgave {
+        val oppgaveClient = OppgaveClient(
+            createShortCircuitWebClientWithStatus(oppgave404(), HttpStatus.NOT_FOUND),
+            stsClientMock,
+            tracerMock,
+            "appName"
+        )
+
+        return oppgaveClient.getOppgave(333)
     }
 
     @Language("json")
@@ -139,4 +161,11 @@ internal class OppgaveClientTest {
         }
     """
 
+    @Language("json")
+    fun oppgave404() = """
+        {
+          "uuid": "37389812-7af9-48ef-9733-e680d06e0978",
+          "feilmelding": "Fant ingen oppgave med id: 3333"
+        }
+    """.trimIndent()
 }
