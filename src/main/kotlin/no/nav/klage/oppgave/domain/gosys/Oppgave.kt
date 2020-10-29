@@ -94,7 +94,7 @@ data class EndreOppgave(
     val behandlingstema: String? = null,
     val oppgavetype: String? = null,
     val behandlingstype: String? = null,
-    val versjon: Int? = null,
+    var versjon: Int? = null,
     val mappeId: Long? = null,
     val prioritet: Prioritet? = null,
     val status: Status? = null,

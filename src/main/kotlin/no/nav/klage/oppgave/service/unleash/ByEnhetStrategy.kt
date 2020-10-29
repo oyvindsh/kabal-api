@@ -37,7 +37,8 @@ class ByEnhetStrategy(val saksbehandlerRepository: SaksbehandlerRepository) : St
         }
 
     private fun getSaksbehandlersEnheter(unleashContext: UnleashContext) =
-        saksbehandlerRepository.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter.asList().map { it.enhetId }
+        saksbehandlerRepository.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter
+            .map { it.enhetId }
 
     private fun getEnabledEnheter(parameters: Map<String, String>?): List<String>? =
         parameters?.get("PARAM")?.split(',')
