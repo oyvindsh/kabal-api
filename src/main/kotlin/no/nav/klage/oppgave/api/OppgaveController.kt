@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.domain.view.OppgaveView
+import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -46,8 +47,9 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
 
     @GetMapping("/oppgaver/{id}")
     fun getOppgave(@PathVariable("id") oppgaveId: String): OppgaveView {
-        logger.debug("getOppgave is requested")
-        return oppgaveService.getOppgave(oppgaveId)
+        logger.debug("getOppgave is requested: {}", oppgaveId)
+
+        return oppgaveService.getOppgave(oppgaveId.toLongOrException())
     }
 
     @PutMapping("/oppgaver/{id}/hjemmel")
@@ -55,8 +57,12 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @PathVariable("id") oppgaveId: String,
         @RequestBody hjemmelUpdate: HjemmelUpdate
     ): ResponseEntity<OppgaveView> {
-        logger.debug("setHjemmel is requested")
-        val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmelUpdate.hjemmel, hjemmelUpdate.oppgaveVersjon)
+        logger.debug("setHjemmel is requested for oppgave: {}", oppgaveId)
+        val oppgave = oppgaveService.setHjemmel(
+            oppgaveId.toLongOrException(),
+            hjemmelUpdate.hjemmel,
+            hjemmelUpdate.oppgaveVersjon
+        )
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -68,8 +74,12 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @PathVariable("id") oppgaveId: String,
         @RequestBody saksbehandlerUpdate: SaksbehandlerUpdate
     ): ResponseEntity<OppgaveView> {
-        logger.debug("setAssignedSaksbehandler is requested")
-        val oppgave = oppgaveService.assignOppgave(oppgaveId, saksbehandlerUpdate.ident, saksbehandlerUpdate.oppgaveVersjon)
+        logger.debug("setAssignedSaksbehandler is requested for oppgave: {}", oppgaveId)
+        val oppgave = oppgaveService.assignOppgave(
+            oppgaveId.toLongOrException(),
+            saksbehandlerUpdate.ident,
+            saksbehandlerUpdate.oppgaveVersjon
+        )
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -81,6 +91,10 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         logger.debug("endreHjemlerAtRandomViolatingGetRpcStyleAndTotallyNotRestish is requested")
         return oppgaveService.assignRandomHjemler()
     }
+
+    private fun String?.toLongOrException() =
+        this?.toLongOrNull() ?: throw OppgaveIdWrongFormatException("OppgaveId could not be parsed as a Long")
+
 }
 
 data class HjemmelUpdate(val hjemmel: String, val oppgaveVersjon: Int? = null)

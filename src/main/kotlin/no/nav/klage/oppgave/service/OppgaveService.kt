@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.domain.view.OppgaveView.Bruker
 import no.nav.klage.oppgave.domain.view.OppgaveView.Saksbehandler
 import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
-import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.repositories.OppgaveRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -156,16 +155,14 @@ class OppgaveService(
         }
     }
 
-    fun setHjemmel(oppgaveId: String, hjemmel: String, oppgaveVersjon: Int?): OppgaveView {
-        val oppgaveIdAsLong = oppgaveId.toLongOrException()
-
-        val oppgave = oppgaveRepository.getOppgave(oppgaveIdAsLong).toEndreOppgave()
+    fun setHjemmel(oppgaveId: Long, hjemmel: String, oppgaveVersjon: Int?): OppgaveView {
+        val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         oppgave.apply {
             setHjemmel(hjemmel)
             versjon = oppgaveVersjon
         }
 
-        return updateAndReturn(oppgaveIdAsLong, oppgave)
+        return updateAndReturn(oppgaveId, oppgave)
     }
 
     private fun EndreOppgave.setHjemmel(hjemmel: String) {
@@ -176,9 +173,8 @@ class OppgaveService(
         metadata!![HJEMMEL] = hjemmel
     }
 
-    fun assignOppgave(oppgaveId: String, saksbehandlerIdent: String?, oppgaveVersjon: Int?): OppgaveView {
-        val oppgaveIdAsLong = oppgaveId.toLongOrException()
-        val oppgave = oppgaveRepository.getOppgave(oppgaveIdAsLong).toEndreOppgave()
+    fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?): OppgaveView {
+        val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         logger.info(
             "Endrer tilordnetRessurs for oppgave {} fra {} til {}",
             oppgave.id,
@@ -190,11 +186,11 @@ class OppgaveService(
             versjon = oppgaveVersjon
         }
 
-        return updateAndReturn(oppgaveIdAsLong, oppgave)
+        return updateAndReturn(oppgaveId, oppgave)
     }
 
-    fun getOppgave(oppgaveId: String): OppgaveView {
-        val oppgave = oppgaveRepository.getOppgave(oppgaveId.toLongOrException())
+    fun getOppgave(oppgaveId: Long): OppgaveView {
+        val oppgave = oppgaveRepository.getOppgave(oppgaveId)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
         val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(listOf(oppgave)))
         return toView(oppgave, brukere, saksbehandlere)
@@ -210,10 +206,7 @@ class OppgaveService(
         return toView(endretOppgave, brukere, saksbehandlere)
     }
 
-    private fun String?.toLongOrException() =
-        this?.toLongOrNull() ?: throw OppgaveIdWrongFormatException("OppgaveId could not be parsed as a Long")
 }
-
 
 data class OppgaveSearchCriteria(
     val type: String? = null,
