@@ -78,7 +78,7 @@ internal class OppgaveClientTest {
             "appName"
         )
 
-        return oppgaveClient.getOppgave(333)
+        return oppgaveClient.getOppgave(3333)
     }
 
     @Language("json")
