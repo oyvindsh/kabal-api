@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.api
 
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -7,10 +9,8 @@ import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -25,16 +25,16 @@ class FeatureToggleControllerTest() {
     @Autowired
     lateinit var mockMvc: MockMvc
 
-    @MockBean
+    @MockkBean
     lateinit var unleash: Unleash
 
-    @MockBean
+    @MockkBean
     lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 
     @BeforeEach
     fun setup() {
-        `when`(innloggetSaksbehandlerRepository.getInnloggetIdent()).thenReturn("H149390")
-        `when`(unleash.isEnabled(anyString(), any<UnleashContext>())).thenReturn(true)
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns "H149390"
+        every { unleash.isEnabled(any(), any<UnleashContext>()) } returns true
     }
 
     @Test
