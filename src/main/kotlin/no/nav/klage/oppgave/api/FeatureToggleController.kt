@@ -29,7 +29,7 @@ class FeatureToggleController(
     fun getUnprotectedToggle(@PathVariable("toggleName") toggleName: String): Boolean =
         unleash.isEnabled(toggleName, UnleashContext.builder().userId("UINNLOGGET").build())
 
-    fun isEnabled(feature: String): Boolean =
+    private fun isEnabled(feature: String): Boolean =
         unleash.isEnabled(feature, contextMedInnloggetBruker())
 
     private fun contextMedInnloggetBruker(): UnleashContext? =
