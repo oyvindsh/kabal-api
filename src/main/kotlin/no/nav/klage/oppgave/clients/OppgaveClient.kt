@@ -38,7 +38,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOnePage(offset: Int): OppgaveResponse {
-        return logTimingAndWebClientResponseException {
+        return logTimingAndWebClientResponseException("getOnePage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder ->
                     buildDefaultUri(uriBuilder, offset)
@@ -54,7 +54,7 @@ class OppgaveClient(
 
     @Retryable
     fun getOneSearchPage(oppgaveSearchCriteria: OppgaveSearchCriteria, offset: Int): OppgaveResponse {
-        return logTimingAndWebClientResponseException {
+        return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
                 .header("Authorization", "Bearer ${stsClient.oidcToken()}")
@@ -105,51 +105,63 @@ class OppgaveClient(
 
     @Retryable
     fun putOppgave(
-        oppgaveId: Long,
+        oppgaveId: Int,
         oppgave: EndreOppgave
     ): Oppgave {
-        return oppgaveWebClient.put()
-            .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}").build(oppgaveId)
-            }
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .bodyValue(oppgave)
-            .retrieve()
-            .bodyToMono<Oppgave>()
-            .block() ?: throw OppgaveNotFoundException("Oppgave could not be put")
+        return logTimingAndWebClientResponseException("putOppgave") {
+            oppgaveWebClient.put()
+                .uri { uriBuilder ->
+                    uriBuilder.pathSegment("{id}").build(oppgaveId)
+                }
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .bodyValue(oppgave)
+                .retrieve()
+                .bodyToMono<Oppgave>()
+                .block() ?: throw OppgaveNotFoundException("Oppgave could not be put")
+        }
     }
 
     @Retryable
-    fun getOppgave(oppgaveId: Long): Oppgave {
-        return oppgaveWebClient.get()
-            .uri { uriBuilder ->
-                uriBuilder.pathSegment("{id}").build(oppgaveId)
-            }
-            .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-            .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-            .header("Nav-Consumer-Id", applicationName)
-            .retrieve()
-            .bodyToMono<Oppgave>()
-            .block() ?: throw OppgaveNotFoundException("Oppgave could not be fetched")
+    fun getOppgave(oppgaveId: Int): Oppgave {
+        return logTimingAndWebClientResponseException("getOppgave") {
+            oppgaveWebClient.get()
+                .uri { uriBuilder ->
+                    uriBuilder.pathSegment("{id}").build(oppgaveId)
+                }
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .retrieve()
+                .bodyToMono<Oppgave>()
+                .block() ?: throw OppgaveNotFoundException("Oppgave could not be fetched")
+        }
     }
 
-    private fun logTimingAndWebClientResponseException(function: () -> OppgaveResponse): OppgaveResponse {
+    private fun <T> logTimingAndWebClientResponseException(methodName: String, function: () -> T): T {
         val start: Long = currentTimeMillis()
         try {
             return function.invoke()
-        } catch(ex: WebClientResponseException) {
-            securelogger.error("Got a {} error calling Oppgave {} {} with message {}", ex.statusCode, ex.request.method, ex.request.uri, ex.responseBodyAsString)
+        } catch (ex: WebClientResponseException) {
+            logger.warn("Caught WebClientResponseException, see securelogs for details")
+            securelogger.error(
+                "Got a {} error calling Oppgave {} {} with message {}",
+                ex.statusCode,
+                ex.request?.method ?: "-",
+                ex.request?.uri ?: "-",
+                ex.responseBodyAsString
+            )
             throw ex
+        } catch (rtex: RuntimeException) {
+            logger.debug("Caught runtimeexception", rtex)
+            throw rtex
         } finally {
             val end: Long = currentTimeMillis()
-            logger.info("It took {} millis to retrieve one page of Oppgaver", (end - start))
+            logger.info("Method {} took {} millis", methodName, (end - start))
         }
-
     }
-
 }
 
 

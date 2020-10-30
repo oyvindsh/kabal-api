@@ -57,12 +57,8 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @PathVariable("id") oppgaveId: String,
         @RequestBody hjemmelUpdate: HjemmelUpdate
     ): ResponseEntity<OppgaveView> {
-        logger.debug("setHjemmel is requested for oppgave: {}", oppgaveId)
-        val oppgave = oppgaveService.setHjemmel(
-            oppgaveId.toLongOrException(),
-            hjemmelUpdate.hjemmel,
-            hjemmelUpdate.oppgaveVersjon
-        )
+        logger.debug("setHjemmel is requested")
+        val oppgave = oppgaveService.setHjemmel(oppgaveId, hjemmelUpdate.hjemmel, hjemmelUpdate.versjon)
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -74,12 +70,8 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @PathVariable("id") oppgaveId: String,
         @RequestBody saksbehandlerUpdate: SaksbehandlerUpdate
     ): ResponseEntity<OppgaveView> {
-        logger.debug("setAssignedSaksbehandler is requested for oppgave: {}", oppgaveId)
-        val oppgave = oppgaveService.assignOppgave(
-            oppgaveId.toLongOrException(),
-            saksbehandlerUpdate.ident,
-            saksbehandlerUpdate.oppgaveVersjon
-        )
+        logger.debug("setAssignedSaksbehandler is requested")
+        val oppgave = oppgaveService.assignOppgave(oppgaveId, saksbehandlerUpdate.ident, saksbehandlerUpdate.versjon)
         val uri = MvcUriComponentsBuilder
             .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
@@ -97,6 +89,6 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
 
 }
 
-data class HjemmelUpdate(val hjemmel: String, val oppgaveVersjon: Int? = null)
+data class HjemmelUpdate(val hjemmel: String, val versjon: Int? = null)
 
-data class SaksbehandlerUpdate(val ident: String, val oppgaveVersjon: Int? = null)
+data class SaksbehandlerUpdate(val ident: String, val versjon: Int? = null)

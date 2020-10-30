@@ -176,10 +176,11 @@ class OppgaveService(
     fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?): OppgaveView {
         val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         logger.info(
-            "Endrer tilordnetRessurs for oppgave {} fra {} til {}",
+            "Endrer tilordnetRessurs for oppgave {} fra {} til {}, versjon er {}",
             oppgave.id,
             oppgave.tilordnetRessurs,
-            saksbehandlerIdent
+            saksbehandlerIdent,
+            oppgaveVersjon
         )
         oppgave.apply {
             tilordnetRessurs = saksbehandlerIdent;
