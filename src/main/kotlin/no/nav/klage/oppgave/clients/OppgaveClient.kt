@@ -145,6 +145,7 @@ class OppgaveClient(
         try {
             return function.invoke()
         } catch (ex: WebClientResponseException) {
+            logger.warn("Caught WebClientResponseException, see securelogs for details")
             securelogger.error(
                 "Got a {} error calling Oppgave {} {} with message {}",
                 ex.statusCode,
@@ -154,21 +155,8 @@ class OppgaveClient(
             )
             throw ex
         } catch (rtex: RuntimeException) {
-            if (rtex.cause is WebClientResponseException) {
-                logger.debug("WebClientResponseException is wrapped in RuntimeException", rtex)
-                val cause: WebClientResponseException = rtex.cause as WebClientResponseException
-                securelogger.error(
-                    "Got a {} error calling Oppgave {} {} with message {}",
-                    cause.statusCode,
-                    cause.request?.method ?: "-",
-                    cause.request?.uri ?: "-",
-                    cause.responseBodyAsString
-                )
-                throw cause
-            } else {
-                logger.debug("Caught runtimeexception", rtex)
-                throw rtex
-            }
+            logger.debug("Caught runtimeexception", rtex)
+            throw rtex
         } finally {
             val end: Long = currentTimeMillis()
             logger.info("Method {} took {} millis", methodName, (end - start))
