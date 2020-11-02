@@ -53,9 +53,9 @@ class OppgaveRepository(private val oppgaveClient: OppgaveClient) {
         return OppgaveResponse(numberOfOppgaverRetrieved, allOppgaver)
     }
 
-    fun updateOppgave(oppgaveId: Int, oppgave: EndreOppgave): Oppgave =
+    fun updateOppgave(oppgaveId: Long, oppgave: EndreOppgave): Oppgave =
         oppgaveClient.putOppgave(oppgaveId, oppgave)
 
-    fun getOppgave(oppgaveId: Int): Oppgave =
+    fun getOppgave(oppgaveId: Long): Oppgave =
         oppgaveClient.getOppgave(oppgaveId)
 }

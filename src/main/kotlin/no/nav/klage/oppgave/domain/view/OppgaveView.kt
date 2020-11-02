@@ -7,7 +7,7 @@ const val TYPE_KLAGE = "klage"
 const val TYPE_FEILUTBETALING = "feilutbetaling"
 
 data class OppgaveView(
-    val id: Int,
+    val id: String,
     val bruker: Bruker,
     val type: String,
     val ytelse: String,

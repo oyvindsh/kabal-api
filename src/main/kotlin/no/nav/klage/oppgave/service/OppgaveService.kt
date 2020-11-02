@@ -48,7 +48,6 @@ class OppgaveService(
     }
 
     private fun OppgaveResponse.toView(): List<OppgaveView> {
-
         val brukere = getBrukere(getFnr(this.oppgaver))
         val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(oppgaver))
 
@@ -63,7 +62,7 @@ class OppgaveService(
         saksbehandlere: Map<String, Saksbehandler>
     ): OppgaveView {
         return OppgaveView(
-            id = oppgave.id,
+            id = oppgave.id.toString(),
             bruker = brukere[oppgave.getFnrForBruker()] ?: Bruker("Mangler fnr", "Mangler fnr"),
             type = oppgave.toType(),
             ytelse = oppgave.tema,
@@ -156,8 +155,8 @@ class OppgaveService(
         }
     }
 
-    fun setHjemmel(oppgaveId: Int, hjemmel: String, oppgaveVersjon: Int?): OppgaveView {
-        var oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
+    fun setHjemmel(oppgaveId: Long, hjemmel: String, oppgaveVersjon: Int?): OppgaveView {
+        val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         oppgave.apply {
             setHjemmel(hjemmel)
             versjon = oppgaveVersjon
@@ -174,7 +173,7 @@ class OppgaveService(
         metadata!![HJEMMEL] = hjemmel
     }
 
-    fun assignOppgave(oppgaveId: Int, saksbehandlerIdent: String?, oppgaveVersjon: Int?): OppgaveView {
+    fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?): OppgaveView {
         val oppgave = oppgaveRepository.getOppgave(oppgaveId).toEndreOppgave()
         logger.info(
             "Endrer tilordnetRessurs for oppgave {} fra {} til {}, versjon er {}",
@@ -191,7 +190,7 @@ class OppgaveService(
         return updateAndReturn(oppgaveId, oppgave)
     }
 
-    fun getOppgave(oppgaveId: Int): OppgaveView {
+    fun getOppgave(oppgaveId: Long): OppgaveView {
         val oppgave = oppgaveRepository.getOppgave(oppgaveId)
         val brukere = getBrukere(getFnr(listOf(oppgave)))
         val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenter(listOf(oppgave)))
@@ -199,7 +198,7 @@ class OppgaveService(
     }
 
     private fun updateAndReturn(
-        oppgaveId: Int,
+        oppgaveId: Long,
         oppgave: EndreOppgave
     ): OppgaveView {
         val endretOppgave = oppgaveRepository.updateOppgave(oppgaveId, oppgave)
@@ -207,6 +206,7 @@ class OppgaveService(
         val saksbehandlere = getSaksbehandlere(getSaksbehandlerIdenterForEndring(listOf(oppgave)))
         return toView(endretOppgave, brukere, saksbehandlere)
     }
+
 }
 
 data class OppgaveSearchCriteria(

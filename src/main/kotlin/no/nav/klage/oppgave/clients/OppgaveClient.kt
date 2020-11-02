@@ -105,7 +105,7 @@ class OppgaveClient(
 
     @Retryable
     fun putOppgave(
-        oppgaveId: Int,
+        oppgaveId: Long,
         oppgave: EndreOppgave
     ): Oppgave {
         return logTimingAndWebClientResponseException("putOppgave") {
@@ -125,7 +125,7 @@ class OppgaveClient(
     }
 
     @Retryable
-    fun getOppgave(oppgaveId: Int): Oppgave {
+    fun getOppgave(oppgaveId: Long): Oppgave {
         return logTimingAndWebClientResponseException("getOppgave") {
             oppgaveWebClient.get()
                 .uri { uriBuilder ->
