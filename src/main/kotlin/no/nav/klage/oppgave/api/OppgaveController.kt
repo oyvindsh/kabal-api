@@ -1,5 +1,8 @@
 package no.nav.klage.oppgave.api
 
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.domain.view.OppgaveView
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
 @RestController
+@Api(tags = ["klage-oppgave-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerService: SaksbehandlerService) {
 
@@ -21,6 +25,23 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
+
+    @ApiOperation(value = "Hent oppgaver", notes = "Henter alle oppgaver som saksbehandler har tilgang til.")
+    @GetMapping("/ansatte/{navIdent}/ikketildelteoppgaver", produces = ["application/json"])
+    fun getOppgaver(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        @ApiParam(value = "Klage eller anke")
+        @RequestParam(name = "type", required = false) type: String,
+        @RequestParam(required = false) ytelse: String,
+        @RequestParam(required = false) hjemmel: String,
+        @RequestParam(required = false) orderby: String,
+        @ApiParam(value = "Order {asc|desc}")
+        @RequestParam(required = false) order: String,
+    ): List<OppgaveView> {
+        TODO()
+    }
+
 
     @GetMapping("/tilganger")
     fun getTilganger(): Tilganger {
