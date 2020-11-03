@@ -11,6 +11,7 @@ import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.zalando.problem.Problem
 import org.zalando.problem.Status
+import org.zalando.problem.ThrowableProblem
 import org.zalando.problem.spring.web.advice.AdviceTrait
 import org.zalando.problem.spring.web.advice.ProblemHandling
 
@@ -29,7 +30,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
-    fun handleOppgaveIdNotParsable(ex: OppgaveIdWrongFormatException, request: NativeWebRequest): ResponseEntity<Problem> =
+    fun handleOppgaveIdNotParsable(
+        ex: OppgaveIdWrongFormatException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
@@ -37,15 +41,17 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         ex: WebClientResponseException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
-        create(
-            ex, Problem.builder()
-                .withStatus(mapStatus(ex.statusCode))
-                .withTitle(ex.statusText)
-                .withDetail(ex.responseBodyAsString)
-                .build(), request
-        )
+        create(ex, createProblem(ex), request)
+    
+    private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
+        return Problem.builder()
+            .withStatus(mapStatus(ex.statusCode))
+            .withTitle(ex.statusText)
+            .withDetail(ex.responseBodyAsString)
+            .build()
+    }
 
-    fun mapStatus(status: HttpStatus): Status =
+    private fun mapStatus(status: HttpStatus): Status =
         try {
             Status.valueOf(status.value())
         } catch (ex: Exception) {
