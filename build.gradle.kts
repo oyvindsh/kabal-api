@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val exposedVersion = "0.21.1"
 val mockkVersion = "1.9.3"
 val h2Version = "1.4.200"
-val tokenValidationVersion = "1.3.0"
+val tokenValidationVersion = "1.3.1"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
 val springSleuthVersion = "2.2.3.RELEASE"
@@ -12,6 +12,7 @@ val problemSpringWebStartVersion = "0.26.2"
 
 val springRetryVersion = "1.3.0"
 val springMockkVersion = "2.0.3"
+val springFoxVersion = "3.0.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -46,6 +47,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
+    implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 
     implementation("org.projectreactor:reactor-spring:1.0.1.RELEASE")
 
