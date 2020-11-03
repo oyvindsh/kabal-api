@@ -6,6 +6,8 @@ import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
+import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.retry.annotation.Retryable
@@ -20,7 +22,8 @@ import java.net.URI
 @Component
 class OppgaveClient(
     private val oppgaveWebClient: WebClient,
-    private val stsClient: StsClient,
+    private val clientConfigurationProperties: ClientConfigurationProperties,
+    private val oAuth2AccessTokenService: OAuth2AccessTokenService,
     private val tracer: Tracer,
     @Value("\${spring.application.name}") val applicationName: String
 ) {
@@ -43,7 +46,7 @@ class OppgaveClient(
                 .uri { uriBuilder ->
                     buildDefaultUri(uriBuilder, offset)
                 }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${getSaksbehandlerTokenWithGraphScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -57,7 +60,7 @@ class OppgaveClient(
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${getSaksbehandlerTokenWithGraphScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -114,7 +117,7 @@ class OppgaveClient(
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${getSaksbehandlerTokenWithGraphScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .bodyValue(oppgave)
@@ -131,7 +134,7 @@ class OppgaveClient(
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${getSaksbehandlerTokenWithGraphScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -162,7 +165,15 @@ class OppgaveClient(
             logger.info("Method {} took {} millis", methodName, (end - start))
         }
     }
+
+    private fun getSaksbehandlerTokenWithGraphScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
 }
+
+
 
 
 
