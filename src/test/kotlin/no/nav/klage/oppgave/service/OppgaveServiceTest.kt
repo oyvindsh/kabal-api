@@ -1,20 +1,7 @@
 package no.nav.klage.oppgave.service
 
-import io.mockk.every
-import io.mockk.mockk
-import no.nav.klage.oppgave.clients.PdlClient
-import no.nav.klage.oppgave.domain.gosys.*
-import no.nav.klage.oppgave.domain.pdl.*
-import no.nav.klage.oppgave.domain.view.HJEMMEL
-import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
-import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
-import no.nav.klage.oppgave.repositories.OppgaveRepository
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
-import java.time.LocalDate
-
 internal class OppgaveServiceTest {
-
+/*
     @Test
     fun `type is klage`() {
         val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_KLAGE)
@@ -161,5 +148,5 @@ internal class OppgaveServiceTest {
             )
         )
     )
-
+*/
 }

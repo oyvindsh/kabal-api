@@ -1,25 +1,11 @@
 package no.nav.klage.oppgave.clients
 
-import brave.Tracer
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.klage.oppgave.domain.gosys.Oppgave
-import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
-import org.assertj.core.api.Assertions.assertThat
-import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.http.HttpStatus
-import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.time.LocalDate
-import java.time.Month
 
 @ExtendWith(MockKExtension::class)
 internal class OppgaveClientTest {
-
+/*
     @MockK
     lateinit var stsClientMock: StsClient
 
@@ -168,4 +154,6 @@ internal class OppgaveClientTest {
           "feilmelding": "Fant ingen oppgave med id: 3333"
         }
     """.trimIndent()
+
+ */
 }

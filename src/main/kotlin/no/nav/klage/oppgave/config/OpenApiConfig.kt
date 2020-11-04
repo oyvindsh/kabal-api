@@ -22,7 +22,6 @@ class OpenApiConfig {
             .pathMapping("/")
             .directModelSubstitute(LocalDate::class.java, String::class.java)
             .genericModelSubstitutes(ResponseEntity::class.java)
-            .enableUrlTemplating(true)
             .tags(Tag("klage-oppgave-api", "oppgave-api for saksbehandlere ved klageinstansen"))
     }
 
