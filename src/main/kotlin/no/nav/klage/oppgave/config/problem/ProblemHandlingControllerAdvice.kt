@@ -41,6 +41,7 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     fun handleNotMatchingUser(ex: NotMatchingUserException, request: NativeWebRequest): ResponseEntity<Problem> =
         create(Status.FORBIDDEN, ex, request)
 
+    @ExceptionHandler
     fun handleResponseStatusException(
         ex: WebClientResponseException,
         request: NativeWebRequest
