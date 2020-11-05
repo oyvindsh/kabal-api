@@ -4,7 +4,7 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.klage.oppgave.domain.OppgaverQueryParams
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.Oppgave
 import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -68,7 +68,7 @@ internal class OppgaveClientTest {
             "appName"
         )
 
-        return oppgaveClient.getOneSearchPage(OppgaverQueryParams(offset = 0, limit = 1), null)
+        return oppgaveClient.getOneSearchPage(OppgaverSearchCriteria(offset = 0, limit = 1))
     }
 
     fun getNonExistingOppgave(): Oppgave {

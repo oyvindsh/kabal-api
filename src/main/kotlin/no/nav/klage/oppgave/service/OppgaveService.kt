@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
-import no.nav.klage.oppgave.domain.OppgaverQueryParams
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
 import no.nav.klage.oppgave.domain.gosys.Gruppe.FOLKEREGISTERIDENT
@@ -30,22 +30,22 @@ class OppgaveService(
 
     fun searchTildelteOppgaver(
         navIdent: String,
-        oppgaverQueryParams: OppgaverQueryParams
+        oppgaverSearchCriteria: OppgaverSearchCriteria
     ): TildelteOppgaverRespons {
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         if (innloggetIdent != navIdent) {
             throw NotMatchingUserException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $navIdent")
         }
 
-        val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverQueryParams, navIdent)
+        val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
         return TildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toTildelteOppgaverView()
         )
     }
 
-    fun searchIkkeTildelteOppgaver(oppgaverQueryParams: OppgaverQueryParams): IkkeTildelteOppgaverRespons {
-        val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverQueryParams, navIdent = null)
+    fun searchIkkeTildelteOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): IkkeTildelteOppgaverRespons {
+        val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
         return IkkeTildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toIkkeTildelteOppgaverView()

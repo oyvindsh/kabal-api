@@ -5,11 +5,11 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.view.IkkeTildelteOppgaverRespons
 import no.nav.klage.oppgave.domain.view.TildelteOppgaverRespons
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.service.OppgaveService
-import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Api(tags = ["klage-oppgave-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerService: SaksbehandlerService) {
+class OppgaveController(val oppgaveService: OppgaveService) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -37,7 +37,7 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         queryParams: OppgaverQueryParams
     ): IkkeTildelteOppgaverRespons {
         logger.debug("Params: {}", queryParams)
-        return oppgaveService.searchIkkeTildelteOppgaver(queryParams)
+        return oppgaveService.searchIkkeTildelteOppgaver(queryParams.toSearchCriteria())
     }
 
     @ApiOperation(
@@ -51,7 +51,7 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         queryParams: OppgaverQueryParams
     ): TildelteOppgaverRespons {
         logger.debug("Params: {}", queryParams)
-        return oppgaveService.searchTildelteOppgaver(navIdent, queryParams)
+        return oppgaveService.searchTildelteOppgaver(navIdent, queryParams.toSearchCriteria(navIdent))
     }
 
 //    @GetMapping("/oppgaver/{id}")
@@ -94,6 +94,17 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
 
     private fun String?.toLongOrException() =
         this?.toLongOrNull() ?: throw OppgaveIdWrongFormatException("OppgaveId could not be parsed as a Long")
+
+    private fun OppgaverQueryParams.toSearchCriteria(saksbehandler: String? = null) = OppgaverSearchCriteria(
+        typer = typer,
+        ytelser = ytelser,
+        hjemler = hjemler,
+        orderBy = orderBy,
+        order = if (order != null) OppgaverSearchCriteria.Order.valueOf(order.name) else null,
+        offset = offset,
+        limit = limit,
+        saksbehandler = saksbehandler
+    )
 
 }
 

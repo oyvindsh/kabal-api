@@ -52,7 +52,7 @@ internal class OppgaveServiceTest {
     fun `fnr is mapped correctly`() {
         val fnr = "12345678910"
         val oppgaveClient = mockk<OppgaveClient>()
-        every { oppgaveClient.getOneSearchPage(any(), any()) } returns getOppgaveResponseWithIdenter(fnr)
+        every { oppgaveClient.getOneSearchPage(any()) } returns getOppgaveResponseWithIdenter(fnr)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(listOf(fnr)) } returns getHentPersonResponse()
@@ -92,7 +92,7 @@ internal class OppgaveServiceTest {
 
     private fun oppgaveServiceWithHjemmel(hjemmel: String): OppgaveService {
         val oppgaveClientMock = mockk<OppgaveClient>()
-        every { oppgaveClientMock.getOneSearchPage(any(), any()) } returns getOppgaveResponseWithHjemmel(hjemmel)
+        every { oppgaveClientMock.getOneSearchPage(any()) } returns getOppgaveResponseWithHjemmel(hjemmel)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
@@ -107,7 +107,7 @@ internal class OppgaveServiceTest {
 
     private fun oppgaveServiceWithType(type: String): OppgaveService {
         val oppgaveClientMock = mockk<OppgaveClient>()
-        every { oppgaveClientMock.getOneSearchPage(any(), any()) } returns getOppgaveResponseWithType(type)
+        every { oppgaveClientMock.getOneSearchPage(any()) } returns getOppgaveResponseWithType(type)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()

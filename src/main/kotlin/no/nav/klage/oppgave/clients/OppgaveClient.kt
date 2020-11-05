@@ -1,8 +1,7 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
-import no.nav.klage.oppgave.domain.OppgaverQueryParams
-import no.nav.klage.oppgave.domain.OppgaverQueryParams.Order
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
 import no.nav.klage.oppgave.domain.gosys.EndreOppgave
 import no.nav.klage.oppgave.domain.gosys.Oppgave
@@ -34,16 +33,15 @@ class OppgaveClient(
         private val logger = getLogger(javaClass.enclosingClass)
         private val securelogger = getSecureLogger()
 
-        const val TEMA_SYK = "SYK"
         const val STATUSKATEGORI_AAPEN = "AAPEN"
         const val HJEMMEL = "HJEMMEL"
     }
 
     @Retryable
-    fun getOneSearchPage(oppgaveSearchCriteria: OppgaverQueryParams, navIdent: String?): OppgaveResponse {
+    fun getOneSearchPage(oppgaveSearchCriteria: OppgaverSearchCriteria): OppgaveResponse {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
-                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, navIdent) }
+                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
                 .header("Authorization", "Bearer ${stsClient.oidcToken()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
@@ -53,7 +51,7 @@ class OppgaveClient(
         }
     }
 
-    private fun OppgaverQueryParams.buildUri(origUriBuilder: UriBuilder, navIdent: String?): URI {
+    private fun OppgaverSearchCriteria.buildUri(origUriBuilder: UriBuilder): URI {
         logger.debug("Search criteria: {}", this)
         val uriBuilder = origUriBuilder
             .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
@@ -68,13 +66,13 @@ class OppgaveClient(
         }
 
 //      Do we need this? ->  uriBuilder.queryParam("tildeltRessurs", true|false)
-        navIdent?.let {
-            uriBuilder.queryParam("tilordnetRessurs", navIdent)
+        saksbehandler?.let {
+            uriBuilder.queryParam("tilordnetRessurs", saksbehandler)
         }
 
         //FRIST is default in oppgave-api.
 //        uriBuilder.queryParam("sorteringsfelt", orderBy ?: "frist")
-        uriBuilder.queryParam("sorteringsrekkefolge", order ?: Order.ASC)
+        uriBuilder.queryParam("sorteringsrekkefolge", order ?: OppgaverSearchCriteria.Order.ASC)
 
         if (hjemler.isNotEmpty()) {
             uriBuilder.queryParam("metadatanokkel", HJEMMEL)
@@ -89,7 +87,7 @@ class OppgaveClient(
     }
 
     private fun mapType(type: String): String {
-        return when(type) {
+        return when (type) {
             "klage" -> BEHANDLINGSTYPE_KLAGE
             else -> {
                 logger.warn("invalid type: {}", type)
