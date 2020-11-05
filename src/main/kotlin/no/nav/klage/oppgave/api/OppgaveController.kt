@@ -12,7 +12,6 @@ import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -27,8 +26,10 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Unprotected
-    @ApiOperation(value = "Hent ikke tildelte oppgaver for en ansatt", notes = "Henter alle oppgaver som saksbehandler har tilgang til.")
+    @ApiOperation(
+        value = "Hent ikke tildelte oppgaver for en ansatt",
+        notes = "Henter alle oppgaver som saksbehandler har tilgang til."
+    )
     @GetMapping("/ansatte/{navIdent}/ikketildelteoppgaver", produces = ["application/json"])
     fun getIkkeTildelteOppgaver(
         @ApiParam(value = "NavIdent til en ansatt")
@@ -39,8 +40,10 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         return oppgaveService.searchIkkeTildelteOppgaver(queryParams)
     }
 
-    @Unprotected
-    @ApiOperation(value = "Hent tildelte oppgaver for en ansatt", notes = "Henter alle oppgaver som saksbehandler har tilgang til.")
+    @ApiOperation(
+        value = "Hent tildelte oppgaver for en ansatt",
+        notes = "Henter alle oppgaver som saksbehandler har tilgang til."
+    )
     @GetMapping("/ansatte/{saksbehandlerident}/tildelteoppgaver", produces = ["application/json"])
     fun getTildelteOppgaver(
         @ApiParam(value = "NavIdent til en ansatt")
