@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config.problem
 
+import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import org.springframework.http.ResponseEntity
@@ -23,5 +24,9 @@ interface OppgaveNotFoundExceptionAdviceTrait : AdviceTrait {
     @ExceptionHandler
     fun handleOppgaveIdNotParsable(ex: OppgaveIdWrongFormatException, request: NativeWebRequest): ResponseEntity<Problem> =
         create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleNotMatchingUser(ex: NotMatchingUserException, request: NativeWebRequest): ResponseEntity<Problem> =
+        create(Status.FORBIDDEN, ex, request)
 
 }

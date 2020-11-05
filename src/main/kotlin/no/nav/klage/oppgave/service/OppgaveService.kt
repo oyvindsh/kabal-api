@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.gosys.Oppgave
 import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.*
+import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.OppgaveRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -31,11 +32,9 @@ class OppgaveService(
         navIdent: String,
         oppgaverQueryParams: OppgaverQueryParams
     ): TildelteOppgaverRespons {
-
-        //TODO improve with better exception
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         if (innloggetIdent != navIdent) {
-            throw RuntimeException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $navIdent")
+            throw NotMatchingUserException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $navIdent")
         }
 
         val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, navIdent)
