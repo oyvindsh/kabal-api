@@ -44,34 +44,15 @@ class OppgaveController(val oppgaveService: OppgaveService, val saksbehandlerSer
         value = "Hent tildelte oppgaver for en ansatt",
         notes = "Henter alle oppgaver som saksbehandler har tilgang til."
     )
-    @GetMapping("/ansatte/{saksbehandlerident}/tildelteoppgaver", produces = ["application/json"])
+    @GetMapping("/ansatte/{navIdent}/tildelteoppgaver", produces = ["application/json"])
     fun getTildelteOppgaver(
         @ApiParam(value = "NavIdent til en ansatt")
-        @PathVariable(name = "saksbehandlerident") saksbehandlerIdent: String,
+        @PathVariable navIdent: String,
         queryParams: OppgaverQueryParams
     ): TildelteOppgaverRespons {
         logger.debug("Params: {}", queryParams)
-        return oppgaveService.searchTildelteOppgaver(saksbehandlerIdent, queryParams)
+        return oppgaveService.searchTildelteOppgaver(navIdent, queryParams)
     }
-
-//    @GetMapping("/oppgaver")
-//    fun getOppgaver(
-//        @RequestParam(name = "erTildelt", required = false) erTildelt: Boolean?,
-//        @RequestParam(name = "saksbehandler", required = false) saksbehandler: String?,
-//    ): List<OppgaveView> {
-////        logger.debug("getOppgaver is requested")
-////        return if (erTildelt == null && saksbehandler == null) {
-////            oppgaveService.getOppgaver()
-////        } else {
-////            oppgaveService.searchOppgaver(
-////                OppgaveSearchCriteria(
-////                    erTildeltSaksbehandler = erTildelt,
-////                    saksbehandler = saksbehandler
-////                )
-////            )
-////        }
-//        TODO()
-//    }
 
 //    @GetMapping("/oppgaver/{id}")
 //    fun getOppgave(@PathVariable("id") oppgaveId: String): OppgaveView {

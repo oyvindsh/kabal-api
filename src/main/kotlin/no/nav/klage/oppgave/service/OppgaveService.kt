@@ -28,17 +28,17 @@ class OppgaveService(
     }
 
     fun searchTildelteOppgaver(
-        saksbehandlerIdent: String,
+        navIdent: String,
         oppgaverQueryParams: OppgaverQueryParams
     ): TildelteOppgaverRespons {
 
         //TODO improve with better exception
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        if (innloggetIdent != saksbehandlerIdent) {
-            throw RuntimeException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $saksbehandlerIdent")
+        if (innloggetIdent != navIdent) {
+            throw RuntimeException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $navIdent")
         }
 
-        val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, saksbehandlerIdent)
+        val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, navIdent)
         return TildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toTildelteOppgaverView()
@@ -46,7 +46,7 @@ class OppgaveService(
     }
 
     fun searchIkkeTildelteOppgaver(oppgaverQueryParams: OppgaverQueryParams): IkkeTildelteOppgaverRespons {
-        val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, saksbehandlerIdent = null)
+        val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, navIdent = null)
         return IkkeTildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toIkkeTildelteOppgaverView()

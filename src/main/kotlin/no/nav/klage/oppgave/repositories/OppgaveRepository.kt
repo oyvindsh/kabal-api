@@ -20,10 +20,10 @@ class OppgaveRepository(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun searchOppgaver(oppgaverSearchCriteria: OppgaverQueryParams, saksbehandlerIdent: String?): OppgaveResponse {
+    fun searchOppgaver(oppgaverSearchCriteria: OppgaverQueryParams, navIdent: String?): OppgaveResponse {
         logger.debug("Searching for oppgaver")
 
-        return oppgaveClient.getOneSearchPage(oppgaverSearchCriteria, saksbehandlerIdent).also {
+        return oppgaveClient.getOneSearchPage(oppgaverSearchCriteria, navIdent).also {
             logger.debug("Retrieved {} of {} oppgaver in search", it.oppgaver.size, it.antallTreffTotalt)
         }
     }

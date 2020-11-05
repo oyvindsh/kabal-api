@@ -40,10 +40,10 @@ class OppgaveClient(
     }
 
     @Retryable
-    fun getOneSearchPage(oppgaveSearchCriteria: OppgaverQueryParams, saksbehandlerIdent: String?): OppgaveResponse {
+    fun getOneSearchPage(oppgaveSearchCriteria: OppgaverQueryParams, navIdent: String?): OppgaveResponse {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
-                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, saksbehandlerIdent) }
+                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, navIdent) }
                 .header("Authorization", "Bearer ${stsClient.oidcToken()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
@@ -53,7 +53,7 @@ class OppgaveClient(
         }
     }
 
-    private fun OppgaverQueryParams.buildUri(origUriBuilder: UriBuilder, saksbehandlerIdent: String?): URI {
+    private fun OppgaverQueryParams.buildUri(origUriBuilder: UriBuilder, navIdent: String?): URI {
         logger.debug("Search criteria: {}", this)
         val uriBuilder = origUriBuilder
             .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
@@ -68,8 +68,8 @@ class OppgaveClient(
         }
 
 //      Do we need this? ->  uriBuilder.queryParam("tildeltRessurs", true|false)
-        saksbehandlerIdent?.let {
-            uriBuilder.queryParam("tilordnetRessurs", saksbehandlerIdent)
+        navIdent?.let {
+            uriBuilder.queryParam("tilordnetRessurs", navIdent)
         }
 
         //FRIST is default in oppgave-api.
@@ -158,6 +158,3 @@ class OppgaveClient(
         }
     }
 }
-
-
-
