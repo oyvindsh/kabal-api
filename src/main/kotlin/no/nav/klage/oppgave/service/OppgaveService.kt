@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
 import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
@@ -11,14 +12,13 @@ import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.*
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.repositories.OppgaveRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 
 
 @Service
 class OppgaveService(
-    val oppgaveRepository: OppgaveRepository,
+    val oppgaveClient: OppgaveClient,
     val pdlClient: PdlClient,
     val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
@@ -37,7 +37,7 @@ class OppgaveService(
             throw NotMatchingUserException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $navIdent")
         }
 
-        val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, navIdent)
+        val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverQueryParams, navIdent)
         return TildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toTildelteOppgaverView()
@@ -45,7 +45,7 @@ class OppgaveService(
     }
 
     fun searchIkkeTildelteOppgaver(oppgaverQueryParams: OppgaverQueryParams): IkkeTildelteOppgaverRespons {
-        val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, navIdent = null)
+        val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverQueryParams, navIdent = null)
         return IkkeTildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toIkkeTildelteOppgaverView()
