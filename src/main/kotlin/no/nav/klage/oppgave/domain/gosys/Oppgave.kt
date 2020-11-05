@@ -38,7 +38,7 @@ data class Oppgave(
     val prioritet: Prioritet? = null,
     val status: Status? = null,
     val metadata: Map<String, String>? = null,
-    val fristFerdigstillelse: LocalDate,
+    val fristFerdigstillelse: LocalDate?,
     val aktivDato: String? = null,
     val opprettetTidspunkt: String? = null,
     val ferdigstiltTidspunkt: String? = null,

@@ -1,43 +1,58 @@
 package no.nav.klage.oppgave.service
 
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.klage.oppgave.clients.PdlClient
+import no.nav.klage.oppgave.domain.gosys.*
+import no.nav.klage.oppgave.domain.pdl.*
+import no.nav.klage.oppgave.domain.view.HJEMMEL
+import no.nav.klage.oppgave.domain.view.TYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
+import no.nav.klage.oppgave.repositories.OppgaveRepository
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import java.time.LocalDate
+
 internal class OppgaveServiceTest {
-/*
+
     @Test
     fun `type is klage`() {
         val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_KLAGE)
-        assertThat(oppgaveService.getOppgaver().first().type).isEqualTo(TYPE_KLAGE)
+        assertThat(oppgaveService.searchTildelteOppgaver("", mockk()).oppgaver.first().type).isEqualTo(TYPE_KLAGE)
     }
 
     @Test
     fun `type is feilutbetaling`() {
         val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_FEILUTBETALING)
-        assertThat(oppgaveService.getOppgaver().first().type).isEqualTo(TYPE_FEILUTBETALING)
+        assertThat(oppgaveService.searchTildelteOppgaver("", mockk()).oppgaver.first().type).isEqualTo(
+            TYPE_FEILUTBETALING
+        )
     }
 
     @Test
     fun `unknown type`() {
         val oppgaveService = oppgaveServiceWithType("somethingelse")
-        assertThat(oppgaveService.getOppgaver().first().type).isEqualTo("mangler")
+        assertThat(oppgaveService.searchTildelteOppgaver("", mockk()).oppgaver.first().type).isEqualTo("mangler")
     }
 
     @Test
     fun `hjemmel is set correctly`() {
         val hjemmel = "8-1"
         val oppgaveService = oppgaveServiceWithHjemmel(hjemmel)
-        assertThat(oppgaveService.getOppgaver().first().hjemmel).isEqualTo(hjemmel)
+        assertThat(oppgaveService.searchTildelteOppgaver("", mockk()).oppgaver.first().hjemmel).isEqualTo(hjemmel)
     }
 
     @Test
     fun `missing hjemmel does not fail`() {
         val oppgaveService = oppgaveServiceWithType("something")
-        assertThat(oppgaveService.getOppgaver().first().hjemmel).isEqualTo("mangler")
+        assertThat(oppgaveService.searchTildelteOppgaver("", mockk()).oppgaver.first().hjemmel).isEqualTo("mangler")
     }
 
     @Test
     fun `fnr is mapped correctly`() {
         val fnr = "12345678910"
         val oppgaveRepository = mockk<OppgaveRepository>()
-        every { oppgaveRepository.getOppgaver() } returns getOppgaveResponseWithIdenter(fnr)
+        every { oppgaveRepository.searchOppgaver(any(), any()) } returns getOppgaveResponseWithIdenter(fnr)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(listOf(fnr)) } returns getHentPersonResponse()
@@ -48,7 +63,7 @@ internal class OppgaveServiceTest {
             mockk(relaxed = true)
         )
 
-        assertThat(oppgaveService.getOppgaver().first().bruker.fnr).isEqualTo(fnr)
+        assertThat(oppgaveService.searchTildelteOppgaver("", mockk()).oppgaver.first().bruker.fnr).isEqualTo(fnr)
     }
 
     private fun getHentPersonResponse(): HentPersonResponse {
@@ -77,7 +92,7 @@ internal class OppgaveServiceTest {
 
     private fun oppgaveServiceWithHjemmel(hjemmel: String): OppgaveService {
         val oppgaveRepositoryMock = mockk<OppgaveRepository>()
-        every { oppgaveRepositoryMock.getOppgaver() } returns getOppgaveResponseWithHjemmel(hjemmel)
+        every { oppgaveRepositoryMock.searchOppgaver(any(), any()) } returns getOppgaveResponseWithHjemmel(hjemmel)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
@@ -92,7 +107,7 @@ internal class OppgaveServiceTest {
 
     private fun oppgaveServiceWithType(type: String): OppgaveService {
         val oppgaveRepositoryMock = mockk<OppgaveRepository>()
-        every { oppgaveRepositoryMock.getOppgaver() } returns getOppgaveResponseWithType(type)
+        every { oppgaveRepositoryMock.searchOppgaver(any(), any()) } returns getOppgaveResponseWithType(type)
 
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
@@ -111,7 +126,8 @@ internal class OppgaveServiceTest {
                 id = 1,
                 behandlingstype = type,
                 fristFerdigstillelse = LocalDate.now(),
-                tema = "SYK"
+                tema = "SYK",
+                versjon = 0
             )
         )
     )
@@ -123,7 +139,8 @@ internal class OppgaveServiceTest {
                 id = 1,
                 fristFerdigstillelse = LocalDate.now(),
                 tema = "SYK",
-                metadata = mapOf(HJEMMEL to hjemmel)
+                metadata = mapOf(HJEMMEL to hjemmel),
+                versjon = 0
             )
         )
     )
@@ -144,9 +161,10 @@ internal class OppgaveServiceTest {
                         ident = fnr,
                         gruppe = Gruppe.FOLKEREGISTERIDENT
                     )
-                )
+                ),
+                versjon = 0
             )
         )
     )
-*/
+
 }

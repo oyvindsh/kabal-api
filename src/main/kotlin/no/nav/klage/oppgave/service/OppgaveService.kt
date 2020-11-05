@@ -27,11 +27,15 @@ class OppgaveService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun searchTildelteOppgaver(saksbehandlerIdent: String, oppgaverQueryParams: OppgaverQueryParams): TildelteOppgaverRespons {
+    fun searchTildelteOppgaver(
+        saksbehandlerIdent: String,
+        oppgaverQueryParams: OppgaverQueryParams
+    ): TildelteOppgaverRespons {
 
         //TODO improve with better exception
-        if (innloggetSaksbehandlerRepository.getInnloggetIdent() != saksbehandlerIdent) {
-            throw RuntimeException("logged in user does not match sent in user")
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        if (innloggetIdent != saksbehandlerIdent) {
+            throw RuntimeException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $saksbehandlerIdent")
         }
 
         val oppgaveResponse = oppgaveRepository.searchOppgaver(oppgaverQueryParams, saksbehandlerIdent)

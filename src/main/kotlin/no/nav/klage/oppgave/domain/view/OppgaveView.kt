@@ -36,6 +36,6 @@ data class IkkeTildeltOppgave(
     val type: String,
     val ytelse: String,
     val hjemmel: String?,
-    val frist: LocalDate,
+    val frist: LocalDate?,
     val versjon: Int
 )
