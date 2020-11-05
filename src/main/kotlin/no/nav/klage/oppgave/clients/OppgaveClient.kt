@@ -1,9 +1,12 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
-import no.nav.klage.oppgave.domain.gosys.*
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
+import no.nav.klage.oppgave.domain.gosys.EndreOppgave
+import no.nav.klage.oppgave.domain.gosys.Oppgave
+import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
-import no.nav.klage.oppgave.service.OppgaveSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
@@ -30,33 +33,15 @@ class OppgaveClient(
         private val logger = getLogger(javaClass.enclosingClass)
         private val securelogger = getSecureLogger()
 
-        const val TEMA_SYK = "SYK"
         const val STATUSKATEGORI_AAPEN = "AAPEN"
         const val HJEMMEL = "HJEMMEL"
-
     }
 
     @Retryable
-    fun getOnePage(offset: Int): OppgaveResponse {
-        return logTimingAndWebClientResponseException("getOnePage") {
-            oppgaveWebClient.get()
-                .uri { uriBuilder ->
-                    buildDefaultUri(uriBuilder, offset)
-                }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
-                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
-                .header("Nav-Consumer-Id", applicationName)
-                .retrieve()
-                .bodyToMono<OppgaveResponse>()
-                .block() ?: throw RuntimeException("Oppgaver could not be fetched")
-        }
-    }
-
-    @Retryable
-    fun getOneSearchPage(oppgaveSearchCriteria: OppgaveSearchCriteria, offset: Int): OppgaveResponse {
+    fun getOneSearchPage(oppgaveSearchCriteria: OppgaverSearchCriteria): OppgaveResponse {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
-                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder, offset) }
+                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
                 .header("Authorization", "Bearer ${stsClient.oidcToken()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
@@ -66,41 +51,49 @@ class OppgaveClient(
         }
     }
 
-    private fun buildDefaultUri(uriBuilder: UriBuilder, offset: Int): URI {
-        return uriBuilder
+    private fun OppgaverSearchCriteria.buildUri(origUriBuilder: UriBuilder): URI {
+        logger.debug("Search criteria: {}", this)
+        val uriBuilder = origUriBuilder
             .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
-            .queryParam("tema", TEMA_SYK)
-            .queryParam("behandlingstype", BEHANDLINGSTYPE_KLAGE)
-            .queryParam("behandlingstype", BEHANDLINGSTYPE_FEILUTBETALING)
-            .queryParam("limit", 100)
             .queryParam("offset", offset)
-            .build()
-    }
+            .queryParam("limit", limit)
 
-    private fun OppgaveSearchCriteria.buildUri(origUriBuilder: UriBuilder, offset: Int): URI {
-        logger.debug("Searchcriteria: {}", this)
-        var uriBuilder = origUriBuilder
-            .queryParam("statuskategori", OppgaveClient.STATUSKATEGORI_AAPEN)
-            .queryParam("limit", 100)
-            .queryParam("offset", offset)
+        typer.forEach {
+            uriBuilder.queryParam("behandlingstype", mapType(it))
+        }
+        ytelser.forEach {
+            uriBuilder.queryParam("tema", it)
+        }
 
-        this.type?.let { uriBuilder = uriBuilder.queryParam("behandlingstype", mapType(it)) }
-        this.ytelse?.let { uriBuilder = uriBuilder.queryParam("tema", mapYtelseTilTema(it)) }
-        this.erTildeltSaksbehandler?.let { uriBuilder = uriBuilder.queryParam("tildeltRessurs", it) }
-        this.saksbehandler?.let { uriBuilder = uriBuilder.queryParam("tilordnetRessurs", it) }
+//      Do we need this? ->  uriBuilder.queryParam("tildeltRessurs", true|false)
+        saksbehandler?.let {
+            uriBuilder.queryParam("tilordnetRessurs", saksbehandler)
+        }
+
+        //FRIST is default in oppgave-api.
+//        uriBuilder.queryParam("sorteringsfelt", orderBy ?: "frist")
+        uriBuilder.queryParam("sorteringsrekkefolge", order ?: OppgaverSearchCriteria.Order.ASC)
+
+        if (hjemler.isNotEmpty()) {
+            uriBuilder.queryParam("metadatanokkel", HJEMMEL)
+            hjemler.forEach {
+                uriBuilder.queryParam("metadataverdi", it)
+            }
+        }
+
         val uri = uriBuilder.build()
-        logger.info("Making searchrequest with query {}", uri.query)
+        logger.info("Making search request with query {}", uri.query)
         return uri
     }
 
     private fun mapType(type: String): String {
-        //TODO
-        return BEHANDLINGSTYPE_KLAGE
-    }
-
-    private fun mapYtelseTilTema(ytelse: String): String {
-        //TODO
-        return TEMA_SYK
+        return when (type) {
+            "klage" -> BEHANDLINGSTYPE_KLAGE
+            else -> {
+                logger.warn("invalid type: {}", type)
+                throw RuntimeException("Invalid type: $type")
+            }
+        }
     }
 
     @Retryable
@@ -155,7 +148,7 @@ class OppgaveClient(
             )
             throw ex
         } catch (rtex: RuntimeException) {
-            logger.debug("Caught runtimeexception", rtex)
+            logger.warn("Caught RuntimeException", rtex)
             throw rtex
         } finally {
             val end: Long = currentTimeMillis()
@@ -163,6 +156,3 @@ class OppgaveClient(
         }
     }
 }
-
-
-

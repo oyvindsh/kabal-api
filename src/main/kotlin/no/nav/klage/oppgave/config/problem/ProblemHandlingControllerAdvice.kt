@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config.problem
 
+import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.util.getLogger
@@ -35,6 +36,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleNotMatchingUser(ex: NotMatchingUserException, request: NativeWebRequest): ResponseEntity<Problem> =
+        create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
     fun handleResponseStatusException(
