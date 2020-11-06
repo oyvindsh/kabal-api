@@ -3,8 +3,10 @@ package no.nav.klage.oppgave.domain.view
 import java.time.LocalDate
 
 const val HJEMMEL = "HJEMMEL"
-const val TYPE_KLAGE = "klage"
-const val TYPE_FEILUTBETALING = "feilutbetaling"
+const val TYPE_KLAGE = "Klage"
+const val TYPE_ANKE = "Anke"
+const val YTELSE_SYK = "Sykepenger"
+const val YTELSE_FOR = "Foreldrepenger"
 
 data class TildelteOppgaverRespons(
     val antallTreffTotalt: Int,

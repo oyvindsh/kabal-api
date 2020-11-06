@@ -3,15 +3,13 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
-import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_FEILUTBETALING
-import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
+import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.gosys.Gruppe.FOLKEREGISTERIDENT
-import no.nav.klage.oppgave.domain.gosys.Oppgave
-import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.*
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 
@@ -20,7 +18,8 @@ import org.springframework.stereotype.Service
 class OppgaveService(
     val oppgaveClient: OppgaveClient,
     val pdlClient: PdlClient,
-    val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
     companion object {
@@ -37,6 +36,8 @@ class OppgaveService(
             throw NotMatchingUserException("logged in user does not match sent in user. Logged in: $innloggetIdent, sent in: $navIdent")
         }
 
+        oppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent)
+
         val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
         return TildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
@@ -45,11 +46,21 @@ class OppgaveService(
     }
 
     fun searchIkkeTildelteOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): IkkeTildelteOppgaverRespons {
+        oppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetSaksbehandlerRepository.getInnloggetIdent())
+
         val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
         return IkkeTildelteOppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toIkkeTildelteOppgaverView()
         )
+    }
+
+    private fun OppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent: String) {
+        val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(innloggetIdent)
+        if (tilgangerForSaksbehandler.enheter.size > 1) {
+            logger.warn("Saksbehandler ({}) had more than one enhet. Only using the first.", innloggetIdent)
+        }
+        this.enhetsnr = tilgangerForSaksbehandler.enheter.first().enhetId
     }
 
     private fun OppgaveResponse.toTildelteOppgaverView(): List<TildeltOppgave> {
@@ -60,7 +71,7 @@ class OppgaveService(
                 id = oppgave.id.toString(),
                 bruker = brukere[oppgave.getFnrForBruker()] ?: TildeltOppgave.Bruker("Mangler fnr", "Mangler fnr"),
                 type = oppgave.toType(),
-                ytelse = oppgave.tema,
+                ytelse = oppgave.toYtelse(),
                 hjemmel = oppgave.metadata.toHjemmel(),
                 frist = oppgave.fristFerdigstillelse,
                 versjon = oppgave.versjon
@@ -73,7 +84,7 @@ class OppgaveService(
             IkkeTildeltOppgave(
                 id = oppgave.id.toString(),
                 type = oppgave.toType(),
-                ytelse = oppgave.tema,
+                ytelse = oppgave.toYtelse(),
                 hjemmel = oppgave.metadata.toHjemmel(),
                 frist = oppgave.fristFerdigstillelse,
                 versjon = oppgave.versjon
@@ -105,10 +116,16 @@ class OppgaveService(
         return if (behandlingstema == null) {
             when (behandlingstype) {
                 BEHANDLINGSTYPE_KLAGE -> TYPE_KLAGE
-                BEHANDLINGSTYPE_FEILUTBETALING -> TYPE_FEILUTBETALING
-                else -> "mangler"
+                BEHANDLINGSTYPE_ANKE -> TYPE_ANKE
+                else -> "ukjent"
             }
         } else "mangler"
+    }
+
+    private fun Oppgave.toYtelse(): String = when (tema) {
+        TEMA_SYK -> YTELSE_SYK
+        TEMA_FOR -> YTELSE_FOR
+        else -> tema
     }
 
     private fun Oppgave.getFnrForBruker() = identer?.find { i -> i.gruppe == FOLKEREGISTERIDENT }?.ident

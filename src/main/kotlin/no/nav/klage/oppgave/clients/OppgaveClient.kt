@@ -2,10 +2,11 @@ package no.nav.klage.oppgave.clients
 
 import brave.Tracer
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
-import no.nav.klage.oppgave.domain.gosys.BEHANDLINGSTYPE_KLAGE
-import no.nav.klage.oppgave.domain.gosys.EndreOppgave
-import no.nav.klage.oppgave.domain.gosys.Oppgave
-import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
+import no.nav.klage.oppgave.domain.gosys.*
+import no.nav.klage.oppgave.domain.view.TYPE_ANKE
+import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
+import no.nav.klage.oppgave.domain.view.YTELSE_FOR
+import no.nav.klage.oppgave.domain.view.YTELSE_SYK
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -54,15 +55,22 @@ class OppgaveClient(
     private fun OppgaverSearchCriteria.buildUri(origUriBuilder: UriBuilder): URI {
         logger.debug("Search criteria: {}", this)
         val uriBuilder = origUriBuilder
+            .queryParam("tildeltEnhetsnr", enhetsnr)
             .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
             .queryParam("offset", offset)
             .queryParam("limit", limit)
 
-        typer.forEach {
-            uriBuilder.queryParam("behandlingstype", mapType(it))
+        if (typer.isNotEmpty()) {
+            typer.forEach {
+                uriBuilder.queryParam("behandlingstype", mapType(it))
+            }
+        } else {
+            uriBuilder.queryParam("behandlingstype", mapType(TYPE_KLAGE))
+            uriBuilder.queryParam("behandlingstype", mapType(TYPE_ANKE))
         }
+
         ytelser.forEach {
-            uriBuilder.queryParam("tema", it)
+            uriBuilder.queryParam("tema", mapYtelse(it))
         }
 
 //      Do we need this? ->  uriBuilder.queryParam("tildeltRessurs", true|false)
@@ -88,10 +96,22 @@ class OppgaveClient(
 
     private fun mapType(type: String): String {
         return when (type) {
-            "klage" -> BEHANDLINGSTYPE_KLAGE
+            TYPE_KLAGE -> BEHANDLINGSTYPE_KLAGE
+            TYPE_ANKE -> BEHANDLINGSTYPE_ANKE
             else -> {
-                logger.warn("invalid type: {}", type)
-                throw RuntimeException("Invalid type: $type")
+                logger.warn("Unknown type: {}", type)
+                type
+            }
+        }
+    }
+
+    private fun mapYtelse(ytelse: String): String {
+        return when (ytelse) {
+            YTELSE_SYK -> TEMA_SYK
+            YTELSE_FOR -> TEMA_FOR
+            else -> {
+                logger.warn("Unknown ytelse: {}", ytelse)
+                ytelse
             }
         }
     }
