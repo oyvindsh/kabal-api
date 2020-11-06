@@ -57,6 +57,9 @@ class OppgaveService(
 
     private fun OppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent: String) {
         val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(innloggetIdent)
+        if (tilgangerForSaksbehandler.enheter.size > 1) {
+            logger.warn("Saksbehandler ({}) had more than one enhet. Only using the first.", innloggetIdent)
+        }
         this.enhetsnr = tilgangerForSaksbehandler.enheter.first().enhetId
     }
 
