@@ -4,12 +4,11 @@ data class OppgaverQueryParams(
     val typer: List<String> = emptyList(),
     val ytelser: List<String> = emptyList(),
     val hjemler: List<String> = emptyList(),
-    val orderBy: String? = null,
-    val order: Order? = null,
-    val offset: Int,
-    val limit: Int
+    val sortering: Sortering? = Sortering.ELDST,
+    val start: Int,
+    val antall: Int
 ) {
-    enum class Order {
-        ASC, DESC
+    enum class Sortering {
+        ELDST, NYEST
     }
 }

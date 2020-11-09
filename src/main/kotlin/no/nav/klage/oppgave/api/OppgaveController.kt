@@ -99,10 +99,13 @@ class OppgaveController(val oppgaveService: OppgaveService) {
         typer = typer,
         ytelser = ytelser,
         hjemler = hjemler,
-        orderBy = orderBy,
-        order = if (order != null) OppgaverSearchCriteria.Order.valueOf(order.name) else null,
-        offset = offset,
-        limit = limit,
+        order = if (sortering == OppgaverQueryParams.Sortering.NYEST) {
+            OppgaverSearchCriteria.Order.DESC
+        } else {
+            OppgaverSearchCriteria.Order.ASC
+        },
+        offset = start,
+        limit = antall,
         saksbehandler = saksbehandler
     )
 
