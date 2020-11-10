@@ -15,6 +15,6 @@ data class OppgaverQueryParams(
     }
 
     enum class Projeksjon {
-        TILDELT
+        UTVIDET
     }
 }
