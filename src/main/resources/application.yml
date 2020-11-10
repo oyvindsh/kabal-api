@@ -71,7 +71,7 @@ allowed.origins:
   https://klage-oppgave.nav.no,
   https://klage-oppgave.dev.nav.no
 
-AXSYS_URL: https://axsys.dev.adeo.no/api/v1/tilgang
+AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v1/tilgang
 MICROSOFT_GRAPH_URL: https://graph.microsoft.com/v1.0
 OPPGAVE_URL: https://api-gw-q2.oera.no/oppgave/api/v1/oppgaver
 UNLEASH_URL: https://unleash.nais.io/api/

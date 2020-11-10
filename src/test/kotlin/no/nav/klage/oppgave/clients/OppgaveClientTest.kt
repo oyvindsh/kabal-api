@@ -4,8 +4,10 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.Oppgave
 import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
+import no.nav.klage.oppgave.service.TokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions
@@ -21,14 +23,14 @@ import java.time.Month
 internal class OppgaveClientTest {
 
     @MockK
-    lateinit var stsClientMock: StsClient
+    lateinit var tokenServiceMock: TokenService
 
     @MockK
     lateinit var tracerMock: Tracer
 
     @BeforeEach
     fun before() {
-        every { stsClientMock.oidcToken() } returns "abc"
+        every { tokenServiceMock.getSaksbehandlerTokenWithGraphScope() } returns "abc"
         every { tracerMock.currentSpan().context().traceIdString() } returns "def"
     }
 
@@ -62,18 +64,18 @@ internal class OppgaveClientTest {
     fun getOppgaver(jsonResponse: String): OppgaveResponse {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClient(jsonResponse),
-            stsClientMock,
+            tokenServiceMock,
             tracerMock,
             "appName"
         )
 
-        return oppgaveClient.getOnePage(0)
+        return oppgaveClient.getOneSearchPage(OppgaverSearchCriteria(offset = 0, limit = 1))
     }
 
     fun getNonExistingOppgave(): Oppgave {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClientWithStatus(oppgave404(), HttpStatus.NOT_FOUND),
-            stsClientMock,
+            tokenServiceMock,
             tracerMock,
             "appName"
         )
@@ -168,4 +170,6 @@ internal class OppgaveClientTest {
           "feilmelding": "Fant ingen oppgave med id: 3333"
         }
     """.trimIndent()
+
+
 }

@@ -13,3 +13,6 @@ STS_APIKEY: 789
 PDL_BASE_URL: local
 PDL_APIKEY: 159
 AXSYS_APIKEY: 357
+nais:
+  cluster:
+    name: local

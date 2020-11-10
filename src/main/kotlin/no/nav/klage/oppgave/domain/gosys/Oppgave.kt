@@ -3,7 +3,10 @@ package no.nav.klage.oppgave.domain.gosys
 import java.time.LocalDate
 
 const val BEHANDLINGSTYPE_KLAGE = "ae0058"
-const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
+const val BEHANDLINGSTYPE_ANKE = "ae0046"
+
+const val TEMA_SYK = "SYK"
+const val TEMA_FOR = "FOR"
 
 data class OppgaveResponse(
     val antallTreffTotalt: Int,
@@ -31,7 +34,7 @@ data class Oppgave(
     val behandlingstema: String? = null,
     val oppgavetype: String? = null,
     val behandlingstype: String? = null,
-    val versjon: Int? = null,
+    val versjon: Int,
     val mappeId: Long? = null,
     val opprettetAv: String? = null,
     val endretAv: String? = null,
