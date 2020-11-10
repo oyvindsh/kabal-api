@@ -7,7 +7,8 @@ data class OppgaverQueryParams(
     val rekkefoelge: Rekkefoelge? = Rekkefoelge.STIGENDE,
     val start: Int,
     val antall: Int,
-    val projeksjon: Projeksjon? = null
+    val projeksjon: Projeksjon? = null,
+    val tildeltSaksbehandler: String? = null
 ) {
     enum class Rekkefoelge {
         STIGENDE, SYNKENDE

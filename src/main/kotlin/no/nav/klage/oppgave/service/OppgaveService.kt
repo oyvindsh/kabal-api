@@ -29,12 +29,12 @@ class OppgaveService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
+    fun searchOppgaver(navIdent: String, oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        if (innloggetIdent != oppgaverSearchCriteria.saksbehandler) {
+        if (innloggetIdent != navIdent) {
             throw NotMatchingUserException(
                 "logged in user does not match sent in user. " +
-                        "Logged in: $innloggetIdent, sent in: ${oppgaverSearchCriteria.saksbehandler}"
+                        "Logged in: $innloggetIdent, sent in: $navIdent"
             )
         }
 

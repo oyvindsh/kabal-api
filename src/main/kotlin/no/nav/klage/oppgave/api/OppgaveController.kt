@@ -39,7 +39,7 @@ class OppgaveController(val oppgaveService: OppgaveService) {
         queryParams: OppgaverQueryParams
     ): OppgaverRespons {
         logger.debug("Params: {}", queryParams)
-        return oppgaveService.searchOppgaver(queryParams.toSearchCriteria(navIdent))
+        return oppgaveService.searchOppgaver(navIdent, queryParams.toSearchCriteria())
     }
 
     @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlertildeling")
@@ -79,7 +79,7 @@ class OppgaveController(val oppgaveService: OppgaveService) {
     private fun String?.toIntOrException() =
         this?.toIntOrNull() ?: throw OppgaveVersjonWrongFormatException("Oppgaveversjon could not be parsed as an Int")
 
-    private fun OppgaverQueryParams.toSearchCriteria(saksbehandler: String? = null) = OppgaverSearchCriteria(
+    private fun OppgaverQueryParams.toSearchCriteria() = OppgaverSearchCriteria(
         typer = typer,
         ytelser = ytelser,
         hjemler = hjemler,
@@ -90,7 +90,7 @@ class OppgaveController(val oppgaveService: OppgaveService) {
         },
         offset = start,
         limit = antall,
-        saksbehandler = saksbehandler,
+        saksbehandler = tildeltSaksbehandler,
         projection = if (projeksjon?.name != null) OppgaverSearchCriteria.Projection.valueOf(projeksjon.name) else null
     )
 
