@@ -19,7 +19,7 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
     @Value("\${OPPGAVE_URL}")
     private lateinit var oppgaveServiceURL: String
 
-    @Value("\${OPPGAVE_APIKEY}")
+    @Value("\${OPPGAVE_APIKEY_Q2}")
     private lateinit var apiKey: String
 
     @Bean
