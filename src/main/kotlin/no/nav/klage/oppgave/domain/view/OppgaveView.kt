@@ -8,36 +8,22 @@ const val TYPE_ANKE = "Anke"
 const val YTELSE_SYK = "Sykepenger"
 const val YTELSE_FOR = "Foreldrepenger"
 
-data class TildelteOppgaverRespons(
+data class OppgaverRespons(
     val antallTreffTotalt: Int,
-    val oppgaver: List<TildeltOppgave>
+    val oppgaver: List<Oppgave>
 )
 
-data class IkkeTildelteOppgaverRespons(
-    val antallTreffTotalt: Int,
-    val oppgaver: List<IkkeTildeltOppgave>
-)
-
-data class TildeltOppgave(
+data class Oppgave(
     val id: String,
-    val bruker: Bruker,
+    val person: Person? = null,
     val type: String,
     val ytelse: String,
     val hjemmel: String?,
     val frist: LocalDate?,
     val versjon: Int
 ) {
-    data class Bruker(
+    data class Person(
         val fnr: String,
         val navn: String
     )
 }
-
-data class IkkeTildeltOppgave(
-    val id: String,
-    val type: String,
-    val ytelse: String,
-    val hjemmel: String?,
-    val frist: LocalDate?,
-    val versjon: Int
-)

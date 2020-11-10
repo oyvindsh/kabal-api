@@ -6,9 +6,14 @@ data class OppgaverQueryParams(
     val hjemler: List<String> = emptyList(),
     val rekkefoelge: Rekkefoelge? = Rekkefoelge.STIGENDE,
     val start: Int,
-    val antall: Int
+    val antall: Int,
+    val projeksjon: Projeksjon? = null
 ) {
     enum class Rekkefoelge {
         STIGENDE, SYNKENDE
+    }
+
+    enum class Projeksjon {
+        TILDELT
     }
 }

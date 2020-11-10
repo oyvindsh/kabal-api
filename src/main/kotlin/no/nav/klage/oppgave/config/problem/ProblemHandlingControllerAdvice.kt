@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.config.problem
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
+import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -33,6 +34,13 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     @ExceptionHandler
     fun handleOppgaveIdNotParsable(
         ex: OppgaveIdWrongFormatException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleOppgaveVersjonNotParsable(
+        ex: OppgaveVersjonWrongFormatException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(Status.BAD_REQUEST, ex, request)
