@@ -4,11 +4,11 @@ data class OppgaverQueryParams(
     val typer: List<String> = emptyList(),
     val ytelser: List<String> = emptyList(),
     val hjemler: List<String> = emptyList(),
-    val sortering: Sortering? = Sortering.ELDST,
+    val rekkefoelge: Rekkefoelge? = Rekkefoelge.STIGENDE,
     val start: Int,
     val antall: Int
 ) {
-    enum class Sortering {
-        ELDST, NYEST
+    enum class Rekkefoelge {
+        STIGENDE, SYNKENDE
     }
 }

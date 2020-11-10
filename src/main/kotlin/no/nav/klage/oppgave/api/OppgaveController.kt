@@ -99,7 +99,7 @@ class OppgaveController(val oppgaveService: OppgaveService) {
         typer = typer,
         ytelser = ytelser,
         hjemler = hjemler,
-        order = if (sortering == OppgaverQueryParams.Sortering.NYEST) {
+        order = if (rekkefoelge == OppgaverQueryParams.Rekkefoelge.SYNKENDE) {
             OppgaverSearchCriteria.Order.DESC
         } else {
             OppgaverSearchCriteria.Order.ASC
