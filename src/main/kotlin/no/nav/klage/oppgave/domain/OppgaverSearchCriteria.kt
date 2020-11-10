@@ -16,6 +16,6 @@ data class OppgaverSearchCriteria(
     }
 
     enum class Projection {
-        TILDELTE
+        UTVIDET
     }
 }

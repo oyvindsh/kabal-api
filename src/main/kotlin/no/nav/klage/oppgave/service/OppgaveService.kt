@@ -56,7 +56,7 @@ class OppgaveService(
     }
 
     private fun OppgaveResponse.toOppgaverView(projection: OppgaverSearchCriteria.Projection?): List<OppgaveView> {
-        val fetchPersoner = projection == OppgaverSearchCriteria.Projection.TILDELTE
+        val fetchPersoner = projection == OppgaverSearchCriteria.Projection.UTVIDET
         val personer = mutableMapOf<String, OppgaveView.Person>()
         if (fetchPersoner) {
             personer.putAll(getPersoner(getFnr(this.oppgaver)))

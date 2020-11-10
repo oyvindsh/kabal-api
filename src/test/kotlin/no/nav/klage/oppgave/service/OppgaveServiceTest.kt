@@ -77,7 +77,7 @@ internal class OppgaveServiceTest {
         )
 
         val oppgaverSearchCriteriaMock = mockk<OppgaverSearchCriteria>(relaxed = true)
-        every { oppgaverSearchCriteriaMock.projection } returns OppgaverSearchCriteria.Projection.TILDELTE
+        every { oppgaverSearchCriteriaMock.projection } returns OppgaverSearchCriteria.Projection.UTVIDET
 
         assertThat(oppgaveService.searchOppgaver("", oppgaverSearchCriteriaMock).oppgaver.first().person?.fnr).isEqualTo(fnr)
     }
