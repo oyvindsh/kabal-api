@@ -4,7 +4,6 @@ data class OppgaverSearchCriteria(
     val typer: List<String> = emptyList(),
     val ytelser: List<String> = emptyList(),
     val hjemler: List<String> = emptyList(),
-    val orderBy: String? = null,
     val order: Order? = null,
     val offset: Int,
     val limit: Int,
