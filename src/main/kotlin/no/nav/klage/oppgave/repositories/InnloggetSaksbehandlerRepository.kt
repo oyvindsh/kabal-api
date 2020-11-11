@@ -16,4 +16,8 @@ class InnloggetSaksbehandlerRepository(
         return microsoftGraphClient.getNavIdentForAuthenticatedUser()
     }
 
+    fun erLeder(): Boolean = saksbehandlerRepository.erLeder(getInnloggetIdent())
+
+    fun erFagansvarlig(): Boolean = saksbehandlerRepository.erFagansvarlig(getInnloggetIdent())
+
 }
