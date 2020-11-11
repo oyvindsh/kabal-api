@@ -8,9 +8,14 @@ data class OppgaverSearchCriteria(
     val offset: Int,
     val limit: Int,
     val saksbehandler: String? = null,
-    var enhetsnr: String? = null
+    var enhetsnr: String? = null,
+    val projection: Projection? = null
 ) {
     enum class Order {
         ASC, DESC
+    }
+
+    enum class Projection {
+        UTVIDET
     }
 }
