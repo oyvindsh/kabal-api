@@ -20,4 +20,8 @@ class InnloggetSaksbehandlerRepository(
 
     fun erFagansvarlig(): Boolean = saksbehandlerRepository.erFagansvarlig(getInnloggetIdent())
 
+    fun erSaksbehandler(): Boolean = saksbehandlerRepository.erSaksbehandler(getInnloggetIdent())
+
+    fun getRoller(): List<String> = saksbehandlerRepository.getRoller(getInnloggetIdent())
+
 }
