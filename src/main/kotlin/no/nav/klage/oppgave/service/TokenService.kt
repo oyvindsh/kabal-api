@@ -25,7 +25,7 @@ class TokenService(
         //    val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
         //    val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         //    return response.accessToken
-        getStsSystembrukerToken()
+        return getStsSystembrukerToken()
     }
 
     fun getAppAccessTokenWithGraphScope(): String {
