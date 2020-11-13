@@ -46,6 +46,10 @@ spec:
       rules:
         - application: klage-oppgave
     outbound:
+      rules:
+        - application: klage-fss-proxy
+        - namespace: klage
+        - cluster: dev-fss
       external:
       {{#each externalHosts as |host|}}
         - host: {{host}}
