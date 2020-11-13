@@ -38,4 +38,5 @@ class TokenService(
 
     fun getJwtAccessToken(): String =
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD).tokenAsString
+
 }
