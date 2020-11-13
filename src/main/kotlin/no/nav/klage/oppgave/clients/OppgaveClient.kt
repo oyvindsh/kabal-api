@@ -45,7 +45,7 @@ class OppgaveClient(
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${tokenService.getStsSystembrukerToken()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -78,7 +78,7 @@ class OppgaveClient(
         enhetsnr?.let {
             uriBuilder.queryParam("tildeltEnhetsnr", enhetsnr)
         }
-        
+
         if (typer.isNotEmpty()) {
             typer.forEach {
                 uriBuilder.queryParam("behandlingstype", mapType(it))
