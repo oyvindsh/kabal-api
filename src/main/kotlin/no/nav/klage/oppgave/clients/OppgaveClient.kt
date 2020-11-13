@@ -59,7 +59,7 @@ class OppgaveClient(
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
-                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerTokenWithOppgaveScope()}")
+                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithOppgaveScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -165,7 +165,7 @@ class OppgaveClient(
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerTokenWithOppgaveScope()}")
+                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithOppgaveScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .bodyValue(oppgave)
@@ -182,7 +182,7 @@ class OppgaveClient(
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
-                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerTokenWithOppgaveScope()}")
+                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithOppgaveScope()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()

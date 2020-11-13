@@ -33,7 +33,7 @@ class MicrosoftGraphClient(
                     .path("/me")
                     .queryParam("\$select", "onPremisesSamAccountName")
                     .build()
-            }.header("Authorization", "Bearer ${tokenService.getSaksbehandlerTokenWithGraphScope()}")
+            }.header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithGraphScope()}")
 
             .retrieve()
             .bodyToMono<MicrosoftGraphIdentResponse>()
@@ -74,7 +74,7 @@ class MicrosoftGraphClient(
                         .queryParam("\$filter", "mailnickname in $idents")
                         .queryParam("\$select", "onPremisesSamAccountName,displayName")
                         .build()
-                }.header("Authorization", "Bearer ${tokenService.getAppTokenWithGraphScope()}")
+                }.header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
                 .retrieve()
                 .bodyToMono()
         } catch (e: Exception) {

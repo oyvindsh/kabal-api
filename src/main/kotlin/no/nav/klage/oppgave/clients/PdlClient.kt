@@ -20,7 +20,7 @@ class PdlClient(
         return pdlWebClient.post()
             .header(
                 HttpHeaders.AUTHORIZATION,
-                "Bearer ${tokenService.getJwtToken()}"
+                "Bearer ${tokenService.getJwtAccessToken()}"
             )
             .header("Nav-Consumer-Token", "Bearer ${tokenService.getStsSystembrukerToken()}")
             .bodyValue(hentPersonQuery(fnrList))
