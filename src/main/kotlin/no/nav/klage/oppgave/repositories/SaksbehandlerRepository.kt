@@ -22,8 +22,8 @@ class SaksbehandlerRepository(
 
         const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
 
-        private const val LEDER_ROLLE = "?"
-        private const val FAGANSVARLIG_ROLLE = "?"
+        private const val LEDER_ROLLE = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
+        private const val FAGANSVARLIG_ROLLE = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
         private const val SAKSBEHANDLER_ROLLE = "0000-GA-GOSYS_OPPGAVE_BEHANDLER"
     }
 
@@ -47,11 +47,11 @@ class SaksbehandlerRepository(
         return saksbehandlerNameCache
     }
 
-    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).contains(FAGANSVARLIG_ROLLE)
+    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).any { it.contains(FAGANSVARLIG_ROLLE) }
 
-    fun erLeder(ident: String): Boolean = getRoller(ident).contains(LEDER_ROLLE)
+    fun erLeder(ident: String): Boolean = getRoller(ident).any { it.contains(LEDER_ROLLE) }
 
-    fun erSaksbehandler(ident: String): Boolean = getRoller(ident).contains(SAKSBEHANDLER_ROLLE)
+    fun erSaksbehandler(ident: String): Boolean = getRoller(ident).any { it.contains(SAKSBEHANDLER_ROLLE) }
 
     fun getRoller(ident: String): List<String> = klageProxyClient.getRoller(ident)
 }
