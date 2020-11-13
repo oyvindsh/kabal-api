@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.UriBuilder
 import java.lang.System.currentTimeMillis
 import java.net.URI
+import java.time.format.DateTimeFormatter
 
 @Component
 class OppgaveClient(
@@ -39,6 +40,20 @@ class OppgaveClient(
     }
 
     @Retryable
+    fun getOppgaveCount(oppgaveSearchCriteria: OppgaverSearchCriteria): Int {
+        return logTimingAndWebClientResponseException("getOneSearchPage") {
+            oppgaveWebClient.get()
+                .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
+                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
+                .header("Nav-Consumer-Id", applicationName)
+                .retrieve()
+                .bodyToMono<OppgaveResponse>()
+                .block() ?: throw RuntimeException("Oppgaver could not be fetched")
+        }.antallTreffTotalt
+    }
+
+    @Retryable
     fun getOneSearchPage(oppgaveSearchCriteria: OppgaverSearchCriteria): OppgaveResponse {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
@@ -55,11 +70,14 @@ class OppgaveClient(
     private fun OppgaverSearchCriteria.buildUri(origUriBuilder: UriBuilder): URI {
         logger.debug("Search criteria: {}", this)
         val uriBuilder = origUriBuilder
-            .queryParam("tildeltEnhetsnr", enhetsnr)
-            .queryParam("statuskategori", STATUSKATEGORI_AAPEN)
+            .queryParam("statuskategori", statuskategori)
             .queryParam("offset", offset)
             .queryParam("limit", limit)
 
+        enhetsnr?.let {
+            uriBuilder.queryParam("tildeltEnhetsnr", enhetsnr)
+        }
+        
         if (typer.isNotEmpty()) {
             typer.forEach {
                 uriBuilder.queryParam("behandlingstype", mapType(it))
@@ -76,6 +94,25 @@ class OppgaveClient(
 //      Do we need this? ->  uriBuilder.queryParam("tildeltRessurs", true|false)
         saksbehandler?.let {
             uriBuilder.queryParam("tilordnetRessurs", saksbehandler)
+        }
+
+        opprettetFom?.let {
+            uriBuilder.queryParam("opprettetFom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+        }
+        opprettetTom?.let {
+            uriBuilder.queryParam("opprettetTom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+        }
+        ferdigstiltFom?.let {
+            uriBuilder.queryParam("ferdigstiltFom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+        }
+        ferdigstiltTom?.let {
+            uriBuilder.queryParam("ferdigstiltTom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+        }
+        fristFom?.let {
+            uriBuilder.queryParam("fristFom", DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+        }
+        fristTom?.let {
+            uriBuilder.queryParam("fristTom", DateTimeFormatter.ISO_LOCAL_DATE.format(it))
         }
 
         //FRIST is default in oppgave-api.
