@@ -2,14 +2,17 @@ package no.nav.klage.oppgave.service
 
 import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.clients.StsClient
+import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.stereotype.Service
 
 @Service
 class TokenService(
     private val clientConfigurationProperties: ClientConfigurationProperties,
     private val oAuth2AccessTokenService: OAuth2AccessTokenService,
+    private val tokenValidationContextHolder: TokenValidationContextHolder,
     private val stsClient: StsClient,
     private val unleash: Unleash
 ) {
@@ -37,4 +40,7 @@ class TokenService(
     }
 
     fun getStsSystembrukerToken(): String = stsClient.oidcToken()
+
+    fun getJwtToken(): String =
+        tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD).tokenAsString
 }
