@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config
 
+import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -9,25 +10,41 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient.newConnection
 
 @Configuration
-class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder) {
+class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder, private val unleash: Unleash) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Value("\${OPPGAVE_URL}")
-    private lateinit var oppgaveServiceURL: String
+    @Value("\${OPPGAVE_URL_Q1}")
+    private lateinit var oppgaveServiceURLQ1: String
+
+    @Value("\${OPPGAVE_URL_Q2}")
+    private lateinit var oppgaveServiceURLQ2: String
+
+    @Value("\${OPPGAVE_APIKEY_Q1}")
+    private lateinit var apiKeyQ1: String
 
     @Value("\${OPPGAVE_APIKEY_Q2}")
-    private lateinit var apiKey: String
+    private lateinit var apiKeyQ2: String
 
     @Bean
     fun oppgaveWebClient(): WebClient {
-        return webClientBuilder
-            .defaultHeader("x-nav-apiKey", apiKey)
-            .baseUrl(oppgaveServiceURL)
-            .clientConnector(ReactorClientHttpConnector(newConnection()))
-            .build()
+        return if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
+            webClientBuilder
+                .defaultHeader("x-nav-apiKey", apiKeyQ2)
+                .baseUrl(oppgaveServiceURLQ2)
+                .clientConnector(ReactorClientHttpConnector(newConnection()))
+                .build()
+        } else {
+            webClientBuilder
+                .defaultHeader("x-nav-apiKey", apiKeyQ1)
+                .baseUrl(oppgaveServiceURLQ1)
+                .clientConnector(ReactorClientHttpConnector(newConnection()))
+                .build()
+        }
     }
+
+
 }

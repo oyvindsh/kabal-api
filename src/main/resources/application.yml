@@ -81,5 +81,6 @@ allowed.origins:
 
 AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v1/tilgang
 MICROSOFT_GRAPH_URL: https://graph.microsoft.com/v1.0
-OPPGAVE_URL: https://api-gw-q2.oera.no/oppgave/api/v1/oppgaver
+OPPGAVE_URL_Q1: https://api-gw-q1.oera.no/oppgave/api/v1/oppgaver
+OPPGAVE_URL_Q2: https://api-gw-q2.oera.no/oppgave/api/v1/oppgaver
 UNLEASH_URL: https://unleash.nais.io/api/
