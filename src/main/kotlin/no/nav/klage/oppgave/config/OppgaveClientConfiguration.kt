@@ -29,22 +29,21 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
     @Value("\${OPPGAVE_APIKEY_Q2}")
     private lateinit var apiKeyQ2: String
 
-    @Bean
-    fun oppgaveWebClient(): WebClient {
-        return if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
-            webClientBuilder
-                .defaultHeader("x-nav-apiKey", apiKeyQ2)
-                .baseUrl(oppgaveServiceURLQ2)
-                .clientConnector(ReactorClientHttpConnector(newConnection()))
-                .build()
-        } else {
-            webClientBuilder
-                .defaultHeader("x-nav-apiKey", apiKeyQ1)
-                .baseUrl(oppgaveServiceURLQ1)
-                .clientConnector(ReactorClientHttpConnector(newConnection()))
-                .build()
-        }
+    @Bean("oppgaveWebClientQ1")
+    fun oppgaveWebClientQ1(): WebClient {
+        return webClientBuilder
+            .defaultHeader("x-nav-apiKey", apiKeyQ2)
+            .baseUrl(oppgaveServiceURLQ2)
+            .clientConnector(ReactorClientHttpConnector(newConnection()))
+            .build()
     }
 
-
+    @Bean("oppgaveWebClientQ2")
+    fun oppgaveWebClientQ2(): WebClient {
+        return webClientBuilder
+            .defaultHeader("x-nav-apiKey", apiKeyQ1)
+            .baseUrl(oppgaveServiceURLQ1)
+            .clientConnector(ReactorClientHttpConnector(newConnection()))
+            .build()
+    }
 }

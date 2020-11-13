@@ -4,6 +4,7 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.Oppgave
 import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
@@ -28,10 +29,14 @@ internal class OppgaveClientTest {
     @MockK
     lateinit var tracerMock: Tracer
 
+    @MockK
+    lateinit var unleashMock: Unleash
+
     @BeforeEach
     fun before() {
         every { tokenServiceMock.getSaksbehandlerAccessTokenWithOppgaveScope() } returns "abc"
         every { tracerMock.currentSpan().context().traceIdString() } returns "def"
+        every { unleashMock.isEnabled(any()) } returns false
     }
 
     @Test
@@ -64,9 +69,11 @@ internal class OppgaveClientTest {
     fun getOppgaver(jsonResponse: String): OppgaveResponse {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClient(jsonResponse),
+            createShortCircuitWebClient(jsonResponse),
             tokenServiceMock,
             tracerMock,
-            "appName"
+            "appName",
+            unleashMock
         )
 
         return oppgaveClient.getOneSearchPage(OppgaverSearchCriteria(offset = 0, limit = 1))
@@ -75,9 +82,11 @@ internal class OppgaveClientTest {
     fun getNonExistingOppgave(): Oppgave {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClientWithStatus(oppgave404(), HttpStatus.NOT_FOUND),
+            createShortCircuitWebClientWithStatus(oppgave404(), HttpStatus.NOT_FOUND),
             tokenServiceMock,
             tracerMock,
-            "appName"
+            "appName",
+            unleashMock
         )
 
         return oppgaveClient.getOppgave(3333)
