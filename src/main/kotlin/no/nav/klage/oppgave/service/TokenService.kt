@@ -23,7 +23,7 @@ class TokenService(
         return response.accessToken
     }
 
-    fun getSaksbehandlerAccessTokenWithOppgaveScope(): String {
+    fun getFeatureToggledAccessTokenForOppgave(): String {
         return if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
             val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
             val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
@@ -41,7 +41,7 @@ class TokenService(
 
     fun getStsSystembrukerToken(): String = stsClient.oidcToken()
 
-    fun getJwtAccessToken(): String =
+    fun getAccessTokenFrontendSent(): String =
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD).tokenAsString
 
 }

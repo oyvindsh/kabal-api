@@ -34,7 +34,7 @@ internal class OppgaveClientTest {
 
     @BeforeEach
     fun before() {
-        every { tokenServiceMock.getSaksbehandlerAccessTokenWithOppgaveScope() } returns "abc"
+        every { tokenServiceMock.getFeatureToggledAccessTokenForOppgave() } returns "abc"
         every { tracerMock.currentSpan().context().traceIdString() } returns "def"
         every { unleashMock.isEnabled(any()) } returns false
     }
