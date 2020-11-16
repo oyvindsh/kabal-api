@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.clients.StsClient
+import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.OPPGAVE_MED_BRUKERKONTEKST
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
@@ -24,7 +25,7 @@ class TokenService(
     }
 
     fun getFeatureToggledAccessTokenForOppgave(): String {
-        return if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
+        return if (unleash.isEnabled(OPPGAVE_MED_BRUKERKONTEKST)) {
             val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
             val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
             response.accessToken
