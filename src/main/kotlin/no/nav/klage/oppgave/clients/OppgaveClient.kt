@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
+import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.view.TYPE_ANKE
@@ -8,6 +9,7 @@ import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
 import no.nav.klage.oppgave.domain.view.YTELSE_FOR
 import no.nav.klage.oppgave.domain.view.YTELSE_SYK
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
+import no.nav.klage.oppgave.service.TokenService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
@@ -24,10 +26,12 @@ import java.time.format.DateTimeFormatter
 
 @Component
 class OppgaveClient(
-    private val oppgaveWebClient: WebClient,
-    private val stsClient: StsClient,
+    private val oppgaveWebClientQ1: WebClient,
+    private val oppgaveWebClientQ2: WebClient,
+    private val tokenService: TokenService,
     private val tracer: Tracer,
-    @Value("\${spring.application.name}") val applicationName: String
+    @Value("\${spring.application.name}") val applicationName: String,
+    private val unleash: Unleash
 ) {
 
     companion object {
@@ -42,9 +46,9 @@ class OppgaveClient(
     @Retryable
     fun getOppgaveCount(oppgaveSearchCriteria: OppgaverSearchCriteria): Int {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
-            oppgaveWebClient.get()
+            oppgaveWebClientQ1.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${tokenService.getStsSystembrukerToken()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -55,10 +59,15 @@ class OppgaveClient(
 
     @Retryable
     fun getOneSearchPage(oppgaveSearchCriteria: OppgaverSearchCriteria): OppgaveResponse {
+        val oppgaveWebClient = if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
+            oppgaveWebClientQ1
+        } else {
+            oppgaveWebClientQ2
+        }
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${tokenService.getFeatureToggledAccessTokenForOppgave()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -77,7 +86,7 @@ class OppgaveClient(
         enhetsnr?.let {
             uriBuilder.queryParam("tildeltEnhetsnr", enhetsnr)
         }
-        
+
         if (typer.isNotEmpty()) {
             typer.forEach {
                 uriBuilder.queryParam("behandlingstype", mapType(it))
@@ -158,13 +167,18 @@ class OppgaveClient(
         oppgaveId: Long,
         oppgave: EndreOppgave
     ): Oppgave {
+        val oppgaveWebClient = if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
+            oppgaveWebClientQ1
+        } else {
+            oppgaveWebClientQ2
+        }
         return logTimingAndWebClientResponseException("putOppgave") {
             oppgaveWebClient.put()
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${tokenService.getFeatureToggledAccessTokenForOppgave()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .bodyValue(oppgave)
@@ -176,12 +190,17 @@ class OppgaveClient(
 
     @Retryable
     fun getOppgave(oppgaveId: Long): Oppgave {
+        val oppgaveWebClient = if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
+            oppgaveWebClientQ1
+        } else {
+            oppgaveWebClientQ2
+        }
         return logTimingAndWebClientResponseException("getOppgave") {
             oppgaveWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
-                .header("Authorization", "Bearer ${stsClient.oidcToken()}")
+                .header("Authorization", "Bearer ${tokenService.getFeatureToggledAccessTokenForOppgave()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -212,4 +231,6 @@ class OppgaveClient(
             logger.info("Method {} took {} millis", methodName, (end - start))
         }
     }
+
+
 }
