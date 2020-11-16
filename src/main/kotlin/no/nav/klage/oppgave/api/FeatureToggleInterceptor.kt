@@ -5,6 +5,7 @@ import no.finn.unleash.UnleashContext
 import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.KLAGE_OPPGAVE_TILGANG
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 import javax.servlet.http.HttpServletRequest
@@ -26,7 +27,13 @@ class FeatureToggleInterceptor(
         request: HttpServletRequest,
         response: HttpServletResponse,
         handler: Any?
-    ): Boolean = isEnabled(KLAGE_OPPGAVE_TILGANG)
+    ): Boolean {
+        val isEnabled = isEnabled(KLAGE_OPPGAVE_TILGANG)
+        if (!isEnabled) {
+            response.status = HttpStatus.FORBIDDEN.value()
+        }
+        return isEnabled
+    }
 
     private fun isEnabled(feature: String): Boolean =
         unleash.isEnabled(feature, contextMedInnloggetBruker())
