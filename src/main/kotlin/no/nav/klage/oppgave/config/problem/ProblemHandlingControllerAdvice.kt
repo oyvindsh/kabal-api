@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.config.problem
 
-import no.nav.klage.oppgave.exceptions.NotMatchingUserException
-import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
-import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
-import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
+import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -50,12 +47,16 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
+    fun handleNotMatchingUser(ex: FeatureNotEnabledException, request: NativeWebRequest): ResponseEntity<Problem> =
+        create(Status.FORBIDDEN, ex, request)
+
+    @ExceptionHandler
     fun handleResponseStatusException(
         ex: WebClientResponseException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(ex, createProblem(ex), request)
-    
+
     private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
         return Problem.builder()
             .withStatus(mapStatus(ex.statusCode))
