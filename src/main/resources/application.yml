@@ -58,7 +58,7 @@ no.nav.security.jwt:
       oppgave-onbehalfof:
         token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
         grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
-        scope: api://7380b8f7-ab50-4b47-8006-3df014946590/.default
+        scope: api://41ca50ba-e44f-4bc8-9e31-b745a0041926/.default
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-secret: ${AZURE_APP_CLIENT_SECRET}
