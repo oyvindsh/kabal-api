@@ -47,7 +47,7 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
-    fun handleNotMatchingUser(ex: FeatureNotEnabledException, request: NativeWebRequest): ResponseEntity<Problem> =
+    fun handleFeatureNotEnabled(ex: FeatureNotEnabledException, request: NativeWebRequest): ResponseEntity<Problem> =
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
