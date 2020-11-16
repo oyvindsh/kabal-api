@@ -45,12 +45,7 @@ class FeatureToggleInterceptor(
     private fun contextMedInnloggetBruker(): UnleashContext? =
         UnleashContext.builder().userId(getIdent()).build()
 
-    private fun getIdent() = try {
-        innloggetSaksbehandlerRepository.getInnloggetIdent()
-    } catch (e: Exception) {
-        logger.info("Not able to retrieve token", e)
-        "UINNLOGGET"
-    }
+    private fun getIdent() = innloggetSaksbehandlerRepository.getInnloggetIdent()
 }
 
 @Configuration
