@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.config
 
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
-import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.KLAGE_OPPGAVE_TILGANG
+import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.KLAGE_GENERELL_TILGANG
 import no.nav.klage.oppgave.exceptions.FeatureNotEnabledException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -31,7 +31,7 @@ class FeatureToggleInterceptor(
         response: HttpServletResponse,
         handler: Any?
     ): Boolean {
-        val isEnabled = isEnabled(KLAGE_OPPGAVE_TILGANG)
+        val isEnabled = isEnabled(KLAGE_GENERELL_TILGANG)
         if (!isEnabled) {
             throw FeatureNotEnabledException("Du er ikke gitt tilgang til klage-oppgave-api")
         }
@@ -50,7 +50,7 @@ class FeatureToggleInterceptor(
 @Configuration
 class FeatureToggleInterceptorConfig(private val featureToggleInterceptor: FeatureToggleInterceptor) :
     WebMvcConfigurer {
-    
+
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(featureToggleInterceptor).addPathPatterns("/ansatte/**")
     }
