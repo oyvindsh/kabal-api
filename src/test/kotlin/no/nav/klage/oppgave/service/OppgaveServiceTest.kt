@@ -48,7 +48,12 @@ internal class OppgaveServiceTest {
     @Test
     fun `missing hjemmel does not fail`() {
         val oppgaveService = oppgaveServiceWithType("something")
-        assertThat(oppgaveService.searchOppgaver("", mockk(relaxed = true)).oppgaver.first().hjemmel).isEqualTo("mangler")
+        assertThat(
+            oppgaveService.searchOppgaver(
+                "",
+                mockk(relaxed = true)
+            ).oppgaver.first().hjemmel
+        ).isEqualTo("mangler")
     }
 
     @Test
@@ -71,15 +76,20 @@ internal class OppgaveServiceTest {
 
         val oppgaveService = OppgaveService(
             oppgaveClient,
-            pdlClientMock,
             mockk(relaxed = true),
-            saksbehandlerRepositoryMock
+            saksbehandlerRepositoryMock,
+            OppgaveMapper(pdlClientMock)
         )
 
         val oppgaverSearchCriteriaMock = mockk<OppgaverSearchCriteria>(relaxed = true)
-        every { oppgaverSearchCriteriaMock.projection } returns OppgaverSearchCriteria.Projection.UTVIDET
+        every { oppgaverSearchCriteriaMock.isProjectionUtvidet() } returns true
 
-        assertThat(oppgaveService.searchOppgaver("", oppgaverSearchCriteriaMock).oppgaver.first().person?.fnr).isEqualTo(fnr)
+        assertThat(
+            oppgaveService.searchOppgaver(
+                "",
+                oppgaverSearchCriteriaMock
+            ).oppgaver.first().person?.fnr
+        ).isEqualTo(fnr)
     }
 
     private fun getHentPersonResponse(): HentPersonResponse {
@@ -124,9 +134,9 @@ internal class OppgaveServiceTest {
 
         val oppgaveService = OppgaveService(
             oppgaveClientMock,
-            pdlClientMock,
             mockk(relaxed = true),
-            saksbehandlerRepositoryMock
+            saksbehandlerRepositoryMock,
+            OppgaveMapper(pdlClientMock)
         )
         return oppgaveService
     }
@@ -149,9 +159,9 @@ internal class OppgaveServiceTest {
 
         return OppgaveService(
             oppgaveClientMock,
-            pdlClientMock,
             mockk(relaxed = true),
-            saksbehandlerRepositoryMock
+            saksbehandlerRepositoryMock,
+            OppgaveMapper(pdlClientMock)
         )
     }
 
