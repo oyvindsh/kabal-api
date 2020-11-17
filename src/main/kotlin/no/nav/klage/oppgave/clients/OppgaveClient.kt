@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients
 
 import brave.Tracer
 import no.finn.unleash.Unleash
+import no.nav.klage.oppgave.config.FeatureToggleConfig
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.view.TYPE_ANKE
@@ -67,7 +68,7 @@ class OppgaveClient(
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
-                .header("Authorization", "Bearer ${tokenService.getFeatureToggledAccessTokenForOppgave()}")
+                .header("Authorization", "Bearer ${getFeatureToggledAccessTokenForOppgave()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -178,7 +179,7 @@ class OppgaveClient(
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer ${tokenService.getFeatureToggledAccessTokenForOppgave()}")
+                .header("Authorization", "Bearer ${getFeatureToggledAccessTokenForOppgave()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .bodyValue(oppgave)
@@ -200,7 +201,7 @@ class OppgaveClient(
                 .uri { uriBuilder ->
                     uriBuilder.pathSegment("{id}").build(oppgaveId)
                 }
-                .header("Authorization", "Bearer ${tokenService.getFeatureToggledAccessTokenForOppgave()}")
+                .header("Authorization", "Bearer ${getFeatureToggledAccessTokenForOppgave()}")
                 .header("X-Correlation-ID", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
@@ -232,5 +233,10 @@ class OppgaveClient(
         }
     }
 
-
+    fun getFeatureToggledAccessTokenForOppgave(): String =
+        if (unleash.isEnabled(FeatureToggleConfig.OPPGAVE_MED_BRUKERKONTEKST)) {
+            tokenService.getSaksbehandlerAccessTokenWithOppgaveScope()
+        } else {
+            tokenService.getStsSystembrukerToken()
+        }
 }

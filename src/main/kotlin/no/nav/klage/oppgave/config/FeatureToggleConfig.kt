@@ -5,8 +5,8 @@ import no.finn.unleash.FakeUnleash
 import no.finn.unleash.Unleash
 import no.finn.unleash.strategy.UserWithIdStrategy
 import no.finn.unleash.util.UnleashConfig
-import no.nav.klage.oppgave.service.unleash.ByEnhetStrategy
 import no.nav.klage.oppgave.service.unleash.ByClusterStrategy
+import no.nav.klage.oppgave.service.unleash.ByEnhetStrategy
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -19,6 +19,8 @@ class FeatureToggleConfig {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        const val KLAGE_OPPGAVE_TILGANG = "KlageOppgaveTilgang"
+        const val OPPGAVE_MED_BRUKERKONTEKST = "OppgaveMedBrukerkontekst"
     }
 
     @Value("\${spring.application.name}")
@@ -29,7 +31,7 @@ class FeatureToggleConfig {
 
     @Value("\${UNLEASH_URL}")
     private lateinit var unleashUrl: String
-
+    
     @Bean
     @Profile("dev-gcp", "prod-gcp")
     fun unleash(byClusterStrategy: ByClusterStrategy, byEnhetStrategy: ByEnhetStrategy): Unleash? {

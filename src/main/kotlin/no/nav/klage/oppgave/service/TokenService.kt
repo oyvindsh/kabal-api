@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.clients.StsClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
@@ -13,8 +12,7 @@ class TokenService(
     private val clientConfigurationProperties: ClientConfigurationProperties,
     private val oAuth2AccessTokenService: OAuth2AccessTokenService,
     private val tokenValidationContextHolder: TokenValidationContextHolder,
-    private val stsClient: StsClient,
-    private val unleash: Unleash
+    private val stsClient: StsClient
 ) {
 
     fun getSaksbehandlerAccessTokenWithGraphScope(): String {
@@ -23,14 +21,10 @@ class TokenService(
         return response.accessToken
     }
 
-    fun getFeatureToggledAccessTokenForOppgave(): String {
-        return if (unleash.isEnabled("OppgaveMedBrukerkontekst")) {
-            val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
-            val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-            response.accessToken
-        } else {
-            getStsSystembrukerToken()
-        }
+    fun getSaksbehandlerAccessTokenWithOppgaveScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
     }
 
     fun getAppAccessTokenWithGraphScope(): String {
