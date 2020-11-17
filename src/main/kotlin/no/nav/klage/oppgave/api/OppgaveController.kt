@@ -8,6 +8,10 @@ import no.nav.klage.oppgave.domain.OppgaverQueryParams
 import no.nav.klage.oppgave.domain.Saksbehandlertildeling
 import no.nav.klage.oppgave.domain.view.Oppgave
 import no.nav.klage.oppgave.domain.view.OppgaverRespons
+import no.nav.klage.oppgave.exceptions.NotMatchingUserException
+import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
+import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -21,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 class OppgaveController(
     private val oppgaveService: OppgaveService,
     private val oppgaverQueryParamsMapper: OppgaverQueryParamsMapper,
-    private val oppgaveControllerHelper: OppgaveControllerHelper
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
 
     companion object {
@@ -40,7 +44,7 @@ class OppgaveController(
         queryParams: OppgaverQueryParams
     ): OppgaverRespons {
         logger.debug("Params: {}", queryParams)
-        oppgaveControllerHelper.validateNavIdent(navIdent)
+        validateNavIdent(navIdent)
         return oppgaveService.searchOppgaver(
             oppgaverQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
         )
@@ -56,9 +60,9 @@ class OppgaveController(
     ): ResponseEntity<Void> {
         logger.debug("assignSaksbehandler is requested for oppgave: {}", oppgaveId)
         oppgaveService.assignOppgave(
-            oppgaveControllerHelper.toLongOrException(oppgaveId),
+            oppgaveId.toLongOrException(),
             saksbehandlertildeling.navIdent,
-            oppgaveControllerHelper.toIntOrException(saksbehandlertildeling.oppgaveversjon)
+            saksbehandlertildeling.oppgaveversjon.toIntOrException()
         )
 
         val uri = MvcUriComponentsBuilder
@@ -73,7 +77,23 @@ class OppgaveController(
         @PathVariable("id") oppgaveId: String
     ): Oppgave {
         logger.debug("getOppgave is requested: {}", oppgaveId)
-        return oppgaveService.getOppgave(oppgaveControllerHelper.toLongOrException(oppgaveId))
+        return oppgaveService.getOppgave(oppgaveId.toLongOrException())
+    }
+
+    private fun String?.toLongOrException() =
+        this?.toLongOrNull() ?: throw OppgaveIdWrongFormatException("OppgaveId could not be parsed as a Long")
+
+    private fun String?.toIntOrException() =
+        this?.toIntOrNull() ?: throw OppgaveVersjonWrongFormatException("Oppgaveversjon could not be parsed as an Int")
+
+    private fun validateNavIdent(navIdent: String) {
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        if (innloggetIdent != navIdent) {
+            throw NotMatchingUserException(
+                "logged in user does not match sent in user. " +
+                        "Logged in: $innloggetIdent, sent in: $navIdent"
+            )
+        }
     }
 
     //    @PutMapping("/oppgaver/{id}/hjemmel")
@@ -90,5 +110,5 @@ class OppgaveController(
 //        return ResponseEntity.ok().location(uri).body(oppgave)
 //    }
 //
-
+    
 }
