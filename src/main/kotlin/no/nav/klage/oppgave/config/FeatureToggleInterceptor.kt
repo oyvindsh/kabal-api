@@ -6,7 +6,6 @@ import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.KLAGE_OPPGAVE_T
 import no.nav.klage.oppgave.exceptions.FeatureNotEnabledException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
@@ -49,11 +48,9 @@ class FeatureToggleInterceptor(
 }
 
 @Configuration
-class FeatureToggleInterceptorConfig : WebMvcConfigurer {
-
-    @Autowired
-    private lateinit var featureToggleInterceptor: FeatureToggleInterceptor
-
+class FeatureToggleInterceptorConfig(private val featureToggleInterceptor: FeatureToggleInterceptor) :
+    WebMvcConfigurer {
+    
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(featureToggleInterceptor).addPathPatterns("/ansatte/**")
     }
