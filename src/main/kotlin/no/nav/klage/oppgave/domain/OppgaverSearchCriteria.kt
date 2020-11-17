@@ -35,4 +35,7 @@ data class OppgaverSearchCriteria(
     enum class Projection {
         UTVIDET
     }
+
+    fun isProjectionUtvidet(): Boolean = Projection.UTVIDET == projection
+
 }

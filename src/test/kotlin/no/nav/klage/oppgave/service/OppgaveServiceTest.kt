@@ -46,6 +46,7 @@ internal class OppgaveServiceTest {
     @Test
     fun `missing hjemmel does not fail`() {
         val oppgaveService = oppgaveServiceWithType("something")
+
         assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().hjemmel).isEqualTo("mangler")
     }
 
@@ -60,11 +61,11 @@ internal class OppgaveServiceTest {
 
         val oppgaveService = OppgaveService(
             oppgaveClient,
-            pdlClientMock
+            OppgaveMapper(pdlClientMock)
         )
 
         val oppgaverSearchCriteriaMock = mockk<OppgaverSearchCriteria>(relaxed = true)
-        every { oppgaverSearchCriteriaMock.projection } returns OppgaverSearchCriteria.Projection.UTVIDET
+        every { oppgaverSearchCriteriaMock.isProjectionUtvidet() } returns true
 
         assertThat(
             oppgaveService.searchOppgaver(oppgaverSearchCriteriaMock).oppgaver.first().person?.fnr
@@ -104,7 +105,7 @@ internal class OppgaveServiceTest {
 
         val oppgaveService = OppgaveService(
             oppgaveClientMock,
-            pdlClientMock
+            OppgaveMapper(pdlClientMock)
         )
         return oppgaveService
     }
@@ -118,7 +119,7 @@ internal class OppgaveServiceTest {
 
         return OppgaveService(
             oppgaveClientMock,
-            pdlClientMock
+            OppgaveMapper(pdlClientMock)
         )
     }
 
