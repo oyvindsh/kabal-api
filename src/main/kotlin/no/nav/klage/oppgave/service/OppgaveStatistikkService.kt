@@ -3,10 +3,12 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+@Service
 class OppgaveStatistikkService(
     val oppgaveClient: OppgaveClient
 ) {
