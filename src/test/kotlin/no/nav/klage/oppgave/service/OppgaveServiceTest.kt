@@ -5,13 +5,11 @@ import io.mockk.mockk
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.clients.PdlClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
-import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.pdl.*
 import no.nav.klage.oppgave.domain.view.HJEMMEL
 import no.nav.klage.oppgave.domain.view.TYPE_ANKE
 import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
-import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -21,13 +19,13 @@ internal class OppgaveServiceTest {
     @Test
     fun `type is klage`() {
         val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_KLAGE)
-        assertThat(oppgaveService.searchOppgaver("", mockk(relaxed = true)).oppgaver.first().type).isEqualTo(TYPE_KLAGE)
+        assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().type).isEqualTo(TYPE_KLAGE)
     }
 
     @Test
     fun `type is anke`() {
         val oppgaveService = oppgaveServiceWithType(BEHANDLINGSTYPE_ANKE)
-        assertThat(oppgaveService.searchOppgaver("", mockk(relaxed = true)).oppgaver.first().type).isEqualTo(
+        assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().type).isEqualTo(
             TYPE_ANKE
         )
     }
@@ -35,20 +33,20 @@ internal class OppgaveServiceTest {
     @Test
     fun `unknown type`() {
         val oppgaveService = oppgaveServiceWithType("somethingelse")
-        assertThat(oppgaveService.searchOppgaver("", mockk(relaxed = true)).oppgaver.first().type).isEqualTo("ukjent")
+        assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().type).isEqualTo("ukjent")
     }
 
     @Test
     fun `hjemmel is set correctly`() {
         val hjemmel = "8-1"
         val oppgaveService = oppgaveServiceWithHjemmel(hjemmel)
-        assertThat(oppgaveService.searchOppgaver("", mockk(relaxed = true)).oppgaver.first().hjemmel).isEqualTo(hjemmel)
+        assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().hjemmel).isEqualTo(hjemmel)
     }
 
     @Test
     fun `missing hjemmel does not fail`() {
         val oppgaveService = oppgaveServiceWithType("something")
-        assertThat(oppgaveService.searchOppgaver("", mockk(relaxed = true)).oppgaver.first().hjemmel).isEqualTo("mangler")
+        assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().hjemmel).isEqualTo("mangler")
     }
 
     @Test
@@ -60,26 +58,17 @@ internal class OppgaveServiceTest {
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(listOf(fnr)) } returns getHentPersonResponse()
 
-        val saksbehandlerRepositoryMock = mockk<SaksbehandlerRepository>()
-        every { saksbehandlerRepositoryMock.getTilgangerForSaksbehandler(any()) } returns Tilganger(
-            arrayOf(
-                mockk(
-                    relaxed = true
-                )
-            )
-        )
-
         val oppgaveService = OppgaveService(
             oppgaveClient,
-            pdlClientMock,
-            mockk(relaxed = true),
-            saksbehandlerRepositoryMock
+            pdlClientMock
         )
 
         val oppgaverSearchCriteriaMock = mockk<OppgaverSearchCriteria>(relaxed = true)
         every { oppgaverSearchCriteriaMock.projection } returns OppgaverSearchCriteria.Projection.UTVIDET
 
-        assertThat(oppgaveService.searchOppgaver("", oppgaverSearchCriteriaMock).oppgaver.first().person?.fnr).isEqualTo(fnr)
+        assertThat(
+            oppgaveService.searchOppgaver(oppgaverSearchCriteriaMock).oppgaver.first().person?.fnr
+        ).isEqualTo(fnr)
     }
 
     private fun getHentPersonResponse(): HentPersonResponse {
@@ -113,20 +102,9 @@ internal class OppgaveServiceTest {
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
 
-        val saksbehandlerRepositoryMock = mockk<SaksbehandlerRepository>()
-        every { saksbehandlerRepositoryMock.getTilgangerForSaksbehandler(any()) } returns Tilganger(
-            arrayOf(
-                mockk(
-                    relaxed = true
-                )
-            )
-        )
-
         val oppgaveService = OppgaveService(
             oppgaveClientMock,
-            pdlClientMock,
-            mockk(relaxed = true),
-            saksbehandlerRepositoryMock
+            pdlClientMock
         )
         return oppgaveService
     }
@@ -135,23 +113,12 @@ internal class OppgaveServiceTest {
         val oppgaveClientMock = mockk<OppgaveClient>()
         every { oppgaveClientMock.getOneSearchPage(any()) } returns getOppgaveResponseWithType(type)
 
-        val saksbehandlerRepositoryMock = mockk<SaksbehandlerRepository>()
-        every { saksbehandlerRepositoryMock.getTilgangerForSaksbehandler(any()) } returns Tilganger(
-            arrayOf(
-                mockk(
-                    relaxed = true
-                )
-            )
-        )
-
         val pdlClientMock = mockk<PdlClient>()
         every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
 
         return OppgaveService(
             oppgaveClientMock,
-            pdlClientMock,
-            mockk(relaxed = true),
-            saksbehandlerRepositoryMock
+            pdlClientMock
         )
     }
 

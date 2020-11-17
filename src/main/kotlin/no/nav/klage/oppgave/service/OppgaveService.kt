@@ -7,9 +7,6 @@ import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.gosys.Gruppe.FOLKEREGISTERIDENT
 import no.nav.klage.oppgave.domain.pdl.Navn
 import no.nav.klage.oppgave.domain.view.*
-import no.nav.klage.oppgave.exceptions.NotMatchingUserException
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -22,9 +19,7 @@ import no.nav.klage.oppgave.domain.view.Oppgave as OppgaveView
 @Service
 class OppgaveService(
     val oppgaveClient: OppgaveClient,
-    val pdlClient: PdlClient,
-    val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    val saksbehandlerRepository: SaksbehandlerRepository
+    val pdlClient: PdlClient
 ) {
 
     companion object {
@@ -32,30 +27,12 @@ class OppgaveService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun searchOppgaver(navIdent: String, oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        if (innloggetIdent != navIdent) {
-            throw NotMatchingUserException(
-                "logged in user does not match sent in user. " +
-                        "Logged in: $innloggetIdent, sent in: $navIdent"
-            )
-        }
-
-        oppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent)
-
+    fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
         val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
         return OppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
             oppgaver = oppgaveResponse.toOppgaverView(oppgaverSearchCriteria.projection)
         )
-    }
-
-    private fun OppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent: String) {
-        val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(innloggetIdent)
-        if (tilgangerForSaksbehandler.enheter.size > 1) {
-            logger.warn("Saksbehandler ({}) had more than one enhet. Only using the first.", innloggetIdent)
-        }
-        this.enhetsnr = tilgangerForSaksbehandler.enheter.first().enhetId
     }
 
     private fun OppgaveResponse.toOppgaverView(projection: OppgaverSearchCriteria.Projection?): List<OppgaveView> {
@@ -202,7 +179,7 @@ class OppgaveService(
     fun klagerInnsendtIPeriode(numberOfDays: Int): Int {
         val startOfPeriod = startOfPeriod(numberOfDays)
         val endOfPeriod = endOfPeriod(numberOfDays)
-        
+
         val searchCriteria1 = OppgaverSearchCriteria(
             typer = listOf("Klage"),
             ytelser = listOf("Sykepenger"),
