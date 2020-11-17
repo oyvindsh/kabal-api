@@ -73,9 +73,8 @@ class OppgaveController(
         @PathVariable navIdent: String,
         @PathVariable("id") oppgaveId: String
     ): Oppgave {
-        TODO()
-//        logger.debug("getOppgave is requested: {}", oppgaveId)
-//        return oppgaveService.getOppgave(oppgaveId.toLongOrException())
+        logger.debug("getOppgave is requested: {}", oppgaveId)
+        return oppgaveService.getOppgave(oppgaveId.toLongOrException())
     }
 
     private fun String?.toLongOrException() =
