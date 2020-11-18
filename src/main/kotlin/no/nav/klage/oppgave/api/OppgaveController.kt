@@ -5,10 +5,10 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.Saksbehandlertildeling
 import no.nav.klage.oppgave.domain.view.Oppgave
 import no.nav.klage.oppgave.domain.view.OppgaverRespons
+import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class OppgaveController(
     private val oppgaveService: OppgaveService,
+    private val oppgaverQueryParamsMapper: OppgaverQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
 
@@ -43,8 +44,10 @@ class OppgaveController(
         queryParams: OppgaverQueryParams
     ): OppgaverRespons {
         logger.debug("Params: {}", queryParams)
-        debugRollerOgTilganger()
-        return oppgaveService.searchOppgaver(navIdent, queryParams.toSearchCriteria())
+        validateNavIdent(navIdent)
+        return oppgaveService.searchOppgaver(
+            oppgaverQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
+        )
     }
 
     @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlertildeling")
@@ -83,20 +86,15 @@ class OppgaveController(
     private fun String?.toIntOrException() =
         this?.toIntOrNull() ?: throw OppgaveVersjonWrongFormatException("Oppgaveversjon could not be parsed as an Int")
 
-    private fun OppgaverQueryParams.toSearchCriteria() = OppgaverSearchCriteria(
-        typer = typer,
-        ytelser = ytelser,
-        hjemler = hjemler,
-        order = if (rekkefoelge == OppgaverQueryParams.Rekkefoelge.SYNKENDE) {
-            OppgaverSearchCriteria.Order.DESC
-        } else {
-            OppgaverSearchCriteria.Order.ASC
-        },
-        offset = start,
-        limit = antall,
-        saksbehandler = tildeltSaksbehandler,
-        projection = if (projeksjon?.name != null) OppgaverSearchCriteria.Projection.valueOf(projeksjon.name) else null
-    )
+    private fun validateNavIdent(navIdent: String) {
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        if (innloggetIdent != navIdent) {
+            throw NotMatchingUserException(
+                "logged in user does not match sent in user. " +
+                        "Logged in: $innloggetIdent, sent in: $navIdent"
+            )
+        }
+    }
 
     //    @PutMapping("/oppgaver/{id}/hjemmel")
 //    fun setHjemmel(
@@ -112,20 +110,5 @@ class OppgaveController(
 //        return ResponseEntity.ok().location(uri).body(oppgave)
 //    }
 //
-
-    private fun debugRollerOgTilganger() {
-        try {
-            val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-            innloggetSaksbehandlerRepository.getRoller().forEach {
-                logger.debug("Funnet rolle {} for saksbehandler {}", it, innloggetIdent)
-            }
-            logger.debug("Er {} saksbehandler? {}", innloggetIdent, innloggetSaksbehandlerRepository.erSaksbehandler())
-            innloggetSaksbehandlerRepository.getTilgangerForSaksbehandler().enheter.forEach {
-                logger.debug("Saksbehandler {} har tilganger {} i enhet {}", innloggetIdent, it.fagomrader, it.enhetId)
-            }
-        } catch (e: Exception) {
-            logger.debug("Klarte ikke å hente ut roller og tilganger", e)
-        }
-    }
-
+    
 }

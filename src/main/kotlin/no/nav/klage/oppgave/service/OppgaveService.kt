@@ -3,19 +3,13 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.OppgaveClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.view.OppgaverRespons
-import no.nav.klage.oppgave.exceptions.NotMatchingUserException
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import no.nav.klage.oppgave.domain.view.Oppgave as OppgaveView
 
-
 @Service
 class OppgaveService(
     val oppgaveClient: OppgaveClient,
-    val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    val saksbehandlerRepository: SaksbehandlerRepository,
     val oppgaveMapper: OppgaveMapper
 ) {
 
@@ -24,17 +18,7 @@ class OppgaveService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun searchOppgaver(navIdent: String, oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        if (innloggetIdent != navIdent) {
-            throw NotMatchingUserException(
-                "logged in user does not match sent in user. " +
-                        "Logged in: $innloggetIdent, sent in: $navIdent"
-            )
-        }
-
-        oppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent)
-
+    fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
         val oppgaveResponse = oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
         return OppgaverRespons(
             antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
@@ -43,14 +27,6 @@ class OppgaveService(
                 oppgaverSearchCriteria.isProjectionUtvidet()
             )
         )
-    }
-
-    private fun OppgaverSearchCriteria.enrichWithEnhetsnrForLoggedInUser(innloggetIdent: String) {
-        val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(innloggetIdent)
-        if (tilgangerForSaksbehandler.enheter.size > 1) {
-            logger.warn("Saksbehandler ({}) had more than one enhet. Only using the first.", innloggetIdent)
-        }
-        this.enhetsnr = tilgangerForSaksbehandler.enheter.first().enhetId
     }
 
     fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?) {
