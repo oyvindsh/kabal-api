@@ -33,11 +33,11 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
 
     private fun findEnhetsnrForUser(navIdent: String): String {
         val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(navIdent)
-        logWarningIfTooManyEnheter(navIdent, tilgangerForSaksbehandler)
+        logWarningIMoreThanOneEnhet(navIdent, tilgangerForSaksbehandler)
         return tilgangerForSaksbehandler.enheter.first().enhetId
     }
 
-    private fun logWarningIfTooManyEnheter(navIdent: String, tilgangerForSaksbehandler: Tilganger) {
+    private fun logWarningIMoreThanOneEnhet(navIdent: String, tilgangerForSaksbehandler: Tilganger) {
         if (tilgangerForSaksbehandler.enheter.size > 1) {
             logger.warn(
                 "Saksbehandler ({}) had more than one enhet: {}. Only using {}.",
