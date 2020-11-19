@@ -13,6 +13,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
 import java.util.*
 
@@ -55,6 +57,8 @@ class CacheWithRedisConfiguration : CachingConfigurerSupport() {
     fun redisTemplate(cf: RedisConnectionFactory?): RedisTemplate<String, String> {
         val redisTemplate: RedisTemplate<String, String> = RedisTemplate<String, String>()
         redisTemplate.connectionFactory = cf
+        redisTemplate.keySerializer = StringRedisSerializer()
+        redisTemplate.valueSerializer = GenericJackson2JsonRedisSerializer()
         return redisTemplate
     }
 
