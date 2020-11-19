@@ -19,7 +19,7 @@ val githubPassword: String by project
 
 repositories {
     mavenCentral()
-    maven ("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/simple-slack-poster")
         credentials {
@@ -46,6 +46,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
     implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 

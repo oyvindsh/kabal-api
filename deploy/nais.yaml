@@ -46,6 +46,8 @@ spec:
       rules:
         - application: klage-oppgave
     outbound:
+      rules:
+        - application: klage-redis
       external:
       {{#each externalHosts as |host|}}
         - host: {{host}}

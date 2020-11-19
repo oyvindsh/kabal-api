@@ -1,10 +1,13 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
+import no.nav.klage.oppgave.config.CacheConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
+import no.nav.klage.oppgave.config.CacheConfiguration.Companion.TILGANGER_CACHE
 import no.nav.klage.oppgave.domain.Bruker
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -23,7 +26,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
     lateinit var applicationName: String
 
     @Retryable
-    //TODO: Ta i bruk @Cacheable
+    @Cacheable(TILGANGER_CACHE)
     fun getTilgangerForSaksbehandler(navIdent: String): Tilganger {
         logger.debug("Fetching tilganger for saksbehandler with Nav-Ident {}", navIdent)
 
@@ -48,7 +51,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
     }
 
     @Retryable
-    //TODO: Ta i bruk @Cacheable
+    @Cacheable(SAKSBEHANDLERE_I_ENHET_CACHE)
     fun getSaksbehandlereIEnhet(enhetId: String): List<Bruker> {
         logger.debug("Fetching brukere in enhet {}", enhetId)
 

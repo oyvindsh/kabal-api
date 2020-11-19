@@ -83,6 +83,12 @@ no.nav.security.jwt:
 navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
+cache:
+  redisHost: klage-redis
+  timeout: 28800
+  cacheExpirations:
+    roller: 3600
+
 allowed.origins:
   https://klage-oppgave.nav.no,
   https://klage-oppgave.dev.nav.no

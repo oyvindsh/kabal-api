@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.clients
 
+import no.nav.klage.oppgave.config.CacheConfiguration.Companion.ROLLER_CACHE
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
@@ -16,7 +18,7 @@ class KlageProxyClient(
 ) {
 
     @Retryable
-    //TODO: Ta i bruk @Cacheable
+    @Cacheable(ROLLER_CACHE)
     fun getRoller(ident: String): List<String> {
         return klageProxyWebClient.get()
             .uri("/roller/{ident}", ident)
