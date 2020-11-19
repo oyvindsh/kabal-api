@@ -19,6 +19,7 @@ data class OppgaverSearchCriteria(
     val order: Order? = null,
     val offset: Int,
     val limit: Int,
+    val erTildeltSaksbehandler: Boolean? = null,
     val saksbehandler: String? = null,
     val enhetsnr: String? = null,
     val projection: Projection? = null
