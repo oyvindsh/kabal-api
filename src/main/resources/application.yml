@@ -14,6 +14,13 @@ spring:
     add-mappings: false
   mvc:
     throw-exception-if-no-handler-found: true
+  cache:
+    redis:
+      time-to-live: "480m"
+      key-prefix: klageoppgaveapi
+  redis:
+    host: klage-redis
+
 
 server:
   port: 7081
@@ -82,12 +89,6 @@ no.nav.security.jwt:
 
 navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
-
-cache:
-  redisHost: klage-redis
-  timeout: 28800
-  cacheExpirations:
-    roller: 3600
 
 allowed.origins:
   https://klage-oppgave.nav.no,
