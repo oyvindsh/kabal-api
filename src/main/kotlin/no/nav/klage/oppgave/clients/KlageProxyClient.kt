@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients
 
-import no.nav.klage.oppgave.config.CacheConfiguration.Companion.ROLLER_CACHE
+import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.ROLLER_CACHE
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.cache.annotation.Cacheable

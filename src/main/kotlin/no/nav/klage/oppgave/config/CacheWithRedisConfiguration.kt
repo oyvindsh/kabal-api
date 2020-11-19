@@ -19,7 +19,7 @@ import java.util.*
 @EnableCaching
 @EnableConfigurationProperties(CacheConfigurationProperties::class)
 @Configuration
-class CacheConfiguration {
+class CacheWithRedisConfiguration : CachingConfigurerSuppor1t() {
 //This code is taken from the tutorial at https://programmerfriend.com/ultimate-guide-to-redis-cache-with-spring-boot-2-and-spring-data-redis/
 
     companion object {

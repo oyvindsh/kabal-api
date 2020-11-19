@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.clients
 
 import brave.Tracer
-import no.nav.klage.oppgave.config.CacheConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
-import no.nav.klage.oppgave.config.CacheConfiguration.Companion.TILGANGER_CACHE
+import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
+import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.TILGANGER_CACHE
 import no.nav.klage.oppgave.domain.Bruker
 import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.util.getLogger
