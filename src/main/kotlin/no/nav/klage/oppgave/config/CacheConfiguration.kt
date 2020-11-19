@@ -1,11 +1,11 @@
 package no.nav.klage.oppgave.config
 
-import lombok.Data
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurerSupport
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
@@ -19,6 +19,7 @@ import java.util.*
 
 
 @Configuration
+@EnableCaching
 @EnableConfigurationProperties(CacheConfigurationProperties::class)
 class CacheConfiguration : CachingConfigurerSupport() {
 //This code is taken from the tutorial at https://programmerfriend.com/ultimate-guide-to-redis-cache-with-spring-boot-2-and-spring-data-redis/
@@ -29,7 +30,7 @@ class CacheConfiguration : CachingConfigurerSupport() {
         const val TILGANGER_CACHE = "tilganger"
         const val ROLLER_CACHE = "roller"
         const val SAKSBEHANDLERE_I_ENHET_CACHE = "saksbehandlereienhet"
-        
+
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
 
@@ -81,12 +82,10 @@ class CacheConfiguration : CachingConfigurerSupport() {
 }
 
 @ConfigurationProperties(prefix = "cache")
-@Data
-class CacheConfigurationProperties {
-    var timeoutSeconds: Long = 60
-    var redisPort = 6379
-    var redisHost = "localhost"
-
+data class CacheConfigurationProperties(
+    var timeoutSeconds: Long = 60,
+    var redisPort: Int = 6379,
+    var redisHost: String = "localhost",
     // Mapping of cacheNames to expira-after-write timeout in seconds
     var cacheExpirations: Map<String, Long> = HashMap()
-}
+)
