@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.config
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.cache.annotation.CachingConfigurerSupport
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,7 +20,7 @@ import java.util.*
 @EnableCaching
 @EnableConfigurationProperties(CacheConfigurationProperties::class)
 @Configuration
-class CacheWithRedisConfiguration : CachingConfigurerSuppor1t() {
+class CacheWithRedisConfiguration : CachingConfigurerSupport() {
 //This code is taken from the tutorial at https://programmerfriend.com/ultimate-guide-to-redis-cache-with-spring-boot-2-and-spring-data-redis/
 
     companion object {
