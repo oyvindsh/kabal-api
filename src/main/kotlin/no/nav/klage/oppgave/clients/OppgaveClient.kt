@@ -100,8 +100,10 @@ class OppgaveClient(
         ytelser.forEach {
             uriBuilder.queryParam("tema", mapYtelse(it))
         }
-
-//      Do we need this? ->  uriBuilder.queryParam("tildeltRessurs", true|false)
+        
+        erTildeltSaksbehandler?.let {
+            uriBuilder.queryParam("tildeltRessurs", erTildeltSaksbehandler)
+        }
         saksbehandler?.let {
             uriBuilder.queryParam("tilordnetRessurs", saksbehandler)
         }

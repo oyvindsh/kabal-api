@@ -26,6 +26,7 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
         },
         offset = oppgaverQueryParams.start,
         limit = oppgaverQueryParams.antall,
+        erTildeltSaksbehandler = oppgaverQueryParams.erTildeltSaksbehandler,
         saksbehandler = oppgaverQueryParams.tildeltSaksbehandler,
         projection = oppgaverQueryParams.projeksjon?.let { OppgaverSearchCriteria.Projection.valueOf(it.name) },
         enhetsnr = findEnhetsnrForUser(navIdent)
