@@ -3,8 +3,6 @@ package no.nav.klage.oppgave.config
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.CachingConfigurerSupport
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,10 +16,10 @@ import java.time.Duration
 import java.util.*
 
 
-@Configuration
 @EnableCaching
 @EnableConfigurationProperties(CacheConfigurationProperties::class)
-class CacheConfiguration : CachingConfigurerSupport() {
+@Configuration
+class CacheConfiguration {
 //This code is taken from the tutorial at https://programmerfriend.com/ultimate-guide-to-redis-cache-with-spring-boot-2-and-spring-data-redis/
 
     companion object {
@@ -68,7 +66,7 @@ class CacheConfiguration : CachingConfigurerSupport() {
     fun cacheManager(
         redisConnectionFactory: RedisConnectionFactory,
         properties: CacheConfigurationProperties
-    ): CacheManager {
+    ): RedisCacheManager {
         val cacheConfigurations: MutableMap<String, RedisCacheConfiguration> =
             HashMap<String, RedisCacheConfiguration>()
         for ((key, value) in properties.cacheExpirations.entries) {
