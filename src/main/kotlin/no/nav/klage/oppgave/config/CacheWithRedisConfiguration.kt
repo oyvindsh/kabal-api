@@ -13,7 +13,6 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.time.Duration
 
-@EnableCaching
 @Configuration
 class CacheWithRedisConfiguration {
 
@@ -41,6 +40,7 @@ class CacheWithRedisConfiguration {
 
     @Bean("redisTemplate")
     fun redisTemplate(cf: RedisConnectionFactory): RedisTemplate<String, String> {
+        logger.info("Creating redisTemplate with GenericJackson2JsonRedisSerializer")
         val redisTemplate: RedisTemplate<String, String> = RedisTemplate<String, String>()
         redisTemplate.connectionFactory = cf
         redisTemplate.keySerializer = StringRedisSerializer()
@@ -48,3 +48,7 @@ class CacheWithRedisConfiguration {
         return redisTemplate
     }
 }
+
+@Configuration
+@EnableCaching
+class CacheConfiguration
