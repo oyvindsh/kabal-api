@@ -31,12 +31,11 @@ class CacheWithRedisConfiguration {
     @Bean
     fun myRedisCacheManagerBuilderCustomizer(): RedisCacheManagerBuilderCustomizer? {
         return RedisCacheManagerBuilderCustomizer { builder: RedisCacheManagerBuilder ->
-            builder
-                .withCacheConfiguration(
-                    ROLLER_CACHE,
-                    RedisCacheConfiguration.defaultCacheConfig()
-                        .entryTtl(Duration.ofHours(1))
-                )
+            builder.withCacheConfiguration(
+                ROLLER_CACHE,
+                RedisCacheConfiguration.defaultCacheConfig()
+                    .entryTtl(Duration.ofHours(1))
+            )
         }
     }
 
