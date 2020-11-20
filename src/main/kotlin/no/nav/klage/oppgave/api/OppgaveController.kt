@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
+import no.nav.klage.oppgave.domain.Saksbehandlerfjerning
 import no.nav.klage.oppgave.domain.Saksbehandlertildeling
 import no.nav.klage.oppgave.domain.view.Oppgave
 import no.nav.klage.oppgave.domain.view.OppgaverRespons
@@ -62,6 +63,27 @@ class OppgaveController(
         oppgaveService.assignOppgave(
             oppgaveId.toLongOrException(),
             saksbehandlertildeling.navIdent,
+            saksbehandlertildeling.oppgaveversjon.toIntOrException()
+        )
+
+        val uri = MvcUriComponentsBuilder
+            .fromMethodName(OppgaveController::class.java, "getOppgave", navIdent, oppgaveId)
+            .buildAndExpand(oppgaveId).toUri()
+        return ResponseEntity.noContent().location(uri).build()
+    }
+
+    @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlerfjerning")
+    fun unassignSaksbehandler(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        @ApiParam(value = "Id til en oppgave")
+        @PathVariable("id") oppgaveId: String,
+        @RequestBody saksbehandlertildeling: Saksbehandlerfjerning
+    ): ResponseEntity<Void> {
+        logger.debug("unassignSaksbehandler is requested for oppgave: {}", oppgaveId)
+        oppgaveService.assignOppgave(
+            oppgaveId.toLongOrException(),
+            null,
             saksbehandlertildeling.oppgaveversjon.toIntOrException()
         )
 

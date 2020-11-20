@@ -4,3 +4,7 @@ data class Saksbehandlertildeling(
     val navIdent: String,
     val oppgaveversjon: String
 )
+
+data class Saksbehandlerfjerning(
+    val oppgaveversjon: String
+)
