@@ -46,6 +46,8 @@ class CacheWithRedisConfiguration {
     @Bean
     @Primary
     fun redisCacheConfiguration(): RedisCacheConfiguration {
+        //Tried a bunch of things, finally found this:
+        //https://stackoverflow.com/questions/52265326/how-can-i-easily-cache-kotlin-objects-in-redis-using-json-via-jackson
         val objectMapper = ObjectMapper()
             .registerModule(KotlinModule())
             .registerModule(JavaTimeModule())
