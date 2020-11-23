@@ -2,16 +2,21 @@ package no.nav.klage.oppgave.config
 
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
+import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
+import org.springframework.data.redis.cache.RedisCacheWriter
+import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.RedisSerializer
 import java.time.Duration
 
 
+@EnableCaching
 @Configuration
 class CacheWithRedisConfiguration {
 
@@ -27,7 +32,28 @@ class CacheWithRedisConfiguration {
     }
 
     @Bean
+    fun cacheManager(redisConnectionFactory: RedisConnectionFactory): CacheManager {
+        return RedisCacheManager(
+            RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory),
+            redisCacheConfiguration(),
+        )
+    }
+
+
+    @Bean
     fun redisCacheConfiguration(): RedisCacheConfiguration {
+        /*
+        val jackson2JsonRedisSerializer = Jackson2JsonRedisSerializer(
+            Any::class.java
+        )
+        var redisCacheConfiguration = RedisCacheConfiguration
+            .defaultCacheConfig()
+        redisCacheConfiguration = redisCacheConfiguration.serializeValuesWith(
+            RedisSerializationContext.SerializationPair
+                .fromSerializer(jackson2JsonRedisSerializer)
+        )
+        return redisCacheConfiguration
+         */
         return RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(
             RedisSerializationContext
                 .SerializationPair
@@ -67,7 +93,3 @@ class CacheWithRedisConfiguration {
     }
      */
 }
-
-@Configuration
-@EnableCaching
-class CacheConfiguration
