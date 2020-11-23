@@ -36,9 +36,11 @@ class ByEnhetStrategy(private val axsysClient: AxsysClient) : Strategy {
             false
         }
 
-    private fun getSaksbehandlersEnheter(unleashContext: UnleashContext) =
-        axsysClient.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter
+    private fun getSaksbehandlersEnheter(unleashContext: UnleashContext): List<String> {
+        logger.debug("Getting saksbehandlers enheter")
+        return axsysClient.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter
             .map { it.enhetId }
+    }
 
     private fun getEnabledEnheter(parameters: Map<String, String>?): List<String>? =
         parameters?.get("PARAM")?.split(',')
