@@ -12,7 +12,7 @@ import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
 import org.springframework.data.redis.cache.RedisCacheWriter
 import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import java.time.Duration
 
@@ -45,14 +45,8 @@ class CacheWithRedisConfiguration(private val objectMapper: ObjectMapper) {
         RedisCacheConfiguration
             .defaultCacheConfig().serializeValuesWith(
                 RedisSerializationContext.SerializationPair
-                    .fromSerializer(jackson2JsonRedisSerializer())
+                    .fromSerializer(GenericJackson2JsonRedisSerializer())
             )
-
-    private fun jackson2JsonRedisSerializer(): Jackson2JsonRedisSerializer<Any> {
-        val jackson2JsonRedisSerializer = Jackson2JsonRedisSerializer(Any::class.java)
-        jackson2JsonRedisSerializer.setObjectMapper(objectMapper)
-        return jackson2JsonRedisSerializer
-    }
 
     @Bean
     fun myRedisCacheManagerBuilderCustomizer(): RedisCacheManagerBuilderCustomizer? {
