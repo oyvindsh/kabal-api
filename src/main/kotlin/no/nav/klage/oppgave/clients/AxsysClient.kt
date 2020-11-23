@@ -46,7 +46,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
         } catch (notFound: WebClientResponseException.NotFound) {
             logger.warn("Got a 404 fetching tilganger for saksbehandler {}, returning empty object", navIdent)
             //TODO: Burde det smelle hardt her isf å returnere tomt objekt?
-            Tilganger(emptyArray())
+            Tilganger(emptyList())
         }
     }
 
