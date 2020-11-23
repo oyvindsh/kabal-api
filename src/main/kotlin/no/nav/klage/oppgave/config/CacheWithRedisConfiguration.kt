@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.config
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect
-import com.fasterxml.jackson.annotation.PropertyAccessor
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer
 import org.springframework.cache.CacheManager
@@ -22,7 +19,7 @@ import java.time.Duration
 
 @EnableCaching
 @Configuration
-class CacheWithRedisConfiguration {
+class CacheWithRedisConfiguration(private val objectMapper: ObjectMapper) {
 
     companion object {
 
@@ -43,7 +40,6 @@ class CacheWithRedisConfiguration {
         )
     }
 
-
     @Bean
     fun redisCacheConfiguration(): RedisCacheConfiguration =
         RedisCacheConfiguration
@@ -53,16 +49,8 @@ class CacheWithRedisConfiguration {
             )
 
     private fun jackson2JsonRedisSerializer(): Jackson2JsonRedisSerializer<Any> {
-        val jackson2JsonRedisSerializer = Jackson2JsonRedisSerializer(
-            Any::class.java
-        )
-        val om = ObjectMapper()
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
-        om.activateDefaultTyping(
-            BasicPolymorphicTypeValidator.builder().build(),
-            ObjectMapper.DefaultTyping.NON_FINAL
-        )
-        jackson2JsonRedisSerializer.setObjectMapper(om)
+        val jackson2JsonRedisSerializer = Jackson2JsonRedisSerializer(Any::class.java)
+        jackson2JsonRedisSerializer.setObjectMapper(objectMapper)
         return jackson2JsonRedisSerializer
     }
 
