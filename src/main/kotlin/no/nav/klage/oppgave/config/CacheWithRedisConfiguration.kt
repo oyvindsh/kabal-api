@@ -1,6 +1,9 @@
 package no.nav.klage.oppgave.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer
 import org.springframework.cache.CacheManager
@@ -21,7 +24,7 @@ import java.time.Duration
 
 @EnableCaching
 @Configuration
-class CacheWithRedisConfiguration(private val objectMapper: ObjectMapper) {
+class CacheWithRedisConfiguration {
 
     companion object {
 
@@ -44,8 +47,17 @@ class CacheWithRedisConfiguration(private val objectMapper: ObjectMapper) {
 
     @Bean
     @Primary
-    fun redisCacheConfiguration(): RedisCacheConfiguration =
-        RedisCacheConfiguration
+    fun redisCacheConfiguration(): RedisCacheConfiguration {
+        val objectMapper = ObjectMapper()
+            .registerModule(KotlinModule())
+            .registerModule(JavaTimeModule())
+            .activateDefaultTyping(
+                BasicPolymorphicTypeValidator.builder()
+                    .allowIfBaseType(Any::class.java)
+                    .build(), ObjectMapper.DefaultTyping.EVERYTHING
+            )
+
+        return RedisCacheConfiguration
             .defaultCacheConfig()
             .serializeKeysWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
@@ -57,6 +69,7 @@ class CacheWithRedisConfiguration(private val objectMapper: ObjectMapper) {
                     )
                 )
             )
+    }
 
     @Bean
     fun myRedisCacheManagerBuilderCustomizer(): RedisCacheManagerBuilderCustomizer? {
