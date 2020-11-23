@@ -51,7 +51,11 @@ class CacheWithRedisConfiguration(private val objectMapper: ObjectMapper) {
                 RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
             )
             .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer())
+                RedisSerializationContext.SerializationPair.fromSerializer(
+                    GenericJackson2JsonRedisSerializer(
+                        objectMapper
+                    )
+                )
             )
 
     @Bean
