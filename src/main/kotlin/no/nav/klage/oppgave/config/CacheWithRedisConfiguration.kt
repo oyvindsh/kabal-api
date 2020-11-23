@@ -7,12 +7,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
-import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.data.redis.serializer.RedisSerializationContext
+import org.springframework.data.redis.serializer.RedisSerializer
 import java.time.Duration
+
 
 @Configuration
 class CacheWithRedisConfiguration {
@@ -29,6 +27,15 @@ class CacheWithRedisConfiguration {
     }
 
     @Bean
+    fun redisCacheConfiguration(): RedisCacheConfiguration {
+        return RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(
+            RedisSerializationContext
+                .SerializationPair
+                .fromSerializer(RedisSerializer.json())
+        )
+    }
+
+    @Bean
     fun myRedisCacheManagerBuilderCustomizer(): RedisCacheManagerBuilderCustomizer? {
         return RedisCacheManagerBuilderCustomizer { builder: RedisCacheManagerBuilder ->
             builder.withCacheConfiguration(
@@ -39,6 +46,7 @@ class CacheWithRedisConfiguration {
         }
     }
 
+    /*
     @Bean("redisTemplate")
     fun redisTemplate(cf: RedisConnectionFactory): RedisTemplate<Any, Any> {
         logger.info("Creating redisTemplate with GenericJackson2JsonRedisSerializer")
@@ -57,6 +65,7 @@ class CacheWithRedisConfiguration {
         redisTemplate.valueSerializer = GenericJackson2JsonRedisSerializer()
         return redisTemplate
     }
+     */
 }
 
 @Configuration
