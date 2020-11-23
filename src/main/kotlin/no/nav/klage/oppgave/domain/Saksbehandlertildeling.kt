@@ -5,6 +5,6 @@ data class Saksbehandlertildeling(
     val oppgaveversjon: String
 )
 
-data class Saksbehandlerfjerning(
+data class Saksbehandlerfradeling(
     val oppgaveversjon: String
 )

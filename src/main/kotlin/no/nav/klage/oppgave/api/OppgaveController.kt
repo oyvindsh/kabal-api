@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
-import no.nav.klage.oppgave.domain.Saksbehandlerfjerning
+import no.nav.klage.oppgave.domain.Saksbehandlerfradeling
 import no.nav.klage.oppgave.domain.Saksbehandlertildeling
 import no.nav.klage.oppgave.domain.view.Oppgave
 import no.nav.klage.oppgave.domain.view.OppgaverRespons
@@ -72,19 +72,19 @@ class OppgaveController(
         return ResponseEntity.noContent().location(uri).build()
     }
 
-    @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlerfjerning")
+    @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlerfradeling")
     fun unassignSaksbehandler(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
         @ApiParam(value = "Id til en oppgave")
         @PathVariable("id") oppgaveId: String,
-        @RequestBody saksbehandlertildeling: Saksbehandlerfjerning
+        @RequestBody saksbehandlerfradeling: Saksbehandlerfradeling
     ): ResponseEntity<Void> {
         logger.debug("unassignSaksbehandler is requested for oppgave: {}", oppgaveId)
         oppgaveService.assignOppgave(
             oppgaveId.toLongOrException(),
             null,
-            saksbehandlertildeling.oppgaveversjon.toIntOrException()
+            saksbehandlerfradeling.oppgaveversjon.toIntOrException()
         )
 
         val uri = MvcUriComponentsBuilder
