@@ -39,7 +39,7 @@ class OppgaveService(
             oppgaveVersjon
         )
         endreOppgave.apply {
-            tilordnetRessurs = saksbehandlerIdent;
+            tilordnetRessurs = saksbehandlerIdent
             versjon = oppgaveVersjon
         }
 
