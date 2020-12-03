@@ -12,7 +12,7 @@ spec:
       - name: klage-oppgave-api
         type: POSTGRES_12
         tier: {{ db_tier }}
-        diskType: ssd
+        diskType: SSD
         highAvailability: {{ db_ha }}
         diskSize: {{ db_size }}
         diskAutoresize: true
