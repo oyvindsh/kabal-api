@@ -9,10 +9,10 @@ spec:
   image: {{ image }}
   gcp:
     sqlInstances:
-      - databases:
-          - name: klage-oppgave-api
+      - type: POSTGRES_12
+        databases:
+          - name: klageoppgavedb
             envVarPrefix: DB
-        type: POSTGRES_12
   azure:
     application:
       enabled: true
