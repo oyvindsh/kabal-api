@@ -7,6 +7,19 @@ metadata:
     team: klage
 spec:
   image: {{ image }}
+  gcp:
+    sqlInstances:
+      - name: klage-oppgave-api
+        type: POSTGRES_12
+        tier: {{ db_tier }}
+        diskType: SSD
+        highAvailability: {{ db_ha }}
+        diskSize: {{ db_size }}
+        diskAutoresize: true
+        autoBackupTime: "03:00"
+        cascadingDelete: false
+        databases:
+          - name: klage-oppgave-api
   azure:
     application:
       enabled: true

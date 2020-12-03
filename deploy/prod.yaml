@@ -1,7 +1,10 @@
-ingress: https://klage-oppgave-api.nav.no
+ingress: https://klage-oppgave-api.intern.nav.no
 externalHosts:
   - login.microsoftonline.com
   - hooks.slack.com
   - unleash.nais.io
 springProfile: prod-gcp
 tenant: nav.no
+db_tier: db-custom-4-15360
+db_size: 10
+db_ha: true
