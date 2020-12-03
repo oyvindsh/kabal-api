@@ -9,7 +9,15 @@ spec:
   image: {{ image }}
   gcp:
     sqlInstances:
-      - type: POSTGRES_12
+      - name: klage-oppgave-api
+        type: POSTGRES_12
+        tier: {{ db_tier }}
+        diskType: ssd
+        highAvailability: {{ db_ha }}
+        diskSize: {{ db_size }}
+        diskAutoresize: true
+        autoBackupTime: "03:00"
+        cascadingDelete: false
         databases:
           - name: klageoppgavedb
   azure:
