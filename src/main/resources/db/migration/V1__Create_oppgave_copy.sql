@@ -89,6 +89,9 @@ VALUES (5, 'FEILREGISTRERT', 'AVSLUTTET');
 
 ALTER TABLE oppgave.oppgave
     ADD CONSTRAINT fk_oppgave_status_id FOREIGN KEY (status_id) REFERENCES oppgave.status (id);
+ALTER TABLE oppgave.oppgaveversjon
+    ADD CONSTRAINT fk_oppgaveversjon_status_id FOREIGN KEY (status_id) REFERENCES oppgave.status (id);
+
 
 CREATE TABLE oppgave.metadata
 (
@@ -103,6 +106,21 @@ CREATE TABLE oppgave.metadata
 );
 
 CREATE SEQUENCE oppgave.metadata_seq;
+
+CREATE TABLE oppgave.versjonmetadata
+(
+    id              BIGINT       NOT NULL,
+    oppgave_id      BIGINT       NOT NULL,
+    oppgave_versjon INT          NOT NULL,
+    nokkel          VARCHAR(40)  NOT NULL,
+    verdi           VARCHAR(255) NOT NULL,
+
+    CONSTRAINT pk_versjonmetadata PRIMARY KEY (id),
+    CONSTRAINT fk_versjonmetadata_oppgave_id FOREIGN KEY (oppgave_id, oppgave_versjon) REFERENCES oppgave.oppgaveversjon (id, versjon),
+    CONSTRAINT unique_nokkel_per_oppgaveversjon UNIQUE (oppgave_id, oppgave_versjon, nokkel)
+);
+
+CREATE SEQUENCE oppgave.versjonmetadata_seq;
 
 CREATE TABLE oppgave.ident
 (
@@ -120,6 +138,8 @@ CREATE SEQUENCE oppgave.ident_seq;
 
 ALTER TABLE oppgave.oppgave
     ADD CONSTRAINT fk_oppgave_ident_id FOREIGN KEY (ident_id) REFERENCES oppgave.ident (id);
+ALTER TABLE oppgave.oppgaveversjon
+    ADD CONSTRAINT fk_oppgaveversjon_ident_id FOREIGN KEY (ident_id) REFERENCES oppgave.ident (id);
 
 -- Oppgave indexer for FK --
 CREATE INDEX idx_oppgave_ident_id
@@ -168,3 +188,50 @@ CREATE INDEX idx_oppgave_oppr_tidspunkt
 
 CREATE INDEX idx_oppgave_opprettet_av
     ON oppgave.oppgave (opprettet_av);
+
+-- Indexer for oppgaveversjon
+
+CREATE INDEX idx_oppgaveversj_ident_id
+    ON oppgave.oppgaveversjon (ident_id);
+
+CREATE INDEX idx_oppgaveversj_status_id
+    ON oppgave.oppgaveversjon (status_id);
+
+CREATE INDEX idx_oppgaveversj_mappe_id
+    ON oppgave.oppgaveversjon (mappe_id);
+
+CREATE INDEX idx_versjonmetadata_oppgave_id
+    ON oppgave.versjonmetadata (oppgave_id, oppgave_versjon);
+
+CREATE INDEX idx_oppgaveversj_tildelt_enhetsnr
+    ON oppgave.oppgaveversjon (tildelt_enhetsnr);
+
+CREATE INDEX idx_oppgaveversj_tilordnet_ressurs
+    ON oppgave.oppgaveversjon (tilordnet_ressurs);
+
+CREATE INDEX idx_oppgaveversj_behandlingstema
+    ON oppgave.oppgaveversjon (behandlingstema);
+
+CREATE INDEX idx_oppgaveversj_behandlingstype
+    ON oppgave.oppgaveversjon (behandlingstype);
+
+CREATE INDEX idx_oppgaveversj_tema
+    ON oppgave.oppgaveversjon (tema);
+
+CREATE INDEX idx_oppgaveversj_oppgavetype
+    ON oppgave.oppgaveversjon (oppgavetype);
+
+CREATE INDEX idx_oppgaveversj_aktiv_dato
+    ON oppgave.oppgaveversjon (aktiv_dato);
+
+CREATE INDEX idx_oppgaveversj_frist_dato
+    ON oppgave.oppgaveversjon (frist_ferdigstillelse);
+
+CREATE INDEX idx_oppgaveversj_journalpost_id
+    ON oppgave.oppgaveversjon (journalpostid);
+
+CREATE INDEX idx_oppgaveversj_oppr_tidspunkt
+    ON oppgave.oppgaveversjon (opprettet_tidspunkt);
+
+CREATE INDEX idx_oppgaveversj_opprettet_av
+    ON oppgave.oppgaveversjon (opprettet_av);
