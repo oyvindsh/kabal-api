@@ -11,6 +11,7 @@ spec:
     sqlInstances:
       - databases:
           - name: klage-oppgave-api
+            envVarPrefix: DB
         type: POSTGRES_12
   azure:
     application:
