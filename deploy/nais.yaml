@@ -12,7 +12,6 @@ spec:
       - type: POSTGRES_12
         databases:
           - name: klageoppgavedb
-            envVarPrefix: DB
   azure:
     application:
       enabled: true

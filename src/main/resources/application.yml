@@ -23,10 +23,10 @@ spring:
     timeout: "10s"
   datasource:
     platform: postgresql
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGEOPPGAVEDB_HOST}:${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGEOPPGAVEDB_PORT}/${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGEOPPGAVEDB_DATABASE}
+      username: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGEOPPGAVEDB_USERNAME}
+      password: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGEOPPGAVEDB_PASSWORD}
+driver-class-name: org.postgresql.Driver
 
 server:
   port: 7081
