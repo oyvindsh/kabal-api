@@ -19,7 +19,7 @@ spec:
         autoBackupTime: "03:00"
         cascadingDelete: false
         databases:
-          - name: klageoppgavedb
+          - name: klage-oppgave-api
   azure:
     application:
       enabled: true
