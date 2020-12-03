@@ -26,7 +26,7 @@ spring:
     url: jdbc:${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_URL}
     username: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_USERNAME}
     password: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_PASSWORD}
-
+    driver-class-name: org.postgresql.Driver
 
 server:
   port: 7081
