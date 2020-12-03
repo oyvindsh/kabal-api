@@ -28,7 +28,7 @@ spring:
     password: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_PASSWORD}
     driver-class-name: org.postgresql.Driver
   flyway:
-    enabled: false
+    enabled: true
 
 server:
   port: 7081
