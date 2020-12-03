@@ -21,6 +21,10 @@ spring:
   redis:
     host: klage-redis
     timeout: "10s"
+  datasource:
+    url: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_URL}
+    username: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_USERNAME}
+    password: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_PASSWORD}
 
 
 server:
