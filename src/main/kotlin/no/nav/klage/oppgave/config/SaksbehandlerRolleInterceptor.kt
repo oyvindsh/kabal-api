@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.config
 
-import no.nav.klage.oppgave.exceptions.NotAuthorizedException
+import no.nav.klage.oppgave.exceptions.NoSaksbehandlerRoleException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
@@ -25,7 +25,7 @@ class SaksbehandlerRolleInterceptor(
         if (isSaksbehandler) {
             return true
         }
-        throw NotAuthorizedException("Bruker har ikke saksbehandlerrolle")
+        throw NoSaksbehandlerRoleException("Bruker har ikke saksbehandlerrolle")
     }
 
 }

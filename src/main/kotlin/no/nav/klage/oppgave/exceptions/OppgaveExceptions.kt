@@ -10,4 +10,4 @@ class NotMatchingUserException(msg: String) : RuntimeException(msg)
 
 class FeatureNotEnabledException(msg: String) : RuntimeException(msg)
 
-class NotAuthorizedException(msg: String) : RuntimeException(msg)
+class NoSaksbehandlerRoleException(msg: String) : RuntimeException(msg)
