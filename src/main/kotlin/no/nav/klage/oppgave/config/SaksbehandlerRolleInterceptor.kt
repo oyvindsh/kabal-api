@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config
 
+import no.nav.klage.oppgave.exceptions.NotAuthorizedException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
@@ -20,7 +21,11 @@ class SaksbehandlerRolleInterceptor(
         response: HttpServletResponse,
         handler: Any?
     ): Boolean {
-        return innloggetSaksbehandlerRepository.erSaksbehandler()
+        val isSaksbehandler = innloggetSaksbehandlerRepository.erSaksbehandler()
+        if (isSaksbehandler) {
+            return true
+        }
+        throw NotAuthorizedException("Bruker har ikke saksbehandlerrolle")
     }
 
 }

@@ -9,3 +9,5 @@ class OppgaveVersjonWrongFormatException(msg: String) : RuntimeException(msg)
 class NotMatchingUserException(msg: String) : RuntimeException(msg)
 
 class FeatureNotEnabledException(msg: String) : RuntimeException(msg)
+
+class NotAuthorizedException(msg: String) : RuntimeException(msg)
