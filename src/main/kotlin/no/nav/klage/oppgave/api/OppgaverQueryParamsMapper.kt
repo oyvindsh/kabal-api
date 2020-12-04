@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.Tilganger
+import no.nav.klage.oppgave.exceptions.NotOwnEnhetException
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
@@ -29,13 +30,18 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
         erTildeltSaksbehandler = oppgaverQueryParams.erTildeltSaksbehandler,
         saksbehandler = oppgaverQueryParams.tildeltSaksbehandler,
         projection = oppgaverQueryParams.projeksjon?.let { OppgaverSearchCriteria.Projection.valueOf(it.name) },
-        enhetsnr = findEnhetsnrForUser(navIdent)
+        enhetsnr = validateAndGetEnhetId(navIdent, oppgaverQueryParams.enhetId)
     )
 
-    private fun findEnhetsnrForUser(navIdent: String): String {
+    private fun validateAndGetEnhetId(navIdent: String, enhetId: String): String {
         val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(navIdent)
         logWarningIMoreThanOneEnhet(navIdent, tilgangerForSaksbehandler)
-        return tilgangerForSaksbehandler.enheter.first().enhetId
+
+        if (tilgangerForSaksbehandler.enheter.none { e -> e.enhetId == enhetId }) {
+            throw NotOwnEnhetException("$navIdent is not part of enhet $enhetId")
+        }
+        return enhetId
+
     }
 
     private fun logWarningIMoreThanOneEnhet(navIdent: String, tilgangerForSaksbehandler: Tilganger) {
