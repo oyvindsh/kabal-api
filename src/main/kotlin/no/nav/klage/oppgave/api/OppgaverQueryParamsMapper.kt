@@ -41,7 +41,6 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
             throw NotOwnEnhetException("$navIdent is not part of enhet $enhetId")
         }
         return enhetId
-
     }
 
     private fun logWarningIMoreThanOneEnhet(navIdent: String, tilgangerForSaksbehandler: Tilganger) {
