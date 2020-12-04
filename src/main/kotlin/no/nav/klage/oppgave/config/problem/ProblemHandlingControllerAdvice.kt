@@ -51,6 +51,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
+    fun handleNoSaksbehandlerRoleEnabled(ex: NoSaksbehandlerRoleException, request: NativeWebRequest): ResponseEntity<Problem> =
+        create(Status.FORBIDDEN, ex, request)
+
+    @ExceptionHandler
     fun handleResponseStatusException(
         ex: WebClientResponseException,
         request: NativeWebRequest
