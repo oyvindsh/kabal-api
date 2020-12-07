@@ -20,6 +20,8 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        const val KLAGEENHET_PREFIX = "42"
     }
 
     @Value("\${spring.application.name}")
@@ -31,7 +33,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
         logger.debug("Fetching tilganger for saksbehandler with Nav-Ident {}", navIdent)
 
         return try {
-            axsysWebClient.get()
+            val tilganger = axsysWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder
                         .path("/tilgang/{navIdent}")
@@ -43,6 +45,10 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
                 .retrieve()
                 .bodyToMono<Tilganger>()
                 .block() ?: throw RuntimeException("Tilganger could not be fetched")
+
+            Tilganger(
+                enheter = tilganger.enheter.filter { enhet -> enhet.enhetId.startsWith(KLAGEENHET_PREFIX) }
+            )
         } catch (notFound: WebClientResponseException.NotFound) {
             logger.warn("Got a 404 fetching tilganger for saksbehandler {}, returning empty object", navIdent)
             //TODO: Burde det smelle hardt her isf å returnere tomt objekt?
