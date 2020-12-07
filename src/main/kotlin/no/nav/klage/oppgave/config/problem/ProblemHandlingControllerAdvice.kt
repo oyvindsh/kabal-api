@@ -55,6 +55,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
+    fun handleNotOwnEnhet(ex: NotOwnEnhetException, request: NativeWebRequest): ResponseEntity<Problem> =
+        create(Status.FORBIDDEN, ex, request)
+
+    @ExceptionHandler
     fun handleResponseStatusException(
         ex: WebClientResponseException,
         request: NativeWebRequest

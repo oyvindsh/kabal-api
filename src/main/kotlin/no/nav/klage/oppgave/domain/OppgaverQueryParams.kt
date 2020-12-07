@@ -9,7 +9,8 @@ data class OppgaverQueryParams(
     val antall: Int,
     val projeksjon: Projeksjon? = null,
     val erTildeltSaksbehandler: Boolean? = null,
-    val tildeltSaksbehandler: String? = null
+    val tildeltSaksbehandler: String? = null,
+    val enhetId: String
 ) {
 
     enum class Rekkefoelge {
