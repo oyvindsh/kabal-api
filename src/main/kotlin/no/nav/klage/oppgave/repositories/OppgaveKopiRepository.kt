@@ -47,7 +47,7 @@ class OppgaveKopiRepository(
             "journalpostid" to oppgaveKopi.journalpostId,
             "saksreferanse" to oppgaveKopi.saksreferanse,
             "mappe_id" to oppgaveKopi.mappeId,
-            "status_id" to oppgaveKopi.status.getId(),
+            "status_id" to oppgaveKopi.status.statusId,
             "tildelt_enhetsnr" to oppgaveKopi.tildeltEnhetsnr,
             "opprettet_av_enhetsnr" to oppgaveKopi.opprettetAvEnhetsnr,
             "endret_av_enhetsnr" to oppgaveKopi.endretAvEnhetsnr,
