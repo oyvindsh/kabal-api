@@ -56,7 +56,7 @@ class OppgaveKopiRepository(
             "behandlingstema" to oppgaveKopi.behandlingstema,
             "oppgavetype" to oppgaveKopi.oppgavetype,
             "behandlingstype" to oppgaveKopi.behandlingstype,
-            "prioritet" to oppgaveKopi.prioritet?.name,
+            "prioritet" to oppgaveKopi.prioritet.name,
             "tilordnet_ressurs" to oppgaveKopi.tilordnetRessurs,
             "beskrivelse" to oppgaveKopi.beskrivelse,
             "frist_ferdigstillelse" to oppgaveKopi.fristFerdigstillelse,
