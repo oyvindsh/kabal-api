@@ -6,8 +6,8 @@ enum class Statuskategori {
 
     fun statuserForKategori(kategori: Statuskategori): List<Status> {
         return when (kategori) {
-            Statuskategori.AAPEN -> aapen()
-            Statuskategori.AVSLUTTET -> avsluttet()
+            AAPEN -> aapen()
+            AVSLUTTET -> avsluttet()
         }
     }
 

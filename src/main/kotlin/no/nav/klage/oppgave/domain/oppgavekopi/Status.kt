@@ -21,8 +21,8 @@ enum class Status {
 
         fun kategoriForStatus(status: Status): Statuskategori {
             return when (status) {
-                Status.AAPNET, Status.OPPRETTET, Status.UNDER_BEHANDLING -> Statuskategori.AAPEN
-                Status.FEILREGISTRERT, Status.FERDIGSTILT -> Statuskategori.AVSLUTTET
+                AAPNET, OPPRETTET, UNDER_BEHANDLING -> Statuskategori.AAPEN
+                FEILREGISTRERT, FERDIGSTILT -> Statuskategori.AVSLUTTET
             }
         }
     }
