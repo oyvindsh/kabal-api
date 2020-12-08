@@ -14,7 +14,7 @@ class OppgaveKopiRepository(
     val versjonMetadataIdIncrementer: PostgresSequenceMaxValueIncrementer
 ) {
 
-    fun identParameterMap(ident: Ident, identId: Long) =
+    private fun identParameterMap(ident: Ident, identId: Long) =
         mapOf(
             "id" to identId,
             "TYPE" to ident.identType.name,
@@ -23,7 +23,7 @@ class OppgaveKopiRepository(
             "registrert_dato" to ident.registrertDato
         )
 
-    fun metadataParameterMap(oppgaveKopi: OppgaveKopi, noekkel: MetadataNoekkel, verdi: String) =
+    private fun metadataParameterMap(oppgaveKopi: OppgaveKopi, noekkel: MetadataNoekkel, verdi: String) =
         mapOf(
             "id" to metadataIdIncrementer.nextLongValue(),
             "oppgave_id" to oppgaveKopi.id,
@@ -31,7 +31,7 @@ class OppgaveKopiRepository(
             "verdi" to verdi,
         )
 
-    fun versjonMetadataParameterMap(oppgaveKopi: OppgaveKopi, noekkel: MetadataNoekkel, verdi: String) =
+    private fun versjonMetadataParameterMap(oppgaveKopi: OppgaveKopi, noekkel: MetadataNoekkel, verdi: String) =
         mapOf(
             "id" to versjonMetadataIdIncrementer.nextLongValue(),
             "oppgave_id" to oppgaveKopi.id,
@@ -40,7 +40,7 @@ class OppgaveKopiRepository(
             "verdi" to verdi
         )
 
-    fun oppgaveParameterMap(oppgaveKopi: OppgaveKopi, identId: Long?) =
+    private fun oppgaveParameterMap(oppgaveKopi: OppgaveKopi, identId: Long?) =
         mapOf(
             "id" to oppgaveKopi.id,
             "versjon" to oppgaveKopi.versjon,
@@ -79,7 +79,7 @@ class OppgaveKopiRepository(
         SimpleJdbcInsert(dataSource).withSchemaName("oppgave").withTableName("versjonmetadata")
     val identJdbcInsert = SimpleJdbcInsert(dataSource).withSchemaName("oppgave").withTableName("ident")
 
-    fun lagreIdentAndReturnId(ident: Ident?): Long? {
+    private fun lagreIdentAndReturnId(ident: Ident?): Long? {
         return ident?.let {
             val identId = identIdIncrementer.nextLongValue()
             val identParameterMap = identParameterMap(it, identId)
