@@ -24,8 +24,8 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
     }
 
     @ApiOperation(
-        value = "Hent enheter for en ansatt",
-        notes = "Henter alle enheter som saksbehandler er knyttet til."
+        value = "Hent klageenheter for en ansatt",
+        notes = "Henter alle klageenheter som saksbehandler er knyttet til."
     )
     @GetMapping("/ansatte/{navIdent}/enheter", produces = ["application/json"])
     fun getEnheter(
