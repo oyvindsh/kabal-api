@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.db
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -12,7 +11,6 @@ import java.sql.ResultSet
 
 @ActiveProfiles("local")
 @DataJpaTest
-@Disabled
 class FlywayMigrationTest {
 
     @Autowired
