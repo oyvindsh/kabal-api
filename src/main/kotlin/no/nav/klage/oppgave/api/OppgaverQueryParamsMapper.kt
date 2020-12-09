@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.domain.OppgaverQueryParams
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
-import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.exceptions.NotOwnEnhetException
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -35,23 +34,11 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
 
     private fun validateAndGetEnhetId(navIdent: String, enhetId: String): String {
         val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(navIdent)
-        logWarningIMoreThanOneEnhet(navIdent, tilgangerForSaksbehandler)
 
         if (tilgangerForSaksbehandler.enheter.none { e -> e.enhetId == enhetId }) {
             throw NotOwnEnhetException("$navIdent is not part of enhet $enhetId")
         }
         return enhetId
-    }
-
-    private fun logWarningIMoreThanOneEnhet(navIdent: String, tilgangerForSaksbehandler: Tilganger) {
-        if (tilgangerForSaksbehandler.enheter.size > 1) {
-            logger.warn(
-                "Saksbehandler ({}) had more than one enhet: {}. Only using {}.",
-                navIdent,
-                tilgangerForSaksbehandler.enheter.map { it.enhetId },
-                tilgangerForSaksbehandler.enheter.first().enhetId
-            )
-        }
     }
 
 }
