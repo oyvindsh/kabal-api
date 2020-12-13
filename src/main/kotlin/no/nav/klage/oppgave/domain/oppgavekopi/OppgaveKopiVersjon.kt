@@ -5,12 +5,14 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name = "oppgave", schema = "oppgave")
-data class OppgaveKopi(
+@Table(name = "oppgaveversjon", schema = "oppgave")
+@IdClass(OppgaveKopiVersjonId::class)
+data class OppgaveKopiVersjon(
 
     @Id
     @Column(name = "id")
     var id: Long,
+    @Id
     @Column(name = "versjon")
     var versjon: Int,
     @Column(name = "journalpostid")
@@ -65,10 +67,21 @@ data class OppgaveKopi(
     var journalpostkilde: String? = null,
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "ident_id", referencedColumnName = "id")
-    var ident: Ident? = null,
+    var ident: VersjonIdent? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "oppgave_id", referencedColumnName = "id", nullable = false)
-    var metadata: Set<Metadata> = mutableSetOf()
+    @JoinColumns(
+        JoinColumn(
+            name = "oppgave_id",
+            referencedColumnName = "id",
+            nullable = false
+        ),
+        JoinColumn(
+            name = "oppgave_versjon",
+            referencedColumnName = "versjon",
+            nullable = false
+        )
+    )
+    var metadata: List<VersjonMetadata> = mutableListOf()
 ) {
     fun statuskategori(): Statuskategori = status.kategoriForStatus()
 
@@ -77,54 +90,6 @@ data class OppgaveKopi(
     }
 
     fun setMetadataAsMap(map: Map<MetadataNoekkel, String>) {
-        metadata = map.map { Metadata(noekkel = it.key, verdi = it.value) }.toSet()
+        metadata = map.map { VersjonMetadata(noekkel = it.key, verdi = it.value) }
     }
-
-    fun toVersjon(): OppgaveKopiVersjon =
-        OppgaveKopiVersjon(
-            id = this.id,
-            versjon = versjon,
-            journalpostId = journalpostId,
-            saksreferanse = saksreferanse,
-            mappeId = mappeId,
-            status = status,
-            tildeltEnhetsnr = tildeltEnhetsnr,
-            opprettetAvEnhetsnr = opprettetAvEnhetsnr,
-            endretAvEnhetsnr = endretAvEnhetsnr,
-            tema = tema,
-            temagruppe = temagruppe,
-            behandlingstema = behandlingstema,
-            oppgavetype = oppgavetype,
-            behandlingstype = behandlingstype,
-            prioritet = prioritet,
-            tilordnetRessurs = tilordnetRessurs,
-            beskrivelse = beskrivelse,
-            fristFerdigstillelse = fristFerdigstillelse,
-            aktivDato = aktivDato,
-            opprettetAv = opprettetAv,
-            endretAv = endretAv,
-            opprettetTidspunkt = opprettetTidspunkt,
-            endretTidspunkt = endretTidspunkt,
-            ferdigstiltTidspunkt = ferdigstiltTidspunkt,
-            behandlesAvApplikasjon = behandlesAvApplikasjon,
-            journalpostkilde = journalpostkilde,
-            ident = if (ident == null) {
-                null
-            } else {
-                VersjonIdent(
-                    id = null,
-                    identType = ident!!.identType,
-                    verdi = ident!!.verdi,
-                    folkeregisterident = ident!!.folkeregisterident,
-                    registrertDato = ident!!.registrertDato
-                )
-            },
-            metadata = metadata.map {
-                VersjonMetadata(
-                    id = null,
-                    noekkel = it.noekkel,
-                    verdi = it.verdi
-                )
-            }
-        )
 }

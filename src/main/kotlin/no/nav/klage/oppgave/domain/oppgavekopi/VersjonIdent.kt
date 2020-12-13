@@ -4,16 +4,16 @@ import java.time.LocalDate
 import javax.persistence.*
 
 @Entity
-@Table(name = "ident", schema = "oppgave")
-data class Ident(
+@Table(name = "versjonident", schema = "oppgave")
+data class VersjonIdent(
     @Id
     @Column(name = "id")
     @SequenceGenerator(
-        name = "ident_seq",
-        sequenceName = "oppgave.ident_seq",
+        name = "versjonident_seq",
+        sequenceName = "oppgave.versjonident_seq",
         allocationSize = 1
     )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ident_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "versjonident_seq")
     var id: Long?,
     @Enumerated(EnumType.STRING)
     @Column(name = "TYPE")
