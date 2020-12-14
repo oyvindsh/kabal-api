@@ -64,9 +64,6 @@ spec:
     outbound:
       rules:
         - application: klage-redis
-        - application: klage-fss-proxy
-          namespace: klage
-          cluster: {{fssCluster}}
       external:
       {{#each externalHosts as |host|}}
         - host: {{host}}
