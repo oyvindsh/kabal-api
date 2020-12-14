@@ -6,4 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface OppgaveKopiVersjonRepository : JpaRepository<OppgaveKopiVersjon, OppgaveKopiVersjonId>
+interface OppgaveKopiVersjonRepository : JpaRepository<OppgaveKopiVersjon, OppgaveKopiVersjonId> {
+
+    fun findFirstByIdOrderByVersjonDesc(oppgaveKopiId: Long): OppgaveKopiVersjon
+}
