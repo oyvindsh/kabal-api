@@ -104,4 +104,3 @@ AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v1
 MICROSOFT_GRAPH_URL: https://graph.microsoft.com/v1.0
 OPPGAVE_URL: https://api-gw-q1.oera.no/oppgave/api/v1/oppgaver
 UNLEASH_URL: https://unleash.nais.io/api/
-KLAGEPROXY_URL: https://klage-fss-proxy.dev-fss-pub.nais.io
