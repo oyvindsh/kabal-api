@@ -39,7 +39,7 @@ class OppgaveKopiServiceTest {
 
         val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
-        assertThat(hentetOppgave?.opprettetTidspunkt).isEqualTo(now)
+        assertThat(hentetOppgave.opprettetTidspunkt).isEqualTo(now)
     }
 
 
@@ -63,8 +63,8 @@ class OppgaveKopiServiceTest {
 
         val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
-        assertThat(hentetOppgave?.ident).isNotNull
-        assertThat(hentetOppgave?.ident?.verdi).isEqualTo("12345")
+        assertThat(hentetOppgave.ident).isNotNull
+        assertThat(hentetOppgave.ident?.verdi).isEqualTo("12345")
     }
 
     @Test
@@ -89,7 +89,7 @@ class OppgaveKopiServiceTest {
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.metadata).isNotNull
         assertThat(hentetOppgave.metadata.size).isEqualTo(1)
-        assertThat(hentetOppgave.getMetadataAsMap().get(MetadataNoekkel.HJEMMEL)).isEqualTo("8-25")
+        assertThat(hentetOppgave.metadataAsMap()[MetadataNoekkel.HJEMMEL]).isEqualTo("8-25")
 
 //        val versjonMetadataCount = jdbcTemplate.queryForObject(
 //            "SELECT count(*) FROM oppgave.versjonmetadata",
@@ -182,12 +182,12 @@ class OppgaveKopiServiceTest {
 
         val hentetOppgaveversjon = oppgaveKopiService.hentOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
-        assertThat(hentetOppgaveversjon!!.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
+        assertThat(hentetOppgaveversjon.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
 
         val hentetOppgaveSisteVersjon =
             oppgaveKopiService.hentOppgaveKopiSisteVersjon(oppgaveKopi.id)
         assertThat(hentetOppgaveSisteVersjon).isNotNull
-        assertThat(hentetOppgaveSisteVersjon!!.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
+        assertThat(hentetOppgaveSisteVersjon.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
     }
 
     @Test
