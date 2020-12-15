@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.config
 
 import no.finn.unleash.Unleash
-import no.finn.unleash.UnleashContext
 import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.KLAGE_GENERELL_TILGANG
 import no.nav.klage.oppgave.exceptions.FeatureNotEnabledException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -40,15 +39,7 @@ class FeatureToggleInterceptor(
 
     private fun isEnabled(feature: String): Boolean {
         logger.debug("Unleash: feature: {}", feature)
-        val contextMedInnloggetBruker = contextMedInnloggetBruker()
-        logger.debug("contextMedInnloggetBruker: {}", contextMedInnloggetBruker)
-        return unleash.isEnabled(feature, contextMedInnloggetBruker)
-    }
-
-    private fun contextMedInnloggetBruker(): UnleashContext? {
-        val ident = getIdent()
-        logger.debug("Unleash: getIdent(): {}", ident)
-        return UnleashContext.builder().userId(ident).build()
+        return unleash.isEnabled(feature)
     }
 
     private fun getIdent() = innloggetSaksbehandlerRepository.getInnloggetIdent()
