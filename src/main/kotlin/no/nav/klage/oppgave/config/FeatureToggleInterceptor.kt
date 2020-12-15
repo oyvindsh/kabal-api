@@ -38,11 +38,18 @@ class FeatureToggleInterceptor(
         return isEnabled
     }
 
-    private fun isEnabled(feature: String): Boolean =
-        unleash.isEnabled(feature, contextMedInnloggetBruker())
+    private fun isEnabled(feature: String): Boolean {
+        logger.debug("Unleash: feature: {}", feature)
+        val contextMedInnloggetBruker = contextMedInnloggetBruker()
+        logger.debug("contextMedInnloggetBruker: {}", contextMedInnloggetBruker)
+        return unleash.isEnabled(feature, contextMedInnloggetBruker)
+    }
 
-    private fun contextMedInnloggetBruker(): UnleashContext? =
-        UnleashContext.builder().userId(getIdent()).build()
+    private fun contextMedInnloggetBruker(): UnleashContext? {
+        val ident = getIdent()
+        logger.debug("Unleash: getIdent(): {}", ident)
+        return UnleashContext.builder().userId(ident).build()
+    }
 
     private fun getIdent() = innloggetSaksbehandlerRepository.getInnloggetIdent()
 }
