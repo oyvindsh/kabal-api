@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config
 
+import no.finn.unleash.DefaultUnleash
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
 import no.nav.klage.oppgave.config.FeatureToggleConfig.Companion.KLAGE_GENERELL_TILGANG
@@ -41,7 +42,21 @@ class FeatureToggleInterceptor(
     private fun isEnabled(feature: String): Boolean {
         logger.debug("Unleash: feature: {}", feature)
         val contextMedInnloggetBruker = contextMedInnloggetBruker()
-        logger.debug("contextMedInnloggetBruker: {}", contextMedInnloggetBruker)
+
+        unleash as DefaultUnleash
+        val featureToggleDefinition = unleash.getFeatureToggleDefinition(feature)
+
+        featureToggleDefinition.get().strategies.forEach {
+            logger.debug("strategy: {}", it.name)
+            it.constraints.forEach { c ->
+                logger.debug("  name: {}", c.contextName)
+                logger.debug("  operator: {}", c.operator)
+                c.values.forEach { v ->
+                    logger.debug("    value: {}", v)
+                }
+            }
+        }
+
         return unleash.isEnabled(feature, contextMedInnloggetBruker)
     }
 
