@@ -22,6 +22,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
         private val logger = getLogger(javaClass.enclosingClass)
 
         const val KLAGEENHET_PREFIX = "42"
+        const val IT_ENHET = "2990"
     }
 
     @Value("\${spring.application.name}")
@@ -46,9 +47,12 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
                 .bodyToMono<Tilganger>()
                 .block() ?: throw RuntimeException("Tilganger could not be fetched")
 
-//            Tilganger(
-//                enheter = tilganger.enheter.filter { enhet -> enhet.enhetId.startsWith(KLAGEENHET_PREFIX) }
-//            )
+            Tilganger(
+                enheter = tilganger.enheter.filter { enhet ->
+                    enhet.enhetId.startsWith(KLAGEENHET_PREFIX) ||
+                    enhet.enhetId == IT_ENHET
+                }
+            )
             tilganger
         } catch (notFound: WebClientResponseException.NotFound) {
             logger.warn("Got a 404 fetching tilganger for saksbehandler {}, returning empty object", navIdent)
