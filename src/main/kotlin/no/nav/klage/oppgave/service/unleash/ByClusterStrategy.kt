@@ -23,7 +23,6 @@ class ByClusterStrategy(@Value("\${nais.cluster.name}") val currentCluster: Stri
         parameters?.get(PARAM)?.split(',')
 
     private fun isCurrentClusterEnabled(cluster: String): Boolean {
-        logger.debug("isCurrentClusterEnabled? cluster: {}, currentCluster: {}", cluster, currentCluster)
         return currentCluster == cluster
     }
 }

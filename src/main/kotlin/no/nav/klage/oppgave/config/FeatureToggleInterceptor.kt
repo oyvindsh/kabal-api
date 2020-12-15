@@ -38,11 +38,8 @@ class FeatureToggleInterceptor(
     }
 
     private fun isEnabled(feature: String): Boolean {
-        logger.debug("Unleash: feature: {}", feature)
         return unleash.isEnabled(feature)
     }
-
-    private fun getIdent() = innloggetSaksbehandlerRepository.getInnloggetIdent()
 }
 
 @Configuration
