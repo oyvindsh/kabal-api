@@ -46,12 +46,12 @@ class FeatureToggleInterceptor(
         unleash as DefaultUnleash
         val featureToggleDefinition = unleash.getFeatureToggleDefinition(feature)
 
-        featureToggleDefinition.get().strategies.forEach {
+        featureToggleDefinition.get().strategies?.forEach {
             logger.debug("strategy: {}", it.name)
-            it.constraints.forEach { c ->
+            it.constraints?.forEach { c ->
                 logger.debug("  name: {}", c.contextName)
                 logger.debug("  operator: {}", c.operator)
-                c.values.forEach { v ->
+                c.values?.forEach { v ->
                     logger.debug("    value: {}", v)
                 }
             }
