@@ -1,13 +1,13 @@
 package no.nav.klage.oppgave.service
 
 
-import no.nav.klage.oppgave.clients.PdlClient
+import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.clients.pdl.PdlClient
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.pdl.Navn
-import no.nav.klage.oppgave.domain.view.*
 import org.springframework.stereotype.Service
+import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
 import no.nav.klage.oppgave.domain.gosys.Oppgave as OppgaveBackend
-import no.nav.klage.oppgave.domain.view.Oppgave as OppgaveView
 
 @Service
 class OppgaveMapper(val pdlClient: PdlClient) {

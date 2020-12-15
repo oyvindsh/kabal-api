@@ -1,11 +1,11 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.clients.OppgaveClient
+import no.nav.klage.oppgave.api.view.OppgaverRespons
+import no.nav.klage.oppgave.clients.gosys.OppgaveClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
-import no.nav.klage.oppgave.domain.view.OppgaverRespons
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
-import no.nav.klage.oppgave.domain.view.Oppgave as OppgaveView
+import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
 
 @Service
 class OppgaveService(

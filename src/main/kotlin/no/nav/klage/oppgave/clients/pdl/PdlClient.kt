@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients
+package no.nav.klage.oppgave.clients.pdl
 
 import no.nav.klage.oppgave.domain.pdl.HentPersonResponse
 import no.nav.klage.oppgave.domain.pdl.hentPersonQuery

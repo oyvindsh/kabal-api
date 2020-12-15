@@ -2,14 +2,14 @@ package no.nav.klage.oppgave.service
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.klage.oppgave.clients.OppgaveClient
-import no.nav.klage.oppgave.clients.PdlClient
+import no.nav.klage.oppgave.api.view.HJEMMEL
+import no.nav.klage.oppgave.api.view.TYPE_ANKE
+import no.nav.klage.oppgave.api.view.TYPE_KLAGE
+import no.nav.klage.oppgave.clients.gosys.OppgaveClient
+import no.nav.klage.oppgave.clients.pdl.PdlClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.domain.gosys.*
 import no.nav.klage.oppgave.domain.pdl.*
-import no.nav.klage.oppgave.domain.view.HJEMMEL
-import no.nav.klage.oppgave.domain.view.TYPE_ANKE
-import no.nav.klage.oppgave.domain.view.TYPE_KLAGE
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
