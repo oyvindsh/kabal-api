@@ -46,9 +46,10 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
                 .bodyToMono<Tilganger>()
                 .block() ?: throw RuntimeException("Tilganger could not be fetched")
 
-            Tilganger(
-                enheter = tilganger.enheter.filter { enhet -> enhet.enhetId.startsWith(KLAGEENHET_PREFIX) }
-            )
+//            Tilganger(
+//                enheter = tilganger.enheter.filter { enhet -> enhet.enhetId.startsWith(KLAGEENHET_PREFIX) }
+//            )
+            tilganger
         } catch (notFound: WebClientResponseException.NotFound) {
             logger.warn("Got a 404 fetching tilganger for saksbehandler {}, returning empty object", navIdent)
             //TODO: Burde det smelle hardt her isf å returnere tomt objekt?
