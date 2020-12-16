@@ -4,12 +4,8 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.OppgaverQueryParamsMapper
-import no.nav.klage.oppgave.api.view.Oppgave
-import no.nav.klage.oppgave.api.view.OppgaverQueryParams
-import no.nav.klage.oppgave.api.view.OppgaverRespons
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.domain.Saksbehandlerfradeling
-import no.nav.klage.oppgave.domain.Saksbehandlertildeling
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
