@@ -43,6 +43,6 @@ class ByEnhetStrategy(private val axsysClient: AxsysClient) : Strategy {
     }
 
     private fun getEnabledEnheter(parameters: Map<String, String>?): List<String>? =
-        parameters?.get("PARAM")?.split(',')
+        parameters?.get(PARAM)?.split(',')
 
 }
