@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.clients.gosys.Oppgave
 import no.nav.klage.oppgave.clients.gosys.OppgaveClient
+import no.nav.klage.oppgave.clients.gosys.OppgaveResponse
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
-import no.nav.klage.oppgave.domain.gosys.Oppgave
-import no.nav.klage.oppgave.domain.gosys.OppgaveResponse
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 
