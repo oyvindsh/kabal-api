@@ -1,10 +1,8 @@
-package no.nav.klage.oppgave.clients
+package no.nav.klage.oppgave.clients.axsys
 
 import brave.Tracer
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.TILGANGER_CACHE
-import no.nav.klage.oppgave.domain.Bruker
-import no.nav.klage.oppgave.domain.Tilganger
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -50,7 +48,7 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
             Tilganger(
                 enheter = tilganger.enheter.filter { enhet ->
                     enhet.enhetId.startsWith(KLAGEENHET_PREFIX) ||
-                    enhet.enhetId == IT_ENHET
+                            enhet.enhetId == IT_ENHET
                 }
             )
             tilganger
