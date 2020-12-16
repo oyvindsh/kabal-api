@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.api.mapper
 
 
 import no.nav.klage.oppgave.api.view.*

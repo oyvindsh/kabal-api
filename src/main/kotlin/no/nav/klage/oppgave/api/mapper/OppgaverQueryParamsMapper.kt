@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.OppgaverQueryParams
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
