@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.gosys.*
-import no.nav.klage.oppgave.clients.pdl.Navn
+import no.nav.klage.oppgave.clients.pdl.HentPersonBolkResult
 import no.nav.klage.oppgave.clients.pdl.PdlClient
 import org.springframework.stereotype.Service
 import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
@@ -65,15 +65,15 @@ class OppgaveMapper(val pdlClient: PdlClient) {
     private fun getPersoner(fnrList: List<String>): Map<String, OppgaveView.Person> {
         val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk
         return people?.map {
-            val fnr = it.folkeregisteridentifikator.first().identifikasjonsnummer
+            val fnr = it.ident
             fnr to OppgaveView.Person(
                 fnr = fnr,
-                navn = it.navn.firstOrNull()?.toName() ?: "mangler"
+                navn = it.person.navn.firstOrNull()?.toName() ?: "mangler"
             )
         }?.toMap() ?: emptyMap()
     }
 
     private fun OppgaveBackend.getFnrForBruker() = identer?.find { i -> i.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident
 
-    private fun Navn.toName() = "$fornavn $etternavn"
+    private fun HentPersonBolkResult.Person.Navn.toName() = "$fornavn $etternavn"
 }
