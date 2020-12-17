@@ -73,7 +73,9 @@ class OppgaveMapper(val pdlClient: PdlClient) {
     private fun getPersoner(fnrList: List<String>): Map<String, OppgaveView.Person> {
         logger.debug("getPersoner is called with {} fnr", fnrList.size)
         secureLogger.debug("getPersoner with fnr: {}", fnrList)
+
         val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk ?: emptyList()
+
         logger.debug("pdl returned {} people", people.size)
         secureLogger.debug("pdl returned {}", people)
 
@@ -96,6 +98,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
     private fun OppgaveBackend.getFnrForBruker(): String? {
         logger.debug("getFnrForBruker is called")
         secureLogger.debug("getFnrForBruker is called with oppgave: {}", this)
+
         return identer?.find { i -> i.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident.also {
             if (it != null) {
                 logger.debug("Returning found fnr")
