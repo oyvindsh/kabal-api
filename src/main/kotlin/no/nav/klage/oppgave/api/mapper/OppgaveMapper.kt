@@ -76,16 +76,35 @@ class OppgaveMapper(val pdlClient: PdlClient) {
         val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk ?: emptyList()
         logger.debug("pdl returned {} people", people.size)
         secureLogger.debug("pdl returned {}", people)
-        return people.map {
+
+        val fnrToPerson: Map<String, no.nav.klage.oppgave.api.view.Oppgave.Person> = people.map {
             val fnr = it.ident
             fnr to OppgaveView.Person(
                 fnr = fnr,
-                navn = it.person.navn.firstOrNull()?.toName() ?: "mangler"
+                navn = it.person.navn.firstOrNull()?.toName() ?: "mangler navn"
             )
+        }.toMap()
+        return fnrList.map {
+            if (fnrToPerson.containsKey(it)) {
+                Pair(it, fnrToPerson.getValue(it))
+            } else {
+                Pair(it, OppgaveView.Person(fnr = it, navn = "Mangler navn"))
+            }
         }.toMap()
     }
 
-    private fun OppgaveBackend.getFnrForBruker() = identer?.find { i -> i.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident
+    private fun OppgaveBackend.getFnrForBruker(): String? {
+        logger.debug("getFnrForBruker is called")
+        secureLogger.debug("getFnrForBruker is called with oppgave: {}", this)
+        return identer?.find { i -> i.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident.also {
+            if (it != null) {
+                logger.debug("Returning found fnr")
+                secureLogger.debug("Returning found fnr from oppgave: {}", it)
+            } else {
+                logger.debug("No fnr found in oppgave")
+            }
+        }
+    }
 
     private fun HentPersonBolkResult.Person.Navn.toName() = "$fornavn $etternavn"
 }
