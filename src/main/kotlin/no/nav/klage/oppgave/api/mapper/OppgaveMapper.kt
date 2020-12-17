@@ -5,12 +5,20 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.gosys.*
 import no.nav.klage.oppgave.clients.pdl.HentPersonBolkResult
 import no.nav.klage.oppgave.clients.pdl.PdlClient
+import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
 import no.nav.klage.oppgave.clients.gosys.Oppgave as OppgaveBackend
 
 @Service
 class OppgaveMapper(val pdlClient: PdlClient) {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+    }
 
     fun mapOppgaveToView(oppgaveBackend: OppgaveBackend, fetchPersoner: Boolean): OppgaveView {
         return mapOppgaverToView(listOf(oppgaveBackend), fetchPersoner).single()
@@ -63,14 +71,18 @@ class OppgaveMapper(val pdlClient: PdlClient) {
         }
 
     private fun getPersoner(fnrList: List<String>): Map<String, OppgaveView.Person> {
-        val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk
-        return people?.map {
+        logger.debug("getPersoner is called with {} fnr", fnrList.size)
+        secureLogger.debug("getPersoner with fnr: {}", fnrList)
+        val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk ?: emptyList()
+        logger.debug("pdl returned {} people", people.size)
+        secureLogger.debug("pdl returned {}", people)
+        return people.map {
             val fnr = it.ident
             fnr to OppgaveView.Person(
                 fnr = fnr,
                 navn = it.person.navn.firstOrNull()?.toName() ?: "mangler"
             )
-        }?.toMap() ?: emptyMap()
+        }.toMap()
     }
 
     private fun OppgaveBackend.getFnrForBruker() = identer?.find { i -> i.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident
