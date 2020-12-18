@@ -86,7 +86,6 @@ class OppgaveClient(
             }
         } else {
             uriBuilder.queryParam("behandlingstype", mapType(TYPE_KLAGE))
-            uriBuilder.queryParam("behandlingstype", mapType(TYPE_FEILUTBETALING))
         }
 
         ytelser.forEach {
