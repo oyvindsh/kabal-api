@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient.newConnection
+import reactor.netty.http.client.HttpClient
 
 @Configuration
 class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder) {
@@ -24,10 +24,14 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
 
     @Bean
     fun oppgaveWebClient(): WebClient {
+
+        val httpClient: HttpClient = HttpClient
+            .create()
+            .wiretap(true)
         return webClientBuilder
             .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(oppgaveServiceURL)
-            .clientConnector(ReactorClientHttpConnector(newConnection()))
+            .clientConnector(ReactorClientHttpConnector(httpClient))
             .build()
     }
 }
