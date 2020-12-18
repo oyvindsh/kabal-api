@@ -49,7 +49,7 @@
             <appender-ref ref="secureJson"/>
         </logger>
 
-        <logger name="logging.level.reactor.netty.http.client" level="debug" additivity="false">
+        <logger name="reactor.netty.http.client" level="debug" additivity="false">
             <appender-ref ref="secureJson"/>
         </logger>
 
