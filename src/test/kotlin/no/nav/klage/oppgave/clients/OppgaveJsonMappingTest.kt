@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.klage.oppgave.clients.gosys.OppgaveResponse
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.json.JsonTest
 
 
 @JsonTest
+@Disabled
 class OppgaveJsonMappingTest(val objectMapper: ObjectMapper) {
 
     @Test
