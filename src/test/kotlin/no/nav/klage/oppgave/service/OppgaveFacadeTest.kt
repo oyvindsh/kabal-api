@@ -16,6 +16,7 @@ import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 internal class OppgaveFacadeTest {
 
@@ -136,7 +137,14 @@ internal class OppgaveFacadeTest {
                 behandlingstype = type,
                 fristFerdigstillelse = LocalDate.now(),
                 tema = "SYK",
-                versjon = 0
+                versjon = 0,
+                aktivDato = LocalDate.now(),
+                oppgavetype = "ae0058",
+                opprettetAv = "H149390",
+                opprettetTidspunkt = OffsetDateTime.now(),
+                prioritet = Prioritet.NORM,
+                status = Status.OPPRETTET,
+                tildeltEnhetsnr = "4209"
             )
         )
     )
@@ -149,7 +157,14 @@ internal class OppgaveFacadeTest {
                 fristFerdigstillelse = LocalDate.now(),
                 tema = "SYK",
                 metadata = mapOf(HJEMMEL to hjemmel),
-                versjon = 0
+                versjon = 0,
+                aktivDato = LocalDate.now(),
+                oppgavetype = "ae0058",
+                opprettetAv = "H149390",
+                opprettetTidspunkt = OffsetDateTime.now(),
+                prioritet = Prioritet.NORM,
+                status = Status.OPPRETTET,
+                tildeltEnhetsnr = "4209"
             )
         )
     )
@@ -171,7 +186,14 @@ internal class OppgaveFacadeTest {
                         gruppe = Gruppe.FOLKEREGISTERIDENT
                     )
                 ),
-                versjon = 0
+                versjon = 0,
+                aktivDato = LocalDate.now(),
+                oppgavetype = "ae0058",
+                opprettetAv = "H149390",
+                opprettetTidspunkt = OffsetDateTime.now(),
+                prioritet = Prioritet.NORM,
+                status = Status.OPPRETTET,
+                tildeltEnhetsnr = "4209"
             )
         )
     )

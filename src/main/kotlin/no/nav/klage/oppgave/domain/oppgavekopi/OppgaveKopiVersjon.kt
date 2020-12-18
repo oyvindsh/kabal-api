@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.domain.oppgavekopi
 
+import no.nav.klage.oppgave.domain.oppgavekopi.helper.StatusConverter
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -48,7 +49,7 @@ class OppgaveKopiVersjon(
     @Column(name = "beskrivelse")
     val beskrivelse: String? = null,
     @Column(name = "frist_ferdigstillelse")
-    val fristFerdigstillelse: LocalDate,
+    val fristFerdigstillelse: LocalDate?,
     @Column(name = "aktiv_dato")
     val aktivDato: LocalDate,
     @Column(name = "opprettet_av")
