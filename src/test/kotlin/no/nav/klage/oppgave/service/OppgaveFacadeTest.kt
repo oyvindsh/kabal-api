@@ -5,7 +5,7 @@ import io.mockk.mockk
 import no.nav.klage.oppgave.api.OppgaveFacade
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.HJEMMEL
-import no.nav.klage.oppgave.api.view.TYPE_ANKE
+import no.nav.klage.oppgave.api.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.api.view.TYPE_KLAGE
 import no.nav.klage.oppgave.clients.gosys.*
 import no.nav.klage.oppgave.clients.pdl.HentPersonBolk
@@ -26,10 +26,10 @@ internal class OppgaveFacadeTest {
     }
 
     @Test
-    fun `type is anke`() {
-        val oppgaveService = oppgaveFacadeWithType(BEHANDLINGSTYPE_ANKE)
+    fun `type is feilutbetaling`() {
+        val oppgaveService = oppgaveFacadeWithType(BEHANDLINGSTYPE_FEILUTBETALING)
         assertThat(oppgaveService.searchOppgaver(mockk(relaxed = true)).oppgaver.first().type).isEqualTo(
-            TYPE_ANKE
+            TYPE_FEILUTBETALING
         )
     }
 
