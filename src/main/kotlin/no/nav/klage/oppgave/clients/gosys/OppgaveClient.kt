@@ -73,6 +73,8 @@ class OppgaveClient(
             .queryParam("statuskategori", statuskategori)
             .queryParam("offset", offset)
             .queryParam("limit", limit)
+            //Behandle sak (Manuell)
+            .queryParam("oppgavetype", "BEH_SAK_MK")
 
         enhetsnr?.let {
             uriBuilder.queryParam("tildeltEnhetsnr", enhetsnr)
