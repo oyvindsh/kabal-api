@@ -53,7 +53,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
         return if (behandlingstema == null) {
             when (behandlingstype) {
                 BEHANDLINGSTYPE_KLAGE -> TYPE_KLAGE
-                BEHANDLINGSTYPE_ANKE -> TYPE_ANKE
+                BEHANDLINGSTYPE_FEILUTBETALING -> TYPE_FEILUTBETALING
                 else -> "ukjent"
             }
         } else "mangler"

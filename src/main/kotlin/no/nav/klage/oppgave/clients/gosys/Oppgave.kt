@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.clients.gosys
 import java.time.LocalDate
 
 const val BEHANDLINGSTYPE_KLAGE = "ae0058"
-const val BEHANDLINGSTYPE_ANKE = "ae0046"
+const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
 
 const val TEMA_SYK = "SYK"
 const val TEMA_FOR = "FOR"

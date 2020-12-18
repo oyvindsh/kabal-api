@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.gosys
 
 import brave.Tracer
-import no.nav.klage.oppgave.api.view.TYPE_ANKE
+import no.nav.klage.oppgave.api.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.api.view.TYPE_KLAGE
 import no.nav.klage.oppgave.api.view.YTELSE_FOR
 import no.nav.klage.oppgave.api.view.YTELSE_SYK
@@ -86,7 +86,7 @@ class OppgaveClient(
             }
         } else {
             uriBuilder.queryParam("behandlingstype", mapType(TYPE_KLAGE))
-            uriBuilder.queryParam("behandlingstype", mapType(TYPE_ANKE))
+            uriBuilder.queryParam("behandlingstype", mapType(TYPE_FEILUTBETALING))
         }
 
         ytelser.forEach {
@@ -138,7 +138,7 @@ class OppgaveClient(
     private fun mapType(type: String): String {
         return when (type) {
             TYPE_KLAGE -> BEHANDLINGSTYPE_KLAGE
-            TYPE_ANKE -> BEHANDLINGSTYPE_ANKE
+            TYPE_FEILUTBETALING -> BEHANDLINGSTYPE_FEILUTBETALING
             else -> {
                 logger.warn("Unknown type: {}", type)
                 type
