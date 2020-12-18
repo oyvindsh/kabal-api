@@ -9,8 +9,6 @@ import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
 import no.nav.klage.oppgave.domain.oppgavekopi.Prioritet
 import no.nav.klage.oppgave.domain.oppgavekopi.Status
 import no.nav.klage.oppgave.util.getLogger
-import java.time.LocalDateTime
-import java.util.*
 import no.nav.klage.oppgave.clients.gosys.Prioritet as GosysPrioritet
 import no.nav.klage.oppgave.clients.gosys.Status as GosysStatus
 
@@ -91,9 +89,6 @@ class GosysOppgaveMapper {
 
     private fun Oppgave.getFolkeregisterIdent(): String? =
         identer?.firstOrNull { it.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident
-
-    //TODO: Mulig denne ikke håndterer tidssonene riktig, ref koden til Oppgave
-    private fun Date.toLocalDateTime(): LocalDateTime = java.sql.Timestamp(time).toLocalDateTime()
     
 }
 
