@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 const val HJEMMEL = "HJEMMEL"
 const val TYPE_KLAGE = "Klage"
-const val TYPE_ANKE = "Anke"
+const val TYPE_FEILUTBETALING = "Feilutbetaling"
 const val YTELSE_SYK = "Sykepenger"
 const val YTELSE_FOR = "Foreldrepenger"
 
