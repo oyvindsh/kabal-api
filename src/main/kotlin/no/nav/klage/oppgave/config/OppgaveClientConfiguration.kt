@@ -24,14 +24,10 @@ class OppgaveClientConfiguration(private val webClientBuilder: WebClient.Builder
 
     @Bean
     fun oppgaveWebClient(): WebClient {
-
-        val httpClient: HttpClient = HttpClient
-            .create()
-            .wiretap(true)
         return webClientBuilder
             .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(oppgaveServiceURL)
-            .clientConnector(ReactorClientHttpConnector(httpClient))
+            .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .build()
     }
 }

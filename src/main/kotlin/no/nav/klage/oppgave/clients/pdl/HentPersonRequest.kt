@@ -6,7 +6,7 @@ data class PersonGraphqlQuery(
 )
 
 data class Variables(
-    val idents: List<String>
+    val identer: List<String>
 )
 
 fun hentPersonQuery(fnrList: List<String>): PersonGraphqlQuery {
