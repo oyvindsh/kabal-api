@@ -6,7 +6,7 @@ data class HentPersonResponse(val data: HentPersonBolk?, val errors: List<PdlErr
 data class HentPersonBolk(val hentPersonBolk: List<HentPersonBolkResult>?)
 
 data class HentPersonBolkResult(
-    val person: Person,
+    val person: Person?,
     val ident: String
 ) {
     data class Person(
