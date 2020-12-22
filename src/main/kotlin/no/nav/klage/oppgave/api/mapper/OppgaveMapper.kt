@@ -83,7 +83,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
             val fnr = it.ident
             fnr to OppgaveView.Person(
                 fnr = fnr,
-                navn = it.person.navn.firstOrNull()?.toName() ?: "mangler navn"
+                navn = it.person?.navn?.firstOrNull()?.toName() ?: "mangler navn"
             )
         }.toMap()
         return fnrList.map {
