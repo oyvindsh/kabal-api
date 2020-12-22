@@ -22,14 +22,8 @@ class PdlClient(
     @Retryable
     fun getPersonInfo(fnrList: List<String>): HentPersonResponse {
         val stsSystembrukerToken = tokenService.getStsSystembrukerToken()
-        val accessTokenFrontendSent = tokenService.getAccessTokenFrontendSent()
-        secureLogger.debug("systembrukertoken: $stsSystembrukerToken")
-        secureLogger.debug("innloggetbrukertoken: $accessTokenFrontendSent")
         return pdlWebClient.post()
-            .header(
-                HttpHeaders.AUTHORIZATION,
-                "Bearer $accessTokenFrontendSent"
-            )
+            .header(HttpHeaders.AUTHORIZATION,"Bearer $stsSystembrukerToken")
             .header("Nav-Consumer-Token", "Bearer $stsSystembrukerToken")
             .bodyValue(hentPersonQuery(fnrList))
             .retrieve()
