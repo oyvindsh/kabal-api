@@ -13,3 +13,7 @@ KLAGEPROXY_URL: https://klage-fss-proxy.dev-fss-pub.nais.io
 OPPGAVE_URL: https://api-gw-q1.oera.no/oppgave/api/v1/oppgaver
 
 AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v1
+
+spring:
+  flyway:
+    clean-on-validation-error: true
