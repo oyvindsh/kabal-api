@@ -3,6 +3,8 @@ package no.nav.klage.oppgave.repositories
 import no.nav.klage.oppgave.clients.axsys.AxsysClient
 import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.fssproxy.KlageProxyClient
+import no.nav.klage.oppgave.domain.EnheterMedLovligeYtelser
+import no.nav.klage.oppgave.domain.mapToInterntDomene
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import kotlin.system.measureTimeMillis
@@ -27,8 +29,8 @@ class SaksbehandlerRepository(
         private const val SAKSBEHANDLER_ROLLE = "0000-GA-GOSYS_OPPGAVE_BEHANDLER"
     }
 
-    fun getTilgangerForSaksbehandler(ident: String) =
-        axsysClient.getTilgangerForSaksbehandler(ident)
+    fun getTilgangerForSaksbehandler(ident: String): EnheterMedLovligeYtelser =
+        axsysClient.getTilgangerForSaksbehandler(ident).mapToInterntDomene()
 
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
