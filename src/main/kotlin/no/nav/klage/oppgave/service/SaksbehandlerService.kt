@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.clients.axsys.Tilganger
+import no.nav.klage.oppgave.domain.EnheterMedLovligeYtelser
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.springframework.stereotype.Service
 
@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service
 class SaksbehandlerService(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
-    fun getTilgangerForSaksbehandler(): Tilganger =
+    fun getTilgangerForSaksbehandler(): EnheterMedLovligeYtelser =
         innloggetSaksbehandlerRepository.getTilgangerForSaksbehandler()
 }
