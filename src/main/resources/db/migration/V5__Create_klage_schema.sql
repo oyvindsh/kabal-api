@@ -109,7 +109,14 @@ CREATE TABLE klage.behandling
 
 CREATE TABLE klage.behandling_hjemmel
 (
-
+    behandling_id           INTEGER                 NOT NULL,
+    hjemmel_id              INTEGER                 NOT NULL,
+    CONSTRAINT fk_behandling
+        FOREIGN KEY (behandling_id)
+            REFERENCES behandling (id),
+    CONSTRAINT fk_hjemmel
+        FOREIGN KEY (hjemmel_id)
+            REFERENCES hjemmel (id)
 );
 
 CREATE TABLE klage.behandlingslogg
