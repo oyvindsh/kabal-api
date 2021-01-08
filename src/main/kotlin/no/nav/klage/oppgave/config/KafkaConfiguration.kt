@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.listener.ContainerProperties
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import java.io.File
 
@@ -36,10 +37,10 @@ class KafkaConfiguration(
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<Long, String> {
-        val factory = ConcurrentKafkaListenerContainerFactory<Long, String>()
+    fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.consumerFactory = consumerFactory()
-
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL;
         factory.setErrorHandler { thrownException, data ->
             logger.error("Could not deserialize record. See secure logs for details.")
             secureLogger.error("Could not deserialize record: $data", thrownException)
@@ -49,7 +50,7 @@ class KafkaConfiguration(
     }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<Long, String> {
+    fun consumerFactory(): ConsumerFactory<String, String> {
         return DefaultKafkaConsumerFactory(consumerProps());
     }
 
@@ -58,6 +59,7 @@ class KafkaConfiguration(
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
         props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         props[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = true
+        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = ErrorHandlingDeserializer::class.java
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ErrorHandlingDeserializer::class.java
         props["spring.deserializer.key.delegate.class"] = StringDeserializer::class.java
@@ -73,4 +75,19 @@ class KafkaConfiguration(
         return props
     }
 
+    @Bean
+    fun finder(consumerFactory: ConsumerFactory<String, String>): PartitionFinder {
+        return PartitionFinder(consumerFactory)
+    }
+
+}
+
+class PartitionFinder(private val consumerFactory: ConsumerFactory<String, String>) {
+    fun partitions(topic: String): Array<String> {
+        consumerFactory.createConsumer().use { consumer ->
+            return consumer.partitionsFor(topic)
+                .map { pi -> "" + pi.partition() }
+                .toTypedArray()
+        }
+    }
 }
