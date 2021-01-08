@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.klage.Klage
+import no.nav.klage.oppgave.domain.klage.Klagesak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +17,7 @@ class KlageRepositoryTest {
 
     @Test
     fun `persist klage works`() {
-        val klage = Klage(
+        val klage = Klagesak(
             foedselsnummer = "12345678910",
             datoMottattFraFoersteinstans = LocalDate.now(),
             frist = LocalDate.now()

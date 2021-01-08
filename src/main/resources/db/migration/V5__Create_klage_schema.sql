@@ -121,6 +121,7 @@ CREATE TABLE klage.behandling_hjemmel
 
 CREATE TABLE klage.behandlingslogg
 (
+    id                      INTEGER PRIMARY KEY,
     behandling_id           INTEGER                  NOT NULL,
     created                 TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     beskrivelse             VARCHAR(500),
@@ -136,7 +137,7 @@ CREATE TABLE klage.behandling_dokument
     CONSTRAINT fk_behandling
         FOREIGN KEY (behandling_id)
             REFERENCES behandling (id),
-    CONSTRAINT fk_okument
+    CONSTRAINT fk_dokument
         FOREIGN KEY (dokument_id)
             REFERENCES dokument (id)
 );
