@@ -6,25 +6,26 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @ActiveProfiles("local")
 @DataJpaTest
-class KlageRepositoryTest {
+class KlagesakRepositoryTest {
 
     @Autowired
-    lateinit var klageRepository: KlageRepository
+    lateinit var klagesakRepository: KlagesakRepository
 
     @Test
     fun `persist klage works`() {
         val klage = Klagesak(
             foedselsnummer = "12345678910",
-            datoMottattFraFoersteinstans = LocalDate.now(),
-            frist = LocalDate.now()
+            sakstypeId = 1,
+            modified = LocalDateTime.now(),
+            created = LocalDateTime.now()
         )
 
-        klageRepository.save(klage)
+        klagesakRepository.save(klage)
 
-        assertThat(klageRepository.findById(klage.id).get()).isEqualTo(klage)
+        assertThat(klagesakRepository.findById(klage.id).get()).isEqualTo(klage)
     }
 }

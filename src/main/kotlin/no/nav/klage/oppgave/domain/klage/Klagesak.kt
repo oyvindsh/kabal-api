@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.domain.klage
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.Column
