@@ -1,10 +1,11 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.domain.kodeverk.Eoes
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
+import no.nav.klage.oppgave.domain.kodeverk.Rol
+import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "vedtak", schema = "klage")
@@ -13,18 +14,24 @@ class Vedtak(
     val id: Int,
     @Column(name = "enhet")
     val enhet: Int,
-    @Column(name = "eoes_id")
-    val eoesId: Int,
-    @Column(name = "rol_id")
-    val rolId: Int,
-    @Column(name = "utfall_id")
-    val utfallId: Int,
-    @Column(name = "grunn_id")
-    val grunnId: Int,
-    @Column(name = "tilbakemelding_id")
-    val tilbakemeldingId: Int?,
-    @Column(name = "vedtaksdokument_id")
-    val vedtaksdokumentId: Int?,
+    @OneToOne
+    @JoinColumn(name = "eoes_id")
+    val eoes: Eoes,
+    @OneToOne
+    @JoinColumn(name = "rol_id")
+    val rol: Rol,
+    @OneToOne
+    @JoinColumn(name = "utfall_id")
+    val utfall: Utfall,
+    @OneToOne
+    @JoinColumn(name = "grunn_id")
+    val grunn: Grunn,
+    @OneToOne
+    @JoinColumn(name = "tilbakemelding_id", nullable = true)
+    val tilbakemelding: Tilbakemelding?,
+    @OneToOne
+    @JoinColumn(name = "vedtaksdokument_id", nullable = true)
+    val vedtaksdokumentId: Dokument?,
     @Column(name = "modified")
     val modified: LocalDateTime,
     @Column(name = "created")

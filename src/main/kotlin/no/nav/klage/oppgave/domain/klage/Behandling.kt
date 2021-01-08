@@ -3,18 +3,16 @@ package no.nav.klage.oppgave.domain.klage
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "behandling", schema = "klage")
 class Behandling(
     @Id
     val id: UUID,
-    @Column(name = "klagesak_id")
-    val klagesakId: UUID?,
+    @ManyToOne
+    @JoinColumn(name = "klagesak_id", nullable = false)
+    val klagesak: Klagesak,
     @Column(name = "dato_mottatt_fra_foersteinstans")
     val mottatt: LocalDate?,
     @Column(name = "dato_behandling_startet")
@@ -25,15 +23,33 @@ class Behandling(
     val frist: LocalDate?,
     @Column(name = "tildelt_saksbehandlerident")
     val tildeltSaksbehandlerident: String?,
-    @Column(name = "vedtak_id")
-    val vedtakId: Int,
+    @OneToOne
+    @JoinColumn(name = "vedtak_id", nullable = true)
+    val vedtak: Vedtak?,
+    @ManyToMany
+    @JoinTable(
+        name = "behandling_hjemmel", schema = "klage",
+        joinColumns = [JoinColumn(name = "behandling_id")],
+        inverseJoinColumns = [JoinColumn(name = "hjemmel_id")]
+    )
+    val hjemler: List<Hjemmel>,
+    @ManyToMany
+    @JoinTable(
+        name = "behandling_dokument", schema = "klage",
+        joinColumns = [JoinColumn(name = "behandling_id")],
+        inverseJoinColumns = [JoinColumn(name = "dokument_id")]
+    )
+    val dokumenter: List<Dokument>,
+    @OneToMany
+    @JoinColumn(name = "behandling_id")
+    val logg: List<Behandlingslogg>,
     @Column(name = "modified")
     val modified: LocalDateTime,
     @Column(name = "created")
     val created: LocalDateTime
 ) {
     override fun toString(): String {
-        return "Tilbakemelding(id=$id, " +
+        return "Behandling(id=$id, " +
                 "modified=$modified, " +
                 "created=$created)"
     }
