@@ -25,7 +25,7 @@ class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService) 
     @KafkaListener(
         topicPartitions = [TopicPartition(
             topic = "\${EGENANSATT_KAFKA_TOPIC}",
-            partitionOffsets = [PartitionOffset(partition = "*", initialOffset = "0")]
+            partitionOffsets = [PartitionOffset(partition = "0", initialOffset = "0")]
         )]
     )
     fun listen(egenAnsattRecord: ConsumerRecord<String, String>) {
