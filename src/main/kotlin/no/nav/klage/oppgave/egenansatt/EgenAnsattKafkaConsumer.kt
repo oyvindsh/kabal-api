@@ -23,10 +23,6 @@ class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService, 
         private val mapper = ObjectMapper().registerModule(KotlinModule()).registerModule(JavaTimeModule())
     }
 
-    /*
-    TODO: Prøve å gjøre oppsettet dynamisk, ref https://docs.spring.io/spring-kafka/reference/html/#tip-assign-all-parts
-    Husk denne: https://stackoverflow.com/questions/44506762/kotlin-compiler-complains-about-using-a-spel-expression-in-a-property-definition
-     */
     @KafkaListener(
         topicPartitions = [TopicPartition(
             topic = "\${EGENANSATT_KAFKA_TOPIC}",
