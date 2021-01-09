@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.egenansatt
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import no.nav.klage.oppgave.config.PartitionFinder
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService) {
+class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService, private val finder: PartitionFinder) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -29,7 +30,8 @@ class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService) 
     @KafkaListener(
         topicPartitions = [TopicPartition(
             topic = "\${EGENANSATT_KAFKA_TOPIC}",
-            partitionOffsets = [PartitionOffset(partition = "0", initialOffset = "0")]
+            partitions = ["#{@finder.partitions('\${EGENANSATT_KAFKA_TOPIC}')}"],
+            partitionOffsets = [PartitionOffset(partition = "*", initialOffset = "0")]
         )]
     )
     fun listen(egenAnsattRecord: ConsumerRecord<String, String>) {
