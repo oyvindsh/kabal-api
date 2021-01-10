@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.api.internal
 
-import no.nav.klage.oppgave.domain.oppgavekopi.Prioritet
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -56,5 +55,9 @@ data class OppgaveKopiAPIModel(
 
     enum class Statuskategori {
         AAPEN, AVSLUTTET
+    }
+
+    enum class Prioritet {
+        HOY, NORM, LAV
     }
 }
