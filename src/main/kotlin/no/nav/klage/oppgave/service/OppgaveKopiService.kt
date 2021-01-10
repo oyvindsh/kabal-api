@@ -21,7 +21,7 @@ class OppgaveKopiService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun lagreOppgaveKopi(oppgaveKopi: OppgaveKopi) {
+    fun saveOppgaveKopi(oppgaveKopi: OppgaveKopi) {
         logger.debug("Received oppgavekopi with id ${oppgaveKopi.id} and versjon ${oppgaveKopi.versjon} for storing")
         if (oppgaveKopiRepository.existsById(oppgaveKopi.id)) {
             val existingOppgaveKopi = oppgaveKopiRepository.getOne(oppgaveKopi.id)
@@ -37,15 +37,15 @@ class OppgaveKopiService(
         oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
     }
 
-    fun hentOppgaveKopi(oppgaveKopiId: Long): OppgaveKopi {
+    fun getOppgaveKopi(oppgaveKopiId: Long): OppgaveKopi {
         return oppgaveKopiRepository.getOne(oppgaveKopiId)
     }
 
-    fun hentOppgaveKopiVersjon(oppgaveKopiId: Long, versjon: Int): OppgaveKopiVersjon {
+    fun getOppgaveKopiVersjon(oppgaveKopiId: Long, versjon: Int): OppgaveKopiVersjon {
         return oppgaveKopiVersjonRepository.getOne(OppgaveKopiVersjonId(oppgaveKopiId, versjon))
     }
     
-    fun hentOppgaveKopiSisteVersjon(oppgaveKopiId: Long): OppgaveKopiVersjon {
+    fun getOppgaveKopiSisteVersjon(oppgaveKopiId: Long): OppgaveKopiVersjon {
         return oppgaveKopiVersjonRepository.findFirstByIdOrderByVersjonDesc(oppgaveKopiId)
     }
 }

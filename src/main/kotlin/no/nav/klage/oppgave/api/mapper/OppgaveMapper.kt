@@ -1,10 +1,15 @@
 package no.nav.klage.oppgave.api.mapper
 
 
+import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.gosys.*
 import no.nav.klage.oppgave.clients.pdl.HentPersonBolkResult
 import no.nav.klage.oppgave.clients.pdl.PdlClient
+import no.nav.klage.oppgave.domain.oppgavekopi.*
+import no.nav.klage.oppgave.domain.oppgavekopi.Ident
+import no.nav.klage.oppgave.domain.oppgavekopi.Prioritet
+import no.nav.klage.oppgave.domain.oppgavekopi.Status
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -110,4 +115,46 @@ class OppgaveMapper(val pdlClient: PdlClient) {
     }
 
     private fun HentPersonBolkResult.Person.Navn.toName() = "$fornavn $etternavn"
+
+    fun mapOppgaveKopiAPIModelToOppgaveKopi(oppgave: OppgaveKopiAPIModel): OppgaveKopi {
+        return OppgaveKopi(
+            id = oppgave.id,
+            versjon = oppgave.versjon,
+            journalpostId = oppgave.journalpostId,
+            saksreferanse = oppgave.saksreferanse,
+            mappeId = oppgave.mappeId,
+            status = Status.valueOf(oppgave.status.name),
+            tildeltEnhetsnr = oppgave.tildeltEnhetsnr,
+            opprettetAvEnhetsnr = oppgave.opprettetAvEnhetsnr,
+            endretAvEnhetsnr = oppgave.endretAvEnhetsnr,
+            tema = oppgave.tema,
+            temagruppe = oppgave.temagruppe,
+            behandlingstema = oppgave.behandlingstema,
+            oppgavetype = oppgave.oppgavetype,
+            behandlingstype = oppgave.behandlingstype,
+            prioritet = Prioritet.valueOf(oppgave.prioritet.name),
+            tilordnetRessurs = oppgave.tilordnetRessurs,
+            beskrivelse = oppgave.beskrivelse,
+            fristFerdigstillelse = oppgave.fristFerdigstillelse,
+            aktivDato = oppgave.aktivDato,
+            opprettetAv = oppgave.opprettetAv,
+            endretAv = oppgave.endretAv,
+            opprettetTidspunkt = oppgave.opprettetTidspunkt,
+            endretTidspunkt = oppgave.endretTidspunkt,
+            ferdigstiltTidspunkt = oppgave.ferdigstiltTidspunkt,
+            behandlesAvApplikasjon = oppgave.behandlesAvApplikasjon,
+            journalpostkilde = oppgave.journalpostkilde,
+            ident = Ident(
+                id = oppgave.ident.id,
+                identType = IdentType.valueOf(oppgave.ident.identType.name),
+                verdi = oppgave.ident.verdi,
+                folkeregisterident = oppgave.ident.folkeregisterident,
+                registrertDato = null
+            ),
+            metadata = oppgave.metadata?.map { (k, v) ->
+                MetadataNoekkel.valueOf(k.name) to v
+            }?.toMap() ?: emptyMap()
+        )
+    }
+
 }
