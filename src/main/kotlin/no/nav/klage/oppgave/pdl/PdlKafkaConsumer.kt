@@ -38,7 +38,7 @@ class PdlKafkaConsumer(private val finder: PartitionFinder) {
             if (pdlDocumentRecord.value() == null) {
                 logger.debug("Received tombstone for aktoerId $aktoerId")
             } else {
-                val pdlDokument: PdlDokument = pdlDocumentRecord.value().toPdlDokument()
+                val pdlDokument: PdlDokument = ("{" + pdlDocumentRecord.value().substringAfter("{")).toPdlDokument()
                 secureLogger.debug("Mottok pdldokument om $aktoerId med navn ${pdlDokument.hentPerson.navn}")
             }
         }.onFailure {
