@@ -35,9 +35,9 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = now
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
-        val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi.id)
+        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.opprettetTidspunkt).isEqualTo(now)
     }
@@ -59,9 +59,9 @@ class OppgaveKopiServiceTest {
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null)
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
-        val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi.id)
+        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.ident).isNotNull
         assertThat(hentetOppgave.ident?.verdi).isEqualTo("12345")
@@ -83,9 +83,9 @@ class OppgaveKopiServiceTest {
             opprettetTidspunkt = LocalDateTime.now(),
             metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
-        val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi.id)
+        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.metadata).isNotNull
         assertThat(hentetOppgave.metadata.size).isEqualTo(1)
@@ -131,9 +131,9 @@ class OppgaveKopiServiceTest {
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
             metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi1)
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi2)
-        val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi1.id)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi2)
+        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi1.id)
         assertThat(hentetOppgave).isNotNull
     }
 
@@ -155,9 +155,9 @@ class OppgaveKopiServiceTest {
             metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
 
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi1)
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi1)
-        val hentetOppgave = oppgaveKopiService.hentOppgaveKopi(oppgaveKopi1.id)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
+        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi1.id)
         assertThat(hentetOppgave).isNotNull
     }
 
@@ -178,14 +178,14 @@ class OppgaveKopiServiceTest {
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
             metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
-        val hentetOppgaveversjon = oppgaveKopiService.hentOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
+        val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
         assertThat(hentetOppgaveversjon.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
 
         val hentetOppgaveSisteVersjon =
-            oppgaveKopiService.hentOppgaveKopiSisteVersjon(oppgaveKopi.id)
+            oppgaveKopiService.getOppgaveKopiSisteVersjon(oppgaveKopi.id)
         assertThat(hentetOppgaveSisteVersjon).isNotNull
         assertThat(hentetOppgaveSisteVersjon.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
     }
@@ -207,9 +207,9 @@ class OppgaveKopiServiceTest {
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
             metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
-        val hentetOppgaveversjon = oppgaveKopiService.hentOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
+        val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
     }
 
@@ -245,15 +245,15 @@ class OppgaveKopiServiceTest {
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
             metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi2)
-        oppgaveKopiService.lagreOppgaveKopi(oppgaveKopi1)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi2)
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
 
-        val hentetOppgaveversjon = oppgaveKopiService.hentOppgaveKopiVersjon(oppgaveKopi1.id, oppgaveKopi1.versjon)
+        val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi1.id, oppgaveKopi1.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
         assertThat(hentetOppgaveversjon.opprettetTidspunkt).isEqualTo(oppgaveKopi1.opprettetTidspunkt)
 
         val hentetOppgaveSisteVersjon =
-            oppgaveKopiService.hentOppgaveKopiSisteVersjon(oppgaveKopi2.id)
+            oppgaveKopiService.getOppgaveKopiSisteVersjon(oppgaveKopi2.id)
         assertThat(hentetOppgaveSisteVersjon).isNotNull
         assertThat(hentetOppgaveSisteVersjon.opprettetTidspunkt).isEqualTo(oppgaveKopi2.opprettetTidspunkt)
 

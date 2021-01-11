@@ -67,7 +67,8 @@ internal class OppgaveFacadeTest {
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlClientMock)
+            OppgaveMapper(pdlClientMock),
+            mockk()
         )
 
         val oppgaverSearchCriteriaMock = mockk<OppgaverSearchCriteria>(relaxed = true)
@@ -109,7 +110,8 @@ internal class OppgaveFacadeTest {
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlClientMock)
+            OppgaveMapper(pdlClientMock),
+            mockk()
         )
         return oppgaveFacade
     }
@@ -125,7 +127,8 @@ internal class OppgaveFacadeTest {
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlClientMock)
+            OppgaveMapper(pdlClientMock),
+            mockk()
         )
     }
 
