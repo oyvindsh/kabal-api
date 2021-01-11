@@ -44,7 +44,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
                     null
                 },
                 type = oppgaveBackend.toType(),
-                ytelse = oppgaveBackend.toYtelse(),
+                tema = oppgaveBackend.toYtelse(),
                 hjemmel = oppgaveBackend.metadata.toHjemmel(),
                 frist = oppgaveBackend.fristFerdigstillelse,
                 versjon = oppgaveBackend.versjon
