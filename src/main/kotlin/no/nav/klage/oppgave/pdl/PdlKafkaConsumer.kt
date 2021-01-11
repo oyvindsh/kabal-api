@@ -34,13 +34,13 @@ class PdlKafkaConsumer(private val finder: PartitionFinder) {
         runCatching {
             logger.debug("Reading offset ${pdlDocumentRecord.offset()} from partition ${pdlDocumentRecord.partition()} on kafka topic ${pdlDocumentRecord.topic()}")
             val aktoerId = pdlDocumentRecord.key()
-            val pdlDokument = pdlDocumentRecord.value().toPdlDokument()
-            secureLogger.debug("Mottok pdldokument om $aktoerId med navn ${pdlDokument.hentPerson.navn}")
+            val pdlDokument: PdlDokument? = pdlDocumentRecord.value().toPdlDokument()
+            secureLogger.debug("Mottok pdldokument om $aktoerId med navn ${pdlDokument?.hentPerson?.navn}")
         }.onFailure {
             secureLogger.error("Failed to process pdldokument record", it)
-            throw RuntimeException("Could not process pdldokument record. See more details in secure log.")
+            //throw RuntimeException("Could not process pdldokument record. See more details in secure log.")
         }
     }
 
-    private fun String.toPdlDokument() = mapper.readValue(this, PdlDokument::class.java)
+    private fun String.toPdlDokument(): PdlDokument? = mapper.readValue(this, PdlDokument::class.java)
 }
