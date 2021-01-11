@@ -12,7 +12,7 @@ class Tilbakemelding(
     @Id
     val id: Int,
     @Column(name = "mottaker_saksbehandlerident")
-    val mottakerSaksbehandlerident: String?,
+    val mottakerSaksbehandlerident: String? = null,
     @Column(name = "tilbakemelding")
     val tilbakemelding: String,
     @Column(name = "modified")

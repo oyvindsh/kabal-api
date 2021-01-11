@@ -11,15 +11,15 @@ class Hjemmel(
     @Id
     val id: Int,
     @Column(name = "lov_id")
-    val lovId: Int?,
+    val lovId: Int? = null,
     @Column(name = "kapittel")
-    val kapittel: Int?,
+    val kapittel: Int? = null,
     @Column(name = "paragraf")
     val paragraf: String,
     @Column(name = "ledd")
-    val ledd: String?,
+    val ledd: String? = null,
     @Column(name = "bokstav")
-    val bokstav: String?
+    val bokstav: String? = null
 ) {
     override fun toString(): String {
         return "Hjemmel(id=$id, " +

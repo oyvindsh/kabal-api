@@ -14,35 +14,21 @@ class Behandling(
     @JoinColumn(name = "klagesak_id", nullable = false)
     val klagesak: Klagesak,
     @Column(name = "dato_mottatt_fra_foersteinstans")
-    val mottatt: LocalDate?,
+    val mottatt: LocalDate? = null,
     @Column(name = "dato_behandling_startet")
-    val startet: LocalDate?,
+    val startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
-    val avsluttet: LocalDate?,
+    val avsluttet: LocalDate? = null,
     @Column(name = "frist")
-    val frist: LocalDate?,
+    val frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
-    val tildeltSaksbehandlerident: String?,
+    val tildeltSaksbehandlerident: String? = null,
     @OneToOne
     @JoinColumn(name = "vedtak_id", nullable = true)
-    val vedtak: Vedtak?,
-    @ManyToMany
-    @JoinTable(
-        name = "behandling_hjemmel", schema = "klage",
-        joinColumns = [JoinColumn(name = "behandling_id")],
-        inverseJoinColumns = [JoinColumn(name = "hjemmel_id")]
-    )
-    val hjemler: List<Hjemmel>,
-    @ManyToMany
-    @JoinTable(
-        name = "behandling_dokument", schema = "klage",
-        joinColumns = [JoinColumn(name = "behandling_id")],
-        inverseJoinColumns = [JoinColumn(name = "dokument_id")]
-    )
-    val dokumenter: List<Dokument>,
+    val vedtak: Vedtak? = null,
     @OneToMany
     @JoinColumn(name = "behandling_id")
-    val logg: List<Behandlingslogg>,
+    val hjemler: List<Hjemmel>,
     @Column(name = "modified")
     val modified: LocalDateTime,
     @Column(name = "created")
