@@ -61,6 +61,7 @@ spec:
     inbound:
       rules:
         - application: klage-oppgave
+        - application: klage-oppgave-consumer
     outbound:
       rules:
         - application: klage-redis

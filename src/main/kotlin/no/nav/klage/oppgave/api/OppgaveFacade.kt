@@ -1,14 +1,20 @@
 package no.nav.klage.oppgave.api
 
+import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.Oppgave
 import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.service.OppgaveKopiService
 import no.nav.klage.oppgave.service.OppgaveService
 import org.springframework.stereotype.Service
 
 @Service
-class OppgaveFacade(val oppgaveService: OppgaveService, val oppgaveMapper: OppgaveMapper) {
+class OppgaveFacade(
+    private val oppgaveService: OppgaveService,
+    private val oppgaveMapper: OppgaveMapper,
+    private val oppgaveKopiService: OppgaveKopiService
+) {
 
     fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
         val oppgaveResponse = oppgaveService.searchOppgaver(oppgaverSearchCriteria)
@@ -30,5 +36,7 @@ class OppgaveFacade(val oppgaveService: OppgaveService, val oppgaveMapper: Oppga
         return oppgaveMapper.mapOppgaveToView(oppgaveBackend, true)
     }
 
-
+    fun saveOppgaveKopi(oppgave: OppgaveKopiAPIModel) {
+        oppgaveKopiService.saveOppgaveKopi(oppgaveMapper.mapOppgaveKopiAPIModelToOppgaveKopi(oppgave))
+    }
 }
