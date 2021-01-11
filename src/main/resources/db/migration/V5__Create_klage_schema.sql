@@ -21,20 +21,7 @@ CREATE TABLE klage.klagesak
     created                         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_klagesak_sakstype
         FOREIGN KEY (sakstype_id)
-            REFERENCES kodeverk.sakstype (id),
-);
-
-CREATE TABLE klage.hjemmel
-(
-    id                              INTEGER PRIMARY KEY,
-    lov_id                          INTEGER                 NOT NULL,
-    kapittel                        INTEGER,
-    paragraf                        VARCHAR(5)              NOT NULL,
-    ledd                            VARCHAR(5),
-    bokstav                         VARCHAR(1),
-    CONSTRAINT fk_hjemmel_lov
-        FOREIGN KEY (lov_id)
-            REFERENCES kodeverk.lov (id)
+            REFERENCES kodeverk.sakstype (id)
 );
 
 CREATE TABLE klage.dokument
@@ -96,9 +83,6 @@ CREATE TABLE klage.behandling
     vedtak_id                       INTEGER,
     modified                        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created                         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_behandling_hjemmel
-        FOREIGN KEY (hjemmel_id)
-            REFERENCES hjemmel (id),
     CONSTRAINT fk_behandling_klagesak
         FOREIGN KEY (klagesak_id)
             REFERENCES klagesak (id),
@@ -107,16 +91,21 @@ CREATE TABLE klage.behandling
             REFERENCES vedtak (id)
 );
 
-CREATE TABLE klage.behandling_hjemmel
+CREATE TABLE klage.hjemmel
 (
-    behandling_id           INTEGER                 NOT NULL,
-    hjemmel_id              INTEGER                 NOT NULL,
-    CONSTRAINT fk_behandling
+    id                              INTEGER PRIMARY KEY,
+    behandling_id                   UUID                    NOT NULL,
+    lov_id                          INTEGER                 NOT NULL,
+    kapittel                        INTEGER,
+    paragraf                        VARCHAR(5)              NOT NULL,
+    ledd                            VARCHAR(5),
+    bokstav                         VARCHAR(1),
+    CONSTRAINT fk_hjemmel_lov
+        FOREIGN KEY (lov_id)
+            REFERENCES kodeverk.lov (id),
+    CONSTRAINT fk_hjemmel_behandling
         FOREIGN KEY (behandling_id)
-            REFERENCES behandling (id),
-    CONSTRAINT fk_hjemmel
-        FOREIGN KEY (hjemmel_id)
-            REFERENCES hjemmel (id)
+            REFERENCES behandling (id)
 );
 
 CREATE TABLE klage.behandlingslogg
@@ -134,10 +123,10 @@ CREATE TABLE klage.behandling_dokument
 (
     behandling_id           INTEGER NOT NULL,
     dokument_id             INTEGER NOT NULL,
-    CONSTRAINT fk_behandling
+    CONSTRAINT fk_behandling_dokument
         FOREIGN KEY (behandling_id)
             REFERENCES behandling (id),
-    CONSTRAINT fk_dokument
+    CONSTRAINT fk_dokument_behandling
         FOREIGN KEY (dokument_id)
             REFERENCES dokument (id)
 );

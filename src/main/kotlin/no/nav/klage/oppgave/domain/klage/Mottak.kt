@@ -23,7 +23,7 @@ class Mottak(
     @Column(name = "ytelse_tema")
     val ytelse: String,
     @Column(name = "referanse_innsyn")
-    val referanseInnsyn: String?,
+    val referanseInnsyn: String? = null,
     @Column(name = "created")
     val created: LocalDateTime
 ) {
