@@ -33,9 +33,9 @@ class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService, 
     fun listen(egenAnsattRecord: ConsumerRecord<String, String>) {
         runCatching {
             logger.debug("Reading offset ${egenAnsattRecord.offset()} from partition ${egenAnsattRecord.partition()} on kafka topic ${egenAnsattRecord.topic()}")
-            val fodselsnr = egenAnsattRecord.key()
+            val foedselsnr = egenAnsattRecord.key()
             val egenAnsatt = egenAnsattRecord.value().toEgenAnsatt()
-            egenAnsattService.oppdaterEgenAnsatt(fodselsnr, egenAnsatt)
+            egenAnsattService.oppdaterEgenAnsatt(foedselsnr, egenAnsatt)
         }.onFailure {
             secureLogger.error("Failed to process egenansatt record", it)
             throw RuntimeException("Could not process egenansatt record. See more details in secure log.")

@@ -9,10 +9,10 @@ class EgenAnsattService {
 
     private val egenAnsattMap: ConcurrentMap<String, EgenAnsatt> = ConcurrentHashMap()
 
-    fun erEgenAnsatt(fodselsnr: String): Boolean =
-        egenAnsattMap[fodselsnr]?.erGyldig() ?: false
+    fun erEgenAnsatt(foedselsnr: String): Boolean =
+        egenAnsattMap[foedselsnr]?.erGyldig() ?: false
 
-    fun oppdaterEgenAnsatt(fodselsnr: String, egenAnsatt: EgenAnsatt) {
-        egenAnsattMap[fodselsnr] = egenAnsatt
+    fun oppdaterEgenAnsatt(foedselsnr: String, egenAnsatt: EgenAnsatt) {
+        egenAnsattMap[foedselsnr] = egenAnsatt
     }
 }
