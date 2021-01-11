@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.pdl
 import java.time.LocalDateTime
 
 data class MetadataDto(
-    val opplysningsId: String,
+    val opplysningsId: String?,
     val master: String,
     val endringer: List<EndringDto>,
     val historisk: Boolean

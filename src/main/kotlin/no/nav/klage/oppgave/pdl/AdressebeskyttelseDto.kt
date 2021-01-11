@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.pdl
 
 data class AdressebeskyttelseDto(
     val gradering: GraderingDto,
-    val folkeregistermetadata: FolkeregistermetadataDto,
+    val folkeregistermetadata: FolkeregistermetadataDto?,
     val metadata: MetadataDto
 )
 
