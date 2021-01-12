@@ -30,7 +30,9 @@ class KafkaConfiguration(
     @Value("\${SERVICE_USER_USERNAME}")
     private val username: String,
     @Value("\${SERVICE_USER_PASSWORD}")
-    private val password: String
+    private val password: String,
+    @Value("\$KAFKA_SCHEMA_REGISTRY_URL")
+    private val schemaRegistryUrl
 ) {
 
     companion object {
@@ -105,7 +107,7 @@ class KafkaConfiguration(
         props[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
         props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
         props[SPECIFIC_AVRO_READER_CONFIG] = false
-        props[SCHEMA_REGISTRY_URL_CONFIG] = false
+        props[SCHEMA_REGISTRY_URL_CONFIG] = schemaRegistryUrl
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = ErrorHandlingDeserializer::class.java
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ErrorHandlingDeserializer::class.java
         props["spring.deserializer.key.delegate.class"] = KafkaAvroDeserializer::class.java
