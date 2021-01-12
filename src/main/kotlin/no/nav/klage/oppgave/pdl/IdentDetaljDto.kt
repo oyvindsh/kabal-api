@@ -5,7 +5,7 @@ data class IdentDetaljDto(
     val historisk: Boolean,
     val gruppe: IdentGruppeDto,
     val folkeregistermetadata: FolkeregistermetadataDto?,
-    val metadata: MetadataDto
+    val metadata: MetadataDto?
 )
 
 enum class IdentGruppeDto {
