@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.EnheterMedLovligeYtelser
+import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.service.TokenService
 import org.springframework.stereotype.Service
 
@@ -10,7 +10,7 @@ class InnloggetSaksbehandlerRepository(
     private val tokenService: TokenService
 ) {
 
-    fun getTilgangerForSaksbehandler(): EnheterMedLovligeYtelser =
+    fun getTilgangerForSaksbehandler(): EnheterMedLovligeTemaer =
         saksbehandlerRepository.getTilgangerForSaksbehandler(getInnloggetIdent())
 
     fun getInnloggetIdent() = tokenService.getIdent()

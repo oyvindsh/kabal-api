@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.Enhet
 import no.nav.klage.oppgave.config.SecurityConfiguration
-import no.nav.klage.oppgave.domain.EnheterMedLovligeYtelser
+import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -36,12 +36,12 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         return saksbehandlerService.getTilgangerForSaksbehandler().toEnheter()
     }
 
-    private fun EnheterMedLovligeYtelser.toEnheter() =
+    private fun EnheterMedLovligeTemaer.toEnheter() =
         this.enheter.map {
             Enhet(
                 id = it.enhetId,
                 navn = it.navn,
-                lovligeYtelser = it.ytelser
+                lovligeTemaer = it.temaer
             )
         }
 }

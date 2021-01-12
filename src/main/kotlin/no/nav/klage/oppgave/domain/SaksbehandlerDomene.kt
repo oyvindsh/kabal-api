@@ -2,27 +2,33 @@ package no.nav.klage.oppgave.domain
 
 import no.nav.klage.oppgave.clients.axsys.Tilganger
 
-const val YTELSE_SYK = "Sykepenger"
-const val YTELSE_FOR = "Foreldrepenger"
+const val TEMA_NAME_SYK = "Sykepenger"
+const val TEMA_NAME_FOR = "Foreldrepenger"
 
 const val TEMA_SYK = "SYK"
 const val TEMA_FOR = "FOR"
 
-data class EnheterMedLovligeYtelser(val enheter: List<EnhetMedLovligeYtelser>)
+const val TYPE_KLAGE = "Klage"
+const val TYPE_FEILUTBETALING = "Feilutbetaling"
 
-data class EnhetMedLovligeYtelser(val enhetId: String, val navn: String, val ytelser: List<String>)
+const val BEHANDLINGSTYPE_KLAGE = "ae0058"
+const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
 
-fun Tilganger.mapToInterntDomene(): EnheterMedLovligeYtelser =
-    EnheterMedLovligeYtelser(this.enheter.map {
-        EnhetMedLovligeYtelser(
-            it.enhetId,
-            it.navn,
-            it.fagomrader.mapNotNull { mapTemaTilYtelse(it) })
+data class EnheterMedLovligeTemaer(val enheter: List<EnhetMedLovligeTemaer>)
+
+data class EnhetMedLovligeTemaer(val enhetId: String, val navn: String, val temaer: List<String>)
+
+fun Tilganger.mapToInterntDomene(): EnheterMedLovligeTemaer =
+    EnheterMedLovligeTemaer(this.enheter.map { enhet ->
+        EnhetMedLovligeTemaer(
+            enhet.enhetId,
+            enhet.navn,
+            enhet.fagomrader.mapNotNull { mapTemaToTemaName(it) })
     })
 
-fun mapTemaTilYtelse(tema: String): String? =
+fun mapTemaToTemaName(tema: String): String? =
     when (tema) {
-        TEMA_SYK -> YTELSE_SYK
-        TEMA_FOR -> YTELSE_FOR
+        TEMA_SYK -> TEMA_NAME_SYK
+        TEMA_FOR -> TEMA_NAME_FOR
         else -> null
     }
