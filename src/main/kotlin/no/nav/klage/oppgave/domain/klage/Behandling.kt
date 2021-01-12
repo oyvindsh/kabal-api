@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.domain.kodeverk.Eoes
+import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -26,6 +28,12 @@ class Behandling(
     @OneToOne
     @JoinColumn(name = "vedtak_id", nullable = true)
     val vedtak: Vedtak? = null,
+    @OneToOne
+    @JoinColumn(name = "eoes_id")
+    val eoes: Eoes,
+    @OneToOne
+    @JoinColumn(name = "raadfoert_med_lege_id")
+    val raadfoertMedLege: RaadfoertMedLege,
     @OneToMany
     @JoinColumn(name = "behandling_id")
     val hjemler: List<Hjemmel>,

@@ -1,12 +1,12 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.klage.Dokument
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface DokumentRepository : JpaRepository<Dokument, Int> {
+interface DokumentRepository : JpaRepository<Saksdokument, Int> {
 
-    fun findDokumenterForBehandling(behandlingId: UUID): List<Dokument>
+    fun findDokumenterForBehandling(behandlingId: UUID): List<Saksdokument>
 }

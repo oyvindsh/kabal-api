@@ -1,33 +1,31 @@
 package no.nav.klage.oppgave.domain.klage
 
-import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "behandlingslogg", schema = "klage")
-class Behandlingslogg(
+@Table(name = "saksdokument", schema = "klage")
+class Saksdokument(
     @Id
     val id: Int,
-    @Column(name = "behandling_id")
-    val behandlingId: Int,
-    @Column(name = "created")
-    val created: LocalDateTime,
-    @Column(name = "beskrivelse")
-    val beskrivelse: String
+    @Column(name = "klagesak_id")
+    val klagesakId: UUID,
+    @Column(name = "referanse")
+    val referanse: String
 ) {
     override fun toString(): String {
-        return "Behandlingslogg(id=$id, " +
-                "created=$created)"
+        return "Mottak(id=$id, " +
+                "referanse=$referanse)"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Behandlingslogg
+        other as Saksdokument
 
         if (id != other.id) return false
 

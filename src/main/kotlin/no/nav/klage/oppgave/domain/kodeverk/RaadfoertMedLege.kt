@@ -6,8 +6,8 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "rol", schema = "kodeverk")
-class Rol(
+@Table(name = "raadfoert_med_lege", schema = "kodeverk")
+class RaadfoertMedLege(
     @Id
     val id: Int,
     @Column(name = "navn")
@@ -25,7 +25,7 @@ class Rol(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Rol
+        other as RaadfoertMedLege
 
         if (id != other.id) return false
 
