@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.pdl
+package no.nav.klage.oppgave.pdl.dtos
 
 data class PdlDokument(
     val hentPerson: PersonDto,

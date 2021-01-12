@@ -1,5 +1,8 @@
 package no.nav.klage.oppgave.config
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.kafka.clients.CommonClientConfigs.SECURITY_PROTOCOL_CONFIG
@@ -37,25 +40,44 @@ class KafkaConfiguration(
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
+    fun egenAnsattKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-        factory.consumerFactory = consumerFactory()
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL;
-        factory.containerProperties.idleEventInterval = 3000L;
+        factory.consumerFactory = egenAnsattConsumerFactory()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
+        factory.containerProperties.idleEventInterval = 3000L
         factory.setErrorHandler { thrownException, data ->
             logger.error("Could not deserialize record. See secure logs for details.")
             secureLogger.error("Could not deserialize record: $data", thrownException)
         }
 
-        return factory;
+        return factory
     }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, String> {
-        return DefaultKafkaConsumerFactory(consumerProps());
+    fun pdlPersonKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<Any, Any> {
+        val factory = ConcurrentKafkaListenerContainerFactory<Any, Any>()
+        factory.consumerFactory = pdlPersonConsumerFactory()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
+        factory.containerProperties.idleEventInterval = 3000L
+        factory.setErrorHandler { thrownException, data ->
+            logger.error("Could not deserialize record. See secure logs for details.")
+            secureLogger.error("Could not deserialize record: $data", thrownException)
+        }
+
+        return factory
     }
 
-    private fun consumerProps(): Map<String, Any> {
+    @Bean
+    fun egenAnsattConsumerFactory(): ConsumerFactory<String, String> {
+        return DefaultKafkaConsumerFactory(egenAnsattConsumerProps())
+    }
+
+    @Bean
+    fun pdlPersonConsumerFactory(): ConsumerFactory<Any, Any> {
+        return DefaultKafkaConsumerFactory(pdlPersonConsumerProps())
+    }
+
+    private fun egenAnsattConsumerProps(): Map<String, Any> {
         val props = mutableMapOf<String, Any>()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
         props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
@@ -76,14 +98,42 @@ class KafkaConfiguration(
         return props
     }
 
+    private fun pdlPersonConsumerProps(): Map<String, Any> {
+        val props = mutableMapOf<String, Any>()
+        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
+        props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
+        props[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
+        props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        props[SPECIFIC_AVRO_READER_CONFIG] = false
+        props[SCHEMA_REGISTRY_URL_CONFIG] = false
+        props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = ErrorHandlingDeserializer::class.java
+        props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ErrorHandlingDeserializer::class.java
+        props["spring.deserializer.key.delegate.class"] = KafkaAvroDeserializer::class.java
+        props["spring.deserializer.value.delegate.class"] = KafkaAvroDeserializer::class.java
+        props[SaslConfigs.SASL_JAAS_CONFIG] =
+            "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"$username\" password=\"$password\";"
+        props[SaslConfigs.SASL_MECHANISM] = "PLAIN"
+        System.getenv("NAV_TRUSTSTORE_PATH")?.let {
+            props[SECURITY_PROTOCOL_CONFIG] = "SASL_SSL"
+            props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = File(it).absolutePath
+            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = System.getenv("NAV_TRUSTSTORE_PASSWORD")
+        }
+        return props
+    }
+
     @Bean
-    fun finder(consumerFactory: ConsumerFactory<String, String>): PartitionFinder {
-        return PartitionFinder(consumerFactory)
+    fun egenAnsattFinder(): PartitionFinder<String, String> {
+        return PartitionFinder(egenAnsattConsumerFactory())
+    }
+
+    @Bean
+    fun pdlPersonFinder(): PartitionFinder<Any, Any> {
+        return PartitionFinder(pdlPersonConsumerFactory())
     }
 
 }
 
-class PartitionFinder(private val consumerFactory: ConsumerFactory<String, String>) {
+class PartitionFinder<K, V>(private val consumerFactory: ConsumerFactory<K, V>) {
     fun partitions(topic: String): Array<String> {
         consumerFactory.createConsumer().use { consumer ->
             return consumer.partitionsFor(topic)

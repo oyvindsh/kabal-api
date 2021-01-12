@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.pdl
+package no.nav.klage.oppgave.pdl.dtos
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
