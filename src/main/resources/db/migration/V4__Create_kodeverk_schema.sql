@@ -3,43 +3,43 @@ CREATE SCHEMA kodeverk;
 CREATE TABLE kodeverk.lov
 (
     id              INTEGER PRIMARY KEY,
-    navn            VARCHAR(50)     NOT NULL,
-    beskrivelse     VARCHAR(1000)
+    navn            TEXT     NOT NULL,
+    beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.sakstype
 (
     id              INTEGER PRIMARY KEY,
-    navn            VARCHAR(50)     NOT NULL,
-    beskrivelse     VARCHAR(1000)
+    navn            TEXT     NOT NULL,
+    beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.eoes
 (
     id              INTEGER PRIMARY KEY,
-    navn            VARCHAR(50)     NOT NULL,
-    beskrivelse     VARCHAR(1000)
+    navn            TEXT     NOT NULL,
+    beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.grunn
 (
     id              INTEGER PRIMARY KEY,
-    navn            VARCHAR(50)     NOT NULL,
-    beskrivelse     VARCHAR(1000)
+    navn            TEXT    NOT NULL,
+    beskrivelse     TEXT
 );
 
-CREATE TABLE kodeverk.rol
+CREATE TABLE kodeverk.raadfoert_med_lege
 (
     id              INTEGER PRIMARY KEY,
-    navn            VARCHAR(50)     NOT NULL,
-    beskrivelse     VARCHAR(1000)
+    navn            TEXT     NOT NULL,
+    beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.utfall
 (
     id              INTEGER PRIMARY KEY,
-    navn            VARCHAR(50)     NOT NULL,
-    beskrivelse     VARCHAR(1000)
+    navn            TEXT     NOT NULL,
+    beskrivelse     TEXT
 );
 
 INSERT INTO kodeverk.lov VALUES(1, 'Folketrygdloven', 'Lov om folketrygd');
@@ -54,10 +54,10 @@ INSERT INTO kodeverk.eoes VALUES(2, 'Ikke oppdaget', 'Vedtaksinstansen har ikke 
 INSERT INTO kodeverk.eoes VALUES(3, 'Feil', 'Vedtaksinstansen har oppdaget at saken gjelder EØS/utland, men har håndtert saken feil');
 INSERT INTO kodeverk.eoes VALUES(4, 'Uaktuelt', 'EØS/utenlandsproblematikk er ikke relevant i saken');
 
-INSERT INTO kodeverk.rol VALUES(1, 'Mangler', 'Saken burde vært forelagt for ROL i vedtaksinstansen');
-INSERT INTO kodeverk.rol VALUES(2, 'Riktig', 'Saken er godt nok medisinsk opplyst med ROL-uttalelse i vedtaksinstansen/uten at ROL har blitt konsultert');
-INSERT INTO kodeverk.rol VALUES(3, 'Mangelfull', 'Saken er forelagt ROL i vedtaksinstans, men er fortsatt mangelfullt medisinsk vurdert');
-INSERT INTO kodeverk.rol VALUES(4, 'Uaktuelt', 'Saken handler ikke om trygdemedisinske vurderinger');
+INSERT INTO kodeverk.raadfoert_med_lege VALUES(1, 'Mangler', 'Saken burde vært forelagt for ROL i vedtaksinstansen');
+INSERT INTO kodeverk.raadfoert_med_lege VALUES(2, 'Riktig', 'Saken er godt nok medisinsk opplyst med ROL-uttalelse i vedtaksinstansen/uten at ROL har blitt konsultert');
+INSERT INTO kodeverk.raadfoert_med_lege VALUES(3, 'Mangelfull', 'Saken er forelagt ROL i vedtaksinstans, men er fortsatt mangelfullt medisinsk vurdert');
+INSERT INTO kodeverk.raadfoert_med_lege VALUES(4, 'Uaktuelt', 'Saken handler ikke om trygdemedisinske vurderinger');
 
 INSERT INTO kodeverk.utfall VALUES(1, 'Trukket', NULL);
 INSERT INTO kodeverk.utfall VALUES(2, 'Retur', NULL);

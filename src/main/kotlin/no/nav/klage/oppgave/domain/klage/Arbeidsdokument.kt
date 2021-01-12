@@ -6,23 +6,23 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "dokument", schema = "klage")
-class Dokument(
+@Table(name = "arbeidsdokument", schema = "klage")
+class Arbeidsdokument(
     @Id
     val id: Int,
-    @Column(name = "referanse")
-    val referanse: String
+    @Column(name = "dokument")
+    val dokument: ByteArray
 ) {
     override fun toString(): String {
         return "Mottak(id=$id, " +
-                "referanse=$referanse)"
+                "dokument=${dokument.size})"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Dokument
+        other as Arbeidsdokument
 
         if (id != other.id) return false
 

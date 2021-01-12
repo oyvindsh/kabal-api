@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Eoes
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
-import no.nav.klage.oppgave.domain.kodeverk.Rol
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -15,12 +13,6 @@ class Vedtak(
     @Column(name = "enhet")
     val enhet: Int,
     @OneToOne
-    @JoinColumn(name = "eoes_id")
-    val eoes: Eoes,
-    @OneToOne
-    @JoinColumn(name = "rol_id")
-    val rol: Rol,
-    @OneToOne
     @JoinColumn(name = "utfall_id")
     val utfall: Utfall,
     @OneToOne
@@ -31,7 +23,7 @@ class Vedtak(
     val tilbakemelding: Tilbakemelding? = null,
     @OneToOne
     @JoinColumn(name = "vedtaksdokument_id", nullable = true)
-    val vedtaksdokumentId: Dokument? = null,
+    val vedtaksdokumentId: Saksdokument? = null,
     @Column(name = "modified")
     val modified: LocalDateTime,
     @Column(name = "created")
