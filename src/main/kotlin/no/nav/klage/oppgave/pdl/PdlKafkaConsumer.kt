@@ -49,8 +49,7 @@ class PdlKafkaConsumer(
             } else {
                 val pdlDokument: PdlDokument = pdlDocumentRecord.value().toPdlDokument()
                 val pdlPerson = pdlDokument.mapToInternal()
-                pdlPersonService.oppdaterPdlPerson(pdlPerson)
-                secureLogger.debug("Mottok pdlPerson ${pdlPerson}")
+                pdlPerson?.let { pdlPersonService.oppdaterPdlPerson(it) }
             }
         }.onFailure {
             secureLogger.error("Failed to process pdldokument record", it)
@@ -60,7 +59,7 @@ class PdlKafkaConsumer(
 
     private fun String.toPdlDokument(): PdlDokument = mapper.readValue(this, PdlDokument::class.java)
 
-    private fun PdlDokument.mapToInternal(): PdlPerson {
+    private fun PdlDokument.mapToInternal(): PdlPerson? {
         val ikkeHistoriskeFnr =
             this.hentIdenter.identer.filter { it.gruppe == IdentGruppeDto.FOLKEREGISTERIDENT }.filter { !it.historisk }
         if (ikkeHistoriskeFnr.count() == 0 || ikkeHistoriskeFnr.count() > 1) {
@@ -80,15 +79,17 @@ class PdlKafkaConsumer(
             logger.debug("Fant ${ikkeHistoriskeAdressebeskyttelser.count()} potensielle adressebeskyttelser")
         }
         val adressebeskyttelse = ikkeHistoriskeAdressebeskyttelser.firstOrNull()
-        if (foedslsnr == null || navn == null) {
+        return if (foedslsnr == null || navn == null) {
             secureLogger.warn("Foedselsnr or navn is missing, cannot proceed with $this")
+            null
+        } else {
+            PdlPerson(
+                foedslsnr!!.ident,
+                navn!!.fornavn,
+                navn.mellomnavn,
+                navn.etternavn,
+                adressebeskyttelse?.let { it.gradering.mapToInternal() })
         }
-        return PdlPerson(
-            foedslsnr!!.ident,
-            navn!!.fornavn,
-            navn.mellomnavn,
-            navn.etternavn,
-            adressebeskyttelse?.let { it.gradering.mapToInternal() })
     }
 
     private fun GraderingDto.mapToInternal(): Beskyttelsesbehov? =
