@@ -15,7 +15,7 @@ class EgenAnsattHealthIndicator : HealthIndicator {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    private var kafkaConsumerHasReadAllMsgs = true;
+    private var kafkaConsumerHasReadAllMsgs = false;
 
 
     @EventListener(condition = "event.listenerId.startsWith('klageEgenAnsattListener-')")
