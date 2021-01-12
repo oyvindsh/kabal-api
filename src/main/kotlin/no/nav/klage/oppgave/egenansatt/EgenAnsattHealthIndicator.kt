@@ -20,7 +20,6 @@ class EgenAnsattHealthIndicator : HealthIndicator {
 
     @EventListener
     fun eventHandler(event: ListenerContainerIdleEvent) {
-        logger.debug("Received ListenerContainerIdleEvent event")
         kafkaConsumerHasReadAllMsgs = true
     }
 
