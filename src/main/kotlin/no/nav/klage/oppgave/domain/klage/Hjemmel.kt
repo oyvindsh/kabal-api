@@ -1,23 +1,21 @@
 package no.nav.klage.oppgave.domain.klage
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import java.util.*
+import javax.persistence.*
 
 @Entity
 @Table(name = "hjemmel", schema = "klage")
 class Hjemmel(
     @Id
-    val id: Int,
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "lov_id")
     val lovId: Int? = null,
     @Column(name = "kapittel")
-    val kapittel: Int? = null,
+    val kapittel: Int,
     @Column(name = "paragraf")
-    val paragraf: String,
+    val paragraf: Int,
     @Column(name = "ledd")
-    val ledd: String? = null,
+    val ledd: Int? = null,
     @Column(name = "bokstav")
     val bokstav: String? = null
 ) {
