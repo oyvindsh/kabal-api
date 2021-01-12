@@ -32,7 +32,7 @@ class KafkaConfiguration(
     @Value("\${SERVICE_USER_PASSWORD}")
     private val password: String,
     @Value("\$KAFKA_SCHEMA_REGISTRY_URL")
-    private val schemaRegistryUrl
+    private val schemaRegistryUrl: String
 ) {
 
     companion object {
