@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.egenansatt
+package no.nav.klage.oppgave.pdl
 
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.actuate.health.Health
@@ -8,7 +8,7 @@ import org.springframework.kafka.event.ListenerContainerIdleEvent
 import org.springframework.stereotype.Component
 
 @Component
-class EgenAnsattHealthIndicator : HealthIndicator {
+class PdlPersonHealthIndicator : HealthIndicator {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -18,9 +18,9 @@ class EgenAnsattHealthIndicator : HealthIndicator {
     private var kafkaConsumerHasReadAllMsgs = true;
 
 
-    @EventListener(condition = "event.listenerId.startsWith('klageEgenAnsattListener-')")
+    @EventListener(condition = "event.listenerId.startsWith('klagePdlPersonListener-')")
     fun eventHandler(event: ListenerContainerIdleEvent) {
-        logger.debug("Mottok ListenerContainerIdleEvent fra klageEgenAnsattListener")
+        logger.debug("Mottok ListenerContainerIdleEvent fra klagePdlPersonListener")
         kafkaConsumerHasReadAllMsgs = true
     }
 

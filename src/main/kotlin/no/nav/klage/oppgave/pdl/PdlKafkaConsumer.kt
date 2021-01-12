@@ -31,6 +31,8 @@ class PdlKafkaConsumer(
     }
 
     @KafkaListener(
+        id = "klagePdlPersonListener",
+        idIsGroup = false,
         containerFactory = "pdlPersonKafkaListenerContainerFactory",
         topicPartitions = [TopicPartition(
             topic = "\${PDL_PERSON_KAFKA_TOPIC}",
@@ -41,7 +43,6 @@ class PdlKafkaConsumer(
     fun listen(pdlDocumentRecord: ConsumerRecord<String, String>) {
         runCatching {
             logger.debug("Reading offset ${pdlDocumentRecord.offset()} from partition ${pdlDocumentRecord.partition()} on kafka topic ${pdlDocumentRecord.topic()}")
-            secureLogger.debug("Value is ${pdlDocumentRecord.value()}")
             val aktoerId = pdlDocumentRecord.key()
             if (pdlDocumentRecord.value() == null) {
                 logger.debug("Received tombstone for aktoerId $aktoerId")
@@ -75,7 +76,7 @@ class PdlKafkaConsumer(
 
         val ikkeHistoriskeAdressebeskyttelser =
             this.hentPerson.adressebeskyttelse.filter { it.metadata.historisk == false }
-        if (ikkeHistoriskeAdressebeskyttelser.count() == 0 || ikkeHistoriskeAdressebeskyttelser.count() > 1) {
+        if (ikkeHistoriskeAdressebeskyttelser.count() > 1) {
             logger.debug("Fant ${ikkeHistoriskeAdressebeskyttelser.count()} potensielle adressebeskyttelser")
         }
         val adressebeskyttelse = ikkeHistoriskeAdressebeskyttelser.firstOrNull()
