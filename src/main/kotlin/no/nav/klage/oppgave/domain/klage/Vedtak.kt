@@ -3,13 +3,14 @@ package no.nav.klage.oppgave.domain.klage
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.*
 
 @Entity
 @Table(name = "vedtak", schema = "klage")
 class Vedtak(
     @Id
-    val id: Int,
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "enhet")
     val enhet: Int,
     @OneToOne

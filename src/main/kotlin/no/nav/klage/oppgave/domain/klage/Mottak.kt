@@ -11,7 +11,9 @@ import javax.persistence.Table
 @Table(name = "mottak", schema = "klage")
 class Mottak(
     @Id
-    var id: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
+    @Column(name = "referanse_id")
+    val referanseId: String,
     @Column(name = "foedselsnummer")
     val foedselsnummer: String,
     @Column(name = "hjemmel_liste")
@@ -20,10 +22,10 @@ class Mottak(
     val avsenderEnhet: Int,
     @Column(name = "avsender_saksbehandler")
     val avsenderSaksbehandler: String,
-    @Column(name = "ytelse_tema")
-    val ytelse: String,
-    @Column(name = "referanse_innsyn")
-    val referanseInnsyn: String? = null,
+    @Column(name = "tema")
+    val tema: String,
+    @Column(name = "innsyn_url")
+    val innsynUrl: String? = null,
     @Column(name = "created")
     val created: LocalDateTime
 ) {

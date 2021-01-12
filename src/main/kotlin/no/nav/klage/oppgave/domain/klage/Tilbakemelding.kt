@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -10,7 +11,7 @@ import javax.persistence.Table
 @Table(name = "tilbakemelding", schema = "klage")
 class Tilbakemelding(
     @Id
-    val id: Int,
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "mottaker_saksbehandlerident")
     val mottakerSaksbehandlerident: String? = null,
     @Column(name = "tilbakemelding")

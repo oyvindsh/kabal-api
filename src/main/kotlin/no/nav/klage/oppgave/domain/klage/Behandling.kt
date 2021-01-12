@@ -11,7 +11,7 @@ import javax.persistence.*
 @Table(name = "behandling", schema = "klage")
 class Behandling(
     @Id
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     @ManyToOne
     @JoinColumn(name = "klagesak_id", nullable = false)
     val klagesak: Klagesak,

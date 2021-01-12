@@ -10,7 +10,7 @@ import javax.persistence.Table
 @Table(name = "saksdokument", schema = "klage")
 class Saksdokument(
     @Id
-    val id: Int,
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "klagesak_id")
     val klagesakId: UUID,
     @Column(name = "referanse")
