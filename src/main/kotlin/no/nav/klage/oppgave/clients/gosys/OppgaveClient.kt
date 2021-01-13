@@ -1,11 +1,7 @@
 package no.nav.klage.oppgave.clients.gosys
 
 import brave.Tracer
-import no.nav.klage.oppgave.api.view.TYPE_FEILUTBETALING
-import no.nav.klage.oppgave.api.view.TYPE_KLAGE
-import no.nav.klage.oppgave.api.view.YTELSE_FOR
-import no.nav.klage.oppgave.api.view.YTELSE_SYK
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.*
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.service.TokenService
 import no.nav.klage.oppgave.util.getLogger
@@ -88,8 +84,8 @@ class OppgaveClient(
             uriBuilder.queryParam("behandlingstype", mapType(TYPE_KLAGE))
         }
 
-        ytelser.forEach {
-            uriBuilder.queryParam("tema", mapYtelse(it))
+        temaer.forEach {
+            uriBuilder.queryParam("tema", it)
         }
 
         erTildeltSaksbehandler?.let {
@@ -141,17 +137,6 @@ class OppgaveClient(
             else -> {
                 logger.warn("Unknown type: {}", type)
                 type
-            }
-        }
-    }
-
-    private fun mapYtelse(ytelse: String): String {
-        return when (ytelse) {
-            YTELSE_SYK -> TEMA_SYK
-            YTELSE_FOR -> TEMA_FOR
-            else -> {
-                logger.warn("Unknown ytelse: {}", ytelse)
-                ytelse
             }
         }
     }

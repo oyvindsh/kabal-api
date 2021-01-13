@@ -2,14 +2,12 @@ package no.nav.klage.oppgave.api.mapper
 
 
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
-import no.nav.klage.oppgave.api.view.*
-import no.nav.klage.oppgave.clients.gosys.*
+import no.nav.klage.oppgave.api.view.HJEMMEL
+import no.nav.klage.oppgave.clients.gosys.Gruppe
 import no.nav.klage.oppgave.clients.pdl.HentPersonBolkResult
 import no.nav.klage.oppgave.clients.pdl.PdlClient
+import no.nav.klage.oppgave.domain.*
 import no.nav.klage.oppgave.domain.oppgavekopi.*
-import no.nav.klage.oppgave.domain.oppgavekopi.Ident
-import no.nav.klage.oppgave.domain.oppgavekopi.Prioritet
-import no.nav.klage.oppgave.domain.oppgavekopi.Status
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -44,7 +42,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
                     null
                 },
                 type = oppgaveBackend.toType(),
-                ytelse = oppgaveBackend.toYtelse(),
+                tema = oppgaveBackend.toTemaName(),
                 hjemmel = oppgaveBackend.metadata.toHjemmel(),
                 frist = oppgaveBackend.fristFerdigstillelse,
                 versjon = oppgaveBackend.versjon
@@ -64,9 +62,9 @@ class OppgaveMapper(val pdlClient: PdlClient) {
         } else "mangler"
     }
 
-    private fun OppgaveBackend.toYtelse(): String = when (tema) {
-        TEMA_SYK -> YTELSE_SYK
-        TEMA_FOR -> YTELSE_FOR
+    private fun OppgaveBackend.toTemaName(): String = when (tema) {
+        TEMA_SYK -> TEMA_NAME_SYK
+        TEMA_FOR -> TEMA_NAME_FOR
         else -> tema
     }
 
@@ -88,7 +86,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
             val fnr = it.ident
             fnr to OppgaveView.Person(
                 fnr = fnr,
-                navn = it.person?.navn?.firstOrNull()?.toName() ?: "mangler navn"
+                navn = it.person?.navn?.firstOrNull()?.toName() ?: "Mangler navn"
             )
         }.toMap()
         return fnrList.map {
