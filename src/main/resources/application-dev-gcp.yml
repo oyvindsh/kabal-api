@@ -15,3 +15,7 @@ OPPGAVE_URL: https://api-gw-q1.oera.no/oppgave/api/v1/oppgaver
 AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v1
 
 KAFKA_BOOTSTRAP_SERVERS: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
+
+spring:
+  flyway:
+    clean-on-validation-error: true
