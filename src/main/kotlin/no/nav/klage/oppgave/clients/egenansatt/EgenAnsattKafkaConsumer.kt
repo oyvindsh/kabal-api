@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.egenansatt
+package no.nav.klage.oppgave.clients.egenansatt
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule

@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.egenansatt
+package no.nav.klage.oppgave.clients.egenansatt
 
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.actuate.health.Health

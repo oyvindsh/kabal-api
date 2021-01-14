@@ -8,10 +8,8 @@ import no.nav.klage.oppgave.api.view.HJEMMEL
 import no.nav.klage.oppgave.api.view.TYPE_FEILUTBETALING
 import no.nav.klage.oppgave.api.view.TYPE_KLAGE
 import no.nav.klage.oppgave.clients.gosys.*
-import no.nav.klage.oppgave.clients.pdl.HentPersonBolk
-import no.nav.klage.oppgave.clients.pdl.HentPersonBolkResult
-import no.nav.klage.oppgave.clients.pdl.HentPersonResponse
-import no.nav.klage.oppgave.clients.pdl.PdlClient
+import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -60,14 +58,14 @@ internal class OppgaveFacadeTest {
         val oppgaveClientMock = mockk<OppgaveClient>()
         every { oppgaveClientMock.getOneSearchPage(any()) } returns getOppgaveResponseWithIdenter(fnr)
 
-        val pdlClientMock = mockk<PdlClient>()
-        every { pdlClientMock.getPersonInfo(listOf(fnr)) } returns getHentPersonResponse()
+        val pdlFacadeMock = mockk<PdlFacade>()
+        every { pdlFacadeMock.getPersonerInfo(listOf(fnr)) } returns getHentPersonResponse()
 
         val oppgaveFacade = OppgaveFacade(
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlClientMock),
+            OppgaveMapper(pdlFacadeMock),
             mockk()
         )
 
@@ -79,22 +77,15 @@ internal class OppgaveFacadeTest {
         ).isEqualTo(fnr)
     }
 
-    private fun getHentPersonResponse(): HentPersonResponse {
-        return HentPersonResponse(
-            data = HentPersonBolk(
-                listOf(
-                    HentPersonBolkResult(
-                        HentPersonBolkResult.Person(
-                            navn = listOf(
-                                HentPersonBolkResult.Person.Navn(
-                                    fornavn = "Test",
-                                    etternavn = "Person"
-                                )
-                            )
-                        ),
-                        ident = "12345678910"
-                    )
-                )
+    private fun getHentPersonResponse(): List<Person> {
+        return listOf(
+            Person(
+                foedselsnr = "12345678910",
+                fornavn = "Test",
+                mellomnavn = null,
+                etternavn = "Person",
+                navn = "Test Person",
+                beskyttelsesbehov = null
             )
         )
     }
@@ -103,14 +94,14 @@ internal class OppgaveFacadeTest {
         val oppgaveClientMock = mockk<OppgaveClient>()
         every { oppgaveClientMock.getOneSearchPage(any()) } returns getOppgaveResponseWithHjemmel(hjemmel)
 
-        val pdlClientMock = mockk<PdlClient>()
-        every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
+        val pdlFacadeMock = mockk<PdlFacade>()
+        every { pdlFacadeMock.getPersonerInfo(any()) } returns getHentPersonResponse()
 
         val oppgaveFacade = OppgaveFacade(
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlClientMock),
+            OppgaveMapper(pdlFacadeMock),
             mockk()
         )
         return oppgaveFacade
@@ -120,14 +111,14 @@ internal class OppgaveFacadeTest {
         val oppgaveClientMock = mockk<OppgaveClient>()
         every { oppgaveClientMock.getOneSearchPage(any()) } returns getOppgaveResponseWithType(type)
 
-        val pdlClientMock = mockk<PdlClient>()
-        every { pdlClientMock.getPersonInfo(any()) } returns getHentPersonResponse()
+        val pdlFacadeMock = mockk<PdlFacade>()
+        every { pdlFacadeMock.getPersonerInfo(any()) } returns getHentPersonResponse()
 
         return OppgaveFacade(
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlClientMock),
+            OppgaveMapper(pdlFacadeMock),
             mockk()
         )
     }

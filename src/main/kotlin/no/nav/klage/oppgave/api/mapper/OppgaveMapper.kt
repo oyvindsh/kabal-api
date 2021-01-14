@@ -4,8 +4,8 @@ package no.nav.klage.oppgave.api.mapper
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.gosys.*
-import no.nav.klage.oppgave.clients.pdl.HentPersonBolkResult
-import no.nav.klage.oppgave.clients.pdl.PdlClient
+import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.pdl.graphql.PdlPerson
 import no.nav.klage.oppgave.domain.oppgavekopi.*
 import no.nav.klage.oppgave.domain.oppgavekopi.Ident
 import no.nav.klage.oppgave.domain.oppgavekopi.Prioritet
@@ -17,7 +17,7 @@ import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
 import no.nav.klage.oppgave.clients.gosys.Oppgave as OppgaveBackend
 
 @Service
-class OppgaveMapper(val pdlClient: PdlClient) {
+class OppgaveMapper(val pdlFacade: PdlFacade) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -79,16 +79,15 @@ class OppgaveMapper(val pdlClient: PdlClient) {
         logger.debug("getPersoner is called with {} fnr", fnrList.size)
         secureLogger.debug("getPersoner with fnr: {}", fnrList)
 
-        val people = pdlClient.getPersonInfo(fnrList).data?.hentPersonBolk ?: emptyList()
+        val people = pdlFacade.getPersonerInfo(fnrList)
 
         logger.debug("pdl returned {} people", people.size)
         secureLogger.debug("pdl returned {}", people)
 
         val fnrToPerson: Map<String, no.nav.klage.oppgave.api.view.Oppgave.Person> = people.map {
-            val fnr = it.ident
-            fnr to OppgaveView.Person(
-                fnr = fnr,
-                navn = it.person?.navn?.firstOrNull()?.toName() ?: "mangler navn"
+            it.foedselsnr to OppgaveView.Person(
+                fnr = it.foedselsnr,
+                navn = it.navn
             )
         }.toMap()
         return fnrList.map {
@@ -114,7 +113,7 @@ class OppgaveMapper(val pdlClient: PdlClient) {
         }
     }
 
-    private fun HentPersonBolkResult.Person.Navn.toName() = "$fornavn $etternavn"
+    private fun PdlPerson.Navn.toName() = "$fornavn $etternavn"
 
     fun mapOppgaveKopiAPIModelToOppgaveKopi(oppgave: OppgaveKopiAPIModel): OppgaveKopi {
         return OppgaveKopi(
