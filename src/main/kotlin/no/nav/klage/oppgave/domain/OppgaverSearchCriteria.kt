@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class OppgaverSearchCriteria(
     val typer: List<String> = emptyList(),
-    val ytelser: List<String> = emptyList(),
+    val temaer: List<String> = emptyList(),
     val hjemler: List<String> = emptyList(),
     val statuskategori: Statuskategori = Statuskategori.AAPEN,
 

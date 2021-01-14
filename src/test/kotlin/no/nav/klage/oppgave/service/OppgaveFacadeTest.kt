@@ -5,12 +5,10 @@ import io.mockk.mockk
 import no.nav.klage.oppgave.api.OppgaveFacade
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.HJEMMEL
-import no.nav.klage.oppgave.api.view.TYPE_FEILUTBETALING
-import no.nav.klage.oppgave.api.view.TYPE_KLAGE
 import no.nav.klage.oppgave.clients.gosys.*
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
