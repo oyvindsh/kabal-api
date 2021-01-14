@@ -6,7 +6,4 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface SaksdokumentRepository : JpaRepository<Saksdokument, UUID> {
-
-    fun findDokumenterForBehandling(behandlingId: UUID): List<Saksdokument>
-}
+interface SaksdokumentRepository : JpaRepository<Saksdokument, UUID>
