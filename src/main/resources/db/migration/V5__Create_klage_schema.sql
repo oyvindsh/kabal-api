@@ -32,7 +32,7 @@ CREATE TABLE klage.saksdokument
     referanse                       TEXT,
     CONSTRAINT fk_saksdokument_klagesak
         FOREIGN KEY (klagesak_id)
-            REFERENCES klagesak (id)
+            REFERENCES klage.klagesak (id)
 );
 
 CREATE TABLE klage.tilbakemelding
@@ -61,7 +61,7 @@ CREATE TABLE klage.vedtak
             REFERENCES kodeverk.grunn (id),
     CONSTRAINT fk_vedtak_tilbakemelding
         FOREIGN KEY (tilbakemelding_id)
-            REFERENCES tilbakemelding (id)
+            REFERENCES klage.tilbakemelding (id)
 );
 
 CREATE TABLE klage.behandling
@@ -87,13 +87,13 @@ CREATE TABLE klage.behandling
             REFERENCES kodeverk.raadfoert_med_lege (id),
     CONSTRAINT fk_behandling_klagesak
         FOREIGN KEY (klagesak_id)
-            REFERENCES klagesak (id),
+            REFERENCES klage.klagesak (id),
     CONSTRAINT fk_behandling_vedtak
         FOREIGN KEY (vedtak_id)
-            REFERENCES vedtak (id),
+            REFERENCES klage.vedtak (id),
     CONSTRAINT fk_behandling_mottak
         FOREIGN KEY (mottak_id)
-            REFERENCES mottak (id)
+            REFERENCES klage.mottak (id)
 );
 
 CREATE TABLE klage.hjemmel
@@ -111,7 +111,7 @@ CREATE TABLE klage.hjemmel
             REFERENCES kodeverk.lov (id),
     CONSTRAINT fk_hjemmel_behandling
         FOREIGN KEY (behandling_id)
-            REFERENCES behandling (id)
+            REFERENCES klage.behandling (id)
 );
 
 CREATE TABLE klage.klage_oppgave
@@ -121,7 +121,7 @@ CREATE TABLE klage.klage_oppgave
     PRIMARY KEY (klagesak_id, oppgave_id),
     CONSTRAINT fk_klage_oppgave_klage
         FOREIGN KEY (klagesak_id)
-            REFERENCES klagesak (id),
+            REFERENCES klage.klagesak (id),
     CONSTRAINT fk_klage_oppgave_oppgave
         FOREIGN KEY (oppgave_id)
             REFERENCES oppgave.oppgave (id)
