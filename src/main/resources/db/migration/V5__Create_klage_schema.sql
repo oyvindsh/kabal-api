@@ -101,10 +101,11 @@ CREATE TABLE klage.hjemmel
     id                              UUID                    PRIMARY KEY,
     behandling_id                   UUID                    NOT NULL,
     lov_id                          INTEGER,
-    kapittel                        INTEGER                 NOT NULL,
-    paragraf                        INTEGER                 NOT NULL,
+    kapittel                        INTEGER,
+    paragraf                        INTEGER,
     ledd                            INTEGER,
     bokstav                         VARCHAR(1),
+    original                        TEXT                    NOT NULL,
     CONSTRAINT fk_hjemmel_lov
         FOREIGN KEY (lov_id)
             REFERENCES kodeverk.lov (id),
