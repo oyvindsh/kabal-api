@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.clients.pdl
 
 import no.nav.klage.oppgave.clients.pdl.graphql.*
-import no.nav.klage.oppgave.clients.pdl.kafka.PersonCacheService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component

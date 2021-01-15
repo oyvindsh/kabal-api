@@ -1,6 +1,5 @@
-package no.nav.klage.oppgave.clients.pdl.kafka
+package no.nav.klage.oppgave.clients.pdl
 
-import no.nav.klage.oppgave.clients.pdl.Person
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
