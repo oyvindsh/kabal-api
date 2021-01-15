@@ -20,7 +20,9 @@ class EgenAnsattHealthIndicator : HealthIndicator {
 
     @EventListener(condition = "event.listenerId.startsWith('klageEgenAnsattListener-')")
     fun eventHandler(event: ListenerContainerIdleEvent) {
-        logger.debug("Mottok ListenerContainerIdleEvent fra klageEgenAnsattListener")
+        if (!kafkaConsumerHasReadAllMsgs) {
+            logger.debug("Mottok ListenerContainerIdleEvent fra klageEgenAnsattListener")
+        }
         kafkaConsumerHasReadAllMsgs = true
     }
 

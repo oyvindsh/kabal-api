@@ -22,6 +22,8 @@ class PdlKafkaConsumer(
     @Qualifier("pdlPersonFinder") private val pdlPersonFinder: PartitionFinder<Any, Any>
 ) {
 
+    private var kafkaConsumerHasReadAllMsgs = false;
+
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -58,7 +60,10 @@ class PdlKafkaConsumer(
 
     @EventListener(condition = "event.listenerId.startsWith('klagePdlPersonListener-')")
     fun eventHandler(event: ListenerContainerIdleEvent) {
-        logger.debug("Mottok ListenerContainerIdleEvent fra klagePdlPersonListener")
+        if (!kafkaConsumerHasReadAllMsgs) {
+            logger.debug("Mottok ListenerContainerIdleEvent fra klagePdlPersonListener")
+        }
+        kafkaConsumerHasReadAllMsgs = true
     }
 
     private fun String.toPdlDokument(): PdlDokument = mapper.readValue(this, PdlDokument::class.java)
