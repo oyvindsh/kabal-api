@@ -13,7 +13,7 @@ class PersonCacheService {
 
     fun getPerson(foedselsnr: String) = personMap.getValue(foedselsnr)
 
-    fun oppdaterPersonCache(person: Person) {
+    fun updatePersonCache(person: Person) {
         personMap[person.foedselsnr] = person
     }
 }

@@ -35,7 +35,7 @@ class PdlFacade(private val pdlClient: PdlClient, private val personCacheService
     }
 
     private fun oppdaterCache(newPersoner: List<Person>) {
-        newPersoner.forEach { personCacheService.oppdaterPersonCache(it) }
+        newPersoner.forEach { personCacheService.updatePersonCache(it) }
     }
 
     fun getPersonInfo(fnr: String): Person? {
@@ -46,7 +46,7 @@ class PdlFacade(private val pdlClient: PdlClient, private val personCacheService
         val pdlPerson = hentPersonResponse.getPersonOrLogErrors()
         return pdlPerson?.let {
             val person = HentPersonMapper.mapToPerson(fnr, it)
-            personCacheService.oppdaterPersonCache(person)
+            personCacheService.updatePersonCache(person)
             person
         }
     }
@@ -68,11 +68,3 @@ class PdlFacade(private val pdlClient: PdlClient, private val personCacheService
         return this.data?.hentPersonBolk ?: emptyList()
     }
 }
-
-
-
-
-
-
-
-
