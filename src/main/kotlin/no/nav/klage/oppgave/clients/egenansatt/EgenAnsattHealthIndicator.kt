@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.egenansatt
+package no.nav.klage.oppgave.clients.egenansatt
 
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.actuate.health.Health
@@ -15,12 +15,14 @@ class EgenAnsattHealthIndicator : HealthIndicator {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    private var kafkaConsumerHasReadAllMsgs = false;
+    private var kafkaConsumerHasReadAllMsgs = false
 
 
-    @EventListener
+    @EventListener(condition = "event.listenerId.startsWith('klageEgenAnsattListener-')")
     fun eventHandler(event: ListenerContainerIdleEvent) {
-        logger.debug("Received ListenerContainerIdleEvent event")
+        if (!kafkaConsumerHasReadAllMsgs) {
+            logger.debug("Mottok ListenerContainerIdleEvent fra klageEgenAnsattListener")
+        }
         kafkaConsumerHasReadAllMsgs = true
     }
 

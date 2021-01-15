@@ -4,6 +4,7 @@ externalHosts:
   - hooks.slack.com
   - unleash.nais.io
   - klage-fss-proxy.dev-fss-pub.nais.io
+  - kafka-schema-registry.nais-q.adeo.no
 springProfile: dev-gcp
 tenant: trygdeetaten.no
 db_tier: db-custom-1-3840

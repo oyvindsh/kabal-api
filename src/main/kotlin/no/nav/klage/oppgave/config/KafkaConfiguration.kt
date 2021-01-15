@@ -27,7 +27,9 @@ class KafkaConfiguration(
     @Value("\${SERVICE_USER_USERNAME}")
     private val username: String,
     @Value("\${SERVICE_USER_PASSWORD}")
-    private val password: String
+    private val password: String,
+    @Value("\${KAFKA_SCHEMA_REGISTRY_URL}")
+    private val schemaRegistryUrl: String
 ) {
 
     companion object {
@@ -37,25 +39,25 @@ class KafkaConfiguration(
     }
 
     @Bean
-    fun kafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
+    fun egenAnsattKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-        factory.consumerFactory = consumerFactory()
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL;
-        factory.containerProperties.idleEventInterval = 3000L;
+        factory.consumerFactory = egenAnsattConsumerFactory()
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
+        factory.containerProperties.idleEventInterval = 3000L
         factory.setErrorHandler { thrownException, data ->
             logger.error("Could not deserialize record. See secure logs for details.")
             secureLogger.error("Could not deserialize record: $data", thrownException)
         }
 
-        return factory;
+        return factory
     }
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<String, String> {
-        return DefaultKafkaConsumerFactory(consumerProps());
+    fun egenAnsattConsumerFactory(): ConsumerFactory<String, String> {
+        return DefaultKafkaConsumerFactory(egenAnsattConsumerProps())
     }
 
-    private fun consumerProps(): Map<String, Any> {
+    private fun egenAnsattConsumerProps(): Map<String, Any> {
         val props = mutableMapOf<String, Any>()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapServers
         props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
@@ -77,13 +79,13 @@ class KafkaConfiguration(
     }
 
     @Bean
-    fun finder(consumerFactory: ConsumerFactory<String, String>): PartitionFinder {
-        return PartitionFinder(consumerFactory)
+    fun egenAnsattFinder(): PartitionFinder<String, String> {
+        return PartitionFinder(egenAnsattConsumerFactory())
     }
 
 }
 
-class PartitionFinder(private val consumerFactory: ConsumerFactory<String, String>) {
+class PartitionFinder<K, V>(private val consumerFactory: ConsumerFactory<K, V>) {
     fun partitions(topic: String): Array<String> {
         consumerFactory.createConsumer().use { consumer ->
             return consumer.partitionsFor(topic)

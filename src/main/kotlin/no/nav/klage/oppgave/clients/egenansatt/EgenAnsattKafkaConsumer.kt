@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.egenansatt
+package no.nav.klage.oppgave.clients.egenansatt
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.config.PartitionFinder
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.PartitionOffset
 import org.springframework.kafka.annotation.TopicPartition
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService, private val finder: PartitionFinder) {
+class EgenAnsattKafkaConsumer(
+    private val egenAnsattService: EgenAnsattService,
+    @Qualifier("egenAnsattFinder") private val egenAnsattFinder: PartitionFinder<String, String>
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -24,9 +28,12 @@ class EgenAnsattKafkaConsumer(private val egenAnsattService: EgenAnsattService, 
     }
 
     @KafkaListener(
+        id = "klageEgenAnsattListener",
+        idIsGroup = false,
+        containerFactory = "egenAnsattKafkaListenerContainerFactory",
         topicPartitions = [TopicPartition(
             topic = "\${EGENANSATT_KAFKA_TOPIC}",
-            partitions = ["#{@finder.partitions('\${EGENANSATT_KAFKA_TOPIC}')}"],
+            partitions = ["#{@egenAnsattFinder.partitions('\${EGENANSATT_KAFKA_TOPIC}')}"],
             partitionOffsets = [PartitionOffset(partition = "*", initialOffset = "0")]
         )]
     )

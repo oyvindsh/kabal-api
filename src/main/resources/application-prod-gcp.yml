@@ -15,4 +15,4 @@ OPPGAVE_URL: https://api-gw.oera.no/oppgave/api/v1/oppgaver
 AXSYS_URL: https://api-gw.oera.no/axsys/api/v1
 
 KAFKA_BOOTSTRAP_SERVERS: a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443
-
+KAFKA_SCHEMA_REGISTRY_URL: https://kafka-schema-registry.nais.adeo.no/

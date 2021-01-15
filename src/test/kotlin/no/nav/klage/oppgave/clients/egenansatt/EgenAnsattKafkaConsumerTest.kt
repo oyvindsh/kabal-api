@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.egenansatt
+package no.nav.klage.oppgave.clients.egenansatt
 
 import io.mockk.every
 import io.mockk.mockk

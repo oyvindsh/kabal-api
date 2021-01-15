@@ -9,7 +9,7 @@ val logstashVersion = "5.1"
 val springSleuthVersion = "2.2.3.RELEASE"
 val unleashVersion = "3.3.3"
 val problemSpringWebStartVersion = "0.26.2"
-
+val kafkaAvroVersion = "5.5.2"
 val springRetryVersion = "1.3.0"
 val springMockkVersion = "2.0.3"
 val springFoxVersion = "3.0.0"
@@ -28,6 +28,7 @@ repositories {
         }
     }
     jcenter()
+    maven("https://packages.confluent.io/maven/")
 }
 
 plugins {
@@ -53,7 +54,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("org.springframework.kafka:spring-kafka")
-    
+    implementation("io.confluent:kafka-avro-serializer:$kafkaAvroVersion") {
+        exclude(group = "org.slf4j", module = "slf4j-log4j12")
+    }
+
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
     implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 
