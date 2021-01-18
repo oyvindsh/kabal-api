@@ -7,10 +7,7 @@ import org.apache.http.util.EntityUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.elasticsearch.client.Request
 import org.elasticsearch.client.RestHighLevelClient
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.util.TestPropertyValues
