@@ -31,7 +31,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
     initializers = [CreateIndexFromEsOppgaveTest.Companion.Initializer::class],
     classes = [ElasticsearchConfiguration::class]
 )
-//@Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
+@Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
 class CreateIndexFromEsOppgaveTest {
 
     companion object {
