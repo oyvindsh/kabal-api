@@ -6,14 +6,16 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
 
 @Component
-class PdlFacade(private val pdlClient: PdlClient, private val personCacheService: PersonCacheService) {
+class PdlFacade(
+    private val pdlClient: PdlClient,
+    private val personCacheService: PersonCacheService,
+    private val hentPersonMapper: HentPersonMapper
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-
-        private val hentPersonMapper = HentPersonMapper()
     }
 
     fun getPersonerInfo(fnrListe: List<String>): List<Person> {
