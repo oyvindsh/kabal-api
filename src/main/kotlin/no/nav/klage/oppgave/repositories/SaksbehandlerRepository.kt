@@ -27,6 +27,9 @@ class SaksbehandlerRepository(
         private const val LEDER_ROLLE = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
         private const val FAGANSVARLIG_ROLLE = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
         private const val SAKSBEHANDLER_ROLLE = "0000-GA-GOSYS_OPPGAVE_BEHANDLER"
+        private const val KAN_BEHANDLE_STRENGT_FORTROLIG = "0000-GA-GOSYS_KODE6"
+        private const val KAN_BEHANDLE_FORTROLIG = "0000-GA-GOSYS_KODE7"
+        private const val KAN_BEHANDLE_EGEN_ANSATT = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
     }
 
     fun getTilgangerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =
@@ -54,6 +57,14 @@ class SaksbehandlerRepository(
     fun erLeder(ident: String): Boolean = getRoller(ident).any { it.contains(LEDER_ROLLE) }
 
     fun erSaksbehandler(ident: String): Boolean = getRoller(ident).any { it.contains(SAKSBEHANDLER_ROLLE) }
+
+    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).any { it.contains(KAN_BEHANDLE_FORTROLIG) }
+
+    fun kanBehandleStrengtFortrolig(ident: String): Boolean =
+        getRoller(ident).any { it.contains(KAN_BEHANDLE_STRENGT_FORTROLIG) }
+
+    fun kanBehandleEgenAnsatt(ident: String): Boolean =
+        getRoller(ident).any { it.contains(KAN_BEHANDLE_EGEN_ANSATT) }
 
     fun getRoller(ident: String): List<String> = klageProxyClient.getRoller(ident)
 }

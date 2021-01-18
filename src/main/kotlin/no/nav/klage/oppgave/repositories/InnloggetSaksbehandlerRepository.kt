@@ -21,6 +21,13 @@ class InnloggetSaksbehandlerRepository(
 
     fun erSaksbehandler(): Boolean = saksbehandlerRepository.erSaksbehandler(getInnloggetIdent())
 
+    fun kanBehandleFortrolig(): Boolean = saksbehandlerRepository.kanBehandleFortrolig(getInnloggetIdent())
+
+    fun kanBehandleStrengtFortrolig(): Boolean =
+        saksbehandlerRepository.kanBehandleStrengtFortrolig(getInnloggetIdent())
+
+    fun kanBehandleEgenAnsatt(): Boolean = saksbehandlerRepository.kanBehandleEgenAnsatt(getInnloggetIdent())
+
     fun getRoller(): List<String> = saksbehandlerRepository.getRoller(getInnloggetIdent())
 
 }

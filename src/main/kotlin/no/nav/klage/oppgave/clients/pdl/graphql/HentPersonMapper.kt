@@ -5,11 +5,14 @@ import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 
-object HentPersonMapper {
+class HentPersonMapper {
 
-    private val logger = getLogger(javaClass.enclosingClass)
-    private val secureLogger = getSecureLogger()
-
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+    }
+    
     fun mapToPerson(fnr: String, pdlPerson: PdlPerson): Person {
 
         secureLogger.debug("pdl returned {}", pdlPerson)
