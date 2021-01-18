@@ -6,7 +6,11 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
 
 @Component
-class PdlFacade(private val pdlClient: PdlClient, private val personCacheService: PersonCacheService) {
+class PdlFacade(
+    private val pdlClient: PdlClient,
+    private val personCacheService: PersonCacheService,
+    private val hentPersonMapper: HentPersonMapper
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -24,7 +28,7 @@ class PdlFacade(private val pdlClient: PdlClient, private val personCacheService
         val fnrIsNotCached = fnrPartition.second
         if (fnrIsNotCached.isNotEmpty()) {
             val hentPersonBolkResult = pdlClient.getPersonerInfo(fnrIsNotCached).getHentPersonBolkAndLogErrors()
-            val newPersoner = HentPersonMapper.mapToPersoner(hentPersonBolkResult)
+            val newPersoner = hentPersonMapper.mapToPersoner(hentPersonBolkResult)
             oppdaterCache(newPersoner)
             return cachedPersoner + newPersoner
         }
@@ -45,7 +49,7 @@ class PdlFacade(private val pdlClient: PdlClient, private val personCacheService
         val hentPersonResponse: HentPersonResponse = pdlClient.getPersonInfo(fnr)
         val pdlPerson = hentPersonResponse.getPersonOrLogErrors()
         return pdlPerson?.let {
-            val person = HentPersonMapper.mapToPerson(fnr, it)
+            val person = hentPersonMapper.mapToPerson(fnr, it)
             personCacheService.updatePersonCache(person)
             person
         }

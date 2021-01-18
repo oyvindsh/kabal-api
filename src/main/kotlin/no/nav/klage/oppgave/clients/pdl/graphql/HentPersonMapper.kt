@@ -4,11 +4,15 @@ import no.nav.klage.oppgave.clients.pdl.Beskyttelsesbehov
 import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.springframework.stereotype.Component
 
-object HentPersonMapper {
+@Component
+class HentPersonMapper {
 
-    private val logger = getLogger(javaClass.enclosingClass)
-    private val secureLogger = getSecureLogger()
+    companion object {
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+    }
 
     fun mapToPerson(fnr: String, pdlPerson: PdlPerson): Person {
 
