@@ -2,8 +2,10 @@ package no.nav.klage.oppgave.api
 
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
+import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,6 +24,7 @@ class FeatureToggleController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
     @GetMapping("/featuretoggle/{toggleName}")
     fun getToggle(@PathVariable("toggleName") toggleName: String): Boolean =
         isEnabled(toggleName)
