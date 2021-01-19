@@ -17,8 +17,8 @@ ENV MAIN_CLASS="Main"
 ENV CLASSPATH="/app/WEB-INF/classes:/app/WEB-INF/lib/*"
 ENV ENVOY_ADMIN_API=http://127.0.0.1:15000
 ENV ISTIO_QUIT_API=http://127.0.0.1:15020
-COPY build/libs/*.jar ./
-
 WORKDIR /app
 EXPOSE 8080
 ENTRYPOINT ["scuttle", "/dumb-init", "--", "/entrypoint.sh"]
+
+COPY build/libs/*.jar ./
