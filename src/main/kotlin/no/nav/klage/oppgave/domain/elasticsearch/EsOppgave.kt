@@ -69,7 +69,7 @@ data class EsOppgave(
     val hjemler: List<String>? = null,
     @Field(type = FieldType.Keyword)
     val fnr: String? = null,
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text)
     val navn: String? = null,
     @Field(type = FieldType.Keyword)
     val statuskategori: Statuskategori = status.kategoriForStatus(),
