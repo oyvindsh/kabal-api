@@ -14,14 +14,14 @@ import java.time.format.DateTimeFormatter
 
 @Configuration
 class ElasticsearchConfiguration(
-    @Value("\${aiven.es.host}") val host: String,
-    @Value("\${aiven.es.port}") val port: String,
-    @Value("\${aiven.es.username.read}") val usernameRead: String,
-    @Value("\${aiven.es.password.read}") val passwordRead: String,
-    @Value("\${aiven.es.username.write}") val usernameWrite: String,
-    @Value("\${aiven.es.password.write}") val passwordWrite: String,
-    @Value("\${aiven.es.username.adm}") val usernameAdmin: String,
-    @Value("\${aiven.es.password.adm}") val passwordAdmin: String
+    @Value("\${AIVEN_ES_HOST}") val host: String,
+    @Value("\${AIVEN_ES_PORT}") val port: String,
+    @Value("\${AIVEN_ES_USERNAME_READ}") val usernameRead: String,
+    @Value("\${AIVEN_ES_PASSWORD_READ}") val passwordRead: String,
+    @Value("\${AIVEN_ES_USERNAME_WRITE}") val usernameWrite: String,
+    @Value("\${AIVEN_ES_PASSWORD_WRITE}") val passwordWrite: String,
+    @Value("\${AIVEN_ES_USERNAME_ADM}") val usernameAdmin: String,
+    @Value("\${AIVEN_ES_PASSWORD_ADM}") val passwordAdmin: String
 ) : AbstractElasticsearchConfiguration() {
 
     @Bean
