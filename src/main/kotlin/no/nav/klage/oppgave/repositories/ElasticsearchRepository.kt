@@ -34,10 +34,19 @@ open class ElasticsearchRepository(
     }
 
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        val indexOps = esTemplate.indexOps(IndexCoordinates.of("oppgavekopier"))
-        if (!indexOps.exists()) {
-            indexOps.create(readFromfile("settings.json"))
-            indexOps.putMapping(readFromfile("mapping.json"))
+        try {
+            logger.info("Trying to initialize Elasticsearch")
+            val indexOps = esTemplate.indexOps(IndexCoordinates.of("oppgavekopier"))
+            logger.info("Does oppgavekopier exist in Elasticsearch?")
+            if (!indexOps.exists()) {
+                logger.info("oppgavekopier does not exist in Elasticsearch")
+                indexOps.create(readFromfile("settings.json"))
+                indexOps.putMapping(readFromfile("mapping.json"))
+            } else {
+                logger.info("oppgavekopier does exist in Elasticsearch")
+            }
+        } catch (e: Exception) {
+            logger.error("Unable to initialize Elasticsearch", e)
         }
     }
 
