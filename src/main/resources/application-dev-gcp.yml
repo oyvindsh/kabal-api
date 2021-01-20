@@ -17,6 +17,8 @@ AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v1
 KAFKA_BOOTSTRAP_SERVERS: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
 KAFKA_SCHEMA_REGISTRY_URL: https://kafka-schema-registry.nais-q.adeo.no/
 
+AIVEN_ES_HOST: elastic-klage-oppgave-es-nav-dev.aivencloud.com
+AIVEN_ES_PORT: 26482
 spring:
   flyway:
     clean-on-validation-error: true
