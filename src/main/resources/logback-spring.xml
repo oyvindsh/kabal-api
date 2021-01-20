@@ -53,6 +53,10 @@
             <appender-ref ref="secureJson"/>
         </logger>
 
+        <logger name="org.springframework.data.elasticsearch.client" level="trace" additivity="false">
+            <appender-ref ref="secureJson"/>
+        </logger>
+
     </springProfile>
 
     <logger name="no.nav.klage" level="debug"/>
