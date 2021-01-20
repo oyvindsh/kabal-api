@@ -46,7 +46,10 @@ class ElasticsearchConfiguration(
                 headers
             }
             .build();
+
         securelogger.info("Kobler til ES $host:$port med $usernameAdmin")
+        securelogger.info("Kobler til ES endpoint ${clientConfiguration.endpoints}")
+        securelogger.info("Kobler til ES med ssl ${clientConfiguration.useSsl()}")
 
         return RestClients.create(clientConfiguration).rest();
     }
