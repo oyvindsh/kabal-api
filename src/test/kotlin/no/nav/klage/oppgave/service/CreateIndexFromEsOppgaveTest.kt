@@ -7,16 +7,14 @@ import org.apache.http.util.EntityUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.elasticsearch.client.Request
 import org.elasticsearch.client.RestHighLevelClient
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testcontainers.elasticsearch.ElasticsearchContainer
@@ -24,6 +22,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
 
+@ActiveProfiles("local")
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Testcontainers
 @ExtendWith(SpringExtension::class)
@@ -31,7 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
     initializers = [CreateIndexFromEsOppgaveTest.Companion.Initializer::class],
     classes = [ElasticsearchConfiguration::class]
 )
-//@Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
+@Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
 class CreateIndexFromEsOppgaveTest {
 
     companion object {
