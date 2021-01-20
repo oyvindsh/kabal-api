@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.config
 
+import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.elasticsearch.client.RestHighLevelClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -24,6 +26,12 @@ class ElasticsearchConfiguration(
     @Value("\${AIVEN_ES_PASSWORD_ADM}") val passwordAdmin: String
 ) : AbstractElasticsearchConfiguration() {
 
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val securelogger = getSecureLogger()
+    }
+
     @Bean
     override fun elasticsearchClient(): RestHighLevelClient {
 
@@ -38,6 +46,8 @@ class ElasticsearchConfiguration(
                 headers
             }
             .build();
+        securelogger.info("Kobler til ES $host:$port med $usernameAdmin")
+
         return RestClients.create(clientConfiguration).rest();
     }
 } 
