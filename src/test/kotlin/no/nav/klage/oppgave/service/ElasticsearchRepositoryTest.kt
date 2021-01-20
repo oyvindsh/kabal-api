@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
@@ -71,7 +71,7 @@ class ElasticsearchRepositoryTest {
     lateinit var repository: ElasticsearchRepository
 
     @Autowired
-    lateinit var esTemplate: ElasticsearchRestTemplate
+    lateinit var esTemplate: ElasticsearchOperations
 
     @Autowired
     lateinit var client: RestHighLevelClient

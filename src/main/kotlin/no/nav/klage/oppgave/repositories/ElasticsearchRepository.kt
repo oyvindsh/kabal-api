@@ -13,7 +13,7 @@ import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.data.elasticsearch.core.document.Document
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 
 
 open class ElasticsearchRepository(
-    val esTemplate: ElasticsearchRestTemplate,
+    val esTemplate: ElasticsearchOperations,
     val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) :
     ApplicationListener<ContextRefreshedEvent> {
@@ -100,7 +100,7 @@ open class ElasticsearchRepository(
         if (!innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
             filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
         }
-        
+
         baseQuery.must(QueryBuilders.termQuery("statuskategori", statuskategori))
 
         val innerQueryOppgavetype = QueryBuilders.boolQuery()

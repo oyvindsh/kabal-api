@@ -20,7 +20,7 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.elasticsearch.UncategorizedElasticsearchException
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
@@ -67,7 +67,7 @@ class ElasticsearchIndexingTest {
     lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 
     @Autowired
-    lateinit var esTemplate: ElasticsearchRestTemplate
+    lateinit var esTemplate: ElasticsearchOperations
 
     @Test
     @Order(1)
