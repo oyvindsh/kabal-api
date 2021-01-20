@@ -54,10 +54,10 @@ class ElasticsearchIndexingTest {
             override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
 
                 TestPropertyValues.of(
-                    "aiven.es.host=${ES_CONTAINER.host}",
-                    "aiven.es.port=${ES_CONTAINER.firstMappedPort}",
-                    "aiven.es.username.adm=elastic",
-                    "aiven.es.password.adm=changeme",
+                    "AIVEN_ES_HOST=${ES_CONTAINER.host}",
+                    "AIVEN_ES_PORT=${ES_CONTAINER.firstMappedPort}",
+                    "AIVEN_ES_USERNAME_ADM=elastic",
+                    "AIVEN_ES_PASSWORD_ADM=changeme",
                 ).applyTo(configurableApplicationContext.environment)
             }
         }
@@ -65,7 +65,7 @@ class ElasticsearchIndexingTest {
 
     @MockkBean
     lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
-    
+
     @Autowired
     lateinit var esTemplate: ElasticsearchRestTemplate
 
