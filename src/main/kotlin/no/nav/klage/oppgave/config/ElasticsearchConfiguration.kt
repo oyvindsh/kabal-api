@@ -61,8 +61,8 @@ class ElasticsearchConfiguration(
         return RestClients.create(clientConfiguration).rest();
     }
 
-    //@Bean
-    //fun healthIndicator() = ElasticsearchRestHealthIndicator(elasticsearchClient())
+    @Bean
+    fun healthIndicator() = ElasticsearchRestHealthIndicator(elasticsearchClient())
 
     fun localClientConfiguration() = ClientConfiguration.builder()
         .connectedTo("$host:$port")
@@ -93,11 +93,19 @@ class ElasticsearchRestHealthIndicator(private val client: RestHighLevelClient) 
     AbstractHealthIndicator("Elasticsearch health check failed") {
     private val jsonParser: JsonParser = JsonParserFactory.getJsonParser()
 
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private const val RED_STATUS = "red"
+    }
+
     @Throws(Exception::class)
     override fun doHealthCheck(builder: Health.Builder) {
 
         val response = client.lowLevelClient.performRequest(Request("GET", "/_cluster/health/"))
         val statusLine = response.statusLine
+        logger.info("Resultat av helsesjekk er ${response.statusLine}")
+        logger.info("Resultat av helsesjekk er ${response}")
         if (statusLine.statusCode != HttpStatus.SC_OK) {
             builder.down()
             builder.withDetail("statusCode", statusLine.statusCode)
@@ -114,6 +122,7 @@ class ElasticsearchRestHealthIndicator(private val client: RestHighLevelClient) 
 
     private fun doHealthCheck(builder: Health.Builder, json: String) {
         val response = jsonParser.parseMap(json)
+        logger.info("Responsen fra ES er ${json}")
         val status = response["status"] as String?
         if (RED_STATUS == status) {
             builder.outOfService()
@@ -121,10 +130,6 @@ class ElasticsearchRestHealthIndicator(private val client: RestHighLevelClient) 
             builder.up()
         }
         builder.withDetails(response)
-    }
-
-    companion object {
-        private const val RED_STATUS = "red"
     }
 
 }
