@@ -77,7 +77,7 @@ class ElasticsearchConfiguration(
 
     fun gcpClientConfiguration() = ClientConfiguration.builder()
         .connectedTo("$host:$port")
-        .usingSsl()
+        //.usingSsl()
         .withConnectTimeout(Duration.ofSeconds(5))
         .withSocketTimeout(Duration.ofSeconds(3))
         .withBasicAuth(usernameAdmin, passwordAdmin)
