@@ -37,6 +37,7 @@ class ElasticsearchConfiguration(
 
         val clientConfiguration: ClientConfiguration = ClientConfiguration.builder()
             .connectedTo("$host:$port")
+            .usingSsl()
             .withConnectTimeout(Duration.ofSeconds(5))
             .withSocketTimeout(Duration.ofSeconds(3))
             .withBasicAuth(usernameAdmin, passwordAdmin)
