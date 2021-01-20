@@ -27,6 +27,8 @@ spec:
       claims:
         extra:
           - NAVident
+  elastic:
+    instance: oppgave-es
   port: 7081
   liveness:
     path: /internal/health
