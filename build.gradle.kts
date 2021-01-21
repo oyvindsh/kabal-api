@@ -45,7 +45,7 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     //temporary fix:
-    implementation("com.nimbusds:nimbus-jose-jwt:nimbusVersion")
+    implementation("com.nimbusds:nimbus-jose-jwt:$nimbusVersion")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
