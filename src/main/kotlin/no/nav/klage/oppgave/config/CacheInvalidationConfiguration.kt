@@ -10,7 +10,6 @@ class CacheInvalidationConfiguration(val cacheManager: CacheManager) :
     ApplicationListener<ContextRefreshedEvent> {
 
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        cacheManager.getCacheNames()
-            .forEach { cacheManager.getCache(it).clear() }
+        cacheManager.cacheNames.forEach { cacheManager.getCache(it)?.clear() }
     }
 }
