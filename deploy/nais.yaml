@@ -27,6 +27,8 @@ spec:
       claims:
         extra:
           - NAVident
+  elastic:
+    instance: oppgave-es
   port: 7081
   liveness:
     path: /internal/health
@@ -78,6 +80,7 @@ spec:
     - secret: slack-channel-id
     - secret: norg2
     - secret: axsys
+    - secret: elastic
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}

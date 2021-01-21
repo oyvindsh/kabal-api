@@ -1,30 +1,53 @@
 package no.nav.klage.oppgave.api
 
+import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.Oppgave
 import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.OppgaveKopiService
 import no.nav.klage.oppgave.service.OppgaveService
+import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 
 @Service
 class OppgaveFacade(
     private val oppgaveService: OppgaveService,
     private val oppgaveMapper: OppgaveMapper,
-    private val oppgaveKopiService: OppgaveKopiService
+    private val oppgaveKopiService: OppgaveKopiService,
+    private val elasticsearchRepository: ElasticsearchRepository,
+    private val unleash: Unleash
 ) {
 
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val securelogger = getSecureLogger()
+    }
+
     fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
-        val oppgaveResponse = oppgaveService.searchOppgaver(oppgaverSearchCriteria)
-        return OppgaverRespons(
-            antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
-            oppgaver = oppgaveMapper.mapOppgaverToView(
-                oppgaveResponse.oppgaver,
-                oppgaverSearchCriteria.isProjectionUtvidet()
+        if (unleash.isEnabled("klage.sokMedES")) {
+            val esResponse = elasticsearchRepository.findByCriteria(oppgaverSearchCriteria)
+            return OppgaverRespons(
+                antallTreffTotalt = esResponse.totalHits.toInt(),
+                oppgaver = oppgaveMapper.mapEsOppgaverToView(
+                    esResponse.searchHits.map { it.content },
+                    oppgaverSearchCriteria.isProjectionUtvidet()
+                )
             )
-        )
+        } else {
+            val oppgaveResponse = oppgaveService.searchOppgaver(oppgaverSearchCriteria)
+            return OppgaverRespons(
+                antallTreffTotalt = oppgaveResponse.antallTreffTotalt,
+                oppgaver = oppgaveMapper.mapOppgaverToView(
+                    oppgaveResponse.oppgaver,
+                    oppgaverSearchCriteria.isProjectionUtvidet()
+                )
+            )
+        }
     }
 
     fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?) {
@@ -38,5 +61,13 @@ class OppgaveFacade(
 
     fun saveOppgaveKopi(oppgave: OppgaveKopiAPIModel) {
         oppgaveKopiService.saveOppgaveKopi(oppgaveMapper.mapOppgaveKopiAPIModelToOppgaveKopi(oppgave))
+        if (unleash.isEnabled("klage.indekserMedES")) {
+            try {
+                elasticsearchRepository.save(oppgaveMapper.mapOppgaveKopiAPIModelToEsOppgave(oppgave))
+            } catch (e: Exception) {
+                logger.error("Unable to index OppgaveKopi, see securelogs for details")
+                securelogger.error("Unable to index OppgaveKopi", e)
+            }
+        }
     }
 }

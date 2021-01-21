@@ -13,6 +13,7 @@ val kafkaAvroVersion = "5.5.2"
 val springRetryVersion = "1.3.0"
 val springMockkVersion = "2.0.3"
 val springFoxVersion = "3.0.0"
+val testContainersVersion = "1.15.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -52,6 +53,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.data:spring-data-elasticsearch")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.confluent:kafka-avro-serializer:$kafkaAvroVersion") {
@@ -91,6 +93,9 @@ dependencies {
         exclude(group = "org.junit.vintage")
         exclude(group = "org.mockito")
     }
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:elasticsearch:$testContainersVersion")
 }
 
 idea {

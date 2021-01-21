@@ -3,24 +3,66 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.view.HJEMMEL
+import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.gosys.Gruppe
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.*
+import no.nav.klage.oppgave.domain.elasticsearch.EsOppgave
 import no.nav.klage.oppgave.domain.oppgavekopi.*
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
 import no.nav.klage.oppgave.clients.gosys.Oppgave as OppgaveBackend
+import no.nav.klage.oppgave.domain.elasticsearch.Prioritet as EsPrioritet
+import no.nav.klage.oppgave.domain.elasticsearch.Status as EsStatus
 
 @Service
-class OppgaveMapper(val pdlFacade: PdlFacade) {
+class OppgaveMapper(
+    private val pdlFacade: PdlFacade,
+    private val egenAnsattService: EgenAnsattService
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
     }
+
+    fun mapEsOppgaverToView(esOppgaver: List<EsOppgave>, fetchPersoner: Boolean): List<OppgaveView> {
+        return esOppgaver.map { oppgaveBackend ->
+            OppgaveView(
+                id = oppgaveBackend.id.toString(),
+                person = if (fetchPersoner) {
+                    OppgaveView.Person(oppgaveBackend.fnr ?: "mangler", oppgaveBackend.navn ?: "mangler")
+                } else {
+                    null
+                },
+                type = oppgaveBackend.toType(),
+                tema = oppgaveBackend.toTemaName(),
+                hjemmel = oppgaveBackend.hjemler?.firstOrNull() ?: "mangler",
+                frist = oppgaveBackend.fristFerdigstillelse,
+                versjon = oppgaveBackend.version!!.toInt()
+            )
+        }
+    }
+
+    private fun EsOppgave.toType(): String {
+        return if (behandlingstema == null) {
+            when (behandlingstype) {
+                BEHANDLINGSTYPE_KLAGE -> TYPE_KLAGE
+                BEHANDLINGSTYPE_FEILUTBETALING -> TYPE_FEILUTBETALING
+                else -> "ukjent"
+            }
+        } else "mangler"
+    }
+
+    private fun EsOppgave.toTemaName(): String = when (tema) {
+        TEMA_SYK -> TEMA_NAME_SYK
+        TEMA_FOR -> TEMA_NAME_FOR
+        else -> tema
+    }
+
 
     fun mapOppgaveToView(oppgaveBackend: OppgaveBackend, fetchPersoner: Boolean): OppgaveView {
         return mapOppgaverToView(listOf(oppgaveBackend), fetchPersoner).single()
@@ -151,4 +193,49 @@ class OppgaveMapper(val pdlFacade: PdlFacade) {
         )
     }
 
+    fun mapOppgaveKopiAPIModelToEsOppgave(oppgave: OppgaveKopiAPIModel): EsOppgave {
+        val fnr = oppgave.ident.id.toString()
+        val erEgenAnsatt = egenAnsattService.erEgenAnsatt(fnr)
+        val personInfo = pdlFacade.getPersonInfo(fnr)
+        val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
+        val erStrengtFortrolig = personInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
+        val navn = personInfo?.navn ?: "mangler navn"
+        return EsOppgave(
+            id = oppgave.id,
+            version = oppgave.versjon.toLong(),
+            journalpostId = oppgave.journalpostId,
+            saksreferanse = oppgave.saksreferanse,
+            mappeId = oppgave.mappeId,
+            status = EsStatus.valueOf(oppgave.status.name),
+            tildeltEnhetsnr = oppgave.tildeltEnhetsnr,
+            opprettetAvEnhetsnr = oppgave.opprettetAvEnhetsnr,
+            endretAvEnhetsnr = oppgave.endretAvEnhetsnr,
+            tema = oppgave.tema,
+            temagruppe = oppgave.temagruppe,
+            behandlingstema = oppgave.behandlingstema,
+            oppgavetype = oppgave.oppgavetype,
+            behandlingstype = oppgave.behandlingstype,
+            prioritet = EsPrioritet.valueOf(oppgave.prioritet.name),
+            tilordnetRessurs = oppgave.tilordnetRessurs,
+            beskrivelse = oppgave.beskrivelse,
+            fristFerdigstillelse = oppgave.fristFerdigstillelse,
+            aktivDato = oppgave.aktivDato,
+            opprettetAv = oppgave.opprettetAv,
+            endretAv = oppgave.endretAv,
+            opprettetTidspunkt = oppgave.opprettetTidspunkt,
+            endretTidspunkt = oppgave.endretTidspunkt,
+            ferdigstiltTidspunkt = oppgave.ferdigstiltTidspunkt,
+            behandlesAvApplikasjon = oppgave.behandlesAvApplikasjon,
+            journalpostkilde = oppgave.journalpostkilde,
+            hjemler = (oppgave.metadata ?: emptyMap())
+                .filter { (k, _) -> OppgaveKopiAPIModel.MetadataKey.HJEMMEL == k }
+                .map { (_, v) -> v },
+            fnr = fnr,
+            navn = navn,
+            statuskategori = EsStatus.valueOf(oppgave.status.name).kategoriForStatus(),
+            egenAnsatt = erEgenAnsatt,
+            fortrolig = erFortrolig,
+            strengtFortrolig = erStrengtFortrolig
+        )
+    }
 }
