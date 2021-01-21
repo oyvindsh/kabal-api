@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: klage-oppgave-api
   main:
     banner-mode: OFF
   sleuth:

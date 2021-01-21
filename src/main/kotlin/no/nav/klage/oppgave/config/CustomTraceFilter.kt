@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.config
 
 import brave.Tracer
 import brave.baggage.BaggageField
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
@@ -18,14 +19,13 @@ import javax.servlet.ServletResponse
 @Profile("!local")
 @Order(-20)
 class CustomTraceFilter(
-    private val tracer: Tracer, @Value("\${spring.application.name}") private val appName: String
+    @Autowired private val tracer: Tracer,
+    @Value("\${spring.application.name}") private val appName: String,
+    @Value("\${navCallId}") private val navCallIdFieldName: String,
+    @Value("\${navConsumerId}") private val navConsumerIdFieldName: String
+
 ) : GenericFilterBean() {
 
-    @Value("\${navCallId}")
-    lateinit var navCallId: String
-
-    @Value("\${navConsumerId}")
-    lateinit var navConsumerId: String
 
     override fun doFilter(
         request: ServletRequest?, response: ServletResponse,
@@ -33,10 +33,10 @@ class CustomTraceFilter(
     ) {
         val currentSpan = tracer.currentSpan()
 
-        val navCallIdField = BaggageField.create(navCallId)
+        val navCallIdField = BaggageField.create(navCallIdFieldName)
         navCallIdField.updateValue(tracer.currentSpan().context(), currentSpan.context().traceIdString())
 
-        val navConsumerIdField = BaggageField.create(navConsumerId)
+        val navConsumerIdField = BaggageField.create(navConsumerIdFieldName)
         navConsumerIdField.updateValue(tracer.currentSpan().context(), appName)
 
         chain.doFilter(request, response)
