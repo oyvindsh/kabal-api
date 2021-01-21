@@ -61,8 +61,8 @@ class ElasticsearchConfiguration(
         return RestClients.create(clientConfiguration).rest();
     }
 
-    @Bean
-    fun healthIndicator() = ElasticsearchRestHealthIndicator(elasticsearchClient())
+    //@Bean
+    //fun healthIndicator() = ElasticsearchRestHealthIndicator(elasticsearchClient())
 
     fun localClientConfiguration() = ClientConfiguration.builder()
         .connectedTo("$host:$port")
