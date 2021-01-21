@@ -17,10 +17,9 @@ import javax.servlet.ServletResponse
 @Component
 @Profile("!local")
 @Order(-20)
-class CustomTraceFilter(private val tracer: Tracer) : GenericFilterBean() {
-
-    @Value("\${spring.application.name}")
-    lateinit var appName: String
+class CustomTraceFilter(
+    private val tracer: Tracer, @Value("\${spring.application.name}") private val appName: String
+) : GenericFilterBean() {
 
     @Value("\${navCallId}")
     lateinit var navCallId: String
