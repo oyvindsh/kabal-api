@@ -2,14 +2,13 @@ spring:
   main:
     banner-mode: OFF
   sleuth:
-    propagation-keys:
-      - Nav-Callid
-      - Nav-Consumer-Id
-    log:
-      slf4j:
-        whitelisted-mdc-keys:
-          - Nav-Callid
-          - Nav-Consumer-Id
+    baggage:
+      remote-fields:
+        - Nav-Callid
+        - Nav-Consumer-Id
+      correlation-fields:
+        - Nav-Callid
+        - Nav-Consumer-Id
   resources:
     add-mappings: false
   mvc:
