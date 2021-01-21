@@ -45,14 +45,12 @@ class OppgaveKopiRepositoryTest {
 
         val oppgaveCount = jdbcTemplate.queryForObject(
             "SELECT count(*) FROM oppgave.oppgave",
-            emptyArray(),
             Integer::class.java
         )
         assertThat(oppgaveCount).isEqualTo(1)
 
         val oppgaveVersjonCount = jdbcTemplate.queryForObject(
             "SELECT count(*) FROM oppgave.oppgaveversjon",
-            emptyArray(),
             Integer::class.java
         )
         assertThat(oppgaveVersjonCount).isEqualTo(1)
@@ -87,7 +85,6 @@ class OppgaveKopiRepositoryTest {
 
         val identCount = jdbcTemplate.queryForObject(
             "SELECT count(*) FROM oppgave.ident",
-            emptyArray(),
             Integer::class.java
         )
         assertThat(identCount).isEqualTo(1)
@@ -121,14 +118,12 @@ class OppgaveKopiRepositoryTest {
 
         val metadataCount = jdbcTemplate.queryForObject(
             "SELECT count(*) FROM oppgave.metadata",
-            emptyArray(),
             Integer::class.java
         )
         assertThat(metadataCount).isEqualTo(1)
 
         val versjonMetadataCount = jdbcTemplate.queryForObject(
             "SELECT count(*) FROM oppgave.versjonmetadata",
-            emptyArray(),
             Integer::class.java
         )
         assertThat(versjonMetadataCount).isEqualTo(1)

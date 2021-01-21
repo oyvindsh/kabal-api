@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.config
 import brave.Tracer
 import brave.baggage.BaggageField
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cloud.sleuth.instrument.web.TraceWebServletAutoConfiguration
 import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -17,7 +16,7 @@ import javax.servlet.ServletResponse
  */
 @Component
 @Profile("!local")
-@Order(TraceWebServletAutoConfiguration.TRACING_FILTER_ORDER + 1)
+@Order(-20)
 class CustomTraceFilter(private val tracer: Tracer) : GenericFilterBean() {
 
     @Value("\${spring.application.name}")

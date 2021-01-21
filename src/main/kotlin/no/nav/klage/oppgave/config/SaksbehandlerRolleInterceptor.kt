@@ -4,16 +4,16 @@ import no.nav.klage.oppgave.exceptions.NoSaksbehandlerRoleException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
+import org.springframework.web.servlet.AsyncHandlerInterceptor
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
 class SaksbehandlerRolleInterceptor(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
-) : HandlerInterceptorAdapter() {
+) : AsyncHandlerInterceptor {
 
     @Throws(Exception::class)
     override fun preHandle(

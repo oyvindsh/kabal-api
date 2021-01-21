@@ -6,7 +6,7 @@ val h2Version = "1.4.200"
 val tokenValidationVersion = "1.3.1"
 val oidcSupportVersion = "0.2.18"
 val logstashVersion = "5.1"
-val springSleuthVersion = "2.2.3.RELEASE"
+val springSleuthVersion = "3.0.0"
 val unleashVersion = "3.3.3"
 val problemSpringWebStartVersion = "0.26.2"
 val kafkaAvroVersion = "5.5.2"
@@ -34,7 +34,7 @@ repositories {
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
-    id("org.springframework.boot") version "2.3.4.RELEASE"
+    id("org.springframework.boot") version "2.4.2"
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.21"
     id("org.jetbrains.kotlin.plugin.jpa") version "1.4.21"
     idea

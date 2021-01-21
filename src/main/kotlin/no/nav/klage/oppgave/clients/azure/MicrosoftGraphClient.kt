@@ -46,7 +46,7 @@ class MicrosoftGraphClient(
 
         val data = Flux.fromIterable(queryString)
             .parallel()
-            .runOn(Schedulers.elastic())
+            .runOn(Schedulers.boundedElastic())
             .flatMap {
                 getDisplayNames(it)
             }

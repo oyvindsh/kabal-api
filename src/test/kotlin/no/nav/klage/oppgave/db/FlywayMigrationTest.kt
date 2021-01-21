@@ -22,14 +22,14 @@ class FlywayMigrationTest {
     fun flyway_should_run() {
         val statuser: List<Status> = jdbcTemplate.query(
             "SELECT * FROM oppgave.status",
-            emptyArray(),
             RowMapper { rs: ResultSet, _: Int ->
                 Status(
                     rs.getLong("id"),
                     rs.getString("navn"),
                     rs.getString("kategori")
                 )
-            })
+            }
+        )
 
         assertThat(statuser).hasSize(5)
     }
