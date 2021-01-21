@@ -1,26 +1,27 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "klagesak", schema = "klage")
 class Klagesak(
 
     @Id
-    var id: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
+    @OneToMany(mappedBy = "behandling", cascade = [CascadeType.ALL])
+    val behandlinger: List<Behandling>,
     @Column(name = "foedselsnummer")
     val foedselsnummer: String,
-    @Column(name = "sakstype_id")
-    val sakstypeId: Int,
+    @OneToOne
+    @JoinColumn(name = "sakstype_id")
+    val sakstype: Sakstype,
     @Column(name = "modified")
-    val modified: LocalDateTime,
+    val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
-    val created: LocalDateTime
+    val created: LocalDateTime = LocalDateTime.now()
 ) {
 
     override fun toString(): String {

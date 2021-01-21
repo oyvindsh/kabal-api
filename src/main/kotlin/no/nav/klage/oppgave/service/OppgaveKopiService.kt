@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class OppgaveKopiService(
     val oppgaveKopiRepository: OppgaveKopiRepository,
-    val oppgaveKopiVersjonRepository: OppgaveKopiVersjonRepository
+    val oppgaveKopiVersjonRepository: OppgaveKopiVersjonRepository,
+    val klagesakService: KlagesakService
 ) {
 
     companion object {
@@ -35,6 +36,8 @@ class OppgaveKopiService(
         }
 
         oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
+
+        klagesakService.connectOppgaveKopiToKlagesak(oppgaveKopi)
     }
 
     fun getOppgaveKopi(oppgaveKopiId: Long): OppgaveKopi {
@@ -44,7 +47,7 @@ class OppgaveKopiService(
     fun getOppgaveKopiVersjon(oppgaveKopiId: Long, versjon: Int): OppgaveKopiVersjon {
         return oppgaveKopiVersjonRepository.getOne(OppgaveKopiVersjonId(oppgaveKopiId, versjon))
     }
-    
+
     fun getOppgaveKopiSisteVersjon(oppgaveKopiId: Long): OppgaveKopiVersjon {
         return oppgaveKopiVersjonRepository.findFirstByIdOrderByVersjonDesc(oppgaveKopiId)
     }

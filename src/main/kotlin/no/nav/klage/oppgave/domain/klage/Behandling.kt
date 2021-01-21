@@ -12,9 +12,6 @@ import javax.persistence.*
 class Behandling(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @ManyToOne
-    @JoinColumn(name = "klagesak_id", nullable = false)
-    val klagesak: Klagesak,
     @Column(name = "dato_mottatt_fra_foersteinstans")
     val mottatt: LocalDate? = null,
     @Column(name = "dato_behandling_startet")
@@ -30,17 +27,17 @@ class Behandling(
     val vedtak: Vedtak? = null,
     @OneToOne
     @JoinColumn(name = "eoes_id")
-    val eoes: Eoes,
+    val eoes: Eoes? = null,
     @OneToOne
     @JoinColumn(name = "raadfoert_med_lege_id")
-    val raadfoertMedLege: RaadfoertMedLege,
+    val raadfoertMedLege: RaadfoertMedLege? = null,
     @OneToMany
     @JoinColumn(name = "behandling_id")
     val hjemler: List<Hjemmel>,
     @Column(name = "modified")
-    val modified: LocalDateTime,
+    val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
-    val created: LocalDateTime
+    val created: LocalDateTime = LocalDateTime.now()
 ) {
     override fun toString(): String {
         return "Behandling(id=$id, " +
