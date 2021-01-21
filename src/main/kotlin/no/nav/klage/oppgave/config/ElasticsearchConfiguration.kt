@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.config
 
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.http.HttpStatus
 import org.elasticsearch.client.Request
 import org.elasticsearch.client.RestHighLevelClient
@@ -41,7 +40,6 @@ class ElasticsearchConfiguration(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val securelogger = getSecureLogger()
     }
 
     @Bean
@@ -53,10 +51,6 @@ class ElasticsearchConfiguration(
         } else {
             gcpClientConfiguration()
         }.build();
-
-        securelogger.info("Kobler til ES $host:$port med $usernameAdmin")
-        securelogger.info("Kobler til ES endpoint ${clientConfiguration.endpoints}")
-        securelogger.info("Kobler til ES med ssl ${clientConfiguration.useSsl()}")
 
         return RestClients.create(clientConfiguration).rest();
     }
