@@ -11,7 +11,7 @@ enum class Status(val statusId: Long) {
     companion object {
 
         fun of(statusId: Long): Status {
-            return values().firstOrNull { it.statusId === statusId }
+            return values().firstOrNull { it.statusId == statusId }
                 ?: throw IllegalArgumentException("No status with ${statusId} exists")
         }
 

@@ -50,7 +50,7 @@ class MicrosoftGraphClient(
             .flatMap {
                 getDisplayNames(it)
             }
-            .ordered { u1: MicrosoftGraphNameResponse, u2: MicrosoftGraphNameResponse -> 1 }.toIterable()
+            .ordered { _: MicrosoftGraphNameResponse, _: MicrosoftGraphNameResponse -> 1 }.toIterable()
 
         return data.flatMap {
             it.value ?: emptyList()
