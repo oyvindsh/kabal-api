@@ -1,19 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val exposedVersion = "0.21.1"
-val mockkVersion = "1.9.3"
+val mockkVersion = "1.10.5"
 val h2Version = "1.4.200"
-val tokenValidationVersion = "1.3.1"
+val tokenValidationVersion = "1.3.2"
 val oidcSupportVersion = "0.2.18"
-val logstashVersion = "5.1"
+val logstashVersion = "6.6"
 val springSleuthVersion = "3.0.0"
 val unleashVersion = "3.3.3"
 val problemSpringWebStartVersion = "0.26.2"
 val kafkaAvroVersion = "5.5.2"
-val springRetryVersion = "1.3.0"
-val springMockkVersion = "2.0.3"
+val springRetryVersion = "1.3.1"
+val springMockkVersion = "3.0.1"
 val springFoxVersion = "3.0.0"
-val testContainersVersion = "1.15.0"
+val testContainersVersion = "1.15.1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -67,8 +66,6 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("com.zaxxer:HikariCP")
-//    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:$exposedVersion")
-//    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("org.postgresql:postgresql")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
