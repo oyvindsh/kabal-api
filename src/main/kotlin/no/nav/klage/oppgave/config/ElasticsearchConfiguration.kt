@@ -61,8 +61,8 @@ class ElasticsearchConfiguration(
         return RestClients.create(clientConfiguration).rest();
     }
 
-    //@Bean
-    //fun healthIndicator() = ElasticsearchRestHealthIndicator(elasticsearchClient())
+    @Bean
+    fun healthIndicator() = ElasticsearchRestHealthIndicator(elasticsearchClient())
 
     fun localClientConfiguration() = ClientConfiguration.builder()
         .connectedTo("$host:$port")
@@ -104,8 +104,8 @@ class ElasticsearchRestHealthIndicator(private val client: RestHighLevelClient) 
 
         val response = client.lowLevelClient.performRequest(Request("GET", "/_cluster/health/"))
         val statusLine = response.statusLine
-        logger.info("Resultat av helsesjekk er ${response.statusLine}")
-        logger.info("Resultat av helsesjekk er ${response}")
+        //logger.info("Resultat av helsesjekk er ${response.statusLine}")
+        //logger.info("Resultat av helsesjekk er ${response}")
         if (statusLine.statusCode != HttpStatus.SC_OK) {
             builder.down()
             builder.withDetail("statusCode", statusLine.statusCode)
@@ -122,7 +122,7 @@ class ElasticsearchRestHealthIndicator(private val client: RestHighLevelClient) 
 
     private fun doHealthCheck(builder: Health.Builder, json: String) {
         val response = jsonParser.parseMap(json)
-        logger.info("Responsen fra ES er ${json}")
+        //logger.info("Responsen fra ES er ${json}")
         val status = response["status"] as String?
         if (RED_STATUS == status) {
             builder.outOfService()
