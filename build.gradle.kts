@@ -12,6 +12,7 @@ val springRetryVersion = "1.3.1"
 val springMockkVersion = "3.0.1"
 val springFoxVersion = "3.0.0"
 val testContainersVersion = "1.15.1"
+val nimbusVersion = "8.20.1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -42,6 +43,9 @@ apply(plugin = "io.spring.dependency-management")
 
 dependencies {
     implementation(kotlin("stdlib"))
+
+    //temporary fix:
+    implementation("com.nimbusds:nimbus-jose-jwt:nimbusVersion")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
