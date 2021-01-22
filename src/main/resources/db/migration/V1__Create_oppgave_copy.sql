@@ -1,4 +1,4 @@
-CREATE SCHEMA IF NOT EXISTS oppgave;
+CREATE SCHEMA oppgave;
 
 CREATE TABLE oppgave.oppgave
 (

@@ -1,4 +1,4 @@
-CREATE SCHEMA IF NOT EXISTS klage;
+CREATE SCHEMA klage;
 
 CREATE TABLE klage.mottak
 (
