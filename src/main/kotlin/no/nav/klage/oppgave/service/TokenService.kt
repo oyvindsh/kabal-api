@@ -27,6 +27,12 @@ class TokenService(
         return response.accessToken
     }
 
+    fun getSaksbehandlerAccessTokenWithSafScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["saf-onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getAppAccessTokenWithGraphScope(): String {
         val clientProperties = clientConfigurationProperties.registration["app"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
