@@ -33,7 +33,7 @@ class SafClient(
             safWebClient.post()
                 .header(
                     HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenService.getSaksbehandlerAccessTokenWithOppgaveScope()}"
+                    "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
                 )
                 .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
 
