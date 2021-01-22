@@ -1,4 +1,4 @@
-CREATE SCHEMA kodeverk;
+CREATE SCHEMA IF NOT EXISTS kodeverk;
 
 CREATE TABLE kodeverk.lov
 (
