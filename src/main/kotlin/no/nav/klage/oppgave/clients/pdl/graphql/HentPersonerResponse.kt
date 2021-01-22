@@ -13,11 +13,11 @@ data class HentPersonBolkResult(
 )
 
 data class PdlPerson(
-    val adressebeskyttelse: List<Adressebeskyttelse>,
+    val adressebeskyttelse: List<Adressebeskyttelse>?,
     val navn: List<Navn>,
     val kjoenn: List<Kjoenn>
 ) {
-    data class Adressebeskyttelse(val gradering: GraderingType) {
+    data class Adressebeskyttelse(val gradering: GraderingType?) {
         enum class GraderingType { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
     }
 
