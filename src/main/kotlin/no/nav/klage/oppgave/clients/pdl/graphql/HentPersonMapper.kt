@@ -24,7 +24,7 @@ class HentPersonMapper {
             mellomnavn = pdlPerson.navn.firstOrNull()?.mellomnavn,
             etternavn = pdlPerson.navn.firstOrNull()?.etternavn ?: "mangler",
             navn = sammensattNavn(pdlPerson.navn.firstOrNull()),
-            beskyttelsesbehov = pdlPerson.adressebeskyttelse.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
+            beskyttelsesbehov = pdlPerson.adressebeskyttelse?.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
         )
     }
 
