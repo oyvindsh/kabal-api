@@ -2,18 +2,25 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.oppgavekopi.*
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
+import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.persistence.PersistenceException
 
 @ActiveProfiles("local")
 @DataJpaTest
 @Import(OppgaveKopiService::class)
 class OppgaveKopiServiceTest {
+
+    @Autowired
+    lateinit var entityManager: TestEntityManager
 
     @Autowired
     lateinit var oppgaveKopiService: OppgaveKopiService
@@ -36,6 +43,9 @@ class OppgaveKopiServiceTest {
             opprettetTidspunkt = now
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
+
+        entityManager.flush()
+        entityManager.clear()
 
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
@@ -61,6 +71,9 @@ class OppgaveKopiServiceTest {
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
+        entityManager.flush()
+        entityManager.clear()
+
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.ident).isNotNull
@@ -81,9 +94,12 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
+
+        entityManager.flush()
+        entityManager.clear()
 
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
@@ -100,7 +116,7 @@ class OppgaveKopiServiceTest {
     }
 
     @Test
-    fun twoVersionsOfOppgaveKopiShouldBeStoredProperly() {
+    fun `two versions of OppgaveKopi should be stored properly`() {
         val oppgaveKopi1 = OppgaveKopi(
             id = 1001L,
             versjon = 1,
@@ -114,7 +130,7 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         val oppgaveKopi2 = OppgaveKopi(
             id = 1001L,
@@ -129,16 +145,25 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
+
+        entityManager.flush()
+        entityManager.clear()
+
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi2)
+
+        entityManager.flush()
+        entityManager.clear()
+
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi1.id)
         assertThat(hentetOppgave).isNotNull
+        assertThat(hentetOppgave.metadata.size).isEqualTo(1)
     }
 
     @Test
-    fun storingTheSameOppgaveTwiceShouldNotCauseError() {
+    fun `storing the same version twice throws ConstraintViolationException`() {
         val oppgaveKopi1 = OppgaveKopi(
             id = 1001L,
             versjon = 1,
@@ -152,13 +177,22 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
 
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
-        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
-        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi1.id)
-        assertThat(hentetOppgave).isNotNull
+
+        entityManager.flush()
+        entityManager.clear()
+
+        assertThatExceptionOfType(PersistenceException::class.java)
+            .isThrownBy {
+                oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
+
+                entityManager.flush()
+                entityManager.clear()
+            }
+            .withCauseInstanceOf(ConstraintViolationException::class.java)
     }
 
     @Test
@@ -176,9 +210,12 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
+
+        entityManager.flush()
+        entityManager.clear()
 
         val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
@@ -205,9 +242,12 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
+
+        entityManager.flush()
+        entityManager.clear()
 
         val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
@@ -228,7 +268,7 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         val oppgaveKopi2 = OppgaveKopi(
             id = 1001L,
@@ -243,10 +283,17 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(no.nav.klage.oppgave.domain.oppgavekopi.Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi2)
+
+        entityManager.flush()
+        entityManager.clear()
+
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
+
+        entityManager.flush()
+        entityManager.clear()
 
         val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi1.id, oppgaveKopi1.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
