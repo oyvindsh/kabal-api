@@ -106,10 +106,10 @@ CREATE TABLE klage.saksdokument
 CREATE TABLE klage.klage_oppgave
 (
     id                              UUID    PRIMARY KEY,
-    behandling_id                   UUID    NOT NULL,
+    klagebehandling_id                   UUID    NOT NULL,
     oppgave_id                      BIGINT  NOT NULL,
-    CONSTRAINT fk_klage_oppgave_behandling
-        FOREIGN KEY (behandling_id)
+    CONSTRAINT fk_klage_oppgave_klagebehandling
+        FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id),
     CONSTRAINT fk_klage_oppgave_oppgave
         FOREIGN KEY (oppgave_id)

@@ -10,8 +10,8 @@ import javax.persistence.Table
 @Table(name = "klage_oppgave", schema = "klage")
 class Oppgavereferanse(
     @Id
-    private val id: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "oppgave_id")
-    private val oppgaveId: Long
+    val oppgaveId: Long
 ) {
 }

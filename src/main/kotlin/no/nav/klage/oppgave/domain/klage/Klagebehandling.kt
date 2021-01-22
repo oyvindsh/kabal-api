@@ -38,10 +38,10 @@ class Klagebehandling(
     @JoinColumn(name = "raadfoert_med_lege_id")
     val raadfoertMedLege: RaadfoertMedLege? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id",)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val hjemler: List<Hjemmel>,
-    @OneToMany
-    @JoinColumn(name = "behandling_id")
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val oppgavereferanser: List<Oppgavereferanse>,
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
