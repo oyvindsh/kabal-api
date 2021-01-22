@@ -30,6 +30,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
+    clean-on-validation-error: true
 
 server:
   port: 7081

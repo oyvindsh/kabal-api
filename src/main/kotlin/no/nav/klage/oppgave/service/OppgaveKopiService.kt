@@ -26,6 +26,10 @@ class OppgaveKopiService(
         if (oppgaveKopiRepository.existsById(oppgaveKopi.id)) {
             val existingOppgaveKopi = oppgaveKopiRepository.getOne(oppgaveKopi.id)
             if (existingOppgaveKopi.versjon < oppgaveKopi.versjon) {
+
+                //Easiest way to keep our unique constraints in db
+                oppgaveKopiRepository.delete(existingOppgaveKopi)
+
                 oppgaveKopiRepository.save(oppgaveKopi)
             } else {
                 logger.debug("Oppgavekopi with id ${existingOppgaveKopi.id} and versjon ${existingOppgaveKopi.versjon} stored before, won't overwrite")

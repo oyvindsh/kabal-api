@@ -1,4 +1,4 @@
-CREATE SCHEMA oppgave;
+CREATE SCHEMA IF NOT EXISTS oppgave;
 
 CREATE TABLE oppgave.oppgave
 (
@@ -19,7 +19,7 @@ CREATE TABLE oppgave.oppgave
     prioritet                VARCHAR(4)            NOT NULL,
     tilordnet_ressurs        VARCHAR(7),
     beskrivelse              TEXT,
-    frist_ferdigstillelse    DATE                  NOT NULL,
+    frist_ferdigstillelse    DATE,
     aktiv_dato               DATE                  NOT NULL,
     opprettet_av             VARCHAR(40)           NOT NULL,
     endret_av                VARCHAR(40),
@@ -129,9 +129,7 @@ CREATE TABLE oppgave.ident
     verdi              VARCHAR(255) NOT NULL,
     folkeregisterident VARCHAR(20),
     registrert_dato    DATE,
-    CONSTRAINT pk_ident PRIMARY KEY (id),
-
-    CONSTRAINT unique_ident_verdi_fnr UNIQUE (verdi, folkeregisterident)
+    CONSTRAINT pk_ident PRIMARY KEY (id)
 );
 
 CREATE SEQUENCE oppgave.ident_seq;
@@ -140,6 +138,23 @@ ALTER TABLE oppgave.oppgave
     ADD CONSTRAINT fk_oppgave_ident_id FOREIGN KEY (ident_id) REFERENCES oppgave.ident (id);
 ALTER TABLE oppgave.oppgaveversjon
     ADD CONSTRAINT fk_oppgaveversjon_ident_id FOREIGN KEY (ident_id) REFERENCES oppgave.ident (id);
+
+CREATE TABLE oppgave.versjonident
+(
+    id                 BIGINT       NOT NULL,
+    TYPE               VARCHAR(255) NOT NULL,
+    verdi              VARCHAR(255) NOT NULL,
+    folkeregisterident VARCHAR(20),
+    registrert_dato    DATE,
+    CONSTRAINT pk_versjonident PRIMARY KEY (id)
+);
+
+CREATE SEQUENCE oppgave.versjonident_seq;
+
+ALTER TABLE oppgave.oppgaveversjon
+    DROP CONSTRAINT fk_oppgaveversjon_ident_id;
+ALTER TABLE oppgave.oppgaveversjon
+    ADD CONSTRAINT fk_oppgaveversjon_versjonident_id FOREIGN KEY (ident_id) REFERENCES oppgave.versjonident (id);
 
 -- Oppgave indexer for FK --
 CREATE INDEX idx_oppgave_ident_id
