@@ -13,28 +13,6 @@ CREATE TABLE klage.mottak
     created                         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE klage.klagesak
-(
-    id                              UUID PRIMARY KEY,
-    foedselsnummer                  VARCHAR(11) NOT NULL,
-    sakstype_id                     INTEGER NOT NULL,
-    modified                        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    created                         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_klagesak_sakstype
-        FOREIGN KEY (sakstype_id)
-            REFERENCES kodeverk.sakstype (id)
-);
-
-CREATE TABLE klage.saksdokument
-(
-    id                              UUID PRIMARY KEY,
-    klagesak_id                     UUID NOT NULL,
-    referanse                       TEXT,
-    CONSTRAINT fk_saksdokument_klagesak
-        FOREIGN KEY (klagesak_id)
-            REFERENCES klage.klagesak (id)
-);
-
 CREATE TABLE klage.tilbakemelding
 (
     id                              UUID PRIMARY KEY,
@@ -64,18 +42,19 @@ CREATE TABLE klage.vedtak
             REFERENCES klage.tilbakemelding (id)
 );
 
-CREATE TABLE klage.behandling
+CREATE TABLE klage.klagebehandling
 (
     id                              UUID PRIMARY KEY,
-    klagesak_id                     UUID                     NOT NULL,
+    foedselsnummer                  VARCHAR(11) NOT NULL,
+    sakstype_id                     INTEGER NOT NULL,
     mottak_id                       UUID,
     dato_mottatt_fra_foersteinstans DATE                     NOT NULL,
     dato_behandling_startet         DATE,
     dato_behandling_avsluttet       DATE,
     frist                           DATE                     NOT NULL,
     tildelt_saksbehandlerident      VARCHAR(7),
-    eoes_id                         INTEGER NOT NULL,
-    raadfoert_med_lege_id           INTEGER NOT NULL,
+    eoes_id                         INTEGER,
+    raadfoert_med_lege_id           INTEGER,
     vedtak_id                       UUID,
     modified                        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created                         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -85,9 +64,9 @@ CREATE TABLE klage.behandling
     CONSTRAINT fk_vedtak_rol
         FOREIGN KEY (raadfoert_med_lege_id)
             REFERENCES kodeverk.raadfoert_med_lege (id),
-    CONSTRAINT fk_behandling_klagesak
-        FOREIGN KEY (klagesak_id)
-            REFERENCES klage.klagesak (id),
+    CONSTRAINT fk_klagebehandling_sakstype
+        FOREIGN KEY (sakstype_id)
+            REFERENCES kodeverk.sakstype (id),
     CONSTRAINT fk_behandling_vedtak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),
@@ -99,7 +78,7 @@ CREATE TABLE klage.behandling
 CREATE TABLE klage.hjemmel
 (
     id                              UUID                    PRIMARY KEY,
-    behandling_id                   UUID                    NOT NULL,
+    klagebehandling_id              UUID                    NOT NULL,
     lov_id                          INTEGER,
     kapittel                        INTEGER,
     paragraf                        INTEGER,
@@ -110,18 +89,28 @@ CREATE TABLE klage.hjemmel
         FOREIGN KEY (lov_id)
             REFERENCES kodeverk.lov (id),
     CONSTRAINT fk_hjemmel_behandling
-        FOREIGN KEY (behandling_id)
-            REFERENCES klage.behandling (id)
+        FOREIGN KEY (klagebehandling_id)
+            REFERENCES klage.klagebehandling (id)
+);
+
+CREATE TABLE klage.saksdokument
+(
+    id                              UUID PRIMARY KEY,
+    klagebehandling_id                     UUID NOT NULL,
+    referanse                       TEXT,
+    CONSTRAINT fk_saksdokument_klagebehandling
+        FOREIGN KEY (klagebehandling_id)
+            REFERENCES klage.klagebehandling (id)
 );
 
 CREATE TABLE klage.klage_oppgave
 (
-    klagesak_id     UUID    NOT NULL,
-    oppgave_id      INTEGER NOT NULL,
-    PRIMARY KEY (klagesak_id, oppgave_id),
-    CONSTRAINT fk_klage_oppgave_klage
-        FOREIGN KEY (klagesak_id)
-            REFERENCES klage.klagesak (id),
+    id                              UUID    PRIMARY KEY,
+    behandling_id                   UUID    NOT NULL,
+    oppgave_id                      BIGINT  NOT NULL,
+    CONSTRAINT fk_klage_oppgave_behandling
+        FOREIGN KEY (behandling_id)
+            REFERENCES klage.klagebehandling (id),
     CONSTRAINT fk_klage_oppgave_oppgave
         FOREIGN KEY (oppgave_id)
             REFERENCES oppgave.oppgave (id)
