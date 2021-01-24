@@ -1,5 +1,3 @@
-CREATE SCHEMA oppgave;
-
 CREATE TABLE oppgave.oppgave
 (
     id                       BIGINT                NOT NULL,
