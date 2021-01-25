@@ -70,6 +70,9 @@ class KlagebehandlingRepositoryTest {
         )
         oppgaveKopiRepository.save(oppgaveKopi)
 
+        testEntityManager.flush()
+        testEntityManager.clear()
+
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
             sakstype = Sakstype(1, "", ""),
