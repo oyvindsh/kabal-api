@@ -25,7 +25,7 @@ internal class SafClientTest {
     @BeforeEach
     fun before() {
         every { tokenServiceMock.getStsSystembrukerToken() } returns "abc"
-        every { tokenServiceMock.getSaksbehandlerAccessTokenWithOppgaveScope() } returns "abc"
+        every { tokenServiceMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
         every { tracerMock.currentSpan().context().traceIdString() } returns "def"
     }
 
