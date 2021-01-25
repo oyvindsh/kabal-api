@@ -69,7 +69,7 @@ class OppgaveKopi(
     val ident: Ident? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "oppgave_id", referencedColumnName = "id", nullable = false)
-    var metadata: Set<Metadata> = setOf()
+    val metadata: Set<Metadata> = setOf()
 ) {
 
     constructor(
