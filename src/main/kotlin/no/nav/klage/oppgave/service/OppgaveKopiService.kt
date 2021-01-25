@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.domain.oppgavekopi.Metadata
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjonId
@@ -28,8 +29,7 @@ class OppgaveKopiService(
             val existingOppgaveKopi = oppgaveKopiRepository.getOne(oppgaveKopi.id)
             if (existingOppgaveKopi.versjon < oppgaveKopi.versjon) {
 
-                //Easiest way to keep our unique constraints in db
-                oppgaveKopiRepository.delete(existingOppgaveKopi)
+                mergeMetadata(oppgaveKopi.metadata, existingOppgaveKopi.metadata)
 
                 oppgaveKopiRepository.save(oppgaveKopi)
             } else {
@@ -40,8 +40,15 @@ class OppgaveKopiService(
         }
 
         oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
+    }
 
-        klagebehandlingService.connectOppgaveKopiToKlagebehandling(oppgaveKopi)
+    private fun mergeMetadata(metadataNew: Set<Metadata>, metadataOld: Set<Metadata>) {
+        metadataNew.forEach { newMetadata ->
+            val oldRow = metadataOld.find { oldMetadata -> oldMetadata.noekkel == newMetadata.noekkel }
+            if (oldRow != null) {
+                newMetadata.id = oldRow.id
+            }
+        }
     }
 
     fun getOppgaveKopi(oppgaveKopiId: Long): OppgaveKopi {
