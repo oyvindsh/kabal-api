@@ -1,5 +1,3 @@
-CREATE SCHEMA IF NOT EXISTS kodeverk;
-
 CREATE TABLE kodeverk.lov
 (
     id              INTEGER PRIMARY KEY,
