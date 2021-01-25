@@ -12,7 +12,7 @@ import java.sql.ResultSet
 
 @ActiveProfiles("local")
 @DataJpaTest
-@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FlywayMigrationTest {
 
     @Autowired

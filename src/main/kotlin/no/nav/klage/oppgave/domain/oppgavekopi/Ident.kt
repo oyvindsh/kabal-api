@@ -16,7 +16,7 @@ class Ident(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ident_seq")
     val id: Long? = null,
     @Enumerated(EnumType.STRING)
-    @Column(name = "TYPE")
+    @Column(name = "type")
     val identType: IdentType,
     @Column(name = "verdi")
     val verdi: String,

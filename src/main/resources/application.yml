@@ -31,7 +31,7 @@ spring:
   flyway:
     enabled: true
     clean-on-validation-error: true
-    schemas: flyway_history_schema,KLAGE,OPPGAVE,KODEVERK
+    schemas: flyway_history_schema,klage,oppgave,kodeverk
 
 server:
   port: 7081
