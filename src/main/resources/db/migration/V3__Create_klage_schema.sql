@@ -1,5 +1,3 @@
-CREATE SCHEMA IF NOT EXISTS klage;
-
 CREATE TABLE klage.mottak
 (
     id                              UUID PRIMARY KEY,
