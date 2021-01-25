@@ -7,5 +7,6 @@ import java.util.*
 
 @Repository
 interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID> {
-    fun findByOppgavereferanserOppgaveId(oppgaveId: Long): Klagebehandling
+
+    fun findByOppgavereferanserOppgaveId(oppgaveId: Long): Klagebehandling?
 }
