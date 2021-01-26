@@ -22,9 +22,6 @@ class Vedtak(
     @OneToOne
     @JoinColumn(name = "tilbakemelding_id", nullable = true)
     val tilbakemelding: Tilbakemelding? = null,
-    @OneToOne
-    @JoinColumn(name = "vedtaksdokument_id", nullable = true)
-    val vedtaksdokumentId: Saksdokument? = null,
     @Column(name = "modified")
     val modified: LocalDateTime,
     @Column(name = "created")

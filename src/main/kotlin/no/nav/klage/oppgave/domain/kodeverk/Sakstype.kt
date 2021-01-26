@@ -9,7 +9,7 @@ import javax.persistence.Table
 @Table(name = "sakstype", schema = "kodeverk")
 class Sakstype(
     @Id
-    val id: Int,
+    val id: String,
     @Column(name = "navn")
     val navn: String,
     @Column(name = "beskrivelse")
