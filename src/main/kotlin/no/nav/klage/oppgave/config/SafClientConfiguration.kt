@@ -17,10 +17,7 @@ class SafClientConfiguration(private val webClientBuilder: WebClient.Builder) {
 
     @Value("\${spring.application.name}")
     private lateinit var applicationName: String
-
-    @Value("\${SAF_APIKEY}")
-    private lateinit var apiKey: String
-
+    
     @Bean
     fun safWebClient(): WebClient {
         return webClientBuilder
@@ -29,7 +26,6 @@ class SafClientConfiguration(private val webClientBuilder: WebClient.Builder) {
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("Nav-Consumer-Id", applicationName)
-            .defaultHeader("x-nav-apiKey", apiKey)
             .build()
     }
 }
