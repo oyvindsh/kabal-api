@@ -4,6 +4,8 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Oppgavereferanse
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
+import no.nav.klage.oppgave.repositories.SakstypeRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -14,7 +16,7 @@ import java.util.*
 class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val hjemmelService: HjemmelService,
-    private val kodeverkService: KodeverkService
+    private val sakstypeRepository: SakstypeRepository
 ) {
 
     fun fetchKlagesakForOppgaveKopi(oppgaveId: Long): Klagebehandling? =
@@ -26,10 +28,13 @@ class KlagebehandlingService(
             return klagesak.id
         }
 
+        requireNotNull(oppgaveKopi.ident)
+        requireNotNull(oppgaveKopi.behandlingstype)
+
         val createdKlagebehandling = klagebehandlingRepository.save(Klagebehandling(
-            foedselsnummer = oppgaveKopi.ident?.verdi ?: throw java.lang.RuntimeException("Missing ident on oppgave ${oppgaveKopi.id}"),
+            foedselsnummer = oppgaveKopi.ident.verdi,
             frist = oppgaveKopi.fristFerdigstillelse ?: calculateFrist(),
-            sakstype = kodeverkService.getSakstypeFromBehandlingstema(oppgaveKopi.behandlingstype),
+            sakstype = sakstypeRepository.findByIdOrNull(oppgaveKopi.behandlingstype) ?: throw RuntimeException("No sakstype found for ${oppgaveKopi.id}"),
             hjemler = hjemmelService.getHjemmelFromOppgaveKopi(oppgaveKopi),
             oppgavereferanser = listOf(
                 Oppgavereferanse(

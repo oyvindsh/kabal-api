@@ -35,7 +35,7 @@ class KlagebehandlingRepositoryTest {
     fun `persist klage works`() {
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
-            sakstype = Sakstype(1, "", ""),
+            sakstype = Sakstype("ae0058", "", ""),
             hjemler = listOf(
                 Hjemmel(
                     original = "8-5"
@@ -77,7 +77,7 @@ class KlagebehandlingRepositoryTest {
 
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
-            sakstype = Sakstype(1, "", ""),
+            sakstype = Sakstype("ae0058", "", ""),
             hjemler = listOf(
                 Hjemmel(
                     original = "8-5"

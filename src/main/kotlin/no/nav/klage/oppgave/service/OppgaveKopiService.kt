@@ -40,6 +40,7 @@ class OppgaveKopiService(
         }
 
         oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
+        klagebehandlingService.connectOppgaveKopiToKlagebehandling(oppgaveKopi)
     }
 
     private fun mergeMetadata(metadataNew: Set<Metadata>, metadataOld: Set<Metadata>) {

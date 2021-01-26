@@ -18,7 +18,7 @@ import javax.persistence.PersistenceException
 @ActiveProfiles("local")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(OppgaveKopiService::class, KlagebehandlingService::class, HjemmelService::class, KodeverkService::class)
+@Import(OppgaveKopiService::class, KlagebehandlingService::class, HjemmelService::class)
 class OppgaveKopiServiceTest {
 
     @Autowired
