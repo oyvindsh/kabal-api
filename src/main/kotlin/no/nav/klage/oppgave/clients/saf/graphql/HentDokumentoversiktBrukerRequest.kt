@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients.saf
+package no.nav.klage.oppgave.clients.saf.graphql
 
 data class HentDokumentoversiktBrukerGraphqlQuery(
     val query: String,

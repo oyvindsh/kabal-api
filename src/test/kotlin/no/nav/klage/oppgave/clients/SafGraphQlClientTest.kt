@@ -4,8 +4,8 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.klage.oppgave.clients.saf.DokumentoversiktBrukerResponse
-import no.nav.klage.oppgave.clients.saf.SafClient
+import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBrukerResponse
+import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.service.TokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
-internal class SafClientTest {
+internal class SafGraphQlClientTest {
 
     @MockK
     lateinit var tokenServiceMock: TokenService
@@ -36,7 +36,7 @@ internal class SafClientTest {
     }
 
     fun getDokumentoversiktBruker(jsonResponse: String): DokumentoversiktBrukerResponse {
-        val safClient = SafClient(
+        val safClient = SafGraphQlClient(
             createShortCircuitWebClient(jsonResponse),
             tokenServiceMock,
             tracerMock

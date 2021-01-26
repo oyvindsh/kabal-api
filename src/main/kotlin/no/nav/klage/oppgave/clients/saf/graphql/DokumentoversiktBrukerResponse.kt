@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients.saf
+package no.nav.klage.oppgave.clients.saf.graphql
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime

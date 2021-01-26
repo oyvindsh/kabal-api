@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients.saf
+package no.nav.klage.oppgave.clients.saf.graphql
 
 import brave.Tracer
 import no.nav.klage.oppgave.service.TokenService
@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
-class SafClient(
+class SafGraphQlClient(
     private val safWebClient: WebClient,
     private val tokenService: TokenService,
     private val tracer: Tracer,
@@ -31,6 +31,7 @@ class SafClient(
     ): DokumentoversiktBrukerResponse {
         return runWithTimingAndLogging {
             safWebClient.post()
+                .uri("graphql")
                 .header(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
