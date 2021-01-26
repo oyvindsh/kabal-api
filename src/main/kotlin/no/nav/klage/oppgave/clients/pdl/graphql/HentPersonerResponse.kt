@@ -1,13 +1,11 @@
 package no.nav.klage.oppgave.clients.pdl.graphql
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.annotation.Nulls
-
 
 data class HentPersonerResponse(val data: HentPersonBolk?, val errors: List<PdlError>? = null)
 
-data class HentPersonResponse(val data: PdlPerson?, val errors: List<PdlError>? = null)
+data class HentPersonResponse(val data: DataWrapper?, val errors: List<PdlError>? = null)
+
+data class DataWrapper(val hentPerson: PdlPerson?)
 
 data class HentPersonBolk(val hentPersonBolk: List<HentPersonBolkResult>?)
 
@@ -16,9 +14,8 @@ data class HentPersonBolkResult(
     val ident: String
 )
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class PdlPerson(
-    @JsonSetter(nulls = Nulls.AS_EMPTY) val adressebeskyttelse: List<Adressebeskyttelse>,
+    val adressebeskyttelse: List<Adressebeskyttelse>,
     val navn: List<Navn>,
     val kjoenn: List<Kjoenn>
 ) {

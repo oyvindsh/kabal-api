@@ -27,7 +27,7 @@ internal class PdlClientTest {
     fun `pdl response kan mappes selv med tomme arrays`() {
         val hentPersonResponse = getHentPersonResponse(pdlResponse())
         assertThat(hentPersonResponse.data).isNotNull
-        assertThat(hentPersonResponse.data!!.navn.first().fornavn).isEqualTo("AREMARK")
+        assertThat(hentPersonResponse.data!!.hentPerson!!.navn.first().fornavn).isEqualTo("AREMARK")
     }
 
     fun getHentPersonResponse(jsonResponse: String): HentPersonResponse {
