@@ -15,6 +15,8 @@ class Klagebehandling(
     val id: UUID = UUID.randomUUID(),
     @Column(name = "foedselsnummer")
     val foedselsnummer: String,
+    @Column(name = "tema")
+    val tema: String,
     @OneToOne
     @JoinColumn(name = "sakstype_id")
     val sakstype: Sakstype,

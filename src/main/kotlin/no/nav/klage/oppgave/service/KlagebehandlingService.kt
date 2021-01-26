@@ -33,6 +33,7 @@ class KlagebehandlingService(
 
         val createdKlagebehandling = klagebehandlingRepository.save(Klagebehandling(
             foedselsnummer = oppgaveKopi.ident.folkeregisterident ?: throw RuntimeException("folkeregisterident is missing from oppgave"),
+            tema = oppgaveKopi.tema,
             frist = oppgaveKopi.fristFerdigstillelse ?: calculateFrist(),
             sakstype = sakstypeRepository.findByIdOrNull(oppgaveKopi.behandlingstype) ?: throw RuntimeException("No sakstype found for ${oppgaveKopi.id}"),
             hjemler = hjemmelService.getHjemmelFromOppgaveKopi(oppgaveKopi),

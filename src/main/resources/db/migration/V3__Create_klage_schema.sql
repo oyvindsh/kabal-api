@@ -44,6 +44,7 @@ CREATE TABLE klage.klagebehandling
 (
     id                              UUID PRIMARY KEY,
     foedselsnummer                  VARCHAR(11)              NOT NULL,
+    tema                            VARCHAR(3)               NOT NULL,
     sakstype_id                     VARCHAR(10)              NOT NULL,
     mottak_id                       UUID,
     dato_mottatt_fra_foersteinstans DATE                     NOT NULL,
