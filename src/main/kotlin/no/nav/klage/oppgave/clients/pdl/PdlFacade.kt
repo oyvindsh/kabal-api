@@ -57,7 +57,7 @@ class PdlFacade(
 
     private fun HentPersonResponse.getPersonOrLogErrors(): PdlPerson? =
         if (this.errors.isNullOrEmpty()) {
-            this.data
+            this.data?.hentPerson
         } else {
             logger.warn("Errors returned from PDL. See securelogs for details.")
             secureLogger.warn("Errors returned from PDL: ${this.errors}")
