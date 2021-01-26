@@ -36,6 +36,7 @@ class KlagebehandlingService(
             frist = oppgaveKopi.fristFerdigstillelse ?: calculateFrist(),
             sakstype = sakstypeRepository.findByIdOrNull(oppgaveKopi.behandlingstype) ?: throw RuntimeException("No sakstype found for ${oppgaveKopi.id}"),
             hjemler = hjemmelService.getHjemmelFromOppgaveKopi(oppgaveKopi),
+            tildeltSaksbehandlerident = oppgaveKopi.tilordnetRessurs,
             oppgavereferanser = listOf(
                 Oppgavereferanse(
                     oppgaveId = oppgaveKopi.id
