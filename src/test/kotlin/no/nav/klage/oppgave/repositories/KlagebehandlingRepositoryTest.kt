@@ -44,7 +44,8 @@ class KlagebehandlingRepositoryTest {
             oppgavereferanser = listOf(),
             modified = LocalDateTime.now(),
             created = LocalDateTime.now(),
-            frist = LocalDate.now()
+            frist = LocalDate.now(),
+            tema = "SYK"
         )
 
         klagebehandlingRepository.save(klage)
@@ -86,7 +87,8 @@ class KlagebehandlingRepositoryTest {
             oppgavereferanser = listOf(Oppgavereferanse(oppgaveId = 1001L)),
             modified = LocalDateTime.now(),
             created = LocalDateTime.now(),
-            frist = LocalDate.now()
+            frist = LocalDate.now(),
+            tema = "SYK"
         )
 
         klagebehandlingRepository.save(klage)
