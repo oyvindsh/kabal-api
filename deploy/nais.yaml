@@ -58,7 +58,6 @@ spec:
     path: /internal/prometheus
   secureLogs:
     enabled: true
-  webproxy: true
   accessPolicy:
     inbound:
       rules:
