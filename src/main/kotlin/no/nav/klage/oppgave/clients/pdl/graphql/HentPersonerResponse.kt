@@ -1,5 +1,9 @@
 package no.nav.klage.oppgave.clients.pdl.graphql
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
+
 
 data class HentPersonerResponse(val data: HentPersonBolk?, val errors: List<PdlError>? = null)
 
@@ -12,12 +16,13 @@ data class HentPersonBolkResult(
     val ident: String
 )
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class PdlPerson(
-    val adressebeskyttelse: List<Adressebeskyttelse>?,
+    @JsonSetter(nulls = Nulls.AS_EMPTY) val adressebeskyttelse: List<Adressebeskyttelse>,
     val navn: List<Navn>,
     val kjoenn: List<Kjoenn>
 ) {
-    data class Adressebeskyttelse(val gradering: GraderingType?) {
+    data class Adressebeskyttelse(val gradering: GraderingType) {
         enum class GraderingType { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
     }
 
