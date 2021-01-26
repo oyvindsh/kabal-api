@@ -123,7 +123,7 @@ CREATE SEQUENCE oppgave.versjonmetadata_seq;
 CREATE TABLE oppgave.ident
 (
     id                 BIGINT       NOT NULL,
-    TYPE               VARCHAR(255) NOT NULL,
+    type               VARCHAR(255) NOT NULL,
     verdi              VARCHAR(255) NOT NULL,
     folkeregisterident VARCHAR(20),
     registrert_dato    DATE,
@@ -140,7 +140,7 @@ ALTER TABLE oppgave.oppgaveversjon
 CREATE TABLE oppgave.versjonident
 (
     id                 BIGINT       NOT NULL,
-    TYPE               VARCHAR(255) NOT NULL,
+    type               VARCHAR(255) NOT NULL,
     verdi              VARCHAR(255) NOT NULL,
     folkeregisterident VARCHAR(20),
     registrert_dato    DATE,
