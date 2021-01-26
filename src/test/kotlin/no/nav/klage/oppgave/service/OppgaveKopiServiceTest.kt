@@ -43,7 +43,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = now,
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
@@ -71,7 +71,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
@@ -100,7 +100,7 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
@@ -136,7 +136,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
@@ -152,7 +152,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
@@ -185,7 +185,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
@@ -219,7 +219,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
@@ -252,7 +252,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
@@ -279,7 +279,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
@@ -295,7 +295,7 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
             metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
             behandlingstype = "ae0058"
         )
