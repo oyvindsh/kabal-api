@@ -5,6 +5,7 @@ externalHosts:
   - unleash.nais.io
   - klage-fss-proxy.dev-fss-pub.nais.io
   - kafka-schema-registry.nais-q.adeo.no
+  - saf.dev-fss-pub.nais.io
 springProfile: dev-gcp
 tenant: trygdeetaten.no
 db_tier: db-custom-1-3840

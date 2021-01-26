@@ -19,3 +19,7 @@ KAFKA_SCHEMA_REGISTRY_URL: https://kafka-schema-registry.nais-q.adeo.no/
 
 AIVEN_ES_HOST: elastic-klage-oppgave-es-nav-dev.aivencloud.com
 AIVEN_ES_PORT: 26482
+
+SAF_BASE_URL: https://saf.dev-fss-pub.nais.io/
+SAF_APP_CLIENT_ID: c7adbfbb-1b1e-41f6-9b7a-af9627c04998
+
