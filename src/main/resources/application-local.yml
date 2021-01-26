@@ -14,7 +14,6 @@ PDL_APIKEY: 159
 AXSYS_APIKEY: 357
 SAF_BASE_URL: local
 SAF_APP_CLIENT_ID: uu-id
-SAF_APIKEY: 246
 nais:
   cluster:
     name: local

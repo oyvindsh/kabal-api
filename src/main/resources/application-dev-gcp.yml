@@ -23,7 +23,3 @@ AIVEN_ES_PORT: 26482
 SAF_BASE_URL: https://saf.dev-fss-pub.nais.io/
 SAF_APP_CLIENT_ID: c7adbfbb-1b1e-41f6-9b7a-af9627c04998
 
-spring:
-  flyway:
-    clean-on-validation-error: true
-
