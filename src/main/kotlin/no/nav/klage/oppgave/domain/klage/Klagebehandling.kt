@@ -2,27 +2,30 @@ package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.oppgave.domain.kodeverk.Eoes
 import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "behandling", schema = "klage")
-class Behandling(
+@Table(name = "klagebehandling", schema = "klage")
+class Klagebehandling(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @ManyToOne
-    @JoinColumn(name = "klagesak_id", nullable = false)
-    val klagesak: Klagesak,
+    @Column(name = "foedselsnummer")
+    val foedselsnummer: String,
+    @OneToOne
+    @JoinColumn(name = "sakstype_id")
+    val sakstype: Sakstype,
     @Column(name = "dato_mottatt_fra_foersteinstans")
-    val mottatt: LocalDate? = null,
+    val mottatt: LocalDate = LocalDate.now(),
     @Column(name = "dato_behandling_startet")
     val startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
     val avsluttet: LocalDate? = null,
     @Column(name = "frist")
-    val frist: LocalDate? = null,
+    val frist: LocalDate,
     @Column(name = "tildelt_saksbehandlerident")
     val tildeltSaksbehandlerident: String? = null,
     @OneToOne
@@ -30,17 +33,20 @@ class Behandling(
     val vedtak: Vedtak? = null,
     @OneToOne
     @JoinColumn(name = "eoes_id")
-    val eoes: Eoes,
+    val eoes: Eoes? = null,
     @OneToOne
     @JoinColumn(name = "raadfoert_med_lege_id")
-    val raadfoertMedLege: RaadfoertMedLege,
-    @OneToMany
-    @JoinColumn(name = "behandling_id")
+    val raadfoertMedLege: RaadfoertMedLege? = null,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val hjemler: List<Hjemmel>,
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    val oppgavereferanser: List<Oppgavereferanse>,
     @Column(name = "modified")
-    val modified: LocalDateTime,
+    val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
-    val created: LocalDateTime
+    val created: LocalDateTime = LocalDateTime.now()
 ) {
     override fun toString(): String {
         return "Behandling(id=$id, " +
@@ -52,7 +58,7 @@ class Behandling(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Behandling
+        other as Klagebehandling
 
         if (id != other.id) return false
 

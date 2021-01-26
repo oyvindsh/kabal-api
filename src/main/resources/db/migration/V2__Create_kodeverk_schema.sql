@@ -1,21 +1,21 @@
 CREATE TABLE kodeverk.lov
 (
     id              INTEGER PRIMARY KEY,
-    navn            TEXT     NOT NULL,
+    navn            TEXT    NOT NULL,
     beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.sakstype
 (
-    id              INTEGER PRIMARY KEY,
-    navn            TEXT     NOT NULL,
+    id              VARCHAR(10) PRIMARY KEY,
+    navn            TEXT        NOT NULL,
     beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.eoes
 (
     id              INTEGER PRIMARY KEY,
-    navn            TEXT     NOT NULL,
+    navn            TEXT    NOT NULL,
     beskrivelse     TEXT
 );
 
@@ -29,23 +29,24 @@ CREATE TABLE kodeverk.grunn
 CREATE TABLE kodeverk.raadfoert_med_lege
 (
     id              INTEGER PRIMARY KEY,
-    navn            TEXT     NOT NULL,
+    navn            TEXT    NOT NULL,
     beskrivelse     TEXT
 );
 
 CREATE TABLE kodeverk.utfall
 (
     id              INTEGER PRIMARY KEY,
-    navn            TEXT     NOT NULL,
+    navn            TEXT    NOT NULL,
     beskrivelse     TEXT
 );
 
 INSERT INTO kodeverk.lov VALUES(1, 'Folketrygdloven', 'Lov om folketrygd');
 
-INSERT INTO kodeverk.sakstype VALUES(1, 'Klage', NULL);
-INSERT INTO kodeverk.sakstype VALUES(2, 'Anke', NULL);
-INSERT INTO kodeverk.sakstype VALUES(3, 'Gjenopptak', NULL);
-INSERT INTO kodeverk.sakstype VALUES(4, 'Revurdering', NULL);
+INSERT INTO kodeverk.sakstype VALUES('ae0058', 'Klage', NULL);
+INSERT INTO kodeverk.sakstype VALUES('ae0046', 'Anke', NULL);
+INSERT INTO kodeverk.sakstype VALUES('ae0047', 'Gjenopptak', NULL);
+INSERT INTO kodeverk.sakstype VALUES('ae0028', 'Revurdering', NULL);
+INSERT INTO kodeverk.sakstype VALUES('ae0161', 'Feilutbetaling', NULL);
 
 INSERT INTO kodeverk.eoes VALUES(1, 'Riktig', 'Problemstilling knyttet til EØS/utland er godt håndtert');
 INSERT INTO kodeverk.eoes VALUES(2, 'Ikke oppdaget', 'Vedtaksinstansen har ikke oppdaget at saken gjelder EØS/utland');

@@ -13,7 +13,7 @@ class Metadata(
         allocationSize = 1
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metadata_seq")
-    val id: Long? = null,
+    var id: Long? = null,
     @Column(name = "nokkel")
     val noekkel: MetadataNoekkel,
     @Column(name = "verdi")

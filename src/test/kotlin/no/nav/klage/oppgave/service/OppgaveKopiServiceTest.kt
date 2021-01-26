@@ -18,7 +18,7 @@ import javax.persistence.PersistenceException
 @ActiveProfiles("local")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(OppgaveKopiService::class)
+@Import(OppgaveKopiService::class, KlagebehandlingService::class, HjemmelService::class)
 class OppgaveKopiServiceTest {
 
     @Autowired
@@ -42,7 +42,9 @@ class OppgaveKopiServiceTest {
             fristFerdigstillelse = LocalDate.now(),
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
-            opprettetTidspunkt = now
+            opprettetTidspunkt = now,
+            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
@@ -69,7 +71,8 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", null, null)
+            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
@@ -96,7 +99,9 @@ class OppgaveKopiServiceTest {
             aktivDato = LocalDate.now(),
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
@@ -132,7 +137,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
         val oppgaveKopi2 = OppgaveKopi(
             id = 1001L,
@@ -147,7 +153,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
 
@@ -179,7 +186,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
 
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
@@ -212,7 +220,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
@@ -244,7 +253,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
 
@@ -270,7 +280,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
         val oppgaveKopi2 = OppgaveKopi(
             id = 1001L,
@@ -285,7 +296,8 @@ class OppgaveKopiServiceTest {
             opprettetAv = "H149290",
             opprettetTidspunkt = LocalDateTime.now(),
             ident = Ident(null, IdentType.AKTOERID, "12345", null, null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25"))
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
+            behandlingstype = "ae0058"
         )
         oppgaveKopiService.saveOppgaveKopi(oppgaveKopi2)
 
