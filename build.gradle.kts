@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val mockkVersion = "1.10.5"
 val h2Version = "1.4.200"
 val tokenValidationVersion = "1.3.2"
-val oidcSupportVersion = "0.2.18"
 val logstashVersion = "6.6"
 val springSleuthVersion = "3.0.0"
 val unleashVersion = "3.3.3"
@@ -79,7 +78,6 @@ dependencies {
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
-    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
 
     implementation("no.nav.slackposter:simple-slack-poster:5")
     implementation("org.springframework.retry:spring-retry:$springRetryVersion")
