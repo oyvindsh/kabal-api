@@ -20,7 +20,12 @@ internal class SaksbehandlerRepositoryTest {
         every { klageProxyClient.getRoller("Z123456") } returns listOf("0000-GA-GOSYS_OPPGAVE_BEHANDLER")
         every { klageProxyClient.getRoller("Z654321") } returns listOf("anything")
 
-        saksbehandlerRepository = SaksbehandlerRepository(mockk(), mockk(), klageProxyClient)
+        saksbehandlerRepository =
+            SaksbehandlerRepository(
+                mockk(),
+                mockk(),
+                klageProxyClient
+            )
     }
 
     @Test

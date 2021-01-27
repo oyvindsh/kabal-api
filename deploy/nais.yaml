@@ -25,6 +25,15 @@ spec:
       enabled: true
       tenant: {{tenant}}
       claims:
+        groups:
+          - id: {{0000-GA-KLAGE_SAKSBEHANDLER}}
+          - id: {{0000-GA-KLAGE_FAGANSVARLIG}}
+          - id: {{0000-GA-KLAGE_LEDER}}
+          - id: {{0000-GA-KLAGE_MERKANTIL}}
+          - id: {{0000-GA-KLAGE_FORTROLIG}}
+          - id: {{0000-GA-KLAGE_STRENGT_FORTROLIG}}
+          - id: {{0000-GA-KLAGE_EGEN_ANSATT}}
+          - id: {{0000-GA-GOSYS_OPPGAVE_BEHANDLER}}
         extra:
           - NAVident
   elastic:

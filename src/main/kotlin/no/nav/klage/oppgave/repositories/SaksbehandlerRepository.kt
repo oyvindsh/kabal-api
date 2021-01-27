@@ -22,14 +22,16 @@ class SaksbehandlerRepository(
 
         val saksbehandlerNameCache = mutableMapOf<String, String>()
 
-        const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
+        const val ROLE_ONPREM_GOSYS_OPPGAVE_BEHANDLER = "0000-GA-GOSYS_OPPGAVE_BEHANDLER"
+        const val ROLE_ONPREM_KLAGE_SAKSBEHANDLER = "0000-GA-KLAGE_SAKSBEHANDLER"
+        const val ROLE_ONPREM_KLAGE_FAGANSVARLIG = "0000-GA-KLAGE_FAGANSVARLIG"
+        const val ROLE_ONPREM_KLAGE_LEDER = "0000-GA-KLAGE_LEDER"
+        const val ROLE_ONPREM_KLAGE_MERKANTIL = "0000-GA-KLAGE_MERKANTIL"
+        const val ROLE_ONPREM_KLAGE_FORTROLIG = "0000-GA-KLAGE_FORTROLIG"
+        const val ROLE_ONPREM_KLAGE_STRENGT_FORTROLIG = "0000-GA-KLAGE_STRENGT_FORTROLIG"
+        const val ROLE_ONPREM_KLAGE_EGEN_ANSATT = "0000-GA-GOSYS-EGEN_ANSATT"
 
-        private const val LEDER_ROLLE = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
-        private const val FAGANSVARLIG_ROLLE = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
-        private const val SAKSBEHANDLER_ROLLE = "0000-GA-GOSYS_OPPGAVE_BEHANDLER"
-        private const val KAN_BEHANDLE_STRENGT_FORTROLIG = "0000-GA-GOSYS_KODE6"
-        private const val KAN_BEHANDLE_FORTROLIG = "0000-GA-GOSYS_KODE7"
-        private const val KAN_BEHANDLE_EGEN_ANSATT = "0000-GA-GOSYS_VETIKKEHVAROLLENHETER"
+        const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
 
     fun getTilgangerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =
@@ -52,19 +54,24 @@ class SaksbehandlerRepository(
         return saksbehandlerNameCache
     }
 
-    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).any { it.contains(FAGANSVARLIG_ROLLE) }
+    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_FAGANSVARLIG)
 
-    fun erLeder(ident: String): Boolean = getRoller(ident).any { it.contains(LEDER_ROLLE) }
+    fun erLeder(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_LEDER)
 
-    fun erSaksbehandler(ident: String): Boolean = getRoller(ident).any { it.contains(SAKSBEHANDLER_ROLLE) }
+    fun erSaksbehandler(ident: String): Boolean =
+        getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_SAKSBEHANDLER)
+                || getRoller(ident).hasRole(ROLE_ONPREM_GOSYS_OPPGAVE_BEHANDLER)
 
-    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).any { it.contains(KAN_BEHANDLE_FORTROLIG) }
+    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_FORTROLIG)
 
     fun kanBehandleStrengtFortrolig(ident: String): Boolean =
-        getRoller(ident).any { it.contains(KAN_BEHANDLE_STRENGT_FORTROLIG) }
+        getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_STRENGT_FORTROLIG)
 
-    fun kanBehandleEgenAnsatt(ident: String): Boolean =
-        getRoller(ident).any { it.contains(KAN_BEHANDLE_EGEN_ANSATT) }
+    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_EGEN_ANSATT)
 
-    fun getRoller(ident: String): List<String> = klageProxyClient.getRoller(ident)
+    //NB! Returnerer navn på gruppene, ikke objectId'er
+    private fun getRoller(ident: String): List<String> = klageProxyClient.getRoller(ident)
+
+    private fun List<String>.hasRole(role: String) = any { it.contains(role) }
+
 }
