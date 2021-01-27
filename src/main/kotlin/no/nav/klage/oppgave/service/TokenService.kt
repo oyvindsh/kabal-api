@@ -67,7 +67,5 @@ class TokenService(
     fun getRollerFromToken(): List<String> =
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
             .jwtTokenClaims?.getAsList("groups").orEmpty().toList()
-            .let { securelogger.debug("Grupper hentet for ${getIdent()} er ${it}"); it }
-
-
+    
 }
