@@ -63,8 +63,9 @@ internal class OppgaveFacadeTest {
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlFacadeMock, mockk(relaxed = true)),
+            OppgaveMapper(pdlFacadeMock, mockk(relaxed = true), mockk(relaxed = true)),
             mockk(),
+            mockk(relaxed = true),
             mockk(relaxed = true),
             mockk(relaxed = true),
         )
@@ -101,8 +102,9 @@ internal class OppgaveFacadeTest {
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlFacadeMock, mockk(relaxed = true)),
+            OppgaveMapper(pdlFacadeMock, mockk(relaxed = true), mockk(relaxed = true)),
             mockk(),
+            mockk(relaxed = true),
             mockk(relaxed = true),
             mockk(relaxed = true),
         )
@@ -120,8 +122,9 @@ internal class OppgaveFacadeTest {
             OppgaveService(
                 oppgaveClientMock
             ),
-            OppgaveMapper(pdlFacadeMock, mockk(relaxed = true)),
+            OppgaveMapper(pdlFacadeMock, mockk(relaxed = true), mockk(relaxed = true)),
             mockk(),
+            mockk(relaxed = true),
             mockk(relaxed = true),
             mockk(relaxed = true),
         )

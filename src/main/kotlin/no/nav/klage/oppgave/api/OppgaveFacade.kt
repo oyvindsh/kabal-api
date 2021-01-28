@@ -3,10 +3,12 @@ package no.nav.klage.oppgave.api
 import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
+import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.Oppgave
 import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveKopiService
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
@@ -19,7 +21,8 @@ class OppgaveFacade(
     private val oppgaveMapper: OppgaveMapper,
     private val oppgaveKopiService: OppgaveKopiService,
     private val elasticsearchRepository: ElasticsearchRepository,
-    private val unleash: Unleash
+    private val unleash: Unleash,
+    private val klagebehandlingService: KlagebehandlingService
 ) {
 
     companion object {
@@ -69,5 +72,13 @@ class OppgaveFacade(
                 securelogger.error("Unable to index OppgaveKopi", e)
             }
         }
+    }
+
+    fun getKlagebehandling(klagebehandlingId: String): KlagebehandlingView {
+        return oppgaveMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.getKlagebehandling(
+                klagebehandlingId
+            )
+        )
     }
 }

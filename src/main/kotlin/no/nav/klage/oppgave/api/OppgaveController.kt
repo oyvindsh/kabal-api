@@ -89,13 +89,16 @@ class OppgaveController(
         return ResponseEntity.noContent().location(uri).build()
     }
 
-    @GetMapping("/ansatte/{navIdent}/oppgaver/{id}")
-    fun getOppgave(
-        @PathVariable navIdent: String,
-        @PathVariable("id") oppgaveId: String
-    ): Oppgave {
-        logger.debug("getOppgave is requested: {}", oppgaveId)
-        return oppgaveFacade.getOppgave(oppgaveId.toLongOrException())
+    @GetMapping("/klagebehandlinger/{id}")
+    fun getKlagebehandling(
+        @PathVariable("id") klagebehandlingId: String
+    ): KlagebehandlingView {
+        logger.debug(
+            "getKlagebehandling is requested by ident {} for id {}",
+            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            klagebehandlingId
+        )
+        return oppgaveFacade.getKlagebehandling(klagebehandlingId)
     }
 
     private fun String?.toLongOrException() =

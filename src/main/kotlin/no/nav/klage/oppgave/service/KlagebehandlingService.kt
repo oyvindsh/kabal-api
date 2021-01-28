@@ -48,6 +48,10 @@ class KlagebehandlingService(
         return createdKlagebehandling.id
     }
 
+    fun getKlagebehandling(klagebehandlingId: String): Klagebehandling {
+        return klagebehandlingRepository.findById(UUID.fromString(klagebehandlingId)).get()
+    }
+
     // TODO Implement a proper algorithm
     private fun calculateFrist() = LocalDate.now().plusDays(100)
 }
