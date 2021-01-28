@@ -3,12 +3,9 @@ package no.nav.klage.oppgave.api
 import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
-import no.nav.klage.oppgave.api.view.KlagebehandlingView
-import no.nav.klage.oppgave.api.view.Oppgave
 import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
-import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveKopiService
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
@@ -21,8 +18,7 @@ class OppgaveFacade(
     private val oppgaveMapper: OppgaveMapper,
     private val oppgaveKopiService: OppgaveKopiService,
     private val elasticsearchRepository: ElasticsearchRepository,
-    private val unleash: Unleash,
-    private val klagebehandlingService: KlagebehandlingService
+    private val unleash: Unleash
 ) {
 
     companion object {
@@ -57,11 +53,6 @@ class OppgaveFacade(
         oppgaveService.assignOppgave(oppgaveId, saksbehandlerIdent, oppgaveVersjon)
     }
 
-    fun getOppgave(oppgaveId: Long): Oppgave {
-        val oppgaveBackend = oppgaveService.getOppgave(oppgaveId)
-        return oppgaveMapper.mapOppgaveToView(oppgaveBackend, true)
-    }
-
     fun saveOppgaveKopi(oppgave: OppgaveKopiAPIModel) {
         oppgaveKopiService.saveOppgaveKopi(oppgaveMapper.mapOppgaveKopiAPIModelToOppgaveKopi(oppgave))
         if (unleash.isEnabled("klage.indekserMedES")) {
@@ -72,13 +63,5 @@ class OppgaveFacade(
                 securelogger.error("Unable to index OppgaveKopi", e)
             }
         }
-    }
-
-    fun getKlagebehandling(klagebehandlingId: String): KlagebehandlingView {
-        return oppgaveMapper.mapKlagebehandlingToKlagebehandlingView(
-            klagebehandlingService.getKlagebehandling(
-                klagebehandlingId
-            )
-        )
     }
 }

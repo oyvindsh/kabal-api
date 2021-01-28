@@ -3,16 +3,12 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.view.HJEMMEL
-import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.gosys.Gruppe
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.*
 import no.nav.klage.oppgave.domain.elasticsearch.EsOppgave
-import no.nav.klage.oppgave.domain.klage.Hjemmel
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.oppgavekopi.*
-import no.nav.klage.oppgave.service.OppgaveKopiService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -24,7 +20,6 @@ import no.nav.klage.oppgave.domain.elasticsearch.Status as EsStatus
 @Service
 class OppgaveMapper(
     private val pdlFacade: PdlFacade,
-    private val oppgaveKopiService: OppgaveKopiService,
     private val egenAnsattService: EgenAnsattService
 ) {
 
@@ -242,42 +237,5 @@ class OppgaveMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig
         )
-    }
-
-    fun mapKlagebehandlingToKlagebehandlingView(klagebehandling: Klagebehandling): KlagebehandlingView {
-        //naive lookup
-        val oppgaveKopi = oppgaveKopiService.getOppgaveKopi(klagebehandling.oppgavereferanser.first().oppgaveId)
-
-        return KlagebehandlingView(
-            id = klagebehandling.id,
-            //TODO get date from where? klage-document/journalpost perhaps.
-            klageInnsendtdato = null,
-            //TODO get name from norg2
-            fraNAVEnhet = oppgaveKopi.opprettetAvEnhetsnr ?: "mangler",
-            mottattFoersteinstans = oppgaveKopi.opprettetTidspunkt.toLocalDate(),
-            foedselsnummer = klagebehandling.foedselsnummer,
-            tema = klagebehandling.tema,
-            sakstype = klagebehandling.sakstype.navn,
-            mottatt = klagebehandling.mottatt,
-            startet = klagebehandling.startet,
-            avsluttet = klagebehandling.avsluttet,
-            frist = klagebehandling.frist,
-            tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
-            hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
-            modified = klagebehandling.modified,
-            created = klagebehandling.created
-        )
-    }
-
-    private fun hjemmelToHjemmelView(hjemler: List<Hjemmel>): List<KlagebehandlingView.Hjemmel> {
-        return hjemler.map {
-            KlagebehandlingView.Hjemmel(
-                kapittel = it.kapittel,
-                paragraf = it.paragraf,
-                ledd = it.ledd,
-                bokstav = it.bokstav,
-                original = it.original
-            )
-        }
     }
 }
