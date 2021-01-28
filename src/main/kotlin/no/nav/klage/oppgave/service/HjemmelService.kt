@@ -10,7 +10,9 @@ class HjemmelService {
     private val hjemmelRegex = """(\d{1,2}-\d{1,2})+""".toRegex()
 
     fun getHjemmelFromOppgaveKopi(oppgaveKopi: OppgaveKopi): List<Hjemmel> {
-        val metadatHjemmel = oppgaveKopi.metadata.find { it.noekkel == MetadataNoekkel.HJEMMEL }
+        val metadatHjemmel = oppgaveKopi.metadata.find {
+            it.noekkel == MetadataNoekkel.HJEMMEL && it.verdi.matchesHjemmelRegex()
+        }
         if (metadatHjemmel != null) {
             return listOf(generateHjemmelFromText(metadatHjemmel.verdi))
         }
@@ -38,4 +40,6 @@ class HjemmelService {
         }
         return list
     }
+
+    private fun String.matchesHjemmelRegex() = hjemmelRegex.find(this) != null
 }
