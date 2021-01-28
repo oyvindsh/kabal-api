@@ -113,13 +113,34 @@ class OppgaveKopiServiceTest {
         assertThat(hentetOppgave.metadata).isNotNull
         assertThat(hentetOppgave.metadata.size).isEqualTo(1)
         assertThat(hentetOppgave.metadataAsMap()[MetadataNoekkel.HJEMMEL]).isEqualTo("8-25")
+    }
 
-//        val versjonMetadataCount = jdbcTemplate.queryForObject(
-//            "SELECT count(*) FROM oppgave.versjonmetadata",
-//            emptyArray(),
-//            Integer::class.java
-//        )
-//        assertThat(versjonMetadataCount).isEqualTo(1)
+    @Test
+    fun `oppgave with MANGLER hjemmel stored ok`() {
+        val oppgaveKopi = OppgaveKopi(
+            id = 1001L,
+            versjon = 1,
+            tema = "SYK",
+            status = Status.OPPRETTET,
+            tildeltEnhetsnr = "4219",
+            oppgavetype = "BEH_SAK_MK",
+            prioritet = Prioritet.NORM,
+            beskrivelse = "Beskrivelse uten hjemmel",
+            fristFerdigstillelse = LocalDate.now(),
+            aktivDato = LocalDate.now(),
+            opprettetAv = "H149290",
+            opprettetTidspunkt = LocalDateTime.now(),
+            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "MANGLER")),
+            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
+            behandlingstype = "ae0058"
+        )
+        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi)
+
+        entityManager.flush()
+        entityManager.clear()
+
+        val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
+        assertThat(hentetOppgave).isNotNull
     }
 
     @Test
