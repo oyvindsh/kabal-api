@@ -4,7 +4,10 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.OppgaverQueryParamsMapper
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.OppgaverQueryParams
+import no.nav.klage.oppgave.api.view.OppgaverRespons
+import no.nav.klage.oppgave.api.view.Saksbehandlerfradeling
+import no.nav.klage.oppgave.api.view.Saksbehandlertildeling
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
@@ -87,15 +90,6 @@ class OppgaveController(
             .fromMethodName(OppgaveController::class.java, "getOppgave", navIdent, oppgaveId)
             .buildAndExpand(oppgaveId).toUri()
         return ResponseEntity.noContent().location(uri).build()
-    }
-
-    @GetMapping("/ansatte/{navIdent}/oppgaver/{id}")
-    fun getOppgave(
-        @PathVariable navIdent: String,
-        @PathVariable("id") oppgaveId: String
-    ): Oppgave {
-        logger.debug("getOppgave is requested: {}", oppgaveId)
-        return oppgaveFacade.getOppgave(oppgaveId.toLongOrException())
     }
 
     private fun String?.toLongOrException() =

@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api
 import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
-import no.nav.klage.oppgave.api.view.Oppgave
 import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
@@ -52,11 +51,6 @@ class OppgaveFacade(
 
     fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?) {
         oppgaveService.assignOppgave(oppgaveId, saksbehandlerIdent, oppgaveVersjon)
-    }
-
-    fun getOppgave(oppgaveId: Long): Oppgave {
-        val oppgaveBackend = oppgaveService.getOppgave(oppgaveId)
-        return oppgaveMapper.mapOppgaveToView(oppgaveBackend, true)
     }
 
     fun saveOppgaveKopi(oppgave: OppgaveKopiAPIModel) {

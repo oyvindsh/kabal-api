@@ -31,21 +31,30 @@ class KlagebehandlingService(
         requireNotNull(oppgaveKopi.ident)
         requireNotNull(oppgaveKopi.behandlingstype)
 
-        val createdKlagebehandling = klagebehandlingRepository.save(Klagebehandling(
-            foedselsnummer = oppgaveKopi.ident.folkeregisterident ?: throw RuntimeException("folkeregisterident is missing from oppgave"),
-            tema = oppgaveKopi.tema,
-            frist = oppgaveKopi.fristFerdigstillelse ?: calculateFrist(),
-            sakstype = sakstypeRepository.findByIdOrNull(oppgaveKopi.behandlingstype) ?: throw RuntimeException("No sakstype found for ${oppgaveKopi.id}"),
-            hjemler = hjemmelService.getHjemmelFromOppgaveKopi(oppgaveKopi),
-            tildeltSaksbehandlerident = oppgaveKopi.tilordnetRessurs,
-            oppgavereferanser = listOf(
-                Oppgavereferanse(
-                    oppgaveId = oppgaveKopi.id
+        val createdKlagebehandling = klagebehandlingRepository.save(
+            Klagebehandling(
+                foedselsnummer = oppgaveKopi.ident.folkeregisterident
+                    ?: throw RuntimeException("folkeregisterident is missing from oppgave"),
+                tema = oppgaveKopi.tema,
+                frist = oppgaveKopi.fristFerdigstillelse ?: calculateFrist(),
+                sakstype = sakstypeRepository.findByIdOrNull(oppgaveKopi.behandlingstype)
+                    ?: throw RuntimeException("No sakstype found for ${oppgaveKopi.id}"),
+                hjemler = hjemmelService.getHjemmelFromOppgaveKopi(oppgaveKopi),
+                tildeltSaksbehandlerident = oppgaveKopi.tilordnetRessurs,
+                oppgavereferanser = listOf(
+                    Oppgavereferanse(
+                        oppgaveId = oppgaveKopi.id
+                    )
                 )
             )
-        ))
+        )
 
         return createdKlagebehandling.id
+    }
+
+    fun getKlagebehandlingByOppgaveId(oppgaveId: Long): Klagebehandling {
+        return klagebehandlingRepository.findByOppgavereferanserOppgaveId(oppgaveId)
+            ?: throw RuntimeException("klagebehandling not found")
     }
 
     // TODO Implement a proper algorithm

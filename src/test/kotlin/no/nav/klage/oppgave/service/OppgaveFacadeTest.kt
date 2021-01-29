@@ -66,7 +66,7 @@ internal class OppgaveFacadeTest {
             OppgaveMapper(pdlFacadeMock, mockk(relaxed = true)),
             mockk(),
             mockk(relaxed = true),
-            mockk(relaxed = true),
+            mockk(relaxed = true)
         )
 
         val oppgaverSearchCriteriaMock = mockk<OppgaverSearchCriteria>(relaxed = true)
@@ -104,7 +104,7 @@ internal class OppgaveFacadeTest {
             OppgaveMapper(pdlFacadeMock, mockk(relaxed = true)),
             mockk(),
             mockk(relaxed = true),
-            mockk(relaxed = true),
+            mockk(relaxed = true)
         )
         return oppgaveFacade
     }
