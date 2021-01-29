@@ -17,3 +17,7 @@ SAF_APP_CLIENT_ID: uu-id
 nais:
   cluster:
     name: local
+
+AIVEN_ES_SCHEME: http
+AIVEN_ES_USE_SSL: false
+

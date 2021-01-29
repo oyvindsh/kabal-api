@@ -32,6 +32,23 @@ spring:
     enabled: true
     clean-on-validation-error: true
     schemas: flyway_history_schema,klage,oppgave,kodeverk
+  elasticsearch:
+    rest:
+      uris: "${AIVEN_ES_SCHEME}://${AIVEN_ES_HOST}:${AIVEN_ES_PORT}"
+      read-timeout: "10s"
+      username: "${AIVEN_ES_USERNAME_ADM}"
+      password: "${AIVEN_ES_PASSWORD_ADM}"
+  data:
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: "${AIVEN_ES_HOST}:${AIVEN_ES_PORT}"
+          use-ssl: ${AIVEN_ES_USE_SSL}
+          socket-timeout: "10s"
+          username: "${AIVEN_ES_USERNAME_ADM}"
+          password: "${AIVEN_ES_PASSWORD_ADM}"
+      repositories:
+        enabled: false
 
 server:
   port: 7081
