@@ -18,7 +18,7 @@
             <appender-ref ref="text"/>
         </root>
         <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
-        <logger name="org.hibernate.type" level="trace" />
+        <logger name="org.hibernate.type" level="trace"/>
     </springProfile>
 
     <springProfile name="!local">
@@ -58,6 +58,7 @@
             <appender-ref ref="secureJson"/>
         </logger>
 
+        <logger name="org.springframework.data.convert.CustomConversions" level="error"/>
     </springProfile>
 
     <logger name="no.nav.klage" level="debug"/>
