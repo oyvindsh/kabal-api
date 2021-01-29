@@ -11,7 +11,7 @@ data class OppgaveKopiAPIModel(
     val saksreferanse: String? = null,
     val mappeId: Long? = null,
     val status: Status,
-    val statuskategori: Statuskategori,
+    val statuskategori: Statuskategori?,
     val tildeltEnhetsnr: String,
     val opprettetAvEnhetsnr: String? = null,
     val endretAvEnhetsnr: String? = null,
