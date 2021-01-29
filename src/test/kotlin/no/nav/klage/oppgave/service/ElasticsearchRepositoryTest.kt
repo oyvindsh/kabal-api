@@ -16,19 +16,19 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.util.TestPropertyValues
-import org.springframework.context.ApplicationContextInitializer
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -40,11 +40,8 @@ import java.time.LocalDateTime
 @ActiveProfiles("local")
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Testcontainers
-@ExtendWith(SpringExtension::class)
-@ContextConfiguration(
-    initializers = [ElasticsearchRepositoryTest.Companion.Initializer::class],
-    classes = [ElasticsearchServiceConfiguration::class]
-)
+@SpringBootTest(classes = [ElasticsearchServiceConfiguration::class])
+@ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
 class ElasticsearchRepositoryTest {
 
     companion object {
@@ -53,16 +50,15 @@ class ElasticsearchRepositoryTest {
         val ES_CONTAINER: ElasticsearchContainer =
             ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.9.3")
 
-        class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-            override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
-
-                TestPropertyValues.of(
-                    "AIVEN_ES_HOST=${ES_CONTAINER.host}",
-                    "AIVEN_ES_PORT=${ES_CONTAINER.firstMappedPort}",
-                    "AIVEN_ES_USERNAME_ADM=elastic",
-                    "AIVEN_ES_PASSWORD_ADM=changeme",
-                ).applyTo(configurableApplicationContext.environment)
-            }
+        @JvmStatic
+        @DynamicPropertySource
+        fun aivenProperties(registry: DynamicPropertyRegistry) {
+            registry.add("AIVEN_ES_HOST", ES_CONTAINER::getHost)
+            registry.add("AIVEN_ES_PORT", ES_CONTAINER::getFirstMappedPort)
+            registry.add("AIVEN_ES_USERNAME_ADM") { "elastic" }
+            registry.add("AIVEN_ES_PASSWORD_ADM") { "changeme" }
+            registry.add("AIVEN_ES_SCHEME") { "http" }
+            registry.add("AIVEN_ES_USE_SSL") { false }
         }
     }
 
@@ -73,7 +69,7 @@ class ElasticsearchRepositoryTest {
     lateinit var repository: ElasticsearchRepository
 
     @Autowired
-    lateinit var esTemplate: ElasticsearchOperations
+    lateinit var esTemplate: ElasticsearchRestTemplate
 
     @Autowired
     lateinit var client: RestHighLevelClient
