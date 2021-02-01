@@ -11,6 +11,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
+import java.util.*
 
 @RestController
 @Api(tags = ["klage-oppgave-api"])
@@ -28,13 +29,13 @@ class DokumentController(
         value = "Hent dokumenter for en klagebehandling",
         notes = "Henter alle dokumenter om en person som saksbehandler har tilgang til."
     )
-    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumenter", produces = ["application/json"])
+    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumenter/alle", produces = ["application/json"])
     fun fetchDokumenter(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
     ): DokumenterResponse {
-        return dokumentService.hentDokumentlisteForKlagebehandling(behandlingsid)
+        val klagebehandlingId = UUID.fromString(behandlingsid)
+        return dokumentService.fetchDokumentlisteForKlagebehandling(klagebehandlingId)
     }
-
 
 }

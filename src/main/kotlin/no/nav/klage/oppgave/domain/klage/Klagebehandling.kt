@@ -42,7 +42,7 @@ class Klagebehandling(
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val hjemler: List<Hjemmel>,
-    @OneToMany(cascade = [CascadeType.ALL])
+    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val oppgavereferanser: List<Oppgavereferanse>,
     @Column(name = "modified")
