@@ -41,11 +41,12 @@ class DokumentService(
         return DokumenterResponse(dokumenter = safResponse.data.dokumentoversiktBruker.journalposter.map { journalpost ->
             DokumentReferanse(
                 tittel = journalpost.tittel ?: "journalposttittel mangler",
-                beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }?.joinToString()
-                    ?: "tittel mangler",
+                beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
+                    ?.joinToString() ?: "tittel mangler",
                 tema = journalpost.temanavn ?: "tema mangler",
                 registrert = journalpost.datoOpprettet.toLocalDate(),
-                dokumentInfoId = journalpost.dokumenter?.joinToString() ?: "-",
+                dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
+                    ?.joinToString() ?: "-",
                 journalpostId = journalpost.journalpostId,
                 variantFormat = journalpost.dokumenter?.firstOrNull()?.dokumentvarianter?.map { dokumentvariant ->
                     logVariantFormat(
