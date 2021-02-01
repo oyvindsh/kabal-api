@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.internal
 
-import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -27,11 +27,11 @@ data class OppgaveKopiAPIModel(
     val aktivDato: LocalDate,
     val opprettetAv: String,
     val endretAv: String? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonDeserialize(using = OffsetDateTimeToLocalDateTimeDeserializer::class)
     val opprettetTidspunkt: LocalDateTime,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonDeserialize(using = OffsetDateTimeToLocalDateTimeDeserializer::class)
     val endretTidspunkt: LocalDateTime? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonDeserialize(using = OffsetDateTimeToLocalDateTimeDeserializer::class)
     val ferdigstiltTidspunkt: LocalDateTime? = null,
     val behandlesAvApplikasjon: String? = null,
     val journalpostkilde: String? = null,
