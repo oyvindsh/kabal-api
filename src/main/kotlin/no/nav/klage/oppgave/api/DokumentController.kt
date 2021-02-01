@@ -29,7 +29,7 @@ class DokumentController(
         value = "Hent dokumenter for en klagebehandling",
         notes = "Henter alle dokumenter om en person som saksbehandler har tilgang til."
     )
-    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumenter/alle", produces = ["application/json"])
+    @GetMapping("/klagebehandlinger/{behandlingsid}/alledokumenter", produces = ["application/json"])
     fun fetchDokumenter(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
