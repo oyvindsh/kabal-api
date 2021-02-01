@@ -2,8 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.oppgavekopi.*
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatExceptionOfType
-import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -13,7 +11,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.persistence.PersistenceException
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -190,40 +187,6 @@ class OppgaveKopiServiceTest {
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi1.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.metadata.size).isEqualTo(1)
-    }
-
-    @Test
-    fun `storing the same version twice throws ConstraintViolationException`() {
-        val oppgaveKopi1 = OppgaveKopi(
-            id = 1001L,
-            versjon = 1,
-            tema = "SYK",
-            status = Status.OPPRETTET,
-            tildeltEnhetsnr = "4219",
-            oppgavetype = "BEH_SAK_MK",
-            prioritet = Prioritet.NORM,
-            fristFerdigstillelse = LocalDate.now(),
-            aktivDato = LocalDate.now(),
-            opprettetAv = "H149290",
-            opprettetTidspunkt = LocalDateTime.now(),
-            ident = Ident(null, IdentType.AKTOERID, "12345", "12345678910", null),
-            metadata = setOf(Metadata(null, MetadataNoekkel.HJEMMEL, "8-25")),
-            behandlingstype = "ae0058"
-        )
-
-        oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
-
-        entityManager.flush()
-        entityManager.clear()
-
-        assertThatExceptionOfType(PersistenceException::class.java)
-            .isThrownBy {
-                oppgaveKopiService.saveOppgaveKopi(oppgaveKopi1)
-
-                entityManager.flush()
-                entityManager.clear()
-            }
-            .withCauseInstanceOf(ConstraintViolationException::class.java)
     }
 
     @Test

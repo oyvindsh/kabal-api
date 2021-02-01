@@ -23,6 +23,9 @@ class OppgaveKopiService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    /**
+     * This method needs to be idempotent
+     */
     fun saveOppgaveKopi(oppgaveKopi: OppgaveKopi) {
         logger.debug("Received oppgavekopi with id ${oppgaveKopi.id} and versjon ${oppgaveKopi.versjon} for storing")
         if (oppgaveKopiRepository.existsById(oppgaveKopi.id)) {
@@ -39,7 +42,13 @@ class OppgaveKopiService(
             oppgaveKopiRepository.save(oppgaveKopi)
         }
 
-        oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
+        //check if version is already stored
+        if (oppgaveKopiVersjonRepository.existsById(OppgaveKopiVersjonId(oppgaveKopi.id, oppgaveKopi.versjon))) {
+            logger.debug("Oppgavekopiversjon with id ${oppgaveKopi.id} and versjon ${oppgaveKopi.versjon} stored before, won't overwrite")
+        } else {
+            oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
+        }
+
         klagebehandlingService.connectOppgaveKopiToKlagebehandling(oppgaveKopi)
     }
 
