@@ -4,17 +4,18 @@ import brave.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBrukerResponse
+import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.service.TokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(MockKExtension::class)
-internal class SafGraphQlClientTest {
+internal class SafDokumentoversiktBrukerTest {
 
     @MockK
     lateinit var tokenServiceMock: TokenService
@@ -31,11 +32,23 @@ internal class SafGraphQlClientTest {
 
     @Test
     fun `saf response kan mappes selv om ikke alle felt er med i kotlin`() {
-        val dokumentoversiktBrukerResponse = getDokumentoversiktBruker(safResponse())
-        assertThat(dokumentoversiktBrukerResponse.data).isNotNull
+        val dokumentoversiktBrukerResponse = getDokumentoversiktBruker(dokumentoversiktResponse())
+        assertThat(dokumentoversiktBrukerResponse.journalposter).hasSize(1)
+        assertThat(dokumentoversiktBrukerResponse.journalposter.first().journalpostId).isEqualTo("492330029")
     }
 
-    fun getDokumentoversiktBruker(jsonResponse: String): DokumentoversiktBrukerResponse {
+    @Test
+    fun `tom response fra saf er ogsaa gyldig`() {
+        val dokumentoversiktBrukerResponse = getDokumentoversiktBruker(dokumentoversiktEmptyResponse())
+        assertThat(dokumentoversiktBrukerResponse.journalposter).hasSize(0)
+    }
+
+    @Test
+    fun `error response fra saf gir RuntimeException`() {
+        assertThrows<RuntimeException> { getDokumentoversiktBruker(dokumentoversiktErrorResponse()) }
+    }
+
+    fun getDokumentoversiktBruker(jsonResponse: String): DokumentoversiktBruker {
         val safClient = SafGraphQlClient(
             createShortCircuitWebClient(jsonResponse),
             tokenServiceMock,
@@ -46,7 +59,7 @@ internal class SafGraphQlClientTest {
     }
 
     @Language("json")
-    fun safResponse() = """
+    fun dokumentoversiktResponse() = """
         {
           "data": {
             "dokumentoversiktBruker": {
@@ -130,5 +143,39 @@ internal class SafGraphQlClientTest {
         }
     """
 
+    @Language("json")
+    fun dokumentoversiktEmptyResponse() = """
+    {
+      "data": {
+        "dokumentoversiktBruker": {
+          "journalposter": [],
+          "sideInfo": {
+            "sluttpeker": null,
+            "finnesNesteSide": false
+          }
+        }
+      }
+    }
+    """
+
+    @Language("json")
+    fun dokumentoversiktErrorResponse() = """
+    {
+      "errors": [
+        {
+          "message": "Field 'id' of variable 'brukerId' has coerced Null value for NonNull type 'String!'",
+          "locations": [
+            {
+              "line": 1,
+              "column": 7
+            }
+          ],
+          "extensions": {
+            "classification": "ValidationError"
+          }
+        }
+      ]
+    }
+    """
 
 }
