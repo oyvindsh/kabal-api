@@ -59,8 +59,12 @@ class OppgaveFacade(
             try {
                 elasticsearchRepository.save(oppgaveMapper.mapOppgaveKopiAPIModelToEsOppgave(oppgave))
             } catch (e: Exception) {
-                logger.error("Unable to index OppgaveKopi, see securelogs for details")
-                securelogger.error("Unable to index OppgaveKopi", e)
+                if (e.message?.contains("version_conflict_engine_exception") == true) {
+                    logger.info("Later version already indexed, ignoring this..")
+                } else {
+                    logger.error("Unable to index OppgaveKopi, see securelogs for details")
+                    securelogger.error("Unable to index OppgaveKopi", e)
+                }
             }
         }
     }
