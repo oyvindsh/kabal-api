@@ -53,77 +53,89 @@ data class Dokumentvariant(
 )
 
 enum class SkjermingType {
-    POL,
-    FEIL
+    POL, //Indikerer at det er fattet et vedtak etter personopplysningsloven (GDPR - brukers rett til å bli glemt).
+    FEIL //Indikerer at det har blitt gjort en feil under mottak, journalføring eller brevproduksjon, slik at journalposten eller dokumentene er markert for sletting.
 }
 
 enum class Variantformat {
+    //Den "offisielle" versjonen av et dokument, som er beregnet på visning og langtidsbevaring. I de fleste tilfeller er arkivvarianten lik dokumentet brukeren sendte inn eller mottok (digitalt eller på papir). Arkivvarianten er alltid i menneskelesbart format, som PDF, PDF/A eller PNG.
+    //Alle dokumenter har en arkivvariant, med mindre bruker har fått innvilget vedtak om sletting eller skjerming av opplysninger i arkivet.
     ARKIV,
+
+    //Dette er en sladdet variant av det opprinnelige dokumentet. Dersom det finnes en SLADDET variant, vil de fleste NAV-ansatte kun ha tilgang til denne varianten og ikke arkivvariant. Enkelte saksbehandlere vil imidlertid ha tilgang til både SLADDET og ARKIV.
     SLADDET,
+
+    //Produksjonsvariant i eget proprietært format. Varianten finnes for dokumenter som er produsert i Metaforce eller Brevklient.
     PRODUKSJON,
+
+    //Produksjonsvariant i eget proprietært format. Varianten finnes kun for dokumenter som er produsert i Exstream Live Editor.
     PRODUKSJON_DLF,
+
+    //Variant av dokument som inneholder spørsmålstekster, hjelpetekster og ubesvarte spørsmål fra søknadsdialogen. Fullversjon genereres for enkelte søknadsskjema fra nav.no, og brukes ved klagebehandling.
     FULLVERSJON,
+
+    //Variant av dokumentet i strukturert format, f.eks. XML eller JSON. Originalvarianten er beregnet på maskinell lesning og behandling.
     ORIGINAL
 }
 
 data class Sak(val datoOpprettet: LocalDateTime?, val fagsakId: String?, val fagsaksystem: String?)
 
 enum class Tema {
-    AAP,
-    AAR,
-    AGR,
-    BAR,
-    BID,
-    BIL,
-    DAG,
-    ENF,
-    ERS,
-    FAR,
-    FEI,
-    FOR,
-    FOS,
-    FRI,
-    FUL,
-    GEN,
-    GRA,
-    GRU,
-    HEL,
-    HJE,
-    IAR,
-    IND,
-    KON,
-    KTR,
-    MED,
-    MOB,
-    OMS,
-    OPA,
-    OPP,
-    PEN,
-    PER,
-    REH,
-    REK,
-    RPO,
-    RVE,
-    SAA,
-    SAK,
-    SAP,
-    SER,
-    SIK,
-    STO,
-    SUP,
-    SYK,
-    SYM,
-    TIL,
-    TRK,
-    TRY,
-    TSO,
-    TSR,
-    UFM,
-    UFO,
-    UKJ,
-    VEN,
-    YRA,
-    YRK,
+    AAP, //Arbeidsavklaringspenger
+    AAR, //Aa-registeret
+    AGR, //Ajourhold - Grunnopplysninger
+    BAR, //Barnetrygd
+    BID, //Bidrag
+    BIL, //Bil
+    DAG, //Dagpenger
+    ENF, //Enslig forsørger
+    ERS, //Erstatning
+    FAR, //Farskap
+    FEI, //Feilutbetaling
+    FOR, //Foreldre- og svangerskapspenger
+    FOS, //Forsikring
+    FRI, //Kompensasjon for selvstendig næringsdrivende/frilansere
+    FUL, //Fullmakt
+    GEN, //Generell
+    GRA, //Gravferdsstønad
+    GRU, //Grunn- og hjelpestønad
+    HEL, //Helsetjenester og ortopediske hjelpemidler
+    HJE, //Hjelpemidler
+    IAR, //Inkluderende arbeidsliv
+    IND, //Tiltakspenger
+    KON, //Kontantstøtte
+    KTR, //Kontroll
+    MED, //Medlemskap
+    MOB, //Mobilitetsfremmende stønad
+    OMS, //Omsorgspenger, pleiepenger og opplæringspenger
+    OPA, //Oppfølging - Arbeidsgiver
+    OPP, //Oppfølging
+    PEN, //Pensjon
+    PER, //Permittering og masseoppsigelser
+    REH, //Rehabilitering
+    REK, //Rekruttering og stilling
+    RPO, //Retting av personopplysninger
+    RVE, //Rettferdsvederlag
+    SAA, //Sanksjon - Arbeidsgiver
+    SAK, //Saksomkostninger
+    SAP, //Sanksjon - Person
+    SER, //Serviceklager
+    SIK, //Sikkerhetstiltak
+    STO, //Regnskap/utbetaling
+    SUP, //	Supplerende stønad
+    SYK, //Sykepenger
+    SYM, //Sykmeldinger
+    TIL, //Tiltak
+    TRK, //Trekkhåndtering
+    TRY, //Trygdeavgift
+    TSO, //Tilleggsstønad
+    TSR, //Tilleggsstønad arbeidssøkere
+    UFM, //Unntak fra medlemskap
+    UFO, //Uføretrygd
+    UKJ, //Ukjent
+    VEN, //Ventelønn
+    YRA, //Yrkesrettet attføring
+    YRK //Yrkesskade / Menerstatning
 }
 
 enum class Journalstatus {
@@ -142,7 +154,7 @@ enum class Journalstatus {
 }
 
 enum class Journalposttype {
-    I,
-    U,
-    N
+    I, //Inngående dokument: Dokumentasjon som NAV har mottatt fra en ekstern part. De fleste inngående dokumenter er søknader, ettersendelser av dokumentasjon til sak, eller innsendinger fra arbeidsgivere. Meldinger brukere har sendt til "Skriv til NAV" arkiveres også som inngående dokumenter.
+    U, //Utgående dokument: Dokumentasjon som NAV har produsert og sendt ut til en ekstern part. De fleste utgående dokumenter er informasjons- eller vedtaksbrev til privatpersoner eller organisasjoner. "Skriv til NAV"-meldinger som saksbehandlere har sendt til brukere arkiveres også som utgående dokumenter.
+    N //Notat: Dokumentasjon som NAV har produsert selv, uten at formålet er å distribuere dette ut av NAV. Eksempler på notater er samtalereferater med veileder på kontaktsenter og interne forvaltningsnotater.
 }
