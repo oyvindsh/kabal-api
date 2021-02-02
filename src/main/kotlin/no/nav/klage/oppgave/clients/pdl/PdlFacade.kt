@@ -47,7 +47,7 @@ class PdlFacade(
             return personCacheService.getPerson(fnr)
         }
         val hentPersonResponse: HentPersonResponse = pdlClient.getPersonInfo(fnr)
-        val pdlPerson = hentPersonResponse.getPersonOrLogErrors()
+        val pdlPerson = hentPersonResponse.getPersonOrLogErrors(fnr)
         return pdlPerson?.let {
             val person = hentPersonMapper.mapToPerson(fnr, it)
             personCacheService.updatePersonCache(person)
@@ -55,12 +55,12 @@ class PdlFacade(
         }
     }
 
-    private fun HentPersonResponse.getPersonOrLogErrors(): PdlPerson? =
+    private fun HentPersonResponse.getPersonOrLogErrors(fnr: String): PdlPerson? =
         if (this.errors.isNullOrEmpty()) {
             this.data?.hentPerson
         } else {
             logger.warn("Errors returned from PDL. See securelogs for details.")
-            secureLogger.warn("Errors returned from PDL: ${this.errors}")
+            secureLogger.warn("Errors returned for hentPerson($fnr) from PDL: ${this.errors}")
             null
         }
 

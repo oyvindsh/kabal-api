@@ -194,7 +194,7 @@ class OppgaveMapper(
     }
 
     fun mapOppgaveKopiAPIModelToEsOppgave(oppgave: OppgaveKopiAPIModel): EsOppgave {
-        val fnr = oppgave.ident.id.toString()
+        val fnr = oppgave.ident.folkeregisterident!!
         val erEgenAnsatt = egenAnsattService.erEgenAnsatt(fnr)
         val personInfo = pdlFacade.getPersonInfo(fnr)
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
