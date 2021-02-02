@@ -34,27 +34,37 @@ class DokumentService(
     */
 
     //TODO: Første dokument er hoveddokument, resten er vedlegg. Må undersøke hvordan det skal vises i lista..
-    fun fetchDokumentlisteForKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
+    fun fetchDokumentlisteForKlagebehandling(
+        klagebehandlingId: UUID,
+        pageSize: Int,
+        previousPageRef: String?
+    ): DokumenterResponse {
         val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
         val dokumentoversiktBruker: DokumentoversiktBruker =
-            safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, 100, null)
-        return DokumenterResponse(dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
-            DokumentReferanse(
-                tittel = journalpost.tittel ?: "journalposttittel mangler",
-                beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
-                    ?.joinToString() ?: "tittel mangler",
-                tema = journalpost.temanavn ?: "tema mangler",
-                registrert = journalpost.datoOpprettet.toLocalDate(),
-                dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
-                    ?.joinToString() ?: "-",
-                journalpostId = journalpost.journalpostId,
-                variantFormat = journalpost.dokumenter?.firstOrNull()?.dokumentvarianter?.map { dokumentvariant ->
-                    logVariantFormat(
-                        dokumentvariant
-                    ); dokumentvariant.variantformat.name
-                }?.joinToString() ?: "-",
-            )
-        }, pageReference = dokumentoversiktBruker.sideInfo.sluttpeker)
+            safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
+        return DokumenterResponse(
+            dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
+                DokumentReferanse(
+                    tittel = journalpost.tittel ?: "journalposttittel mangler",
+                    beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
+                        ?.joinToString() ?: "tittel mangler",
+                    tema = journalpost.temanavn ?: "tema mangler",
+                    registrert = journalpost.datoOpprettet.toLocalDate(),
+                    dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
+                        ?.joinToString() ?: "-",
+                    journalpostId = journalpost.journalpostId,
+                    variantFormat = journalpost.dokumenter?.firstOrNull()?.dokumentvarianter?.map { dokumentvariant ->
+                        logVariantFormat(
+                            dokumentvariant
+                        ); dokumentvariant.variantformat.name
+                    }?.joinToString() ?: "-",
+                )
+            }, pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
+                dokumentoversiktBruker.sideInfo.sluttpeker
+            } else {
+                null
+            }
+        )
     }
 
     fun logVariantFormat(dokumentvariant: Dokumentvariant) {
