@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
-import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBrukerResponse
+import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.Dokumentvariant
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
@@ -36,9 +36,9 @@ class DokumentService(
     //TODO: Første dokument er hoveddokument, resten er vedlegg. Må undersøke hvordan det skal vises i lista..
     fun fetchDokumentlisteForKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
         val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        val safResponse: DokumentoversiktBrukerResponse =
+        val dokumentoversiktBruker: DokumentoversiktBruker =
             safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, 100, null)
-        return DokumenterResponse(dokumenter = safResponse.data.dokumentoversiktBruker.journalposter.map { journalpost ->
+        return DokumenterResponse(dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
             DokumentReferanse(
                 tittel = journalpost.tittel ?: "journalposttittel mangler",
                 beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
@@ -54,7 +54,7 @@ class DokumentService(
                     ); dokumentvariant.variantformat.name
                 }?.joinToString() ?: "-",
             )
-        }, pageReference = safResponse.data.dokumentoversiktBruker.sideInfo.sluttpeker)
+        }, pageReference = dokumentoversiktBruker.sideInfo.sluttpeker)
     }
 
     fun logVariantFormat(dokumentvariant: Dokumentvariant) {
