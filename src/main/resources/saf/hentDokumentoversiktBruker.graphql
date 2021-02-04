@@ -1,6 +1,7 @@
 query($brukerId: BrukerIdInput!, $foerste: Int, $etter: String) {
     dokumentoversiktBruker(
         brukerId: $brukerId,
+        journalstatuser: [FERDIGSTILT,JOURNALFOERT,EKSPEDERT,MOTTATT,RESERVERT,UNDER_ARBEID]
         foerste: $foerste,
         etter: $etter) {
         journalposter {
