@@ -36,12 +36,12 @@ class KlagebehandlingRepositoryTest {
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
             sakstype = Sakstype.KLAGE,
-            hjemler = listOf(
+            hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
             ),
-            oppgavereferanser = listOf(),
+            oppgavereferanser = mutableListOf(),
             modified = LocalDateTime.now(),
             created = LocalDateTime.now(),
             frist = LocalDate.now(),
@@ -79,12 +79,12 @@ class KlagebehandlingRepositoryTest {
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
             sakstype = Sakstype.KLAGE,
-            hjemler = listOf(
+            hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
             ),
-            oppgavereferanser = listOf(Oppgavereferanse(oppgaveId = 1001L)),
+            oppgavereferanser = mutableListOf(Oppgavereferanse(oppgaveId = 1001L)),
             modified = LocalDateTime.now(),
             created = LocalDateTime.now(),
             frist = LocalDate.now(),

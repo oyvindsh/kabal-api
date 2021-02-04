@@ -11,8 +11,6 @@ import javax.persistence.Table
 class Saksdokument(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "klagebehandling_id")
-    val klagebehandlingId: UUID,
     @Column(name = "referanse")
     val referanse: String
 ) {

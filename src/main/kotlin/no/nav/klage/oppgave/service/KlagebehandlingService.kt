@@ -41,7 +41,7 @@ class KlagebehandlingService(
                     sakstype = Sakstype.of(oppgaveKopi.behandlingstype),
                     hjemler = hjemmelService.getHjemmelFromOppgaveKopi(oppgaveKopi),
                     tildeltSaksbehandlerident = oppgaveKopi.tilordnetRessurs,
-                    oppgavereferanser = listOf(
+                    oppgavereferanser = mutableListOf(
                         Oppgavereferanse(
                             oppgaveId = oppgaveKopi.id
                         )
