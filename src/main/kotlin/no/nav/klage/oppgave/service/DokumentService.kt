@@ -106,25 +106,24 @@ class DokumentMapper {
     }
 
     //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
-    fun mapJournalpost(journalpost: Journalpost, isConnected: Boolean) =
-        DokumentReferanse(
-            tittel = journalpost.tittel ?: "journalposttittel mangler",
-            beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
-                ?.joinToString() ?: "tittel mangler",
-            beskrivelser = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel.nullAsTittelMangler() }
-                ?: emptyList(),
-            tema = journalpost.temanavn ?: "tema mangler",
-            registrert = journalpost.datoOpprettet.toLocalDate(),
-            dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
-                ?.joinToString() ?: "-",
-            journalpostId = journalpost.journalpostId,
-            variantFormat = journalpost.dokumenter?.firstOrNull()?.dokumentvarianter?.map { dokumentvariant ->
-                logVariantFormat(
-                    dokumentvariant
-                ); dokumentvariant.variantformat.name
-            }?.joinToString() ?: "-",
-            valgt = isConnected
-        )
+    fun mapJournalpost(journalpost: Journalpost, isConnected: Boolean) = DokumentReferanse(
+        tittel = journalpost.tittel ?: "journalposttittel mangler",
+        beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
+            ?.joinToString() ?: "tittel mangler",
+        beskrivelser = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel.nullAsTittelMangler() }
+            ?: emptyList(),
+        tema = journalpost.temanavn ?: "tema mangler",
+        registrert = journalpost.datoOpprettet.toLocalDate(),
+        dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
+            ?.joinToString() ?: "-",
+        journalpostId = journalpost.journalpostId,
+        variantFormat = journalpost.dokumenter?.firstOrNull()?.dokumentvarianter?.map { dokumentvariant ->
+            logVariantFormat(
+                dokumentvariant
+            ); dokumentvariant.variantformat.name
+        }?.joinToString() ?: "-",
+        valgt = isConnected
+    )
 
     private fun String?.nullAsTittelMangler() = this ?: "tittel mangler"
 
