@@ -106,7 +106,7 @@ class DokumentController(
         try {
             UUID.fromString(behandlingsid)
         } catch (e: Exception) {
-            logger.warn("Unable to parse uuid from $behandlingsid")
+            logger.warn("Unable to parse uuid from $behandlingsid", e)
             throw BehandlingsidWrongFormatException("$behandlingsid is not a valid behandlingsid")
         }
 }
