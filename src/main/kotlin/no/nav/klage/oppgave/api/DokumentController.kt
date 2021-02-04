@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.DokumentKnytning
+import no.nav.klage.oppgave.api.view.DokumentReferanserResponse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.DokumentService
@@ -50,7 +51,39 @@ class DokumentController(
         @PathVariable behandlingsid: String
     ): DokumenterResponse {
         val klagebehandlingId = UUID.fromString(behandlingsid)
-        return dokumentService.fetchDokumenterConnectedToKlagebehandling(klagebehandlingId)
+        return dokumentService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
+    }
+
+    @ApiOperation(
+        value = "Hent IDene til dokumentene knyttet til en klagebehandling",
+        notes = "Henter IDene til dokumentene som saksbehandler har markert at skal knyttes til klagebehandlingen."
+    )
+    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumentreferanser", produces = ["application/json"])
+    fun fetchConnectedDokumentIder(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable behandlingsid: String
+    ): DokumentReferanserResponse {
+        val klagebehandlingId = UUID.fromString(behandlingsid)
+        return DokumentReferanserResponse(
+            dokumentService.fetchJournalpostIderConnectedToKlagebehandling(
+                klagebehandlingId
+            )
+        )
+    }
+
+    @ApiOperation(
+        value = "Fjerner et dokument fra en klagebehandling",
+        notes = "Sletter knytningen mellom en journalpost fra SAF og klagebehandlingen den har vært knyttet til."
+    )
+    @DeleteMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostid}", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deconnectDokument(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable behandlingsid: String,
+        @PathVariable(name = "journalpostid") journalpostId: String
+    ) {
+        val klagebehandlingId = UUID.fromString(behandlingsid)
+        dokumentService.deconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId)
     }
 
     @ApiOperation(

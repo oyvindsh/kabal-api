@@ -38,7 +38,10 @@ class DokumentService(
             safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
         return DokumenterResponse(
             dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
-                dokumentMapper.mapJournalpost(journalpost, valgteJournalpostIder.contains(journalpost.journalpostId))
+                dokumentMapper.mapJournalpost(
+                    journalpost,
+                    valgteJournalpostIder.contains(journalpost.journalpostId)
+                )
             },
             pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
                 dokumentoversiktBruker.sideInfo.sluttpeker
@@ -48,7 +51,13 @@ class DokumentService(
         )
     }
 
-    fun fetchDokumenterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
+    fun fetchJournalpostIderConnectedToKlagebehandling(
+        klagebehandlingId: UUID
+    ): List<String> = saksdokumentRepository.findByKlagebehandlingId(klagebehandlingId).map { it.referanse }
+
+    fun fetchJournalposterConnectedToKlagebehandling(
+        klagebehandlingId: UUID
+    ): DokumenterResponse {
         val saksdokumenter = saksdokumentRepository.findByKlagebehandlingId(klagebehandlingId)
         return saksdokumenter
             .mapNotNull { safGraphQlClient.getJournalpost(it.referanse) }
@@ -57,10 +66,33 @@ class DokumentService(
     }
 
     fun connectJournalpostToKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
-        if (saksdokumentRepository.existsByKlagebehandlingIdAndReferanse(klagebehandlingId, journalpostId)) {
-            logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
-        } else {
-            saksdokumentRepository.save(Saksdokument(klagebehandlingId = klagebehandlingId, referanse = journalpostId))
+        try {
+            if (saksdokumentRepository.existsByKlagebehandlingIdAndReferanse(klagebehandlingId, journalpostId)) {
+                logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
+            } else {
+                saksdokumentRepository.save(
+                    Saksdokument(
+                        klagebehandlingId = klagebehandlingId,
+                        referanse = journalpostId
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            logger.error("Error connecting $journalpostId to $klagebehandlingId", e)
+            throw e
+        }
+    }
+
+    fun deconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
+        try {
+            val saksdokument =
+                saksdokumentRepository.findByKlagebehandlingIdAndReferanse(klagebehandlingId, journalpostId)
+            if (saksdokument != null) {
+                saksdokumentRepository.delete(saksdokument)
+            }
+        } catch (e: Exception) {
+            logger.error("Error deconnecting $journalpostId from $klagebehandlingId", e)
+            throw e
         }
     }
 
