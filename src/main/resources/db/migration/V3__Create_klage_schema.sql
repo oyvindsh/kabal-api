@@ -114,5 +114,3 @@ CREATE TABLE klage.klage_oppgave
         FOREIGN KEY (oppgave_id)
             REFERENCES oppgave.oppgave (id)
 );
-
--- create trigger to update 'modified' field in klage
