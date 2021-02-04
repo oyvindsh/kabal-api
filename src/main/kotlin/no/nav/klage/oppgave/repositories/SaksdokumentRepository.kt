@@ -9,4 +9,6 @@ import java.util.*
 interface SaksdokumentRepository : JpaRepository<Saksdokument, UUID> {
 
     fun findByKlagebehandlingId(klagebehandlingId: UUID): List<Saksdokument>
+
+    fun existsByKlagebehandlingIdAndReferanse(klagebehandlingId: UUID, referanse: String): Boolean
 }
