@@ -83,7 +83,7 @@ class DokumentService(
         }
     }
 
-    fun deconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
+    fun disconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
         try {
             val saksdokument =
                 saksdokumentRepository.findByKlagebehandlingIdAndReferanse(klagebehandlingId, journalpostId)

@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.api.view.DokumentKnytning
 import no.nav.klage.oppgave.api.view.DokumentReferanserResponse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -37,7 +38,7 @@ class DokumentController(
         @RequestParam(required = false, name = "antall", defaultValue = "10") pageSize: Int,
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null
     ): DokumenterResponse {
-        val klagebehandlingId = UUID.fromString(behandlingsid)
+        val klagebehandlingId = parseAndValidate(behandlingsid)
         return dokumentService.fetchDokumentlisteForKlagebehandling(klagebehandlingId, pageSize, previousPageRef)
     }
 
@@ -50,7 +51,7 @@ class DokumentController(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String
     ): DokumenterResponse {
-        val klagebehandlingId = UUID.fromString(behandlingsid)
+        val klagebehandlingId = parseAndValidate(behandlingsid)
         return dokumentService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
     }
 
@@ -63,7 +64,7 @@ class DokumentController(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String
     ): DokumentReferanserResponse {
-        val klagebehandlingId = UUID.fromString(behandlingsid)
+        val klagebehandlingId = parseAndValidate(behandlingsid)
         return DokumentReferanserResponse(
             dokumentService.fetchJournalpostIderConnectedToKlagebehandling(
                 klagebehandlingId
@@ -77,13 +78,13 @@ class DokumentController(
     )
     @DeleteMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostid}", produces = ["application/json"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deconnectDokument(
+    fun disconnectDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
         @PathVariable(name = "journalpostid") journalpostId: String
     ) {
-        val klagebehandlingId = UUID.fromString(behandlingsid)
-        dokumentService.deconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId)
+        val klagebehandlingId = parseAndValidate(behandlingsid)
+        dokumentService.disconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId)
     }
 
     @ApiOperation(
@@ -97,7 +98,15 @@ class DokumentController(
         @PathVariable behandlingsid: String,
         @RequestBody dokumentKnytning: DokumentKnytning
     ) {
-        val klagebehandlingId = UUID.fromString(behandlingsid)
+        val klagebehandlingId = parseAndValidate(behandlingsid)
         dokumentService.connectJournalpostToKlagebehandling(klagebehandlingId, dokumentKnytning.journalpostId)
     }
+
+    private fun parseAndValidate(behandlingsid: String): UUID =
+        try {
+            UUID.fromString(behandlingsid)
+        } catch (e: Exception) {
+            logger.warn("Unable to parse uuid from $behandlingsid")
+            throw BehandlingsidWrongFormatException("$behandlingsid is not a valid behandlingsid")
+        }
 }
