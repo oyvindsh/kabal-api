@@ -12,5 +12,8 @@ data class DokumentReferanse(
     val registrert: LocalDate,
     val dokumentInfoId: String,
     val journalpostId: String,
-    val variantFormat: String
+    val variantFormat: String,
+    val valgt: Boolean
 )
+
+data class DokumentKnytning(val journalpostId: String)
