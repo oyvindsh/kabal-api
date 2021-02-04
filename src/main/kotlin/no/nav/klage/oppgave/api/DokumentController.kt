@@ -34,7 +34,7 @@ class DokumentController(
     fun fetchDokumenter(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
-        @RequestParam(required = false, name = "antall") pageSize: Int = 10,
+        @RequestParam(required = false, name = "antall", defaultValue = "10") pageSize: Int,
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null
     ): DokumenterResponse {
         val klagebehandlingId = UUID.fromString(behandlingsid)
