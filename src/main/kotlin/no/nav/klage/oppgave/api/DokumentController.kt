@@ -58,7 +58,7 @@ class DokumentController(
         value = "Hent IDene til dokumentene knyttet til en klagebehandling",
         notes = "Henter IDene til dokumentene som saksbehandler har markert at skal knyttes til klagebehandlingen."
     )
-    @GetMapping("/klagebehandlinger/{behandlingsid}/tilknyttededokumenter", produces = ["application/json"])
+    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumentreferanser", produces = ["application/json"])
     fun fetchConnectedDokumentIder(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String
