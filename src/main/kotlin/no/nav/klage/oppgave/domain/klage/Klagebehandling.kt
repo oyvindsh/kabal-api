@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Eoes
-import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -17,8 +15,8 @@ class Klagebehandling(
     val foedselsnummer: String,
     @Column(name = "tema")
     val tema: String,
-    @OneToOne
-    @JoinColumn(name = "sakstype_id")
+    @Column(name = "sakstype_id")
+    @Convert(converter = SakstypeConverter::class)
     val sakstype: Sakstype,
     @Column(name = "dato_mottatt_fra_foersteinstans")
     val mottatt: LocalDate = LocalDate.now(),
@@ -33,11 +31,11 @@ class Klagebehandling(
     @OneToOne
     @JoinColumn(name = "vedtak_id", nullable = true)
     val vedtak: Vedtak? = null,
-    @OneToOne
-    @JoinColumn(name = "eoes_id")
+    @Column(name = "eoes_id")
+    @Convert(converter = EoesConverter::class)
     val eoes: Eoes? = null,
-    @OneToOne
-    @JoinColumn(name = "raadfoert_med_lege_id")
+    @Column(name = "raadfoert_med_lege_id")
+    @Convert(converter = RaadfoertMedLegeConverter::class)
     val raadfoertMedLege: RaadfoertMedLege? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
