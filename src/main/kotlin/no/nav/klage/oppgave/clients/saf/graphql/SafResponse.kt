@@ -139,17 +139,56 @@ enum class Tema {
 }
 
 enum class Journalstatus {
+    //Journalposten er mottatt, men ikke journalført. "Mottatt" er et annet ord for "arkivert" eller "midlertidig journalført"
+    //Statusen vil kun forekomme for inngående dokumenter.
     MOTTATT,
+
+    //Journalposten er ferdigstilt og ansvaret for videre behandling av forsendelsen er overført til fagsystemet. Journalen er i prinsippet låst for videre endringer.
+    //Journalposter med status JOURNALFØRT oppfyller minimumskrav til metadata i arkivet, som for eksempel tema, sak, bruker og avsender.
     JOURNALFOERT,
+
+    //Journalposten med tilhørende dokumenter er ferdigstilt, og journalen er i prinsippet låst for videre endringer. FERDIGSTILT tilsvarer statusen JOURNALFØRT for inngående dokumenter.
+    //Tilsvarer begrepet Arkivert
+    //Statusen kan forekomme for utgående dokumenter og notater.
     FERDIGSTILT,
+
+    //Dokumentet er sendt til bruker. Statusen benyttes også når dokumentet er tilgjengeliggjort for bruker på DittNAV, og bruker er varslet.
+    //Tilsvarer begrepet Sendt
+    //Statusen kan forekomme for utgående dokumenter.
     EKSPEDERT,
+
+    //Journalposten er opprettet i arkivet, men fremdeles under arbeid.
+    //Statusen kan forekomme for utgående dokumenter og notater.
     UNDER_ARBEID,
+
+    //Journalposten har blitt arkivavgrenset etter at den feilaktig har blitt knyttet til en sak.
+    //Statusen kan forekomme for alle journalposttyper.
     FEILREGISTRERT,
+
+    //Journalposten er arkivavgrenset grunnet en feilsituasjon, ofte knyttet til skanning eller journalføring.
+    //Statusen vil kun forekomme for inngående dokumenter.
     UTGAAR,
+
+    //Utgående dokumenter og notater kan avbrytes mens de er under arbeid, og ikke enda er ferdigstilt. Statusen AVBRUTT brukes stort sett ved feilsituasjoner knyttet til dokumentproduksjon.
+    //Statusen kan forekomme for utgående dokumenter og notater.
     AVBRUTT,
+
+    //Journalposten har ikke noen kjent bruker.
+    //NB: UKJENT_BRUKER er ikke en midlertidig status, men benyttes der det ikke er mulig å journalføre fordi man ikke klarer å identifisere brukeren forsendelsen gjelder.
+    //Statusen kan kun forekomme for inngående dokumenter.
     UKJENT_BRUKER,
+
+    //Statusen benyttes bl.a. i forbindelse med brevproduksjon for å reservere 'plass' i journalen for dokumenter som skal populeres på et senere tidspunkt.
+    //Dersom en journalpost blir stående i status RESEVERT over tid, tyder dette på at noe har gått feil under dokumentproduksjon eller ved skanning av et utgående dokument.
+    //Statusen kan forekomme for utgående dokumenter og notater.
     RESERVERT,
+
+    //Midlertidig status på vei mot MOTTATT.
+    //Dersom en journalpost blir stående i status OPPLASTING_DOKUMENT over tid, tyder dette på at noe har gått feil under opplasting av vedlegg ved arkivering.
+    //Statusen kan kun forekomme for inngående dokumenter.
     OPPLASTING_DOKUMENT,
+
+    //Dersom statusfeltet i Joark er tomt, mappes dette til "UKJENT"
     UKJENT
 }
 
