@@ -7,6 +7,7 @@ data class DokumenterResponse(val dokumenter: List<DokumentReferanse>, val pageR
 data class DokumentReferanse(
     val tittel: String,
     val beskrivelse: String,
+    val beskrivelser: List<String>,
     val tema: String,
     val registrert: LocalDate,
     val dokumentInfoId: String,

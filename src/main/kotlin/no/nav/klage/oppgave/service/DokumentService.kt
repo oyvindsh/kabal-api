@@ -48,6 +48,8 @@ class DokumentService(
                     tittel = journalpost.tittel ?: "journalposttittel mangler",
                     beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
                         ?.joinToString() ?: "tittel mangler",
+                    beskrivelser = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel.nullAsTittelMangler() }
+                        ?: emptyList(),
                     tema = journalpost.temanavn ?: "tema mangler",
                     registrert = journalpost.datoOpprettet.toLocalDate(),
                     dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
@@ -71,5 +73,7 @@ class DokumentService(
         logger.debug("Fant variantformat ${dokumentvariant.variantformat} med filnavn ${dokumentvariant.filnavn} og skjerming ${dokumentvariant.skjerming}. Saksbehandler har tilgang? ${dokumentvariant.saksbehandlerHarTilgang}")
     }
 }
+
+private fun String?.nullAsTittelMangler() = this ?: "tittel mangler"
 
 
