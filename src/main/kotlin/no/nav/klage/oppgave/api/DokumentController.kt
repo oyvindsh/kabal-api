@@ -75,12 +75,12 @@ class DokumentController(
         value = "Fjerner et dokument fra en klagebehandling",
         notes = "Sletter knytningen mellom en journalpost fra SAF og klagebehandlingen den har vært knyttet til."
     )
-    @DeleteMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostId}", produces = ["application/json"])
+    @DeleteMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostid}", produces = ["application/json"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deconnectDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
-        @PathVariable journalpostId: String
+        @PathVariable(name = "journalpostid") journalpostId: String
     ) {
         val klagebehandlingId = UUID.fromString(behandlingsid)
         dokumentService.deconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId)
