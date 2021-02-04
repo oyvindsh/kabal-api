@@ -1,39 +1,31 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.AttributeConverter
+import javax.persistence.Converter
 
-@Entity
-@Table(name = "lov", schema = "kodeverk")
-class Lov(
-    @Id
-    val id: Int,
-    @Column(name = "navn")
-    val navn: String,
-    @Column(name = "beskrivelse")
-    val beskrivelse: String?
-) {
+enum class Lov(val id: Int, val navn: String, val beskrivelse: String) {
+
+    FOLKETRYGDLOVEN(1, "Folketrygdloven", "Lov om folketrygd");
 
     override fun toString(): String {
         return "Lov(id=$id, " +
                 "navn=$navn)"
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Lov
-
-        if (id != other.id) return false
-
-        return true
+    companion object {
+        fun of(id: Int): Lov {
+            return Lov.values().firstOrNull { it.id == id }
+                ?: throw IllegalArgumentException("No Lov with ${id} exists")
+        }
     }
+}
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+@Converter
+class LovConverter : AttributeConverter<Lov, Int?> {
 
+    override fun convertToDatabaseColumn(entity: Lov?): Int? =
+        entity?.let { it.id }
+
+    override fun convertToEntityAttribute(id: Int?): Lov? =
+        id?.let { Lov.of(it) }
 }

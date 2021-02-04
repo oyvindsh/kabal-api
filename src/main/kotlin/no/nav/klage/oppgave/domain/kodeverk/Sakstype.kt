@@ -1,39 +1,35 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.AttributeConverter
+import javax.persistence.Converter
 
-@Entity
-@Table(name = "sakstype", schema = "kodeverk")
-class Sakstype(
-    @Id
-    val id: String,
-    @Column(name = "navn")
-    val navn: String,
-    @Column(name = "beskrivelse")
-    val beskrivelse: String?
-) {
+enum class Sakstype(val id: String, val navn: String, val beskrivelse: String?) {
+
+    KLAGE("ae0058", "Klage", null),
+    ANKE("ae0046", "Anke", null),
+    GJENOPPTAK("ae0047", "Gjenopptak", null),
+    REVURDERING("ae0028", "Revurdering", null),
+    FEILUTBETALING("ae0161", "Feilutbetaling", null);
 
     override fun toString(): String {
         return "Sakstype(id=$id, " +
                 "navn=$navn)"
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Sakstype
-
-        if (id != other.id) return false
-
-        return true
+    companion object {
+        fun of(id: String): Sakstype {
+            return Sakstype.values().firstOrNull { it.id == id }
+                ?: throw IllegalArgumentException("No Sakstype with ${id} exists")
+        }
     }
+}
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+@Converter
+class SakstypeConverter : AttributeConverter<Sakstype, String?> {
 
+    override fun convertToDatabaseColumn(entity: Sakstype?): String? =
+        entity?.let { it.id }
+
+    override fun convertToEntityAttribute(id: String?): Sakstype? =
+        id?.let { Sakstype.of(it) }
 }

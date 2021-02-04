@@ -1,39 +1,43 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.AttributeConverter
+import javax.persistence.Converter
 
-@Entity
-@Table(name = "raadfoert_med_lege", schema = "kodeverk")
-class RaadfoertMedLege(
-    @Id
-    val id: Int,
-    @Column(name = "navn")
-    val navn: String,
-    @Column(name = "beskrivelse")
-    val beskrivelse: String?
-) {
+enum class RaadfoertMedLege(val id: Int, val navn: String, val beskrivelse: String?) {
+
+    MANGLER(1, "Mangler", "Saken burde vært forelagt for ROL i vedtaksinstansen"),
+    RIKTIG(
+        2,
+        "Riktig",
+        "Saken er godt nok medisinsk opplyst med ROL-uttalelse i vedtaksinstansen/uten at ROL har blitt konsultert"
+    ),
+    MANGELFULL(
+        3,
+        "Mangelfull",
+        "Saken er forelagt ROL i vedtaksinstans, men er fortsatt mangelfullt medisinsk vurdert"
+    ),
+    UAKTUELT(4, "Uaktuelt", "Saken handler ikke om trygdemedisinske vurderinger");
 
     override fun toString(): String {
         return "Rol(id=$id, " +
                 "navn=$navn)"
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as RaadfoertMedLege
-
-        if (id != other.id) return false
-
-        return true
+    companion object {
+        fun of(id: Int): RaadfoertMedLege {
+            return RaadfoertMedLege.values().firstOrNull { it.id == id }
+                ?: throw IllegalArgumentException("No RaadfoertMedLege with ${id} exists")
+        }
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+}
 
+@Converter
+class RaadfoertMedLegeConverter : AttributeConverter<RaadfoertMedLege, Int?> {
+
+    override fun convertToDatabaseColumn(entity: RaadfoertMedLege?): Int? =
+        entity?.let { it.id }
+
+    override fun convertToEntityAttribute(id: Int?): RaadfoertMedLege? =
+        id?.let { RaadfoertMedLege.of(it) }
 }
