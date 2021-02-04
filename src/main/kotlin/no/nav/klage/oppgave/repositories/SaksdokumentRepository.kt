@@ -11,4 +11,6 @@ interface SaksdokumentRepository : JpaRepository<Saksdokument, UUID> {
     fun findByKlagebehandlingId(klagebehandlingId: UUID): List<Saksdokument>
 
     fun existsByKlagebehandlingIdAndReferanse(klagebehandlingId: UUID, referanse: String): Boolean
+
+    fun findByKlagebehandlingIdAndReferanse(klagebehandlingId: UUID, journalpostId: String): Saksdokument?
 }
