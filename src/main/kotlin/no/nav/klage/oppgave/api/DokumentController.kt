@@ -58,7 +58,7 @@ class DokumentController(
         notes = "Knytter en journalpost fra SAF til klagebehandlingen."
     )
     @PostMapping("/klagebehandlinger/{behandlingsid}/dokumenter", produces = ["application/json"])
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     fun connectDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
