@@ -6,19 +6,21 @@ import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.Dokumentvariant
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
-import no.nav.klage.oppgave.repositories.SaksdokumentRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
+@Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
     private val safRestClient: SafGraphQlClient,
     private val klagebehandlingRepository: KlagebehandlingRepository,
-    private val saksdokumentRepository: SaksdokumentRepository
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -31,9 +33,10 @@ class DokumentService(
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
-        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+        val klagebehandling: Klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+
         val valgteJournalpostIder =
-            saksdokumentRepository.findByKlagebehandlingId(klagebehandlingId).map { it.referanse }.toHashSet()
+            klagebehandling.saksdokumenter.map { it.referanse }.toHashSet()
         val dokumentoversiktBruker: DokumentoversiktBruker =
             safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
         return DokumenterResponse(
@@ -51,31 +54,29 @@ class DokumentService(
         )
     }
 
-    fun fetchJournalpostIderConnectedToKlagebehandling(
-        klagebehandlingId: UUID
-    ): List<String> = saksdokumentRepository.findByKlagebehandlingId(klagebehandlingId).map { it.referanse }
+    fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+        return klagebehandling.saksdokumenter.map { it.referanse }
+    }
 
-    fun fetchJournalposterConnectedToKlagebehandling(
-        klagebehandlingId: UUID
-    ): DokumenterResponse {
-        val saksdokumenter = saksdokumentRepository.findByKlagebehandlingId(klagebehandlingId)
-        return saksdokumenter
+    fun fetchJournalposterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+        return klagebehandling.saksdokumenter
             .mapNotNull { safGraphQlClient.getJournalpost(it.referanse) }
             .map { dokumentMapper.mapJournalpost(it, true) }
             .let { DokumenterResponse(dokumenter = it, pageReference = null) }
     }
 
     fun connectJournalpostToKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+
+        validateJournalpostExists(journalpostId)
+
         try {
-            if (saksdokumentRepository.existsByKlagebehandlingIdAndReferanse(klagebehandlingId, journalpostId)) {
+            if (klagebehandling.saksdokumenter.any { it.referanse == journalpostId }) {
                 logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
-                saksdokumentRepository.save(
-                    Saksdokument(
-                        klagebehandlingId = klagebehandlingId,
-                        referanse = journalpostId
-                    )
-                )
+                klagebehandling.saksdokumenter.add(Saksdokument(referanse = journalpostId))
             }
         } catch (e: Exception) {
             logger.error("Error connecting $journalpostId to $klagebehandlingId", e)
@@ -83,17 +84,18 @@ class DokumentService(
         }
     }
 
-    fun deconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
-        try {
-            val saksdokument =
-                saksdokumentRepository.findByKlagebehandlingIdAndReferanse(klagebehandlingId, journalpostId)
-            if (saksdokument != null) {
-                saksdokumentRepository.delete(saksdokument)
-            }
+    fun disconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+        klagebehandling.saksdokumenter.removeIf { it.referanse == journalpostId }
+    }
+
+    private fun validateJournalpostExists(journalpostId: String) {
+        val journalpost: Journalpost = try {
+            safGraphQlClient.getJournalpost(journalpostId)
         } catch (e: Exception) {
-            logger.error("Error deconnecting $journalpostId from $klagebehandlingId", e)
-            throw e
-        }
+            logger.warn("Unable to find journalpost $journalpostId", e)
+            null
+        } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
 }

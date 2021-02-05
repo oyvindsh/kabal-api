@@ -2,9 +2,17 @@ package no.nav.klage.oppgave.exceptions
 
 class OppgaveNotFoundException(msg: String) : RuntimeException(msg)
 
-class OppgaveIdWrongFormatException(msg: String) : RuntimeException(msg)
+class JournalpostNotFoundException(msg: String) : ValidationException(msg)
 
-class OppgaveVersjonWrongFormatException(msg: String) : RuntimeException(msg)
+class KlagebehandlingNotFoundException(msg: String) : RuntimeException(msg)
+
+open class ValidationException(msg: String) : RuntimeException(msg)
+
+class OppgaveIdWrongFormatException(msg: String) : ValidationException(msg)
+
+class OppgaveVersjonWrongFormatException(msg: String) : ValidationException(msg)
+
+class BehandlingsidWrongFormatException(msg: String) : ValidationException(msg)
 
 class NotMatchingUserException(msg: String) : RuntimeException(msg)
 

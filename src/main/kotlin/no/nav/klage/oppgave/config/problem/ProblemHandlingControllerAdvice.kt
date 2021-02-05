@@ -29,15 +29,15 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
-    fun handleOppgaveIdNotParsable(
-        ex: OppgaveIdWrongFormatException,
+    fun handleKlagebehandlingNotFound(
+        ex: KlagebehandlingNotFoundException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+        create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
-    fun handleOppgaveVersjonNotParsable(
-        ex: OppgaveVersjonWrongFormatException,
+    fun handleValidationException(
+        ex: ValidationException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(Status.BAD_REQUEST, ex, request)
@@ -51,7 +51,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler
-    fun handleNoSaksbehandlerRoleEnabled(ex: NoSaksbehandlerRoleException, request: NativeWebRequest): ResponseEntity<Problem> =
+    fun handleNoSaksbehandlerRoleEnabled(
+        ex: NoSaksbehandlerRoleException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
         create(Status.FORBIDDEN, ex, request)
 
     @ExceptionHandler

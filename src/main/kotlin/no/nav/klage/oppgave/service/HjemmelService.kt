@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service
 class HjemmelService {
     private val hjemmelRegex = """(\d{1,2}-\d{1,2})+""".toRegex()
 
-    fun getHjemmelFromOppgaveKopi(oppgaveKopi: OppgaveKopi): List<Hjemmel> {
+    fun getHjemmelFromOppgaveKopi(oppgaveKopi: OppgaveKopi): MutableList<Hjemmel> {
         val metadataHjemmel = oppgaveKopi.metadata.find {
             it.noekkel == MetadataNoekkel.HJEMMEL && it.verdi.matchesHjemmelRegex()
         }
         if (metadataHjemmel != null) {
-            return listOf(generateHjemmelFromText(metadataHjemmel.verdi))
+            return mutableListOf(generateHjemmelFromText(metadataHjemmel.verdi))
         }
         val hjemler = hjemmelRegex.findAll(oppgaveKopi.beskrivelse ?: "").collect()
         if (hjemler.isNotEmpty()) {
-            return listOf(generateHjemmelFromText(hjemler[0]))
+            return mutableListOf(generateHjemmelFromText(hjemler[0]))
         }
-        return listOf()
+        return mutableListOf()
     }
 
     private fun generateHjemmelFromText(hjemmelText: String): Hjemmel {

@@ -39,14 +39,17 @@ class Klagebehandling(
     val raadfoertMedLege: RaadfoertMedLege? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val hjemler: List<Hjemmel>,
+    val hjemler: MutableList<Hjemmel>,
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val oppgavereferanser: List<Oppgavereferanse>,
+    val oppgavereferanser: MutableList<Oppgavereferanse>,
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
-    val created: LocalDateTime = LocalDateTime.now()
+    val created: LocalDateTime = LocalDateTime.now(),
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    val saksdokumenter: MutableList<Saksdokument> = mutableListOf()
 ) {
     override fun toString(): String {
         return "Behandling(id=$id, " +
