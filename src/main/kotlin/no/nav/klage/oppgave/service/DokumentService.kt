@@ -73,7 +73,7 @@ class DokumentService(
         validateJournalpostExists(journalpostId)
 
         try {
-            if (klagebehandling.saksdokumenter.find { it.referanse == journalpostId } != null) {
+            if (klagebehandling.saksdokumenter.any { it.referanse == journalpostId }) {
                 logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 klagebehandling.saksdokumenter.add(Saksdokument(referanse = journalpostId))
@@ -84,6 +84,11 @@ class DokumentService(
         }
     }
 
+    fun disconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+        klagebehandling.saksdokumenter.removeIf { it.referanse == journalpostId }
+    }
+
     private fun validateJournalpostExists(journalpostId: String) {
         val journalpost: Journalpost = try {
             safGraphQlClient.getJournalpost(journalpostId)
@@ -91,12 +96,6 @@ class DokumentService(
             logger.warn("Unable to find journalpost $journalpostId", e)
             null
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
-    }
-
-    fun disconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
-        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        klagebehandling.saksdokumenter.find { it.referanse == journalpostId }
-            .let { klagebehandling.saksdokumenter.remove(it) }
     }
 
 }
