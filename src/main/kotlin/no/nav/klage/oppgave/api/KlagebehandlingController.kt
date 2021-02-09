@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
-import java.net.http.HttpRequest
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @Api(tags = ["klage-oppgave-api"])
@@ -34,7 +34,7 @@ class KlagebehandlingController(
     @GetMapping("/klagebehandlinger/{id}")
     fun getKlagebehandling(
         @PathVariable("id") oppgaveId: Long,
-        request: HttpRequest
+        request: HttpServletRequest
     ): KlagebehandlingView {
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         logger.debug(
@@ -46,8 +46,8 @@ class KlagebehandlingController(
             auditLogger.log(AuditLogEvent(
                 applicationName = applicationName,
                 navIdent = innloggetIdent,
-                requestURL = request.uri().toString(),
-                requestMethod = request.method(),
+                requestURL = request.requestURI,
+                requestMethod = request.method,
                 personFnr = it.foedselsnummer,
                 traceId = tracer.currentSpan().context().traceIdString()
             ))
