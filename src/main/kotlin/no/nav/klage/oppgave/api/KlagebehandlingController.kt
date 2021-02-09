@@ -47,7 +47,7 @@ class KlagebehandlingController(
                 applicationName = applicationName,
                 navIdent = innloggetIdent,
                 requestURL = request.uri().toString(),
-                request.method(),
+                requestMethod = request.method(),
                 personFnr = it.foedselsnummer,
                 traceId = tracer.currentSpan().context().traceIdString()
             ))
