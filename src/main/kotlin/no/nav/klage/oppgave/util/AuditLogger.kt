@@ -49,16 +49,16 @@ class AuditLogger {
         )
     }
 
-    private fun getExtensions(logEvent: AuditLogEvent): List<String> {
-        val extensions = mutableListOf<String>()
-        extensions += "end=${System.currentTimeMillis()}"
-        extensions += "suid=${logEvent.navIdent}"
-        extensions += "duid=${logEvent.personFnr}"
-        extensions += "request=${logEvent.requestURL}"
-        extensions += "requestMethod=${logEvent.requestMethod}"
-        extensions += "flexString1=Permit"
-        extensions += "flexString1Label=Decision"
-        extensions += "sproc=${logEvent.traceId}}"
-        return extensions
-    }
+    private fun getExtensions(logEvent: AuditLogEvent): List<String> =
+        listOf(
+            "end=${System.currentTimeMillis()}",
+            "suid=${logEvent.navIdent}",
+            "duid=${logEvent.personFnr}",
+            "request=${logEvent.requestURL}",
+            "requestMethod=${logEvent.requestMethod}",
+            "flexString1=Permit",
+            "flexString1Label=Decision",
+            "sproc=${logEvent.traceId}}",
+        )
+
 }
