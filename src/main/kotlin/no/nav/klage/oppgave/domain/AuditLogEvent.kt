@@ -7,8 +7,7 @@ data class AuditLogEvent(
     val requestMethod: String,
     val personFnr: String?,
     val traceId: String,
-    val logLevel: Level = Level.INFO,
-    val appDescription: String
+    val logLevel: Level = Level.INFO
 ) {
     enum class Level {
         INFO, WARN

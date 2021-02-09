@@ -25,12 +25,34 @@ class AuditLogger {
     }
 
     private fun compileLogMessage(logEvent: AuditLogEvent): String {
+        //Field descriptions from CEF documentation (#tech-logg_analyse_og_datainnsikt):
+        /*
+        Set to: 0 (zero)
+         */
         val version = "CEF:0"
+        /*
+        Arena, Bisys etc
+         */
         val deviceVendor = logEvent.applicationName
+        /*
+        The name of the log that originated the event. Auditlog, leselogg, ABAC-Audit, Sporingslogg
+         */
         val deviceProduct = "auditLog"
+        /*
+        The version of the logformat. 1.0
+         */
         val deviceVersion = "1.0"
+        /*
+        The text representing the type of the event. For example audit:access, audit:edit
+         */
         val deviceEventClassId = "${logEvent.applicationName}:accessed"
-        val name = logEvent.appDescription
+        /*
+        The description of the event. For example 'ABAC sporingslogg' or 'Database query'
+         */
+        val name = logEvent.applicationName + " audit log"
+        /*
+        The severity of the event (INFO or WARN)
+         */
         val severity = logEvent.logLevel.name
 
         val extensions = join(" ", getExtensions(logEvent))
