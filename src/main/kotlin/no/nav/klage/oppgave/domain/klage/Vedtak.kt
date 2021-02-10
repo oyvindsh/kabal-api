@@ -1,7 +1,5 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Grunn
-import no.nav.klage.oppgave.domain.kodeverk.GrunnConverter
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.domain.kodeverk.UtfallConverter
 import java.time.LocalDateTime
@@ -13,17 +11,9 @@ import javax.persistence.*
 class Vedtak(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "enhet")
-    val enhet: Int,
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     val utfall: Utfall,
-    @Column(name = "grunn_id")
-    @Convert(converter = GrunnConverter::class)
-    val grunn: Grunn,
-    @OneToOne
-    @JoinColumn(name = "tilbakemelding_id", nullable = true)
-    val tilbakemelding: Tilbakemelding? = null,
     @Column(name = "modified")
     val modified: LocalDateTime,
     @Column(name = "created")

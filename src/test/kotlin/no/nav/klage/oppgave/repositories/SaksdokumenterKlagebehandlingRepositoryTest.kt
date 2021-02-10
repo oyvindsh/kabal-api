@@ -2,8 +2,11 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.domain.kodeverk.Kilde
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,23 +30,33 @@ class SaksdokumenterKlagebehandlingRepositoryTest {
 
     @Test
     fun `persist klage with saksdokumenter works`() {
+
+        val mottak = Mottak(
+            tema = Tema.SYK,
+            sakstype = Sakstype.KLAGE,
+            kilde = Kilde.OPPGAVE
+        )
+
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
+            tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
+            frist = LocalDate.now(),
             hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
             ),
             oppgavereferanser = mutableListOf(),
-            modified = LocalDateTime.now(),
-            created = LocalDateTime.now(),
-            frist = LocalDate.now(),
-            tema = "SYK",
             saksdokumenter = mutableListOf(
                 Saksdokument(referanse = "REF1"),
                 Saksdokument(referanse = "REF2"),
-            )
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDate.now(),
+            kilde = Kilde.OPPGAVE,
+            mottak = mottak
         )
 
         klagebehandlingRepository.save(klage)
@@ -60,23 +73,32 @@ class SaksdokumenterKlagebehandlingRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
+        val mottak = Mottak(
+            tema = Tema.SYK,
+            sakstype = Sakstype.KLAGE,
+            kilde = Kilde.OPPGAVE
+        )
+
         val klage = Klagebehandling(
             foedselsnummer = "12345678910",
+            tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
+            frist = LocalDate.now(),
             hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
             ),
             oppgavereferanser = mutableListOf(),
-            modified = LocalDateTime.now(),
-            created = LocalDateTime.now(),
-            frist = LocalDate.now(),
-            tema = "SYK",
             saksdokumenter = mutableListOf(
                 Saksdokument(referanse = "REF1"),
                 Saksdokument(referanse = "REF2"),
-            )
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDate.now(),
+            kilde = Kilde.OPPGAVE,
+            mottak = mottak
         )
 
         klagebehandlingRepository.save(klage)
