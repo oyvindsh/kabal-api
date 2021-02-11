@@ -1,15 +1,15 @@
 package no.nav.klage.oppgave.api
 
-import brave.Tracer
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
+import no.nav.klage.oppgave.domain.AuditLogEvent.Action.KLAGEBEHANDLING_VIEW
+import no.nav.klage.oppgave.domain.AuditLogEvent.Decision.ALLOW
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -22,8 +22,6 @@ class KlagebehandlingController(
     private val klagebehandlingFacade: KlagebehandlingFacade,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val auditLogger: AuditLogger,
-    private val tracer: Tracer,
-    @Value("\$spring.application.name") private val applicationName: String
 ) {
 
     companion object {
@@ -43,14 +41,14 @@ class KlagebehandlingController(
             oppgaveId
         )
         return klagebehandlingFacade.getKlagebehandling(oppgaveId).also {
-            auditLogger.log(AuditLogEvent(
-                applicationName = applicationName,
-                navIdent = innloggetIdent,
-                requestURL = request.requestURI,
-                requestMethod = request.method,
-                personFnr = it.foedselsnummer,
-                traceId = tracer.currentSpan().context().traceIdString()
-            ))
+            auditLogger.log(
+                AuditLogEvent(
+                    navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
+                    action = KLAGEBEHANDLING_VIEW,
+                    decision = ALLOW,
+                    personFnr = it.foedselsnummer
+                )
+            )
         }
     }
 

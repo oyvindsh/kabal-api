@@ -1,13 +1,18 @@
 package no.nav.klage.oppgave.util
 
+import brave.Tracer
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.domain.AuditLogEvent.Level.INFO
 import no.nav.klage.oppgave.domain.AuditLogEvent.Level.WARN
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.lang.String.join
 
 @Component
-class AuditLogger {
+class AuditLogger(
+    private val tracer: Tracer,
+    @Value("\${spring.application.name}") private val applicationName: String
+) {
 
     companion object {
         val auditLogger = getAuditLogger()
@@ -33,7 +38,7 @@ class AuditLogger {
         /*
         Arena, Bisys etc
          */
-        val deviceVendor = logEvent.applicationName
+        val deviceVendor = applicationName
         /*
         The name of the log that originated the event. Auditlog, leselogg, ABAC-Audit, Sporingslogg
          */
@@ -45,11 +50,11 @@ class AuditLogger {
         /*
         The text representing the type of the event. For example audit:access, audit:edit
          */
-        val deviceEventClassId = "${logEvent.applicationName}:accessed"
+        val deviceEventClassId = logEvent.action.value
         /*
         The description of the event. For example 'ABAC sporingslogg' or 'Database query'
          */
-        val name = logEvent.applicationName + " audit log"
+        val name = "$applicationName audit log"
         /*
         The severity of the event (INFO or WARN)
          */
@@ -76,11 +81,9 @@ class AuditLogger {
             "end=${System.currentTimeMillis()}",
             "suid=${logEvent.navIdent}",
             "duid=${logEvent.personFnr}",
-            "request=${logEvent.requestURL}",
-            "requestMethod=${logEvent.requestMethod}",
-            "flexString1=Permit",
             "flexString1Label=Decision",
-            "sproc=${logEvent.traceId}}",
+            "flexString1=${logEvent.decision.name}",
+            "sproc=${tracer.currentSpan().context().traceIdString()}}",
         )
 
 }
