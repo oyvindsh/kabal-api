@@ -30,9 +30,9 @@ class Kvalitetsvurdering(
     @Column(name = "mottaker_enhet")
     val mottakerEnhet: String? = null,
     @Column(name = "created")
-    val created: LocalDateTime,
+    val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
-    val modified: LocalDateTime
+    val modified: LocalDateTime = LocalDateTime.now()
 ) {
     override fun toString(): String {
         return "Tilbakemelding(id=$id, " +
