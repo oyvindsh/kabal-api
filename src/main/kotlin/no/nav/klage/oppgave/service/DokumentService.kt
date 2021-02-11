@@ -35,23 +35,27 @@ class DokumentService(
     ): DokumenterResponse {
         val klagebehandling: Klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
 
-        val valgteJournalpostIder =
-            klagebehandling.saksdokumenter.map { it.referanse }.toHashSet()
-        val dokumentoversiktBruker: DokumentoversiktBruker =
-            safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
-        return DokumenterResponse(
-            dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
-                dokumentMapper.mapJournalpost(
-                    journalpost,
-                    valgteJournalpostIder.contains(journalpost.journalpostId)
-                )
-            },
-            pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
-                dokumentoversiktBruker.sideInfo.sluttpeker
-            } else {
-                null
-            }
-        )
+        if (klagebehandling.foedselsnummer != null) {
+            val valgteJournalpostIder =
+                klagebehandling.saksdokumenter.map { it.referanse }.toHashSet()
+            val dokumentoversiktBruker: DokumentoversiktBruker =
+                safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
+            return DokumenterResponse(
+                dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
+                    dokumentMapper.mapJournalpost(
+                        journalpost,
+                        valgteJournalpostIder.contains(journalpost.journalpostId)
+                    )
+                },
+                pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
+                    dokumentoversiktBruker.sideInfo.sluttpeker
+                } else {
+                    null
+                }
+            )
+        } else {
+            return DokumenterResponse(dokumenter = emptyList(), pageReference = null)
+        }
     }
 
     fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> {
@@ -90,7 +94,7 @@ class DokumentService(
     }
 
     private fun validateJournalpostExists(journalpostId: String) {
-        val journalpost: Journalpost = try {
+        try {
             safGraphQlClient.getJournalpost(journalpostId)
         } catch (e: Exception) {
             logger.warn("Unable to find journalpost $journalpostId", e)

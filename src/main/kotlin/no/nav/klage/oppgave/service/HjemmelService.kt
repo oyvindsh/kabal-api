@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.oppgavekopi.MetadataNoekkel
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
+import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import org.springframework.stereotype.Service
 
 @Service
@@ -23,7 +24,14 @@ class HjemmelService {
         return mutableListOf()
     }
 
-    private fun generateHjemmelFromText(hjemmelText: String): Hjemmel {
+    fun getHjemmelFromOppgaveKopiVersjon(oppgaveKopiVersjon: OppgaveKopiVersjon): String? =
+        oppgaveKopiVersjon.metadata
+            .find { it.noekkel == MetadataNoekkel.HJEMMEL && it.verdi.matchesHjemmelRegex() }
+            ?.verdi
+            ?: hjemmelRegex.findAll(oppgaveKopiVersjon.beskrivelse ?: "").collect().firstOrNull()
+
+
+    fun generateHjemmelFromText(hjemmelText: String): Hjemmel {
         val parts = hjemmelText.split("-")
         return Hjemmel(
             original = hjemmelText,

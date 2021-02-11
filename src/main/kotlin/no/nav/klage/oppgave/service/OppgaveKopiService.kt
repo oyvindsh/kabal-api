@@ -46,10 +46,11 @@ class OppgaveKopiService(
         if (oppgaveKopiVersjonRepository.existsById(OppgaveKopiVersjonId(oppgaveKopi.id, oppgaveKopi.versjon))) {
             logger.debug("Oppgavekopiversjon with id ${oppgaveKopi.id} and versjon ${oppgaveKopi.versjon} stored before, won't overwrite")
         } else {
-            oppgaveKopiVersjonRepository.save(oppgaveKopi.toVersjon())
+            oppgaveKopiVersjonRepository.saveAndFlush(oppgaveKopi.toVersjon())
         }
 
-        klagebehandlingService.connectOppgaveKopiToKlagebehandling(oppgaveKopi)
+        val alleVersjoner = oppgaveKopiVersjonRepository.findByIdOrderByVersjonDesc(oppgaveKopi.id)
+        klagebehandlingService.connectOppgaveKopiToKlagebehandling(alleVersjoner)
     }
 
     private fun mergeMetadata(metadataNew: Set<Metadata>, metadataOld: Set<Metadata>) {

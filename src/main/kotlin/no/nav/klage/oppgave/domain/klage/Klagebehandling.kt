@@ -12,44 +12,54 @@ class Klagebehandling(
     @Id
     val id: UUID = UUID.randomUUID(),
     @Column(name = "foedselsnummer")
-    val foedselsnummer: String,
-    @Column(name = "tema")
-    val tema: String,
+    val foedselsnummer: String? = null,
+    @Column(name = "tema_id")
+    @Convert(converter = TemaConverter::class)
+    val tema: Tema,
     @Column(name = "sakstype_id")
     @Convert(converter = SakstypeConverter::class)
     val sakstype: Sakstype,
-    @Column(name = "dato_mottatt_fra_foersteinstans")
-    val mottatt: LocalDate = LocalDate.now(),
+    @Column(name = "dato_innsendt")
+    val innsendt: LocalDate? = null,
+    @Column(name = "dato_mottatt_foersteinstans")
+    val mottattFoersteinstans: LocalDate? = null,
+    @Column(name = " dato_mottatt_klageinstans")
+    val mottattKlageinstans: LocalDate,
     @Column(name = "dato_behandling_startet")
     val startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
     val avsluttet: LocalDate? = null,
     @Column(name = "frist")
-    val frist: LocalDate,
+    val frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
     val tildeltSaksbehandlerident: String? = null,
-    @OneToOne
+    @Column(name = "tildelt_enhet")
+    val tildeltEnhet: String? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "mottak_id", nullable = true)
+    val mottak: Mottak,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "vedtak_id", nullable = true)
     val vedtak: Vedtak? = null,
-    @Column(name = "eoes_id")
-    @Convert(converter = EoesConverter::class)
-    val eoes: Eoes? = null,
-    @Column(name = "raadfoert_med_lege_id")
-    @Convert(converter = RaadfoertMedLegeConverter::class)
-    val raadfoertMedLege: RaadfoertMedLege? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
+    val kvalitetsvurdering: Kvalitetsvurdering? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val hjemler: MutableList<Hjemmel>,
+    val hjemler: MutableList<Hjemmel> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val oppgavereferanser: MutableList<Oppgavereferanse>,
-    @Column(name = "modified")
-    val modified: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "created")
-    val created: LocalDateTime = LocalDateTime.now(),
+    val oppgavereferanser: MutableList<Oppgavereferanse> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val saksdokumenter: MutableList<Saksdokument> = mutableListOf()
+    val saksdokumenter: MutableList<Saksdokument> = mutableListOf(),
+    @Column(name = "created")
+    val created: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "modified")
+    val modified: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "kilde")
+    @Enumerated(EnumType.STRING)
+    val kilde: Kilde
 ) {
     override fun toString(): String {
         return "Behandling(id=$id, " +
