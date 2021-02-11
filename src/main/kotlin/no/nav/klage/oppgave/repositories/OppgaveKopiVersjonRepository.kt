@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
 interface OppgaveKopiVersjonRepository : JpaRepository<OppgaveKopiVersjon, OppgaveKopiVersjonId> {
 
     fun findFirstByIdOrderByVersjonDesc(oppgaveKopiId: Long): OppgaveKopiVersjon
+
+    fun findByIdOrderByVersjonDesc(oppgaveKopiId: Long): List<OppgaveKopiVersjon>
 }

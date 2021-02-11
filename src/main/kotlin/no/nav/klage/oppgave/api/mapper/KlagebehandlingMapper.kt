@@ -21,20 +21,17 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingToKlagebehandlingView(klagebehandling: Klagebehandling): KlagebehandlingView {
-        //naive lookup
-        val oppgaveKopi = oppgaveKopiService.getOppgaveKopi(klagebehandling.oppgavereferanser.first().oppgaveId)
-
+        
         return KlagebehandlingView(
             id = klagebehandling.id,
-            //TODO get date from where? klage-document/journalpost perhaps.
-            klageInnsendtdato = null,
+            klageInnsendtdato = klagebehandling.innsendt,
             //TODO get name from norg2
-            fraNAVEnhet = oppgaveKopi.opprettetAvEnhetsnr ?: "mangler",
-            mottattFoersteinstans = oppgaveKopi.opprettetTidspunkt.toLocalDate(),
-            foedselsnummer = klagebehandling.foedselsnummer,
-            tema = klagebehandling.tema,
+            fraNAVEnhet = klagebehandling.mottak.avsenderEnhet ?: "mangler",
+            mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
+            foedselsnummer = klagebehandling.foedselsnummer ?: "mangler",
+            tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
-            mottatt = klagebehandling.mottatt,
+            mottatt = klagebehandling.mottattKlageinstans,
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,
             frist = klagebehandling.frist,

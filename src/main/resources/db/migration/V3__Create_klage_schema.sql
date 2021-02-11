@@ -1,74 +1,96 @@
 CREATE TABLE klage.mottak
 (
-    id                     UUID PRIMARY KEY,
-    referanse_id           TEXT,
-    foedselsnummer         VARCHAR(11)              NOT NULL,
-    hjemmel_liste          TEXT,
-    avsender_enhet         INTEGER                  NOT NULL,
-    avsender_saksbehandler VARCHAR(7)               NOT NULL,
-    tema                   VARCHAR(3)               NOT NULL,
-    innsyn_url             TEXT,
-    created                TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    id                            UUID PRIMARY KEY,
+    tema_id                       VARCHAR(3)               NOT NULL,
+    sakstype_id                   VARCHAR(10)              NOT NULL,
+    referanse_id                  TEXT,
+    innsyn_url                    TEXT,
+    foedselsnummer                VARCHAR(11),
+    organisasjonsnummer           VARCHAR(9),
+    virksomhetsnummer             VARCHAR(9),
+    hjemmel_liste                 TEXT,
+    avsender_saksbehandlerident   VARCHAR(7),
+    avsender_enhet                VARCHAR(10),
+    oversendt_klageinstans_enhet  VARCHAR(10),
+    dato_innsendt                 DATE,
+    dato_mottatt_foersteinstans   DATE,
+    dato_oversendt_klageinstans   DATE,
+    dato_frist_fra_foersteinstans DATE,
+    kilde                         VARCHAR(15)              NOT NULL,
+    created                       TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified                      TIMESTAMP WITH TIME ZONE NOT NULL,
+    CONSTRAINT fk_mottak_sakstype
+        FOREIGN KEY (sakstype_id)
+            REFERENCES kodeverk.sakstype (id),
+    CONSTRAINT fk_mottak_tema
+        FOREIGN KEY (tema_id)
+            REFERENCES kodeverk.tema (id)
 );
 
-CREATE TABLE klage.tilbakemelding
+CREATE TABLE klage.kvalitetsvurdering
 (
     id                          UUID PRIMARY KEY,
-    mottaker_saksbehandlerident VARCHAR(7), -- Hente fra mottak-tabellen i stedet?
-    tilbakemelding              TEXT                     NOT NULL,
-    modified                    TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    created                     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    grunn_id                    INTEGER,
+    eoes_id                     INTEGER,
+    raadfoert_med_lege_id       INTEGER,
+    intern_vurdering            TEXT,
+    send_tilbakemelding         BOOLEAN,
+    tilbakemelding              TEXT,
+    mottaker_saksbehandlerident VARCHAR(7),
+    mottaker_enhet              VARCHAR(10),
+    created                     TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified                    TIMESTAMP WITH TIME ZONE NOT NULL,
+    CONSTRAINT fk_kvalitetsvurdering_grunn
+        FOREIGN KEY (grunn_id)
+            REFERENCES kodeverk.grunn (id),
+    CONSTRAINT fk_kvalitetsvurdering_eoes
+        FOREIGN KEY (eoes_id)
+            REFERENCES kodeverk.eoes (id),
+    CONSTRAINT fk_kvalitetsvurdering_rol
+        FOREIGN KEY (raadfoert_med_lege_id)
+            REFERENCES kodeverk.raadfoert_med_lege (id)
 );
 
 CREATE TABLE klage.vedtak
 (
-    id                UUID PRIMARY KEY,
-    enhet             INTEGER                  NOT NULL,
-    utfall_id         INTEGER                  NOT NULL,
-    grunn_id          INTEGER                  NOT NULL,
-    tilbakemelding_id UUID,
-    modified          TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    created           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    id        UUID PRIMARY KEY,
+    utfall_id INTEGER                  NOT NULL,
+    modified  TIMESTAMP WITH TIME ZONE NOT NULL,
+    created   TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_vedtak_utfall
         FOREIGN KEY (utfall_id)
-            REFERENCES kodeverk.utfall (id),
-    CONSTRAINT fk_vedtak_grunn
-        FOREIGN KEY (grunn_id)
-            REFERENCES kodeverk.grunn (id),
-    CONSTRAINT fk_vedtak_tilbakemelding
-        FOREIGN KEY (tilbakemelding_id)
-            REFERENCES klage.tilbakemelding (id)
+            REFERENCES kodeverk.utfall (id)
 );
 
 CREATE TABLE klage.klagebehandling
 (
-    id                              UUID PRIMARY KEY,
-    foedselsnummer                  VARCHAR(11)              NOT NULL,
-    tema                            VARCHAR(3)               NOT NULL,
-    sakstype_id                     VARCHAR(10)              NOT NULL,
-    mottak_id                       UUID,
-    dato_mottatt_fra_foersteinstans DATE                     NOT NULL,
-    dato_behandling_startet         DATE,
-    dato_behandling_avsluttet       DATE,
-    frist                           DATE                     NOT NULL,
-    tildelt_saksbehandlerident      VARCHAR(7),
-    eoes_id                         INTEGER,
-    raadfoert_med_lege_id           INTEGER,
-    vedtak_id                       UUID,
-    modified                        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    created                         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_vedtak_eoes
-        FOREIGN KEY (eoes_id)
-            REFERENCES kodeverk.eoes (id),
-    CONSTRAINT fk_vedtak_rol
-        FOREIGN KEY (raadfoert_med_lege_id)
-            REFERENCES kodeverk.raadfoert_med_lege (id),
+    id                          UUID PRIMARY KEY,
+    foedselsnummer              VARCHAR(11),
+    tema_id                     VARCHAR(3)               NOT NULL,
+    sakstype_id                 VARCHAR(10)              NOT NULL,
+    dato_innsendt               DATE,
+    dato_mottatt_foersteinstans DATE,
+    dato_mottatt_klageinstans   DATE                     NOT NULL,
+    dato_behandling_startet     DATE,
+    dato_behandling_avsluttet   DATE,
+    frist                       DATE,
+    tildelt_saksbehandlerident  VARCHAR(7),
+    tildelt_enhet               VARCHAR(10),
+    mottak_id                   UUID,
+    vedtak_id                   UUID,
+    kvalitetsvurdering_id       UUID,
+    kilde                       VARCHAR(15)              NOT NULL,
+    created                     TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified                    TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_klagebehandling_sakstype
         FOREIGN KEY (sakstype_id)
             REFERENCES kodeverk.sakstype (id),
     CONSTRAINT fk_behandling_vedtak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),
+    CONSTRAINT fk_behandling_kvalitetsvurdering
+        FOREIGN KEY (kvalitetsvurdering_id)
+            REFERENCES klage.kvalitetsvurdering (id),
     CONSTRAINT fk_behandling_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id)
