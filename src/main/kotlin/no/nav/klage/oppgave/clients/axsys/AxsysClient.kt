@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.clients.axsys
 import brave.Tracer
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.TILGANGER_CACHE
+import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -18,8 +19,6 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-
-        const val KLAGEENHET_PREFIX = "42"
         const val IT_ENHET = "2990"
     }
 

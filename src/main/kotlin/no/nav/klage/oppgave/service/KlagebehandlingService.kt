@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.Oppgavereferanse
@@ -25,7 +26,6 @@ class KlagebehandlingService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val klageinstansPrefix = "42"
     }
 
     fun getKlagebehandlingByOppgaveId(oppgaveId: Long): Klagebehandling {
@@ -40,7 +40,7 @@ class KlagebehandlingService(
         val nyesteVersjon = oppgaveKopierOrdererByVersion.first()
         val klagesak = fetchKlagesakForOppgaveKopi(nyesteVersjon.id)
         //TODO: Oppdatere mottak selv om Klagebehandling har blitt laget tidligere? Hvor avslutter man oppgaven, hos oss eller i Gosys?
-        if (klagesak == null && nyesteVersjon.tildeltEnhetsnr.startsWith(klageinstansPrefix)) {
+        if (klagesak == null && nyesteVersjon.tildeltEnhetsnr.startsWith(KLAGEENHET_PREFIX)) {
             requireNotNull(nyesteVersjon.ident)
             requireNotNull(nyesteVersjon.behandlingstype)
 
@@ -108,12 +108,12 @@ class KlagebehandlingService(
         findLastVersionWhereTildeltEnhetIsNotKAAndSaksbehandlerIsNotNull(oppgaveKopiVersjoner)?.tilordnetRessurs
 
     private fun findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon =
-        oppgaveKopiVersjoner.last { it.tildeltEnhetsnr.startsWith(klageinstansPrefix) }
+        oppgaveKopiVersjoner.last { it.tildeltEnhetsnr.startsWith(KLAGEENHET_PREFIX) }
 
     private fun findLastVersionWhereTildeltEnhetIsNotKA(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon? =
-        oppgaveKopiVersjoner.firstOrNull { !it.tildeltEnhetsnr.startsWith(klageinstansPrefix) }
+        oppgaveKopiVersjoner.firstOrNull { !it.tildeltEnhetsnr.startsWith(KLAGEENHET_PREFIX) }
 
     private fun findLastVersionWhereTildeltEnhetIsNotKAAndSaksbehandlerIsNotNull(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon? =
-        oppgaveKopiVersjoner.firstOrNull { !it.tildeltEnhetsnr.startsWith(klageinstansPrefix) && it.tilordnetRessurs != null }
+        oppgaveKopiVersjoner.firstOrNull { !it.tildeltEnhetsnr.startsWith(KLAGEENHET_PREFIX) && it.tilordnetRessurs != null }
 
 }
