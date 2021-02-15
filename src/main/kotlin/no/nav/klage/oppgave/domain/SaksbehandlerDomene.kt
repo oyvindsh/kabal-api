@@ -13,6 +13,7 @@ const val TYPE_FEILUTBETALING = "Feilutbetaling"
 
 const val BEHANDLINGSTYPE_KLAGE = "ae0058"
 const val BEHANDLINGSTYPE_FEILUTBETALING = "ae0161"
+const val BEHANDLINGSTYPE_ANKE = "ab0165"
 
 data class EnheterMedLovligeTemaer(val enheter: List<EnhetMedLovligeTemaer>)
 
