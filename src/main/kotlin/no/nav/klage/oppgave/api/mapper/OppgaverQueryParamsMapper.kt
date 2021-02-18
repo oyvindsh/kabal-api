@@ -18,8 +18,8 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
     }
 
     fun toSearchCriteria(navIdent: String, oppgaverQueryParams: OppgaverQueryParams) = OppgaverSearchCriteria(
-        typer = oppgaverQueryParams.typer.map { Sakstype.of(it) },
-        temaer = oppgaverQueryParams.temaer.map { Tema.of(it) },
+        typer = oppgaverQueryParams.typer.map { Sakstype.fromNavn(it) },
+        temaer = oppgaverQueryParams.temaer.map { Tema.fromNavn(it) },
         hjemler = oppgaverQueryParams.hjemler,
         order = if (oppgaverQueryParams.rekkefoelge == OppgaverQueryParams.Rekkefoelge.SYNKENDE) {
             OppgaverSearchCriteria.Order.DESC

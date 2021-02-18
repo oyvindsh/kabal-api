@@ -18,8 +18,13 @@ enum class Sakstype(val id: String, val navn: String, val beskrivelse: String?) 
 
     companion object {
         fun of(id: String): Sakstype {
-            return Sakstype.values().firstOrNull { it.id == id }
+            return values().firstOrNull { it.id == id }
                 ?: throw IllegalArgumentException("No Sakstype with ${id} exists")
+        }
+
+        fun fromNavn(navn: String): Sakstype {
+            return values().firstOrNull { it.navn == navn }
+                ?: throw IllegalArgumentException("No Sakstype with ${navn} exists")
         }
     }
 }
