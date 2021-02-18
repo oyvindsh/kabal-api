@@ -2,9 +2,9 @@ package no.nav.klage.oppgave.service
 
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
-import no.nav.klage.oppgave.domain.elasticsearch.EsOppgave
-import no.nav.klage.oppgave.domain.elasticsearch.Prioritet
-import no.nav.klage.oppgave.domain.elasticsearch.Status
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -33,7 +33,6 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 
 @ActiveProfiles("local")
@@ -61,7 +60,7 @@ class ElasticsearchIndexingTest {
         }
     }
 
-    @MockkBean
+    @MockkBean(relaxed = true)
     lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 
     @Autowired
@@ -76,76 +75,76 @@ class ElasticsearchIndexingTest {
     @Test
     @Order(2)
     fun `index has been created by service`() {
-        val indexOps = esTemplate.indexOps(IndexCoordinates.of("oppgavekopier"))
+        val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
         assertThat(indexOps.exists()).isTrue
     }
 
     @Test
     @Order(3)
-    fun `oppgave can be saved and retrieved`() {
+    fun `klagebehandling can be saved and retrieved`() {
 
-        val oppgave = oppgaveWith(
-            id = 1001L,
+        val klagebehandling = klagebehandlingWith(
+            id = "1001L",
             versjon = 1L,
-            beskrivelse = "hei"
+            saksreferanse = "hei"
         )
-        esTemplate.save(oppgave)
+        esTemplate.save(klagebehandling)
 
         sleep(2000L)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
-        val searchHits: SearchHits<EsOppgave> = esTemplate.search(query, EsOppgave::class.java)
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.beskrivelse).isEqualTo("hei")
+        assertThat(searchHits.searchHits.first().content.saksreferanse).isEqualTo("hei")
     }
 
     @Test
     @Order(4)
-    fun `oppgave can be saved twice without creating a duplicate`() {
+    fun `klagebehandling can be saved twice without creating a duplicate`() {
 
-        var oppgave = oppgaveWith(
-            id = 2001L,
+        var klagebehandling = klagebehandlingWith(
+            id = "2001L",
             versjon = 1L,
-            beskrivelse = "hei"
+            saksreferanse = "hei"
         )
-        esTemplate.save(oppgave)
+        esTemplate.save(klagebehandling)
 
-        oppgave = oppgaveWith(
-            id = 2001L,
+        klagebehandling = klagebehandlingWith(
+            id = "2001L",
             versjon = 2L,
-            beskrivelse = "hallo"
+            saksreferanse = "hallo"
         )
-        esTemplate.save(oppgave)
+        esTemplate.save(klagebehandling)
         sleep(2000L)
 
         val query: Query = NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.idsQuery().addIds("2001"))
+            .withQuery(QueryBuilders.idsQuery().addIds("2001L"))
             .build()
-        val searchHits: SearchHits<EsOppgave> = esTemplate.search(query, EsOppgave::class.java)
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.beskrivelse).isEqualTo("hallo")
+        assertThat(searchHits.searchHits.first().content.saksreferanse).isEqualTo("hallo")
     }
 
     @Test
     @Order(5)
-    fun `saving an earlier version of oppgave causes a conflict`() {
+    fun `saving an earlier version of klagebehandling causes a conflict`() {
 
-        var oppgave = oppgaveWith(
-            id = 3001L,
+        var klagebehandling = klagebehandlingWith(
+            id = "3001L",
             versjon = 2L,
-            beskrivelse = "hei"
+            saksreferanse = "hei"
         )
-        esTemplate.save(oppgave)
+        esTemplate.save(klagebehandling)
 
-        oppgave = oppgaveWith(
-            id = 3001L,
+        klagebehandling = klagebehandlingWith(
+            id = "3001L",
             versjon = 1L,
-            beskrivelse = "hallo"
+            saksreferanse = "hallo"
         )
         assertThatThrownBy {
-            esTemplate.save(oppgave)
+            esTemplate.save(klagebehandling)
         }.isInstanceOf(UncategorizedElasticsearchException::class.java)
             .hasRootCauseInstanceOf(ElasticsearchStatusException::class.java)
             .hasMessageContaining("type=version_conflict_engine_exception")
@@ -153,28 +152,36 @@ class ElasticsearchIndexingTest {
         sleep(2000L)
 
         val query: Query = NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.idsQuery().addIds("3001"))
+            .withQuery(QueryBuilders.idsQuery().addIds("3001L"))
             .build()
-        val searchHits: SearchHits<EsOppgave> = esTemplate.search(query, EsOppgave::class.java)
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.beskrivelse).isEqualTo("hei")
+        assertThat(searchHits.searchHits.first().content.saksreferanse).isEqualTo("hei")
     }
 
-    private fun oppgaveWith(id: Long, versjon: Long, beskrivelse: String): EsOppgave {
-        return EsOppgave(
+    private fun klagebehandlingWith(id: String, versjon: Long, saksreferanse: String): EsKlagebehandling {
+        return EsKlagebehandling(
             id = id,
-            version = versjon,
-            tema = "SYK",
-            status = Status.OPPRETTET,
-            tildeltEnhetsnr = "4219",
-            oppgavetype = "BEH_SAK_MK",
-            behandlingstype = "ae0058",
-            prioritet = Prioritet.NORM,
-            fristFerdigstillelse = LocalDate.now(),
-            aktivDato = LocalDate.now(),
-            opprettetAv = "H149290",
-            opprettetTidspunkt = LocalDateTime.now(),
-            beskrivelse = beskrivelse
+            versjon = versjon,
+            journalpostId = emptyList(),
+            saksreferanse = saksreferanse,
+            tildeltEnhet = "",
+            tema = Tema.SYK,
+            sakstype = Sakstype.KLAGE,
+            tildeltSaksbehandlerident = null,
+            innsendt = null,
+            mottattFoersteinstans = null,
+            mottattKlageinstans = LocalDate.now(),
+            frist = null,
+            startet = null,
+            avsluttet = null,
+            hjemler = listOf(),
+            foedselsnummer = null,
+            navn = null,
+            egenAnsatt = false,
+            fortrolig = false,
+            strengtFortrolig = false
+
         )
     }
 }

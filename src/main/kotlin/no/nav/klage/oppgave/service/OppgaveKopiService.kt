@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.oppgavekopi.Metadata
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
@@ -26,7 +28,7 @@ class OppgaveKopiService(
     /**
      * This method needs to be idempotent
      */
-    fun saveOppgaveKopi(oppgaveKopi: OppgaveKopi) {
+    fun saveOppgaveKopi(oppgaveKopi: OppgaveKopi): List<Pair<Klagebehandling, Mottak>> {
         logger.debug("Received oppgavekopi with id ${oppgaveKopi.id} and versjon ${oppgaveKopi.versjon} for storing")
         if (oppgaveKopiRepository.existsById(oppgaveKopi.id)) {
             val existingOppgaveKopi = oppgaveKopiRepository.getOne(oppgaveKopi.id)
@@ -50,7 +52,7 @@ class OppgaveKopiService(
         }
 
         val alleVersjoner = oppgaveKopiVersjonRepository.findByIdOrderByVersjonDesc(oppgaveKopi.id)
-        klagebehandlingService.connectOppgaveKopiToKlagebehandling(alleVersjoner)
+        return klagebehandlingService.connectOppgaveKopiToKlagebehandling(alleVersjoner)
     }
 
     private fun mergeMetadata(metadataNew: Set<Metadata>, metadataOld: Set<Metadata>) {

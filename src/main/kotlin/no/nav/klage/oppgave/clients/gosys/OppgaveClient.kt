@@ -1,7 +1,10 @@
 package no.nav.klage.oppgave.clients.gosys
 
 import brave.Tracer
-import no.nav.klage.oppgave.domain.*
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
+import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.service.TokenService
 import no.nav.klage.oppgave.util.getLogger
@@ -81,11 +84,11 @@ class OppgaveClient(
                 uriBuilder.queryParam("behandlingstype", mapType(it))
             }
         } else {
-            uriBuilder.queryParam("behandlingstype", mapType(TYPE_KLAGE))
+            uriBuilder.queryParam("behandlingstype", mapType(Sakstype.KLAGE))
         }
 
         temaer.forEach {
-            uriBuilder.queryParam("tema", it)
+            uriBuilder.queryParam("tema", it.navn)
         }
 
         erTildeltSaksbehandler?.let {
@@ -130,13 +133,13 @@ class OppgaveClient(
         return uri
     }
 
-    private fun mapType(type: String): String {
+    private fun mapType(type: Sakstype): String {
         return when (type) {
-            TYPE_KLAGE -> BEHANDLINGSTYPE_KLAGE
-            TYPE_FEILUTBETALING -> BEHANDLINGSTYPE_FEILUTBETALING
+            Sakstype.KLAGE -> BEHANDLINGSTYPE_KLAGE
+            Sakstype.FEILUTBETALING -> BEHANDLINGSTYPE_FEILUTBETALING
             else -> {
                 logger.warn("Unknown type: {}", type)
-                type
+                BEHANDLINGSTYPE_KLAGE
             }
         }
     }

@@ -1,7 +1,8 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.*
-import no.nav.klage.oppgave.domain.elasticsearch.EsOppgave
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.util.getLogger
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
@@ -23,8 +24,8 @@ import java.time.format.DateTimeFormatter
 
 
 open class ElasticsearchRepository(
-    val esTemplate: ElasticsearchOperations,
-    val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    private val esTemplate: ElasticsearchOperations,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) :
     ApplicationListener<ContextRefreshedEvent> {
 
@@ -36,14 +37,14 @@ open class ElasticsearchRepository(
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         try {
             logger.info("Trying to initialize Elasticsearch")
-            val indexOps = esTemplate.indexOps(IndexCoordinates.of("oppgavekopier"))
-            logger.info("Does oppgavekopier exist in Elasticsearch?")
+            val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
+            logger.info("Does klagebehandling exist in Elasticsearch?")
             if (!indexOps.exists()) {
-                logger.info("oppgavekopier does not exist in Elasticsearch")
+                logger.info("klagebehandling does not exist in Elasticsearch")
                 indexOps.create(readFromfile("settings.json"))
                 indexOps.putMapping(readFromfile("mapping.json"))
             } else {
-                logger.info("oppgavekopier does exist in Elasticsearch")
+                logger.info("klagebehandling does exist in Elasticsearch")
             }
         } catch (e: Exception) {
             logger.error("Unable to initialize Elasticsearch", e)
@@ -56,32 +57,31 @@ open class ElasticsearchRepository(
         return Document.parse(text)
     }
 
-    fun save(oppgaver: List<EsOppgave>) {
-        esTemplate.save(oppgaver)
+    fun save(klagebehandlinger: List<EsKlagebehandling>) {
+        esTemplate.save(klagebehandlinger)
     }
 
-    fun save(oppgave: EsOppgave) {
-        esTemplate.save(oppgave)
+    fun save(klagebehandling: EsKlagebehandling) {
+        esTemplate.save(klagebehandling)
     }
 
-    open fun findByCriteria(criteria: OppgaverSearchCriteria): SearchHits<EsOppgave> {
+    open fun findByCriteria(criteria: OppgaverSearchCriteria): SearchHits<EsKlagebehandling> {
         val query: Query = NativeSearchQueryBuilder()
             .withPageable(toPageable(criteria))
-            .withSort(SortBuilders.fieldSort("fristFerdigstillelse").order(mapOrder(criteria.order)))
+            .withSort(SortBuilders.fieldSort("frist").order(mapOrder(criteria.order)))
             .withQuery(criteria.toEsQuery())
             .build()
-        val searchHits: SearchHits<EsOppgave> = esTemplate.search(query, EsOppgave::class.java)
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         println("ANTALL TREFF: ${searchHits.totalHits}")
         return searchHits
     }
 
     private fun mapOrder(order: OppgaverSearchCriteria.Order?): SortOrder {
         return order.let {
-            when {
-                it == null -> SortOrder.ASC
-                it == OppgaverSearchCriteria.Order.ASC -> SortOrder.ASC
-                it == OppgaverSearchCriteria.Order.DESC -> SortOrder.DESC
-                else -> SortOrder.ASC
+            when (it) {
+                null -> SortOrder.ASC
+                OppgaverSearchCriteria.Order.ASC -> SortOrder.ASC
+                OppgaverSearchCriteria.Order.DESC -> SortOrder.DESC
             }
         }
     }
@@ -110,72 +110,71 @@ open class ElasticsearchRepository(
             filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
         }
 
-        baseQuery.must(QueryBuilders.termQuery("statuskategori", statuskategori))
-
-        val innerQueryOppgavetype = QueryBuilders.boolQuery()
-        baseQuery.must(innerQueryOppgavetype)
-        innerQueryOppgavetype.should(QueryBuilders.termQuery("oppgavetype", "BEH_SAK_MK"))
-        innerQueryOppgavetype.should(QueryBuilders.termQuery("oppgavetype", "BEH_SAK"))
+        if (statuskategori == OppgaverSearchCriteria.Statuskategori.AAPEN) {
+            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttet"))
+        } else {
+            baseQuery.must(QueryBuilders.existsQuery("avsluttet"))
+        }
 
         enhetsnr?.let {
-            baseQuery.must(QueryBuilders.termQuery("tildeltEnhetsnr", enhetsnr))
+            baseQuery.must(QueryBuilders.termQuery("tildeltEnhet", enhetsnr))
         }
 
         val innerQueryBehandlingtype = QueryBuilders.boolQuery()
         baseQuery.must(innerQueryBehandlingtype)
         if (typer.isNotEmpty()) {
             typer.forEach {
-                innerQueryBehandlingtype.should(QueryBuilders.termQuery("behandlingstype", mapType(it)))
+                innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", it.name))
             }
         } else {
-            innerQueryBehandlingtype.should(QueryBuilders.termQuery("behandlingstype", mapType(TYPE_KLAGE)))
+            innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", Sakstype.KLAGE.name))
         }
 
         val innerQueryTema = QueryBuilders.boolQuery()
         baseQuery.must(innerQueryTema)
         temaer.forEach {
-            innerQueryTema.should(QueryBuilders.termQuery("tema", it))
+            innerQueryTema.should(QueryBuilders.termQuery("tema", it.name))
         }
 
         erTildeltSaksbehandler?.let {
             if (erTildeltSaksbehandler) {
-                baseQuery.must(QueryBuilders.existsQuery("tilordnetRessurs"))
+                baseQuery.must(QueryBuilders.existsQuery("tildeltSaksbehandlerident"))
             } else {
-                baseQuery.mustNot(QueryBuilders.existsQuery("tilordnetRessurs"))
+                baseQuery.mustNot(QueryBuilders.existsQuery("tildeltSaksbehandlerident"))
             }
         }
         saksbehandler?.let {
-            baseQuery.must(QueryBuilders.termQuery("tilordnetRessurs", saksbehandler))
+            baseQuery.must(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
         }
 
         opprettetFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("opprettetTidspunkt").gte(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+                QueryBuilders.rangeQuery("mottattKlageinstans").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
             )
         }
         opprettetTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("opprettetTidspunkt").lte(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+                QueryBuilders.rangeQuery("mottattKlageinstans").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
             )
         }
         ferdigstiltFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("ferdigstiltTidspunkt").gte(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+                QueryBuilders.rangeQuery("avsluttet").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
             )
         }
         ferdigstiltTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("ferdigstiltTidspunkt").lte(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+                QueryBuilders.rangeQuery("avsluttet").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
             )
         }
         fristFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("fristFerdigstillelse").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("frist").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
             )
         }
         fristTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("fristFerdigstillelse").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("frist").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
             )
         }
 
@@ -189,16 +188,5 @@ open class ElasticsearchRepository(
 
         logger.info("Making search request with query {}", baseQuery.toString())
         return baseQuery
-    }
-
-    private fun mapType(type: String): String {
-        return when (type) {
-            TYPE_KLAGE -> BEHANDLINGSTYPE_KLAGE
-            TYPE_FEILUTBETALING -> BEHANDLINGSTYPE_FEILUTBETALING
-            else -> {
-                logger.warn("Unknown type: {}", type)
-                type
-            }
-        }
     }
 }

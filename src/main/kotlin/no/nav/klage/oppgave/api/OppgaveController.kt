@@ -9,8 +9,8 @@ import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.api.view.Saksbehandlerfradeling
 import no.nav.klage.oppgave.api.view.Saksbehandlertildeling
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
-import no.nav.klage.oppgave.exceptions.OppgaveIdWrongFormatException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -18,12 +18,13 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
+import java.util.*
 
 @RestController
 @Api(tags = ["klage-oppgave-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class OppgaveController(
-    private val oppgaveFacade: OppgaveFacade,
+    private val klagebehandlingFacade: KlagebehandlingFacade,
     private val oppgaverQueryParamsMapper: OppgaverQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
@@ -45,7 +46,7 @@ class OppgaveController(
     ): OppgaverRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        return oppgaveFacade.searchOppgaver(
+        return klagebehandlingFacade.searchOppgaver(
             oppgaverQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
         )
     }
@@ -54,20 +55,20 @@ class OppgaveController(
     fun assignSaksbehandler(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
-        @ApiParam(value = "Id til en oppgave")
-        @PathVariable("id") oppgaveId: String,
+        @ApiParam(value = "Id til en klagebehandling")
+        @PathVariable("id") klagebehandlingId: String,
         @RequestBody saksbehandlertildeling: Saksbehandlertildeling
     ): ResponseEntity<Void> {
-        logger.debug("assignSaksbehandler is requested for oppgave: {}", oppgaveId)
-        oppgaveFacade.assignOppgave(
-            oppgaveId.toLongOrException(),
+        logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
+        klagebehandlingFacade.assignOppgave(
+            klagebehandlingId.toUUIDOrException(),
             saksbehandlertildeling.navIdent,
-            saksbehandlertildeling.oppgaveversjon.toIntOrException()
+            saksbehandlertildeling.oppgaveversjon.versjonToLongOrException()
         )
 
         val uri = MvcUriComponentsBuilder
-            .fromMethodName(OppgaveController::class.java, "getOppgave", navIdent, oppgaveId)
-            .buildAndExpand(oppgaveId).toUri()
+            .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
+            .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
     }
 
@@ -75,28 +76,34 @@ class OppgaveController(
     fun unassignSaksbehandler(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
-        @ApiParam(value = "Id til en oppgave")
-        @PathVariable("id") oppgaveId: String,
+        @ApiParam(value = "Id til en klagebehandling")
+        @PathVariable("id") klagebehandlingId: String,
         @RequestBody saksbehandlerfradeling: Saksbehandlerfradeling
     ): ResponseEntity<Void> {
-        logger.debug("unassignSaksbehandler is requested for oppgave: {}", oppgaveId)
-        oppgaveFacade.assignOppgave(
-            oppgaveId.toLongOrException(),
+        logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
+        klagebehandlingFacade.assignOppgave(
+            klagebehandlingId.toUUIDOrException(),
             null,
-            saksbehandlerfradeling.oppgaveversjon.toIntOrException()
+            saksbehandlerfradeling.oppgaveversjon.versjonToLongOrException()
         )
 
         val uri = MvcUriComponentsBuilder
-            .fromMethodName(OppgaveController::class.java, "getOppgave", navIdent, oppgaveId)
-            .buildAndExpand(oppgaveId).toUri()
+            .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
+            .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
     }
 
-    private fun String?.toLongOrException() =
-        this?.toLongOrNull() ?: throw OppgaveIdWrongFormatException("OppgaveId could not be parsed as a Long")
+    private fun String?.versjonToLongOrException() =
+        this?.toLongOrNull()
+            ?: throw OppgaveVersjonWrongFormatException("KlagebehandlingVersjon could not be parsed as an Long")
 
-    private fun String?.toIntOrException() =
-        this?.toIntOrNull() ?: throw OppgaveVersjonWrongFormatException("Oppgaveversjon could not be parsed as an Int")
+    private fun String.toUUIDOrException(): UUID =
+        try {
+            UUID.fromString(this)
+        } catch (e: Exception) {
+            logger.error("KlagebehandlingId could not be parsed as an UUID", e)
+            throw BehandlingsidWrongFormatException("KlagebehandlingId could not be parsed as an UUID")
+        }
 
     private fun validateNavIdent(navIdent: String) {
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()

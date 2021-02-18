@@ -4,14 +4,13 @@ package no.nav.klage.oppgave.api.mapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.service.OppgaveKopiService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 
 @Service
 class KlagebehandlingMapper(
-    private val oppgaveKopiService: OppgaveKopiService
+
 ) {
 
     companion object {
@@ -21,12 +20,15 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingToKlagebehandlingView(klagebehandling: Klagebehandling): KlagebehandlingView {
-        
+
+
+        //TODO: Trenger vi egentlig Mottak her også?
+        //Skal vi vise frem dataene vi mottok fra førsteinstans i tillegg til det saksbehandler har satt/endret?
         return KlagebehandlingView(
             id = klagebehandling.id,
             klageInnsendtdato = klagebehandling.innsendt,
             //TODO get name from norg2
-            fraNAVEnhet = klagebehandling.mottak.avsenderEnhet ?: "mangler",
+            fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             foedselsnummer = klagebehandling.foedselsnummer ?: "mangler",
             tema = klagebehandling.tema.id,

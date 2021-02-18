@@ -3,12 +3,14 @@ package no.nav.klage.oppgave.api
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
+import java.util.*
 
 @RestController
 @Api(tags = ["klage-oppgave-api"])
@@ -25,14 +27,21 @@ class KlagebehandlingController(
 
     @GetMapping("/klagebehandlinger/{id}")
     fun getKlagebehandling(
-        @PathVariable("id") oppgaveId: Long
+        @PathVariable("id") klagebehandlingId: String
     ): KlagebehandlingView {
         logger.debug(
             "getKlagebehandling is requested by ident {} for oppgaveId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            oppgaveId
+            klagebehandlingId
         )
-        return klagebehandlingFacade.getKlagebehandling(oppgaveId)
+        return klagebehandlingFacade.getKlagebehandling(klagebehandlingId.toUUIDOrException())
     }
 
+    private fun String.toUUIDOrException(): UUID =
+        try {
+            UUID.fromString(this)
+        } catch (e: Exception) {
+            logger.error("KlagebehandlingId could not be parsed as an UUID", e)
+            throw BehandlingsidWrongFormatException("KlagebehandlingId could not be parsed as an UUID")
+        }
 }

@@ -7,7 +7,7 @@ import java.util.*
 data class KlagebehandlingView(
     val id: UUID,
     val klageInnsendtdato: LocalDate?,
-    val fraNAVEnhet: String,
+    val fraNAVEnhet: String?,
     val mottattFoersteinstans: LocalDate? = null,
     val foedselsnummer: String,
     val tema: String,

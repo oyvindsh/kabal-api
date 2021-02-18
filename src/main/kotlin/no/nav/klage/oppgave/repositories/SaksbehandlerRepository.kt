@@ -1,10 +1,12 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.clients.axsys.AxsysClient
+import no.nav.klage.oppgave.clients.axsys.Tilganger
 import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
 import no.nav.klage.oppgave.clients.fssproxy.KlageProxyClient
+import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
-import no.nav.klage.oppgave.domain.mapToInterntDomene
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import kotlin.system.measureTimeMillis
@@ -74,4 +76,19 @@ class SaksbehandlerRepository(
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 
+    private fun Tilganger.mapToInterntDomene(): EnheterMedLovligeTemaer =
+        EnheterMedLovligeTemaer(this.enheter.map { enhet ->
+            EnhetMedLovligeTemaer(
+                enhet.enhetId,
+                enhet.navn,
+                enhet.fagomrader.mapNotNull { mapTemaToTemaName(it) })
+        })
+
+    private fun mapTemaToTemaName(tema: String): Tema? =
+        try {
+            Tema.of(tema)
+        } catch (e: Exception) {
+            logger.error("Unable to map Tema $tema", e)
+            null
+        }
 }
