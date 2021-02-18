@@ -68,7 +68,7 @@ open class ElasticsearchRepository(
     open fun findByCriteria(criteria: OppgaverSearchCriteria): SearchHits<EsKlagebehandling> {
         val query: Query = NativeSearchQueryBuilder()
             .withPageable(toPageable(criteria))
-            .withSort(SortBuilders.fieldSort("frist").order(mapOrder(criteria.order)))
+            .withSort(SortBuilders.fieldSort(sortField(criteria)).order(mapOrder(criteria.order)))
             .withQuery(criteria.toEsQuery())
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
@@ -76,6 +76,13 @@ open class ElasticsearchRepository(
         return searchHits
     }
 
+    private fun sortField(criteria: OppgaverSearchCriteria): String =
+        if (criteria.sortField == OppgaverSearchCriteria.SortField.MOTTATT) {
+            "mottattKlageinstans"
+        } else {
+            "frist"
+        }
+    
     private fun mapOrder(order: OppgaverSearchCriteria.Order?): SortOrder {
         return order.let {
             when (it) {

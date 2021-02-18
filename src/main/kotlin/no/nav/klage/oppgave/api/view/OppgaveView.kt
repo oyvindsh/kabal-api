@@ -16,6 +16,7 @@ data class Oppgave(
     val tema: String,
     val hjemmel: String?,
     val frist: LocalDate?,
+    val mottatt: LocalDate?,
     val versjon: Int
 ) {
     data class Person(

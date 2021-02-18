@@ -71,7 +71,12 @@ internal class OppgaveClientTest {
             "appName",
         )
 
-        return oppgaveClient.getOneSearchPage(OppgaverSearchCriteria(offset = 0, limit = 1))
+        return oppgaveClient.getOneSearchPage(
+            OppgaverSearchCriteria(
+                offset = 0,
+                limit = 1
+            )
+        )
     }
 
     fun getNonExistingOppgave(): Oppgave {
