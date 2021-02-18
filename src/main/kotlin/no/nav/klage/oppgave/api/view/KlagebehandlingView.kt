@@ -19,7 +19,8 @@ data class KlagebehandlingView(
     val tildeltSaksbehandlerident: String? = null,
     val hjemler: List<Hjemmel>,
     val modified: LocalDateTime,
-    val created: LocalDateTime
+    val created: LocalDateTime,
+    val fraSaksbehandlerident: String? = null
 ) {
     data class Hjemmel(
         val kapittel: Int? = null,

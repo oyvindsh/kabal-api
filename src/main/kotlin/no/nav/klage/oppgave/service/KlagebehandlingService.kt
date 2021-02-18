@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.Oppgavereferanse
-import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Kilde
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -40,6 +37,15 @@ class KlagebehandlingService(
 
     fun fetchMottakForOppgaveKopi(oppgaveId: Long): List<Mottak> =
         mottakRepository.findByOppgavereferanserOppgaveId(oppgaveId)
+
+    fun updateKvalitetsvurdering(
+        klagebehandlingId: UUID,
+        kvalitetsvurderingInput: KvalitetsvurderingInput
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        klagebehandling.createOrUpdateKvalitetsvurdering(kvalitetsvurderingInput)
+        return klagebehandling
+    }
 
     fun connectOppgaveKopiToKlagebehandling(oppgaveKopierOrdererByVersion: List<OppgaveKopiVersjon>): List<Pair<Klagebehandling, Mottak>> {
         val lastVersjon = oppgaveKopierOrdererByVersion.first()
@@ -104,6 +110,7 @@ class KlagebehandlingService(
                 innsendt = null,
                 mottattFoersteinstans = null,
                 avsenderEnhetFoersteinstans = createdMottak.avsenderEnhet,
+                avsenderSaksbehandleridentFoersteinstans = createdMottak.avsenderSaksbehandlerident,
                 mottattKlageinstans = createdMottak.oversendtKaDato ?: LocalDate.now(),
                 startet = null,
                 avsluttet = null,
