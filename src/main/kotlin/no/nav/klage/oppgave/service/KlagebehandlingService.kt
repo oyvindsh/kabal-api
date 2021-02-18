@@ -69,10 +69,12 @@ class KlagebehandlingService(
                 foedselsnummer = lastVersjon.ident.folkeregisterident,
                 organisasjonsnummer = mapOrganisasjonsnummer(lastVersjon.ident),
                 hjemmelListe = mapHjemler(lastVersjon),
-                avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion).endretAv,
-                avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion).endretAvEnhetsnr,
-                oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion).tildeltEnhetsnr,
-                oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion).endretTidspunkt?.toLocalDate(),
+                avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv,
+                avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr,
+                oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr
+                    ?: lastVersjon.tildeltEnhetsnr,
+                oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate()
+                    ?: lastVersjon.endretTidspunkt?.toLocalDate(),
                 fristFraFoersteinstans = lastVersjon.fristFerdigstillelse,
                 beskrivelse = lastVersjon.beskrivelse,
                 status = lastVersjon.status.name,
@@ -156,13 +158,13 @@ class KlagebehandlingService(
     private fun mapTema(tema: String): Tema = Tema.of(tema)
 
     //Oppgaven kan ha gått ping-pong frem og tilbake, så det vi leter etter her er siste gang den ble assignet KA
-    private fun findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon =
+    private fun findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon? =
         oppgaveKopiVersjoner.zipWithNext()
             .firstOrNull {
                 it.first.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX)
                         && !it.second.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX)
             }
-            ?.first ?: oppgaveKopiVersjoner.first()
+            ?.first
 
     fun assignOppgave(klagebehandlingId: UUID, klagebehandlingVersjon: Long, saksbehandlerIdent: String?) {
 
