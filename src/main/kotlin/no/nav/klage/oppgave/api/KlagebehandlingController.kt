@@ -4,6 +4,8 @@ import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
+import no.nav.klage.oppgave.domain.AuditLogEvent.Action.KLAGEBEHANDLING_VIEW
+import no.nav.klage.oppgave.domain.AuditLogEvent.Decision.ALLOW
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.AuditLogger
@@ -41,8 +43,8 @@ class KlagebehandlingController(
             auditLogger.log(
                 AuditLogEvent(
                     navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
-                    action = AuditLogEvent.Action.KLAGEBEHANDLING_VIEW,
-                    decision = AuditLogEvent.Decision.ALLOW,
+                    action = KLAGEBEHANDLING_VIEW,
+                    decision = ALLOW,
                     personFnr = it.foedselsnummer
                 )
             )
