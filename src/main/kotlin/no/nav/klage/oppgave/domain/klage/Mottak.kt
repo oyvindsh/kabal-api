@@ -13,43 +13,61 @@ class Mottak(
     val id: UUID = UUID.randomUUID(),
     @Column(name = "tema_id")
     @Convert(converter = TemaConverter::class)
-    val tema: Tema,
+    var tema: Tema,
     @Column(name = "sakstype_id")
     @Convert(converter = SakstypeConverter::class)
-    val sakstype: Sakstype,
+    var sakstype: Sakstype,
     @Column(name = "referanse_id")
-    val referanseId: String? = null,
+    var referanseId: String? = null,
     @Column(name = "innsyn_url")
     val innsynUrl: String? = null,
     @Column(name = "foedselsnummer")
-    val foedselsnummer: String? = null,
+    var foedselsnummer: String? = null,
     @Column(name = "organisasjonsnummer")
-    val organisasjonsnummer: String? = null,
+    var organisasjonsnummer: String? = null,
     @Column(name = "virksomhetsnummer")
     val virksomhetsnummer: String? = null,
     @Column(name = "hjemmel_liste")
-    val hjemmelListe: String? = null,
+    var hjemmelListe: String? = null,
+    @Column(name = "beskrivelse")
+    var beskrivelse: String? = null,
     @Column(name = "avsender_saksbehandlerident")
-    val avsenderSaksbehandlerident: String? = null,
+    var avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")
-    val avsenderEnhet: String? = null,
+    var avsenderEnhet: String? = null,
     @Column(name = "oversendt_klageinstans_enhet")
-    val oversendtKaEnhet: String? = null,
+    var oversendtKaEnhet: String? = null,
+    @Column(name = "status")
+    var status: String,
+    @Column(name = "status_kategori")
+    var statusKategori: String,
+    @Column(name = "tildelt_enhet")
+    var tildeltEnhet: String? = null,
+    @Column(name = "tildelt_saksbehandlerident")
+    var tildeltSaksbehandlerident: String? = null,
+    @Column(name = "journalpost_id")
+    var journalpostId: String? = null,
+    @Column(name = "journalpost_kilde")
+    var journalpostKilde: String? = null,
     @Column(name = "dato_innsendt")
     val innsendtDato: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
     val mottattNavDato: LocalDate? = null,
     @Column(name = "dato_oversendt_klageinstans")
-    val oversendtKaDato: LocalDate? = null,
+    var oversendtKaDato: LocalDate? = null,
     @Column(name = "dato_frist_fra_foersteinstans")
-    val fristFraFoersteinstans: LocalDate? = null,
+    var fristFraFoersteinstans: LocalDate? = null,
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kilde")
     @Enumerated(EnumType.STRING)
-    val kilde: Kilde
+    val kilde: Kilde,
+    //Dette er egentlig bare 1, ikke en liste!
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
+    val oppgavereferanser: MutableList<Oppgavereferanse> = mutableListOf(),
 ) {
 
     fun hjemler(): List<String> = hjemmelListe?.split(",") ?: emptyList()

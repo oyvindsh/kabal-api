@@ -2,8 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.gosys.Oppgave
 import no.nav.klage.oppgave.clients.gosys.OppgaveClient
-import no.nav.klage.oppgave.clients.gosys.OppgaveResponse
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 
@@ -15,22 +13,16 @@ class OppgaveService(val oppgaveClient: OppgaveClient) {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaveResponse {
-        return oppgaveClient.getOneSearchPage(oppgaverSearchCriteria)
-    }
-
-    fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?, oppgaveVersjon: Int?) {
+    fun assignOppgave(oppgaveId: Long, saksbehandlerIdent: String?) {
         val endreOppgave = oppgaveClient.getOppgave(oppgaveId).toEndreOppgave()
         logger.info(
-            "Endrer tilordnetRessurs for oppgave {} fra {} til {}, versjon er {}",
+            "Endrer tilordnetRessurs for oppgave {} fra {} til {}",
             endreOppgave.id,
             endreOppgave.tilordnetRessurs,
-            saksbehandlerIdent,
-            oppgaveVersjon
+            saksbehandlerIdent
         )
         endreOppgave.apply {
             tilordnetRessurs = saksbehandlerIdent
-            versjon = oppgaveVersjon
         }
 
         oppgaveClient.putOppgave(oppgaveId, endreOppgave)

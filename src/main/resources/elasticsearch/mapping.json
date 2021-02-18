@@ -6,88 +6,60 @@
     "saksreferanse": {
       "type": "keyword"
     },
-    "mappeId": {
-      "type": "keyword"
-    },
-    "status": {
-      "type": "keyword"
-    },
-    "tildeltEnhetsnr": {
-      "type": "keyword"
-    },
-    "opprettetAvEnhetsnr": {
-      "type": "keyword"
-    },
-    "endretAvEnhetsnr": {
-      "type": "keyword"
+    "tildeltEnhet": {
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text"
+        }
+      }
     },
     "tema": {
       "type": "keyword"
     },
-    "temagruppe": {
+    "sakstype": {
       "type": "keyword"
     },
-    "behandlingstema": {
+    "tildeltSaksbehandlerident": {
       "type": "keyword"
     },
-    "oppgavetype": {
-      "type": "keyword"
-    },
-    "behandlingstype": {
-      "type": "keyword"
-    },
-    "prioritet": {
-      "type": "keyword"
-    },
-    "tilordnetRessurs": {
-      "type": "keyword"
-    },
-    "beskrivelse": {
-      "type": "text"
-    },
-    "fristFerdigstillelse": {
+    "innsendt": {
       "type": "date",
       "format": "date"
     },
-    "aktivDato": {
+    "mottattFoersteinstans": {
       "type": "date",
       "format": "date"
     },
-    "opprettetAv": {
-      "type": "keyword"
-    },
-    "endretAv": {
-      "type": "keyword"
-    },
-    "opprettetTidspunkt": {
+    "mottattKlageinstans": {
       "type": "date",
-      "format": "date_time"
+      "format": "date"
     },
-    "endretTidspunkt": {
+    "frist": {
       "type": "date",
-      "format": "date_time"
+      "format": "date"
     },
-    "ferdigstiltTidspunkt": {
+    "startet": {
       "type": "date",
-      "format": "date_time"
+      "format": "date"
     },
-    "behandlesAvApplikasjon": {
-      "type": "text"
-    },
-    "journalpostkilde": {
-      "type": "keyword"
+    "avsluttet": {
+      "type": "date",
+      "format": "date"
     },
     "hjemler": {
-      "type": "keyword"
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text"
+        }
+      }
     },
-    "fnr": {
+    "foedselsnummer": {
       "type": "keyword"
     },
     "navn": {
-      "type": "keyword"
-    },
-    "statuskategori": {
-      "type": "keyword"
+      "type": "text"
     },
     "egenAnsatt": {
       "type": "boolean"

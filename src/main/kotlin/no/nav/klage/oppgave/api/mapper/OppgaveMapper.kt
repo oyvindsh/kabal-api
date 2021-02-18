@@ -2,20 +2,16 @@ package no.nav.klage.oppgave.api.mapper
 
 
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
-import no.nav.klage.oppgave.api.view.HJEMMEL
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
-import no.nav.klage.oppgave.clients.gosys.Gruppe
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.domain.*
-import no.nav.klage.oppgave.domain.elasticsearch.EsOppgave
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.oppgavekopi.*
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import no.nav.klage.oppgave.api.view.Oppgave as OppgaveView
-import no.nav.klage.oppgave.clients.gosys.Oppgave as OppgaveBackend
-import no.nav.klage.oppgave.domain.elasticsearch.Prioritet as EsPrioritet
-import no.nav.klage.oppgave.domain.elasticsearch.Status as EsStatus
 
 @Service
 class OppgaveMapper(
@@ -29,126 +25,27 @@ class OppgaveMapper(
         private val secureLogger = getSecureLogger()
     }
 
-    fun mapEsOppgaverToView(esOppgaver: List<EsOppgave>, fetchPersoner: Boolean): List<OppgaveView> {
-        return esOppgaver.map { oppgaveBackend ->
+    fun mapEsKlagebehandlingerToView(
+        esKlagebehandlinger: List<EsKlagebehandling>,
+        fetchPersoner: Boolean
+    ): List<OppgaveView> {
+        return esKlagebehandlinger.map { esKlagebehandling ->
             OppgaveView(
-                id = oppgaveBackend.id.toString(),
+                id = esKlagebehandling.id,
                 person = if (fetchPersoner) {
-                    OppgaveView.Person(oppgaveBackend.fnr ?: "mangler", oppgaveBackend.navn ?: "mangler")
+                    OppgaveView.Person(
+                        esKlagebehandling.foedselsnummer ?: "mangler",
+                        esKlagebehandling.navn ?: "mangler"
+                    )
                 } else {
                     null
                 },
-                type = oppgaveBackend.toType(),
-                tema = oppgaveBackend.toTemaName(),
-                hjemmel = oppgaveBackend.hjemler?.firstOrNull() ?: "mangler",
-                frist = oppgaveBackend.fristFerdigstillelse,
-                versjon = oppgaveBackend.version!!.toInt()
+                type = esKlagebehandling.sakstype.navn,
+                tema = esKlagebehandling.tema.navn,
+                hjemmel = esKlagebehandling.hjemler?.firstOrNull() ?: "mangler",
+                frist = esKlagebehandling.frist,
+                versjon = esKlagebehandling.versjon!!.toInt()
             )
-        }
-    }
-
-    private fun EsOppgave.toType(): String {
-        return if (behandlingstema == null) {
-            when (behandlingstype) {
-                BEHANDLINGSTYPE_KLAGE -> TYPE_KLAGE
-                BEHANDLINGSTYPE_FEILUTBETALING -> TYPE_FEILUTBETALING
-                else -> "ukjent"
-            }
-        } else "mangler"
-    }
-
-    private fun EsOppgave.toTemaName(): String = when (tema) {
-        TEMA_SYK -> TEMA_NAME_SYK
-        TEMA_FOR -> TEMA_NAME_FOR
-        else -> tema
-    }
-
-
-    fun mapOppgaveToView(oppgaveBackend: OppgaveBackend, fetchPersoner: Boolean): OppgaveView {
-        return mapOppgaverToView(listOf(oppgaveBackend), fetchPersoner).single()
-    }
-
-    fun mapOppgaverToView(oppgaverBackend: List<OppgaveBackend>, fetchPersoner: Boolean): List<OppgaveView> {
-        val personer = mutableMapOf<String, OppgaveView.Person>()
-        if (fetchPersoner) {
-            personer.putAll(getPersoner(getFnr(oppgaverBackend)))
-        }
-
-        return oppgaverBackend.map { oppgaveBackend ->
-            OppgaveView(
-                id = oppgaveBackend.id.toString(),
-                person = if (fetchPersoner) {
-                    personer[oppgaveBackend.getFnrForBruker()] ?: OppgaveView.Person("Mangler fnr", "Mangler navn")
-                } else {
-                    null
-                },
-                type = oppgaveBackend.toType(),
-                tema = oppgaveBackend.toTemaName(),
-                hjemmel = oppgaveBackend.metadata.toHjemmel(),
-                frist = oppgaveBackend.fristFerdigstillelse,
-                versjon = oppgaveBackend.versjon
-            )
-        }
-    }
-
-    private fun Map<String, String>?.toHjemmel() = this?.get(HJEMMEL) ?: "mangler"
-
-    private fun OppgaveBackend.toType(): String {
-        return if (behandlingstema == null) {
-            when (behandlingstype) {
-                BEHANDLINGSTYPE_KLAGE -> TYPE_KLAGE
-                BEHANDLINGSTYPE_FEILUTBETALING -> TYPE_FEILUTBETALING
-                else -> "ukjent"
-            }
-        } else "mangler"
-    }
-
-    private fun OppgaveBackend.toTemaName(): String = when (tema) {
-        TEMA_SYK -> TEMA_NAME_SYK
-        TEMA_FOR -> TEMA_NAME_FOR
-        else -> tema
-    }
-
-    private fun getFnr(oppgaver: List<OppgaveBackend>) =
-        oppgaver.mapNotNull {
-            it.getFnrForBruker()
-        }
-
-    private fun getPersoner(fnrList: List<String>): Map<String, OppgaveView.Person> {
-        logger.debug("getPersoner is called with {} fnr", fnrList.size)
-        secureLogger.debug("getPersoner with fnr: {}", fnrList)
-
-        val people = pdlFacade.getPersonerInfo(fnrList)
-
-        logger.debug("pdl returned {} people", people.size)
-        secureLogger.debug("pdl returned {}", people)
-
-        val fnrToPerson: Map<String, no.nav.klage.oppgave.api.view.Oppgave.Person> = people.map {
-            it.foedselsnr to OppgaveView.Person(
-                fnr = it.foedselsnr,
-                navn = it.navn
-            )
-        }.toMap()
-        return fnrList.map {
-            if (fnrToPerson.containsKey(it)) {
-                Pair(it, fnrToPerson.getValue(it))
-            } else {
-                Pair(it, OppgaveView.Person(fnr = it, navn = "Mangler navn"))
-            }
-        }.toMap()
-    }
-
-    private fun OppgaveBackend.getFnrForBruker(): String? {
-        logger.debug("getFnrForBruker is called")
-        secureLogger.debug("getFnrForBruker is called with oppgave: {}", this)
-
-        return identer?.find { i -> i.gruppe == Gruppe.FOLKEREGISTERIDENT }?.ident.also {
-            if (it != null) {
-                logger.debug("Returning found fnr")
-                secureLogger.debug("Returning found fnr from oppgave: {}", it)
-            } else {
-                logger.debug("No fnr found in oppgave")
-            }
         }
     }
 
@@ -193,46 +90,36 @@ class OppgaveMapper(
         )
     }
 
-    fun mapOppgaveKopiAPIModelToEsOppgave(oppgave: OppgaveKopiAPIModel): EsOppgave {
-        val fnr = oppgave.ident.folkeregisterident!!
-        val erEgenAnsatt = egenAnsattService.erEgenAnsatt(fnr)
-        val personInfo = pdlFacade.getPersonInfo(fnr)
+    fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandlingOgMottak: Pair<Klagebehandling, Mottak>): EsKlagebehandling {
+
+        val klagebehandling = klagebehandlingOgMottak.first
+        //TODO: Nå bruker jeg ikke mottak her, så jeg kunne endret Pair<Klagebehandling, Mottak> til å bare være Klagebehandling?
+        //TODO: Er det noe vi skal indeksere opp som kommer fra Mottak? Beskrivelse f.eks?
+
+        val personInfo = klagebehandling.foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
         val erStrengtFortrolig = personInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
+        val erEgenAnsatt = klagebehandling.foedselsnummer?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
         val navn = personInfo?.navn ?: "mangler navn"
-        return EsOppgave(
-            id = oppgave.id,
-            version = oppgave.versjon.toLong(),
-            journalpostId = oppgave.journalpostId,
-            saksreferanse = oppgave.saksreferanse,
-            mappeId = oppgave.mappeId,
-            status = EsStatus.valueOf(oppgave.status.name),
-            tildeltEnhetsnr = oppgave.tildeltEnhetsnr,
-            opprettetAvEnhetsnr = oppgave.opprettetAvEnhetsnr,
-            endretAvEnhetsnr = oppgave.endretAvEnhetsnr,
-            tema = oppgave.tema,
-            temagruppe = oppgave.temagruppe,
-            behandlingstema = oppgave.behandlingstema,
-            oppgavetype = oppgave.oppgavetype,
-            behandlingstype = oppgave.behandlingstype,
-            prioritet = EsPrioritet.valueOf(oppgave.prioritet.name),
-            tilordnetRessurs = oppgave.tilordnetRessurs,
-            beskrivelse = oppgave.beskrivelse,
-            fristFerdigstillelse = oppgave.fristFerdigstillelse,
-            aktivDato = oppgave.aktivDato,
-            opprettetAv = oppgave.opprettetAv,
-            endretAv = oppgave.endretAv,
-            opprettetTidspunkt = oppgave.opprettetTidspunkt,
-            endretTidspunkt = oppgave.endretTidspunkt,
-            ferdigstiltTidspunkt = oppgave.ferdigstiltTidspunkt,
-            behandlesAvApplikasjon = oppgave.behandlesAvApplikasjon,
-            journalpostkilde = oppgave.journalpostkilde,
-            hjemler = (oppgave.metadata ?: emptyMap())
-                .filter { (k, _) -> OppgaveKopiAPIModel.MetadataKey.HJEMMEL == k }
-                .map { (_, v) -> v },
-            fnr = fnr,
+
+        return EsKlagebehandling(
+            id = klagebehandling.id.toString(),
+            versjon = klagebehandling.versjon,
+            journalpostId = klagebehandling.saksdokumenter.map { it.referanse },
+            saksreferanse = klagebehandling.referanseId,
+            tildeltEnhet = klagebehandling.tildeltEnhet,
+            tema = klagebehandling.tema,
+            sakstype = klagebehandling.sakstype,
+            tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
+            innsendt = klagebehandling.innsendt,
+            mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
+            mottattKlageinstans = klagebehandling.mottattKlageinstans,
+            frist = klagebehandling.frist,
+            startet = klagebehandling.startet,
+            avsluttet = klagebehandling.avsluttet,
+            hjemler = klagebehandling.hjemler.map { it.original },
+            foedselsnummer = klagebehandling.foedselsnummer,
             navn = navn,
-            statuskategori = EsStatus.valueOf(oppgave.status.name).kategoriForStatus(),
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig

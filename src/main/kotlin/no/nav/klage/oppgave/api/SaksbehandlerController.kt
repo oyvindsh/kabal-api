@@ -37,11 +37,11 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
     }
 
     private fun EnheterMedLovligeTemaer.toEnheter() =
-        this.enheter.map {
+        this.enheter.map { enhet ->
             Enhet(
-                id = it.enhetId,
-                navn = it.navn,
-                lovligeTemaer = it.temaer
+                id = enhet.enhetId,
+                navn = enhet.navn,
+                lovligeTemaer = enhet.temaer.map { tema -> tema.navn }
             )
         }
 }

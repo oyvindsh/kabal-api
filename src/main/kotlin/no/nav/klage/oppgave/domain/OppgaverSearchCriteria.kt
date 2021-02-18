@@ -1,11 +1,13 @@
 package no.nav.klage.oppgave.domain
 
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class OppgaverSearchCriteria(
-    val typer: List<String> = emptyList(),
-    val temaer: List<String> = emptyList(),
+    val typer: List<Sakstype> = emptyList(),
+    val temaer: List<Tema> = emptyList(),
     val hjemler: List<String> = emptyList(),
     val statuskategori: Statuskategori = Statuskategori.AAPEN,
 

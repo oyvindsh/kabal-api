@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.OppgaverQueryParams
-import no.nav.klage.oppgave.domain.*
+import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.NotOwnEnhetException
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -16,8 +18,8 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
     }
 
     fun toSearchCriteria(navIdent: String, oppgaverQueryParams: OppgaverQueryParams) = OppgaverSearchCriteria(
-        typer = oppgaverQueryParams.typer,
-        temaer = oppgaverQueryParams.temaer.toTemaCode(),
+        typer = oppgaverQueryParams.typer.map { Sakstype.of(it) },
+        temaer = oppgaverQueryParams.temaer.map { Tema.of(it) },
         hjemler = oppgaverQueryParams.hjemler,
         order = if (oppgaverQueryParams.rekkefoelge == OppgaverQueryParams.Rekkefoelge.SYNKENDE) {
             OppgaverSearchCriteria.Order.DESC
@@ -39,19 +41,6 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
             throw NotOwnEnhetException("$navIdent is not part of enhet $enhetId")
         }
         return enhetId
-    }
-
-    private fun List<String>.toTemaCode(): List<String> {
-        return this.map { temaName ->
-            when (temaName) {
-                TEMA_NAME_SYK -> TEMA_SYK
-                TEMA_NAME_FOR -> TEMA_FOR
-                else -> {
-                    logger.warn("Unknown tema name: {}", temaName)
-                    temaName
-                }
-            }
-        }
     }
 
 }

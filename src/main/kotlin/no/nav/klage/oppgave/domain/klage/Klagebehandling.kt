@@ -13,6 +13,9 @@ const val KLAGEENHET_PREFIX = "42"
 class Klagebehandling(
     @Id
     val id: UUID = UUID.randomUUID(),
+    @Version
+    @Column(name = "versjon")
+    val versjon: Long = 1L,
     @Column(name = "foedselsnummer")
     val foedselsnummer: String? = null,
     @Column(name = "tema_id")
@@ -21,10 +24,14 @@ class Klagebehandling(
     @Column(name = "sakstype_id")
     @Convert(converter = SakstypeConverter::class)
     val sakstype: Sakstype,
+    @Column(name = "referanse_id")
+    var referanseId: String? = null,
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
     val mottattFoersteinstans: LocalDate? = null,
+    @Column(name = "avsender_enhet_foersteinstans")
+    val avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
     val mottattKlageinstans: LocalDate,
     @Column(name = "dato_behandling_startet")
@@ -37,9 +44,8 @@ class Klagebehandling(
     val tildeltSaksbehandlerident: String? = null,
     @Column(name = "tildelt_enhet")
     val tildeltEnhet: String? = null,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "mottak_id", nullable = true)
-    val mottak: Mottak,
+    @Column(name = "mottak_id")
+    val mottakId: UUID,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "vedtak_id", nullable = true)
     val vedtak: Vedtak? = null,
@@ -49,9 +55,6 @@ class Klagebehandling(
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val hjemler: MutableList<Hjemmel> = mutableListOf(),
-    @OneToMany(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val oppgavereferanser: MutableList<Oppgavereferanse> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val saksdokumenter: MutableList<Saksdokument> = mutableListOf(),

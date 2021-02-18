@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.service
 
 
-import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
-import no.nav.klage.oppgave.domain.elasticsearch.EsOppgave
+import com.ninjasquad.springmockk.MockkBean
+import no.nav.klage.oppgave.config.RetryConfig
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.apache.http.util.EntityUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.elasticsearch.client.Request
@@ -25,7 +27,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ActiveProfiles("local")
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Testcontainers
-@SpringBootTest(classes = [ElasticsearchServiceConfiguration::class])
+@SpringBootTest(classes = [RetryConfig::class])
 @ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
 @Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
 class CreateIndexFromEsOppgaveTest {
@@ -48,6 +50,9 @@ class CreateIndexFromEsOppgaveTest {
         }
     }
 
+    @MockkBean(relaxed = true)
+    lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+
     @Autowired
     lateinit var esTemplate: ElasticsearchRestTemplate
 
@@ -62,11 +67,11 @@ class CreateIndexFromEsOppgaveTest {
 
     @Test
     @Order(2)
-    fun `denne vil printe ut settings og mapping generert fra EsOppgave`() {
+    fun `denne vil printe ut settings og mapping generert fra EsKlagebehandling`() {
 
-        val indexOps = esTemplate.indexOps(EsOppgave::class.java)
+        val indexOps = esTemplate.indexOps(EsKlagebehandling::class.java)
         indexOps.create()
-        val mappingDocument = indexOps.createMapping(EsOppgave::class.java)
+        val mappingDocument = indexOps.createMapping(EsKlagebehandling::class.java)
         indexOps.putMapping(mappingDocument)
 
         val mappingResponse = client.lowLevelClient.performRequest(Request("GET", "/_all/_mapping"))

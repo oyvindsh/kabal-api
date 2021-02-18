@@ -2,6 +2,8 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.gosys.OppgaveClient
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -20,8 +22,8 @@ class OppgaveStatistikkService(
 
     fun ubehandledeKlager(): Int {
         val searchCriteria = OppgaverSearchCriteria(
-            typer = listOf("Klage"),
-            temaer = listOf("SYK"),
+            typer = listOf(Sakstype.KLAGE),
+            temaer = listOf(Tema.SYK),
             statuskategori = OppgaverSearchCriteria.Statuskategori.AAPEN,
             offset = 0,
             limit = 1
@@ -31,8 +33,8 @@ class OppgaveStatistikkService(
 
     fun klagerOverFrist(): Int {
         val searchCriteria = OppgaverSearchCriteria(
-            typer = listOf("Klage"),
-            temaer = listOf("SYK"),
+            typer = listOf(Sakstype.KLAGE),
+            temaer = listOf(Tema.SYK),
             statuskategori = OppgaverSearchCriteria.Statuskategori.AAPEN,
             fristFom = LocalDate.now().plusDays(1),
             offset = 0,
@@ -46,8 +48,8 @@ class OppgaveStatistikkService(
         val endOfPeriod = endOfPeriod(numberOfDays)
 
         val searchCriteria1 = OppgaverSearchCriteria(
-            typer = listOf("Klage"),
-            temaer = listOf("SYK"),
+            typer = listOf(Sakstype.KLAGE),
+            temaer = listOf(Tema.SYK),
             statuskategori = OppgaverSearchCriteria.Statuskategori.AAPEN,
             opprettetFom = startOfPeriod,
             opprettetTom = endOfPeriod,
@@ -55,8 +57,8 @@ class OppgaveStatistikkService(
             limit = 1
         )
         val searchCriteria2 = OppgaverSearchCriteria(
-            typer = listOf("Klage"),
-            temaer = listOf("SYK"),
+            typer = listOf(Sakstype.KLAGE),
+            temaer = listOf(Tema.SYK),
             statuskategori = OppgaverSearchCriteria.Statuskategori.AVSLUTTET,
             opprettetFom = startOfPeriod,
             opprettetTom = endOfPeriod,
@@ -71,8 +73,8 @@ class OppgaveStatistikkService(
         val endOfPeriod = endOfPeriod(numberOfDays)
 
         val searchCriteria = OppgaverSearchCriteria(
-            typer = listOf("Klage"),
-            temaer = listOf("SYK"),
+            typer = listOf(Sakstype.KLAGE),
+            temaer = listOf(Tema.SYK),
             statuskategori = OppgaverSearchCriteria.Statuskategori.AVSLUTTET,
             ferdigstiltFom = startOfPeriod,
             ferdigstiltTom = endOfPeriod,
