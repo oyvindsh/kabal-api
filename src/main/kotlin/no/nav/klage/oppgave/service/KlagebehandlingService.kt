@@ -69,12 +69,10 @@ class KlagebehandlingService(
                 foedselsnummer = lastVersjon.ident.folkeregisterident,
                 organisasjonsnummer = mapOrganisasjonsnummer(lastVersjon.ident),
                 hjemmelListe = mapHjemler(lastVersjon),
-                avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv,
-                avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr,
-                oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr
-                    ?: lastVersjon.tildeltEnhetsnr,
-                oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate()
-                    ?: lastVersjon.endretTidspunkt?.toLocalDate(),
+                avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv ?: lastVersjon.opprettetAv,
+                avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr ?: lastVersjon.opprettetAvEnhetsnr,
+                oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr ?: lastVersjon.tildeltEnhetsnr,
+                oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate() ?: lastVersjon.endretTidspunkt?.toLocalDate(),
                 fristFraFoersteinstans = lastVersjon.fristFerdigstillelse,
                 beskrivelse = lastVersjon.beskrivelse,
                 status = lastVersjon.status.name,
@@ -91,24 +89,35 @@ class KlagebehandlingService(
                 )
             )
         )
-        //TODO: Mer som må settes her!
+
         val createdKlagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                tema = createdMottak.tema,
-                sakstype = createdMottak.sakstype,
-
-                foedselsnummer = createdMottak.foedselsnummer,
-                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
-                tildeltEnhet = createdMottak.oversendtKaEnhet,
+                foedselsnummer = createdMottak.foedselsnummer,,
+                tema =createdMottak.tema,
+                sakstype =createdMottak.sakstype,
+                referanseId = createdMottak.referanseId,
+                innsendt = null,
+                mottattFoersteinstans = null,
+                avsenderEnhetFoersteinstans = createdMottak.avsenderEnhet,
                 mottattKlageinstans = createdMottak.oversendtKaDato ?: LocalDate.now(),
+                startet = null,
+                avsluttet = null,
                 frist = createdMottak.fristFraFoersteinstans,
+                tildeltSaksbehandlerident = createdMottak.tildeltSaksbehandlerident,
+                tildeltEnhet = createdMottak.tildeltEnhet,
                 mottakId = createdMottak.id,
+                vedtak = null,
+                kvalitetsvurdering = null,
+                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
+                saksdokumenter =,
                 kilde = Kilde.OPPGAVE
             )
         )
         logger.debug("Created behandling ${createdKlagebehandling.id} with mottak ${createdMottak.id} for oppgave ${lastVersjon.id}")
         return Pair(createdKlagebehandling, createdMottak)
     }
+
+
 
     private fun updatemottak(
         mottak: Mottak,
