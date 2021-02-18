@@ -10,12 +10,14 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.oppgavekopi.IdentType
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.VersjonIdent
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -23,7 +25,8 @@ import java.util.*
 class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val mottakRepository: MottakRepository,
-    private val hjemmelService: HjemmelService
+    private val hjemmelService: HjemmelService,
+    private val tilgangService: TilgangService
 ) {
 
     companion object {
@@ -32,11 +35,19 @@ class KlagebehandlingService(
         private const val KLAGEINSTANS_PREFIX = "42"
     }
 
+    private fun checkTilgang(klagebehandling: Klagebehandling) {
+        klagebehandling.foedselsnummer?.let {
+            if (!tilgangService.harSaksbehandlerTilgangTil(it)) {
+                throw MissingTilgangException("Not authorized to access this user")
+            }
+        }
+    }
+
     fun getOppgaveIderForKlagebehandling(klagebehandlingId: UUID): List<Long> =
         mottakRepository.getOne(klagebehandlingRepository.getOne(klagebehandlingId).mottakId).oppgavereferanser.map { it.oppgaveId }
 
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
-        klagebehandlingRepository.getOne(klagebehandlingId)
+        klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }
 
     fun fetchMottakForOppgaveKopi(oppgaveId: Long): List<Mottak> =
         mottakRepository.findByOppgavereferanserOppgaveId(oppgaveId)
@@ -184,7 +195,9 @@ class KlagebehandlingService(
             }
             ?.first
 
-    fun assignOppgave(klagebehandlingId: UUID, klagebehandlingVersjon: Long, saksbehandlerIdent: String?) {
-
+    fun assignOppgave(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        klagebehandling.tildeltSaksbehandlerident = saksbehandlerIdent
+        klagebehandling.modified = LocalDateTime.now()
     }
 }

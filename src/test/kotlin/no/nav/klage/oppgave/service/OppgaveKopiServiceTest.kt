@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.domain.oppgavekopi.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -17,6 +18,9 @@ import java.time.LocalDateTime
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(OppgaveKopiService::class, KlagebehandlingService::class, HjemmelService::class)
 class OppgaveKopiServiceTest {
+
+    @MockkBean(relaxed = true)
+    lateinit var tilgangService: TilgangService
 
     @Autowired
     lateinit var entityManager: TestEntityManager
