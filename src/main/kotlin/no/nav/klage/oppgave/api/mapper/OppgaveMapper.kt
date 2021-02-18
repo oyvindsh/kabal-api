@@ -25,20 +25,26 @@ class OppgaveMapper(
         private val secureLogger = getSecureLogger()
     }
 
-    fun mapEsKlagebehandlingerToView(esOppgaver: List<EsKlagebehandling>, fetchPersoner: Boolean): List<OppgaveView> {
-        return esOppgaver.map { oppgaveBackend ->
+    fun mapEsKlagebehandlingerToView(
+        esKlagebehandlinger: List<EsKlagebehandling>,
+        fetchPersoner: Boolean
+    ): List<OppgaveView> {
+        return esKlagebehandlinger.map { esKlagebehandling ->
             OppgaveView(
-                id = oppgaveBackend.id,
+                id = esKlagebehandling.id,
                 person = if (fetchPersoner) {
-                    OppgaveView.Person(oppgaveBackend.foedselsnummer ?: "mangler", oppgaveBackend.navn ?: "mangler")
+                    OppgaveView.Person(
+                        esKlagebehandling.foedselsnummer ?: "mangler",
+                        esKlagebehandling.navn ?: "mangler"
+                    )
                 } else {
                     null
                 },
-                type = oppgaveBackend.sakstype.navn,
-                tema = oppgaveBackend.tema.navn,
-                hjemmel = oppgaveBackend.hjemler?.firstOrNull() ?: "mangler",
-                frist = oppgaveBackend.frist,
-                versjon = oppgaveBackend.versjon!!.toInt()
+                type = esKlagebehandling.sakstype.navn,
+                tema = esKlagebehandling.tema.navn,
+                hjemmel = esKlagebehandling.hjemler?.firstOrNull() ?: "mangler",
+                frist = esKlagebehandling.frist,
+                versjon = esKlagebehandling.versjon!!.toInt()
             )
         }
     }
@@ -84,7 +90,7 @@ class OppgaveMapper(
         )
     }
 
-    fun mapToEs(klagebehandlingOgMottak: Pair<Klagebehandling, Mottak>): EsKlagebehandling {
+    fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandlingOgMottak: Pair<Klagebehandling, Mottak>): EsKlagebehandling {
 
         val klagebehandling = klagebehandlingOgMottak.first
         //TODO: Nå bruker jeg ikke mottak her, så jeg kunne endret Pair<Klagebehandling, Mottak> til å bare være Klagebehandling?

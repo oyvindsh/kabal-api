@@ -26,7 +26,13 @@ class OppgaveFacade(
             oppgaveKopiService.saveOppgaveKopi(oppgaveMapper.mapOppgaveKopiAPIModelToOppgaveKopi(oppgave))
 
         try {
-            klagebehandlingerOgMottak.forEach { elasticsearchRepository.save(oppgaveMapper.mapToEs(it)) }
+            klagebehandlingerOgMottak.forEach {
+                elasticsearchRepository.save(
+                    oppgaveMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(
+                        it
+                    )
+                )
+            }
         } catch (e: Exception) {
             if (e.message?.contains("version_conflict_engine_exception") == true) {
                 logger.info("Later version already indexed, ignoring this..")
