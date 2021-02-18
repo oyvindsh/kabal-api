@@ -24,8 +24,14 @@ data class OppgaverSearchCriteria(
     val erTildeltSaksbehandler: Boolean? = null,
     val saksbehandler: String? = null,
     val enhetsnr: String? = null,
-    val projection: Projection? = null
+    val projection: Projection? = null,
+    val sortField: SortField? = null
 ) {
+
+    enum class SortField {
+        FRIST, MOTTATT
+    }
+
     enum class Order {
         ASC, DESC
     }

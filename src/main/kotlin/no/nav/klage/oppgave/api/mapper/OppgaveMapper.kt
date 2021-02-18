@@ -44,6 +44,7 @@ class OppgaveMapper(
                 tema = esKlagebehandling.tema.navn,
                 hjemmel = esKlagebehandling.hjemler?.firstOrNull() ?: "mangler",
                 frist = esKlagebehandling.frist,
+                mottatt = esKlagebehandling.mottattKlageinstans,
                 versjon = esKlagebehandling.versjon!!.toInt()
             )
         }
