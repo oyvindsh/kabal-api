@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.Oppgavereferanse
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.Kilde
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -69,10 +70,14 @@ class KlagebehandlingService(
                 foedselsnummer = lastVersjon.ident.folkeregisterident,
                 organisasjonsnummer = mapOrganisasjonsnummer(lastVersjon.ident),
                 hjemmelListe = mapHjemler(lastVersjon),
-                avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv ?: lastVersjon.opprettetAv,
-                avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr ?: lastVersjon.opprettetAvEnhetsnr,
-                oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr ?: lastVersjon.tildeltEnhetsnr,
-                oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate() ?: lastVersjon.endretTidspunkt?.toLocalDate(),
+                avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv
+                    ?: lastVersjon.opprettetAv,
+                avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr
+                    ?: lastVersjon.opprettetAvEnhetsnr,
+                oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr
+                    ?: lastVersjon.tildeltEnhetsnr,
+                oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate()
+                    ?: lastVersjon.endretTidspunkt?.toLocalDate(),
                 fristFraFoersteinstans = lastVersjon.fristFerdigstillelse,
                 beskrivelse = lastVersjon.beskrivelse,
                 status = lastVersjon.status.name,
@@ -92,9 +97,9 @@ class KlagebehandlingService(
 
         val createdKlagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                foedselsnummer = createdMottak.foedselsnummer,,
-                tema =createdMottak.tema,
-                sakstype =createdMottak.sakstype,
+                foedselsnummer = createdMottak.foedselsnummer,
+                tema = createdMottak.tema,
+                sakstype = createdMottak.sakstype,
                 referanseId = createdMottak.referanseId,
                 innsendt = null,
                 mottattFoersteinstans = null,
@@ -109,14 +114,17 @@ class KlagebehandlingService(
                 vedtak = null,
                 kvalitetsvurdering = null,
                 hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
-                saksdokumenter =,
+                saksdokumenter = if (createdMottak.journalpostId != null) {
+                    mutableListOf(Saksdokument(referanse = createdMottak.journalpostId!!))
+                } else {
+                    mutableListOf()
+                },
                 kilde = Kilde.OPPGAVE
             )
         )
         logger.debug("Created behandling ${createdKlagebehandling.id} with mottak ${createdMottak.id} for oppgave ${lastVersjon.id}")
         return Pair(createdKlagebehandling, createdMottak)
     }
-
 
 
     private fun updatemottak(
@@ -127,6 +135,7 @@ class KlagebehandlingService(
         requireNotNull(lastVersjon.ident)
         requireNotNull(lastVersjon.behandlingstype)
 
+        //TODO: Legge til nytt saksdokument hvis journalpostId er oppdatert?
         mottak.apply {
             tema = mapTema(lastVersjon.tema)
             sakstype = mapSakstype(lastVersjon.behandlingstype)
