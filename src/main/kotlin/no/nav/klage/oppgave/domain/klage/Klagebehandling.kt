@@ -6,6 +6,8 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
+const val KLAGEENHET_PREFIX = "42"
+
 @Entity
 @Table(name = "klagebehandling", schema = "klage")
 class Klagebehandling(

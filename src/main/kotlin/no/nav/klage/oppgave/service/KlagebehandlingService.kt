@@ -129,7 +129,7 @@ class KlagebehandlingService(
             statusKategori = lastVersjon.statuskategori().name
             journalpostId = lastVersjon.journalpostId
             journalpostKilde = lastVersjon.journalpostkilde
-            //TODO: Bør disse oppdateres?
+            //TODO: Bør dise oppdateres?
             tildeltEnhet = lastVersjon.tildeltEnhetsnr
             tildeltSaksbehandlerident = lastVersjon.tilordnetRessurs
             //oversendtKaEnhet = mapMottakerEnhet(oppgaveKopierOrdererByVersion)
