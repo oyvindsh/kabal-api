@@ -82,7 +82,7 @@ open class ElasticsearchRepository(
         } else {
             "frist"
         }
-    
+
     private fun mapOrder(order: OppgaverSearchCriteria.Order?): SortOrder {
         return order.let {
             when (it) {
@@ -195,5 +195,12 @@ open class ElasticsearchRepository(
 
         logger.info("Making search request with query {}", baseQuery.toString())
         return baseQuery
+    }
+
+    fun deleteAll() {
+        val query: Query = NativeSearchQueryBuilder()
+            .withQuery(QueryBuilders.matchAllQuery())
+            .build()
+        esTemplate.delete(query)
     }
 }
