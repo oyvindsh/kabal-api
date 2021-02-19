@@ -30,6 +30,8 @@ class Klagebehandling(
     val innsendt: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
     val mottattFoersteinstans: LocalDate? = null,
+    @Column(name = "avsender_saksbehandlerident_foersteinstans")
+    val avsenderSaksbehandleridentFoersteinstans: String? = null,
     @Column(name = "avsender_enhet_foersteinstans")
     val avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
@@ -51,7 +53,7 @@ class Klagebehandling(
     val vedtak: Vedtak? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
-    val kvalitetsvurdering: Kvalitetsvurdering? = null,
+    var kvalitetsvurdering: Kvalitetsvurdering? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val hjemler: MutableList<Hjemmel> = mutableListOf(),
@@ -66,6 +68,31 @@ class Klagebehandling(
     @Enumerated(EnumType.STRING)
     val kilde: Kilde
 ) {
+
+    fun createOrUpdateKvalitetsvurdering(input: KvalitetsvurderingInput) {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering(
+                grunn = input.grunn,
+                eoes = input.eoes,
+                raadfoertMedLege = input.raadfoertMedLege,
+                internVurdering = input.internVurdering,
+                sendTilbakemelding = input.sendTilbakemelding,
+                tilbakemelding = input.tilbakemelding,
+                mottakerSaksbehandlerident = this.avsenderSaksbehandleridentFoersteinstans,
+                mottakerEnhet = this.avsenderEnhetFoersteinstans
+            )
+        } else {
+            kvalitetsvurdering!!.grunn = input.grunn
+            kvalitetsvurdering!!.eoes = input.eoes
+            kvalitetsvurdering!!.raadfoertMedLege = input.raadfoertMedLege
+            kvalitetsvurdering!!.internVurdering = input.internVurdering
+            kvalitetsvurdering!!.sendTilbakemelding = input.sendTilbakemelding
+            kvalitetsvurdering!!.tilbakemelding = input.tilbakemelding
+            kvalitetsvurdering!!.modified = LocalDateTime.now()
+        }
+        //TODO: Burde jeg også oppdatere kvalitetsbehandling.modified?
+    }
+
     override fun toString(): String {
         return "Behandling(id=$id, " +
                 "modified=$modified, " +

@@ -12,19 +12,19 @@ class Kvalitetsvurdering(
     val id: UUID = UUID.randomUUID(),
     @Column(name = "grunn_id")
     @Convert(converter = GrunnConverter::class)
-    val grunn: Grunn? = null,
+    var grunn: Grunn? = null,
     @Column(name = "eoes_id")
     @Convert(converter = EoesConverter::class)
-    val eoes: Eoes? = null,
+    var eoes: Eoes? = null,
     @Column(name = "raadfoert_med_lege_id")
     @Convert(converter = RaadfoertMedLegeConverter::class)
-    val raadfoertMedLege: RaadfoertMedLege? = null,
+    var raadfoertMedLege: RaadfoertMedLege? = null,
     @Column(name = "intern_vurdering")
-    val internVurdering: String? = null,
+    var internVurdering: String? = null,
     @Column(name = "send_tilbakemelding")
-    val sendTilbakemelding: Boolean? = null,
+    var sendTilbakemelding: Boolean? = null,
     @Column(name = "tilbakemelding")
-    val tilbakemelding: String? = null,
+    var tilbakemelding: String? = null,
     @Column(name = "mottaker_saksbehandlerident")
     val mottakerSaksbehandlerident: String? = null,
     @Column(name = "mottaker_enhet")
@@ -32,7 +32,7 @@ class Kvalitetsvurdering(
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
-    val modified: LocalDateTime = LocalDateTime.now()
+    var modified: LocalDateTime = LocalDateTime.now()
 ) {
     override fun toString(): String {
         return "Tilbakemelding(id=$id, " +
@@ -55,3 +55,12 @@ class Kvalitetsvurdering(
         return id.hashCode()
     }
 }
+
+data class KvalitetsvurderingInput(
+    val grunn: Grunn?,
+    val eoes: Eoes?,
+    val raadfoertMedLege: RaadfoertMedLege?,
+    val internVurdering: String?,
+    val sendTilbakemelding: Boolean?,
+    val tilbakemelding: String?
+)
