@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.oppgavekopi.IdentType
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.VersjonIdent
-import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -34,9 +33,7 @@ class KlagebehandlingService(
 
     private fun checkTilgang(klagebehandling: Klagebehandling) {
         klagebehandling.foedselsnummer?.let {
-            if (!tilgangService.harSaksbehandlerTilgangTil(it)) {
-                throw MissingTilgangException("Not authorized to access this user")
-            }
+            tilgangService.verifySaksbehandlersTilgangTil(it)
         }
     }
 

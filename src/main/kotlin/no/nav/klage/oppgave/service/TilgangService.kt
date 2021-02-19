@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.domain.AuditLogEvent.Decision.ALLOW
 import no.nav.klage.oppgave.domain.AuditLogEvent.Decision.DENY
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
@@ -35,7 +36,13 @@ class TilgangService(
             )
         )
     }
-    
+
+    fun verifySaksbehandlersTilgangTil(fnr: String) {
+        if (!harSaksbehandlerTilgangTil(fnr)) {
+            throw MissingTilgangException("Not authorized to access this user")
+        }
+    }
+
     fun harSaksbehandlerTilgangTil(fnr: String): Boolean {
         val personInfo = pdlFacade.getPersonInfo(fnr)
         if (personInfo == null) {
