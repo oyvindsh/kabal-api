@@ -3,8 +3,10 @@ package no.nav.klage.oppgave.api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.api.view.OppgaverRespons
 import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveService
@@ -63,7 +65,21 @@ class KlagebehandlingFacade(
                     e
                 )
             }
-
         }
+    }
+
+    fun getKvalitetsvurdering(klagebehandlingId: UUID): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.getKlagebehandling(klagebehandlingId)
+        )
+    }
+
+    fun updateKvalitetsvurdering(
+        klagebehandlingId: UUID,
+        kvalitetsvurderingInput: KvalitetsvurderingInput
+    ): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.updateKvalitetsvurdering(klagebehandlingId, kvalitetsvurderingInput)
+        )
     }
 }
