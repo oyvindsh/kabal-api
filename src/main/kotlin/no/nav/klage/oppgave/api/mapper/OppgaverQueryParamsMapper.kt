@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.exceptions.NotOwnEnhetException
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OppgaverQueryParamsMapper(private val saksbehandlerRepository: SaksbehandlerRepository) {
@@ -37,6 +38,18 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
         } else {
             OppgaverSearchCriteria.SortField.FRIST
         }
+    )
+
+    fun toFristSearchCriteria(navIdent: String, oppgaverQueryParams: OppgaverQueryParams) = OppgaverSearchCriteria(
+        typer = oppgaverQueryParams.typer.map { Sakstype.fromNavn(it) },
+        temaer = oppgaverQueryParams.temaer.map { Tema.fromNavn(it) },
+        hjemler = oppgaverQueryParams.hjemler,
+        offset = 0,
+        limit = 1,
+        erTildeltSaksbehandler = false,
+        enhetsnr = validateAndGetEnhetId(navIdent, oppgaverQueryParams.enhetId),
+        fristFom = LocalDate.now().minusYears(15),
+        fristTom = LocalDate.now().minusDays(1),
     )
 
     private fun validateAndGetEnhetId(navIdent: String, enhetId: String): String {
