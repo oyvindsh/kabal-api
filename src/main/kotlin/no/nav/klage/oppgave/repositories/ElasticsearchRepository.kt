@@ -76,6 +76,13 @@ open class ElasticsearchRepository(
         return searchHits
     }
 
+    open fun countByCriteria(criteria: OppgaverSearchCriteria): Int {
+        val query = NativeSearchQueryBuilder()
+            .withQuery(criteria.toEsQuery())
+            .build()
+        return esTemplate.count(query, IndexCoordinates.of("klagebehandling")).toInt()
+    }
+
     private fun sortField(criteria: OppgaverSearchCriteria): String =
         if (criteria.sortField == OppgaverSearchCriteria.SortField.MOTTATT) {
             "mottattKlageinstans"
