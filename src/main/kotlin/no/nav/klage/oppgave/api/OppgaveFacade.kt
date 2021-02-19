@@ -28,9 +28,7 @@ class OppgaveFacade(
         try {
             klagebehandlingerOgMottak.forEach {
                 elasticsearchRepository.save(
-                    oppgaveMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(
-                        it
-                    )
+                    oppgaveMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it)
                 )
             }
         } catch (e: Exception) {

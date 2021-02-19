@@ -34,7 +34,9 @@ class KlagebehandlingFacade(
 
     fun getKlagebehandling(klagebehandlingId: UUID): KlagebehandlingView {
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
-            klagebehandlingService.getKlagebehandling(klagebehandlingId)
+            klagebehandlingService.getKlagebehandling(
+                klagebehandlingId
+            )
         )
     }
 
@@ -49,8 +51,8 @@ class KlagebehandlingFacade(
         )
     }
 
-    fun assignOppgave(klagebehandlingId: UUID, saksbehandlerIdent: String?, klagebehandlingVersjon: Long) {
-        klagebehandlingService.assignOppgave(klagebehandlingId, klagebehandlingVersjon, saksbehandlerIdent)
+    fun assignOppgave(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
+        klagebehandlingService.assignOppgave(klagebehandlingId, saksbehandlerIdent)
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {

@@ -62,8 +62,7 @@ class OppgaveController(
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignOppgave(
             klagebehandlingId.toUUIDOrException(),
-            saksbehandlertildeling.navIdent,
-            saksbehandlertildeling.oppgaveversjon.versjonToLongOrException()
+            saksbehandlertildeling.navIdent
         )
 
         val uri = MvcUriComponentsBuilder
@@ -83,8 +82,7 @@ class OppgaveController(
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignOppgave(
             klagebehandlingId.toUUIDOrException(),
-            null,
-            saksbehandlerfradeling.oppgaveversjon.versjonToLongOrException()
+            null
         )
 
         val uri = MvcUriComponentsBuilder

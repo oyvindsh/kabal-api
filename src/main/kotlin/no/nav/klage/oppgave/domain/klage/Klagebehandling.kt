@@ -43,7 +43,7 @@ class Klagebehandling(
     @Column(name = "frist")
     val frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
-    val tildeltSaksbehandlerident: String? = null,
+    var tildeltSaksbehandlerident: String? = null,
     @Column(name = "tildelt_enhet")
     val tildeltEnhet: String? = null,
     @Column(name = "mottak_id")
@@ -63,7 +63,7 @@ class Klagebehandling(
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
-    val modified: LocalDateTime = LocalDateTime.now(),
+    var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kilde")
     @Enumerated(EnumType.STRING)
     val kilde: Kilde
