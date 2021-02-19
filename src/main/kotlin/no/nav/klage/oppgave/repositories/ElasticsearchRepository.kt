@@ -201,6 +201,6 @@ open class ElasticsearchRepository(
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
-        esTemplate.delete(query)
+        esTemplate.delete(query, EsKlagebehandling::class.java)
     }
 }
