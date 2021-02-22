@@ -58,17 +58,6 @@ CREATE TABLE klage.kvalitetsvurdering
             REFERENCES kodeverk.raadfoert_med_lege (id)
 );
 
-CREATE TABLE klage.vedtak
-(
-    id        UUID PRIMARY KEY,
-    utfall_id INTEGER                  NOT NULL,
-    modified  TIMESTAMP WITH TIME ZONE NOT NULL,
-    created   TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_vedtak_utfall
-        FOREIGN KEY (utfall_id)
-            REFERENCES kodeverk.utfall (id)
-);
-
 CREATE TABLE klage.klagebehandling
 (
     id                                         UUID PRIMARY KEY,
@@ -88,7 +77,6 @@ CREATE TABLE klage.klagebehandling
     avsender_enhet_foersteinstans              VARCHAR(10),
     avsender_saksbehandlerident_foersteinstans VARCHAR(50),
     mottak_id                                  UUID                     NOT NULL,
-    vedtak_id                                  UUID,
     kvalitetsvurdering_id                      UUID,
     kilde                                      VARCHAR(15)              NOT NULL,
     created                                    TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -96,9 +84,6 @@ CREATE TABLE klage.klagebehandling
     CONSTRAINT fk_klagebehandling_sakstype
         FOREIGN KEY (sakstype_id)
             REFERENCES kodeverk.sakstype (id),
-    CONSTRAINT fk_behandling_vedtak
-        FOREIGN KEY (vedtak_id)
-            REFERENCES klage.vedtak (id),
     CONSTRAINT fk_behandling_kvalitetsvurdering
         FOREIGN KEY (kvalitetsvurdering_id)
             REFERENCES klage.kvalitetsvurdering (id),
@@ -107,22 +92,34 @@ CREATE TABLE klage.klagebehandling
             REFERENCES klage.mottak (id)
 );
 
-CREATE TABLE klage.hjemmel
+CREATE TABLE klage.vedtak
 (
     id                 UUID PRIMARY KEY,
-    klagebehandling_id UUID NOT NULL,
-    lov_id             INTEGER,
-    kapittel           INTEGER,
-    paragraf           INTEGER,
-    ledd               INTEGER,
-    bokstav            VARCHAR(1),
-    original           TEXT NOT NULL,
-    CONSTRAINT fk_hjemmel_lov
-        FOREIGN KEY (lov_id)
-            REFERENCES kodeverk.lov (id),
-    CONSTRAINT fk_hjemmel_behandling
+    utfall_id          INTEGER                  NOT NULL,
+    klagebehandling_id UUID                     NOT NULL,
+    modified           TIMESTAMP WITH TIME ZONE NOT NULL,
+    created            TIMESTAMP WITH TIME ZONE NOT NULL,
+    CONSTRAINT fk_vedtak_utfall
+        FOREIGN KEY (utfall_id)
+            REFERENCES kodeverk.utfall (id),
+    CONSTRAINT fk_vedtak_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
+);
+
+CREATE TABLE klage.hjemmel
+(
+    id       UUID PRIMARY KEY,
+
+    lov_id   INTEGER,
+    kapittel INTEGER,
+    paragraf INTEGER,
+    ledd     INTEGER,
+    bokstav  VARCHAR(1),
+    original TEXT NOT NULL,
+    CONSTRAINT fk_hjemmel_lov
+        FOREIGN KEY (lov_id)
+            REFERENCES kodeverk.lov (id)
 );
 
 CREATE TABLE klage.saksdokument
@@ -146,4 +143,30 @@ CREATE TABLE klage.mottak_oppgave
     CONSTRAINT fk_mottak_oppgave_oppgave
         FOREIGN KEY (oppgave_id)
             REFERENCES oppgave.oppgave (id)
+);
+
+CREATE TABLE klage.klagebehandling_hjemmel
+(
+    id                 UUID PRIMARY KEY,
+    klagebehandling_id UUID NOT NULL,
+    hjemmel_id         UUID NOT NULL,
+    CONSTRAINT fk_hjemmel_klagebehandling
+        FOREIGN KEY (klagebehandling_id)
+            REFERENCES klage.klagebehandling (id),
+    CONSTRAINT fk_klagebehandling_hjemmel
+        FOREIGN KEY (hjemmel_id)
+            REFERENCES klage.hjemmel (id)
+);
+
+CREATE TABLE klage.vedtak_hjemmel
+(
+    id         UUID PRIMARY KEY,
+    vedtak_id  UUID NOT NULL,
+    hjemmel_id UUID NOT NULL,
+    CONSTRAINT fk_hjemmel_vedtak
+        FOREIGN KEY (vedtak_id)
+            REFERENCES klage.vedtak (id),
+    CONSTRAINT fk_vedtak_hjemmel
+        FOREIGN KEY (hjemmel_id)
+            REFERENCES klage.hjemmel (id)
 );

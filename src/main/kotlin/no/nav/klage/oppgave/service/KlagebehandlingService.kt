@@ -126,7 +126,7 @@ class KlagebehandlingService(
                 tildeltSaksbehandlerident = createdMottak.tildeltSaksbehandlerident,
                 tildeltEnhet = createdMottak.tildeltEnhet,
                 mottakId = createdMottak.id,
-                vedtak = null,
+                vedtak = mutableListOf(),
                 kvalitetsvurdering = null,
                 hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
                 saksdokumenter = if (createdMottak.journalpostId != null) {
