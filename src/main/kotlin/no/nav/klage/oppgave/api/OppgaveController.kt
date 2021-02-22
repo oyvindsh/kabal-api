@@ -101,7 +101,7 @@ class OppgaveController(
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
         return klagebehandlingFacade.countOppgaver(
-            oppgaverQueryParamsMapper.toFristSearchCriteria(navIdent, queryParams)
+            oppgaverQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(navIdent, queryParams)
         )
     }
 

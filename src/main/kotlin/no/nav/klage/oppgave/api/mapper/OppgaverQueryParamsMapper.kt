@@ -40,7 +40,7 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
         }
     )
 
-    fun toFristSearchCriteria(navIdent: String, oppgaverQueryParams: OppgaverQueryParams) = OppgaverSearchCriteria(
+    fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, oppgaverQueryParams: OppgaverQueryParams) = OppgaverSearchCriteria(
         typer = oppgaverQueryParams.typer.map { Sakstype.fromNavn(it) },
         temaer = oppgaverQueryParams.temaer.map { Tema.fromNavn(it) },
         hjemler = oppgaverQueryParams.hjemler,
