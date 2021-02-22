@@ -33,7 +33,7 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
         saksbehandler = oppgaverQueryParams.tildeltSaksbehandler,
         projection = oppgaverQueryParams.projeksjon?.let { OppgaverSearchCriteria.Projection.valueOf(it.name) },
         enhetsnr = validateAndGetEnhetId(navIdent, oppgaverQueryParams.enhetId),
-        sortField = if (oppgaverQueryParams.sorterting == OppgaverQueryParams.Sortering.MOTTATT) {
+        sortField = if (oppgaverQueryParams.sortering == OppgaverQueryParams.Sortering.MOTTATT) {
             OppgaverSearchCriteria.SortField.MOTTATT
         } else {
             OppgaverSearchCriteria.SortField.FRIST
