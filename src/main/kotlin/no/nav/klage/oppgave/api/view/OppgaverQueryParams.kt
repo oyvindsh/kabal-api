@@ -5,7 +5,7 @@ data class OppgaverQueryParams(
     var temaer: List<String> = emptyList(),
     var hjemler: List<String> = emptyList(),
     val rekkefoelge: Rekkefoelge? = Rekkefoelge.STIGENDE,
-    val sorterting: Sortering? = Sortering.FRIST,
+    val sortering: Sortering? = Sortering.FRIST,
     val start: Int,
     val antall: Int,
     val projeksjon: Projeksjon? = null,

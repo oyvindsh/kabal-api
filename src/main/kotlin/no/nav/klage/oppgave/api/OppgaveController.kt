@@ -4,10 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.OppgaverQueryParamsMapper
-import no.nav.klage.oppgave.api.view.OppgaverQueryParams
-import no.nav.klage.oppgave.api.view.OppgaverRespons
-import no.nav.klage.oppgave.api.view.Saksbehandlerfradeling
-import no.nav.klage.oppgave.api.view.Saksbehandlertildeling
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
@@ -89,6 +86,23 @@ class OppgaveController(
             .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
             .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
+    }
+
+    @ApiOperation(
+        value = "Hent antall utildelte klagebehandlinger der fristen gått ut",
+        notes = "Teller opp alle utildelte klagebehandlinger der fristen gått ut."
+    )
+    @GetMapping("/ansatte/{navIdent}/antallutgaattefrister", produces = ["application/json"])
+    fun getAntallUtgaatteFrister(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        queryParams: OppgaverQueryParams
+    ): AntallUtgaatteFristerResponse {
+        logger.debug("Params: {}", queryParams)
+        validateNavIdent(navIdent)
+        return klagebehandlingFacade.countOppgaver(
+            oppgaverQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(navIdent, queryParams)
+        )
     }
 
     private fun String?.versjonToLongOrException() =

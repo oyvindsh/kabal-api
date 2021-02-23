@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
+import no.nav.klage.oppgave.api.view.AntallUtgaatteFristerResponse
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.api.view.OppgaverRespons
@@ -48,6 +49,12 @@ class KlagebehandlingFacade(
                 esResponse.searchHits.map { it.content },
                 oppgaverSearchCriteria.isProjectionUtvidet()
             )
+        )
+    }
+
+    fun countOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): AntallUtgaatteFristerResponse {
+        return AntallUtgaatteFristerResponse(
+            antall = elasticsearchRepository.countByCriteria(oppgaverSearchCriteria)
         )
     }
 
