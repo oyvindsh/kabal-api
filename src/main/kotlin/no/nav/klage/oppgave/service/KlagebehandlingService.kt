@@ -60,11 +60,13 @@ class KlagebehandlingService(
 
         if (lastVersjon.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX) && (lastVersjon.oppgavetype == "BEH_SAK_MK" || lastVersjon.oppgavetype == "BEH_SAK")) {
             val mottakSomHarPaagaaendeKlagebehandlinger =
-                fetchMottakForOppgaveKopi(lastVersjon.id).filter { klagebehandlingRepository.findByMottakId(it.id)?.avsluttet != null }
+                fetchMottakForOppgaveKopi(lastVersjon.id).filter {
+                    klagebehandlingRepository.findByMottakId(it.id)?.avsluttet == null
+                }
             return if (mottakSomHarPaagaaendeKlagebehandlinger.isEmpty()) {
                 listOf(createNewMottakAndKlagebehandling(oppgaveKopierOrdererByVersion))
             } else {
-                mottakSomHarPaagaaendeKlagebehandlinger.map { updatemottak(it, oppgaveKopierOrdererByVersion) }
+                mottakSomHarPaagaaendeKlagebehandlinger.map { updateMottak(it, oppgaveKopierOrdererByVersion) }
             }
         } else {
             return emptyList()
@@ -142,10 +144,12 @@ class KlagebehandlingService(
     }
 
 
-    private fun updatemottak(
+    private fun updateMottak(
         mottak: Mottak,
         oppgaveKopierOrdererByVersion: List<OppgaveKopiVersjon>
     ): Pair<Klagebehandling, Mottak> {
+        logger.debug("Updating mottak")
+
         val lastVersjon = oppgaveKopierOrdererByVersion.first()
         requireNotNull(lastVersjon.ident)
         requireNotNull(lastVersjon.behandlingstype)
