@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.Dokumentvariant
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
@@ -21,7 +22,7 @@ import java.util.*
 @Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
-    private val safRestClient: SafGraphQlClient,
+    private val safRestClient: SafRestClient,
     private val klagebehandlingRepository: KlagebehandlingRepository,
 ) {
     companion object {
@@ -104,7 +105,9 @@ class DokumentService(
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
-    fun getFile(journalpostId: String): ByteArray {
+    fun getFile(journalpostId: String, dokumentInfoId: String, format: String = "ARKIV"): ByteArray {
+//        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId, format)
+//        val contentAsByteArray = Base64.getDecoder().decode(arkivertDokument.base64EncodedString)
         //Return test data for now
         return Files.readAllBytes(Path.of(this::class.java.getResource("klage_test_file.pdf").toURI()))
     }

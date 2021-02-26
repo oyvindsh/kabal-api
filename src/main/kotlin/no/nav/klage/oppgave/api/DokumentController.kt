@@ -106,21 +106,25 @@ class DokumentController(
     }
 
     @ResponseBody
-    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostId}/content")
+    @GetMapping("/klagebehandlinger/{behandlingsid}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}")
     fun getJournalpostContent(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
         @ApiParam(value = "Id til journalpost")
-        @PathVariable journalpostId: String
+        @PathVariable journalpostId: String,
+        @ApiParam(value = "Id til dokumentInfo")
+        @PathVariable dokumentInfoId: String
+
     ): ResponseEntity<ByteArray> {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         logger.debug(
-            "Get getJournalpostContent is requested. behandlingsid: {} - journalpostId: {}",
+            "Get getJournalpostContent is requested. behandlingsid: {} - journalpostId: {} - dokumentInfoId: {}",
             klagebehandlingId,
-            journalpostId
+            journalpostId,
+            dokumentInfoId
         )
 
-        val content = dokumentService.getFile(journalpostId)
+        val content = dokumentService.getFile(journalpostId, dokumentInfoId)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
