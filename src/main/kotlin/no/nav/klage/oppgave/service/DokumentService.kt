@@ -109,7 +109,15 @@ class DokumentService(
 //        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId, format)
 //        val contentAsByteArray = Base64.getDecoder().decode(arkivertDokument.base64EncodedString)
         //Return test data for now
-        return Files.readAllBytes(Path.of(this::class.java.getResource("test/klage_test_file.pdf").toURI()))
+        val uri = this::class.java.getResource(".").toURI()
+        logger.debug("base uri: $uri")
+
+        Files.list(Path.of(uri)).forEach {
+            logger.debug("file: $it")
+        }
+
+        val toURI = this::class.java.getResource("test/klage_test_file.pdf").toURI()
+        return Files.readAllBytes(Path.of(toURI))
     }
 
 }
