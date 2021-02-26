@@ -14,8 +14,6 @@ import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.nio.file.Files
-import java.nio.file.Path
 import java.util.*
 
 @Service
@@ -106,18 +104,8 @@ class DokumentService(
     }
 
     fun getFile(journalpostId: String, dokumentInfoId: String, format: String = "ARKIV"): ByteArray {
-//        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId, format)
-//        val contentAsByteArray = Base64.getDecoder().decode(arkivertDokument.base64EncodedString)
-        //Return test data for now
-        val uri = this::class.java.getResource(".").toURI()
-        logger.debug("base uri: $uri")
-
-        Files.list(Path.of(uri)).forEach {
-            logger.debug("file: $it")
-        }
-
-        val toURI = this::class.java.getResource("test/klage_test_file.pdf").toURI()
-        return Files.readAllBytes(Path.of(toURI))
+        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId, format)
+        return Base64.getDecoder().decode(arkivertDokument.base64EncodedString)
     }
 
 }
