@@ -109,7 +109,7 @@ class DokumentService(
 //        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId, format)
 //        val contentAsByteArray = Base64.getDecoder().decode(arkivertDokument.base64EncodedString)
         //Return test data for now
-        return Files.readAllBytes(Path.of(this::class.java.getResource("klage_test_file.pdf").toURI()))
+        return Files.readAllBytes(Path.of(this::class.java.getResource("test/klage_test_file.pdf").toURI()))
     }
 
 }
