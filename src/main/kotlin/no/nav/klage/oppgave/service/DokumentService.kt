@@ -13,6 +13,8 @@ import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 
 @Service
@@ -100,6 +102,11 @@ class DokumentService(
             logger.warn("Unable to find journalpost $journalpostId", e)
             null
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
+    }
+
+    fun getFile(journalpostId: String): ByteArray {
+        //Return test data for now
+        return Files.readAllBytes(Path.of(this::class.java.getResource("klage_test_file.pdf").toURI()))
     }
 
 }

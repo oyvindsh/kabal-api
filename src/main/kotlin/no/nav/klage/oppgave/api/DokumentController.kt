@@ -11,7 +11,10 @@ import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -100,6 +103,33 @@ class DokumentController(
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         dokumentService.connectJournalpostToKlagebehandling(klagebehandlingId, dokumentKnytning.journalpostId)
+    }
+
+    @ResponseBody
+    @GetMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostId}/content")
+    fun getJournalpostContent(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable behandlingsid: String,
+        @ApiParam(value = "Id til journalpost")
+        @PathVariable journalpostId: String
+    ): ResponseEntity<ByteArray> {
+        val klagebehandlingId = parseAndValidate(behandlingsid)
+        logger.debug(
+            "Get getJournalpostContent is requested. behandlingsid: {} - journalpostId: {}",
+            klagebehandlingId,
+            journalpostId
+        )
+
+        val content = dokumentService.getFile(journalpostId)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.valueOf("application/pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=" + "file.pdf")
+        return ResponseEntity(
+            content,
+            responseHeaders,
+            HttpStatus.OK
+        )
     }
 
     private fun parseAndValidate(behandlingsid: String): UUID =
