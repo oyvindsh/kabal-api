@@ -30,7 +30,7 @@ class SafRestClient(
         dokumentInfoId: String,
         journalpostId: String,
         variantFormat: String
-    ): ArkivertDokument {
+    ): ByteArray {
         return try {
             runWithTimingAndLogging {
                 safWebClient.get()
@@ -46,8 +46,8 @@ class SafRestClient(
                     )
                     .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
                     .retrieve()
-                    .bodyToMono<String>()
-                    .block().wrapAsDokument() ?: throw RuntimeException("getDokument failed")
+                    .bodyToMono<ByteArray>()
+                    .block()
             }
         } catch (badRequest: WebClientResponseException.BadRequest) {
             logger.warn("Got a 400 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")

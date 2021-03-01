@@ -109,8 +109,7 @@ class DokumentService(
     }
 
     fun getFile(journalpostId: String, dokumentInfoId: String, format: String = "ARKIV"): ByteArray {
-        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId, format)
-        return arkivertDokument.base64EncodedString.toByteArray()
+        return safRestClient.getDokument(dokumentInfoId, journalpostId, format)
     }
 
 }
