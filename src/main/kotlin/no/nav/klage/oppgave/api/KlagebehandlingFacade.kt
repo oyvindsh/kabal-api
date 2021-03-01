@@ -2,11 +2,8 @@ package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
-import no.nav.klage.oppgave.api.view.AntallUtgaatteFristerResponse
-import no.nav.klage.oppgave.api.view.KlagebehandlingView
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
-import no.nav.klage.oppgave.api.view.OppgaverRespons
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -41,25 +38,36 @@ class KlagebehandlingFacade(
         )
     }
 
-    fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
-        val esResponse = elasticsearchRepository.findByCriteria(oppgaverSearchCriteria)
-        return OppgaverRespons(
+    fun searchKlagebehandlinger(searchCriteria: KlagebehandlingerSearchCriteria): KlagebehandlingerListRespons {
+        val esResponse = elasticsearchRepository.findByCriteria(searchCriteria)
+        return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
-            oppgaver = oppgaveMapper.mapEsKlagebehandlingerToView(
+            klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
-                oppgaverSearchCriteria.isProjectionUtvidet()
+                searchCriteria.isProjectionUtvidet()
             )
         )
     }
 
-    fun countOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): AntallUtgaatteFristerResponse {
-        return AntallUtgaatteFristerResponse(
-            antall = elasticsearchRepository.countByCriteria(oppgaverSearchCriteria)
+    fun searchOppgaver(klagebehandlingerSearchCriteria: KlagebehandlingerSearchCriteria): OppgaverRespons {
+        val esResponse = elasticsearchRepository.findByCriteria(klagebehandlingerSearchCriteria)
+        return OppgaverRespons(
+            antallTreffTotalt = esResponse.totalHits.toInt(),
+            oppgaver = oppgaveMapper.mapEsKlagebehandlingerToView(
+                esResponse.searchHits.map { it.content },
+                klagebehandlingerSearchCriteria.isProjectionUtvidet()
+            )
         )
     }
 
-    fun assignOppgave(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
-        klagebehandlingService.assignOppgave(klagebehandlingId, saksbehandlerIdent)
+    fun countOppgaver(klagebehandlingerSearchCriteria: KlagebehandlingerSearchCriteria): AntallUtgaatteFristerResponse {
+        return AntallUtgaatteFristerResponse(
+            antall = elasticsearchRepository.countByCriteria(klagebehandlingerSearchCriteria)
+        )
+    }
+
+    fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
+        klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {

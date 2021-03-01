@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.api.mapper
 
 
+import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.util.getLogger
@@ -18,6 +20,31 @@ class KlagebehandlingMapper(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+    }
+
+    fun mapEsKlagebehandlingerToListView(
+        esKlagebehandlinger: List<EsKlagebehandling>,
+        fetchPersoner: Boolean
+    ): List<KlagebehandlingListView> {
+        return esKlagebehandlinger.map { esKlagebehandling ->
+            KlagebehandlingListView(
+                id = esKlagebehandling.id,
+                person = if (fetchPersoner) {
+                    KlagebehandlingListView.Person(
+                        esKlagebehandling.foedselsnummer,
+                        esKlagebehandling.navn
+                    )
+                } else {
+                    null
+                },
+                type = esKlagebehandling.sakstype.id,
+                tema = esKlagebehandling.tema.id,
+                hjemmel = esKlagebehandling.hjemler?.firstOrNull(),
+                frist = esKlagebehandling.frist,
+                mottatt = esKlagebehandling.mottattKlageinstans,
+                versjon = esKlagebehandling.versjon!!.toInt()
+            )
+        }
     }
 
     fun mapKlagebehandlingToKlagebehandlingView(klagebehandling: Klagebehandling): KlagebehandlingView {

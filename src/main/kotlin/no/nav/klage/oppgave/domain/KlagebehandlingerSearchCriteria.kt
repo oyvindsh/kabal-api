@@ -5,7 +5,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class OppgaverSearchCriteria(
+data class KlagebehandlingerSearchCriteria(
     val typer: List<Sakstype> = emptyList(),
     val temaer: List<Tema> = emptyList(),
     val hjemler: List<String> = emptyList(),

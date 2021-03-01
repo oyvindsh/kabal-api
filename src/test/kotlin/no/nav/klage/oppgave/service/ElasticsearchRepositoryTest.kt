@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.service
 
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -135,7 +135,7 @@ class ElasticsearchRepositoryTest {
     fun `Klagebehandling can be searched for by tema`() {
         val klagebehandlinger: List<EsKlagebehandling> =
             repository.findByCriteria(
-                OppgaverSearchCriteria(
+                KlagebehandlingerSearchCriteria(
                     temaer = listOf(Tema.SYK),
                     offset = 0,
                     limit = 10
@@ -150,7 +150,7 @@ class ElasticsearchRepositoryTest {
     fun `Klagebehandling can be searched for by frist`() {
         val klagebehandlinger: List<EsKlagebehandling> =
             repository.findByCriteria(
-                OppgaverSearchCriteria(
+                KlagebehandlingerSearchCriteria(
                     fristFom = LocalDate.of(2020, 12, 1),
                     offset = 0,
                     limit = 10

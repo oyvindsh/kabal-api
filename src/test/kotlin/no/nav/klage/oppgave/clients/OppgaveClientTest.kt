@@ -7,7 +7,7 @@ import io.mockk.junit5.MockKExtension
 import no.nav.klage.oppgave.clients.gosys.Oppgave
 import no.nav.klage.oppgave.clients.gosys.OppgaveClient
 import no.nav.klage.oppgave.clients.gosys.OppgaveResponse
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.service.TokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
@@ -72,7 +72,7 @@ internal class OppgaveClientTest {
         )
 
         return oppgaveClient.getOneSearchPage(
-            OppgaverSearchCriteria(
+            KlagebehandlingerSearchCriteria(
                 offset = 0,
                 limit = 1
             )
