@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.mapper
 
-import no.nav.klage.oppgave.api.view.OppgaverQueryParams
+import no.nav.klage.oppgave.api.view.KlagebehandlingerQueryParams
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class OppgaverQueryParamsMapper(private val saksbehandlerRepository: SaksbehandlerRepository) {
+class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: SaksbehandlerRepository) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun toSearchCriteria(navIdent: String, queryParams: OppgaverQueryParams) = KlagebehandlingerSearchCriteria(
-        typer = queryParams.typer.map { Sakstype.fromNavn(it) },
-        temaer = queryParams.temaer.map { Tema.fromNavn(it) },
+    fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
+        typer = queryParams.typer.map { Sakstype.of(it) },
+        temaer = queryParams.temaer.map { Tema.of(it) },
         hjemler = queryParams.hjemler,
-        order = if (queryParams.rekkefoelge == OppgaverQueryParams.Rekkefoelge.SYNKENDE) {
+        order = if (queryParams.rekkefoelge == KlagebehandlingerQueryParams.Rekkefoelge.SYNKENDE) {
             KlagebehandlingerSearchCriteria.Order.DESC
         } else {
             KlagebehandlingerSearchCriteria.Order.ASC
@@ -33,22 +33,22 @@ class OppgaverQueryParamsMapper(private val saksbehandlerRepository: Saksbehandl
         saksbehandler = queryParams.tildeltSaksbehandler,
         projection = queryParams.projeksjon?.let { KlagebehandlingerSearchCriteria.Projection.valueOf(it.name) },
         enhetsnr = validateAndGetEnhetId(navIdent, queryParams.enhetId),
-        sortField = if (queryParams.sortering == OppgaverQueryParams.Sortering.MOTTATT) {
+        sortField = if (queryParams.sortering == KlagebehandlingerQueryParams.Sortering.MOTTATT) {
             KlagebehandlingerSearchCriteria.SortField.MOTTATT
         } else {
             KlagebehandlingerSearchCriteria.SortField.FRIST
         }
     )
 
-    fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, oppgaverQueryParams: OppgaverQueryParams) =
+    fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) =
         KlagebehandlingerSearchCriteria(
-            typer = oppgaverQueryParams.typer.map { Sakstype.fromNavn(it) },
-            temaer = oppgaverQueryParams.temaer.map { Tema.fromNavn(it) },
-            hjemler = oppgaverQueryParams.hjemler,
+            typer = queryParams.typer.map { Sakstype.of(it) },
+            temaer = queryParams.temaer.map { Tema.of(it) },
+            hjemler = queryParams.hjemler,
             offset = 0,
             limit = 1,
             erTildeltSaksbehandler = false,
-            enhetsnr = validateAndGetEnhetId(navIdent, oppgaverQueryParams.enhetId),
+            enhetsnr = validateAndGetEnhetId(navIdent, queryParams.enhetId),
             fristFom = LocalDate.now().minusYears(15),
             fristTom = LocalDate.now().minusDays(1),
         )
