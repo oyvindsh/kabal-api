@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class OppgaveFacade(
     private val oppgaveMapper: OppgaveMapper,
-    private val klagebehandlingMapper: KlagebehandlingMapper
+    private val klagebehandlingMapper: KlagebehandlingMapper,
     private val oppgaveKopiService: OppgaveKopiService,
     private val elasticsearchRepository: ElasticsearchRepository
 ) {
