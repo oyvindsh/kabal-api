@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.OppgaveKopiService
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class OppgaveFacade(
     private val oppgaveMapper: OppgaveMapper,
+    private val klagebehandlingMapper: KlagebehandlingMapper
     private val oppgaveKopiService: OppgaveKopiService,
     private val elasticsearchRepository: ElasticsearchRepository
 ) {
@@ -28,7 +30,7 @@ class OppgaveFacade(
         try {
             klagebehandlingerOgMottak.forEach {
                 elasticsearchRepository.save(
-                    oppgaveMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it)
+                    klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it)
                 )
             }
         } catch (e: Exception) {

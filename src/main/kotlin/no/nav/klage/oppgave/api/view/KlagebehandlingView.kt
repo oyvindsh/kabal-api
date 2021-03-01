@@ -9,7 +9,7 @@ data class KlagebehandlingView(
     val klageInnsendtdato: LocalDate?,
     val fraNAVEnhet: String?,
     val mottattFoersteinstans: LocalDate? = null,
-    val foedselsnummer: String,
+    val foedselsnummer: String?,
     val tema: String,
     val sakstype: String,
     val mottatt: LocalDate,

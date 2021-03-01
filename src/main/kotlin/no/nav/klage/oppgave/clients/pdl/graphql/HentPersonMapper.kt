@@ -20,11 +20,11 @@ class HentPersonMapper {
         secureLogger.debug("pdl returned {}", pdlPerson)
         return Person(
             foedselsnr = fnr,
-            fornavn = pdlPerson.navn.firstOrNull()?.fornavn ?: "mangler",
+            fornavn = pdlPerson.navn.firstOrNull()?.fornavn,
             mellomnavn = pdlPerson.navn.firstOrNull()?.mellomnavn,
-            etternavn = pdlPerson.navn.firstOrNull()?.etternavn ?: "mangler",
+            etternavn = pdlPerson.navn.firstOrNull()?.etternavn,
             navn = sammensattNavn(pdlPerson.navn.firstOrNull()),
-            beskyttelsesbehov = pdlPerson.adressebeskyttelse?.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
+            beskyttelsesbehov = pdlPerson.adressebeskyttelse.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
         )
     }
 
@@ -36,21 +36,17 @@ class HentPersonMapper {
         return people.map {
             Person(
                 foedselsnr = it.ident,
-                fornavn = it.person?.navn?.firstOrNull()?.fornavn ?: "mangler",
+                fornavn = it.person?.navn?.firstOrNull()?.fornavn,
                 mellomnavn = it.person?.navn?.firstOrNull()?.mellomnavn,
-                etternavn = it.person?.navn?.firstOrNull()?.etternavn ?: "mangler",
+                etternavn = it.person?.navn?.firstOrNull()?.etternavn,
                 navn = sammensattNavn(it.person?.navn?.firstOrNull()),
                 beskyttelsesbehov = it.person?.adressebeskyttelse?.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
             )
         }
     }
 
-    private fun sammensattNavn(navn: PdlPerson.Navn?): String =
-        if (navn == null) {
-            "mangler navn"
-        } else {
-            "${navn.fornavn} ${navn.etternavn}"
-        }
+    private fun sammensattNavn(navn: PdlPerson.Navn?): String? =
+        navn?.let { "${it.fornavn} ${it.etternavn}" }
 
     fun PdlPerson.Adressebeskyttelse.GraderingType.mapToBeskyttelsesbehov(): Beskyttelsesbehov? =
         when (this) {
