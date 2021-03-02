@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.util.getLogger
@@ -65,7 +65,7 @@ open class ElasticsearchRepository(
         esTemplate.save(klagebehandling)
     }
 
-    open fun findByCriteria(criteria: OppgaverSearchCriteria): SearchHits<EsKlagebehandling> {
+    open fun findByCriteria(criteria: KlagebehandlingerSearchCriteria): SearchHits<EsKlagebehandling> {
         val query: Query = NativeSearchQueryBuilder()
             .withPageable(toPageable(criteria))
             .withSort(SortBuilders.fieldSort(sortField(criteria)).order(mapOrder(criteria.order)))
@@ -76,37 +76,37 @@ open class ElasticsearchRepository(
         return searchHits
     }
 
-    open fun countByCriteria(criteria: OppgaverSearchCriteria): Int {
+    open fun countByCriteria(criteria: KlagebehandlingerSearchCriteria): Int {
         val query = NativeSearchQueryBuilder()
             .withQuery(criteria.toEsQuery())
             .build()
         return esTemplate.count(query, IndexCoordinates.of("klagebehandling")).toInt()
     }
 
-    private fun sortField(criteria: OppgaverSearchCriteria): String =
-        if (criteria.sortField == OppgaverSearchCriteria.SortField.MOTTATT) {
+    private fun sortField(criteria: KlagebehandlingerSearchCriteria): String =
+        if (criteria.sortField == KlagebehandlingerSearchCriteria.SortField.MOTTATT) {
             "mottattKlageinstans"
         } else {
             "frist"
         }
 
-    private fun mapOrder(order: OppgaverSearchCriteria.Order?): SortOrder {
+    private fun mapOrder(order: KlagebehandlingerSearchCriteria.Order?): SortOrder {
         return order.let {
             when (it) {
                 null -> SortOrder.ASC
-                OppgaverSearchCriteria.Order.ASC -> SortOrder.ASC
-                OppgaverSearchCriteria.Order.DESC -> SortOrder.DESC
+                KlagebehandlingerSearchCriteria.Order.ASC -> SortOrder.ASC
+                KlagebehandlingerSearchCriteria.Order.DESC -> SortOrder.DESC
             }
         }
     }
 
-    private fun toPageable(criteria: OppgaverSearchCriteria): Pageable {
+    private fun toPageable(criteria: KlagebehandlingerSearchCriteria): Pageable {
         val page: Int = (criteria.offset / criteria.limit)
         val size: Int = criteria.limit
         return PageRequest.of(page, size)
     }
 
-    private fun OppgaverSearchCriteria.toEsQuery(): QueryBuilder {
+    private fun KlagebehandlingerSearchCriteria.toEsQuery(): QueryBuilder {
 
         val baseQuery: BoolQueryBuilder = QueryBuilders.boolQuery()
         logger.debug("Search criteria: {}", this)
@@ -124,7 +124,7 @@ open class ElasticsearchRepository(
             filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
         }
 
-        if (statuskategori == OppgaverSearchCriteria.Statuskategori.AAPEN) {
+        if (statuskategori == KlagebehandlingerSearchCriteria.Statuskategori.AAPEN) {
             baseQuery.mustNot(QueryBuilders.existsQuery("avsluttet"))
         } else {
             baseQuery.must(QueryBuilders.existsQuery("avsluttet"))

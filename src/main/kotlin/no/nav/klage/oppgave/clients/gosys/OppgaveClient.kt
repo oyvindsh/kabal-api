@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.clients.gosys
 import brave.Tracer
 import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_FEILUTBETALING
 import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
 import no.nav.klage.oppgave.service.TokenService
@@ -39,7 +39,7 @@ class OppgaveClient(
     }
 
     @Retryable
-    fun getOppgaveCount(oppgaveSearchCriteria: OppgaverSearchCriteria): Int {
+    fun getOppgaveCount(oppgaveSearchCriteria: KlagebehandlingerSearchCriteria): Int {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
@@ -53,7 +53,7 @@ class OppgaveClient(
     }
 
     @Retryable
-    fun getOneSearchPage(oppgaveSearchCriteria: OppgaverSearchCriteria): OppgaveResponse {
+    fun getOneSearchPage(oppgaveSearchCriteria: KlagebehandlingerSearchCriteria): OppgaveResponse {
         return logTimingAndWebClientResponseException("getOneSearchPage") {
             oppgaveWebClient.get()
                 .uri { uriBuilder -> oppgaveSearchCriteria.buildUri(uriBuilder) }
@@ -66,7 +66,7 @@ class OppgaveClient(
         }
     }
 
-    private fun OppgaverSearchCriteria.buildUri(origUriBuilder: UriBuilder): URI {
+    private fun KlagebehandlingerSearchCriteria.buildUri(origUriBuilder: UriBuilder): URI {
         logger.debug("Search criteria: {}", this)
         val uriBuilder = origUriBuilder
             .queryParam("statuskategori", statuskategori)
@@ -119,7 +119,7 @@ class OppgaveClient(
 
         //FRIST is default in oppgave-api.
 //        uriBuilder.queryParam("sorteringsfelt", orderBy ?: "frist")
-        uriBuilder.queryParam("sorteringsrekkefolge", order ?: OppgaverSearchCriteria.Order.ASC)
+        uriBuilder.queryParam("sorteringsrekkefolge", order ?: KlagebehandlingerSearchCriteria.Order.ASC)
 
         if (hjemler.isNotEmpty()) {
             uriBuilder.queryParam("metadatanokkel", HJEMMEL)
