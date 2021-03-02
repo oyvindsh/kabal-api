@@ -72,7 +72,7 @@ class SafRestClient(
     fun <T> runWithTimingAndLogging(block: () -> T): T {
         val start = System.currentTimeMillis()
         try {
-            return block.invoke().let { secureLogger.debug("Received Dokument: $it"); it }
+            return block.invoke()
         } finally {
             val end = System.currentTimeMillis()
             logger.info("Time it took to call saf: ${end - start} millis")

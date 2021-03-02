@@ -106,7 +106,7 @@ class DokumentController(
 
     @ResponseBody
     @GetMapping("/klagebehandlinger/{behandlingsid}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}")
-    fun getJournalpostContent(
+    fun getArkivertDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
         @ApiParam(value = "Id til journalpost")
@@ -117,7 +117,7 @@ class DokumentController(
     ): ResponseEntity<ByteArray> {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         logger.debug(
-            "Get getJournalpostContent is requested. behandlingsid: {} - journalpostId: {} - dokumentInfoId: {}",
+            "Get getArkivertDokument is requested. behandlingsid: {} - journalpostId: {} - dokumentInfoId: {}",
             klagebehandlingId,
             journalpostId,
             dokumentInfoId
