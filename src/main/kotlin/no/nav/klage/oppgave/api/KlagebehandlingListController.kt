@@ -92,7 +92,7 @@ class KlagebehandlingListController(
         value = "Hent antall utildelte klagebehandlinger der fristen gått ut",
         notes = "Teller opp alle utildelte klagebehandlinger der fristen gått ut."
     )
-    @GetMapping("/ansatte/{navIdent}/antallutgaattefrister", produces = ["application/json"])
+    @GetMapping("/ansatte/{navIdent}/antallklagebehandlingermedutgaattefrister", produces = ["application/json"])
     fun getAntallUtgaatteFrister(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
