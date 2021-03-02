@@ -4,6 +4,7 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
-@Transactional
 class KlagebehandlingFacade(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val klagebehandlingService: KlagebehandlingService,
@@ -30,6 +30,7 @@ class KlagebehandlingFacade(
         private val securelogger = getSecureLogger()
     }
 
+    @Transactional(readOnly = true)
     fun getKlagebehandling(klagebehandlingId: UUID): KlagebehandlingView {
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
             klagebehandlingService.getKlagebehandling(
@@ -66,8 +67,10 @@ class KlagebehandlingFacade(
         )
     }
 
+    @Transactional
     fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
         klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
+            .also { indexKlagebehandling(it) }
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {
@@ -85,18 +88,36 @@ class KlagebehandlingFacade(
         }
     }
 
+    @Transactional(readOnly = true)
     fun getKvalitetsvurdering(klagebehandlingId: UUID): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.getKlagebehandling(klagebehandlingId)
         )
     }
 
+    @Transactional
     fun updateKvalitetsvurdering(
         klagebehandlingId: UUID,
         kvalitetsvurderingInput: KvalitetsvurderingInput
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.updateKvalitetsvurdering(klagebehandlingId, kvalitetsvurderingInput)
+                .also { indexKlagebehandling(it) }
         )
+    }
+
+    fun indexKlagebehandling(klagebehandling: Klagebehandling) {
+        try {
+            elasticsearchRepository.save(
+                klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
+            )
+        } catch (e: Exception) {
+            if (e.message?.contains("version_conflict_engine_exception") == true) {
+                logger.info("Later version already indexed, ignoring this..")
+            } else {
+                logger.error("Unable to index klagebehandling ${klagebehandling.id}, see securelogs for details")
+                securelogger.error("Unable to index klagebehandling ${klagebehandling.id}", e)
+            }
+        }
     }
 }

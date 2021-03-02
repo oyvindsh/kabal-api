@@ -203,9 +203,10 @@ class KlagebehandlingService(
             }
             ?.first
 
-    fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
+    fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?): Klagebehandling {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         klagebehandling.tildeltSaksbehandlerident = saksbehandlerIdent
         klagebehandling.modified = LocalDateTime.now()
+        return klagebehandling
     }
 }
