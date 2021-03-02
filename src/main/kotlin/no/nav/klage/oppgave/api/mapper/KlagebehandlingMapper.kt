@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -26,12 +25,8 @@ class KlagebehandlingMapper(
         private val secureLogger = getSecureLogger()
     }
 
-    fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandlingOgMottak: Pair<Klagebehandling, Mottak>): EsKlagebehandling {
-
-        val klagebehandling = klagebehandlingOgMottak.first
-        //TODO: Nå bruker jeg ikke mottak her, så jeg kunne endret Pair<Klagebehandling, Mottak> til å bare være Klagebehandling?
-        //TODO: Er det noe vi skal indeksere opp som kommer fra Mottak? Beskrivelse f.eks?
-
+    fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling: Klagebehandling): EsKlagebehandling {
+        
         val personInfo = klagebehandling.foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
         val erStrengtFortrolig = personInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
