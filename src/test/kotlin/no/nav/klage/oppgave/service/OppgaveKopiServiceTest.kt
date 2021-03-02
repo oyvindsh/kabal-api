@@ -16,7 +16,12 @@ import java.time.LocalDateTime
 @ActiveProfiles("local")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(OppgaveKopiService::class, KlagebehandlingService::class, HjemmelService::class)
+@Import(
+    OppgaveKopiService::class,
+    KlagebehandlingService::class,
+    HjemmelService::class,
+    OverfoeringsdataParserService::class
+)
 class OppgaveKopiServiceTest {
 
     @MockkBean(relaxed = true)

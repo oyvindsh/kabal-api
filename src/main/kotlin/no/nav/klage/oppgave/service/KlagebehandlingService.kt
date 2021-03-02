@@ -12,7 +12,6 @@ import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,7 +21,8 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val mottakRepository: MottakRepository,
     private val hjemmelService: HjemmelService,
-    private val tilgangService: TilgangService
+    private val tilgangService: TilgangService,
+    private val overfoeringsdataParserService: OverfoeringsdataParserService
 ) {
 
     companion object {
@@ -78,6 +78,8 @@ class KlagebehandlingService(
         requireNotNull(lastVersjon.ident)
         requireNotNull(lastVersjon.behandlingstype)
 
+        val overfoeringsdata = overfoeringsdataParserService.parseBeskrivelse(lastVersjon.beskrivelse ?: "")
+
         val createdMottak = mottakRepository.save(
             Mottak(
                 tema = mapTema(lastVersjon.tema),
@@ -87,13 +89,13 @@ class KlagebehandlingService(
                 organisasjonsnummer = mapOrganisasjonsnummer(lastVersjon.ident),
                 hjemmelListe = mapHjemler(lastVersjon),
                 avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv
-                    ?: lastVersjon.opprettetAv,
+                    ?: overfoeringsdata?.saksbehandlerWhoMadeTheChange,
                 avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr
-                    ?: lastVersjon.opprettetAvEnhetsnr,
+                    ?: overfoeringsdata?.enhetOverfoertFra ?: lastVersjon.opprettetAvEnhetsnr,
                 oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr
-                    ?: lastVersjon.tildeltEnhetsnr,
+                    ?: overfoeringsdata?.enhetOverfoertTil ?: lastVersjon.tildeltEnhetsnr,
                 oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate()
-                    ?: lastVersjon.endretTidspunkt?.toLocalDate(),
+                    ?: overfoeringsdata?.datoForOverfoering,
                 fristFraFoersteinstans = lastVersjon.fristFerdigstillelse,
                 beskrivelse = lastVersjon.beskrivelse,
                 status = lastVersjon.status.name,
@@ -121,7 +123,7 @@ class KlagebehandlingService(
                 mottattFoersteinstans = null,
                 avsenderEnhetFoersteinstans = createdMottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = createdMottak.avsenderSaksbehandlerident,
-                mottattKlageinstans = createdMottak.oversendtKaDato ?: LocalDate.now(),
+                mottattKlageinstans = createdMottak.oversendtKaDato,
                 startet = null,
                 avsluttet = null,
                 frist = createdMottak.fristFraFoersteinstans,
