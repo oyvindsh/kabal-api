@@ -123,7 +123,7 @@ class DokumentController(
             dokumentInfoId
         )
 
-        val arkivertDokument = dokumentService.getFile(journalpostId, dokumentInfoId)
+        val arkivertDokument = dokumentService.getArkivertDokument(journalpostId, dokumentInfoId)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = arkivertDokument.contentType

@@ -13,7 +13,6 @@ import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -28,7 +27,6 @@ class DokumentService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
         private val dokumentMapper = DokumentMapper()
     }
 
@@ -44,9 +42,6 @@ class DokumentService(
                 klagebehandling.saksdokumenter.map { it.referanse }.toHashSet()
             val dokumentoversiktBruker: DokumentoversiktBruker =
                 safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
-
-            secureLogger.debug("Journalposter: {}", dokumentoversiktBruker.journalposter)
-
             return DokumenterResponse(
                 dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
                     dokumentMapper.mapJournalpost(
@@ -109,8 +104,8 @@ class DokumentService(
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
-    fun getFile(journalpostId: String, dokumentInfoId: String, format: String = "ARKIV"): ArkivertDokument {
-        return safRestClient.getDokument(dokumentInfoId, journalpostId, format)
+    fun getArkivertDokument(journalpostId: String, dokumentInfoId: String): ArkivertDokument {
+        return safRestClient.getDokument(dokumentInfoId, journalpostId)
     }
 
 }
