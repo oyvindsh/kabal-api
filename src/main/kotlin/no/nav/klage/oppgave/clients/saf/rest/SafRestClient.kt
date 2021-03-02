@@ -50,7 +50,7 @@ class SafRestClient(
                         val type = it.headers.contentType
                         ArkivertDokument(
                             bytes = it.body ?: throw RuntimeException("no document data"),
-                            contentType = type)
+                            contentType = type ?: throw RuntimeException("no content type"))
                     }
                     .block() ?: throw RuntimeException("no document data returned")
             }
