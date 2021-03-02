@@ -7,11 +7,8 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
 
 
 @Component
@@ -47,8 +44,13 @@ class SafRestClient(
                         "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
                     )
                     .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
-                    .exchangeToMono {
-                        it.wrapAsMono()
+                    .retrieve()
+                    .toEntity(ByteArray::class.java)
+                    .map {
+                        val type = it.headers.contentType
+                        ArkivertDokument(
+                            bytes = it.body ?: throw RuntimeException("no document data"),
+                            contentType = type)
                     }
                     .block() ?: throw RuntimeException("no document data returned")
             }
@@ -65,14 +67,6 @@ class SafRestClient(
             logger.warn("Got a 404 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
             throw notFound
         }
-    }
-
-    private fun ClientResponse.wrapAsMono(): Mono<ArkivertDokument> {
-        val type = this.headers().header("Content-Type")
-        val document = ArkivertDokument(
-            bytes = this.bodyToMono<ByteArray>().block() ?: throw RuntimeException("no body found"),
-            contentType = type.first())
-        return Mono.just(document)
     }
 
     fun <T> runWithTimingAndLogging(block: () -> T): T {

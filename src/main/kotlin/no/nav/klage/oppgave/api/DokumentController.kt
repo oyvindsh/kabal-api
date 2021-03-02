@@ -13,7 +13,6 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -127,7 +126,7 @@ class DokumentController(
         val arkivertDokument = dokumentService.getFile(journalpostId, dokumentInfoId)
 
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf(arkivertDokument.contentType)
+        responseHeaders.contentType = arkivertDokument.contentType
         responseHeaders.add("Content-Disposition", "inline")
         return ResponseEntity(
             arkivertDokument.bytes,
