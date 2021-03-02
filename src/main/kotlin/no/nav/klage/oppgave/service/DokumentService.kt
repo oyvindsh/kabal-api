@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.Dokumentvariant
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
@@ -108,7 +109,7 @@ class DokumentService(
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
-    fun getFile(journalpostId: String, dokumentInfoId: String, format: String = "ARKIV"): ByteArray {
+    fun getFile(journalpostId: String, dokumentInfoId: String, format: String = "ARKIV"): ArkivertDokument {
         return safRestClient.getDokument(dokumentInfoId, journalpostId, format)
     }
 

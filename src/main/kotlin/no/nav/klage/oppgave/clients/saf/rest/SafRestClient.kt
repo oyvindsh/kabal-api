@@ -7,9 +7,11 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Mono
 
 
 @Component
@@ -30,7 +32,7 @@ class SafRestClient(
         dokumentInfoId: String,
         journalpostId: String,
         variantFormat: String
-    ): ByteArray {
+    ): ArkivertDokument {
         return try {
             runWithTimingAndLogging {
                 safWebClient.get()
@@ -45,9 +47,10 @@ class SafRestClient(
                         "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
                     )
                     .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
-                    .retrieve()
-                    .bodyToMono<ByteArray>()
-                    .block()
+                    .exchangeToMono {
+                        it.wrapAsMono()
+                    }
+                    .block() ?: throw RuntimeException("no document data returned")
             }
         } catch (badRequest: WebClientResponseException.BadRequest) {
             logger.warn("Got a 400 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
@@ -64,7 +67,13 @@ class SafRestClient(
         }
     }
 
-    private fun String.wrapAsDokument(): ArkivertDokument = ArkivertDokument(this)
+    private fun ClientResponse.wrapAsMono(): Mono<ArkivertDokument> {
+        val type = this.headers().header("Content-Type")
+        val document = ArkivertDokument(
+            bytes = this.bodyToMono<ByteArray>().block() ?: throw RuntimeException("no body found"),
+            contentType = type.first())
+        return Mono.just(document)
+    }
 
     fun <T> runWithTimingAndLogging(block: () -> T): T {
         val start = System.currentTimeMillis()

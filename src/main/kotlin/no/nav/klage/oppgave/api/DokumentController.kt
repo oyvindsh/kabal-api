@@ -124,13 +124,13 @@ class DokumentController(
             dokumentInfoId
         )
 
-        val content = dokumentService.getFile(journalpostId, dokumentInfoId)
+        val arkivertDokument = dokumentService.getFile(journalpostId, dokumentInfoId)
 
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "file.pdf")
+        responseHeaders.contentType = MediaType.valueOf(arkivertDokument.contentType)
+        responseHeaders.add("Content-Disposition", "inline")
         return ResponseEntity(
-            content,
+            arkivertDokument.bytes,
             responseHeaders,
             HttpStatus.OK
         )
