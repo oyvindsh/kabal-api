@@ -6,6 +6,8 @@ import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.Dokumentvariant
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
+import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
@@ -19,7 +21,7 @@ import java.util.*
 @Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
-    private val safRestClient: SafGraphQlClient,
+    private val safRestClient: SafRestClient,
     private val klagebehandlingRepository: KlagebehandlingRepository,
 ) {
     companion object {
@@ -100,6 +102,10 @@ class DokumentService(
             logger.warn("Unable to find journalpost $journalpostId", e)
             null
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
+    }
+
+    fun getArkivertDokument(journalpostId: String, dokumentInfoId: String): ArkivertDokument {
+        return safRestClient.getDokument(dokumentInfoId, journalpostId)
     }
 
 }

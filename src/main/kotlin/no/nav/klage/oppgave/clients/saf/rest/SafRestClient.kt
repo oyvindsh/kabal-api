@@ -9,7 +9,6 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import org.springframework.web.reactive.function.client.bodyToMono
 
 
 @Component
@@ -29,7 +28,7 @@ class SafRestClient(
     fun getDokument(
         dokumentInfoId: String,
         journalpostId: String,
-        variantFormat: String
+        variantFormat: String = "ARKIV"
     ): ArkivertDokument {
         return try {
             runWithTimingAndLogging {
@@ -46,8 +45,14 @@ class SafRestClient(
                     )
                     .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
                     .retrieve()
-                    .bodyToMono<String>()
-                    .block().wrapAsDokument() ?: throw RuntimeException("getDokument failed")
+                    .toEntity(ByteArray::class.java)
+                    .map {
+                        val type = it.headers.contentType
+                        ArkivertDokument(
+                            bytes = it.body ?: throw RuntimeException("no document data"),
+                            contentType = type ?: throw RuntimeException("no content type"))
+                    }
+                    .block() ?: throw RuntimeException("no document data returned")
             }
         } catch (badRequest: WebClientResponseException.BadRequest) {
             logger.warn("Got a 400 fetching dokument with journalpostId $journalpostId, dokumentInfoId $dokumentInfoId and variantFormat $variantFormat")
@@ -64,12 +69,10 @@ class SafRestClient(
         }
     }
 
-    private fun String.wrapAsDokument(): ArkivertDokument = ArkivertDokument(this)
-
     fun <T> runWithTimingAndLogging(block: () -> T): T {
         val start = System.currentTimeMillis()
         try {
-            return block.invoke().let { secureLogger.debug("Received Dokument: $it"); it }
+            return block.invoke()
         } finally {
             val end = System.currentTimeMillis()
             logger.info("Time it took to call saf: ${end - start} millis")
