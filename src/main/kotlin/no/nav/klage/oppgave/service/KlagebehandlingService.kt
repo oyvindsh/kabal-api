@@ -43,6 +43,9 @@ class KlagebehandlingService(
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }
 
+    fun getKvalitetsvurdering(klagebehandlingId: UUID): Kvalitetsvurdering? =
+        klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }.kvalitetsvurdering
+
     fun fetchMottakForOppgaveKopi(oppgaveId: Long): List<Mottak> =
         mottakRepository.findByOppgavereferanserOppgaveId(oppgaveId)
 
@@ -132,7 +135,7 @@ class KlagebehandlingService(
                 mottakId = createdMottak.id,
                 vedtak = null,
                 kvalitetsvurdering = null,
-                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
+                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
                 saksdokumenter = if (createdMottak.journalpostId != null) {
                     mutableListOf(Saksdokument(referanse = createdMottak.journalpostId!!))
                 } else {

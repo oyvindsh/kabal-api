@@ -12,7 +12,6 @@ import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -30,7 +29,6 @@ class KlagebehandlingFacade(
         private val securelogger = getSecureLogger()
     }
 
-    @Transactional(readOnly = true)
     fun getKlagebehandling(klagebehandlingId: UUID): KlagebehandlingView {
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
             klagebehandlingService.getKlagebehandling(
@@ -67,7 +65,6 @@ class KlagebehandlingFacade(
         )
     }
 
-    @Transactional
     fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
         klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
             .also { indexKlagebehandling(it) }
@@ -88,21 +85,19 @@ class KlagebehandlingFacade(
         }
     }
 
-    @Transactional(readOnly = true)
     fun getKvalitetsvurdering(klagebehandlingId: UUID): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
-            klagebehandlingService.getKlagebehandling(klagebehandlingId)
+            klagebehandlingService.getKvalitetsvurdering(klagebehandlingId)
         )
     }
 
-    @Transactional
     fun updateKvalitetsvurdering(
         klagebehandlingId: UUID,
         kvalitetsvurderingInput: KvalitetsvurderingInput
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.updateKvalitetsvurdering(klagebehandlingId, kvalitetsvurderingInput)
-                .also { indexKlagebehandling(it) }
+                .also { indexKlagebehandling(it) }.kvalitetsvurdering
         )
     }
 
