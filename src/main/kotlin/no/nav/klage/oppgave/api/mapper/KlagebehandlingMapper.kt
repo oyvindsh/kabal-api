@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.Kvalitetsvurdering
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -26,7 +27,7 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling: Klagebehandling): EsKlagebehandling {
-        
+
         val personInfo = klagebehandling.foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
         val erStrengtFortrolig = personInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
@@ -108,7 +109,7 @@ class KlagebehandlingMapper(
         )
     }
 
-    private fun hjemmelToHjemmelView(hjemler: List<Hjemmel>): List<KlagebehandlingView.Hjemmel> {
+    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<KlagebehandlingView.Hjemmel> {
         return hjemler.map {
             KlagebehandlingView.Hjemmel(
                 kapittel = it.kapittel,
@@ -117,17 +118,17 @@ class KlagebehandlingMapper(
                 bokstav = it.bokstav,
                 original = it.original
             )
-        }
+        }.sortedBy { it.original }
     }
 
-    fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {
+    fun mapKlagebehandlingToKvalitetsvurderingView(kvalitetsvurdering: Kvalitetsvurdering?): KvalitetsvurderingView {
         return KvalitetsvurderingView(
-            grunn = klagebehandling.kvalitetsvurdering?.grunn?.id,
-            eoes = klagebehandling.kvalitetsvurdering?.eoes?.id,
-            raadfoertMedLege = klagebehandling.kvalitetsvurdering?.raadfoertMedLege?.id,
-            internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
-            sendTilbakemelding = klagebehandling.kvalitetsvurdering?.sendTilbakemelding,
-            tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding
+            grunn = kvalitetsvurdering?.grunn?.id,
+            eoes = kvalitetsvurdering?.eoes?.id,
+            raadfoertMedLege = kvalitetsvurdering?.raadfoertMedLege?.id,
+            internVurdering = kvalitetsvurdering?.internVurdering,
+            sendTilbakemelding = kvalitetsvurdering?.sendTilbakemelding,
+            tilbakemelding = kvalitetsvurdering?.tilbakemelding
         )
     }
 }

@@ -54,10 +54,10 @@ class Klagebehandling(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
     var kvalitetsvurdering: Kvalitetsvurdering? = null,
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val hjemler: MutableList<Hjemmel> = mutableListOf(),
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val saksdokumenter: MutableList<Saksdokument> = mutableListOf(),
     @Column(name = "created")
