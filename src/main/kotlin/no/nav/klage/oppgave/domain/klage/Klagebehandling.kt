@@ -59,7 +59,7 @@ class Klagebehandling(
     )
     val hjemler: MutableList<Hjemmel> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = true)
     val vedtak: MutableList<Vedtak> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
