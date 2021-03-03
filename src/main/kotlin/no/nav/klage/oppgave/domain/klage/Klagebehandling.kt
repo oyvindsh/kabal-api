@@ -59,7 +59,7 @@ class Klagebehandling(
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val saksdokumenter: MutableList<Saksdokument> = mutableListOf(),
+    val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
