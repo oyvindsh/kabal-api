@@ -172,7 +172,7 @@ class KlagebehandlingRepositoryTest {
                     original = "8-5"
                 )
             ),
-            saksdokumenter = mutableListOf(
+            saksdokumenter = mutableSetOf(
                 Saksdokument(referanse = "REF1"),
                 Saksdokument(referanse = "REF2"),
             ),
@@ -218,7 +218,7 @@ class KlagebehandlingRepositoryTest {
                     original = "8-5"
                 )
             ),
-            saksdokumenter = mutableListOf(
+            saksdokumenter = mutableSetOf(
                 Saksdokument(referanse = "REF1"),
                 Saksdokument(referanse = "REF2"),
             ),
