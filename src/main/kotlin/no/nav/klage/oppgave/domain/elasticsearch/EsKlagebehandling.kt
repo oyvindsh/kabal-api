@@ -35,7 +35,7 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Date, format = DateFormat.date)
     val mottattFoersteinstans: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
-    val mottattKlageinstans: LocalDate,
+    val mottattKlageinstans: LocalDate?,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val frist: LocalDate?,
     @Field(type = FieldType.Date, format = DateFormat.date)
