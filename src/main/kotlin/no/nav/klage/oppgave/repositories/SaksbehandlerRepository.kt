@@ -81,7 +81,7 @@ class SaksbehandlerRepository(
             EnhetMedLovligeTemaer(
                 enhet.enhetId,
                 enhet.navn,
-                enhet.fagomrader.mapNotNull { mapTemaToTemaName(it) })
+                enhet.temaer.mapNotNull { mapTemaToTemaName(it) })
         })
 
     private fun mapTemaToTemaName(tema: String): Tema? =
