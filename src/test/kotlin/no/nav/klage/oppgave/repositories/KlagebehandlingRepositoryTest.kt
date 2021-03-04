@@ -51,7 +51,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableSetOf(
+            hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -107,7 +107,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableSetOf(
+            hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -129,7 +129,7 @@ class KlagebehandlingRepositoryTest {
                 created = LocalDateTime.now(),
                 modified = LocalDateTime.now()
             ),
-            vedtak = mutableListOf(Vedtak(
+            vedtak = mutableSetOf(Vedtak(
                 utfall = Utfall.DELVIS_MEDHOLD,
                 created = LocalDateTime.now(),
                 modified = LocalDateTime.now()
@@ -143,7 +143,7 @@ class KlagebehandlingRepositoryTest {
         testEntityManager.clear()
 
         val foundklage = klagebehandlingRepository.findById(klage.id).get()
-        assertThat(foundklage.vedtak[0].utfall).isEqualTo(Utfall.DELVIS_MEDHOLD)
+        assertThat(foundklage.vedtak.first().utfall).isEqualTo(Utfall.DELVIS_MEDHOLD)
         assertThat(foundklage.kvalitetsvurdering?.raadfoertMedLege).isEqualTo(RaadfoertMedLege.MANGLER)
         assertThat(foundklage.hjemler.first().original).isEqualTo("8-5")
     }
@@ -167,7 +167,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableSetOf(
+            hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -213,7 +213,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableSetOf(
+            hjemler = mutableListOf(
                 Hjemmel(
                     original = "8-5"
                 )

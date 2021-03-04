@@ -109,7 +109,7 @@ class KlagebehandlingMapper(
         )
     }
 
-    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<KlagebehandlingView.Hjemmel> {
+    private fun hjemmelToHjemmelView(hjemler: List<Hjemmel>): List<KlagebehandlingView.Hjemmel> {
         return hjemler.map {
             KlagebehandlingView.Hjemmel(
                 kapittel = it.kapittel,
