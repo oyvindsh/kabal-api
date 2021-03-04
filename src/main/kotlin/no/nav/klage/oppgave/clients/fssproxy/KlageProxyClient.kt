@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients.fssproxy
 
-import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.ROLLER_CACHE
+import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration.Companion.ROLLER_CACHE
 import no.nav.klage.oppgave.service.TokenService
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
