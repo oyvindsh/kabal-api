@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.clients.axsys
 
 import brave.Tracer
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
-import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.TILGANGER_CACHE
 import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -26,10 +25,10 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
     lateinit var applicationName: String
 
     @Retryable
-    @Cacheable(TILGANGER_CACHE)
+    //@Cacheable(TILGANGER_CACHE)
     fun getTilgangerForSaksbehandler(navIdent: String): Tilganger {
         logger.debug("Fetching tilganger for saksbehandler with Nav-Ident {}", navIdent)
-
+        
         return try {
             val tilganger = axsysWebClient.get()
                 .uri { uriBuilder ->

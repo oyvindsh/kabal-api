@@ -29,6 +29,8 @@ class AxsysClientConfiguration(
     @Bean
     fun axsysWebClient(): WebClient {
 
+        logger.info("Setting up axsys webclient with base url $axsysServiceURL")
+        
         val httpClient = HttpClient
             .create()
             .wiretap("reactor.netty.http.client.HttpClient", LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL);
