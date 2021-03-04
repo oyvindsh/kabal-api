@@ -17,6 +17,7 @@ class Vedtak(
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "vedtak_hjemmel",
+        schema = "klage",
         joinColumns = [JoinColumn(name = "vedtak_id", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
     )

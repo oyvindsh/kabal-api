@@ -147,7 +147,6 @@ CREATE TABLE klage.mottak_oppgave
 
 CREATE TABLE klage.klagebehandling_hjemmel
 (
-    id                 UUID PRIMARY KEY,
     klagebehandling_id UUID NOT NULL,
     hjemmel_id         UUID NOT NULL,
     CONSTRAINT fk_hjemmel_klagebehandling
@@ -160,7 +159,6 @@ CREATE TABLE klage.klagebehandling_hjemmel
 
 CREATE TABLE klage.vedtak_hjemmel
 (
-    id         UUID PRIMARY KEY,
     vedtak_id  UUID NOT NULL,
     hjemmel_id UUID NOT NULL,
     CONSTRAINT fk_hjemmel_vedtak

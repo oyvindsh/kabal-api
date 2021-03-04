@@ -54,12 +54,13 @@ class Klagebehandling(
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "klagebehandling_hjemmel",
+        schema = "klage",
         joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
     )
     val hjemler: MutableList<Hjemmel> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val vedtak: MutableList<Vedtak> = mutableListOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
