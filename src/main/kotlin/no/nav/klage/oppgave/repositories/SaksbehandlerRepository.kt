@@ -69,7 +69,6 @@ class SaksbehandlerRepository(
 
     fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_EGEN_ANSATT)
 
-    //NB! Returnerer navn på gruppene, ikke objectId'er
     private fun getRoller(ident: String): List<String> = TODO()
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
