@@ -1,6 +1,7 @@
 CREATE TABLE klage.mottak
 (
     id                            UUID PRIMARY KEY,
+    versjon                       BIGINT                   NOT NULL,
     tema_id                       VARCHAR(3)               NOT NULL,
     sakstype_id                   VARCHAR(10)              NOT NULL,
     referanse_id                  TEXT,
@@ -68,7 +69,7 @@ CREATE TABLE klage.klagebehandling
     referanse_id                               TEXT,
     dato_innsendt                              DATE,
     dato_mottatt_foersteinstans                DATE,
-    dato_mottatt_klageinstans                  DATE                     NOT NULL,
+    dato_mottatt_klageinstans                  DATE,
     dato_behandling_startet                    DATE,
     dato_behandling_avsluttet                  DATE,
     frist                                      DATE,

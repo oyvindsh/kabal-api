@@ -35,7 +35,7 @@ class Klagebehandling(
     @Column(name = "avsender_enhet_foersteinstans")
     val avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
-    val mottattKlageinstans: LocalDate,
+    val mottattKlageinstans: LocalDate?,
     @Column(name = "dato_behandling_startet")
     val startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
@@ -59,12 +59,12 @@ class Klagebehandling(
         inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
     )
     val hjemler: MutableList<Hjemmel> = mutableListOf(),
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val vedtak: MutableList<Vedtak> = mutableListOf(),
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    val vedtak: MutableSet<Vedtak> = mutableSetOf(),
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val saksdokumenter: MutableList<Saksdokument> = mutableListOf(),
+    val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")

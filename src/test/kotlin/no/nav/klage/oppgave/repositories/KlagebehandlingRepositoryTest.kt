@@ -51,7 +51,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -107,7 +107,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -145,7 +145,7 @@ class KlagebehandlingRepositoryTest {
         val foundklage = klagebehandlingRepository.findById(klage.id).get()
         assertThat(foundklage.vedtak[0].utfall).isEqualTo(Utfall.DELVIS_MEDHOLD)
         assertThat(foundklage.kvalitetsvurdering?.raadfoertMedLege).isEqualTo(RaadfoertMedLege.MANGLER)
-        assertThat(foundklage.hjemler[0].original).isEqualTo("8-5")
+        assertThat(foundklage.hjemler.first().original).isEqualTo("8-5")
     }
 
     @Test
@@ -167,12 +167,12 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
             ),
-            saksdokumenter = mutableListOf(
+            saksdokumenter = mutableSetOf(
                 Saksdokument(referanse = "REF1"),
                 Saksdokument(referanse = "REF2"),
             ),
@@ -213,12 +213,12 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
             ),
-            saksdokumenter = mutableListOf(
+            saksdokumenter = mutableSetOf(
                 Saksdokument(referanse = "REF1"),
                 Saksdokument(referanse = "REF2"),
             ),

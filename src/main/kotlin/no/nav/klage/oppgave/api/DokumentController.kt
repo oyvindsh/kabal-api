@@ -11,7 +11,9 @@ import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -100,6 +102,37 @@ class DokumentController(
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         dokumentService.connectJournalpostToKlagebehandling(klagebehandlingId, dokumentKnytning.journalpostId)
+    }
+
+    @ResponseBody
+    @GetMapping("/klagebehandlinger/{behandlingsid}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}")
+    fun getArkivertDokument(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable behandlingsid: String,
+        @ApiParam(value = "Id til journalpost")
+        @PathVariable journalpostId: String,
+        @ApiParam(value = "Id til dokumentInfo")
+        @PathVariable dokumentInfoId: String
+
+    ): ResponseEntity<ByteArray> {
+        val klagebehandlingId = parseAndValidate(behandlingsid)
+        logger.debug(
+            "Get getArkivertDokument is requested. behandlingsid: {} - journalpostId: {} - dokumentInfoId: {}",
+            klagebehandlingId,
+            journalpostId,
+            dokumentInfoId
+        )
+
+        val arkivertDokument = dokumentService.getArkivertDokument(journalpostId, dokumentInfoId)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = arkivertDokument.contentType
+        responseHeaders.add("Content-Disposition", "inline")
+        return ResponseEntity(
+            arkivertDokument.bytes,
+            responseHeaders,
+            HttpStatus.OK
+        )
     }
 
     private fun parseAndValidate(behandlingsid: String): UUID =

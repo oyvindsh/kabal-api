@@ -2,10 +2,9 @@ package no.nav.klage.oppgave.api
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
-import no.nav.klage.oppgave.api.view.KlagebehandlingView
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
-import no.nav.klage.oppgave.api.view.OppgaverRespons
-import no.nav.klage.oppgave.domain.OppgaverSearchCriteria
+import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -13,11 +12,9 @@ import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
-@Transactional
 class KlagebehandlingFacade(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val klagebehandlingService: KlagebehandlingService,
@@ -40,19 +37,37 @@ class KlagebehandlingFacade(
         )
     }
 
-    fun searchOppgaver(oppgaverSearchCriteria: OppgaverSearchCriteria): OppgaverRespons {
-        val esResponse = elasticsearchRepository.findByCriteria(oppgaverSearchCriteria)
-        return OppgaverRespons(
+    fun searchKlagebehandlinger(searchCriteria: KlagebehandlingerSearchCriteria): KlagebehandlingerListRespons {
+        val esResponse = elasticsearchRepository.findByCriteria(searchCriteria)
+        return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
-            oppgaver = oppgaveMapper.mapEsKlagebehandlingerToView(
+            klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
-                oppgaverSearchCriteria.isProjectionUtvidet()
+                searchCriteria.isProjectionUtvidet()
             )
         )
     }
 
-    fun assignOppgave(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
-        klagebehandlingService.assignOppgave(klagebehandlingId, saksbehandlerIdent)
+    fun searchOppgaver(klagebehandlingerSearchCriteria: KlagebehandlingerSearchCriteria): OppgaverRespons {
+        val esResponse = elasticsearchRepository.findByCriteria(klagebehandlingerSearchCriteria)
+        return OppgaverRespons(
+            antallTreffTotalt = esResponse.totalHits.toInt(),
+            oppgaver = oppgaveMapper.mapEsKlagebehandlingerToView(
+                esResponse.searchHits.map { it.content },
+                klagebehandlingerSearchCriteria.isProjectionUtvidet()
+            )
+        )
+    }
+
+    fun countOppgaver(klagebehandlingerSearchCriteria: KlagebehandlingerSearchCriteria): AntallUtgaatteFristerResponse {
+        return AntallUtgaatteFristerResponse(
+            antall = elasticsearchRepository.countByCriteria(klagebehandlingerSearchCriteria)
+        )
+    }
+
+    fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
+        klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
+            .also { indexKlagebehandling(it) }
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {
@@ -72,7 +87,7 @@ class KlagebehandlingFacade(
 
     fun getKvalitetsvurdering(klagebehandlingId: UUID): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
-            klagebehandlingService.getKlagebehandling(klagebehandlingId)
+            klagebehandlingService.getKvalitetsvurdering(klagebehandlingId)
         )
     }
 
@@ -82,6 +97,22 @@ class KlagebehandlingFacade(
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.updateKvalitetsvurdering(klagebehandlingId, kvalitetsvurderingInput)
+                .also { indexKlagebehandling(it) }.kvalitetsvurdering
         )
+    }
+
+    fun indexKlagebehandling(klagebehandling: Klagebehandling) {
+        try {
+            elasticsearchRepository.save(
+                klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
+            )
+        } catch (e: Exception) {
+            if (e.message?.contains("version_conflict_engine_exception") == true) {
+                logger.info("Later version already indexed, ignoring this..")
+            } else {
+                logger.error("Unable to index klagebehandling ${klagebehandling.id}, see securelogs for details")
+                securelogger.error("Unable to index klagebehandling ${klagebehandling.id}", e)
+            }
+        }
     }
 }

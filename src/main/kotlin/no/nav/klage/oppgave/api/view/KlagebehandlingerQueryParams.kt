@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
-data class OppgaverQueryParams(
+data class KlagebehandlingerQueryParams(
     var typer: List<String> = emptyList(),
     var temaer: List<String> = emptyList(),
     var hjemler: List<String> = emptyList(),

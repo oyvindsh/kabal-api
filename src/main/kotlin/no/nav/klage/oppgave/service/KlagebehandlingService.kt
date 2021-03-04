@@ -12,7 +12,6 @@ import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,7 +21,8 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val mottakRepository: MottakRepository,
     private val hjemmelService: HjemmelService,
-    private val tilgangService: TilgangService
+    private val tilgangService: TilgangService,
+    private val overfoeringsdataParserService: OverfoeringsdataParserService
 ) {
 
     companion object {
@@ -43,6 +43,9 @@ class KlagebehandlingService(
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }
 
+    fun getKvalitetsvurdering(klagebehandlingId: UUID): Kvalitetsvurdering? =
+        klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }.kvalitetsvurdering
+
     fun fetchMottakForOppgaveKopi(oppgaveId: Long): List<Mottak> =
         mottakRepository.findByOppgavereferanserOppgaveId(oppgaveId)
 
@@ -60,11 +63,13 @@ class KlagebehandlingService(
 
         if (lastVersjon.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX) && (lastVersjon.oppgavetype == "BEH_SAK_MK" || lastVersjon.oppgavetype == "BEH_SAK")) {
             val mottakSomHarPaagaaendeKlagebehandlinger =
-                fetchMottakForOppgaveKopi(lastVersjon.id).filter { klagebehandlingRepository.findByMottakId(it.id)?.avsluttet != null }
+                fetchMottakForOppgaveKopi(lastVersjon.id).filter {
+                    klagebehandlingRepository.findByMottakId(it.id)?.avsluttet == null
+                }
             return if (mottakSomHarPaagaaendeKlagebehandlinger.isEmpty()) {
                 listOf(createNewMottakAndKlagebehandling(oppgaveKopierOrdererByVersion))
             } else {
-                mottakSomHarPaagaaendeKlagebehandlinger.map { updatemottak(it, oppgaveKopierOrdererByVersion) }
+                mottakSomHarPaagaaendeKlagebehandlinger.map { updateMottak(it, oppgaveKopierOrdererByVersion) }
             }
         } else {
             return emptyList()
@@ -76,6 +81,8 @@ class KlagebehandlingService(
         requireNotNull(lastVersjon.ident)
         requireNotNull(lastVersjon.behandlingstype)
 
+        val overfoeringsdata = overfoeringsdataParserService.parseBeskrivelse(lastVersjon.beskrivelse ?: "")
+
         val createdMottak = mottakRepository.save(
             Mottak(
                 tema = mapTema(lastVersjon.tema),
@@ -85,13 +92,13 @@ class KlagebehandlingService(
                 organisasjonsnummer = mapOrganisasjonsnummer(lastVersjon.ident),
                 hjemmelListe = mapHjemler(lastVersjon),
                 avsenderSaksbehandlerident = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAv
-                    ?: lastVersjon.opprettetAv,
+                    ?: overfoeringsdata?.saksbehandlerWhoMadeTheChange,
                 avsenderEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretAvEnhetsnr
-                    ?: lastVersjon.opprettetAvEnhetsnr,
+                    ?: overfoeringsdata?.enhetOverfoertFra ?: lastVersjon.opprettetAvEnhetsnr,
                 oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr
-                    ?: lastVersjon.tildeltEnhetsnr,
+                    ?: overfoeringsdata?.enhetOverfoertTil ?: lastVersjon.tildeltEnhetsnr,
                 oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate()
-                    ?: lastVersjon.endretTidspunkt?.toLocalDate(),
+                    ?: overfoeringsdata?.datoForOverfoering,
                 fristFraFoersteinstans = lastVersjon.fristFerdigstillelse,
                 beskrivelse = lastVersjon.beskrivelse,
                 status = lastVersjon.status.name,
@@ -119,7 +126,7 @@ class KlagebehandlingService(
                 mottattFoersteinstans = null,
                 avsenderEnhetFoersteinstans = createdMottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = createdMottak.avsenderSaksbehandlerident,
-                mottattKlageinstans = createdMottak.oversendtKaDato ?: LocalDate.now(),
+                mottattKlageinstans = createdMottak.oversendtKaDato,
                 startet = null,
                 avsluttet = null,
                 frist = createdMottak.fristFraFoersteinstans,
@@ -128,11 +135,11 @@ class KlagebehandlingService(
                 mottakId = createdMottak.id,
                 vedtak = mutableListOf(),
                 kvalitetsvurdering = null,
-                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
+                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
                 saksdokumenter = if (createdMottak.journalpostId != null) {
-                    mutableListOf(Saksdokument(referanse = createdMottak.journalpostId!!))
+                    mutableSetOf(Saksdokument(referanse = createdMottak.journalpostId!!))
                 } else {
-                    mutableListOf()
+                    mutableSetOf()
                 },
                 kilde = Kilde.OPPGAVE
             )
@@ -142,10 +149,12 @@ class KlagebehandlingService(
     }
 
 
-    private fun updatemottak(
+    private fun updateMottak(
         mottak: Mottak,
         oppgaveKopierOrdererByVersion: List<OppgaveKopiVersjon>
     ): Pair<Klagebehandling, Mottak> {
+        logger.debug("Updating mottak")
+
         val lastVersjon = oppgaveKopierOrdererByVersion.first()
         requireNotNull(lastVersjon.ident)
         requireNotNull(lastVersjon.behandlingstype)
@@ -199,9 +208,10 @@ class KlagebehandlingService(
             }
             ?.first
 
-    fun assignOppgave(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
+    fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?): Klagebehandling {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         klagebehandling.tildeltSaksbehandlerident = saksbehandlerIdent
         klagebehandling.modified = LocalDateTime.now()
+        return klagebehandling
     }
 }
