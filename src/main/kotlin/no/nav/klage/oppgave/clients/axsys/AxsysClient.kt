@@ -43,7 +43,7 @@ class AxsysClient(
                         .queryParam("inkluderAlleEnheter", "true")
                         .build(navIdent)
                 }
-                .header("Authorization", "Bearer ${tokenService.getStsSystembrukerToken()}")
+                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithAxsysScope()}")
                 .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
 
