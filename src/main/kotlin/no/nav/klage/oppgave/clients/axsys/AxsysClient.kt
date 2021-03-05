@@ -4,6 +4,7 @@ import brave.Tracer
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
 import no.nav.klage.oppgave.config.CacheWithRedisConfiguration.Companion.TILGANGER_CACHE
 import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
+import no.nav.klage.oppgave.service.TokenService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -14,7 +15,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
-class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tracer) {
+class AxsysClient(
+    private val axsysWebClient: WebClient,
+    private val tokenService: TokenService,
+    private val tracer: Tracer
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -37,7 +42,9 @@ class AxsysClient(private val axsysWebClient: WebClient, private val tracer: Tra
                         .path("/tilgang/{navIdent}")
                         .queryParam("inkluderAlleEnheter", "true")
                         .build(navIdent)
-                }.header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
+                }
+                .header("Authorization", "Bearer ${tokenService.getStsSystembrukerToken()}")
+                .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
 
                 .retrieve()
