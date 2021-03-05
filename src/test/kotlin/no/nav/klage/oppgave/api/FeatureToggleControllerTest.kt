@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
+import no.nav.klage.oppgave.api.controller.FeatureToggleController
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.BeforeEach

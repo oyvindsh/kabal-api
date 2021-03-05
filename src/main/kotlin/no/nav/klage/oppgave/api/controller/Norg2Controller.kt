@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.clients.norg2.Enhet
 import no.nav.klage.oppgave.clients.norg2.Norg2Client

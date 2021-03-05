@@ -1,12 +1,12 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.facade
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
+import no.nav.klage.oppgave.service.IndexService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
@@ -19,6 +19,7 @@ class KlagebehandlingFacade(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val klagebehandlingService: KlagebehandlingService,
     private val elasticsearchRepository: ElasticsearchRepository,
+    private val indexService: IndexService,
     private val oppgaveMapper: OppgaveMapper,
     private val oppgaveService: OppgaveService
 ) {
@@ -67,7 +68,7 @@ class KlagebehandlingFacade(
 
     fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
         klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
-            .also { indexKlagebehandling(it) }
+            .also { indexService.indexKlagebehandling(it) }
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {
@@ -97,22 +98,9 @@ class KlagebehandlingFacade(
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.updateKvalitetsvurdering(klagebehandlingId, kvalitetsvurderingInput)
-                .also { indexKlagebehandling(it) }.kvalitetsvurdering
+                .also { indexService.indexKlagebehandling(it) }.kvalitetsvurdering
         )
     }
 
-    fun indexKlagebehandling(klagebehandling: Klagebehandling) {
-        try {
-            elasticsearchRepository.save(
-                klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
-            )
-        } catch (e: Exception) {
-            if (e.message?.contains("version_conflict_engine_exception") == true) {
-                logger.info("Later version already indexed, ignoring this..")
-            } else {
-                logger.error("Unable to index klagebehandling ${klagebehandling.id}, see securelogs for details")
-                securelogger.error("Unable to index klagebehandling ${klagebehandling.id}", e)
-            }
-        }
-    }
+
 }
