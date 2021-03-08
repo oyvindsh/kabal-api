@@ -135,7 +135,7 @@ class KlagebehandlingService(
                 mottakId = createdMottak.id,
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
-                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableList(),
+                hjemler = createdMottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
                 saksdokumenter = if (createdMottak.journalpostId != null) {
                     mutableSetOf(Saksdokument(referanse = createdMottak.journalpostId!!))
                 } else {

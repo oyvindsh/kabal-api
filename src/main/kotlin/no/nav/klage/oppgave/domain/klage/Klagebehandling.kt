@@ -58,7 +58,7 @@ class Klagebehandling(
         joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
     )
-    val hjemler: MutableList<Hjemmel> = mutableListOf(),
+    val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val vedtak: MutableSet<Vedtak> = mutableSetOf(),

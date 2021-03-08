@@ -51,7 +51,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -107,7 +107,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -167,7 +167,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
@@ -213,7 +213,7 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
-            hjemler = mutableListOf(
+            hjemler = mutableSetOf(
                 Hjemmel(
                     original = "8-5"
                 )
