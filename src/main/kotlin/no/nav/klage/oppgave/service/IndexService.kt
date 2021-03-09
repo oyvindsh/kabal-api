@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 
 @Service
@@ -33,15 +34,35 @@ class IndexService(
             PageRequest.of(0, 50, Sort.by("created").descending())
         do {
             val page = klagebehandlingRepository.findAll(pageable)
-            page.content.forEach { indexKlagebehandling(it) }
+            page.content.map { klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it) }
+                .let { elasticsearchRepository.save(it) }
             pageable = page.nextPageable();
         } while (pageable.isPaged)
     }
 
-    fun findAndLogOldKlagebehandlinger(): Pair<Long, Long> =
-        elasticsearchRepository.findAndLogKlagebehandlingerNotUpdated()
+    fun findAndLogOutOfSyncKlagebehandlinger() {
+        val idsInEs = elasticsearchRepository.findAllIds()
+        val idsInDb = idsInDb()
+        logger.info("Number of klagebehandlinger in ES: ${idsInEs.size}, number of klagebehandlinger in DB: ${idsInDb.size}")
+        logger.info("Klagebehandlinger in ES that are not in DB: {}", idsInEs.minus(idsInDb))
+        logger.info("Klagebehandlinger in DB that are not in ES: {}", idsInDb.minus(idsInEs))
+        //TODO: Are they up to date?
+    }
+
+    private fun idsInDb(): List<String> {
+        val idsInDb = mutableListOf<String>()
+        var pageable: Pageable =
+            PageRequest.of(0, 50)
+        do {
+            val page = klagebehandlingRepository.findAll(pageable)
+            page.content.map { it.id.toString() }.let { idsInDb.addAll(it) }
+            pageable = page.nextPageable();
+        } while (pageable.isPaged)
+        return idsInDb
+    }
 
 
+    @Retryable
     fun indexKlagebehandling(klagebehandling: Klagebehandling) {
         try {
             elasticsearchRepository.save(

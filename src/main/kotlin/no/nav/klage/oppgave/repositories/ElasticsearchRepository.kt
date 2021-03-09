@@ -20,7 +20,6 @@ import org.springframework.data.elasticsearch.core.document.Document
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 
@@ -212,26 +211,11 @@ open class ElasticsearchRepository(
         esTemplate.delete(query, EsKlagebehandling::class.java)
     }
 
-    fun findAndLogKlagebehandlingerNotUpdated(): Pair<Long, Long> {
-        val oldBaseQuery: BoolQueryBuilder = QueryBuilders.boolQuery()
-        oldBaseQuery.must(
-            QueryBuilders.rangeQuery("timestamp")
-                .lte(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ZonedDateTime.now().minusDays(1)))
-        )
-        val oldQuery: Query = NativeSearchQueryBuilder()
-            .withPageable(PageRequest.of(0, 1))
-            .withSort(SortBuilders.fieldSort("timestamp").order(SortOrder.ASC))
-            .withQuery(oldBaseQuery)
-            .build()
-        val oldSearchHits: SearchHits<EsKlagebehandling> = esTemplate.search(oldQuery, EsKlagebehandling::class.java)
-
+    fun findAllIds(): List<String> {
         val allQuery: Query = NativeSearchQueryBuilder()
-            .withPageable(PageRequest.of(0, 1))
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
-        val allSearchHits: SearchHits<EsKlagebehandling> = esTemplate.search(allQuery, EsKlagebehandling::class.java)
-
-        logger.info("Found ${oldSearchHits.totalHits} old esKlagebehandling in Elastic of a total of ${allSearchHits.totalHits}")
-        return Pair(oldSearchHits.totalHits, allSearchHits.totalHits)
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(allQuery, EsKlagebehandling::class.java)
+        return searchHits.searchHits.map { it.id!! }
     }
 }

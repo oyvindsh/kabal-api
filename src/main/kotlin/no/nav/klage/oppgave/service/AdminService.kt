@@ -10,18 +10,18 @@ class AdminService(private val indexService: IndexService) {
         private const val TEN_SECONDS = 10000L
     }
 
-    @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
     fun syncEsWithDb() {
         indexService.reindexAllKlagebehandlinger()
         Thread.sleep(TEN_SECONDS)
-        indexService.findAndLogOldKlagebehandlinger()
+        indexService.findAndLogOutOfSyncKlagebehandlinger()
     }
 
     fun deleteAllInES() {
         indexService.deleteAllKlagebehandlinger()
     }
 
-    fun getAndLogOldDocuments(): Pair<Long, Long> =
-        indexService.findAndLogOldKlagebehandlinger()
+    @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
+    fun findAndLogOutOfSyncKlagebehandlinger() =
+        indexService.findAndLogOutOfSyncKlagebehandlinger()
 
 }

@@ -20,11 +20,10 @@ class AdminController(private val adminService: AdminService) {
         //TODO: Make this more fancy.. Need auth, need a service, need to reindex from db.
         adminService.deleteAllInES()
         adminService.syncEsWithDb()
-        val numbers = adminService.getAndLogOldDocuments()
+        adminService.findAndLogOutOfSyncKlagebehandlinger()
 
-        return ElasticAdminResponse("ok", NumbersOfDocuments(numbers.first, numbers.second))
+        return ElasticAdminResponse("ok")
     }
 }
 
-data class ElasticAdminResponse(private val status: String, private val numbers: NumbersOfDocuments)
-data class NumbersOfDocuments(private val oldDocuments: Long, private val allDocuments: Long)
+data class ElasticAdminResponse(private val status: String)

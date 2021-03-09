@@ -1,14 +1,14 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.oppgavekopi.Metadata
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjonId
+import no.nav.klage.oppgave.events.OppgaveMottattEvent
 import no.nav.klage.oppgave.repositories.OppgaveKopiRepository
 import no.nav.klage.oppgave.repositories.OppgaveKopiVersjonRepository
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 class OppgaveKopiService(
     private val oppgaveKopiRepository: OppgaveKopiRepository,
     private val oppgaveKopiVersjonRepository: OppgaveKopiVersjonRepository,
-    private val klagebehandlingService: KlagebehandlingService
+    private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
     companion object {
@@ -28,7 +28,7 @@ class OppgaveKopiService(
     /**
      * This method needs to be idempotent
      */
-    fun saveOppgaveKopi(oppgaveKopi: OppgaveKopi): List<Pair<Klagebehandling, Mottak>> {
+    fun saveOppgaveKopi(oppgaveKopi: OppgaveKopi) {
         logger.debug("Received oppgavekopi with id ${oppgaveKopi.id} and versjon ${oppgaveKopi.versjon} for storing")
         if (oppgaveKopiRepository.existsById(oppgaveKopi.id)) {
             val existingOppgaveKopi = oppgaveKopiRepository.getOne(oppgaveKopi.id)
@@ -52,7 +52,7 @@ class OppgaveKopiService(
         }
 
         val alleVersjoner = oppgaveKopiVersjonRepository.findByIdOrderByVersjonDesc(oppgaveKopi.id)
-        return klagebehandlingService.connectOppgaveKopiToKlagebehandling(alleVersjoner)
+        applicationEventPublisher.publishEvent(OppgaveMottattEvent(alleVersjoner))
     }
 
     private fun mergeMetadata(metadataNew: Set<Metadata>, metadataOld: Set<Metadata>) {

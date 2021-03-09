@@ -1,31 +1,49 @@
 package no.nav.klage.oppgave.service
 
-import com.ninjasquad.springmockk.MockkBean
+import com.ninjasquad.springmockk.SpykBean
+import io.mockk.verify
 import no.nav.klage.oppgave.domain.oppgavekopi.*
+import no.nav.klage.oppgave.events.OppgaveMottattEvent
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.event.EventListener
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
+
 
 @ActiveProfiles("local")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(
     OppgaveKopiService::class,
-    KlagebehandlingService::class,
-    HjemmelService::class,
-    OverfoeringsdataParserService::class
+    OppgaveKopiServiceTest.MyTestConfiguration::class
 )
 class OppgaveKopiServiceTest {
 
-    @MockkBean(relaxed = true)
-    lateinit var tilgangService: TilgangService
+    /* https://github.com/spring-projects/spring-boot/issues/6060 */
+    class MyEventListener {
+        @EventListener
+        fun noop(oppgaveMottattEvent: OppgaveMottattEvent) {
+        }
+    }
+
+    @TestConfiguration
+    class MyTestConfiguration {
+
+        @Bean
+        fun myEventListener(): MyEventListener = MyEventListener()
+    }
+
+    @SpykBean
+    lateinit var eventListener: OppgaveKopiServiceTest.MyEventListener
 
     @Autowired
     lateinit var entityManager: TestEntityManager
@@ -60,6 +78,7 @@ class OppgaveKopiServiceTest {
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.opprettetTidspunkt).isEqualTo(now)
+        verify { eventListener.noop(any()) }
     }
 
 
@@ -89,6 +108,7 @@ class OppgaveKopiServiceTest {
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.ident).isNotNull
         assertThat(hentetOppgave.ident?.verdi).isEqualTo("12345")
+        verify { eventListener.noop(any()) }
     }
 
     @Test
@@ -119,6 +139,7 @@ class OppgaveKopiServiceTest {
         assertThat(hentetOppgave.metadata).isNotNull
         assertThat(hentetOppgave.metadata.size).isEqualTo(1)
         assertThat(hentetOppgave.metadataAsMap()[MetadataNoekkel.HJEMMEL]).isEqualTo("8-25")
+        verify { eventListener.noop(any()) }
     }
 
     @Test
@@ -147,6 +168,7 @@ class OppgaveKopiServiceTest {
 
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi.id)
         assertThat(hentetOppgave).isNotNull
+        verify { eventListener.noop(any()) }
     }
 
     @Test
@@ -196,6 +218,7 @@ class OppgaveKopiServiceTest {
         val hentetOppgave = oppgaveKopiService.getOppgaveKopi(oppgaveKopi1.id)
         assertThat(hentetOppgave).isNotNull
         assertThat(hentetOppgave.metadata.size).isEqualTo(1)
+        verify { eventListener.noop(any()) }
     }
 
     @Test
@@ -229,6 +252,7 @@ class OppgaveKopiServiceTest {
             oppgaveKopiService.getOppgaveKopiSisteVersjon(oppgaveKopi.id)
         assertThat(hentetOppgaveSisteVersjon).isNotNull
         assertThat(hentetOppgaveSisteVersjon.opprettetTidspunkt).isEqualTo(oppgaveKopi.opprettetTidspunkt)
+        verify { eventListener.noop(any()) }
     }
 
     @Test
@@ -256,6 +280,7 @@ class OppgaveKopiServiceTest {
 
         val hentetOppgaveversjon = oppgaveKopiService.getOppgaveKopiVersjon(oppgaveKopi.id, oppgaveKopi.versjon)
         assertThat(hentetOppgaveversjon).isNotNull
+        verify { eventListener.noop(any()) }
     }
 
     @Test
@@ -310,7 +335,7 @@ class OppgaveKopiServiceTest {
             oppgaveKopiService.getOppgaveKopiSisteVersjon(oppgaveKopi2.id)
         assertThat(hentetOppgaveSisteVersjon).isNotNull
         assertThat(hentetOppgaveSisteVersjon.opprettetTidspunkt).isEqualTo(oppgaveKopi2.opprettetTidspunkt)
-
+        verify { eventListener.noop(any()) }
     }
 
 }
