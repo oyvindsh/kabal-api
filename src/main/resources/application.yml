@@ -52,12 +52,15 @@ spring:
         enabled: false
   jpa:
     open-in-view: false
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
 
 server:
   port: 7081
   error:
     whitelabel:
       enabled: false
+  shutdown: graceful
 
 management:
   health:

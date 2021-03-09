@@ -41,7 +41,8 @@ class KlagebehandlingRepositoryTest {
             kilde = Kilde.OPPGAVE,
             oppgavereferanser = mutableListOf(),
             status = Status.OPPRETTET.name,
-            statusKategori = Status.OPPRETTET.kategoriForStatus().name
+            statusKategori = Status.OPPRETTET.kategoriForStatus().name,
+            oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
@@ -97,7 +98,8 @@ class KlagebehandlingRepositoryTest {
             kilde = Kilde.OPPGAVE,
             oppgavereferanser = mutableListOf(Oppgavereferanse(oppgaveId = 1001L)),
             status = Status.OPPRETTET.name,
-            statusKategori = Status.OPPRETTET.kategoriForStatus().name
+            statusKategori = Status.OPPRETTET.kategoriForStatus().name,
+            oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
@@ -157,7 +159,8 @@ class KlagebehandlingRepositoryTest {
             kilde = Kilde.OPPGAVE,
             oppgavereferanser = mutableListOf(),
             status = Status.OPPRETTET.name,
-            statusKategori = Status.OPPRETTET.kategoriForStatus().name
+            statusKategori = Status.OPPRETTET.kategoriForStatus().name,
+            oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
@@ -203,7 +206,8 @@ class KlagebehandlingRepositoryTest {
             kilde = Kilde.OPPGAVE,
             oppgavereferanser = mutableListOf(),
             status = Status.OPPRETTET.name,
-            statusKategori = Status.OPPRETTET.kategoriForStatus().name
+            statusKategori = Status.OPPRETTET.kategoriForStatus().name,
+            oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
