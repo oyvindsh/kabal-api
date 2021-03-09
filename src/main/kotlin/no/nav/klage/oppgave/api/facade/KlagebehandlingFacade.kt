@@ -5,12 +5,13 @@ import no.nav.klage.oppgave.api.mapper.OppgaveMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
+import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
-import no.nav.klage.oppgave.service.IndexService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -19,7 +20,7 @@ class KlagebehandlingFacade(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val klagebehandlingService: KlagebehandlingService,
     private val elasticsearchRepository: ElasticsearchRepository,
-    private val indexService: IndexService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
     private val oppgaveMapper: OppgaveMapper,
     private val oppgaveService: OppgaveService
 ) {
@@ -68,7 +69,7 @@ class KlagebehandlingFacade(
 
     fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
         klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
-            .also { indexService.indexKlagebehandling(it) }
+            .also { applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(it)) }
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {
@@ -98,7 +99,7 @@ class KlagebehandlingFacade(
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.updateKvalitetsvurdering(klagebehandlingId, kvalitetsvurderingInput)
-                .also { indexService.indexKlagebehandling(it) }.kvalitetsvurdering
+                .also { applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(it)) }.kvalitetsvurdering
         )
     }
 
