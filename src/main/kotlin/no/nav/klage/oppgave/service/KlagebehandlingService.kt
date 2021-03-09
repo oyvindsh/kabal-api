@@ -98,7 +98,7 @@ class KlagebehandlingService(
                 oversendtKaEnhet = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.tildeltEnhetsnr
                     ?: overfoeringsdata?.enhetOverfoertTil ?: lastVersjon.tildeltEnhetsnr,
                 oversendtKaDato = findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopierOrdererByVersion)?.endretTidspunkt?.toLocalDate()
-                    ?: overfoeringsdata?.datoForOverfoering,
+                    ?: overfoeringsdata?.datoForOverfoering ?: lastVersjon.opprettetTidspunkt.toLocalDate(),
                 fristFraFoersteinstans = lastVersjon.fristFerdigstillelse,
                 beskrivelse = lastVersjon.beskrivelse,
                 status = lastVersjon.status.name,

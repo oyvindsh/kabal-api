@@ -83,6 +83,37 @@ class OverfoeringsdataParserServiceTest {
             Svartidsbrev sendt.
         """.trimIndent()
 
+    private val beskrivelseUtenOverfoeringsdata1 =
+        """
+            Beskrivelsehistorikk
+            --- 26.11.2020 12:32 Duck, Dolly (D112233, 4291) ---
+            §§ 21-3, 21-7 og 8-3
+            Oppgaven er flyttet  fra saksbehandler D112233 til <ingen>
+             
+            --- 18.11.2020 08:36 Duck, Dolly (D112233, 4291) ---
+            §§ 21-3, 21-7 og 8-3.
+             
+            Oppgaven er flyttet , fra saksbehandler <ingen> til D112233, fra mappe <ingen> til Sykepenger klager
+             
+            --- 07.11.2020 12:24 Duck, Donald (D667788, 4403) ---
+            §§ 21-3, 21-7 og 8-3.
+             
+            Sak oversendt KA.
+             
+            Oversendelsesbrevet vil være tilgjengelig i Gosys fra 101120.
+             
+            Klage
+             
+            Reg.dato: 23.08.2020
+        """.trimIndent()
+
+    private val beskrivelseOpprettetIKA =
+        """
+            Beskrivelsehistorikk
+            --- 11.01.2021 20:49 Nordmann, Kari (K787878, 4291) ---
+            § 8-20
+        """.trimIndent()
+
     @Test
     fun `beskrivelse med kun overfoeringer parsed correctly`() {
 
@@ -110,6 +141,32 @@ class OverfoeringsdataParserServiceTest {
         assertThat(datoForOverfoering).isEqualTo("2020-03-09")
         assertThat(enhetOverfoertFra).isEqualTo("4416")
         assertThat(enhetOverfoertTil).isEqualTo("4291")
+
+    }
+
+    @Test
+    fun `beskrivelse uten autogenerert tekst parsed correctly`() {
+
+        val (saksbehandlerWhoMadeTheChange, enhetOfsaksbehandlerWhoMadeTheChange, datoForOverfoering, enhetOverfoertFra, enhetOverfoertTil) = service.parseBeskrivelse(
+            beskrivelseUtenOverfoeringsdata1
+        )!!
+
+        assertThat(saksbehandlerWhoMadeTheChange).isEqualTo("D667788")
+        assertThat(enhetOfsaksbehandlerWhoMadeTheChange).isEqualTo("4403")
+        assertThat(datoForOverfoering).isEqualTo("2020-11-07")
+        assertThat(enhetOverfoertFra).isEqualTo("4403")
+        assertThat(enhetOverfoertTil).isEqualTo("4291")
+
+    }
+
+    @Test
+    fun `beskrivelse opprettet i KA returns null`() {
+
+        val overfoeringsdata = service.parseBeskrivelse(
+            beskrivelseOpprettetIKA
+        )
+
+        assertThat(overfoeringsdata).isNull()
 
     }
 }
