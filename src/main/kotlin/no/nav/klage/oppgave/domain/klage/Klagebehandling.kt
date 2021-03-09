@@ -35,7 +35,7 @@ class Klagebehandling(
     @Column(name = "avsender_enhet_foersteinstans")
     val avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
-    val mottattKlageinstans: LocalDate?,
+    val mottattKlageinstans: LocalDate,
     @Column(name = "dato_behandling_startet")
     val startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
