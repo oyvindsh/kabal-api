@@ -1,9 +1,10 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.mapper.OppgaverQueryParamsMapper
+import no.nav.klage.oppgave.api.facade.KlagebehandlingFacade
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
@@ -20,9 +21,9 @@ import java.util.*
 @RestController
 @Api(tags = ["klage-oppgave-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class OppgaveController(
+class KlagebehandlingListController(
     private val klagebehandlingFacade: KlagebehandlingFacade,
-    private val oppgaverQueryParamsMapper: OppgaverQueryParamsMapper,
+    private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
 
@@ -35,20 +36,20 @@ class OppgaveController(
         value = "Hent oppgaver for en ansatt",
         notes = "Henter alle oppgaver som saksbehandler har tilgang til."
     )
-    @GetMapping("/ansatte/{navIdent}/oppgaver", produces = ["application/json"])
+    @GetMapping("/ansatte/{navIdent}/klagebehandlinger", produces = ["application/json"])
     fun getOppgaver(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
-        queryParams: OppgaverQueryParams
-    ): OppgaverRespons {
+        queryParams: KlagebehandlingerQueryParams
+    ): KlagebehandlingerListRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        return klagebehandlingFacade.searchOppgaver(
-            oppgaverQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
+        return klagebehandlingFacade.searchKlagebehandlinger(
+            klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
         )
     }
 
-    @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlertildeling")
+    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/{id}/saksbehandlertildeling")
     fun assignSaksbehandler(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
@@ -68,13 +69,13 @@ class OppgaveController(
         return ResponseEntity.noContent().location(uri).build()
     }
 
-    @PostMapping("/ansatte/{navIdent}/oppgaver/{id}/saksbehandlerfradeling")
+    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/{id}/saksbehandlerfradeling")
     fun unassignSaksbehandler(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
         @ApiParam(value = "Id til en klagebehandling")
         @PathVariable("id") klagebehandlingId: String,
-        @RequestBody saksbehandlerfradeling: Saksbehandlerfradeling
+        @RequestBody(required = false) saksbehandlerfradeling: Saksbehandlerfradeling?
     ): ResponseEntity<Void> {
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignKlagebehandling(
@@ -92,16 +93,16 @@ class OppgaveController(
         value = "Hent antall utildelte klagebehandlinger der fristen gått ut",
         notes = "Teller opp alle utildelte klagebehandlinger der fristen gått ut."
     )
-    @GetMapping("/ansatte/{navIdent}/antallutgaattefrister", produces = ["application/json"])
+    @GetMapping("/ansatte/{navIdent}/antallklagebehandlingermedutgaattefrister", produces = ["application/json"])
     fun getAntallUtgaatteFrister(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
-        queryParams: OppgaverQueryParams
+        queryParams: KlagebehandlingerQueryParams
     ): AntallUtgaatteFristerResponse {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
         return klagebehandlingFacade.countOppgaver(
-            oppgaverQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(navIdent, queryParams)
+            klagebehandlingerQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(navIdent, queryParams)
         )
     }
 

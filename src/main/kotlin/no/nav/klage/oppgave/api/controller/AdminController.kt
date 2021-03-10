@@ -1,13 +1,13 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.repositories.ElasticsearchRepository
+import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class ElasticsearchController(private val elasticsearchRepository: ElasticsearchRepository) {
+class AdminController(private val adminService: AdminService) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -18,7 +18,10 @@ class ElasticsearchController(private val elasticsearchRepository: Elasticsearch
     @GetMapping("/internal/elasticadmin/nuke", produces = ["application/json"])
     fun resetElasticIndex(): ElasticAdminResponse {
         //TODO: Make this more fancy.. Need auth, need a service, need to reindex from db.
-        elasticsearchRepository.deleteAll()
+        adminService.deleteAllInES()
+        adminService.syncEsWithDb()
+        adminService.findAndLogOutOfSyncKlagebehandlinger()
+
         return ElasticAdminResponse("ok")
     }
 }
