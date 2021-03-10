@@ -7,9 +7,11 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.oppgavekopi.IdentType
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.VersjonIdent
+import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -22,7 +24,8 @@ class KlagebehandlingService(
     private val mottakRepository: MottakRepository,
     private val hjemmelService: HjemmelService,
     private val tilgangService: TilgangService,
-    private val overfoeringsdataParserService: OverfoeringsdataParserService
+    private val overfoeringsdataParserService: OverfoeringsdataParserService,
+    private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
     companion object {
@@ -58,7 +61,7 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
-    fun connectOppgaveKopiToKlagebehandling(oppgaveKopierOrdererByVersion: List<OppgaveKopiVersjon>): List<Pair<Klagebehandling, Mottak>> {
+    fun connectOppgaveKopiToKlagebehandling(oppgaveKopierOrdererByVersion: List<OppgaveKopiVersjon>) {
         val lastVersjon = oppgaveKopierOrdererByVersion.first()
 
         if (lastVersjon.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX) && (lastVersjon.oppgavetype == "BEH_SAK_MK" || lastVersjon.oppgavetype == "BEH_SAK")) {
@@ -66,13 +69,13 @@ class KlagebehandlingService(
                 fetchMottakForOppgaveKopi(lastVersjon.id).filter {
                     klagebehandlingRepository.findByMottakId(it.id)?.avsluttet == null
                 }
-            return if (mottakSomHarPaagaaendeKlagebehandlinger.isEmpty()) {
+            val klagebehandlingerOgMottak = if (mottakSomHarPaagaaendeKlagebehandlinger.isEmpty()) {
                 listOf(createNewMottakAndKlagebehandling(oppgaveKopierOrdererByVersion))
             } else {
                 mottakSomHarPaagaaendeKlagebehandlinger.map { updateMottak(it, oppgaveKopierOrdererByVersion) }
             }
-        } else {
-            return emptyList()
+            klagebehandlingerOgMottak.map { KlagebehandlingEndretEvent(it.first) }
+                .forEach { applicationEventPublisher.publishEvent(it) }
         }
     }
 

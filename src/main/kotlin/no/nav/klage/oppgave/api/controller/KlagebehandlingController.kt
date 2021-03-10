@@ -1,6 +1,7 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
+import no.nav.klage.oppgave.api.facade.KlagebehandlingFacade
 import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD

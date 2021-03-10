@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.facade
 
 import no.nav.klage.oppgave.api.internal.OppgaveKopiAPIModel
 import no.nav.klage.oppgave.api.mapper.OppgaveMapper
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service
 @Service
 class OppgaveFacade(
     private val oppgaveMapper: OppgaveMapper,
-    private val klagebehandlingFacade: KlagebehandlingFacade,
     private val oppgaveKopiService: OppgaveKopiService
 ) {
 
@@ -21,13 +20,7 @@ class OppgaveFacade(
     }
 
     fun saveOppgaveKopi(oppgave: OppgaveKopiAPIModel) {
-        val klagebehandlingerOgMottak =
-            oppgaveKopiService.saveOppgaveKopi(oppgaveMapper.mapOppgaveKopiAPIModelToOppgaveKopi(oppgave))
-
-        klagebehandlingerOgMottak.forEach {
-            klagebehandlingFacade.indexKlagebehandling(it.first)
-        }
-
+        oppgaveKopiService.saveOppgaveKopi(oppgaveMapper.mapOppgaveKopiAPIModelToOppgaveKopi(oppgave))
     }
 }
 

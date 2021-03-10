@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.api.view.KodeverkResponse
 import no.nav.klage.oppgave.util.getLogger
