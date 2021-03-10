@@ -58,6 +58,7 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         klagebehandling.createOrUpdateKvalitetsvurdering(kvalitetsvurderingInput)
+        applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling))
         return klagebehandling
     }
 
@@ -215,6 +216,7 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         klagebehandling.tildeltSaksbehandlerident = saksbehandlerIdent
         klagebehandling.modified = LocalDateTime.now()
+        applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling))
         return klagebehandling
     }
 }
