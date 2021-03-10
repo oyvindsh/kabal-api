@@ -127,8 +127,8 @@ class DokumentMapper {
         val hoveddokument = journalpost.dokumenter?.firstOrNull()
 
         val dokumentReferanse = DokumentReferanse(
-            tittel = hoveddokument?.tittel ?: "tittel mangler",
-            tema = journalpost.temanavn ?: "tema mangler",
+            tittel = hoveddokument?.tittel,
+            tema = journalpost.temanavn,
             registrert = journalpost.datoOpprettet.toLocalDate(),
             dokumentInfoId = hoveddokument?.dokumentInfoId,
             journalpostId = journalpost.journalpostId,
@@ -145,7 +145,7 @@ class DokumentMapper {
         return if (journalpost.dokumenter?.size ?: 0 > 1) {
             journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
                 DokumentReferanse.VedleggReferanse(
-                    tittel = vedlegg.tittel ?: "tittel mangler",
+                    tittel = vedlegg.tittel,
                     dokumentInfoId = vedlegg.dokumentInfoId,
                     harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
                 )

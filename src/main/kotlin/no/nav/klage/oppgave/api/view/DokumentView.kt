@@ -9,8 +9,8 @@ data class DokumentReferanserResponse(val journalpostIder: List<String>)
 data class DokumentReferanse(
     val journalpostId: String,
     val dokumentInfoId: String?,
-    val tittel: String,
-    val tema: String,
+    val tittel: String?,
+    val tema: String?,
     val registrert: LocalDate,
     val harTilgangTilArkivvariant: Boolean,
     val valgt: Boolean,
@@ -19,7 +19,7 @@ data class DokumentReferanse(
 
     data class VedleggReferanse(
         val dokumentInfoId: String,
-        val tittel: String,
+        val tittel: String?,
         val harTilgangTilArkivvariant: Boolean
     )
 }
