@@ -130,7 +130,7 @@ CREATE TABLE klage.saksdokument
 (
     id                 UUID PRIMARY KEY,
     klagebehandling_id UUID NOT NULL,
-    referanse          TEXT,
+    journalpost_id     TEXT,
     CONSTRAINT fk_saksdokument_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)

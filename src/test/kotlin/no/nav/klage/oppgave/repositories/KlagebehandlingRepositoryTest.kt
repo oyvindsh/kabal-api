@@ -176,8 +176,8 @@ class KlagebehandlingRepositoryTest {
                 )
             ),
             saksdokumenter = mutableSetOf(
-                Saksdokument(referanse = "REF1"),
-                Saksdokument(referanse = "REF2"),
+                Saksdokument(journalpostId = "REF1"),
+                Saksdokument(journalpostId = "REF2"),
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
@@ -223,8 +223,8 @@ class KlagebehandlingRepositoryTest {
                 )
             ),
             saksdokumenter = mutableSetOf(
-                Saksdokument(referanse = "REF1"),
-                Saksdokument(referanse = "REF2"),
+                Saksdokument(journalpostId = "REF1"),
+                Saksdokument(journalpostId = "REF2"),
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
@@ -239,13 +239,13 @@ class KlagebehandlingRepositoryTest {
         testEntityManager.clear()
 
         val foundklage = klagebehandlingRepository.findById(klage.id).get()
-        foundklage.saksdokumenter.removeIf { it.referanse == "REF1" }
+        foundklage.saksdokumenter.removeIf { it.journalpostId == "REF1" }
 
         testEntityManager.flush()
         testEntityManager.clear()
 
         val foundModifiedKlage = klagebehandlingRepository.findById(klage.id).get()
         assertThat(foundModifiedKlage.saksdokumenter).hasSize(1)
-        assertThat(foundModifiedKlage.saksdokumenter.first().referanse).isEqualTo("REF2")
+        assertThat(foundModifiedKlage.saksdokumenter.first().journalpostId).isEqualTo("REF2")
     }
 }
