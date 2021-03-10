@@ -18,7 +18,7 @@ data class DokumentReferanse(
 ) {
 
     data class VedleggReferanse(
-        val dokumentInfoId: String?,
+        val dokumentInfoId: String,
         val tittel: String,
         val harTilgangTilArkivvariant: Boolean
     )
