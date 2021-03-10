@@ -7,15 +7,21 @@ data class DokumenterResponse(val dokumenter: List<DokumentReferanse>, val pageR
 data class DokumentReferanserResponse(val journalpostIder: List<String>)
 
 data class DokumentReferanse(
+    val journalpostId: String,
+    val dokumentInfoId: String?,
     val tittel: String,
-    val beskrivelse: String,
-    val beskrivelser: List<String>,
     val tema: String,
     val registrert: LocalDate,
-    val dokumentInfoId: String,
-    val journalpostId: String,
-    val variantFormat: String,
-    val valgt: Boolean
-)
+    val harTilgangTilArkivvariant: Boolean,
+    val valgt: Boolean,
+    val vedlegg: MutableList<VedleggReferanse> = mutableListOf()
+) {
+
+    data class VedleggReferanse(
+        val dokumentInfoId: String?,
+        val tittel: String,
+        val harTilgangTilArkivvariant: Boolean
+    )
+}
 
 data class DokumentKnytning(val journalpostId: String)

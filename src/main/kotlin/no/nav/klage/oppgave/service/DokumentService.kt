@@ -2,10 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
-import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
-import no.nav.klage.oppgave.clients.saf.graphql.Dokumentvariant
-import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
-import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
@@ -38,15 +35,15 @@ class DokumentService(
         val klagebehandling: Klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
 
         if (klagebehandling.foedselsnummer != null) {
-            val valgteJournalpostIder =
-                klagebehandling.saksdokumenter.map { it.referanse }.toHashSet()
+            val valgteJournalposter =
+                klagebehandling.saksdokumenter.map { it.journalpostId }.toHashSet()
             val dokumentoversiktBruker: DokumentoversiktBruker =
                 safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
             return DokumenterResponse(
                 dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
                     dokumentMapper.mapJournalpost(
                         journalpost,
-                        valgteJournalpostIder.contains(journalpost.journalpostId)
+                        valgteJournalposter.contains(journalpost.journalpostId)
                     )
                 },
                 pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
@@ -62,13 +59,13 @@ class DokumentService(
 
     fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> {
         val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        return klagebehandling.saksdokumenter.map { it.referanse }
+        return klagebehandling.saksdokumenter.map { it.journalpostId }
     }
 
     fun fetchJournalposterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
         val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
         return klagebehandling.saksdokumenter
-            .mapNotNull { safGraphQlClient.getJournalpost(it.referanse) }
+            .mapNotNull { safGraphQlClient.getJournalpost(it.journalpostId) }
             .map { dokumentMapper.mapJournalpost(it, true) }
             .let { DokumenterResponse(dokumenter = it, pageReference = null) }
     }
@@ -79,20 +76,27 @@ class DokumentService(
         validateJournalpostExists(journalpostId)
 
         try {
-            if (klagebehandling.saksdokumenter.any { it.referanse == journalpostId }) {
+            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId }) {
                 logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
-                klagebehandling.saksdokumenter.add(Saksdokument(referanse = journalpostId))
+                klagebehandling.saksdokumenter.add(
+                    Saksdokument(
+                        journalpostId = journalpostId
+                    )
+                )
             }
         } catch (e: Exception) {
-            logger.error("Error connecting $journalpostId to $klagebehandlingId", e)
+            logger.error("Error connecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
             throw e
         }
     }
 
-    fun disconnectJournalpostFromKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
+    fun disconnectJournalpostFromKlagebehandling(
+        klagebehandlingId: UUID,
+        journalpostId: String
+    ) {
         val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        klagebehandling.saksdokumenter.removeIf { it.referanse == journalpostId }
+        klagebehandling.saksdokumenter.removeIf { it.journalpostId == journalpostId }
     }
 
     private fun validateJournalpostExists(journalpostId: String) {
@@ -118,32 +122,42 @@ class DokumentMapper {
     }
 
     //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
-    fun mapJournalpost(journalpost: Journalpost, isConnected: Boolean) = DokumentReferanse(
-        tittel = journalpost.tittel ?: "journalposttittel mangler",
-        beskrivelse = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel }
-            ?.joinToString() ?: "tittel mangler",
-        beskrivelser = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.tittel.nullAsTittelMangler() }
-            ?: emptyList(),
-        tema = journalpost.temanavn ?: "tema mangler",
-        registrert = journalpost.datoOpprettet.toLocalDate(),
-        dokumentInfoId = journalpost.dokumenter?.map { dokumentinfo -> dokumentinfo.dokumentInfoId }
-            ?.joinToString() ?: "-",
-        journalpostId = journalpost.journalpostId,
-        variantFormat = journalpost.dokumenter?.firstOrNull()?.dokumentvarianter?.map { dokumentvariant ->
-            logVariantFormat(
-                dokumentvariant
-            ); dokumentvariant.variantformat.name
-        }?.joinToString() ?: "-",
-        valgt = isConnected
-    )
+    fun mapJournalpost(journalpost: Journalpost, isConnected: Boolean): DokumentReferanse {
 
-    private fun String?.nullAsTittelMangler() = this ?: "tittel mangler"
+        val hoveddokument = journalpost.dokumenter?.firstOrNull()
 
-    private fun logVariantFormat(dokumentvariant: Dokumentvariant) {
-        logger.debug("Fant variantformat ${dokumentvariant.variantformat} med filnavn ${dokumentvariant.filnavn} og skjerming ${dokumentvariant.skjerming}. Saksbehandler har tilgang? ${dokumentvariant.saksbehandlerHarTilgang}")
+        val dokumentReferanse = DokumentReferanse(
+            tittel = hoveddokument?.tittel ?: "tittel mangler",
+            tema = journalpost.temanavn ?: "tema mangler",
+            registrert = journalpost.datoOpprettet.toLocalDate(),
+            dokumentInfoId = hoveddokument?.dokumentInfoId,
+            journalpostId = journalpost.journalpostId,
+            harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
+            valgt = isConnected
+        )
+
+        dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost))
+
+        return dokumentReferanse
     }
+
+    private fun getVedlegg(journalpost: Journalpost): List<DokumentReferanse.VedleggReferanse> {
+        return if (journalpost.dokumenter?.size ?: 0 > 1) {
+            journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
+                DokumentReferanse.VedleggReferanse(
+                    tittel = vedlegg.tittel ?: "tittel mangler",
+                    dokumentInfoId = vedlegg.dokumentInfoId,
+                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
+                )
+            } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
+        dokumentInfo?.dokumentvarianter?.any { dv ->
+            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
+        } == true
+
 }
-
-
-
-
