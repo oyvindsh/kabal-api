@@ -55,12 +55,3 @@ class Kvalitetsvurdering(
         return id.hashCode()
     }
 }
-
-data class KvalitetsvurderingInput(
-    val grunn: Grunn?,
-    val eoes: Eoes?,
-    val raadfoertMedLege: RaadfoertMedLege?,
-    val internVurdering: String?,
-    val sendTilbakemelding: Boolean?,
-    val tilbakemelding: String?
-)

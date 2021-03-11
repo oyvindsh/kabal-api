@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingGrunn
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Kilde
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -8,6 +10,7 @@ import no.nav.klage.oppgave.domain.oppgavekopi.IdentType
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.VersjonIdent
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
+import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -22,6 +25,7 @@ import java.util.*
 class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val mottakRepository: MottakRepository,
+    private val endringsloggRepository: EndringsloggRepository,
     private val hjemmelService: HjemmelService,
     private val tilgangService: TilgangService,
     private val overfoeringsdataParserService: OverfoeringsdataParserService,
@@ -52,12 +56,14 @@ class KlagebehandlingService(
     fun fetchMottakForOppgaveKopi(oppgaveId: Long): List<Mottak> =
         mottakRepository.findByOppgavereferanserOppgaveId(oppgaveId)
 
-    fun updateKvalitetsvurdering(
+    fun updateKvalitetsvurderingGrunn(
         klagebehandlingId: UUID,
-        kvalitetsvurderingInput: KvalitetsvurderingInput
+        grunn: Grunn,
+        saksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
-        klagebehandling.createOrUpdateKvalitetsvurdering(kvalitetsvurderingInput)
+        val endringslogginnslag = klagebehandling.setKvalitetsvurderingGrunn(grunn, saksbehandlerIdent)
+        endringsloggRepository.save(endringslogginnslag) //TODO Egen repo eller inni klagebehandling?
         applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling))
         return klagebehandling
     }

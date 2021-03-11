@@ -6,7 +6,7 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveService
@@ -79,14 +79,16 @@ class KlagebehandlingFacade(
         )
     }
 
-    fun updateKvalitetsvurdering(
+    fun updateKvalitetsvurderingGrunn(
         klagebehandlingId: UUID,
-        kvalitetsvurderingInput: KvalitetsvurderingInput
+        grunn: Grunn,
+        saksbehandlerIdent: String
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
-            klagebehandlingService.updateKvalitetsvurdering(
+            klagebehandlingService.updateKvalitetsvurderingGrunn(
                 klagebehandlingId,
-                kvalitetsvurderingInput
+                grunn,
+                saksbehandlerIdent
             ).kvalitetsvurdering
         )
     }

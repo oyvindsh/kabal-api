@@ -69,30 +69,6 @@ class Klagebehandling(
     val kilde: Kilde
 ) {
 
-    fun createOrUpdateKvalitetsvurdering(input: KvalitetsvurderingInput) {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering(
-                grunn = input.grunn,
-                eoes = input.eoes,
-                raadfoertMedLege = input.raadfoertMedLege,
-                internVurdering = input.internVurdering,
-                sendTilbakemelding = input.sendTilbakemelding,
-                tilbakemelding = input.tilbakemelding,
-                mottakerSaksbehandlerident = this.avsenderSaksbehandleridentFoersteinstans,
-                mottakerEnhet = this.avsenderEnhetFoersteinstans
-            )
-        } else {
-            kvalitetsvurdering!!.grunn = input.grunn
-            kvalitetsvurdering!!.eoes = input.eoes
-            kvalitetsvurdering!!.raadfoertMedLege = input.raadfoertMedLege
-            kvalitetsvurdering!!.internVurdering = input.internVurdering
-            kvalitetsvurdering!!.sendTilbakemelding = input.sendTilbakemelding
-            kvalitetsvurdering!!.tilbakemelding = input.tilbakemelding
-            kvalitetsvurdering!!.modified = LocalDateTime.now()
-        }
-        //TODO: Burde jeg også oppdatere kvalitetsbehandling.modified?
-    }
-
     override fun toString(): String {
         return "Behandling(id=$id, " +
                 "modified=$modified, " +
