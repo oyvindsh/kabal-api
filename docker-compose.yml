@@ -1,0 +1,79 @@
+version: '2.4'
+
+services:
+#  klage-oppgave-api:
+#    depends_on:
+#      klage-oppgave-db:
+#        condition: service_healthy
+#    build: .
+#    ports:
+#    - "7070:7070"
+#    environment:
+#      SPRING_PROFILES_ACTIVE: local
+  klage-oppgave-db:
+    container_name: klage-oppgave-db
+    image: library/postgres:12
+    environment:
+      POSTGRES_USER: klage
+      POSTGRES_PASSWORD: klage
+      POSTGRES_DB: klage-oppgave-api
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U klage -d klage-oppgave-api"
+      interval: 3s
+      timeout: 5s
+      retries: 5
+  klage-oppgave-es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    restart: always
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - KEYSTORE_PASSWORD=password
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.5.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  broker:
+    image: confluentinc/cp-kafka:5.5.0
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  redis:
+    container_name: klage-redis
+    image: redis
+    ports:
+      - "6379:6379"
+volumes:
+  esdata:
+#  postgres:
