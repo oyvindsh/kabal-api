@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.api.facade
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.mapper.OppgaveMapper
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.AntallUtgaatteFristerResponse
+import no.nav.klage.oppgave.api.view.KlagebehandlingView
+import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
@@ -18,7 +20,6 @@ class KlagebehandlingFacade(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val klagebehandlingService: KlagebehandlingService,
     private val elasticsearchRepository: ElasticsearchRepository,
-    private val oppgaveMapper: OppgaveMapper,
     private val oppgaveService: OppgaveService
 ) {
 
@@ -43,17 +44,6 @@ class KlagebehandlingFacade(
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet()
-            )
-        )
-    }
-
-    fun searchOppgaver(klagebehandlingerSearchCriteria: KlagebehandlingerSearchCriteria): OppgaverRespons {
-        val esResponse = elasticsearchRepository.findByCriteria(klagebehandlingerSearchCriteria)
-        return OppgaverRespons(
-            antallTreffTotalt = esResponse.totalHits.toInt(),
-            oppgaver = oppgaveMapper.mapEsKlagebehandlingerToView(
-                esResponse.searchHits.map { it.content },
-                klagebehandlingerSearchCriteria.isProjectionUtvidet()
             )
         )
     }
