@@ -10,7 +10,7 @@ import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Service
-class KlagebehandlingEndretEventListener(private val indexService: IndexService) {
+class IndexKlagebehandlingEventListener(private val indexService: IndexService) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")

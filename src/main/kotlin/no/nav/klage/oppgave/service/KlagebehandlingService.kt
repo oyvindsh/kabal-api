@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.domain.oppgavekopi.IdentType
 import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
 import no.nav.klage.oppgave.domain.oppgavekopi.VersjonIdent
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
-import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -25,7 +24,6 @@ import java.util.*
 class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val mottakRepository: MottakRepository,
-    private val endringsloggRepository: EndringsloggRepository,
     private val hjemmelService: HjemmelService,
     private val tilgangService: TilgangService,
     private val overfoeringsdataParserService: OverfoeringsdataParserService,
@@ -63,8 +61,7 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         val endringslogginnslag = klagebehandling.setKvalitetsvurderingGrunn(grunn, saksbehandlerIdent)
-        endringsloggRepository.save(endringslogginnslag) //TODO Egen repo eller inni klagebehandling?
-        applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling))
+        applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling, listOf(endringslogginnslag)))
         return klagebehandling
     }
 
@@ -81,7 +78,7 @@ class KlagebehandlingService(
             } else {
                 mottakSomHarPaagaaendeKlagebehandlinger.map { updateMottak(it, oppgaveKopierOrdererByVersion) }
             }
-            klagebehandlingerOgMottak.map { KlagebehandlingEndretEvent(it.first) }
+            klagebehandlingerOgMottak.map { KlagebehandlingEndretEvent(it.first, emptyList()) }
                 .forEach { applicationEventPublisher.publishEvent(it) }
         }
     }
@@ -222,7 +219,7 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         klagebehandling.tildeltSaksbehandlerident = saksbehandlerIdent
         klagebehandling.modified = LocalDateTime.now()
-        applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling))
+        applicationEventPublisher.publishEvent(KlagebehandlingEndretEvent(klagebehandling, emptyList()))
         return klagebehandling
     }
 }

@@ -12,12 +12,7 @@ object KlagebehandlingAggregatFunctions {
         }
         kvalitetsvurdering!!.grunn = grunn
         kvalitetsvurdering!!.modified = LocalDateTime.now()
-        return Endringslogginnslag.opprettingFromKabal(
-            saksbehandlerident = saksbehandlerident,
-            felt = "grunn",
-            tilVerdi = grunn.navn,
-            klagebehandlingId = this.id
-        )
+        return Endringslogginnslag.opprettingFromKabal(saksbehandlerident, "grunn", grunn.navn, this.id)
     }
 
     fun Klagebehandling.setKvalitetsvurderingEoes(eoes: Eoes, saksbehandlerident: String): Endringslogginnslag {
@@ -26,12 +21,7 @@ object KlagebehandlingAggregatFunctions {
         }
         kvalitetsvurdering!!.eoes = eoes
         kvalitetsvurdering!!.modified = LocalDateTime.now()
-        return Endringslogginnslag.opprettingFromKabal(
-            saksbehandlerident = saksbehandlerident,
-            felt = "eoes",
-            tilVerdi = eoes.navn,
-            klagebehandlingId = this.id
-        )
+        return Endringslogginnslag.opprettingFromKabal(saksbehandlerident, "eøs", eoes.navn, this.id)
     }
 
 

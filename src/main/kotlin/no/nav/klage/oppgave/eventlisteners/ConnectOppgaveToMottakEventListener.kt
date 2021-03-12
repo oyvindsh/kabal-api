@@ -7,7 +7,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 
 @Service
-class OppgaveMottattEventListener(private val klagebehandlingService: KlagebehandlingService) {
+class ConnectOppgaveToMottakEventListener(private val klagebehandlingService: KlagebehandlingService) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
