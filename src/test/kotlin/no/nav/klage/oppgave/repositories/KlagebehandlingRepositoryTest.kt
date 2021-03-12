@@ -131,11 +131,11 @@ class KlagebehandlingRepositoryTest {
                 created = LocalDateTime.now(),
                 modified = LocalDateTime.now()
             ),
-            vedtak = Vedtak(
+            vedtak = mutableSetOf(Vedtak(
                 utfall = Utfall.DELVIS_MEDHOLD,
                 created = LocalDateTime.now(),
                 modified = LocalDateTime.now()
-            )
+            ))
 
         )
 
@@ -145,7 +145,7 @@ class KlagebehandlingRepositoryTest {
         testEntityManager.clear()
 
         val foundklage = klagebehandlingRepository.findById(klage.id).get()
-        assertThat(foundklage.vedtak?.utfall).isEqualTo(Utfall.DELVIS_MEDHOLD)
+        assertThat(foundklage.vedtak.first().utfall).isEqualTo(Utfall.DELVIS_MEDHOLD)
         assertThat(foundklage.kvalitetsvurdering?.raadfoertMedLege).isEqualTo(RaadfoertMedLege.MANGLER)
         assertThat(foundklage.hjemler.first().original).isEqualTo("8-5")
     }

@@ -49,14 +49,19 @@ class Klagebehandling(
     @Column(name = "mottak_id")
     val mottakId: UUID,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "vedtak_id", nullable = true)
-    val vedtak: Vedtak? = null,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
     var kvalitetsvurdering: Kvalitetsvurdering? = null,
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "klagebehandling_hjemmel",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
+    )
+    val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    val vedtak: MutableSet<Vedtak> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),

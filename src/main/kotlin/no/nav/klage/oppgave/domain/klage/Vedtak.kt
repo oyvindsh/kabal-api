@@ -14,6 +14,14 @@ class Vedtak(
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     val utfall: Utfall,
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "vedtak_hjemmel",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "vedtak_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
+    )
+    val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
