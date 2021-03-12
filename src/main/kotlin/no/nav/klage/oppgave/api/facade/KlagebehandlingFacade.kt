@@ -6,7 +6,9 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.domain.klage.KvalitetsvurderingInput
+import no.nav.klage.oppgave.domain.kodeverk.Eoes
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
+import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.OppgaveService
@@ -54,18 +56,26 @@ class KlagebehandlingFacade(
         )
     }
 
-    fun assignKlagebehandling(klagebehandlingId: UUID, saksbehandlerIdent: String?) {
-        klagebehandlingService.assignKlagebehandling(klagebehandlingId, saksbehandlerIdent)
+    fun assignKlagebehandling(
+        klagebehandlingId: UUID,
+        tildeltSaksbehandlerident: String?,
+        utfoerendeSaksbehandlerident: String
+    ) {
+        klagebehandlingService.assignKlagebehandling(
+            klagebehandlingId,
+            tildeltSaksbehandlerident,
+            utfoerendeSaksbehandlerident
+        )
         val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
 
         oppgaveIderForKlagebehandling.forEach {
             try {
-                oppgaveService.assignOppgave(it, saksbehandlerIdent)
+                oppgaveService.assignOppgave(it, tildeltSaksbehandlerident)
             } catch (e: Exception) {
                 logger.error(
                     "Unable to assign oppgave {} to saksbehandler {}, klagebehandling {} is not in sync",
                     it,
-                    saksbehandlerIdent,
+                    tildeltSaksbehandlerident,
                     klagebehandlingId,
                     e
                 )
@@ -79,14 +89,86 @@ class KlagebehandlingFacade(
         )
     }
 
-    fun updateKvalitetsvurdering(
+    fun setKvalitetsvurderingGrunn(
         klagebehandlingId: UUID,
-        kvalitetsvurderingInput: KvalitetsvurderingInput
+        grunn: Grunn?,
+        saksbehandlerIdent: String
     ): KvalitetsvurderingView {
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
-            klagebehandlingService.updateKvalitetsvurdering(
+            klagebehandlingService.setKvalitetsvurderingGrunn(
                 klagebehandlingId,
-                kvalitetsvurderingInput
+                grunn,
+                saksbehandlerIdent
+            ).kvalitetsvurdering
+        )
+    }
+
+    fun setKvalitetsvurderingEoes(
+        klagebehandlingId: UUID,
+        eoes: Eoes?,
+        saksbehandlerIdent: String
+    ): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingEoes(
+                klagebehandlingId,
+                eoes,
+                saksbehandlerIdent
+            ).kvalitetsvurdering
+        )
+    }
+
+    fun setKvalitetsvurderingRaadfoertMedLege(
+        klagebehandlingId: UUID,
+        raadfoertMedLege: RaadfoertMedLege?,
+        saksbehandlerIdent: String
+    ): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingRaadfoertMedLege(
+                klagebehandlingId,
+                raadfoertMedLege,
+                saksbehandlerIdent
+            ).kvalitetsvurdering
+        )
+    }
+
+    fun setKvalitetsvurderingInternVurdering(
+        klagebehandlingId: UUID,
+        internVurdering: String?,
+        saksbehandlerIdent: String
+    ): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingInternVurdering(
+                klagebehandlingId,
+                internVurdering,
+                saksbehandlerIdent
+            ).kvalitetsvurdering
+        )
+    }
+
+    fun setKvalitetsvurderingSendTilbakemelding(
+        klagebehandlingId: UUID,
+        sendTilbakemelding: Boolean?,
+        saksbehandlerIdent: String
+    ): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingSendTilbakemelding(
+                klagebehandlingId,
+                sendTilbakemelding,
+                saksbehandlerIdent
+            ).kvalitetsvurdering
+        )
+    }
+
+    fun setKvalitetsvurderingTilbakemelding(
+        klagebehandlingId: UUID,
+        tilbakemelding: String?,
+        saksbehandlerIdent: String
+    ): KvalitetsvurderingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingTilbakemelding(
+                klagebehandlingId,
+                tilbakemelding,
+                saksbehandlerIdent
             ).kvalitetsvurdering
         )
     }

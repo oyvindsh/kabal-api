@@ -60,7 +60,8 @@ class KlagebehandlingListController(
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
-            saksbehandlertildeling.navIdent
+            saksbehandlertildeling.navIdent,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
         val uri = MvcUriComponentsBuilder
@@ -80,7 +81,8 @@ class KlagebehandlingListController(
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
-            null
+            null,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
         val uri = MvcUriComponentsBuilder

@@ -148,3 +148,19 @@ CREATE TABLE klage.mottak_oppgave
         FOREIGN KEY (oppgave_id)
             REFERENCES oppgave.oppgave (id)
 );
+
+CREATE TABLE klage.endringslogginnslag
+(
+    id                 UUID PRIMARY KEY,
+    klagebehandling_id UUID                     NOT NULL,
+    saksbehandlerident VARCHAR(50),
+    kilde              VARCHAR(20)              NOT NULL,
+    handling           VARCHAR(20)              NOT NULL,
+    felt               VARCHAR(50)              NOT NULL,
+    fraverdi           TEXT,
+    tilverdi           TEXT,
+    tidspunkt          TIMESTAMP WITH TIME ZONE NOT NULL,
+    CONSTRAINT fk_endringslogginnslag_klagebehandling
+        FOREIGN KEY (klagebehandling_id)
+            REFERENCES klage.klagebehandling (id)
+);
