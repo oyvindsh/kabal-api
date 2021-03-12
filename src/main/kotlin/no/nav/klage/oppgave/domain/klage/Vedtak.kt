@@ -14,7 +14,7 @@ class Vedtak(
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     val utfall: Utfall,
-    @OneToMany(cascade = [CascadeType.ALL])
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinTable(
         name = "vedtak_hjemmel",
         schema = "klage",

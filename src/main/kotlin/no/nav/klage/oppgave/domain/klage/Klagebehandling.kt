@@ -51,7 +51,7 @@ class Klagebehandling(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
     var kvalitetsvurdering: Kvalitetsvurdering? = null,
-    @OneToMany(cascade = [CascadeType.ALL])
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinTable(
         name = "klagebehandling_hjemmel",
         schema = "klage",
