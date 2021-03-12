@@ -16,7 +16,7 @@ class StoreEndringsloggEventListener(private val endringsloggRepository: Endring
 
     @EventListener
     fun storeEndringslogg(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
-        logger.info("Received KlagebehandlingEndretEvent for klagebehandlingId ${klagebehandlingEndretEvent.klagebehandling.id} in StoreEndringsloggEventListener")
+        logger.debug("Received KlagebehandlingEndretEvent for klagebehandlingId ${klagebehandlingEndretEvent.klagebehandling.id} in StoreEndringsloggEventListener")
         if (klagebehandlingEndretEvent.endringslogginnslag.isNotEmpty()) {
             endringsloggRepository.saveAll(klagebehandlingEndretEvent.endringslogginnslag)
         }

@@ -22,7 +22,7 @@ class IndexKlagebehandlingEventListener(private val indexService: IndexService) 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
     fun indexKlagebehandling(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
-        logger.info("Received KlagebehandlingEndretEvent for klagebehandlingId ${klagebehandlingEndretEvent.klagebehandling.id}")
+        logger.debug("Received KlagebehandlingEndretEvent for klagebehandlingId ${klagebehandlingEndretEvent.klagebehandling.id}")
         indexService.indexKlagebehandling(klagebehandlingEndretEvent.klagebehandling)
     }
 }

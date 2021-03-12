@@ -17,7 +17,7 @@ class ConnectOppgaveToMottakEventListener(private val klagebehandlingService: Kl
     /* Denne kjøres i samme transaksjon som den forrige, det er ingen endring på det selv om det nå brukes events. */
     @EventListener
     fun connectOppgaveToMottak(oppgaveMottattEvent: OppgaveMottattEvent) {
-        logger.info("Received OppgaveMottattEvent for oppgaveId ${oppgaveMottattEvent.oppgavekopiVersjoner.firstOrNull()?.id}")
+        logger.debug("Received OppgaveMottattEvent for oppgaveId ${oppgaveMottattEvent.oppgavekopiVersjoner.firstOrNull()?.id}")
         klagebehandlingService.connectOppgaveKopiToKlagebehandling(oppgaveMottattEvent.oppgavekopiVersjoner)
     }
 }
