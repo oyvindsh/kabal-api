@@ -4,7 +4,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Eoes
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
 
-data class KvalitetsvurderingGrunnInput(val grunn: Grunn)
+data class KvalitetsvurderingGrunnInput(val grunn: Grunn?)
 
 data class KvalitetsvurderingEoesInput(val eoes: Eoes)
 

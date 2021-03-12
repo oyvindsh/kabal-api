@@ -45,7 +45,7 @@ class Klagebehandling(
     @Column(name = "tildelt_saksbehandlerident")
     var tildeltSaksbehandlerident: String? = null,
     @Column(name = "tildelt_enhet")
-    val tildeltEnhet: String? = null,
+    var tildeltEnhet: String? = null,
     @Column(name = "mottak_id")
     val mottakId: UUID,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
