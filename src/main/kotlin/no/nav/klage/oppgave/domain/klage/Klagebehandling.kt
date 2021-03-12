@@ -35,7 +35,7 @@ class Klagebehandling(
     @Column(name = "avsender_enhet_foersteinstans")
     val avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
-    val mottattKlageinstans: LocalDate?,
+    val mottattKlageinstans: LocalDate,
     @Column(name = "dato_behandling_startet")
     val startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
@@ -45,7 +45,7 @@ class Klagebehandling(
     @Column(name = "tildelt_saksbehandlerident")
     var tildeltSaksbehandlerident: String? = null,
     @Column(name = "tildelt_enhet")
-    val tildeltEnhet: String? = null,
+    var tildeltEnhet: String? = null,
     @Column(name = "mottak_id")
     val mottakId: UUID,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -73,30 +73,6 @@ class Klagebehandling(
     @Enumerated(EnumType.STRING)
     val kilde: Kilde
 ) {
-
-    fun createOrUpdateKvalitetsvurdering(input: KvalitetsvurderingInput) {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering(
-                grunn = input.grunn,
-                eoes = input.eoes,
-                raadfoertMedLege = input.raadfoertMedLege,
-                internVurdering = input.internVurdering,
-                sendTilbakemelding = input.sendTilbakemelding,
-                tilbakemelding = input.tilbakemelding,
-                mottakerSaksbehandlerident = this.avsenderSaksbehandleridentFoersteinstans,
-                mottakerEnhet = this.avsenderEnhetFoersteinstans
-            )
-        } else {
-            kvalitetsvurdering!!.grunn = input.grunn
-            kvalitetsvurdering!!.eoes = input.eoes
-            kvalitetsvurdering!!.raadfoertMedLege = input.raadfoertMedLege
-            kvalitetsvurdering!!.internVurdering = input.internVurdering
-            kvalitetsvurdering!!.sendTilbakemelding = input.sendTilbakemelding
-            kvalitetsvurdering!!.tilbakemelding = input.tilbakemelding
-            kvalitetsvurdering!!.modified = LocalDateTime.now()
-        }
-        //TODO: Burde jeg også oppdatere kvalitetsbehandling.modified?
-    }
 
     override fun toString(): String {
         return "Behandling(id=$id, " +

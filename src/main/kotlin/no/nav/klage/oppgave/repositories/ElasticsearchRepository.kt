@@ -210,4 +210,12 @@ open class ElasticsearchRepository(
             .build()
         esTemplate.delete(query, EsKlagebehandling::class.java)
     }
+
+    fun findAllIds(): List<String> {
+        val allQuery: Query = NativeSearchQueryBuilder()
+            .withQuery(QueryBuilders.matchAllQuery())
+            .build()
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(allQuery, EsKlagebehandling::class.java)
+        return searchHits.searchHits.map { it.id!! }
+    }
 }

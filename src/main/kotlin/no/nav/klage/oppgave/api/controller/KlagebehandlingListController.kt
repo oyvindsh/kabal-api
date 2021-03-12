@@ -1,8 +1,9 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import no.nav.klage.oppgave.api.facade.KlagebehandlingFacade
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -59,7 +60,8 @@ class KlagebehandlingListController(
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
-            saksbehandlertildeling.navIdent
+            saksbehandlertildeling.navIdent,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
         val uri = MvcUriComponentsBuilder
@@ -79,7 +81,8 @@ class KlagebehandlingListController(
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingFacade.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
-            null
+            null,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
         val uri = MvcUriComponentsBuilder

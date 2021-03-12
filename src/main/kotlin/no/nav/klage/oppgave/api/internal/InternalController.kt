@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.internal
 
-import no.nav.klage.oppgave.api.OppgaveFacade
+import no.nav.klage.oppgave.api.facade.OppgaveFacade
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims

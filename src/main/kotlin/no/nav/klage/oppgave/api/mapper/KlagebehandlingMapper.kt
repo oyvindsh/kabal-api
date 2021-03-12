@@ -37,7 +37,7 @@ class KlagebehandlingMapper(
         return EsKlagebehandling(
             id = klagebehandling.id.toString(),
             versjon = klagebehandling.versjon,
-            journalpostId = klagebehandling.saksdokumenter.map { it.referanse },
+            journalpostId = klagebehandling.saksdokumenter.map { it.journalpostId },
             saksreferanse = klagebehandling.referanseId,
             tildeltEnhet = klagebehandling.tildeltEnhet,
             tema = klagebehandling.tema,

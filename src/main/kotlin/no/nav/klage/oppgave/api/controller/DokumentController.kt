@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation

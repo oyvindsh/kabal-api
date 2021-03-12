@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api
+package no.nav.klage.oppgave.api.controller
 
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext

@@ -11,12 +11,15 @@ spec:
     sqlInstances:
       - name: klage-oppgave-api
         type: POSTGRES_12
+        maintenanceWindow:
+          day: 1
+          hour: 4
         tier: {{ db_tier }}
         diskType: SSD
         highAvailability: {{ db_ha }}
         diskSize: {{ db_size }}
         diskAutoresize: true
-        autoBackupTime: "03:00"
+        autoBackupTime: "02:00"
         cascadingDelete: false
         databases:
           - name: klage-oppgave-api

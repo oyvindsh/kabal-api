@@ -11,12 +11,11 @@ import javax.persistence.Table
 class Saksdokument(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "referanse")
-    val referanse: String
+    @Column(name = "journalpost_id")
+    val journalpostId: String
 ) {
     override fun toString(): String {
-        return "Mottak(id=$id, " +
-                "referanse=$referanse)"
+        return "Mottak(id=$id, journalpostId=$journalpostId)"
     }
 
     override fun equals(other: Any?): Boolean {

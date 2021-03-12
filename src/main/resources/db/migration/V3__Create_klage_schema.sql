@@ -22,7 +22,7 @@ CREATE TABLE klage.mottak
     journalpost_kilde             VARCHAR(40),
     dato_innsendt                 DATE,
     dato_mottatt_foersteinstans   DATE,
-    dato_oversendt_klageinstans   DATE,
+    dato_oversendt_klageinstans   DATE                     NOT NULL,
     dato_frist_fra_foersteinstans DATE,
     kilde                         VARCHAR(15)              NOT NULL,
     created                       TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE klage.klagebehandling
     referanse_id                               TEXT,
     dato_innsendt                              DATE,
     dato_mottatt_foersteinstans                DATE,
-    dato_mottatt_klageinstans                  DATE,
+    dato_mottatt_klageinstans                  DATE                     NOT NULL,
     dato_behandling_startet                    DATE,
     dato_behandling_avsluttet                  DATE,
     frist                                      DATE,
@@ -127,7 +127,7 @@ CREATE TABLE klage.saksdokument
 (
     id                 UUID PRIMARY KEY,
     klagebehandling_id UUID NOT NULL,
-    referanse          TEXT,
+    journalpost_id     TEXT,
     CONSTRAINT fk_saksdokument_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
@@ -168,4 +168,20 @@ CREATE TABLE klage.vedtak_hjemmel
     CONSTRAINT fk_vedtak_hjemmel
         FOREIGN KEY (hjemmel_id)
             REFERENCES klage.hjemmel (id)
+);
+
+CREATE TABLE klage.endringslogginnslag
+(
+    id                 UUID PRIMARY KEY,
+    klagebehandling_id UUID                     NOT NULL,
+    saksbehandlerident VARCHAR(50),
+    kilde              VARCHAR(20)              NOT NULL,
+    handling           VARCHAR(20)              NOT NULL,
+    felt               VARCHAR(50)              NOT NULL,
+    fraverdi           TEXT,
+    tilverdi           TEXT,
+    tidspunkt          TIMESTAMP WITH TIME ZONE NOT NULL,
+    CONSTRAINT fk_endringslogginnslag_klagebehandling
+        FOREIGN KEY (klagebehandling_id)
+            REFERENCES klage.klagebehandling (id)
 );

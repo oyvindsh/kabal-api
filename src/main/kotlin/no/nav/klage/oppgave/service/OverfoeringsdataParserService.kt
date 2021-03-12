@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -38,7 +39,7 @@ class OverfoeringsdataParserService {
             }
         }
         return if (saksbehandlerWhoMadeTheChange == null || enhetOfsaksbehandlerWhoMadeTheChange == null || enhetOverfoertFra == null || enhetOverfoertTil == null || datoForOverfoering == null) {
-            null
+            parseBeskrivelseAnnenMaate(beskrivelse)
         } else {
             Overfoeringsdata(
                 saksbehandlerWhoMadeTheChange,
@@ -49,6 +50,31 @@ class OverfoeringsdataParserService {
             )
         }
     }
+
+    private fun parseBeskrivelseAnnenMaate(beskrivelse: String): Overfoeringsdata? =
+        beskrivelse.lineSequence().filter { newCommentRegex.containsMatchIn(it) }.map {
+            val values = newCommentRegex.find(it)?.groupValues!!
+            val datoForOverfoering = LocalDate.parse(values[1], DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+            val saksbehandlerWhoMadeTheChange = values[2]
+            val enhetOfsaksbehandlerWhoMadeTheChange = values[3]
+            Triple(
+                saksbehandlerWhoMadeTheChange,
+                enhetOfsaksbehandlerWhoMadeTheChange,
+                datoForOverfoering
+            )
+        }.zipWithNext().firstOrNull {
+            it.first.second.startsWith(KLAGEENHET_PREFIX) && !it.second.second.startsWith(
+                KLAGEENHET_PREFIX
+            )
+        }?.let {
+            Overfoeringsdata(
+                it.second.first,
+                it.second.second,
+                it.second.third,
+                it.second.second,
+                it.first.second
+            )
+        }
 }
 
 data class Overfoeringsdata(
