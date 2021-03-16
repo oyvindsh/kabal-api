@@ -6,12 +6,12 @@ import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 import javax.validation.constraints.Past
 import javax.validation.constraints.Pattern
 
 data class OversendtKlage(
-    @Pattern(regexp = "[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}", message = "Ugyldig UUID")
-    val uuid: String,
+    val uuid: UUID,
     val tema: Tema,
     val eksternReferanse: String,
     val innsynUrl: String,
