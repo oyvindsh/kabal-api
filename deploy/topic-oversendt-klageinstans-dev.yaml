@@ -1,0 +1,23 @@
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: oversendt-klageinstans
+  namespace: klage
+  labels:
+    team: klage
+  annotations:
+    dcat.data.nav.no/title: "Klager/Anker oversendt til klageinstans"
+    dcat.data.nav.no/description: "På dette topicet blir klager og anker som skal behandles av klageinstans bli lagt, leses kun av klageinstans sin saksbehandlingsapplikasjon"
+spec:
+  pool: nav-dev
+  config:  # optional; all fields are optional too; defaults shown
+    cleanupPolicy: delete  # delete, compact
+    minimumInSyncReplicas: 1
+    partitions: 1
+    replication: 3  # see min/max requirements
+    retentionBytes: -1  # -1 means unlimited
+    retentionHours: 72  # -1 means unlimited
+  acl:
+    - team: klage
+      application: klage-oppgave-api
+      access: read   # read, write, readwrite
