@@ -6,17 +6,22 @@ import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.validation.constraints.Past
+import javax.validation.constraints.Pattern
 
-data class InnsendtKlage(
+data class OversendtKlage(
+    @Pattern(regexp = "[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}", message = "Ugyldig UUID")
     val uuid: String,
     val tema: Tema,
     val eksternReferanse: String,
     val innsynUrl: String,
-    val fodselsnummer: String,
+    @Pattern(regexp = "\\d{11}", message = "Fødselsnummer er ugyldig")
+    val foedselsnummer: String,
     val beskrivelse: String?,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     val hjemler: List<String>,
+    @Past(message = "Dato for mottatt førsteinstans må være i fortiden")
     val mottattFoersteinstans: LocalDateTime
 ) {
     fun toMottak() = Mottak(
