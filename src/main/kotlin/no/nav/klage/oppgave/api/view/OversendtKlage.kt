@@ -4,8 +4,8 @@ import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.kodeverk.Kilde
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 import javax.validation.constraints.Past
 import javax.validation.constraints.Pattern
@@ -15,14 +15,15 @@ data class OversendtKlage(
     val tema: Tema,
     val eksternReferanse: String,
     val innsynUrl: String,
-    @Pattern(regexp = "\\d{11}", message = "Fødselsnummer er ugyldig")
+    @field:Pattern(regexp = "\\d{11}", message = "Fødselsnummer er ugyldig")
     val foedselsnummer: String,
     val beskrivelse: String?,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     val hjemler: List<String>,
-    @Past(message = "Dato for mottatt førsteinstans må være i fortiden")
-    val mottattFoersteinstans: LocalDateTime
+    @field:Past(message = "Dato for mottatt førsteinstans må være i fortiden")
+    @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    val mottattFoersteinstans: LocalDate
 ) {
     fun toMottak() = Mottak(
         kilde = Kilde.OPPGAVE,
