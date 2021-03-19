@@ -5,7 +5,7 @@ on:
       - main
 
 env:
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/klage-oppgave-api:${{ github.sha }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/kabal-api:${{ github.sha }}
 
 jobs:
   build:

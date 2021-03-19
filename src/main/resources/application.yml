@@ -1,6 +1,6 @@
 spring:
   application:
-    name: klage-oppgave-api
+    name: kabal-api
   main:
     banner-mode: OFF
   sleuth:
@@ -150,7 +150,7 @@ UNLEASH_URL: https://unleash.nais.io/api/
 
 KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_SCHEMA_REGISTRY_URL: http://localhost:9093
-KAFKA_GROUP_ID: klage-oppgave-api
+KAFKA_GROUP_ID: kabal-api
 EGENANSATT_KAFKA_TOPIC: aapen-skjermede-personer-v1
 PDL_PERSON_KAFKA_TOPIC: aapen-person-pdl-dokument-v1
 

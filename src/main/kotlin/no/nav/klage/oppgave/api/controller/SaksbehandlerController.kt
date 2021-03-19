@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api(tags = ["klage-oppgave-api"])
+@Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerService) {
 
