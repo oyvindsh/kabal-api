@@ -133,19 +133,6 @@ CREATE TABLE klage.saksdokument
             REFERENCES klage.klagebehandling (id)
 );
 
-CREATE TABLE klage.mottak_oppgave
-(
-    id         UUID PRIMARY KEY,
-    mottak_id  UUID   NOT NULL,
-    oppgave_id BIGINT NOT NULL,
-    CONSTRAINT fk_mottak_oppgave_mottak
-        FOREIGN KEY (mottak_id)
-            REFERENCES klage.mottak (id),
-    CONSTRAINT fk_mottak_oppgave_oppgave
-        FOREIGN KEY (oppgave_id)
-            REFERENCES oppgave.oppgave (id)
-);
-
 CREATE TABLE klage.klagebehandling_hjemmel
 (
     klagebehandling_id UUID NOT NULL,

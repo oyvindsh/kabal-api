@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.test.context.ActiveProfiles
 import java.sql.ResultSet
 
@@ -18,22 +17,20 @@ class FlywayMigrationTest {
     @Autowired
     lateinit var jdbcTemplate: JdbcTemplate
 
-    data class Status(val id: Long, val navn: String, val kategori: String)
+    data class Utfall(val id: Long, val navn: String)
 
     @Test
     fun flyway_should_run() {
-        val statuser: List<Status> = jdbcTemplate.query(
-            "SELECT * FROM oppgave.status",
-            RowMapper { rs: ResultSet, _: Int ->
-                Status(
-                    rs.getLong("id"),
-                    rs.getString("navn"),
-                    rs.getString("kategori")
-                )
-            }
-        )
+        val statuser: List<Utfall> = jdbcTemplate.query(
+            "SELECT * FROM kodeverk.utfall"
+        ) { rs: ResultSet, _: Int ->
+            Utfall(
+                rs.getLong("id"),
+                rs.getString("navn")
+            )
+        }
 
-        assertThat(statuser).hasSize(5)
+        assertThat(statuser).hasSize(8)
     }
 
 }
