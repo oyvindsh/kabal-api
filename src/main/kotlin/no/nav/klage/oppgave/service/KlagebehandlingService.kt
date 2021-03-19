@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingGrunn
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInternvurdering
@@ -8,11 +8,9 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKva
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingTilbakemelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
+import no.nav.klage.oppgave.domain.klage.Kvalitetsvurdering
+import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.kodeverk.*
-import no.nav.klage.oppgave.domain.oppgavekopi.IdentType
-import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopiVersjon
-import no.nav.klage.oppgave.domain.oppgavekopi.VersjonIdent
-import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -134,6 +132,20 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
+
+    private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
+
+    private fun mapTema(tema: String): Tema = Tema.of(tema)
+
+    /*
+    //Oppgaven kan ha gått ping-pong frem og tilbake, så det vi leter etter her er siste gang den ble assignet KA
+    private fun findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon? =
+        oppgaveKopiVersjoner.zipWithNext()
+            .firstOrNull {
+                it.first.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX)
+                        && !it.second.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX)
+            }
+            ?.first
     fun connectOppgaveKopiToKlagebehandling(oppgaveKopierOrdererByVersion: List<OppgaveKopiVersjon>) {
         val lastVersjon = oppgaveKopierOrdererByVersion.first()
 
@@ -270,18 +282,5 @@ class KlagebehandlingService(
         } else {
             null
         }
-
-    private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
-
-    private fun mapTema(tema: String): Tema = Tema.of(tema)
-
-    //Oppgaven kan ha gått ping-pong frem og tilbake, så det vi leter etter her er siste gang den ble assignet KA
-    private fun findFirstVersionWhereTildeltEnhetIsKA(oppgaveKopiVersjoner: List<OppgaveKopiVersjon>): OppgaveKopiVersjon? =
-        oppgaveKopiVersjoner.zipWithNext()
-            .firstOrNull {
-                it.first.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX)
-                        && !it.second.tildeltEnhetsnr.startsWith(KLAGEINSTANS_PREFIX)
-            }
-            ?.first
-
+*/
 }
