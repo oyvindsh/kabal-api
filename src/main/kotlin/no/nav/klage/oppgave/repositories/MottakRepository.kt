@@ -6,7 +6,4 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface MottakRepository : JpaRepository<Mottak, UUID> {
-
-    fun findByOppgavereferanserOppgaveId(oppgaveId: Long): List<Mottak>
-}
+interface MottakRepository : JpaRepository<Mottak, UUID>
