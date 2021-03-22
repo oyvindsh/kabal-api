@@ -1,7 +1,7 @@
 version: '2.4'
 
 services:
-#  klage-oppgave-api:
+#  kabal-api:
 #    depends_on:
 #      klage-oppgave-db:
 #        condition: service_healthy
@@ -10,17 +10,17 @@ services:
 #    - "7070:7070"
 #    environment:
 #      SPRING_PROFILES_ACTIVE: local
-  klage-oppgave-db:
+  kabal-db:
     container_name: klage-oppgave-db
     image: library/postgres:12
     environment:
       POSTGRES_USER: klage
       POSTGRES_PASSWORD: klage
-      POSTGRES_DB: klage-oppgave-api
+      POSTGRES_DB: kabal-api
     ports:
       - "5432:5432"
     healthcheck:
-      test: "pg_isready -h localhost -p 5432 -q -U klage -d klage-oppgave-api"
+      test: "pg_isready -h localhost -p 5432 -q -U klage -d kabal-api"
       interval: 3s
       timeout: 5s
       retries: 5

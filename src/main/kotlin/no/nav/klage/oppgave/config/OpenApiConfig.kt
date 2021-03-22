@@ -20,7 +20,7 @@ class OpenApiConfig {
             .build()
             .pathMapping("/")
             .genericModelSubstitutes(ResponseEntity::class.java)
-            .tags(Tag("klage-oppgave-api", "oppgave-api for saksbehandlere ved klageinstansen"))
+            .tags(Tag("kabal-api", "api for saksbehandlere ved klageinstansen"))
     }
 
 }

@@ -1,1 +1,1 @@
-rootProject.name = "klage-oppgave-api"
+rootProject.name = "kabal-api"

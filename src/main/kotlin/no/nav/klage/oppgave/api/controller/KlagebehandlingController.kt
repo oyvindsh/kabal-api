@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@Api(tags = ["klage-oppgave-api"])
+@Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class KlagebehandlingController(
     private val klagebehandlingFacade: KlagebehandlingFacade,

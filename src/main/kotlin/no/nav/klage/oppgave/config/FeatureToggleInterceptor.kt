@@ -22,7 +22,7 @@ class FeatureToggleInterceptor(private val unleash: Unleash) : AsyncHandlerInter
     ): Boolean {
         val isEnabled = unleash.isEnabled(KLAGE_GENERELL_TILGANG)
         if (!isEnabled) {
-            throw FeatureNotEnabledException("Du er ikke gitt tilgang til klage-oppgave-api")
+            throw FeatureNotEnabledException("Du er ikke gitt tilgang til kabal-api")
         }
         return isEnabled
     }

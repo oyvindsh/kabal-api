@@ -1,5 +1,5 @@
-# klage-oppgave-api
-API for oppgaver.
+# kabal-api
+API for oppgaver i klageinstansen.
 
 ##Lokal kjøring av appen
 Det er mulig å kjøre appen lokalt ved hjelp av docker-compose. For å sette opp database, kafka, elastic search og redis kan du kjøre følgende i rotmappa:

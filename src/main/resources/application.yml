@@ -1,6 +1,6 @@
 spring:
   application:
-    name: klage-oppgave-api
+    name: kabal-api
   main:
     banner-mode: OFF
   sleuth:
@@ -25,9 +25,9 @@ spring:
     timeout: "10s"
   datasource:
     platform: postgresql
-    url: jdbc:postgresql://${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_HOST}:${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_PORT}/${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_DATABASE}
-    username: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_USERNAME}
-    password: ${NAIS_DATABASE_KLAGE_OPPGAVE_API_KLAGE_OPPGAVE_API_PASSWORD}
+    url: jdbc:postgresql://${NAIS_DATABASE_KABAL_API_KABAL_API_HOST}:${NAIS_DATABASE_KABAL_API_KABAL_API_PORT}/${NAIS_DATABASE_KABAL_API_KABAL_API_DATABASE}
+    username: ${NAIS_DATABASE_KABAL_API_KABAL_API_USERNAME}
+    password: ${NAIS_DATABASE_KABAL_API_KABAL_API_PASSWORD}
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
@@ -150,7 +150,7 @@ UNLEASH_URL: https://unleash.nais.io/api/
 
 KAFKA_BOOTSTRAP_SERVERS: localhost:9092
 KAFKA_SCHEMA_REGISTRY_URL: http://localhost:9093
-KAFKA_GROUP_ID: klage-oppgave-api
+KAFKA_GROUP_ID: kabal-api
 EGENANSATT_KAFKA_TOPIC: aapen-skjermede-personer-v1
 PDL_PERSON_KAFKA_TOPIC: aapen-person-pdl-dokument-v1
 
