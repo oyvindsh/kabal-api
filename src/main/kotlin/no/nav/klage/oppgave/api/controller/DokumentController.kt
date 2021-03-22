@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.view.DokumentReferanserResponse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -21,7 +22,8 @@ import java.util.*
 @Api(tags = ["klage-oppgave-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class DokumentController(
-    private val dokumentService: DokumentService
+    private val dokumentService: DokumentService,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
 
     companion object {
@@ -86,7 +88,8 @@ class DokumentController(
         @PathVariable(name = "journalpostid") journalpostId: String
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsid)
-        dokumentService.disconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId)
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        dokumentService.disconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId, innloggetIdent)
     }
 
     @ApiOperation(
@@ -101,7 +104,12 @@ class DokumentController(
         @RequestBody dokumentKnytning: DokumentKnytning
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsid)
-        dokumentService.connectJournalpostToKlagebehandling(klagebehandlingId, dokumentKnytning.journalpostId)
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        dokumentService.connectJournalpostToKlagebehandling(
+            klagebehandlingId,
+            dokumentKnytning.journalpostId,
+            innloggetIdent
+        )
     }
 
     @ResponseBody
