@@ -1,13 +1,13 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: oversendt-klageinstans
+  name: vedtak-fattet
   namespace: klage
   labels:
     team: klage
   annotations:
-    dcat.data.nav.no/title: "Klager/Anker oversendt til klageinstans"
-    dcat.data.nav.no/description: "På dette topicet blir klager og anker som skal behandles av klageinstans bli lagt, leses kun av klageinstans sin saksbehandlingsapplikasjon"
+    dcat.data.nav.no/title: "Vedtak fattet på klage"
+    dcat.data.nav.no/description: "Fullførte vedtak på klageinstans som er klare for førsteinstans postes på dette topicet."
 spec:
   pool: nav-dev
   config:  # optional; all fields are optional too; defaults shown
@@ -20,4 +20,4 @@ spec:
   acl:
     - team: klage
       application: klage-oppgave-api
-      access: read   # read, write, readwrite
+      access: readwrite
