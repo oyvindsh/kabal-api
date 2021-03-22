@@ -6,9 +6,7 @@ import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
-import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +17,7 @@ import java.util.*
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
     private val safRestClient: SafRestClient,
-    private val klagebehandlingRepository: KlagebehandlingRepository,
+    private val klagebehandlingService: KlagebehandlingService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -32,7 +30,7 @@ class DokumentService(
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
-        val klagebehandling: Klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+        val klagebehandling: Klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId)
 
         if (klagebehandling.foedselsnummer != null) {
             val valgteJournalposter =
@@ -57,47 +55,35 @@ class DokumentService(
         }
     }
 
-    fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> {
-        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        return klagebehandling.saksdokumenter.map { it.journalpostId }
-    }
+    fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> =
+        klagebehandlingService.getKlagebehandling(klagebehandlingId).saksdokumenter.map { it.journalpostId }
 
-    fun fetchJournalposterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
-        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        return klagebehandling.saksdokumenter
+    fun fetchJournalposterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse =
+        klagebehandlingService.getKlagebehandling(klagebehandlingId).saksdokumenter
             .mapNotNull { safGraphQlClient.getJournalpost(it.journalpostId) }
             .map { dokumentMapper.mapJournalpost(it, true) }
             .let { DokumenterResponse(dokumenter = it, pageReference = null) }
-    }
 
-    fun connectJournalpostToKlagebehandling(klagebehandlingId: UUID, journalpostId: String) {
-        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-
+    fun connectJournalpostToKlagebehandling(
+        klagebehandlingId: UUID,
+        journalpostId: String,
+        saksbehandlerIdent: String
+    ) {
         validateJournalpostExists(journalpostId)
 
-        try {
-            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId }) {
-                logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
-            } else {
-                klagebehandling.saksdokumenter.add(
-                    Saksdokument(
-                        journalpostId = journalpostId
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            logger.error("Error connecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
-            throw e
-        }
+        klagebehandlingService.addJournalpost(
+            klagebehandlingId,
+            journalpostId,
+            saksbehandlerIdent
+        )
     }
 
     fun disconnectJournalpostFromKlagebehandling(
         klagebehandlingId: UUID,
-        journalpostId: String
-    ) {
-        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        klagebehandling.saksdokumenter.removeIf { it.journalpostId == journalpostId }
-    }
+        journalpostId: String,
+        saksbehandlerIdent: String
+    ) = klagebehandlingService.removeJournalpost(klagebehandlingId, journalpostId, saksbehandlerIdent)
+
 
     private fun validateJournalpostExists(journalpostId: String) {
         try {

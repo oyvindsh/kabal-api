@@ -1,15 +1,26 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderEnhetFoersteinstans
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderSaksbehandleridentFoersteinstans
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingGrunn
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInternvurdering
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingRaadfoertMedLege
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingTilbakemelding
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
 import no.nav.klage.oppgave.domain.klage.Kvalitetsvurdering
 import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
@@ -17,6 +28,7 @@ import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -62,6 +74,108 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         val event =
             klagebehandling.setTildeltSaksbehandlerident(tildeltSaksbehandlerIdent, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setSakstype(
+        klagebehandlingId: UUID,
+        sakstype: Sakstype,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setSakstype(sakstype, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setTema(
+        klagebehandlingId: UUID,
+        tema: Tema,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setTema(tema, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setInnsendt(
+        klagebehandlingId: UUID,
+        innsendt: LocalDate,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setInnsendt(innsendt, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setMottattFoersteinstans(
+        klagebehandlingId: UUID,
+        mottattFoersteinstans: LocalDate,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setMottattFoersteinstans(mottattFoersteinstans, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setMottattKlageinstans(
+        klagebehandlingId: UUID,
+        mottattKlageinstans: LocalDate,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setMottattKlageinstans(mottattKlageinstans, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setFrist(
+        klagebehandlingId: UUID,
+        frist: LocalDate,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setFrist(frist, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setAvsenderSaksbehandleridentFoersteinstans(
+        klagebehandlingId: UUID,
+        saksbehandlerIdent: String,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setAvsenderSaksbehandleridentFoersteinstans(
+                saksbehandlerIdent,
+                utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setAvsenderEnhetFoersteinstans(
+        klagebehandlingId: UUID,
+        enhet: String,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        val event =
+            klagebehandling.setAvsenderEnhetFoersteinstans(
+                enhet,
+                utfoerendeSaksbehandlerIdent
+            )
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -136,6 +250,38 @@ class KlagebehandlingService(
     private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
 
     private fun mapTema(tema: String): Tema = Tema.of(tema)
+
+    fun addJournalpost(klagebehandlingId: UUID, journalpostId: String, saksbehandlerIdent: String) {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        try {
+            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId }) {
+                logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
+            } else {
+                val event =
+                    klagebehandling.addSaksdokument(Saksdokument(journalpostId = journalpostId), saksbehandlerIdent)
+                event?.let { applicationEventPublisher.publishEvent(it) }
+            }
+        } catch (e: Exception) {
+            logger.error("Error connecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
+            throw e
+        }
+    }
+
+    fun removeJournalpost(klagebehandlingId: UUID, journalpostId: String, saksbehandlerIdent: String) {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        try {
+            if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId }) {
+                logger.debug("Journalpost $journalpostId is not connected to klagebehandling $klagebehandlingId, doing nothing")
+            } else {
+                val event =
+                    klagebehandling.removeSaksdokument(Saksdokument(journalpostId = journalpostId), saksbehandlerIdent)
+                event?.let { applicationEventPublisher.publishEvent(it) }
+            }
+        } catch (e: Exception) {
+            logger.error("Error disconnecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
+            throw e
+        }
+    }
 
     /*
     //Oppgaven kan ha gått ping-pong frem og tilbake, så det vi leter etter her er siste gang den ble assignet KA

@@ -20,28 +20,28 @@ class Klagebehandling(
     val foedselsnummer: String? = null,
     @Column(name = "tema_id")
     @Convert(converter = TemaConverter::class)
-    val tema: Tema,
+    var tema: Tema,
     @Column(name = "sakstype_id")
     @Convert(converter = SakstypeConverter::class)
-    val sakstype: Sakstype,
+    var sakstype: Sakstype,
     @Column(name = "referanse_id")
     var referanseId: String? = null,
     @Column(name = "dato_innsendt")
-    val innsendt: LocalDate? = null,
+    var innsendt: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
-    val mottattFoersteinstans: LocalDate? = null,
+    var mottattFoersteinstans: LocalDate? = null,
     @Column(name = "avsender_saksbehandlerident_foersteinstans")
-    val avsenderSaksbehandleridentFoersteinstans: String? = null,
+    var avsenderSaksbehandleridentFoersteinstans: String? = null,
     @Column(name = "avsender_enhet_foersteinstans")
-    val avsenderEnhetFoersteinstans: String? = null,
+    var avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
-    val mottattKlageinstans: LocalDate,
+    var mottattKlageinstans: LocalDate,
     @Column(name = "dato_behandling_startet")
-    val startet: LocalDate? = null,
+    var startet: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
-    val avsluttet: LocalDate? = null,
+    var avsluttet: LocalDate? = null,
     @Column(name = "frist")
-    val frist: LocalDate? = null,
+    var frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
     var tildeltSaksbehandlerident: String? = null,
     @Column(name = "tildelt_enhet")
