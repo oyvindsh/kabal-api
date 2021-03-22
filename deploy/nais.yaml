@@ -1,7 +1,7 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: klage-oppgave-api
+  name: kabal-api
   namespace: klage
   labels:
     team: klage
@@ -9,7 +9,7 @@ spec:
   image: {{ image }}
   gcp:
     sqlInstances:
-      - name: klage-oppgave-api
+      - name: kabal-api
         type: POSTGRES_12
         maintenanceWindow:
           day: 1
@@ -22,7 +22,7 @@ spec:
         autoBackupTime: "02:00"
         cascadingDelete: false
         databases:
-          - name: klage-oppgave-api
+          - name: kabal-api
   azure:
     application:
       enabled: true
@@ -60,7 +60,9 @@ spec:
       cpu: 400m
       memory: 256Mi
   ingresses:
+  { { #each ingresses as |ingress|}}
     - {{ingress}}
+  {{/each}}
   replicas:
     min: 1
     max: 1
