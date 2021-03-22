@@ -60,7 +60,7 @@ spec:
       cpu: 400m
       memory: 256Mi
   ingresses:
-  { { #each ingresses as |ingress|}}
+  {{#each ingresses as |ingress|}}
     - {{ingress}}
   {{/each}}
   replicas:
