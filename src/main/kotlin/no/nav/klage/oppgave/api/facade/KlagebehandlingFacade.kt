@@ -6,14 +6,13 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.domain.kodeverk.Eoes
-import no.nav.klage.oppgave.domain.kodeverk.Grunn
-import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
+import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -63,6 +62,94 @@ class KlagebehandlingFacade(
             klagebehandlingId,
             tildeltSaksbehandlerident,
             utfoerendeSaksbehandlerident
+        )
+    }
+
+    fun setSakstype(klagebehandlingId: UUID, sakstype: Sakstype, saksbehandlerIdent: String): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setSakstype(klagebehandlingId, sakstype, saksbehandlerIdent)
+        )
+    }
+
+    fun setTema(klagebehandlingId: UUID, tema: Tema, saksbehandlerIdent: String): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setTema(klagebehandlingId, tema, saksbehandlerIdent)
+        )
+    }
+
+    fun setInnsendt(klagebehandlingId: UUID, innsendt: LocalDate, saksbehandlerIdent: String): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setInnsendt(klagebehandlingId, innsendt, saksbehandlerIdent)
+        )
+    }
+
+    fun setMottattFoersteinstans(
+        klagebehandlingId: UUID,
+        mottattFoersteinstans: LocalDate,
+        saksbehandlerIdent: String
+    ): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setMottattFoersteinstans(
+                klagebehandlingId,
+                mottattFoersteinstans,
+                saksbehandlerIdent
+            )
+        )
+    }
+
+    fun setMottattKlageinstans(
+        klagebehandlingId: UUID,
+        mottattKlageinstans: LocalDate,
+        saksbehandlerIdent: String
+    ): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setMottattKlageinstans(
+                klagebehandlingId,
+                mottattKlageinstans,
+                saksbehandlerIdent
+            )
+        )
+    }
+
+    fun setFrist(
+        klagebehandlingId: UUID,
+        frist: LocalDate,
+        saksbehandlerIdent: String
+    ): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setFrist(
+                klagebehandlingId,
+                frist,
+                saksbehandlerIdent
+            )
+        )
+    }
+
+    fun setAvsenderSaksbehandleridentFoersteinstans(
+        klagebehandlingId: UUID,
+        avsenderSaksbehandlerident: String,
+        saksbehandlerIdent: String
+    ): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setAvsenderSaksbehandleridentFoersteinstans(
+                klagebehandlingId,
+                avsenderSaksbehandlerident,
+                saksbehandlerIdent
+            )
+        )
+    }
+
+    fun setAvsenderEnhetFoersteinstans(
+        klagebehandlingId: UUID,
+        avsenderEnhet: String,
+        saksbehandlerIdent: String
+    ): KlagebehandlingView {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setAvsenderEnhetFoersteinstans(
+                klagebehandlingId,
+                avsenderEnhet,
+                saksbehandlerIdent
+            )
         )
     }
 

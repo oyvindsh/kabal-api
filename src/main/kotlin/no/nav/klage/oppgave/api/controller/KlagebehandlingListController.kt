@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import java.util.*
 
 @RestController
-@Api(tags = ["klage-oppgave-api"])
+@Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class KlagebehandlingListController(
     private val klagebehandlingFacade: KlagebehandlingFacade,

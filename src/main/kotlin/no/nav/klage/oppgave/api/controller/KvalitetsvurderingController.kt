@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@Api(tags = ["klage-oppgave-api"])
+@Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class KvalitetsvurderingController(
     private val klagebehandlingFacade: KlagebehandlingFacade,
