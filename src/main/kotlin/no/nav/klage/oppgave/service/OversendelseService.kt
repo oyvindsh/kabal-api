@@ -15,6 +15,10 @@ class OversendelseService(
 
     @Transactional
     fun createMottakForKlage(oversendtKlage: OversendtKlage) {
+        if (mottakRepository.existsById(oversendtKlage.uuid)) {
+            //TODO: Throw exception or log silently? Is this supposed to be idempotent?
+            //TODO: Are we supposed to support updates? What if oversendtKlage has the same UUID, but different values?
+        }
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
     }
