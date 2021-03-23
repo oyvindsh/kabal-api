@@ -22,8 +22,8 @@ import no.nav.klage.oppgave.domain.klage.Kvalitetsvurdering
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
-import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -35,17 +35,14 @@ import java.util.*
 @Transactional
 class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
-    private val mottakRepository: MottakRepository,
-    private val hjemmelService: HjemmelService,
     private val tilgangService: TilgangService,
-    private val overfoeringsdataParserService: OverfoeringsdataParserService,
-    private val applicationEventPublisher: ApplicationEventPublisher
+    private val applicationEventPublisher: ApplicationEventPublisher,
+    private val hjemmelService: HjemmelService
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private const val KLAGEINSTANS_PREFIX = "42"
     }
 
     private fun checkTilgang(klagebehandling: Klagebehandling) {
@@ -54,17 +51,11 @@ class KlagebehandlingService(
         }
     }
 
-    fun getOppgaveIderForKlagebehandling(klagebehandlingId: UUID): List<Long> =
-        mottakRepository.getOne(klagebehandlingRepository.getOne(klagebehandlingId).mottakId).oppgavereferanser.map { it.oppgaveId }
-
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }
 
     fun getKvalitetsvurdering(klagebehandlingId: UUID): Kvalitetsvurdering? =
         klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }.kvalitetsvurdering
-
-    fun fetchMottakForOppgaveKopi(oppgaveId: Long): List<Mottak> =
-        mottakRepository.findByOppgavereferanserOppgaveId(oppgaveId)
 
     fun assignKlagebehandling(
         klagebehandlingId: UUID,
@@ -244,6 +235,47 @@ class KlagebehandlingService(
         val event = klagebehandling.setKvalitetsvurderingTilbakemelding(tilbakemelding, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
+    }
+
+    fun createKlagebehandlingFromMottak(mottak: Mottak) {
+        if (klagebehandlingRepository.findByMottakId(mottak.id) != null) {
+            logger.error("We already have a klagebehandling for mottak ${mottak.id}, will not create a new one, nor update the existing one.")
+        }
+        val klagebehandling = klagebehandlingRepository.save(
+            Klagebehandling(
+                foedselsnummer = mottak.foedselsnummer,
+                tema = mottak.tema,
+                sakstype = mottak.sakstype,
+                referanseId = mottak.referanseId,
+                innsendt = null,
+                mottattFoersteinstans = null,
+                avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
+                avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
+                mottattKlageinstans = mottak.oversendtKaDato,
+                startet = null,
+                avsluttet = null,
+                frist = mottak.fristFraFoersteinstans,
+                tildeltSaksbehandlerident = mottak.tildeltSaksbehandlerident,
+                tildeltEnhet = mottak.tildeltEnhet,
+                mottakId = mottak.id,
+                vedtak = mutableSetOf(),
+                kvalitetsvurdering = null,
+                hjemler = mottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
+                saksdokumenter = if (mottak.journalpostId != null) {
+                    mutableSetOf(Saksdokument(journalpostId = mottak.journalpostId!!))
+                } else {
+                    mutableSetOf()
+                },
+                kilde = Kilde.OPPGAVE
+            )
+        )
+        logger.debug("Created behandling ${klagebehandling.id} for mottak ${mottak.id}")
+        applicationEventPublisher.publishEvent(
+            KlagebehandlingEndretEvent(
+                klagebehandling = klagebehandling,
+                endringslogginnslag = emptyList()
+            )
+        )
     }
 
 

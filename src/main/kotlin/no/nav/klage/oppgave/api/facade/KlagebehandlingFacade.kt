@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
-import no.nav.klage.oppgave.service.OppgaveService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -20,8 +19,7 @@ import java.util.*
 class KlagebehandlingFacade(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val klagebehandlingService: KlagebehandlingService,
-    private val elasticsearchRepository: ElasticsearchRepository,
-    private val oppgaveService: OppgaveService
+    private val elasticsearchRepository: ElasticsearchRepository
 ) {
 
     companion object {
@@ -65,21 +63,6 @@ class KlagebehandlingFacade(
             tildeltSaksbehandlerident,
             utfoerendeSaksbehandlerident
         )
-        val oppgaveIderForKlagebehandling = klagebehandlingService.getOppgaveIderForKlagebehandling(klagebehandlingId)
-
-        oppgaveIderForKlagebehandling.forEach {
-            try {
-                oppgaveService.assignOppgave(it, tildeltSaksbehandlerident)
-            } catch (e: Exception) {
-                logger.error(
-                    "Unable to assign klagebehandling {} to saksbehandler {}, klagebehandling {} is not in sync",
-                    it,
-                    tildeltSaksbehandlerident,
-                    klagebehandlingId,
-                    e
-                )
-            }
-        }
     }
 
     fun setSakstype(klagebehandlingId: UUID, sakstype: Sakstype, saksbehandlerIdent: String): KlagebehandlingView {
