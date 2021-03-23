@@ -1,11 +1,12 @@
 package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
-import no.nav.klage.oppgave.api.facade.KlagebehandlingFacade
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -16,8 +17,9 @@ import java.util.*
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class KvalitetsvurderingController(
-    private val klagebehandlingFacade: KlagebehandlingFacade,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val klagebehandlingService: KlagebehandlingService,
+    private val klagebehandlingMapper: KlagebehandlingMapper,
     private val auditLogger: AuditLogger
 ) {
 
@@ -35,7 +37,9 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.getKvalitetsvurdering(klagebehandlingId.toUUIDOrException())
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.getKlagebehandling(klagebehandlingId.toUUIDOrException())
+        )
     }
 
     @PutMapping("/klagebehandlinger/{id}/kvalitetsvurdering/grunn")
@@ -48,10 +52,12 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setKvalitetsvurderingGrunn(
-            klagebehandlingId.toUUIDOrException(),
-            input.grunn,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingGrunn(
+                klagebehandlingId.toUUIDOrException(),
+                input.grunn,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -65,10 +71,12 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setKvalitetsvurderingEoes(
-            klagebehandlingId.toUUIDOrException(),
-            input.eoes,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingEoes(
+                klagebehandlingId.toUUIDOrException(),
+                input.eoes,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -82,10 +90,12 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setKvalitetsvurderingRaadfoertMedLege(
-            klagebehandlingId.toUUIDOrException(),
-            input.raadfoertMedLege,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingRaadfoertMedLege(
+                klagebehandlingId.toUUIDOrException(),
+                input.raadfoertMedLege,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -99,10 +109,12 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setKvalitetsvurderingInternVurdering(
-            klagebehandlingId.toUUIDOrException(),
-            input.internVurdering,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingInternVurdering(
+                klagebehandlingId.toUUIDOrException(),
+                input.internVurdering,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -116,10 +128,12 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setKvalitetsvurderingSendTilbakemelding(
-            klagebehandlingId.toUUIDOrException(),
-            input.sendTilbakemelding,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingSendTilbakemelding(
+                klagebehandlingId.toUUIDOrException(),
+                input.sendTilbakemelding,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -133,10 +147,12 @@ class KvalitetsvurderingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setKvalitetsvurderingTilbakemelding(
-            klagebehandlingId.toUUIDOrException(),
-            input.tilbakemelding,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
+            klagebehandlingService.setKvalitetsvurderingTilbakemelding(
+                klagebehandlingId.toUUIDOrException(),
+                input.tilbakemelding,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
