@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
-import no.nav.klage.oppgave.api.facade.KlagebehandlingFacade
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.AuditLogEvent.Action.KLAGEBEHANDLING_VIEW
 import no.nav.klage.oppgave.domain.AuditLogEvent.Decision.ALLOW
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -19,7 +20,8 @@ import java.util.*
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class KlagebehandlingController(
-    private val klagebehandlingFacade: KlagebehandlingFacade,
+    private val klagebehandlingService: KlagebehandlingService,
+    private val klagebehandlingMapper: KlagebehandlingMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val auditLogger: AuditLogger
 ) {
@@ -38,7 +40,11 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.getKlagebehandling(klagebehandlingId.toUUIDOrException()).also {
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.getKlagebehandling(
+                klagebehandlingId.toUUIDOrException()
+            )
+        ).also {
             auditLogger.log(
                 AuditLogEvent(
                     navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
@@ -60,10 +66,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setSakstype(
-            klagebehandlingId.toUUIDOrException(),
-            input.sakstype,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setSakstype(
+                klagebehandlingId.toUUIDOrException(),
+                input.sakstype,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -77,10 +85,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setTema(
-            klagebehandlingId.toUUIDOrException(),
-            input.tema,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setTema(
+                klagebehandlingId.toUUIDOrException(),
+                input.tema,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -94,10 +104,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setInnsendt(
-            klagebehandlingId.toUUIDOrException(),
-            input.innsendt,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setInnsendt(
+                klagebehandlingId.toUUIDOrException(),
+                input.innsendt,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -111,10 +123,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setMottattFoersteinstans(
-            klagebehandlingId.toUUIDOrException(),
-            input.mottattFoersteinstans,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setMottattFoersteinstans(
+                klagebehandlingId.toUUIDOrException(),
+                input.mottattFoersteinstans,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -128,10 +142,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setMottattKlageinstans(
-            klagebehandlingId.toUUIDOrException(),
-            input.mottattKlageinstans,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setMottattKlageinstans(
+                klagebehandlingId.toUUIDOrException(),
+                input.mottattKlageinstans,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -145,10 +161,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setFrist(
-            klagebehandlingId.toUUIDOrException(),
-            input.frist,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setFrist(
+                klagebehandlingId.toUUIDOrException(),
+                input.frist,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -162,10 +180,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setAvsenderSaksbehandleridentFoersteinstans(
-            klagebehandlingId.toUUIDOrException(),
-            input.avsenderSaksbehandlerident,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setAvsenderSaksbehandleridentFoersteinstans(
+                klagebehandlingId.toUUIDOrException(),
+                input.avsenderSaksbehandlerident,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
@@ -179,10 +199,12 @@ class KlagebehandlingController(
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
-        return klagebehandlingFacade.setAvsenderEnhetFoersteinstans(
-            klagebehandlingId.toUUIDOrException(),
-            input.avsenderEnhet,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingView(
+            klagebehandlingService.setAvsenderEnhetFoersteinstans(
+                klagebehandlingId.toUUIDOrException(),
+                input.avsenderEnhet,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 

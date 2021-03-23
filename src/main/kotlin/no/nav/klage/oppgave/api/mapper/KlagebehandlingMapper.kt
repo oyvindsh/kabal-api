@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Kvalitetsvurdering
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -121,7 +120,8 @@ class KlagebehandlingMapper(
         }.sortedBy { it.original }
     }
 
-    fun mapKlagebehandlingToKvalitetsvurderingView(kvalitetsvurdering: Kvalitetsvurdering?): KvalitetsvurderingView {
+    fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {
+        val kvalitetsvurdering = klagebehandling.kvalitetsvurdering
         return KvalitetsvurderingView(
             grunn = kvalitetsvurdering?.grunn?.id,
             eoes = kvalitetsvurdering?.eoes?.id,
