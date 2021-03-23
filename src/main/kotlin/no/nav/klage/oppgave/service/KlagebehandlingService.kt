@@ -261,11 +261,19 @@ class KlagebehandlingService(
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
                 hjemler = mottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
-                saksdokumenter = if (mottak.journalpostId != null) {
-                    mutableSetOf(Saksdokument(journalpostId = mottak.journalpostId!!))
-                } else {
-                    mutableSetOf()
-                },
+                saksdokumenter =
+                listOfNotNull(
+                    if (mottak.oversendelsesbrevJournalpostId != null) {
+                        Saksdokument(journalpostId = mottak.oversendelsesbrevJournalpostId!!)
+                    } else {
+                        null
+                    },
+                    if (mottak.brukersKlageJournalpostId != null) {
+                        Saksdokument(journalpostId = mottak.brukersKlageJournalpostId!!)
+                    } else {
+                        null
+                    },
+                ).toMutableSet(),
                 kilde = Kilde.OPPGAVE
             )
         )
