@@ -39,7 +39,7 @@ class MottakService(
     fun OversendtKlage.validate() {
         if (mottakRepository.existsById(uuid)) {
             logger.warn("We have received oversendtKlage with uuid {} before", uuid)
-            throw OversendtKlageReceivedBeforeException("Processed and received $uuid before")
+            throw OversendtKlageReceivedBeforeException("Oversendt klage med uuid $uuid er et duplikat av tidligere oversendt klage, avbryter mottak")
         }
         oversendelsesbrevJournalpostId?.let {
             validateJournalpost(it)
@@ -57,9 +57,9 @@ class MottakService(
         hjemler.forEach { validateHjemmel(it) }
     }
 
-    private fun validateSaksbehandler(saksbehandlerident: String, avsenderEnhet: String) {
-        if (enhetRepository.getAnsatteIEnhet(avsenderEnhet).none { it == saksbehandlerident }) {
-            throw OversendtKlageNotValidException("Angitt saksbehandler er ikke i angitt enhet")
+    private fun validateSaksbehandler(saksbehandlerident: String, enhet: String) {
+        if (enhetRepository.getAnsatteIEnhet(enhet).none { it == saksbehandlerident }) {
+            throw OversendtKlageNotValidException("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
         }
     }
 
@@ -68,14 +68,14 @@ class MottakService(
             hjemmelService.generateHjemmelFromText(hjemmel)
         } catch (e: Exception) {
             logger.warn("Unable to parse hjemmel from oversendt klage: {}", hjemmel, e)
-            throw OversendtKlageNotValidException("Ugyldig hjemmel angitt")
+            throw OversendtKlageNotValidException("$hjemmel er ikke en gyldig hjemmel")
         }
 
 
     private fun validateKaEnhet(enhet: String) {
         if (!enhet.startsWith(KLAGEENHET_PREFIX)) {
             logger.warn("{} is not a klageinstansen enhet", enhet)
-            throw OversendtKlageNotValidException("Angitt enhet er ikke i klageinstansen")
+            throw OversendtKlageNotValidException("$enhet er ikke en enhet i klageinstansen")
         }
     }
 
@@ -84,7 +84,7 @@ class MottakService(
             norg2Client.fetchEnhet(enhet).navn
         } catch (e: RuntimeException) {
             logger.warn("Unable to validate enhet from oversendt klage: {}", enhet, e)
-            throw OversendtKlageNotValidException("Ugyldig NAV-enhet angitt")
+            throw OversendtKlageNotValidException("$enhet er ikke en gyldig NAV-enhet")
         }
 
     private fun validateJournalpost(journalpostId: String) =
@@ -94,7 +94,7 @@ class MottakService(
             //dokumentService.validateJournalpostExists(journalpostId)
         } catch (e: JournalpostNotFoundException) {
             logger.warn("Unable to validate journalpost from oversendt klage: {}", journalpostId, e)
-            throw OversendtKlageNotValidException("Ugyldig journalpost referanse angitt")
+            throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
 
 
