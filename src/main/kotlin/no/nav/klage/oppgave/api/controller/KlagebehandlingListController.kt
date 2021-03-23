@@ -3,14 +3,16 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.facade.KlagebehandlingFacade
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
+import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
@@ -22,7 +24,9 @@ import java.util.*
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class KlagebehandlingListController(
-    private val klagebehandlingFacade: KlagebehandlingFacade,
+    private val klagebehandlingService: KlagebehandlingService,
+    private val klagebehandlingMapper: KlagebehandlingMapper,
+    private val elasticsearchRepository: ElasticsearchRepository,
     private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
@@ -44,8 +48,14 @@ class KlagebehandlingListController(
     ): KlagebehandlingerListRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        return klagebehandlingFacade.searchKlagebehandlinger(
-            klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
+        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
+        val esResponse = elasticsearchRepository.findByCriteria(searchCriteria)
+        return KlagebehandlingerListRespons(
+            antallTreffTotalt = esResponse.totalHits.toInt(),
+            klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
+                esResponse.searchHits.map { it.content },
+                searchCriteria.isProjectionUtvidet()
+            )
         )
     }
 
@@ -58,7 +68,7 @@ class KlagebehandlingListController(
         @RequestBody saksbehandlertildeling: Saksbehandlertildeling
     ): ResponseEntity<Void> {
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
-        klagebehandlingFacade.assignKlagebehandling(
+        klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
             saksbehandlertildeling.navIdent,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
@@ -79,7 +89,7 @@ class KlagebehandlingListController(
         @RequestBody(required = false) saksbehandlerfradeling: Saksbehandlerfradeling?
     ): ResponseEntity<Void> {
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
-        klagebehandlingFacade.assignKlagebehandling(
+        klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
             null,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
@@ -103,8 +113,13 @@ class KlagebehandlingListController(
     ): AntallUtgaatteFristerResponse {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        return klagebehandlingFacade.countOppgaver(
-            klagebehandlingerQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(navIdent, queryParams)
+        return AntallUtgaatteFristerResponse(
+            antall = elasticsearchRepository.countByCriteria(
+                klagebehandlingerQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(
+                    navIdent,
+                    queryParams
+                )
+            )
         )
     }
 
