@@ -18,7 +18,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMot
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
-import no.nav.klage.oppgave.domain.klage.Kvalitetsvurdering
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
@@ -53,9 +52,6 @@ class KlagebehandlingService(
 
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }
-
-    fun getKvalitetsvurdering(klagebehandlingId: UUID): Kvalitetsvurdering? =
-        klagebehandlingRepository.getOne(klagebehandlingId).also { checkTilgang(it) }.kvalitetsvurdering
 
     fun assignKlagebehandling(
         klagebehandlingId: UUID,
@@ -239,7 +235,8 @@ class KlagebehandlingService(
 
     fun createKlagebehandlingFromMottak(mottak: Mottak) {
         if (klagebehandlingRepository.findByMottakId(mottak.id) != null) {
-            logger.error("We already have a klagebehandling for mottak ${mottak.id}, will not create a new one, nor update the existing one.")
+            logger.error("We already have a klagebehandling for mottak ${mottak.id}. This is not supposed to happen.")
+            throw RuntimeException("We already have a klagebehandling for mottak ${mottak.id}")
         }
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
@@ -247,16 +244,16 @@ class KlagebehandlingService(
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
                 referanseId = mottak.referanseId,
-                innsendt = null,
-                mottattFoersteinstans = null,
+                innsendt = mottak.innsendtDato,
+                mottattFoersteinstans = mottak.mottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
                 mottattKlageinstans = mottak.oversendtKaDato,
                 startet = null,
                 avsluttet = null,
                 frist = mottak.fristFraFoersteinstans,
-                tildeltSaksbehandlerident = mottak.tildeltSaksbehandlerident,
-                tildeltEnhet = mottak.tildeltEnhet,
+                tildeltSaksbehandlerident = null,
+                tildeltEnhet = mottak.oversendtKaEnhet,
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,

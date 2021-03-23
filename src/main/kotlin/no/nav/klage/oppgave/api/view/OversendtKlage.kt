@@ -10,8 +10,6 @@ import java.util.*
 import javax.validation.constraints.Past
 import javax.validation.constraints.Pattern
 
-//TODO: Validere hjemmel-format
-//TODO: Validere alle String, at de faktisk er det man forventer (fødselsnummer, url, enheter, identer etc)
 //TODO: Det er en del felter som må være nullable fra Oppgave, men som vi burde kunne kreve at er satt fra moderne løsninger. Hvordan løse det?
 data class OversendtKlage(
     val uuid: UUID,
@@ -37,7 +35,6 @@ data class OversendtKlage(
 ) {
 
     //TODO: Orgnr/virksomhetsnr?
-    //TODO: Sender de oss referanse til en behandling, eller til en sak? (Betyr det noe??)
     //TODO: Hvis sakstype er ANKE, trenger vi da referansen til klagen?
     //TODO: Trenger vi dokumentId også, ikke bare journalpostId?
     fun toMottak() = Mottak(

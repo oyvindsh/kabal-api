@@ -40,10 +40,6 @@ class Mottak(
     var avsenderEnhet: String? = null,
     @Column(name = "oversendt_klageinstans_enhet")
     var oversendtKaEnhet: String? = null,
-    @Column(name = "tildelt_enhet")
-    var tildeltEnhet: String? = null,
-    @Column(name = "tildelt_saksbehandlerident")
-    var tildeltSaksbehandlerident: String? = null,
     @Column(name = "oversendelsesbrev_journalpost_id")
     var oversendelsesbrevJournalpostId: String? = null,
     @Column(name = "brukers_klage_journalpost_id")
