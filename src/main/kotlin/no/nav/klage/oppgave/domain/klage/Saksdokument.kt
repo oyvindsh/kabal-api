@@ -17,7 +17,7 @@ class Saksdokument(
     val dokumentInfoId: String
 ) {
     override fun toString(): String {
-        return "Mottak(id=$id, journalpostId=$journalpostId, dokumentInfoId=$dokumentInfoId)"
+        return "Saksdokument(id=$id, journalpostId=$journalpostId, dokumentInfoId=$dokumentInfoId)"
     }
 
     override fun equals(other: Any?): Boolean {
