@@ -40,18 +40,10 @@ class Mottak(
     var avsenderEnhet: String? = null,
     @Column(name = "oversendt_klageinstans_enhet")
     var oversendtKaEnhet: String? = null,
-    @Column(name = "status")
-    var status: String,
-    @Column(name = "status_kategori")
-    var statusKategori: String,
-    @Column(name = "tildelt_enhet")
-    var tildeltEnhet: String? = null,
-    @Column(name = "tildelt_saksbehandlerident")
-    var tildeltSaksbehandlerident: String? = null,
-    @Column(name = "journalpost_id")
-    var journalpostId: String? = null,
-    @Column(name = "journalpost_kilde")
-    var journalpostKilde: String? = null,
+    @Column(name = "oversendelsesbrev_journalpost_id")
+    var oversendelsesbrevJournalpostId: String? = null,
+    @Column(name = "brukers_klage_journalpost_id")
+    var brukersKlageJournalpostId: String? = null,
     @Column(name = "dato_innsendt")
     val innsendtDato: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
@@ -67,10 +59,6 @@ class Mottak(
     @Column(name = "kilde")
     @Enumerated(EnumType.STRING)
     val kilde: Kilde,
-    //Dette er egentlig bare 1, ikke en liste!
-    @OneToMany(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
-    val oppgavereferanser: MutableList<Oppgavereferanse> = mutableListOf(),
 ) {
 
     fun hjemler(): List<String> = hjemmelListe?.split(",") ?: emptyList()
