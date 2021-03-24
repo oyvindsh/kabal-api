@@ -86,7 +86,7 @@ class DokumentService(
     ) = klagebehandlingService.removeDokument(klagebehandlingId, journalpostId, dokumentInfoId, saksbehandlerIdent)
 
 
-    private fun validateJournalpostExists(journalpostId: String) {
+    fun validateJournalpostExists(journalpostId: String) {
         try {
             safGraphQlClient.getJournalpost(journalpostId)
         } catch (e: Exception) {

@@ -25,6 +25,20 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     }
 
     @ExceptionHandler
+    fun handleOversendtKlageNotValidException(
+        ex: OversendtKlageNotValidException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
+
+    @ExceptionHandler
+    fun handleOversendtKlageReceivedBeforeException(
+        ex: OversendtKlageReceivedBeforeException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.CONFLICT, ex, request)
+
+    @ExceptionHandler
     fun handleOppgaveNotFound(ex: OppgaveNotFoundException, request: NativeWebRequest): ResponseEntity<Problem> =
         create(Status.NOT_FOUND, ex, request)
 
