@@ -109,20 +109,24 @@ class DokumentMapper {
     }
 
     //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
-    fun mapJournalpostToDokumentReferanse(journalpost: Journalpost, klagebehandling: Klagebehandling): DokumentReferanse {
+    fun mapJournalpostToDokumentReferanse(
+        journalpost: Journalpost,
+        klagebehandling: Klagebehandling
+    ): DokumentReferanse {
 
         val hoveddokument = journalpost.dokumenter?.firstOrNull()
+            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
 
         val dokumentReferanse = DokumentReferanse(
-            tittel = hoveddokument?.tittel,
+            tittel = hoveddokument.tittel,
             tema = journalpost.temanavn,
             registrert = journalpost.datoOpprettet.toLocalDate(),
-            dokumentInfoId = hoveddokument?.dokumentInfoId,
+            dokumentInfoId = hoveddokument.dokumentInfoId,
             journalpostId = journalpost.journalpostId,
             harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
             valgt = klagebehandling.saksdokumenter.containsDokument(
                 journalpost.journalpostId,
-                hoveddokument?.dokumentInfoId
+                hoveddokument.dokumentInfoId
             )
         )
 
@@ -157,7 +161,7 @@ class DokumentMapper {
             dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
         } == true
 
-    private fun MutableSet<Saksdokument>.containsDokument(journalpostId: String, dokumentInfoId: String?) =
+    private fun MutableSet<Saksdokument>.containsDokument(journalpostId: String, dokumentInfoId: String) =
         any {
             it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId
         }
