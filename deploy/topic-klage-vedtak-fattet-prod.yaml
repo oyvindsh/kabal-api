@@ -19,5 +19,5 @@ spec:
     retentionHours: 720
   acl:
     - team: klage
-      application: klage-oppgave-api
+      application: kabal-api
       access: readwrite

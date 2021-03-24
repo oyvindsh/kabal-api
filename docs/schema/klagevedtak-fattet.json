@@ -36,7 +36,7 @@
       "$id": "#KlagevedtakFattet/vedtaksbrevReferanse",
       "title": "Vedtaksbrevreferanse",
       "type": "string",
-      "description": "JOARK referanse til vedtaksbrev."
+      "description": "Journalpost id til vedtaksbrev."
     }
   }
 }
