@@ -111,7 +111,6 @@ CREATE TABLE klage.vedtak
 CREATE TABLE klage.hjemmel
 (
     id       UUID PRIMARY KEY,
-
     lov_id   INTEGER,
     kapittel INTEGER,
     paragraf INTEGER,
@@ -128,6 +127,7 @@ CREATE TABLE klage.saksdokument
     id                 UUID PRIMARY KEY,
     klagebehandling_id UUID NOT NULL,
     journalpost_id     TEXT,
+    dokument_info_id   TEXT,
     CONSTRAINT fk_saksdokument_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)

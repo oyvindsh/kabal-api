@@ -80,16 +80,25 @@ class DokumentController(
         value = "Fjerner et dokument fra en klagebehandling",
         notes = "Sletter knytningen mellom en journalpost fra SAF og klagebehandlingen den har vært knyttet til."
     )
-    @DeleteMapping("/klagebehandlinger/{behandlingsid}/dokumenter/{journalpostid}", produces = ["application/json"])
+    @DeleteMapping(
+        "/klagebehandlinger/{behandlingsId}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}",
+        produces = ["application/json"]
+    )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun disconnectDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
-        @PathVariable behandlingsid: String,
-        @PathVariable(name = "journalpostid") journalpostId: String
+        @PathVariable behandlingsId: String,
+        @PathVariable journalpostId: String,
+        @PathVariable dokumentInfoId: String
     ) {
-        val klagebehandlingId = parseAndValidate(behandlingsid)
+        val klagebehandlingId = parseAndValidate(behandlingsId)
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        dokumentService.disconnectJournalpostFromKlagebehandling(klagebehandlingId, journalpostId, innloggetIdent)
+        dokumentService.disconnectDokumentFromKlagebehandling(
+            klagebehandlingId,
+            journalpostId,
+            dokumentInfoId,
+            innloggetIdent
+        )
     }
 
     @ApiOperation(
@@ -105,25 +114,26 @@ class DokumentController(
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        dokumentService.connectJournalpostToKlagebehandling(
+        dokumentService.connectDokumentToKlagebehandling(
             klagebehandlingId,
             dokumentKnytning.journalpostId,
+            dokumentKnytning.dokumentInfoId,
             innloggetIdent
         )
     }
 
     @ResponseBody
-    @GetMapping("/klagebehandlinger/{behandlingsid}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}")
+    @GetMapping("/klagebehandlinger/{behandlingsId}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}")
     fun getArkivertDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
-        @PathVariable behandlingsid: String,
+        @PathVariable behandlingsId: String,
         @ApiParam(value = "Id til journalpost")
         @PathVariable journalpostId: String,
         @ApiParam(value = "Id til dokumentInfo")
         @PathVariable dokumentInfoId: String
 
     ): ResponseEntity<ByteArray> {
-        val klagebehandlingId = parseAndValidate(behandlingsid)
+        val klagebehandlingId = parseAndValidate(behandlingsId)
         logger.debug(
             "Get getArkivertDokument is requested. behandlingsid: {} - journalpostId: {} - dokumentInfoId: {}",
             klagebehandlingId,
