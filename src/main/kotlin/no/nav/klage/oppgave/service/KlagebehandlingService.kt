@@ -274,6 +274,7 @@ class KlagebehandlingService(
                     },
                 ).toMutableSet(),
                  */
+                kilde = mottak.kilde
             )
         )
         logger.debug("Created behandling ${klagebehandling.id} for mottak ${mottak.id}")
