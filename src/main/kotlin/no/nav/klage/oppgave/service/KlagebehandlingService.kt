@@ -258,6 +258,8 @@ class KlagebehandlingService(
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
                 hjemler = mottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
+                //TODO lookup actual documents
+                /*
                 saksdokumenter =
                 listOfNotNull(
                     if (mottak.oversendelsesbrevJournalpostId != null) {
@@ -271,7 +273,8 @@ class KlagebehandlingService(
                         null
                     },
                 ).toMutableSet(),
-                kilde = Kilde.OPPGAVE
+                 */
+                kilde = mottak.kilde
             )
         )
         logger.debug("Created behandling ${klagebehandling.id} for mottak ${mottak.id}")
@@ -288,14 +291,24 @@ class KlagebehandlingService(
 
     private fun mapTema(tema: String): Tema = Tema.of(tema)
 
-    fun addJournalpost(klagebehandlingId: UUID, journalpostId: String, saksbehandlerIdent: String) {
+    fun addDokument(
+        klagebehandlingId: UUID,
+        journalpostId: String,
+        dokumentInfoId: String,
+        saksbehandlerIdent: String
+    ) {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         try {
             if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId }) {
                 logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 val event =
-                    klagebehandling.addSaksdokument(Saksdokument(journalpostId = journalpostId), saksbehandlerIdent)
+                    klagebehandling.addSaksdokument(
+                        Saksdokument(
+                            journalpostId = journalpostId,
+                            dokumentInfoId = dokumentInfoId
+                        ), saksbehandlerIdent
+                    )
                 event?.let { applicationEventPublisher.publishEvent(it) }
             }
         } catch (e: Exception) {
@@ -304,14 +317,24 @@ class KlagebehandlingService(
         }
     }
 
-    fun removeJournalpost(klagebehandlingId: UUID, journalpostId: String, saksbehandlerIdent: String) {
+    fun removeDokument(
+        klagebehandlingId: UUID,
+        journalpostId: String,
+        dokumentInfoId: String,
+        saksbehandlerIdent: String
+    ) {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
         try {
-            if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId }) {
+            if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
                 logger.debug("Journalpost $journalpostId is not connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 val event =
-                    klagebehandling.removeSaksdokument(Saksdokument(journalpostId = journalpostId), saksbehandlerIdent)
+                    klagebehandling.removeSaksdokument(
+                        Saksdokument(
+                            journalpostId = journalpostId,
+                            dokumentInfoId = dokumentInfoId
+                        ), saksbehandlerIdent
+                    )
                 event?.let { applicationEventPublisher.publishEvent(it) }
             }
         } catch (e: Exception) {

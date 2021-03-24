@@ -12,10 +12,12 @@ class Saksdokument(
     @Id
     val id: UUID = UUID.randomUUID(),
     @Column(name = "journalpost_id")
-    val journalpostId: String
+    val journalpostId: String,
+    @Column(name = "dokument_info_id")
+    val dokumentInfoId: String
 ) {
     override fun toString(): String {
-        return "Mottak(id=$id, journalpostId=$journalpostId)"
+        return "Saksdokument(id=$id, journalpostId=$journalpostId, dokumentInfoId=$dokumentInfoId)"
     }
 
     override fun equals(other: Any?): Boolean {
