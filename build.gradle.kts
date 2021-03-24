@@ -13,7 +13,6 @@ val springMockkVersion = "3.0.1"
 val springFoxVersion = "3.0.0"
 val testContainersVersion = "1.15.1"
 val nimbusVersion = "8.20.1"
-val kabalSchemaVersion = "0.0.1"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -23,13 +22,6 @@ repositories {
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/simple-slack-poster")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
-    }
-    maven {
-        url = uri("https://maven.pkg.github.com/navikt/kabal-schema")
         credentials {
             username = githubUser
             password = githubPassword
@@ -93,8 +85,6 @@ dependencies {
     implementation("org.springframework.retry:spring-retry:$springRetryVersion")
     implementation("no.finn.unleash:unleash-client-java:$unleashVersion")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
-
-    implementation("no.nav.kabal.avro:kabal-schema:$kabalSchemaVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")

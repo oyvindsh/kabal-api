@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.kabal.avro.KlagevedtakFattet
+import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
@@ -23,7 +23,7 @@ class VedtakKafkaProducer(
     fun sendVedtak(vedtak: KlagevedtakFattet) {
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nVedtak: {}", topic, vedtak)
-        kotlin.runCatching {
+        runCatching {
             kafkaTemplate.send(topic, vedtak)
             logger.debug("Vedtak sent to Kafka.")
         }.onFailure {
