@@ -1,18 +1,9 @@
 package no.nav.klage.oppgave.domain.kafka
 
+import no.nav.klage.oppgave.domain.kodeverk.Utfall
+
 data class KlagevedtakFattet (
     val id: String,
-    val utfall: KlagevedtakUtfall,
+    val utfall: Utfall,
     val vedtaksbrevReferanse: String
 )
-
-enum class KlagevedtakUtfall {
-    TRUKKET,
-    RETUR,
-    OPPHEVET,
-    MEDHOD,
-    DELVIS_MEDHOLD,
-    OPPRETTHOLDT,
-    UGUNST,
-    AVVIST
-}
