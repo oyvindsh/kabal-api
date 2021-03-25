@@ -33,7 +33,7 @@ class KvalitetsvurderingController(
         @PathVariable("id") klagebehandlingId: String
     ): KvalitetsvurderingView {
         logger.debug(
-            "getKvalitetsvurdering is requested by ident {} for oppgaveId {}",
+            "getKvalitetsvurdering is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
@@ -48,7 +48,7 @@ class KvalitetsvurderingController(
         @RequestBody input: KvalitetsvurderingGrunnInput
     ): KvalitetsvurderingView {
         logger.debug(
-            "putKvalitetsvurderingGrunn is requested by ident {} for oppgaveId {}",
+            "putKvalitetsvurderingGrunn is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
@@ -67,7 +67,7 @@ class KvalitetsvurderingController(
         @RequestBody input: KvalitetsvurderingEoesInput
     ): KvalitetsvurderingView {
         logger.debug(
-            "putKvalitetsvurderingEoes is requested by ident {} for oppgaveId {}",
+            "putKvalitetsvurderingEoes is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
@@ -86,7 +86,7 @@ class KvalitetsvurderingController(
         @RequestBody input: KvalitetsvurderingRaadfoertMedLegeInput
     ): KvalitetsvurderingView {
         logger.debug(
-            "putKvalitetsvurderingRaadfoertMedLege is requested by ident {} for oppgaveId {}",
+            "putKvalitetsvurderingRaadfoertMedLege is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
@@ -105,7 +105,7 @@ class KvalitetsvurderingController(
         @RequestBody input: KvalitetsvurderingInternVurderingInput
     ): KvalitetsvurderingView {
         logger.debug(
-            "putKvalitetsvurderingInternVurdering is requested by ident {} for oppgaveId {}",
+            "putKvalitetsvurderingInternVurdering is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
@@ -124,7 +124,7 @@ class KvalitetsvurderingController(
         @RequestBody input: KvalitetsvurderingSendTilbakemeldingInput
     ): KvalitetsvurderingView {
         logger.debug(
-            "putKvalitetsvurderingSendTilbakemelding is requested by ident {} for oppgaveId {}",
+            "putKvalitetsvurderingSendTilbakemelding is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )
@@ -143,7 +143,7 @@ class KvalitetsvurderingController(
         @RequestBody input: KvalitetsvurderingTilbakemeldingInput
     ): KvalitetsvurderingView {
         logger.debug(
-            "putKvalitetsvurderingTilbakemelding is requested by ident {} for oppgaveId {}",
+            "putKvalitetsvurderingTilbakemelding is requested by ident {} for klagebehandlingId {}",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
         )

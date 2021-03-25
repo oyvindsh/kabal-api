@@ -270,7 +270,7 @@ class KlagebehandlingDetaljerController(
 
     private fun logMethodDetails(methodName: String, klagebehandlingId: String) {
         logger.debug(
-            "{} is requested by ident {} for oppgaveId {}",
+            "{} is requested by ident {} for klagebehandlingId {}",
             methodName,
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId
