@@ -63,7 +63,12 @@
         <root level="info">
             <appender-ref ref="json"/>
         </root>
+
         <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug" additivity="false">
+            <appender-ref ref="secureJson"/>
+        </logger>
+
+        <logger name="org.zalando" level="info" additivity="false">
             <appender-ref ref="secureJson"/>
         </logger>
 
