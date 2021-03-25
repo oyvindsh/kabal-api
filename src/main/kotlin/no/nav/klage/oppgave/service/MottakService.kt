@@ -33,6 +33,7 @@ class MottakService(
     fun createMottakForKlage(oversendtKlage: OversendtKlage) {
         oversendtKlage.validate()
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
+        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
     }
 
