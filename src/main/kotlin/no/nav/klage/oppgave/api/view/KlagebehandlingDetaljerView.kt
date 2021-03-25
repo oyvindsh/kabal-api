@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class KlagebehandlingView(
+data class KlagebehandlingDetaljerView(
     val id: UUID,
     val klageInnsendtdato: LocalDate?,
     val fraNAVEnhet: String?,
@@ -20,13 +20,11 @@ data class KlagebehandlingView(
     val hjemler: List<HjemmelView>,
     val modified: LocalDateTime,
     val created: LocalDateTime,
-    val fraSaksbehandlerident: String? = null
-)
-
-data class HjemmelView(
-    val kapittel: Int? = null,
-    val paragraf: Int? = null,
-    val ledd: Int? = null,
-    val bokstav: String? = null,
-    val original: String
+    val fraSaksbehandlerident: String? = null,
+    val grunn: Int?,
+    val eoes: Int?,
+    val raadfoertMedLege: Int?,
+    val internVurdering: String?,
+    val sendTilbakemelding: Boolean?,
+    val tilbakemelding: String?
 )

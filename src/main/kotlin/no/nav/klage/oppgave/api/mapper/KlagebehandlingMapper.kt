@@ -1,9 +1,7 @@
 package no.nav.klage.oppgave.api.mapper
 
 
-import no.nav.klage.oppgave.api.view.KlagebehandlingListView
-import no.nav.klage.oppgave.api.view.KlagebehandlingView
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
@@ -83,10 +81,6 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingToKlagebehandlingView(klagebehandling: Klagebehandling): KlagebehandlingView {
-
-
-        //TODO: Trenger vi egentlig Mottak her også?
-        //Skal vi vise frem dataene vi mottok fra førsteinstans i tillegg til det saksbehandler har satt/endret?
         return KlagebehandlingView(
             id = klagebehandling.id,
             klageInnsendtdato = klagebehandling.innsendt,
@@ -108,9 +102,37 @@ class KlagebehandlingMapper(
         )
     }
 
-    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<KlagebehandlingView.Hjemmel> {
+    fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
+        return KlagebehandlingDetaljerView(
+            id = klagebehandling.id,
+            klageInnsendtdato = klagebehandling.innsendt,
+            //TODO get name from norg2
+            fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
+            fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
+            mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
+            foedselsnummer = klagebehandling.foedselsnummer,
+            tema = klagebehandling.tema.id,
+            sakstype = klagebehandling.sakstype.navn,
+            mottatt = klagebehandling.mottattKlageinstans,
+            startet = klagebehandling.startet,
+            avsluttet = klagebehandling.avsluttet,
+            frist = klagebehandling.frist,
+            tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
+            hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
+            modified = klagebehandling.modified,
+            created = klagebehandling.created,
+            grunn = klagebehandling.kvalitetsvurdering?.grunn?.id,
+            eoes = klagebehandling.kvalitetsvurdering?.eoes?.id,
+            raadfoertMedLege = klagebehandling.kvalitetsvurdering?.raadfoertMedLege?.id,
+            internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
+            sendTilbakemelding = klagebehandling.kvalitetsvurdering?.sendTilbakemelding,
+            tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding
+        )
+    }
+
+    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<HjemmelView> {
         return hjemler.map {
-            KlagebehandlingView.Hjemmel(
+            HjemmelView(
                 kapittel = it.kapittel,
                 paragraf = it.paragraf,
                 ledd = it.ledd,
