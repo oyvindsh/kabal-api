@@ -4,7 +4,9 @@ import no.nav.klage.oppgave.events.MottakLagretEvent
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Service
 
+@Service
 class CreateKlagebehandlingFromMottakEventListener(private val klagebehandlingService: KlagebehandlingService) {
 
     companion object {
