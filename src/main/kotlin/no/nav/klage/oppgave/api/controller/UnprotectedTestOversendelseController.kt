@@ -9,10 +9,12 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.util.*
+import javax.validation.Valid
 
 @Profile("dev-gcp")
 @RestController
@@ -28,6 +30,11 @@ class UnprotectedTestOversendelseController(
     }
 
     @PostMapping("/klage")
+    fun sendInnKlage(@Valid @RequestBody oversendtKlage: OversendtKlage) {
+        mottakService.createMottakForKlage(oversendtKlage)
+    }
+
+    @PostMapping("/predefklage")
     fun sendInnKlage() {
         val klager = listOf(
             OversendtKlage(
