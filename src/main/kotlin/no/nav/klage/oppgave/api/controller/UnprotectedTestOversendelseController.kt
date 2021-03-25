@@ -39,8 +39,8 @@ class UnprotectedTestOversendelseController(
         val klager = listOf(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
-                tema = Tema.OMS,
-                eksternReferanse = "OMS_27458422236",
+                tema = Tema.SYK,
+                eksternReferanse = "SYK_27458422236",
                 innsynUrl = "https://vg.no",
                 foedselsnummer = "27458422236",
                 beskrivelse = "ORDINÆR",
@@ -58,8 +58,8 @@ class UnprotectedTestOversendelseController(
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
-                tema = Tema.OMS,
-                eksternReferanse = "OMS_28488425473",
+                tema = Tema.SYK,
+                eksternReferanse = "SYK_28488425473",
                 innsynUrl = "https://vg.no",
                 foedselsnummer = "28488425473",
                 beskrivelse = "EGEN ANSATT",
@@ -77,8 +77,8 @@ class UnprotectedTestOversendelseController(
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
-                tema = Tema.OMS,
-                eksternReferanse = "OMS_02518418680",
+                tema = Tema.SYK,
+                eksternReferanse = "SYK_02518418680",
                 innsynUrl = "https://vg.no",
                 foedselsnummer = "02518418680",
                 beskrivelse = "KODE 6",
@@ -96,8 +96,8 @@ class UnprotectedTestOversendelseController(
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
-                tema = Tema.OMS,
-                eksternReferanse = "OMS_02508425425",
+                tema = Tema.SYK,
+                eksternReferanse = "SYK_02508425425",
                 innsynUrl = "https://vg.no",
                 foedselsnummer = "02508425425",
                 beskrivelse = "KODE 7",
@@ -115,8 +115,8 @@ class UnprotectedTestOversendelseController(
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
-                tema = Tema.OMS,
-                eksternReferanse = "OMS_23528406688",
+                tema = Tema.SYK,
+                eksternReferanse = "SYK_23528406688",
                 innsynUrl = "https://vg.no",
                 foedselsnummer = "23528406688",
                 beskrivelse = "KODE 19",
