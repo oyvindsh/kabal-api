@@ -59,6 +59,12 @@ class TokenService(
         return response.accessToken
     }
 
+    fun getAppAccessTokenWithAxsysScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["axsys-maskintilmaskin"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getStsSystembrukerToken(): String = stsClient.oidcToken()
 
     fun getAccessTokenFrontendSent(): String =

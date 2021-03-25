@@ -76,7 +76,7 @@ class AxsysClient(
                     .path("/enhet/{enhetId}/brukere")
                     .build(enhetId)
             }
-            .header("Authorization", "Bearer ${tokenService.getStsSystembrukerToken()}")
+            .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithAxsysScope()}")
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
 
