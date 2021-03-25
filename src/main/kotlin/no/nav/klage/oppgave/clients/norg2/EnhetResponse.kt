@@ -4,7 +4,7 @@ data class EnhetResponse(
     val antallRessurser: Int,
     val enhetId: Int,
     val enhetNr: String,
-    val kanalstrategi: String,
+    val kanalstrategi: String? = null,
     val navn: String,
     val oppgavebehandler: Boolean,
     val sosialeTjenester: String,
