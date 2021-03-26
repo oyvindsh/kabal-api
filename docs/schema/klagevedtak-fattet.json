@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "klagevedtak-fattet.json",
+  "title": "KlagevedtakFattet",
+  "description": "Kafka-melding som sendes ut når vedtak er fattet av klageinstans.",
+  "type": "object",
+  "required": [
+    "id",
+    "utfall",
+    "vedtaksbrevReferanse"
+  ],
+  "properties": {
+    "id": {
+      "$id": "#KlagevedtakFattet/id",
+      "title": "Identifikator",
+      "type": "string",
+      "description": "Ekstern id for klage. Skal stemme overens med id sendt inn."
+    },
+    "utfall": {
+      "$id": "#KlagevedtakFattet/utfall",
+      "title": "Utfall",
+      "type": "string",
+      "description": "Utfallet av vedtaket.",
+      "enum": [
+        "TRUKKET",
+        "RETUR",
+        "OPPHEVET",
+        "MEDHOD",
+        "DELVIS_MEDHOLD",
+        "OPPRETTHOLDT",
+        "UGUNST",
+        "AVVIST"
+      ]
+    },
+    "vedtaksbrevReferanse": {
+      "$id": "#KlagevedtakFattet/vedtaksbrevReferanse",
+      "title": "Vedtaksbrevreferanse",
+      "type": "string",
+      "description": "Journalpost id til vedtaksbrev."
+    }
+  }
+}
