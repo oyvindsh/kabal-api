@@ -152,6 +152,8 @@ navConsumerId: Nav-Consumer-Id
 allowed.origins:
   https://klage-oppgave.nav.no,
   https://klage-oppgave.dev.nav.no
+  https://kabal.nav.no,
+  https://kabal.dev.nav.no
 
 MICROSOFT_GRAPH_URL: https://graph.microsoft.com/v1.0
 UNLEASH_URL: https://unleash.nais.io/api/
