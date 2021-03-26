@@ -75,7 +75,9 @@ class KlagebehandlingMapper(
                 hjemmel = esKlagebehandling.hjemler?.firstOrNull(),
                 frist = esKlagebehandling.frist,
                 mottatt = esKlagebehandling.mottattKlageinstans,
-                versjon = esKlagebehandling.versjon!!.toInt()
+                versjon = esKlagebehandling.versjon!!.toInt(),
+                klagebehandlingVersjon = esKlagebehandling.versjon
+
             )
         }
     }
@@ -98,7 +100,8 @@ class KlagebehandlingMapper(
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
             modified = klagebehandling.modified,
-            created = klagebehandling.created
+            created = klagebehandling.created,
+            klagebehandlingVersjon = klagebehandling.versjon
         )
     }
 
@@ -126,7 +129,8 @@ class KlagebehandlingMapper(
             raadfoertMedLege = klagebehandling.kvalitetsvurdering?.raadfoertMedLege?.id,
             internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
             sendTilbakemelding = klagebehandling.kvalitetsvurdering?.sendTilbakemelding,
-            tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding
+            tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding,
+            klagebehandlingVersjon = klagebehandling.versjon
         )
     }
 
@@ -150,7 +154,8 @@ class KlagebehandlingMapper(
             raadfoertMedLege = kvalitetsvurdering?.raadfoertMedLege?.id,
             internVurdering = kvalitetsvurdering?.internVurdering,
             sendTilbakemelding = kvalitetsvurdering?.sendTilbakemelding,
-            tilbakemelding = kvalitetsvurdering?.tilbakemelding
+            tilbakemelding = kvalitetsvurdering?.tilbakemelding,
+            klagebehandlingVersjon = klagebehandling.versjon
         )
     }
 }

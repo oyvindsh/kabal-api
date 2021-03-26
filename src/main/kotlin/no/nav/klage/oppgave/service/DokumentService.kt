@@ -64,6 +64,7 @@ class DokumentService(
 
     fun connectDokumentToKlagebehandling(
         klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
@@ -72,6 +73,7 @@ class DokumentService(
 
         klagebehandlingService.addDokument(
             klagebehandlingId,
+            klagebehandlingVersjon,
             journalpostId,
             dokumentInfoId,
             saksbehandlerIdent
@@ -80,10 +82,19 @@ class DokumentService(
 
     fun disconnectDokumentFromKlagebehandling(
         klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ) = klagebehandlingService.removeDokument(klagebehandlingId, journalpostId, dokumentInfoId, saksbehandlerIdent)
+    ) {
+        klagebehandlingService.removeDokument(
+            klagebehandlingId,
+            klagebehandlingVersjon,
+            journalpostId,
+            dokumentInfoId,
+            saksbehandlerIdent
+        )
+    }
 
 
     fun validateJournalpostExists(journalpostId: String) {

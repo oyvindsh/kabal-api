@@ -32,6 +32,13 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
+    fun handleKlagebehandlingSamtidigEndretException(
+        ex: KlagebehandlingSamtidigEndretException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.CONFLICT, ex, request)
+
+    @ExceptionHandler
     fun handleOversendtKlageReceivedBeforeException(
         ex: OversendtKlageReceivedBeforeException,
         request: NativeWebRequest

@@ -70,6 +70,7 @@ class KlagebehandlingListController(
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
+            saksbehandlertildeling.klagebehandlingVersjon,
             saksbehandlertildeling.navIdent,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
@@ -91,6 +92,7 @@ class KlagebehandlingListController(
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
+            saksbehandlerfradeling?.klagebehandlingVersjon,
             null,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )

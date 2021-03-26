@@ -55,6 +55,7 @@ class KvalitetsvurderingController(
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.setKvalitetsvurderingGrunn(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.grunn,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -74,6 +75,7 @@ class KvalitetsvurderingController(
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.setKvalitetsvurderingEoes(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.eoes,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -93,6 +95,7 @@ class KvalitetsvurderingController(
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.setKvalitetsvurderingRaadfoertMedLege(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.raadfoertMedLege,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -112,6 +115,7 @@ class KvalitetsvurderingController(
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.setKvalitetsvurderingInternVurdering(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.internVurdering,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -131,6 +135,7 @@ class KvalitetsvurderingController(
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.setKvalitetsvurderingSendTilbakemelding(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.sendTilbakemelding,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -150,6 +155,7 @@ class KvalitetsvurderingController(
         return klagebehandlingMapper.mapKlagebehandlingToKvalitetsvurderingView(
             klagebehandlingService.setKvalitetsvurderingTilbakemelding(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.tilbakemelding,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
