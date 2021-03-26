@@ -75,6 +75,7 @@ spec:
   accessPolicy:
     inbound:
       rules:
+        - application: kabal
         - application: klage-oppgave
         - application: klage-oppgave-consumer
     outbound:
