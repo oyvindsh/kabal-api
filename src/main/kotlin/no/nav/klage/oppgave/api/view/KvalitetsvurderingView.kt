@@ -6,5 +6,6 @@ data class KvalitetsvurderingView(
     val raadfoertMedLege: Int?,
     val internVurdering: String?,
     val sendTilbakemelding: Boolean?,
-    val tilbakemelding: String?
+    val tilbakemelding: String?,
+    val klagebehandlingVersjon: Long
 )

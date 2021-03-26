@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -93,5 +94,12 @@ class Klagebehandling(
 
     override fun hashCode(): Int {
         return id.hashCode()
+    }
+
+    fun checkOptimisticLocking(klagebehandlingVersjon: Long?) {
+        if (klagebehandlingVersjon != null) {
+            if (klagebehandlingVersjon != this.versjon) throw KlagebehandlingSamtidigEndretException("Angitt versjon er $klagebehandlingVersjon, men nyeste klagebehandling har versjon ${this.versjon}")
+        }
+
     }
 }

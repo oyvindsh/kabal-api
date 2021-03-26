@@ -20,7 +20,8 @@ data class KlagebehandlingView(
     val hjemler: List<HjemmelView>,
     val modified: LocalDateTime,
     val created: LocalDateTime,
-    val fraSaksbehandlerident: String? = null
+    val fraSaksbehandlerident: String? = null,
+    val klagebehandlingVersjon: Long
 )
 
 data class HjemmelView(

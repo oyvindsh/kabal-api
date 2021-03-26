@@ -95,6 +95,7 @@ class DokumentController(
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         dokumentService.disconnectDokumentFromKlagebehandling(
             klagebehandlingId,
+            null, //dropper optimistic locking her
             journalpostId,
             dokumentInfoId,
             innloggetIdent
@@ -116,6 +117,7 @@ class DokumentController(
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         dokumentService.connectDokumentToKlagebehandling(
             klagebehandlingId,
+            null, //dropper optimistic locking her
             dokumentKnytning.journalpostId,
             dokumentKnytning.dokumentInfoId,
             innloggetIdent
