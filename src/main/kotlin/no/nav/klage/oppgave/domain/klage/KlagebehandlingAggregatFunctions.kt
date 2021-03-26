@@ -1,10 +1,10 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Eoes
-import no.nav.klage.oppgave.domain.kodeverk.Grunn
-import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
+import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object KlagebehandlingAggregatFunctions {
 
@@ -16,9 +16,27 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         tildeltSaksbehandlerident = nyVerdi
         modified = tidspunkt
-        val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TILDELT_SAKSBEHANDLERIDENT, gammelVerdi, nyVerdi, tidspunkt)
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+        if (startet == null) {
+            startet = tidspunkt.toLocalDate()
+            endringslogg(
+                saksbehandlerident,
+                Felt.STARTET,
+                null,
+                startet?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tidspunkt
+            )?.let { endringslogginnslag.add(it) }
+        }
+
+        endringslogg(
+            saksbehandlerident,
+            Felt.TILDELT_SAKSBEHANDLERIDENT,
+            gammelVerdi,
+            nyVerdi,
+            tidspunkt
+        )?.let { endringslogginnslag.add(it) }
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
     }
 
     fun Klagebehandling.setTildeltEnhet(
@@ -30,7 +48,147 @@ object KlagebehandlingAggregatFunctions {
         tildeltEnhet = nyVerdi
         modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TILDELT_SAKSBEHANDLERIDENT, gammelVerdi, nyVerdi, tidspunkt)
+            endringslogg(saksbehandlerident, Felt.TILDELT_ENHET, gammelVerdi, nyVerdi, tidspunkt)
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setSakstype(
+        nyVerdi: Sakstype,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = sakstype
+        val tidspunkt = LocalDateTime.now()
+        sakstype = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(saksbehandlerident, Felt.SAKSTYPE, gammelVerdi.id, nyVerdi.id, tidspunkt)
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setTema(
+        nyVerdi: Tema,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = tema
+        val tidspunkt = LocalDateTime.now()
+        tema = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(saksbehandlerident, Felt.TEMA, gammelVerdi.id, nyVerdi.id, tidspunkt)
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setInnsendt(
+        nyVerdi: LocalDate,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = innsendt
+        val tidspunkt = LocalDateTime.now()
+        innsendt = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.DATO_KLAGE_INNSENDT,
+                gammelVerdi?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                nyVerdi.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setMottattFoersteinstans(
+        nyVerdi: LocalDate,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = mottattFoersteinstans
+        val tidspunkt = LocalDateTime.now()
+        mottattFoersteinstans = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.DATO_MOTTATT_FOERSTEINSTANS,
+                gammelVerdi?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                nyVerdi.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setMottattKlageinstans(
+        nyVerdi: LocalDate,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = mottattKlageinstans
+        val tidspunkt = LocalDateTime.now()
+        mottattKlageinstans = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.DATO_OVERSENDT_KA,
+                gammelVerdi.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                nyVerdi.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setFrist(
+        nyVerdi: LocalDate,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = frist
+        val tidspunkt = LocalDateTime.now()
+        frist = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.DATO_FRIST,
+                gammelVerdi?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                nyVerdi.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setAvsenderSaksbehandleridentFoersteinstans(
+        nyVerdi: String,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = avsenderSaksbehandleridentFoersteinstans
+        val tidspunkt = LocalDateTime.now()
+        avsenderSaksbehandleridentFoersteinstans = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.AVSENDER_SAKSBEHANDLERIDENT,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setAvsenderEnhetFoersteinstans(
+        nyVerdi: String,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = avsenderEnhetFoersteinstans
+        val tidspunkt = LocalDateTime.now()
+        avsenderEnhetFoersteinstans = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.AVSENDER_ENHET,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
@@ -152,6 +310,46 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(saksbehandlerident, Felt.TILDELT_SAKSBEHANDLERIDENT, gammelVerdi, nyVerdi, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.addSaksdokument(
+        saksdokument: Saksdokument,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent? {
+        if (saksdokumenter.none { it.journalpostId == saksdokument.journalpostId }) {
+            val tidspunkt = LocalDateTime.now()
+            saksdokumenter.add(saksdokument)
+            val endringslogg = Endringslogginnslag.endringslogg(
+                saksbehandlerident,
+                Felt.SAKSDOKUMENT,
+                null,
+                saksdokument.journalpostId,
+                id,
+                tidspunkt
+            )
+            return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        }
+        return null
+    }
+
+    fun Klagebehandling.removeSaksdokument(
+        saksdokument: Saksdokument,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent? {
+        if (saksdokumenter.any { it.journalpostId == saksdokument.journalpostId && it.dokumentInfoId == saksdokument.dokumentInfoId }) {
+            val tidspunkt = LocalDateTime.now()
+            saksdokumenter.removeIf { it.journalpostId == saksdokument.journalpostId }
+            val endringslogg = Endringslogginnslag.endringslogg(
+                saksbehandlerident,
+                Felt.SAKSDOKUMENT,
+                saksdokument.journalpostId,
+                null,
+                id,
+                tidspunkt
+            )
+            return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        }
+        return null
     }
 
     private fun Klagebehandling.endringslogg(

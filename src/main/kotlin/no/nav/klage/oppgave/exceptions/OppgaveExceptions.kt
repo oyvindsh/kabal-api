@@ -23,3 +23,7 @@ class NoSaksbehandlerRoleException(msg: String) : RuntimeException(msg)
 class NotOwnEnhetException(msg: String) : RuntimeException(msg)
 
 class MissingTilgangException(msg: String) : RuntimeException(msg)
+
+class OversendtKlageNotValidException(msg: String) : RuntimeException(msg)
+
+class OversendtKlageReceivedBeforeException(msg: String) : RuntimeException(msg)

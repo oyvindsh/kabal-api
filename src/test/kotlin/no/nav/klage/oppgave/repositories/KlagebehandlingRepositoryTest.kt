@@ -1,19 +1,10 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.*
-import no.nav.klage.oppgave.domain.oppgavekopi.OppgaveKopi
-import no.nav.klage.oppgave.domain.oppgavekopi.Prioritet
-import no.nav.klage.oppgave.domain.oppgavekopi.Status
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -29,9 +20,7 @@ class KlagebehandlingRepositoryTest {
     @Autowired
     lateinit var mottakRepository: MottakRepository
 
-    @Autowired
-    lateinit var oppgaveKopiRepository: OppgaveKopiRepository
-
+    /*
     @Test
     fun `persist klage works`() {
 
@@ -248,4 +237,5 @@ class KlagebehandlingRepositoryTest {
         assertThat(foundModifiedKlage.saksdokumenter).hasSize(1)
         assertThat(foundModifiedKlage.saksdokumenter.first().journalpostId).isEqualTo("REF2")
     }
+    */
 }

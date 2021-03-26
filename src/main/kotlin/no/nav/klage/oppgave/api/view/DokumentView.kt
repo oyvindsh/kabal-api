@@ -20,8 +20,9 @@ data class DokumentReferanse(
     data class VedleggReferanse(
         val dokumentInfoId: String,
         val tittel: String?,
-        val harTilgangTilArkivvariant: Boolean
+        val harTilgangTilArkivvariant: Boolean,
+        val valgt: Boolean
     )
 }
 
-data class DokumentKnytning(val journalpostId: String)
+data class DokumentKnytning(val journalpostId: String, val dokumentInfoId: String)
