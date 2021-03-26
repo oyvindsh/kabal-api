@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-@Api(tags = ["klage-oppgave-api"])
+@Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class VedtakController(
     private val vedtakService: VedtakService
