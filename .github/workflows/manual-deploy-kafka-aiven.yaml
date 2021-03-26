@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   workflow_dispatch:
-    
+
 jobs:
   setup-matrix:
     runs-on: ubuntu-latest
