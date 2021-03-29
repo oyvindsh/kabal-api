@@ -1,0 +1,26 @@
+name: End-to-end tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  acceptance-tests:
+    name: Run acceptance tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+        with:
+          repository: navikt/klage-oppgave-e2e
+      - id: get-sha
+        run: |
+          echo ::set-output name=sha::$( curl -u "u:${{secrets.GITHUB_TOKEN}}" https://api.github.com/repos/navikt/klage-oppgave-e2e/git/ref/heads/master | jq .object.sha | tr -d '"' )
+      - uses: nais/deploy/actions/deploy@master
+        name: Run acceptance tests
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
+          IMAGE: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:${{ steps.get-sha.outputs.sha }}
+          CLUSTER: dev-gcp
+          VAR: app=klage-oppgave
+          RESOURCE: nais/job.yml
+        timeout-minutes: 5
