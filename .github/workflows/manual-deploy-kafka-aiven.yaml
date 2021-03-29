@@ -12,7 +12,7 @@ jobs:
       - name: deploy to dev
         uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
           CLUSTER: dev-gcp
           RESOURCE: kafka-aiven/vedtak-fattet.v1/topic.yaml
           VARS: kafka-aiven/vedtak-fattet.v1/dev-vars.yaml
@@ -20,7 +20,7 @@ jobs:
       - name: deploy to prod
         uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
           CLUSTER: prod-gcp
           RESOURCE: kafka-aiven/vedtak-fattet.v1/topic.yaml
           VARS: kafka-aiven/vedtak-fattet.v1/prod-vars.yaml
