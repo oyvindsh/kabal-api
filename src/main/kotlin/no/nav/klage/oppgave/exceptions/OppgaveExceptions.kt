@@ -27,3 +27,5 @@ class MissingTilgangException(msg: String) : RuntimeException(msg)
 class OversendtKlageNotValidException(msg: String) : RuntimeException(msg)
 
 class OversendtKlageReceivedBeforeException(msg: String) : RuntimeException(msg)
+
+class KlagebehandlingSamtidigEndretException(msg: String) : RuntimeException(msg)

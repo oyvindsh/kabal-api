@@ -59,6 +59,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setSakstype(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.sakstype,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -74,6 +75,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setTema(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.tema,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -89,6 +91,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setInnsendt(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.innsendt,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -104,6 +107,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setMottattFoersteinstans(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.mottattFoersteinstans,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -119,6 +123,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setMottattKlageinstans(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.mottattKlageinstans,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -134,6 +139,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setFrist(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.frist,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -149,6 +155,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setAvsenderSaksbehandleridentFoersteinstans(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.avsenderSaksbehandlerident,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -164,6 +171,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setAvsenderEnhetFoersteinstans(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.avsenderEnhet,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -179,6 +187,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setKvalitetsvurderingGrunn(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.grunn,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -194,6 +203,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setKvalitetsvurderingEoes(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.eoes,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -209,6 +219,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setKvalitetsvurderingRaadfoertMedLege(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.raadfoertMedLege,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -224,6 +235,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setKvalitetsvurderingInternVurdering(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.internVurdering,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -239,6 +251,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setKvalitetsvurderingSendTilbakemelding(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.sendTilbakemelding,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
@@ -254,6 +267,7 @@ class KlagebehandlingDetaljerController(
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setKvalitetsvurderingTilbakemelding(
                 klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
                 input.tilbakemelding,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )

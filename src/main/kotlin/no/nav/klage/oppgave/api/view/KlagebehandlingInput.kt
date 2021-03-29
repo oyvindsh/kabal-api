@@ -5,22 +5,37 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import java.time.LocalDate
 
 
-data class KlagebehandlingSakstypeInput(val sakstype: Sakstype)
+data class KlagebehandlingSakstypeInput(val sakstype: Sakstype, val klagebehandlingVersjon: Long? = null)
 
-data class KlagebehandlingTemaInput(val tema: Tema)
+data class KlagebehandlingTemaInput(val tema: Tema, val klagebehandlingVersjon: Long? = null)
 
-data class KlagebehandlingInnsendtInput(val innsendt: LocalDate)
+data class KlagebehandlingInnsendtInput(val innsendt: LocalDate, val klagebehandlingVersjon: Long? = null)
 
-data class KlagebehandlingMottattFoersteinstansInput(val mottattFoersteinstans: LocalDate)
+data class KlagebehandlingMottattFoersteinstansInput(
+    val mottattFoersteinstans: LocalDate,
+    val klagebehandlingVersjon: Long? = null
+)
 
-data class KlagebehandlingMottattKlageinstansInput(val mottattKlageinstans: LocalDate)
+data class KlagebehandlingMottattKlageinstansInput(
+    val mottattKlageinstans: LocalDate,
+    val klagebehandlingVersjon: Long? = null
+)
 
-data class KlagebehandlingFristInput(val frist: LocalDate)
+data class KlagebehandlingFristInput(val frist: LocalDate, val klagebehandlingVersjon: Long? = null)
 
-data class KlagebehandlingAvsenderSaksbehandleridentFoersteinstansInput(val avsenderSaksbehandlerident: String)
+data class KlagebehandlingAvsenderSaksbehandleridentFoersteinstansInput(
+    val avsenderSaksbehandlerident: String,
+    val klagebehandlingVersjon: Long? = null
+)
 
-data class KlagebehandlingAvsenderEnhetFoersteinstansInput(val avsenderEnhet: String)
+data class KlagebehandlingAvsenderEnhetFoersteinstansInput(
+    val avsenderEnhet: String,
+    val klagebehandlingVersjon: Long? = null
+)
 
-data class KlagebehandlingTildeltSaksbehandleridentInput(val tildeltSaksbehandlerident: String)
+data class KlagebehandlingTildeltSaksbehandleridentInput(
+    val tildeltSaksbehandlerident: String,
+    val klagebehandlingVersjon: Long? = null
+)
 
-data class KlagebehandlingTildeltEnhetInput(val tildeltEnhet: String)
+data class KlagebehandlingTildeltEnhetInput(val tildeltEnhet: String, val klagebehandlingVersjon: Long? = null)
