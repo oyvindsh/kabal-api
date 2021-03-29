@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: navikt/klage-oppgave-e2e
+          ref: master
       - id: get-sha
         run: |
           echo ::set-output name=sha::$( curl -u "u:${{secrets.GITHUB_TOKEN}}" https://api.github.com/repos/navikt/klage-oppgave-e2e/git/ref/heads/master | jq .object.sha | tr -d '"' )
