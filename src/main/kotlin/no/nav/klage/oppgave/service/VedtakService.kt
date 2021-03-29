@@ -12,8 +12,10 @@ class VedtakService(
 ) {
 
     fun fullfoerVedtak(vedtakId: UUID) {
-        val klage = klagebehandlingRepository.findById(vedtakId).orElseThrow()
-        val vedtak = klage.vedtak.first() // TODO: Hvordan gjør vi dette?
+        val klage = klagebehandlingRepository.findByVedtakId(vedtakId)
+        require(klage != null) { "Ingen klage knyttet til vedtak" }
+        val vedtak = klage.vedtak.find { it.id == vedtakId }
+        require(vedtak != null) { "Fant ikke vedtak på klage" }
         val vedtakFattet = KlagevedtakFattet(
             id = klage.referanseId ?: "UKJENT", // TODO: Riktig?
             utfall = vedtak.utfall,
