@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy kafka topics
 
 on:
   workflow_dispatch:
