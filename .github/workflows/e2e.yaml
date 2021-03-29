@@ -13,14 +13,11 @@ jobs:
         with:
           repository: navikt/klage-oppgave-e2e
           ref: master
-      - id: get-sha
-        run: |
-          echo ::set-output name=sha::$( curl -u "u:${{secrets.GITHUB_TOKEN}}" https://api.github.com/repos/navikt/klage-oppgave-e2e/git/ref/heads/master | jq .object.sha | tr -d '"' )
-      - uses: nais/deploy/actions/deploy@master
-        name: Run acceptance tests
+      - name: Run acceptance tests
+        uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
-          IMAGE: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:${{ steps.get-sha.outputs.sha }}
+          IMAGE: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:latest
           CLUSTER: dev-gcp
           VAR: app=klage-oppgave
           RESOURCE: nais/job.yml
