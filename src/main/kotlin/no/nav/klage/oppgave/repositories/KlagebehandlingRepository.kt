@@ -14,9 +14,6 @@ interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID> {
 
     fun findByMottakId(mottakId: UUID): Klagebehandling?
 
-    @Query("SELECT kb FROM Klagebehandling kb JOIN kb.vedtak v WHERE v.id = ?1")
-    fun findByVedtakId(vedtakId: UUID): Klagebehandling?
-
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     override fun getOne(id: UUID): Klagebehandling
 }
