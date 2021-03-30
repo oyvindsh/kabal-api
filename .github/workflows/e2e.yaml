@@ -15,5 +15,5 @@ jobs:
           IMAGE: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:latest
           CLUSTER: dev-gcp
           VAR: app=klage-oppgave
-          RESOURCE: nais/job.yml
+          RESOURCE: deploy/e2ejob.yml
         timeout-minutes: 5
