@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
@@ -37,7 +38,8 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val hjemmelService: HjemmelService
+    private val hjemmelService: HjemmelService,
+    private val vedtakKafkaProducer: VedtakKafkaProducer
 ) {
 
     companion object {
@@ -367,6 +369,19 @@ class KlagebehandlingService(
             logger.error("Error disconnecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
             throw e
         }
+    }
+
+    fun fullfoerVedtak(klagebehandlingId: UUID, vedtakId: UUID) {
+        val klage = klagebehandlingRepository.findById(klagebehandlingId).orElseThrow()
+        val vedtak = klage.vedtak.find { it.id == vedtakId }
+        require(vedtak != null) { "Fant ikke vedtak på klage" }
+        val vedtakFattet = KlagevedtakFattet(
+            id = klage.referanseId ?: "UKJENT", // TODO: Riktig?
+            utfall = vedtak.utfall,
+            vedtaksbrevReferanse = "TODO"
+        )
+
+        vedtakKafkaProducer.sendVedtak(vedtakFattet)
     }
 
     /*

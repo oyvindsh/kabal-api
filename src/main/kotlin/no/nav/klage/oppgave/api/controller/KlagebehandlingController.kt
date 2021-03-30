@@ -216,6 +216,14 @@ class KlagebehandlingController(
         )
     }
 
+    @PostMapping("/klagebehandlinger/{id}/vedtak/{vedtakId}/fullfoer")
+    fun fullfoerVedtak(
+        @PathVariable id: String,
+        @PathVariable vedtakId: String
+    ) {
+        klagebehandlingService.fullfoerVedtak(id.toUUIDOrException(), vedtakId.toUUIDOrException())
+    }
+
     private fun String.toUUIDOrException() =
         try {
             UUID.fromString(this)
