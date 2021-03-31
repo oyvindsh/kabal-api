@@ -15,6 +15,9 @@
 ````
 POST <kabal-api-url>/oversendelse/klage <oversendt-klage-json>
 ````
+- DEV-url: `https://kabal-api.dev.nav.no`
+- PROD-url: `https://kabal-api.intern.nav.no`
+
 Skjema for oversendt klage kan finnes [her](../schema/oversendt-klage.json).
 
 ### Klage-vedtak på Kafka
