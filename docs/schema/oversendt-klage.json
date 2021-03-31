@@ -10,17 +10,11 @@
     "eksternReferanse",
     "innsynUrl",
     "foedselsnummer",
-    "beskrivelse",
     "avsenderSaksbehandlerIdent",
     "avsenderEnhet",
     "hjemler",
-    "mottattFoersteinstans",
-    "innsendtTilNav",
     "sakstype",
     "oversendtEnhet",
-    "oversendelsesbrevJournalpostId",
-    "brukersKlageJournalpostId",
-    "frist",
     "kilde"
   ],
   "properties": {
