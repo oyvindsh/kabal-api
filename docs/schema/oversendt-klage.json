@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "oversendt-klage.json",
+  "title": "OversendtKlage",
+  "description": "JSON-objekt for oversendt klage.",
+  "type": "object",
+  "required": [
+    "uuid",
+    "tema",
+    "eksternReferanse",
+    "innsynUrl",
+    "foedselsnummer",
+    "beskrivelse",
+    "avsenderSaksbehandlerIdent",
+    "avsenderEnhet",
+    "hjemler",
+    "mottattFoersteinstans",
+    "innsendtTilNav",
+    "sakstype",
+    "oversendtEnhet",
+    "oversendelsesbrevJournalpostId",
+    "brukersKlageJournalpostId",
+    "frist",
+    "kilde"
+  ],
+  "properties": {
+    "uuid": {
+      "$id": "#OversendtKlage/uuid",
+      "title": "Identifikator",
+      "type": "string",
+      "description": "UUID"
+    },
+    "tema": {
+      "$id": "#OversendtKlage/tema",
+      "title": "Tema",
+      "type": "string",
+      "description": "Tema. Lovlige verdier: https://github.com/navikt/kabal-api/blob/main/src/main/kotlin/no/nav/klage/oppgave/domain/kodeverk/Tema.kt"
+    },
+    "eksternReferanse": {
+      "$id": "#OversendtKlage/eksternReferanse",
+      "title": "Eksternreferanse",
+      "type": "string",
+      "description": "Ekstern referanse til vedtaksløsning."
+    },
+    "innsynUrl": {
+      "$id": "#OversendtKlage/innsynUrl",
+      "title": "Innsynurl",
+      "type": "string",
+      "description": "Dyplenke til vedtaksløsning så saksbehandler på klageinstans kan navigere til vedtaksløsning for innsyn i saksbehandling."
+    },
+    "foedselsnummer": {
+      "$id": "#OversendtKlage/foedselsnummer",
+      "title": "Foedselsnummer",
+      "type": "string",
+      "description": "Fødselsnummer bruker.",
+      "pattern": "^\\d{11}$"
+    },
+    "beskrivelse": {
+      "$id": "#OversendtKlage/beskrivelse",
+      "title": "Beskrivelse",
+      "type": "string",
+      "description": "Beskrivelse for klage"
+    },
+    "avsenderSaksbehandlerIdent": {
+      "$id": "#OversendtKlage/avsenderSaksbehandlerIdent",
+      "title": "Avsendersaksbehandlerident",
+      "type": "string",
+      "description": "Ident for saksbehandler som fattet vedtak i førsteinstans."
+    },
+    "avsenderEnhet": {
+      "$id": "#OversendtKlage/avsenderEnhet",
+      "title": "Avsenderenhet",
+      "type": "string",
+      "description": "Enhet som fattet vedtak i førsteinstans."
+    },
+    "hjemler": {
+      "$id": "#OversendtKlage/hjemler",
+      "title": "Hjemler",
+      "type": "array",
+      "description": "Hjemler knyttet til klagen",
+      "items":{
+        "$id": "#OversendtKlage/hjemler/items",
+        "title": "Items",
+        "type": "string"
+      }
+    },
+    "mottattFoersteinstans": {
+      "$id": "#OversendtKlage/mottattFoersteinstans",
+      "title": "Mottattfoersteinstans",
+      "type": "string",
+      "description": "Dato for når førsteinstans mottok klage. Format yyyy-MM-dd."
+    },
+    "innsendtTilNav": {
+      "$id": "#OversendtKlage/innsendtTilNav",
+      "title": "Innsendttilnav",
+      "type": "string",
+      "description": "Dato for når klagen ble innsendt til NAV. Format yyyy-MM-dd."
+    },
+    "sakstype": {
+      "$id": "#OversendtKlage/sakstype",
+      "title": "Sakstype",
+      "type": "string",
+      "description": "Type klage",
+      "enum": [
+        "KLAGE",
+        "ANKE",
+        "GJENOPPTAK",
+        "REVURDERING",
+        "FEILUTBETALING"
+      ]
+    },
+    "oversendtEnhet": {
+      "$id": "#OversendtKlage/oversendtEnhet",
+      "title": "Oversendtenhet",
+      "type": "string",
+      "description": "Klageenhet som skal motta klagen."
+    },
+    "oversendelsesbrevJournalpostId": {
+      "$id": "#OversendtKlage/oversendelsesbrevJournalpostId",
+      "title": "Oversendelsesbrevjournalpostid",
+      "type": "string",
+      "description": "JournalpostId for vedtaksbrev."
+    },
+    "brukersKlageJournalpostId": {
+      "$id": "#OversendtKlage/brukersKlageJournalpostId",
+      "title": "Brukersklagejournalpostid",
+      "type": "string",
+      "description": "JournalpostId for brukers klage."
+    },
+    "frist": {
+      "$id": "#OversendtKlage/frist",
+      "title": "Frist",
+      "type": "string",
+      "default": "Frist for når klagen skal være ferdigbehandlet. Format yyyy-MM-dd."
+    },
+    "kilde": {
+      "$id": "#OversendtKlage/kilde",
+      "title": "Kilde",
+      "type": "string",
+      "description": "Vedtaksløsning der klagen først ble behandlet."
+    }
+  }
+}
