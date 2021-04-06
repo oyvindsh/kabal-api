@@ -34,6 +34,46 @@ class UnprotectedTestOversendelseController(
         mottakService.createMottakForKlage(oversendtKlage)
     }
 
+    @PostMapping("/randomklage")
+    fun sendInnRandomKlage() {
+        val fnr = listOf(
+            "01498435854",
+            "01508420680",
+            "03508440684",
+            "08528430687",
+            "10498400820",
+            "13488409241",
+            "19508400619",
+            "23458435642",
+            "23478437471",
+            "26488436251",
+            "27458422236"
+        ).shuffled().first()
+        val dato = LocalDate.of(2020, (1..12).random(), (1..28).random())
+
+        mottakService.createMottakForKlage(
+            OversendtKlage(
+                uuid = UUID.randomUUID(),
+                tema = listOf(Tema.SYK).shuffled().first(),
+                eksternReferanse = "REF_$fnr",
+                innsynUrl = "https://vg.no",
+                foedselsnummer = fnr,
+                beskrivelse = "ORDINÆR",
+                avsenderSaksbehandlerIdent = "Z994674",
+                avsenderEnhet = "0104", //NAV Moss
+                hjemler = listOf(listOf("8-4", "8-21", "8-22", "8-35").shuffled().first()),
+                mottattFoersteinstans = dato,
+                innsendtTilNav = dato.minusDays(3),
+                sakstype = Sakstype.KLAGE,
+                oversendtEnhet = "4291",
+                oversendelsesbrevJournalpostId = null,
+                brukersKlageJournalpostId = null,
+                frist = dato.plusDays(100),
+                kilde = Kilde.OPPGAVE
+            )
+        )
+    }
+
     @PostMapping("/predefklage")
     fun sendInnKlage() {
         val klager = listOf(
