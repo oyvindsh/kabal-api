@@ -22,4 +22,4 @@ Skjema for oversendt klage kan finnes [her](../schema/oversendt-klage.json).
 
 ### Klage-vedtak på Kafka
 
-Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1` kan finnes [her](../schema/oversendt-klage.json).
+Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1` kan finnes [her](../schema/klagevedtak-fattet.json).
