@@ -37,10 +37,10 @@ class UnprotectedTestOversendelseController(
     @PostMapping("/randomklage")
     fun sendInnRandomKlage() {
         val fnr = listOf(
-            "1498435854",
-            "1508420680",
-            "3508440684",
-            "8528430687",
+            "01498435854",
+            "01508420680",
+            "03508440684",
+            "08528430687",
             "10498400820",
             "13488409241",
             "19508400619",
