@@ -103,7 +103,7 @@ class StatistikkInElasticsearchRepositoryTest {
 
     @Test
     @Order(3)
-    fun `saving klagebehandlinger for laster tests`() {
+    fun `saving klagebehandlinger for later tests`() {
 
 
         fun idag() = LocalDate.now()
