@@ -2,11 +2,14 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.util.getLogger
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.search.aggregations.AggregationBuilders
+import org.elasticsearch.search.aggregations.bucket.range.ParsedDateRange
 import org.elasticsearch.search.sort.SortBuilders
 import org.elasticsearch.search.sort.SortOrder
 import org.springframework.context.ApplicationListener
@@ -217,5 +220,87 @@ open class ElasticsearchRepository(
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(allQuery, EsKlagebehandling::class.java)
         return searchHits.searchHits.map { it.id!! }
+    }
+
+    open fun statistikkQuery(): KlageStatistikk {
+
+        val baseQueryInnsendtOgAvsluttet: QueryBuilder = QueryBuilders.matchAllQuery()
+        val queryBuilderInnsendtOgAvsluttet: NativeSearchQueryBuilder = NativeSearchQueryBuilder()
+            .withQuery(baseQueryInnsendtOgAvsluttet)
+        addAggregationsForInnsendtAndAvsluttet(queryBuilderInnsendtOgAvsluttet)
+
+        val searchHitsInnsendtOgAvsluttet: SearchHits<EsKlagebehandling> =
+            esTemplate.search(queryBuilderInnsendtOgAvsluttet.build(), EsKlagebehandling::class.java)
+
+        val innsendtOgAvsluttetAggs = searchHitsInnsendtOgAvsluttet.aggregations!!
+        val sumInnsendtYesterday =
+            innsendtOgAvsluttetAggs.get<ParsedDateRange>("innsendt_yesterday").buckets.firstOrNull()?.docCount ?: 0
+        val sumInnsendtLastSevenDays =
+            innsendtOgAvsluttetAggs.get<ParsedDateRange>("innsendt_last7days").buckets.firstOrNull()?.docCount ?: 0
+        val sumInnsendtLastThirtyDays =
+            innsendtOgAvsluttetAggs.get<ParsedDateRange>("innsendt_last30days").buckets.firstOrNull()?.docCount ?: 0
+        val sumAvsluttetYesterday =
+            innsendtOgAvsluttetAggs.get<ParsedDateRange>("avsluttet_yesterday").buckets.firstOrNull()?.docCount ?: 0
+        val sumAvsluttetLastSevenDays =
+            innsendtOgAvsluttetAggs.get<ParsedDateRange>("avsluttet_last7days").buckets.firstOrNull()?.docCount ?: 0
+        val sumAvsluttetLastThirtyDays =
+            innsendtOgAvsluttetAggs.get<ParsedDateRange>("avsluttet_last30days").buckets.firstOrNull()?.docCount ?: 0
+
+        val baseQueryOverFrist: BoolQueryBuilder = QueryBuilders.boolQuery()
+        baseQueryOverFrist.mustNot(QueryBuilders.existsQuery("avsluttet"))
+        val queryBuilderOverFrist: NativeSearchQueryBuilder = NativeSearchQueryBuilder()
+            .withQuery(baseQueryOverFrist)
+        addAggregationsForOverFrist(queryBuilderOverFrist)
+
+        val searchHitsOverFrist: SearchHits<EsKlagebehandling> =
+            esTemplate.search(queryBuilderOverFrist.build(), EsKlagebehandling::class.java)
+        val sumOverFrist =
+            searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.firstOrNull()?.docCount ?: 0
+        val sumUbehandlede = searchHitsOverFrist.totalHits
+        return KlageStatistikk(
+            sumUbehandlede,
+            sumOverFrist,
+            sumInnsendtYesterday,
+            sumInnsendtLastSevenDays,
+            sumInnsendtLastThirtyDays,
+            sumAvsluttetYesterday,
+            sumAvsluttetLastSevenDays,
+            sumAvsluttetLastThirtyDays
+        )
+    }
+
+    private fun addAggregationsForOverFrist(querybuilder: NativeSearchQueryBuilder) {
+        querybuilder
+            .addAggregation(
+                AggregationBuilders.dateRange("over_frist").field("frist").addUnboundedTo("now/d").format("yyyy-MM-dd")
+            )
+    }
+
+    private fun addAggregationsForInnsendtAndAvsluttet(querybuilder: NativeSearchQueryBuilder) {
+        querybuilder
+            .addAggregation(
+                AggregationBuilders.dateRange("innsendt_yesterday").field("innsendt").addRange("now-1d/d", "now/d")
+                    .format("yyyy-MM-dd")
+            )
+            .addAggregation(
+                AggregationBuilders.dateRange("innsendt_last7days").field("innsendt").addRange("now-7d/d", "now/d")
+                    .format("yyyy-MM-dd")
+            )
+            .addAggregation(
+                AggregationBuilders.dateRange("innsendt_last30days").field("innsendt").addRange("now-30d/d", "now/d")
+                    .format("yyyy-MM-dd")
+            )
+            .addAggregation(
+                AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttet").addRange("now-1d/d", "now/d")
+                    .format("yyyy-MM-dd")
+            )
+            .addAggregation(
+                AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttet").addRange("now-7d/d", "now/d")
+                    .format("yyyy-MM-dd")
+            )
+            .addAggregation(
+                AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttet").addRange("now-30d/d", "now/d")
+                    .format("yyyy-MM-dd")
+            )
     }
 }

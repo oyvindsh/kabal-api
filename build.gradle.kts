@@ -13,6 +13,7 @@ val springMockkVersion = "3.0.1"
 val springFoxVersion = "3.0.0"
 val testContainersVersion = "1.15.1"
 val nimbusVersion = "8.20.1"
+val threeTenExtraVersion = "1.6.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -46,6 +47,7 @@ dependencies {
 
     //temporary fix:
     implementation("com.nimbusds:nimbus-jose-jwt:$nimbusVersion")
+    implementation("org.threeten:threeten-extra:$threeTenExtraVersion")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
