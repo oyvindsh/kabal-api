@@ -47,6 +47,7 @@ Eksempel
 
 Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1` kan finnes [her](../schema/klagevedtak-fattet.json).
 
+Eksempel
 ````
 {
     "id": "1234",
