@@ -20,6 +20,37 @@ POST <kabal-api-url>/oversendelse/klage <oversendt-klage-json>
 
 Skjema for oversendt klage kan finnes [her](../schema/oversendt-klage.json).
 
+Eksempel
+````
+{
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "tema": "SYK",
+    "eksternReferanse": "1234",
+    "innsynUrl": "https://sykepenger.intern.nav.no/behandling/1234",
+    "foedselsnummer": "12345678910",
+    "beskrivelse": "Enkel eskrivelse",
+    "avsenderSaksbehandlerIdent": "Z123456",
+    "avsenderEnhet": "2334",
+    "hjemler": ["8-4", "8-5"],
+    "mottattFoersteinstans": "2020-01-01",
+    "innsendtTilNav": "2019-12-20",
+    "sakstype": "KLAGE",
+    "oversendtEnhet": "4291",
+    "oversendelsesbrevJournalpostId": "5766798",
+    "brukersKlageJournalpostId": "578654",
+    "frist": "2021-12-12",
+    "kilde": "SPEIL"
+}
+````
+
 ### Klage-vedtak på Kafka
 
 Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1` kan finnes [her](../schema/klagevedtak-fattet.json).
+
+````
+{
+    "id": "1234",
+    "utfall": "MEDHOLD",
+    "vedtaksbrevReferanse": "34567657"
+}
+````
