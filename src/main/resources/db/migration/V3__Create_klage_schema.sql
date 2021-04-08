@@ -1,34 +1,61 @@
+CREATE TYPE id_type AS ENUM ('PERSON', 'ORGANISASJON', 'VIRKSOMHET');
+
+CREATE TABLE klage.part_id
+(
+    id          UUID    PRIMARY KEY,
+    type        id_type NOT NULL,
+    value       TEXT
+);
+
 CREATE TABLE klage.mottak
 (
-    id                               UUID PRIMARY KEY,
-    versjon                          BIGINT                   NOT NULL,
-    tema_id                          VARCHAR(3)               NOT NULL,
-    sakstype_id                      VARCHAR(10)              NOT NULL,
-    referanse_id                     TEXT,
-    innsyn_url                       TEXT,
-    foedselsnummer                   VARCHAR(11),
-    organisasjonsnummer              VARCHAR(9),
-    virksomhetsnummer                VARCHAR(9),
-    hjemmel_liste                    TEXT,
-    beskrivelse                      TEXT,
-    avsender_saksbehandlerident      VARCHAR(50),
-    avsender_enhet                   VARCHAR(10),
-    oversendt_klageinstans_enhet     VARCHAR(10),
-    oversendelsesbrev_journalpost_id VARCHAR(40),
-    brukers_klage_journalpost_id     VARCHAR(40),
-    dato_innsendt                    DATE,
-    dato_mottatt_foersteinstans      DATE,
-    dato_oversendt_klageinstans      DATE                     NOT NULL,
-    dato_frist_fra_foersteinstans    DATE,
-    kilde                            VARCHAR(50)              NOT NULL,
-    created                          TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified                         TIMESTAMP WITH TIME ZONE NOT NULL,
+    id                                  UUID PRIMARY KEY,
+    versjon                             BIGINT                   NOT NULL,
+    tema_id                             VARCHAR(3)               NOT NULL,
+    sakstype_id                         VARCHAR(10)              NOT NULL,
+    klager_part_id                      UUID,
+    saksreferanse                       TEXT,
+    intern_referanse                    TEXT,
+    dvh_referanse                       TEXT,
+    innsyn_url                          TEXT,
+    hjemmel_liste                       TEXT,
+    beskrivelse                         TEXT, -- SPØRSMÅL: Hva er dette, egentlig?
+    avsender_saksbehandlerident         TEXT,
+    avsender_enhet                      VARCHAR(10),
+    oversendt_klageinstans_enhet        VARCHAR(10),
+    -- SPØRSMÅL: Burde de tre journalpostene plasseres i egen tabell?
+    opprinnelig_vedtak_journalpost_id   TEXT,
+    oversendelsesbrev_journalpost_id    TEXT,
+    brukers_klage_journalpost_id        TEXT,
+    dato_innsendt                       DATE,
+    dato_mottatt_foersteinstans         DATE,
+    dato_oversendt_klageinstans         DATE                     NOT NULL,
+    dato_frist_fra_foersteinstans       DATE,
+    kilde                               TEXT                     NOT NULL,
+    created                             TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified                            TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_mottak_sakstype
         FOREIGN KEY (sakstype_id)
             REFERENCES kodeverk.sakstype (id),
     CONSTRAINT fk_mottak_tema
         FOREIGN KEY (tema_id)
-            REFERENCES kodeverk.tema (id)
+            REFERENCES kodeverk.tema (id),
+    CONSTRAINT fk_mottak_part
+        FOREIGN KEY (klager_part_id)
+            REFERENCES klage.part_id (id)
+);
+
+CREATE TABLE klage.mottak_brevmottaker
+(
+    id                  UUID PRIMARY KEY,
+    mottak_id           UUID NOT NULL,
+    mottaker_part_id    UUID NOT NULL,
+    CONSTRAINT fk_brevmottaker_mottak
+        FOREIGN KEY (mottak_id)
+            REFERENCES klage.mottak (id),
+    CONSTRAINT fk_brevmottaker_part
+        FOREIGN KEY (mottaker_part_id)
+            REFERENCES klage.part_id (id)
 );
 
 CREATE TABLE klage.kvalitetsvurdering
@@ -102,6 +129,37 @@ CREATE TABLE klage.vedtak
     CONSTRAINT fk_vedtak_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
+);
+
+CREATE TYPE adressetype AS ENUM ('NORSK', 'UTENLANDSK');
+
+CREATE TABLE klage.adresse
+(
+    id                  UUID PRIMARY KEY,
+    adressetype         adressetype NOT NULL,
+    adresselinje1       TEXT,
+    adresselinje2       TEXT,
+    adresselinje3       TEXT,
+    postnummer          VARCHAR(4),
+    poststed            TEXT,
+    land                VARCHAR(2)
+);
+
+CREATE TABLE klage.brevmottaker
+(
+    id                  UUID PRIMARY KEY,
+    vedtak_id           UUID NOT NULL,
+    mottaker_part_id    UUID,
+    adresse_id          UUID,
+    CONSTRAINT fk_brevmottaker_mottak
+        FOREIGN KEY (vedtak_id)
+            REFERENCES klage.vedtak (id),
+    CONSTRAINT fk_brevmottaker_part
+        FOREIGN KEY (mottaker_part_id)
+            REFERENCES klage.part_id (id),
+    CONSTRAINT fk_brevmottaker_adresse
+        FOREIGN KEY (adresse_id)
+            REFERENCES klage.adresse (id)
 );
 
 CREATE TABLE klage.hjemmel
