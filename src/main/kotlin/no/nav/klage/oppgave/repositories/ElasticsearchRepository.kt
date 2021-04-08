@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.repositories
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
+import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.util.getLogger
 import org.elasticsearch.index.query.BoolQueryBuilder
@@ -220,6 +221,66 @@ open class ElasticsearchRepository(
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(allQuery, EsKlagebehandling::class.java)
         return searchHits.searchHits.map { it.id!! }
+    }
+
+    open fun findRelatedKlagebehandlinger(
+        fnr: String,
+        saksreferanse: String,
+        journalpostIder: List<String>
+    ): RelatedKlagebehandlinger {
+        val aapneByFnr = klagebehandlingerMedFoedselsnummer(fnr, true)
+        val aapneBySaksreferanse = klagebehandlingerMedSaksreferanse(saksreferanse, true)
+        val aapneByJournalpostid = klagebehandlingerMedJournalpostId(journalpostIder, true)
+        val avsluttedeByFnr = klagebehandlingerMedFoedselsnummer(fnr, false)
+        val avsluttedeBySaksreferanse = klagebehandlingerMedSaksreferanse(saksreferanse, false)
+        val avsluttedeByJournalpostid = klagebehandlingerMedJournalpostId(journalpostIder, false)
+        //TODO: Vi trenger vel neppe returnere hele klagebehandlingen.. Hva trenger vi å vise i gui?
+        return RelatedKlagebehandlinger(
+            aapneByFnr,
+            avsluttedeByFnr,
+            aapneBySaksreferanse,
+            avsluttedeBySaksreferanse,
+            aapneByJournalpostid,
+            avsluttedeByJournalpostid
+        )
+    }
+
+    private fun klagebehandlingerMedFoedselsnummer(fnr: String, aapen: Boolean): List<EsKlagebehandling> {
+        return findWithBaseQueryAndAapen(
+            QueryBuilders.boolQuery().must(QueryBuilders.termQuery("foedselsnummer", fnr)), aapen
+        )
+    }
+
+    private fun klagebehandlingerMedSaksreferanse(saksreferanse: String, aapen: Boolean): List<EsKlagebehandling> {
+        return findWithBaseQueryAndAapen(
+            QueryBuilders.boolQuery().must(QueryBuilders.termQuery("saksreferanse", saksreferanse)), aapen
+        )
+    }
+
+    private fun klagebehandlingerMedJournalpostId(
+        journalpostIder: List<String>,
+        aapen: Boolean
+    ): List<EsKlagebehandling> {
+        return findWithBaseQueryAndAapen(
+            QueryBuilders.boolQuery().must(QueryBuilders.termsQuery("journalpostId", journalpostIder)), aapen
+        )
+    }
+
+    private fun findWithBaseQueryAndAapen(baseQuery: BoolQueryBuilder, aapen: Boolean): List<EsKlagebehandling> {
+        if (aapen) {
+            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttet"))
+        } else {
+            baseQuery.must(QueryBuilders.existsQuery("avsluttet"))
+        }
+        return try {
+            esTemplate.search(
+                NativeSearchQueryBuilder().withQuery(baseQuery).build(),
+                EsKlagebehandling::class.java
+            ).searchHits.map { it.content }
+        } catch (e: Exception) {
+            logger.error("Failed to search ES for related klagebehandlinger", e)
+            emptyList()
+        }
     }
 
     open fun statistikkQuery(): KlageStatistikk {

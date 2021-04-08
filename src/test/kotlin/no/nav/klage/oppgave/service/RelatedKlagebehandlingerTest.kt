@@ -39,7 +39,7 @@ import java.time.LocalDate
 @Testcontainers
 @SpringBootTest(classes = [ElasticsearchServiceConfiguration::class])
 @ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
-class StatistikkInElasticsearchRepositoryTest {
+class RelatedKlagebehandlingerTest {
 
     companion object {
         @Container
@@ -85,7 +85,13 @@ class StatistikkInElasticsearchRepositoryTest {
         assertThat(indexOps.exists()).isTrue()
     }
 
-    private fun klagebehandling(id: Long, innsendt: LocalDate, frist: LocalDate, avsluttet: LocalDate? = null) =
+    private fun klagebehandling(
+        id: Long,
+        fnr: String,
+        saksreferanse: String?,
+        journalpostIder: List<String>,
+        aapen: Boolean
+    ) =
         EsKlagebehandling(
             id = id.toString(),
             versjon = 1L,
@@ -93,37 +99,32 @@ class StatistikkInElasticsearchRepositoryTest {
             tema = Tema.FOR,
             sakstype = Sakstype.KLAGE,
             tildeltSaksbehandlerident = null,
-            innsendt = innsendt,
-            mottattFoersteinstans = LocalDate.of(2018, 11, 1),
-            mottattKlageinstans = LocalDate.of(2018, 12, 1),
-            frist = frist,
-            avsluttet = avsluttet,
-            hjemler = listOf()
+            innsendt = LocalDate.now(),
+            mottattFoersteinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDate.now(),
+            frist = LocalDate.now(),
+            avsluttet = if (aapen) {
+                null
+            } else {
+                LocalDate.now()
+            },
+            hjemler = listOf(),
+            foedselsnummer = fnr,
+            saksreferanse = saksreferanse,
+            journalpostId = journalpostIder
         )
 
     @Test
     @Order(3)
     fun `saving klagebehandlinger for later tests`() {
 
-
-        fun idag() = LocalDate.now()
-        fun uviktigdag() = LocalDate.now()
-
         val klagebehandlinger = listOf(
-            klagebehandling(1001L, idag(), idag()),
-            klagebehandling(1002L, idag().minusDays(1), idag().minusDays(1)),
-            klagebehandling(1003L, idag().minusDays(6), idag().plusDays(1)),
-            klagebehandling(1004L, idag().minusDays(7), idag().minusDays(7)),
-            klagebehandling(1005L, idag().minusDays(8), idag().plusDays(7)),
-            klagebehandling(1006L, idag().minusDays(30), idag().minusDays(30)),
-            klagebehandling(1007L, idag().minusDays(31), idag().plusDays(30)),
-            klagebehandling(2001L, idag(), idag(), idag()),
-            klagebehandling(2002L, idag().minusDays(1), uviktigdag(), idag().minusDays(1)),
-            klagebehandling(2003L, idag().minusDays(6), uviktigdag(), idag().minusDays(6)),
-            klagebehandling(2004L, idag().minusDays(7), uviktigdag(), idag().minusDays(7)),
-            klagebehandling(2005L, idag().minusDays(8), uviktigdag(), idag().minusDays(8)),
-            klagebehandling(2006L, idag().minusDays(30), uviktigdag(), idag().minusDays(30)),
-            klagebehandling(2007L, idag().minusDays(31), uviktigdag(), idag().minusDays(31)),
+            klagebehandling(1001L, "01019012345", "AAA123", listOf(), true),
+            klagebehandling(1002L, "02019012345", "AAA123", listOf(), false),
+            klagebehandling(1003L, "03019012345", "BBB123", listOf(), true),
+            klagebehandling(1004L, "01019012345", "BBB123", listOf(), false),
+            klagebehandling(1005L, "02019012345", "CCC123", listOf("111222", "333444"), true),
+            klagebehandling(1006L, "03019012345", "CCC123", listOf("333444", "555666"), false)
         )
         esTemplate.save(klagebehandlinger)
 
@@ -133,21 +134,19 @@ class StatistikkInElasticsearchRepositoryTest {
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
-        assertThat(searchHits.totalHits).isEqualTo(14L)
+        assertThat(searchHits.totalHits).isEqualTo(6L)
     }
 
     @Test
     @Order(4)
-    fun `Klagebehandling statistikk gives correct numbers`() {
-        val statistikkTall = repository.statistikkQuery()
-        assertThat(statistikkTall.ubehandlede).isEqualTo(7)
-        assertThat(statistikkTall.overFrist).isEqualTo(3)
-        assertThat(statistikkTall.innsendtIGaar).isEqualTo(2)
-        assertThat(statistikkTall.innsendtSiste7Dager).isEqualTo(6)
-        assertThat(statistikkTall.innsendtSiste30Dager).isEqualTo(10)
-        assertThat(statistikkTall.behandletIGaar).isEqualTo(1)
-        assertThat(statistikkTall.behandletSiste7Dager).isEqualTo(3)
-        assertThat(statistikkTall.behandletSiste30Dager).isEqualTo(5)
+    fun `related klagebehandlinger gives correct answer`() {
+        val related = repository.findRelatedKlagebehandlinger("01019012345", "AAA123", listOf("333444", "777888"))
+        assertThat(related.aapneByFnr.map { it.id }).containsExactly("1001")
+        assertThat(related.avsluttedeByFnr.map { it.id }).containsExactly("1004")
+        assertThat(related.aapneBySaksreferanse.map { it.id }).containsExactly("1001")
+        assertThat(related.avsluttedeBySaksreferanse.map { it.id }).containsExactly("1002")
+        assertThat(related.aapneByJournalpostid.map { it.id }).containsExactly("1005")
+        assertThat(related.avsluttedeByJournalpostid.map { it.id }).containsExactly("1006")
     }
 
 
