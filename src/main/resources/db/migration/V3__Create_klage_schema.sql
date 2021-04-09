@@ -44,7 +44,6 @@ CREATE TABLE klage.mottak
 
 CREATE TABLE klage.mottak_brevmottaker
 (
-    id                  UUID PRIMARY KEY,
     mottak_id           UUID NOT NULL,
     mottaker_part_id    UUID NOT NULL,
     CONSTRAINT fk_brevmottaker_mottak
@@ -128,9 +127,10 @@ CREATE TABLE klage.vedtak
             REFERENCES klage.klagebehandling (id)
 );
 
-CREATE TABLE klage.adresse
+CREATE TABLE klage.vedtaksadresse
 (
     id                  UUID PRIMARY KEY,
+    vedtak_id           UUID NOT NULL,
     adressetype         TEXT NOT NULL,  -- Må begrenses i kode til 'NORSK', 'UTENLANDSK'
     adresselinje1       TEXT,
     adresselinje2       TEXT,
@@ -142,19 +142,14 @@ CREATE TABLE klage.adresse
 
 CREATE TABLE klage.brevmottaker
 (
-    id                  UUID PRIMARY KEY,
     vedtak_id           UUID NOT NULL,
     mottaker_part_id    UUID,
-    adresse_id          UUID,
     CONSTRAINT fk_brevmottaker_mottak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),
     CONSTRAINT fk_brevmottaker_part
         FOREIGN KEY (mottaker_part_id)
-            REFERENCES klage.part_id (id),
-    CONSTRAINT fk_brevmottaker_adresse
-        FOREIGN KEY (adresse_id)
-            REFERENCES klage.adresse (id)
+            REFERENCES klage.part_id (id)
 );
 
 CREATE TABLE klage.hjemmel
