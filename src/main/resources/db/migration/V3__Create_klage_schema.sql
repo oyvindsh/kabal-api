@@ -1,8 +1,8 @@
 CREATE TABLE klage.part_id
 (
-    id          UUID    PRIMARY KEY,
-    type        TEXT    NOT NULL,   -- Må bli begrenset i kode til 'PERSON', 'ORGANISASJON', 'VIRKSOMHET'
-    value       TEXT
+    id          UUID PRIMARY KEY,
+    type        TEXT NOT NULL,   -- Må bli begrenset i kode til 'PERSON', 'ORGANISASJON', 'VIRKSOMHET'
+    value       TEXT NOT NULL
 );
 
 CREATE TABLE klage.mottak
@@ -11,35 +11,36 @@ CREATE TABLE klage.mottak
     versjon                             BIGINT                   NOT NULL,
     tema_id                             VARCHAR(3)               NOT NULL,
     sakstype_id                         VARCHAR(10)              NOT NULL,
-    klager_part_id                      UUID,
+    klager_part_id                      UUID NOT NULL,
     sak_referanse                       TEXT,
-    intern_referanse                    TEXT,
+    intern_referanse                    TEXT NOT NULL,
     dvh_referanse                       TEXT,
     innsyn_url                          TEXT,
     hjemmel_liste                       TEXT,
     avsender_saksbehandlerident         TEXT,
     avsender_enhet                      VARCHAR(10),
     oversendt_klageinstans_enhet        VARCHAR(10),
-    -- SPØRSMÅL: Burde de tre journalpostene plasseres i egen tabell?
-    opprinnelig_vedtak_journalpost_id   TEXT,
-    oversendelsesbrev_journalpost_id    TEXT,
-    brukers_klage_journalpost_id        TEXT,
     dato_innsendt                       DATE,
     dato_mottatt_foersteinstans         DATE,
     dato_oversendt_klageinstans         DATE                     NOT NULL,
     dato_frist_fra_foersteinstans       DATE,
-    kilde                               TEXT                     NOT NULL,  -- SPØRSMÅL: Hvorfor er Kilde en enum? Hvorfor må den valideres?
+    kilde                               TEXT                     NOT NULL,
     created                             TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                            TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_mottak_sakstype
-        FOREIGN KEY (sakstype_id)
-            REFERENCES kodeverk.sakstype (id),
-    CONSTRAINT fk_mottak_tema
-        FOREIGN KEY (tema_id)
-            REFERENCES kodeverk.tema (id),
     CONSTRAINT fk_mottak_part
         FOREIGN KEY (klager_part_id)
             REFERENCES klage.part_id (id)
+);
+
+CREATE TABLE klage.mottak_dokument
+(
+    id              UUID PRIMARY KEY,
+    mottak_id       UUID NOT NULL,
+    type            TEXT NOT NULL,   -- Må bli begrenset i kode til "BRUKERS_KLAGE", "OPPRINNELIG_VEDTAK", "OVERSENDELSESBREV", "ANNET"
+    journalpost_id  TEXT NOT NULL,
+    CONSTRAINT fk_brevmottaker_mottak
+        FOREIGN KEY (mottak_id)
+            REFERENCES klage.mottak (id)
 );
 
 CREATE TABLE klage.mottak_brevmottaker
@@ -66,16 +67,7 @@ CREATE TABLE klage.kvalitetsvurdering
     mottaker_saksbehandlerident VARCHAR(50),
     mottaker_enhet              VARCHAR(10),
     created                     TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified                    TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_kvalitetsvurdering_grunn
-        FOREIGN KEY (grunn_id)
-            REFERENCES kodeverk.grunn (id),
-    CONSTRAINT fk_kvalitetsvurdering_eoes
-        FOREIGN KEY (eoes_id)
-            REFERENCES kodeverk.eoes (id),
-    CONSTRAINT fk_kvalitetsvurdering_rol
-        FOREIGN KEY (raadfoert_med_lege_id)
-            REFERENCES kodeverk.raadfoert_med_lege (id)
+    modified                    TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE klage.klagebehandling
@@ -101,9 +93,6 @@ CREATE TABLE klage.klagebehandling
     kilde                                      VARCHAR(15)              NOT NULL,
     created                                    TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                                   TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_klagebehandling_sakstype
-        FOREIGN KEY (sakstype_id)
-            REFERENCES kodeverk.sakstype (id),
     CONSTRAINT fk_behandling_kvalitetsvurdering
         FOREIGN KEY (kvalitetsvurdering_id)
             REFERENCES klage.kvalitetsvurdering (id),
@@ -119,9 +108,6 @@ CREATE TABLE klage.vedtak
     klagebehandling_id UUID                     NOT NULL,
     modified           TIMESTAMP WITH TIME ZONE NOT NULL,
     created            TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_vedtak_utfall
-        FOREIGN KEY (utfall_id)
-            REFERENCES kodeverk.utfall (id),
     CONSTRAINT fk_vedtak_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
@@ -160,10 +146,7 @@ CREATE TABLE klage.hjemmel
     paragraf INTEGER,
     ledd     INTEGER,
     bokstav  VARCHAR(1),
-    original TEXT NOT NULL,
-    CONSTRAINT fk_hjemmel_lov
-        FOREIGN KEY (lov_id)
-            REFERENCES kodeverk.lov (id)
+    original TEXT NOT NULL
 );
 
 CREATE TABLE klage.saksdokument
