@@ -1,9 +1,7 @@
-CREATE TYPE id_type AS ENUM ('PERSON', 'ORGANISASJON', 'VIRKSOMHET');
-
 CREATE TABLE klage.part_id
 (
     id          UUID    PRIMARY KEY,
-    type        id_type NOT NULL,
+    type        TEXT    NOT NULL,   -- Må bli begrenset i kode til 'PERSON', 'ORGANISASJON', 'VIRKSOMHET'
     value       TEXT
 );
 
@@ -14,12 +12,11 @@ CREATE TABLE klage.mottak
     tema_id                             VARCHAR(3)               NOT NULL,
     sakstype_id                         VARCHAR(10)              NOT NULL,
     klager_part_id                      UUID,
-    saksreferanse                       TEXT,
+    sak_referanse                       TEXT,
     intern_referanse                    TEXT,
     dvh_referanse                       TEXT,
     innsyn_url                          TEXT,
     hjemmel_liste                       TEXT,
-    beskrivelse                         TEXT, -- SPØRSMÅL: Hva er dette, egentlig?
     avsender_saksbehandlerident         TEXT,
     avsender_enhet                      VARCHAR(10),
     oversendt_klageinstans_enhet        VARCHAR(10),
@@ -31,7 +28,7 @@ CREATE TABLE klage.mottak
     dato_mottatt_foersteinstans         DATE,
     dato_oversendt_klageinstans         DATE                     NOT NULL,
     dato_frist_fra_foersteinstans       DATE,
-    kilde                               TEXT                     NOT NULL,
+    kilde                               TEXT                     NOT NULL,  -- SPØRSMÅL: Hvorfor er Kilde en enum? Hvorfor må den valideres?
     created                             TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                            TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_mottak_sakstype
@@ -131,12 +128,10 @@ CREATE TABLE klage.vedtak
             REFERENCES klage.klagebehandling (id)
 );
 
-CREATE TYPE adressetype AS ENUM ('NORSK', 'UTENLANDSK');
-
 CREATE TABLE klage.adresse
 (
     id                  UUID PRIMARY KEY,
-    adressetype         adressetype NOT NULL,
+    adressetype         TEXT NOT NULL,  -- Må begrenses i kode til 'NORSK', 'UTENLANDSK'
     adresselinje1       TEXT,
     adresselinje2       TEXT,
     adresselinje3       TEXT,
