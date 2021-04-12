@@ -5,8 +5,6 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
-import no.nav.klage.oppgave.domain.AuditLogEvent.Action.KLAGEBEHANDLING_VIEW
-import no.nav.klage.oppgave.domain.AuditLogEvent.Decision.ALLOW
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -48,8 +46,6 @@ class KlagebehandlingController(
             auditLogger.log(
                 AuditLogEvent(
                     navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
-                    action = KLAGEBEHANDLING_VIEW,
-                    decision = ALLOW,
                     personFnr = it.foedselsnummer
                 )
             )
