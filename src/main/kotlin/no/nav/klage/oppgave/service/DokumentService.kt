@@ -69,7 +69,8 @@ class DokumentService(
         dokumentInfoId: String,
         saksbehandlerIdent: String
     ) {
-        validateJournalpostExists(journalpostId)
+        //MIDLERTIDIG HACK FOR Å TESTE SYSTEMBRUKER
+        validateJournalpostExistsAsSystembruker(journalpostId)
 
         klagebehandlingService.addDokument(
             klagebehandlingId,
