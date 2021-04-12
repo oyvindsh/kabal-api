@@ -2,8 +2,8 @@ package no.nav.klage.oppgave.domain
 
 data class AuditLogEvent(
     val navIdent: String,
-    val action: Action,
-    val decision: Decision,
+    val action: Action = Action.ACCESS,
+    val decision: Decision = Decision.PERMIT,
     val personFnr: String?,
     val logLevel: Level = Level.INFO
 ) {
@@ -12,11 +12,11 @@ data class AuditLogEvent(
     }
 
     enum class Action(val value: String) {
-        KLAGEBEHANDLING_VIEW("klagebehandling:view")
+        ACCESS("audit:access")
     }
 
     enum class Decision {
-        ALLOW, DENY
+        PERMIT, DENY
     }
 
 }

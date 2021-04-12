@@ -85,5 +85,4 @@ class AuditLogger(
             "flexString1=${logEvent.decision.name}",
             "sproc=${tracer.currentSpan().context().traceIdString()}}",
         )
-
 }
