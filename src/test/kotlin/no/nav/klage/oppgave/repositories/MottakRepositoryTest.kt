@@ -1,10 +1,16 @@
 package no.nav.klage.oppgave.repositories
 
+import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Tema
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
+import java.time.LocalDate
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -17,16 +23,28 @@ class MottakRepositoryTest {
     @Autowired
     lateinit var mottakRepository: MottakRepository
 
-/*    @Test
+    @Test
     fun `persist mottak works`() {
         val mottak = Mottak(
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
-            kilde = Kilde.OPPGAVE,
-            oppgavereferanser = mutableListOf(),
-            status = Status.OPPRETTET.name,
-            statusKategori = Status.OPPRETTET.kategoriForStatus().name,
-            oversendtKaDato = LocalDate.now()
+            klagerPartId = PartId(type = PartIdType.PERSON, value = "123454"),
+            sakReferanse = "12345",
+            internReferanse = "54321",
+            dvhReferanse = "5342523",
+            hjemmelListe = "8-4",
+            avsenderSaksbehandlerident = "Z123456",
+            avsenderEnhet = "1234",
+            mottakDokument = mutableSetOf(MottakDokument(
+                type = MottakDokumentType.OVERSENDELSESBREV,
+                journalpostId = "245245"
+            )),
+            brevmottakere = mutableSetOf(PartId(
+                type = PartIdType.PERSON,
+                value = "746574"
+            )),
+            oversendtKaDato = LocalDate.now(),
+            kilde = "Kilde"
         )
 
         mottakRepository.save(mottak)
@@ -35,6 +53,6 @@ class MottakRepositoryTest {
         testEntityManager.clear()
 
         assertThat(mottakRepository.findById(mottak.id).get()).isEqualTo(mottak)
-    }*/
+    }
 
 }

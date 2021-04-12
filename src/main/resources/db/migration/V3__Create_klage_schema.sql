@@ -38,7 +38,7 @@ CREATE TABLE klage.mottak_dokument
     mottak_id       UUID NOT NULL,
     type            TEXT NOT NULL,   -- Må bli begrenset i kode til "BRUKERS_KLAGE", "OPPRINNELIG_VEDTAK", "OVERSENDELSESBREV", "ANNET"
     journalpost_id  TEXT NOT NULL,
-    CONSTRAINT fk_brevmottaker_mottak
+    CONSTRAINT fk_dokument_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id)
 );
@@ -47,10 +47,10 @@ CREATE TABLE klage.mottak_brevmottaker
 (
     mottak_id           UUID NOT NULL,
     mottaker_part_id    UUID NOT NULL,
-    CONSTRAINT fk_brevmottaker_mottak
+    CONSTRAINT fk_mottak_brevmottaker_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id),
-    CONSTRAINT fk_brevmottaker_part
+    CONSTRAINT fk_mottak_brevmottaker_part
         FOREIGN KEY (mottaker_part_id)
             REFERENCES klage.part_id (id)
 );
