@@ -106,6 +106,15 @@ class DokumentService(
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
+    fun validateJournalpostExistsAsSystembruker(journalpostId: String) {
+        try {
+            safGraphQlClient.getJournalpostAsSystembruker(journalpostId)
+        } catch (e: Exception) {
+            logger.warn("Unable to find journalpost $journalpostId", e)
+            null
+        } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
+    }
+
     fun getArkivertDokument(journalpostId: String, dokumentInfoId: String): ArkivertDokument {
         return safRestClient.getDokument(dokumentInfoId, journalpostId)
     }
