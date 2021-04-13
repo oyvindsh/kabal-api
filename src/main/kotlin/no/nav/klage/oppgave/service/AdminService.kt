@@ -18,6 +18,7 @@ class AdminService(private val indexService: IndexService) {
 
     fun deleteAllInES() {
         indexService.deleteAllKlagebehandlinger()
+        Thread.sleep(TEN_SECONDS)
     }
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
