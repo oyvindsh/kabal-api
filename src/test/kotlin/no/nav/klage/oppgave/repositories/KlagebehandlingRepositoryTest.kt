@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
+import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -10,13 +11,22 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @ActiveProfiles("local")
 @DataJpaTest
+@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class KlagebehandlingRepositoryTest {
+
+    companion object {
+        @Container
+        @JvmField
+        val postgreSQLContainer: TestPostgresqlContainer = TestPostgresqlContainer.instance
+    }
 
     @Autowired
     lateinit var testEntityManager: TestEntityManager
