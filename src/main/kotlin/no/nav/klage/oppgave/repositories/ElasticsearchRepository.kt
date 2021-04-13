@@ -63,10 +63,12 @@ open class ElasticsearchRepository(
 
     fun save(klagebehandlinger: List<EsKlagebehandling>) {
         esTemplate.save(klagebehandlinger)
+        refresh()
     }
 
     fun save(klagebehandling: EsKlagebehandling) {
         esTemplate.save(klagebehandling)
+        refresh()
     }
 
     open fun findByCriteria(criteria: KlagebehandlingerSearchCriteria): SearchHits<EsKlagebehandling> {
@@ -208,11 +210,16 @@ open class ElasticsearchRepository(
         return baseQuery
     }
 
+    fun refresh() {
+        esTemplate.indexOps(IndexCoordinates.of("klagebehandling")).refresh()
+    }
+
     fun deleteAll() {
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
         esTemplate.delete(query, EsKlagebehandling::class.java)
+        refresh()
     }
 
     fun findAllIds(): List<String> {

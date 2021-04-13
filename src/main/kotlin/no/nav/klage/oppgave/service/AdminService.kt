@@ -7,18 +7,18 @@ import org.springframework.stereotype.Service
 class AdminService(private val indexService: IndexService) {
 
     companion object {
-        private const val TEN_SECONDS = 10000L
+        private const val TWO_SECONDS = 2000L
     }
 
     fun syncEsWithDb() {
         indexService.reindexAllKlagebehandlinger()
-        Thread.sleep(TEN_SECONDS)
+        //Thread.sleep(TWO_SECONDS)
         indexService.findAndLogOutOfSyncKlagebehandlinger()
     }
 
     fun deleteAllInES() {
         indexService.deleteAllKlagebehandlinger()
-        Thread.sleep(TEN_SECONDS)
+        //Thread.sleep(TWO_SECONDS)
     }
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
