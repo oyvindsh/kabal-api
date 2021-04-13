@@ -81,9 +81,6 @@ class AuditLogger(
             "end=${System.currentTimeMillis()}",
             "suid=${logEvent.navIdent}",
             "duid=${logEvent.personFnr}",
-            "flexString1Label=Decision",
-            "flexString1=${logEvent.decision.name}",
             "sproc=${tracer.currentSpan().context().traceIdString()}}",
         )
-
 }
