@@ -35,7 +35,13 @@ class IndexService(
         do {
             val page = klagebehandlingRepository.findAll(pageable)
             page.content.map { klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it) }
-                .let { elasticsearchRepository.save(it) }
+                .forEach {
+                    try {
+                        elasticsearchRepository.save(it)
+                    } catch (e: Exception) {
+                        logger.warn("Unable to index {}", it.id, e)
+                    }
+                }
             pageable = page.nextPageable();
         } while (pageable.isPaged)
     }
