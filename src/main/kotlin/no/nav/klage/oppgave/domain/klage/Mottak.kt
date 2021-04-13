@@ -20,30 +20,36 @@ class Mottak(
     @Column(name = "sakstype_id")
     @Convert(converter = SakstypeConverter::class)
     var sakstype: Sakstype,
-    @Column(name = "referanse_id")
-    var referanseId: String? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "klager_part_id", nullable = false)
+    var klagerPartId: PartId,
+    @Column(name = "sak_referanse")
+    var sakReferanse: String? = null,
+    @Column(name = "intern_referanse")
+    var internReferanse: String,
+    @Column(name = "dvh_referanse")
+    var dvhReferanse: String? = null,
     @Column(name = "innsyn_url")
     val innsynUrl: String? = null,
-    @Column(name = "foedselsnummer")
-    var foedselsnummer: String? = null,
-    @Column(name = "organisasjonsnummer")
-    var organisasjonsnummer: String? = null,
-    @Column(name = "virksomhetsnummer")
-    val virksomhetsnummer: String? = null,
     @Column(name = "hjemmel_liste")
     var hjemmelListe: String? = null,
-    @Column(name = "beskrivelse")
-    var beskrivelse: String? = null,
     @Column(name = "avsender_saksbehandlerident")
     var avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")
     var avsenderEnhet: String? = null,
     @Column(name = "oversendt_klageinstans_enhet")
     var oversendtKaEnhet: String? = null,
-    @Column(name = "oversendelsesbrev_journalpost_id")
-    var oversendelsesbrevJournalpostId: String? = null,
-    @Column(name = "brukers_klage_journalpost_id")
-    var brukersKlageJournalpostId: String? = null,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
+    val mottakDokument: MutableSet<MottakDokument> = mutableSetOf(),
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "mottak_brevmottaker",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "mottak_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "mottaker_part_id", referencedColumnName = "id")]
+    )
+    val brevmottakere: MutableSet<PartId> = mutableSetOf(),
     @Column(name = "dato_innsendt")
     val innsendtDato: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
@@ -57,8 +63,7 @@ class Mottak(
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kilde")
-    @Enumerated(EnumType.STRING)
-    val kilde: Kilde,
+    val kilde: String,
 ) {
 
     fun hjemler(): List<String> = hjemmelListe?.split(",") ?: emptyList()

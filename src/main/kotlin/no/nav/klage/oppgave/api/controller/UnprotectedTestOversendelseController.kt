@@ -1,11 +1,13 @@
 package no.nav.klage.oppgave.api.controller
 
+import no.nav.klage.oppgave.api.view.OversendtDokumentReferanse
 import no.nav.klage.oppgave.api.view.OversendtKlage
-import no.nav.klage.oppgave.domain.kodeverk.Kilde
+import no.nav.klage.oppgave.api.view.OversendtKlagerPartId
+import no.nav.klage.oppgave.domain.klage.MottakDokumentType
+import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.service.MottakService
-import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,12 +25,6 @@ import javax.validation.Valid
 class UnprotectedTestOversendelseController(
     private val mottakService: MottakService
 ) {
-
-    companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
-    }
-
     @PostMapping("/klage")
     fun sendInnKlage(@Valid @RequestBody oversendtKlage: OversendtKlage) {
         mottakService.createMottakForKlage(oversendtKlage)
@@ -55,21 +51,20 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = listOf(Tema.SYK).shuffled().first(),
-                eksternReferanse = "REF_$fnr",
+                sakstype = Sakstype.KLAGE,
+                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, fnr),
+                sakReferanse = "10000",
+                internReferanse = "REF_$fnr",
                 innsynUrl = "https://vg.no",
-                foedselsnummer = fnr,
-                beskrivelse = "ORDINÆR",
+                hjemler = listOf(listOf("8-4", "8-21", "8-22", "8-35").shuffled().first()),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                hjemler = listOf(listOf("8-4", "8-21", "8-22", "8-35").shuffled().first()),
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(MottakDokumentType.ANNET, "123")),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                sakstype = Sakstype.KLAGE,
-                oversendtEnhet = "4291",
-                oversendelsesbrevJournalpostId = null,
-                brukersKlageJournalpostId = null,
                 frist = dato.plusDays(100),
-                kilde = Kilde.OPPGAVE
+                kilde = "OPPGAVE"
             )
         )
     }
@@ -80,97 +75,92 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                eksternReferanse = "SYK_27458422236",
+                sakstype = Sakstype.KLAGE,
+                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "27458422236"),
+                sakReferanse = "10001",
+                internReferanse = "SYK_27458422236",
                 innsynUrl = "https://vg.no",
-                foedselsnummer = "27458422236",
-                beskrivelse = "ORDINÆR",
+                hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                hjemler = listOf("8-4", "8-21"),
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(MottakDokumentType.ANNET, "123")),
                 mottattFoersteinstans = LocalDate.of(2021, 2, 2),
                 innsendtTilNav = LocalDate.of(2021, 2, 1),
-                sakstype = Sakstype.KLAGE,
-                oversendtEnhet = "4291",
-                oversendelsesbrevJournalpostId = null,
-                brukersKlageJournalpostId = null,
                 frist = LocalDate.of(2021, 8, 2),
-                kilde = Kilde.OPPGAVE
+                kilde = "OPPGAVE"
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                eksternReferanse = "SYK_28488425473",
+                sakstype = Sakstype.KLAGE,
+                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "28488425473"),
+                sakReferanse = "10002",
+                internReferanse = "SYK_28488425473",
                 innsynUrl = "https://vg.no",
-                foedselsnummer = "28488425473",
-                beskrivelse = "EGEN ANSATT",
+                hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                hjemler = listOf("8-4", "8-21"),
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(MottakDokumentType.ANNET, "123")),
                 mottattFoersteinstans = LocalDate.of(2021, 2, 3),
                 innsendtTilNav = LocalDate.of(2021, 2, 2),
-                sakstype = Sakstype.KLAGE,
-                oversendtEnhet = "4291",
-                oversendelsesbrevJournalpostId = null,
-                brukersKlageJournalpostId = null,
                 frist = LocalDate.of(2021, 8, 3),
-                kilde = Kilde.OPPGAVE
+                kilde = "OPPGAVE"
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                eksternReferanse = "SYK_02518418680",
+                sakstype = Sakstype.KLAGE,
+                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "02518418680"),
+                sakReferanse = "10003",
+                internReferanse = "SYK_02518418680",
                 innsynUrl = "https://vg.no",
-                foedselsnummer = "02518418680",
-                beskrivelse = "KODE 6",
+                hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                hjemler = listOf("8-4", "8-21"),
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(MottakDokumentType.ANNET, "123")),
                 mottattFoersteinstans = LocalDate.of(2021, 2, 4),
                 innsendtTilNav = LocalDate.of(2021, 2, 3),
-                sakstype = Sakstype.KLAGE,
-                oversendtEnhet = "4291",
-                oversendelsesbrevJournalpostId = null,
-                brukersKlageJournalpostId = null,
                 frist = LocalDate.of(2021, 8, 4),
-                kilde = Kilde.OPPGAVE
+                kilde = "OPPGAVE"
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                eksternReferanse = "SYK_02508425425",
+                sakstype = Sakstype.KLAGE,
+                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "02508425425"),
+                sakReferanse = "10004",
+                internReferanse = "SYK_02508425425",
                 innsynUrl = "https://vg.no",
-                foedselsnummer = "02508425425",
-                beskrivelse = "KODE 7",
+                hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                hjemler = listOf("8-4", "8-21"),
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(MottakDokumentType.ANNET, "123")),
                 mottattFoersteinstans = LocalDate.of(2021, 2, 5),
                 innsendtTilNav = LocalDate.of(2021, 2, 4),
-                sakstype = Sakstype.KLAGE,
-                oversendtEnhet = "4291",
-                oversendelsesbrevJournalpostId = null,
-                brukersKlageJournalpostId = null,
                 frist = LocalDate.of(2021, 8, 5),
-                kilde = Kilde.OPPGAVE
+                kilde = "OPPGAVE"
             ),
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                eksternReferanse = "SYK_23528406688",
+                sakstype = Sakstype.KLAGE,
+                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "23528406688"),
+                sakReferanse = "10005",
+                internReferanse = "SYK_23528406688",
                 innsynUrl = "https://vg.no",
-                foedselsnummer = "23528406688",
-                beskrivelse = "KODE 19",
+                hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                hjemler = listOf("8-4", "8-21"),
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(MottakDokumentType.ANNET, "123")),
                 mottattFoersteinstans = LocalDate.of(2021, 2, 6),
                 innsendtTilNav = LocalDate.of(2021, 2, 5),
-                sakstype = Sakstype.KLAGE,
-                oversendtEnhet = "4291",
-                oversendelsesbrevJournalpostId = null,
-                brukersKlageJournalpostId = null,
                 frist = LocalDate.of(2021, 8, 6),
-                kilde = Kilde.OPPGAVE
+                kilde = "OPPGAVE"
             )
         )
         klager.forEach {
