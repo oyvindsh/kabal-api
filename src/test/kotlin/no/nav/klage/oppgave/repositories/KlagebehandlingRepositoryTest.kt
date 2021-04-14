@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import org.assertj.core.api.Assertions.assertThat
@@ -58,9 +59,7 @@ class KlagebehandlingRepositoryTest {
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
-                Hjemmel(
-                    original = "8-5"
-                )
+                Hjemmel.FTL_8_5
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
@@ -97,9 +96,7 @@ class KlagebehandlingRepositoryTest {
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
-                Hjemmel(
-                    original = "8-5"
-                )
+                Hjemmel.FTL_8_5
             ),
             saksdokumenter = mutableSetOf(
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
@@ -143,9 +140,7 @@ class KlagebehandlingRepositoryTest {
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
-                Hjemmel(
-                    original = "8-5"
-                )
+                Hjemmel.FTL_8_5
             ),
             saksdokumenter = mutableSetOf(
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),

@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans
+import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
@@ -38,7 +40,6 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val hjemmelService: HjemmelService,
     private val vedtakKafkaProducer: VedtakKafkaProducer
 ) {
 
@@ -283,7 +284,7 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
-                hjemler = mottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
+                hjemler = mottak.hjemler().mapNotNull { mapHjemmelFraFoersteInstans(it) }.toMutableSet(),
                 //TODO lookup actual documents
                 /*
                 saksdokumenter =
@@ -310,6 +311,30 @@ class KlagebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
+    }
+
+    private fun mapHjemmelFraFoersteInstans(hjemmelFraFoersteInstans: HjemmelFraFoersteInstans): Hjemmel? {
+        return try {
+            val lov = mapLov(hjemmelFraFoersteInstans.lov)
+            val posisjon = mapPosisjon(hjemmelFraFoersteInstans.kapittel, hjemmelFraFoersteInstans.paragraf)
+            Hjemmel.of(lov, posisjon)
+        } catch (e: Exception) {
+            logger.warn("Unable to map hjemmel", hjemmelFraFoersteInstans, e)
+            null
+        }
+    }
+
+    private fun mapPosisjon(kapittel: Int?, paragraf: Int?): LovPosisjon? {
+        return if (kapittel != null) {
+            LovPosisjon(kapittel, paragraf)
+        } else null
+    }
+
+    private fun mapLov(lov: Lov): LovKilde {
+        return when (lov) {
+            Lov.FOLKETRYGDLOVEN -> LovKilde.FOLKETRYGDLOVEN
+            Lov.FORVALTNINGSLOVEN -> LovKilde.FORVALTNINGSLOVEN
+        }
     }
 
 

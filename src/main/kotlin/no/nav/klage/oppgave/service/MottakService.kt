@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
@@ -20,8 +21,7 @@ class MottakService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
-    private val enhetRepository: EnhetRepository,
-    private val hjemmelService: HjemmelService
+    private val enhetRepository: EnhetRepository
 ) {
 
     companion object {
@@ -59,9 +59,9 @@ class MottakService(
         }
     }
 
-    private fun validateHjemmel(hjemmel: String) =
+    private fun validateHjemmel(hjemmel: HjemmelFraFoersteInstans) =
         try {
-            hjemmelService.generateHjemmelFromText(hjemmel)
+            //hjemmelService.generateHjemmelFromText(hjemmel)
         } catch (e: Exception) {
             logger.warn("Unable to parse hjemmel from oversendt klage: {}", hjemmel, e)
             throw OversendtKlageNotValidException("$hjemmel er ikke en gyldig hjemmel")

@@ -1,6 +1,10 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.SakstypeConverter
+import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.TemaConverter
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -66,7 +70,8 @@ class Mottak(
     val kilde: String,
 ) {
 
-    fun hjemler(): List<String> = hjemmelListe?.split(",") ?: emptyList()
+    fun hjemler(): List<HjemmelFraFoersteInstans> =
+        hjemmelListe?.split(",")?.map { HjemmelFraFoersteInstans.fromString(it) } ?: emptyList()
 
     override fun toString(): String {
         return "Mottak(id=$id, " +

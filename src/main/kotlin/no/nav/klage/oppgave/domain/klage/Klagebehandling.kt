@@ -52,13 +52,14 @@ class Klagebehandling(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
     var kvalitetsvurdering: Kvalitetsvurdering? = null,
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinTable(
+    @ElementCollection(targetClass = Hjemmel::class, fetch = FetchType.EAGER)
+    @CollectionTable(
         name = "klagebehandling_hjemmel",
         schema = "klage",
-        joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
+        joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)]
     )
+    @Convert(converter = HjemmelConverter::class)
+    @Column(name = "id")
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)

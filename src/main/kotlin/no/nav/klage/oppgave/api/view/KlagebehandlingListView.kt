@@ -12,7 +12,7 @@ data class KlagebehandlingListView(
     val person: Person? = null,
     val type: String,
     val tema: String,
-    val hjemmel: String?,
+    val hjemmel: Int?,
     val frist: LocalDate?,
     val mottatt: LocalDate?,
     val versjon: Int,

@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api.view
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.util.getLogger
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.util.*
@@ -17,7 +18,7 @@ data class OversendtKlage(
     val internReferanse: String,
     val dvhReferanse: String? = null,
     val innsynUrl: String,
-    val hjemler: List<String>,
+    val hjemler: List<HjemmelFraFoersteInstans>,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     val oversendtEnhet: String? = null,
@@ -39,7 +40,7 @@ data class OversendtKlage(
         sakReferanse = sakReferanse,
         internReferanse = internReferanse,
         dvhReferanse = dvhReferanse,
-        hjemmelListe = hjemler.joinToString(separator = ","),
+        hjemmelListe = hjemler.joinToString(separator = ",") { it.toString() },
         avsenderSaksbehandlerident = avsenderSaksbehandlerIdent,
         avsenderEnhet = avsenderEnhet,
         oversendtKaEnhet = oversendtEnhet,
@@ -51,6 +52,57 @@ data class OversendtKlage(
         fristFraFoersteinstans = frist,
         kilde = kilde
     )
+}
+
+class HjemmelFraFoersteInstans private constructor(
+    val kapittel: Int?,
+    val paragraf: Int?,
+    val lov: Lov,
+) {
+    constructor(lov: Lov) : this(null, null, lov)
+    constructor(lov: Lov, kapittel: Int) : this(kapittel, null, lov)
+    constructor(lov: Lov, kapittel: Int, paragraf: Int) : this(kapittel, paragraf, lov)
+
+    override fun toString(): String {
+        if (kapittel != null && paragraf != null) {
+            return "$lov $kapittel-$paragraf"
+        } else if (kapittel != null) {
+            return "$lov $kapittel"
+        } else {
+            return "$lov"
+        }
+    }
+
+    companion object {
+
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+
+        fun fromString(string: String): HjemmelFraFoersteInstans {
+            try {
+                if (string.contains(" ")) {
+                    val lov = string.split(" ").first()
+                    val kapittelOgParagraf = string.split(" ").last()
+                    if (kapittelOgParagraf.contains("-")) {
+                        val kapittel = kapittelOgParagraf.split("-").first()
+                        val paragraf = kapittelOgParagraf.split("-").last()
+                        return HjemmelFraFoersteInstans(Lov.valueOf(lov), kapittel.toInt(), paragraf.toInt())
+                    } else {
+                        return HjemmelFraFoersteInstans(Lov.valueOf(lov), kapittelOgParagraf.toInt())
+                    }
+                } else {
+                    return HjemmelFraFoersteInstans(Lov.valueOf(string))
+                }
+            } catch (e: Exception) {
+                logger.error("Exception parsing HjemmelFraFoersteInstans from String {}", string, e)
+                throw IllegalArgumentException("Exception parsing HjemmelFraFoersteInstans from $string")
+            }
+        }
+    }
+}
+
+enum class Lov {
+    FOLKETRYGDLOVEN, FORVALTNINGSLOVEN
 }
 
 data class OversendtKlagerPartId(

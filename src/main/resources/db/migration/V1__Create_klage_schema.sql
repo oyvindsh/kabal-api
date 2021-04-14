@@ -12,33 +12,33 @@ $$;
 
 CREATE TABLE klage.part_id
 (
-    id          UUID PRIMARY KEY,
-    type        TEXT NOT NULL,   -- Må bli begrenset i kode til 'PERSON', 'ORGANISASJON', 'VIRKSOMHET'
-    value       TEXT NOT NULL
+    id    UUID PRIMARY KEY,
+    type  TEXT NOT NULL, -- Må bli begrenset i kode til 'PERSON', 'ORGANISASJON', 'VIRKSOMHET'
+    value TEXT NOT NULL
 );
 
 CREATE TABLE klage.mottak
 (
-    id                                  UUID PRIMARY KEY,
-    versjon                             BIGINT                   NOT NULL,
-    tema_id                             VARCHAR(3)               NOT NULL,
-    sakstype_id                         VARCHAR(10)              NOT NULL,
-    klager_part_id                      UUID NOT NULL,
-    sak_referanse                       TEXT,
-    intern_referanse                    TEXT NOT NULL,
-    dvh_referanse                       TEXT,
-    innsyn_url                          TEXT,
-    hjemmel_liste                       TEXT,
-    avsender_saksbehandlerident         TEXT,
-    avsender_enhet                      VARCHAR(10),
-    oversendt_klageinstans_enhet        VARCHAR(10),
-    dato_innsendt                       DATE,
-    dato_mottatt_foersteinstans         DATE,
-    dato_oversendt_klageinstans         DATE                     NOT NULL,
-    dato_frist_fra_foersteinstans       DATE,
-    kilde                               TEXT                     NOT NULL,
-    created                             TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified                            TIMESTAMP WITH TIME ZONE NOT NULL,
+    id                            UUID PRIMARY KEY,
+    versjon                       BIGINT                   NOT NULL,
+    tema_id                       VARCHAR(3)               NOT NULL,
+    sakstype_id                   VARCHAR(10)              NOT NULL,
+    klager_part_id                UUID                     NOT NULL,
+    sak_referanse                 TEXT,
+    intern_referanse              TEXT                     NOT NULL,
+    dvh_referanse                 TEXT,
+    innsyn_url                    TEXT,
+    hjemmel_liste                 TEXT,
+    avsender_saksbehandlerident   TEXT,
+    avsender_enhet                VARCHAR(10),
+    oversendt_klageinstans_enhet  VARCHAR(10),
+    dato_innsendt                 DATE,
+    dato_mottatt_foersteinstans   DATE,
+    dato_oversendt_klageinstans   DATE                     NOT NULL,
+    dato_frist_fra_foersteinstans DATE,
+    kilde                         TEXT                     NOT NULL,
+    created                       TIMESTAMP WITH TIME ZONE NOT NULL,
+    modified                      TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_mottak_part
         FOREIGN KEY (klager_part_id)
             REFERENCES klage.part_id (id)
@@ -46,10 +46,10 @@ CREATE TABLE klage.mottak
 
 CREATE TABLE klage.mottak_dokument
 (
-    id              UUID PRIMARY KEY,
-    mottak_id       UUID NOT NULL,
-    type            TEXT NOT NULL,   -- Må bli begrenset i kode til "BRUKERS_KLAGE", "OPPRINNELIG_VEDTAK", "OVERSENDELSESBREV", "ANNET"
-    journalpost_id  TEXT NOT NULL,
+    id             UUID PRIMARY KEY,
+    mottak_id      UUID NOT NULL,
+    type           TEXT NOT NULL, -- Må bli begrenset i kode til "BRUKERS_KLAGE", "OPPRINNELIG_VEDTAK", "OVERSENDELSESBREV", "ANNET"
+    journalpost_id TEXT NOT NULL,
     CONSTRAINT fk_dokument_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id)
@@ -57,8 +57,8 @@ CREATE TABLE klage.mottak_dokument
 
 CREATE TABLE klage.mottak_brevmottaker
 (
-    mottak_id           UUID NOT NULL,
-    mottaker_part_id    UUID NOT NULL,
+    mottak_id        UUID NOT NULL,
+    mottaker_part_id UUID NOT NULL,
     CONSTRAINT fk_mottak_brevmottaker_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id),
@@ -127,21 +127,21 @@ CREATE TABLE klage.vedtak
 
 CREATE TABLE klage.vedtaksadresse
 (
-    id                  UUID PRIMARY KEY,
-    vedtak_id           UUID NOT NULL,
-    adressetype         TEXT NOT NULL,  -- Må begrenses i kode til 'NORSK', 'UTENLANDSK'
-    adresselinje1       TEXT,
-    adresselinje2       TEXT,
-    adresselinje3       TEXT,
-    postnummer          VARCHAR(4),
-    poststed            TEXT,
-    land                VARCHAR(2)
+    id            UUID PRIMARY KEY,
+    vedtak_id     UUID NOT NULL,
+    adressetype   TEXT NOT NULL, -- Må begrenses i kode til 'NORSK', 'UTENLANDSK'
+    adresselinje1 TEXT,
+    adresselinje2 TEXT,
+    adresselinje3 TEXT,
+    postnummer    VARCHAR(4),
+    poststed      TEXT,
+    land          VARCHAR(2)
 );
 
 CREATE TABLE klage.brevmottaker
 (
-    vedtak_id           UUID NOT NULL,
-    mottaker_part_id    UUID,
+    vedtak_id        UUID NOT NULL,
+    mottaker_part_id UUID,
     CONSTRAINT fk_brevmottaker_mottak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),
@@ -150,15 +150,14 @@ CREATE TABLE klage.brevmottaker
             REFERENCES klage.part_id (id)
 );
 
-CREATE TABLE klage.hjemmel
+CREATE TABLE klage.klagebehandling_hjemmel
 (
-    id       UUID PRIMARY KEY,
-    lov_id   INTEGER,
-    kapittel INTEGER,
-    paragraf INTEGER,
-    ledd     INTEGER,
-    bokstav  VARCHAR(1),
-    original TEXT NOT NULL
+    id                 INTEGER NOT NULL,
+    klagebehandling_id UUID    NOT NULL,
+    PRIMARY KEY (id, klagebehandling_id),
+    CONSTRAINT fk_hjemmel_klagebehandling
+        FOREIGN KEY (klagebehandling_id)
+            REFERENCES klage.klagebehandling (id)
 );
 
 CREATE TABLE klage.saksdokument
@@ -172,28 +171,14 @@ CREATE TABLE klage.saksdokument
             REFERENCES klage.klagebehandling (id)
 );
 
-CREATE TABLE klage.klagebehandling_hjemmel
-(
-    klagebehandling_id UUID NOT NULL,
-    hjemmel_id         UUID NOT NULL,
-    CONSTRAINT fk_hjemmel_klagebehandling
-        FOREIGN KEY (klagebehandling_id)
-            REFERENCES klage.klagebehandling (id),
-    CONSTRAINT fk_klagebehandling_hjemmel
-        FOREIGN KEY (hjemmel_id)
-            REFERENCES klage.hjemmel (id)
-);
-
 CREATE TABLE klage.vedtak_hjemmel
 (
-    vedtak_id  UUID NOT NULL,
-    hjemmel_id UUID NOT NULL,
+    id        INTEGER NOT NULL,
+    vedtak_id UUID    NOT NULL,
+    PRIMARY KEY (id, vedtak_id),
     CONSTRAINT fk_hjemmel_vedtak
         FOREIGN KEY (vedtak_id)
-            REFERENCES klage.vedtak (id),
-    CONSTRAINT fk_vedtak_hjemmel
-        FOREIGN KEY (hjemmel_id)
-            REFERENCES klage.hjemmel (id)
+            REFERENCES klage.vedtak (id)
 );
 
 CREATE TABLE klage.endringslogginnslag
@@ -214,19 +199,19 @@ CREATE TABLE klage.endringslogginnslag
 
 CREATE TABLE klage.vedtaksbrev
 (
-    id       UUID PRIMARY KEY,
+    id                 UUID PRIMARY KEY,
     klagebehandling_id UUID,
-    brev_mal TEXT,
+    brev_mal           TEXT,
 
-     CONSTRAINT fk_vedtaksbrev_klagebehandling
+    CONSTRAINT fk_vedtaksbrev_klagebehandling
         FOREIGN KEY (klagebehandling_id)
-             REFERENCES klage.klagebehandling (id)
+            REFERENCES klage.klagebehandling (id)
 );
 
 CREATE TABLE klage.brevelement
 (
-    id                 UUID PRIMARY KEY ,
-    brev_id            UUID NOT NULL,
+    id                 UUID PRIMARY KEY,
+    brev_id            UUID    NOT NULL,
     key                VARCHAR NOT NULL,
     display_text       TEXT,
     content            TEXT,

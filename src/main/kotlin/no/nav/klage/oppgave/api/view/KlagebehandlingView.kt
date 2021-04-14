@@ -17,17 +17,9 @@ data class KlagebehandlingView(
     val avsluttet: LocalDate? = null,
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
-    val hjemler: List<HjemmelView>,
+    val hjemler: List<Int>,
     val modified: LocalDateTime,
     val created: LocalDateTime,
     val fraSaksbehandlerident: String? = null,
     val klagebehandlingVersjon: Long
-)
-
-data class HjemmelView(
-    val kapittel: Int? = null,
-    val paragraf: Int? = null,
-    val ledd: Int? = null,
-    val bokstav: String? = null,
-    val original: String
 )
