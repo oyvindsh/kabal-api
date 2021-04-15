@@ -310,7 +310,7 @@ class KlagebehandlingService(
     }
 
     private fun createSaksdokument(journalpostId: String) =
-        dokumentService.fetchDokumentInfoIdForJournalposAsSystembruker(journalpostId)
+        dokumentService.fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
     private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)

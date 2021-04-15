@@ -72,7 +72,7 @@ class DokumentService(
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
-    fun fetchDokumentInfoIdForJournalposAsSystembruker(journalpostId: String): List<String> {
+    fun fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId: String): List<String> {
         return try {
             val journalpost = safGraphQlClient.getJournalpostAsSystembruker(journalpostId)
             journalpost?.dokumenter?.filter { harArkivVariantformat(it) }?.map { it.dokumentInfoId } ?: emptyList()
@@ -86,10 +86,10 @@ class DokumentService(
         return safRestClient.getDokument(dokumentInfoId, journalpostId)
     }
 
-    private fun harArkivVariantformat(dokumentInfo: DokumentInfo?): Boolean =
-        dokumentInfo?.dokumentvarianter?.any { dv ->
+    private fun harArkivVariantformat(dokumentInfo: DokumentInfo): Boolean =
+        dokumentInfo.dokumentvarianter.any { dv ->
             dv.variantformat == Variantformat.ARKIV
-        } == true
+        }
 
 }
 
