@@ -8,7 +8,13 @@ import org.springframework.data.annotation.Version
 import org.springframework.data.elasticsearch.annotations.*
 import java.time.LocalDate
 
-@Document(indexName = "klagebehandling", shards = 3, replicas = 2, versionType = VersionType.EXTERNAL)
+@Document(
+    indexName = "klagebehandling",
+    shards = 3,
+    replicas = 2,
+    versionType = VersionType.EXTERNAL,
+    createIndex = false
+)
 data class EsKlagebehandling(
     @Id
     val id: String,

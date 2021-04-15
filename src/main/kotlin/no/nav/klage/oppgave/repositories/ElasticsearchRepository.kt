@@ -49,6 +49,9 @@ open class ElasticsearchRepository(
                 indexOps.putMapping(readFromfile("mapping.json"))
             } else {
                 logger.info("klagebehandling does exist in Elasticsearch")
+                val mapping: MutableMap<String, Any> = indexOps.mapping
+                logger.debug("Current index has mapping $mapping")
+                mapping.forEach { (key, value) -> logger.debug("mapping key: $key, value: $value") }
             }
         } catch (e: Exception) {
             logger.error("Unable to initialize Elasticsearch", e)
