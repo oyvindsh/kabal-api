@@ -23,10 +23,10 @@ CREATE TABLE klage.klager
     part_id                     UUID    NOT NULL,
     prosessfullmektig_part_id   UUID    DEFAULT NULL,
     skal_motta_kopi             BOOLEAN DEFAULT NULL,
-    CONSTRAINT fk_mottak_part
+    CONSTRAINT fk_klager_part_id
         FOREIGN KEY (part_id)
             REFERENCES klage.part_id (id),
-    CONSTRAINT fk_mottak_part
+    CONSTRAINT fk_klager_prosessfullmektig_part
         FOREIGN KEY (prosessfullmektig_part_id)
             REFERENCES klage.part_id (id)
 );
@@ -104,7 +104,7 @@ CREATE TABLE klage.klagebehandling
 (
     id                                         UUID PRIMARY KEY,
     versjon                                    BIGINT                   NOT NULL,
-    foedselsnummer                             VARCHAR(11),
+    saken_gjelder_part_id                      UUID                     NOT NULL,
     tema_id                                    VARCHAR(3)               NOT NULL,
     sakstype_id                                VARCHAR(10)              NOT NULL,
     referanse_id                               TEXT,
@@ -128,7 +128,10 @@ CREATE TABLE klage.klagebehandling
             REFERENCES klage.kvalitetsvurdering (id),
     CONSTRAINT fk_behandling_mottak
         FOREIGN KEY (mottak_id)
-            REFERENCES klage.mottak (id)
+            REFERENCES klage.mottak (id),
+    CONSTRAINT fk_klagebehandling_gjelder_part
+        FOREIGN KEY (saken_gjelder_part_id)
+            REFERENCES klage.part_id (id)
 );
 
 CREATE TABLE klage.vedtak
