@@ -50,6 +50,9 @@
     "hjemler": {
       "type": "integer"
     },
+    "hjemlerAsText": {
+      "type": "text"
+    },
     "foedselsnummer": {
       "type": "keyword"
     },
