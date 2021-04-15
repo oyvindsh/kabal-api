@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
@@ -22,6 +21,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
 import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.MottakHjemmel
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -284,23 +284,7 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
-                hjemler = mottak.hjemler().mapNotNull { mapHjemmelFraFoersteInstans(it) }.toMutableSet(),
-                //TODO lookup actual documents
-                /*
-                saksdokumenter =
-                listOfNotNull(
-                    if (mottak.oversendelsesbrevJournalpostId != null) {
-                        Saksdokument(journalpostId = mottak.oversendelsesbrevJournalpostId!!)
-                    } else {
-                        null
-                    },
-                    if (mottak.brukersKlageJournalpostId != null) {
-                        Saksdokument(journalpostId = mottak.brukersKlageJournalpostId!!)
-                    } else {
-                        null
-                    },
-                ).toMutableSet(),
-                 */
+                hjemler = mottak.hjemmelListe.mapNotNull { mapMottakHjemmel(it) }.toMutableSet(),
                 kilde = mottak.kilde
             )
         )
@@ -313,18 +297,18 @@ class KlagebehandlingService(
         )
     }
 
-    private fun mapHjemmelFraFoersteInstans(hjemmelFraFoersteInstans: HjemmelFraFoersteInstans): Hjemmel? {
+    private fun mapMottakHjemmel(hjemmel: MottakHjemmel): Hjemmel? {
         return try {
-            val lov = mapLov(hjemmelFraFoersteInstans.lov)
-            val posisjon = mapPosisjon(hjemmelFraFoersteInstans.kapittel, hjemmelFraFoersteInstans.paragraf)
-            Hjemmel.of(lov, posisjon)
+            val lov = mapLov(hjemmel.lov)
+            val kapittelOgParagraf = mapKapittelOgParagraf(hjemmel.kapittel, hjemmel.paragraf)
+            Hjemmel.of(lov, kapittelOgParagraf)
         } catch (e: Exception) {
-            logger.warn("Unable to map hjemmel", hjemmelFraFoersteInstans, e)
+            logger.warn("Unable to map hjemmel", hjemmel, e)
             null
         }
     }
 
-    private fun mapPosisjon(kapittel: Int?, paragraf: Int?): KapittelOgParagraf? {
+    private fun mapKapittelOgParagraf(kapittel: Int?, paragraf: Int?): KapittelOgParagraf? {
         return if (kapittel != null) {
             KapittelOgParagraf(kapittel, paragraf)
         } else null

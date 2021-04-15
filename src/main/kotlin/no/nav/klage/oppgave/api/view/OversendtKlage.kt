@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.view
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.util.getLogger
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.util.*
@@ -40,7 +39,7 @@ data class OversendtKlage(
         sakReferanse = sakReferanse,
         internReferanse = internReferanse,
         dvhReferanse = dvhReferanse,
-        hjemmelListe = hjemler.joinToString(separator = ",") { it.toString() },
+        hjemmelListe = hjemler.map { it.toMottakHjemmel() }.toMutableSet(),
         avsenderSaksbehandlerident = avsenderSaksbehandlerIdent,
         avsenderEnhet = avsenderEnhet,
         oversendtKaEnhet = oversendtEnhet,
@@ -73,32 +72,7 @@ class HjemmelFraFoersteInstans private constructor(
         }
     }
 
-    companion object {
-
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
-
-        fun fromString(string: String): HjemmelFraFoersteInstans {
-            try {
-                if (string.contains(" ")) {
-                    val lov = string.split(" ").first()
-                    val kapittelOgParagraf = string.split(" ").last()
-                    if (kapittelOgParagraf.contains("-")) {
-                        val kapittel = kapittelOgParagraf.split("-").first()
-                        val paragraf = kapittelOgParagraf.split("-").last()
-                        return HjemmelFraFoersteInstans(Lov.valueOf(lov), kapittel.toInt(), paragraf.toInt())
-                    } else {
-                        return HjemmelFraFoersteInstans(Lov.valueOf(lov), kapittelOgParagraf.toInt())
-                    }
-                } else {
-                    return HjemmelFraFoersteInstans(Lov.valueOf(string))
-                }
-            } catch (e: Exception) {
-                logger.error("Exception parsing HjemmelFraFoersteInstans from String {}", string, e)
-                throw IllegalArgumentException("Exception parsing HjemmelFraFoersteInstans from $string")
-            }
-        }
-    }
+    fun toMottakHjemmel() = MottakHjemmel(lov = lov, kapittel = kapittel, paragraf = paragraf)
 }
 
 enum class Lov {

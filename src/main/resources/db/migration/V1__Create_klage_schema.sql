@@ -28,7 +28,6 @@ CREATE TABLE klage.mottak
     intern_referanse              TEXT                     NOT NULL,
     dvh_referanse                 TEXT,
     innsyn_url                    TEXT,
-    hjemmel_liste                 TEXT,
     avsender_saksbehandlerident   TEXT,
     avsender_enhet                VARCHAR(10),
     oversendt_klageinstans_enhet  VARCHAR(10),
@@ -51,6 +50,18 @@ CREATE TABLE klage.mottak_dokument
     type           TEXT NOT NULL, -- Må bli begrenset i kode til "BRUKERS_KLAGE", "OPPRINNELIG_VEDTAK", "OVERSENDELSESBREV", "ANNET"
     journalpost_id TEXT NOT NULL,
     CONSTRAINT fk_dokument_mottak
+        FOREIGN KEY (mottak_id)
+            REFERENCES klage.mottak (id)
+);
+
+CREATE TABLE klage.mottak_hjemmel
+(
+    id        UUID PRIMARY KEY,
+    mottak_id UUID    NOT NULL,
+    lov       TEXT    NOT NULL, -- Enum i koden
+    kapittel  INTEGER NOT NULL,
+    paragraf  INTEGER NOT NULL,
+    CONSTRAINT fk_hjemmel_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id)
 );
