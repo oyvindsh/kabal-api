@@ -179,7 +179,7 @@ class KlagebehandlingDetaljerController(
         @PathVariable("id") klagebehandlingId: String,
         @RequestBody input: KlagebehandlingMedunderskriveridentInput
     ): KlagebehandlingDetaljerView {
-        logMethodDetails("putAvsenderSaksbehandlerident", klagebehandlingId)
+        logMethodDetails("putMedunderskriverident", klagebehandlingId)
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setMedunderskriverident(
                 klagebehandlingId.toUUIDOrException(),
