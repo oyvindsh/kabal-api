@@ -85,9 +85,7 @@ class MottakService(
 
     private fun validateJournalpost(journalpostId: String) =
         try {
-            //TODO: Denne kjører i saksbehandlers context, vi trenger en systembruker her..
-            // Det må lages mot SAF, og da må vi vel også gå gjennom apigw.. :-(
-            //dokumentService.validateJournalpostExists(journalpostId)
+            dokumentService.validateJournalpostExistsAsSystembruker(journalpostId)
         } catch (e: JournalpostNotFoundException) {
             logger.warn("Unable to validate journalpost from oversendt klage: {}", journalpostId, e)
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")

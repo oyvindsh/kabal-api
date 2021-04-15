@@ -11,14 +11,12 @@ import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 @Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
-    private val safRestClient: SafRestClient,
-    private val klagebehandlingService: KlagebehandlingService,
+    private val safRestClient: SafRestClient
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -27,12 +25,10 @@ class DokumentService(
     }
 
     fun fetchDokumentlisteForKlagebehandling(
-        klagebehandlingId: UUID,
+        klagebehandling: Klagebehandling,
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
-        val klagebehandling: Klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId)
-
         if (klagebehandling.foedselsnummer != null) {
             val dokumentoversiktBruker: DokumentoversiktBruker =
                 safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
@@ -51,51 +47,12 @@ class DokumentService(
         }
     }
 
-    fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> =
-        klagebehandlingService.getKlagebehandling(klagebehandlingId).saksdokumenter.map { it.journalpostId }
-
-    fun fetchJournalposterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
-        val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId)
+    fun fetchJournalposterConnectedToKlagebehandling(klagebehandling: Klagebehandling): DokumenterResponse {
         return klagebehandling.saksdokumenter
             .mapNotNull { safGraphQlClient.getJournalpost(it.journalpostId) }
             .map { dokumentMapper.mapJournalpostToDokumentReferanse(it, klagebehandling) }
             .let { DokumenterResponse(dokumenter = it, pageReference = null) }
     }
-
-    fun connectDokumentToKlagebehandling(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
-        journalpostId: String,
-        dokumentInfoId: String,
-        saksbehandlerIdent: String
-    ) {
-        validateJournalpostExists(journalpostId)
-
-        klagebehandlingService.addDokument(
-            klagebehandlingId,
-            klagebehandlingVersjon,
-            journalpostId,
-            dokumentInfoId,
-            saksbehandlerIdent
-        )
-    }
-
-    fun disconnectDokumentFromKlagebehandling(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
-        journalpostId: String,
-        dokumentInfoId: String,
-        saksbehandlerIdent: String
-    ) {
-        klagebehandlingService.removeDokument(
-            klagebehandlingId,
-            klagebehandlingVersjon,
-            journalpostId,
-            dokumentInfoId,
-            saksbehandlerIdent
-        )
-    }
-
 
     fun validateJournalpostExists(journalpostId: String) {
         try {
@@ -106,9 +63,33 @@ class DokumentService(
         } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
     }
 
+    fun validateJournalpostExistsAsSystembruker(journalpostId: String) {
+        try {
+            safGraphQlClient.getJournalpostAsSystembruker(journalpostId)
+        } catch (e: Exception) {
+            logger.warn("Unable to find journalpost $journalpostId", e)
+            null
+        } ?: throw JournalpostNotFoundException("Journalpost $journalpostId not found")
+    }
+
+    fun fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId: String): List<String> {
+        return try {
+            val journalpost = safGraphQlClient.getJournalpostAsSystembruker(journalpostId)
+            journalpost?.dokumenter?.filter { harArkivVariantformat(it) }?.map { it.dokumentInfoId } ?: emptyList()
+        } catch (e: Exception) {
+            logger.warn("Unable to find journalpost $journalpostId", e)
+            emptyList()
+        }
+    }
+
     fun getArkivertDokument(journalpostId: String, dokumentInfoId: String): ArkivertDokument {
         return safRestClient.getDokument(dokumentInfoId, journalpostId)
     }
+
+    private fun harArkivVariantformat(dokumentInfo: DokumentInfo): Boolean =
+        dokumentInfo.dokumentvarianter.any { dv ->
+            dv.variantformat == Variantformat.ARKIV
+        }
 
 }
 
