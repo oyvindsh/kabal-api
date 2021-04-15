@@ -302,15 +302,17 @@ class KlagebehandlingService(
 
     private fun createSaksdokumenter(mottak: Mottak): MutableSet<Saksdokument> {
         val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf()
-        saksdokumenter.addAll(mottak.brukersKlageJournalpostId?.let { createSaksdokument(it) } ?: emptyList())
-        saksdokumenter.addAll(mottak.oversendelsesbrevJournalpostId?.let { createSaksdokument(it) } ?: emptyList())
+        mottak.mottakDokument.forEach {
+            //TODO: Mangler å få med MottakDokument.type over i Saksdokument!
+            saksdokumenter.addAll(createSaksdokument(it.journalpostId))
+        }
         return saksdokumenter
     }
 
     private fun createSaksdokument(journalpostId: String) =
         dokumentService.fetchDokumentInfoIdForJournalposAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
-    
+
     private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
 
     private fun mapTema(tema: String): Tema = Tema.of(tema)
