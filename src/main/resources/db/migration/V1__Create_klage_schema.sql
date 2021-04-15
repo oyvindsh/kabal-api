@@ -57,10 +57,10 @@ CREATE TABLE klage.mottak_dokument
 CREATE TABLE klage.mottak_hjemmel
 (
     id        UUID PRIMARY KEY,
-    mottak_id UUID    NOT NULL,
-    lov       TEXT    NOT NULL, -- Enum i koden
-    kapittel  INTEGER NOT NULL,
-    paragraf  INTEGER NOT NULL,
+    mottak_id UUID NOT NULL,
+    lov       TEXT NOT NULL, -- Enum i koden
+    kapittel  INTEGER,
+    paragraf  INTEGER,
     CONSTRAINT fk_hjemmel_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id)
