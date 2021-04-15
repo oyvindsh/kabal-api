@@ -1,10 +1,12 @@
-package no.nav.klage.oppgave.repositories
+package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
@@ -27,9 +29,10 @@ import org.springframework.data.elasticsearch.core.query.Query
 import java.time.format.DateTimeFormatter
 
 
-open class ElasticsearchRepository(
+open class ElasticsearchService(
     private val esTemplate: ElasticsearchOperations,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val esKlagebehandlingRepository: EsKlagebehandlingRepository
 ) :
     ApplicationListener<ContextRefreshedEvent> {
 
@@ -77,13 +80,11 @@ open class ElasticsearchRepository(
     }
 
     fun save(klagebehandlinger: List<EsKlagebehandling>) {
-        esTemplate.save(klagebehandlinger)
-        refresh()
+        esKlagebehandlingRepository.saveAll(klagebehandlinger)
     }
 
     fun save(klagebehandling: EsKlagebehandling) {
-        esTemplate.save(klagebehandling)
-        refresh()
+        esKlagebehandlingRepository.save(klagebehandling)
     }
 
     open fun findByCriteria(criteria: KlagebehandlingerSearchCriteria): SearchHits<EsKlagebehandling> {
@@ -230,11 +231,7 @@ open class ElasticsearchRepository(
     }
 
     fun deleteAll() {
-        val query: Query = NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.matchAllQuery())
-            .build()
-        esTemplate.delete(query, EsKlagebehandling::class.java)
-        refresh()
+        esKlagebehandlingRepository.deleteAll()
     }
 
     fun findAllIds(): List<String> {

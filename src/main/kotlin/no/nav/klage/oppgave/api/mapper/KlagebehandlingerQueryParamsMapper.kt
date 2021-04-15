@@ -21,7 +21,7 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
     fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
         typer = queryParams.typer.map { Sakstype.of(it) },
         temaer = queryParams.temaer.map { Tema.of(it) },
-        hjemler = queryParams.hjemler.mapNotNull { toIntOrNull(it) },
+        hjemler = queryParams.hjemler.mapNotNull { it.toIntOrNull() },
         order = if (queryParams.rekkefoelge == KlagebehandlingerQueryParams.Rekkefoelge.SYNKENDE) {
             KlagebehandlingerSearchCriteria.Order.DESC
         } else {

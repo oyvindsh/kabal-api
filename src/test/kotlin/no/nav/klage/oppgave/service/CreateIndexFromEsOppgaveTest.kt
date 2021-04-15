@@ -13,6 +13,7 @@ import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
@@ -28,7 +29,11 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Testcontainers
 @SpringBootTest(classes = [RetryConfig::class])
-@ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
+@ImportAutoConfiguration(
+    ElasticsearchRestClientAutoConfiguration::class,
+    ElasticsearchDataAutoConfiguration::class,
+    ElasticsearchRepositoriesAutoConfiguration::class
+)
 @Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
 class CreateIndexFromEsOppgaveTest {
 

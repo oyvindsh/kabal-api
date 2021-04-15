@@ -17,6 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.elasticsearch.UncategorizedElasticsearchException
@@ -39,7 +40,11 @@ import java.time.LocalDate
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Testcontainers
 @SpringBootTest(classes = [ElasticsearchServiceConfiguration::class])
-@ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
+@ImportAutoConfiguration(
+    ElasticsearchRestClientAutoConfiguration::class,
+    ElasticsearchDataAutoConfiguration::class,
+    ElasticsearchRepositoriesAutoConfiguration::class
+)
 class ElasticsearchIndexingTest {
 
     companion object {

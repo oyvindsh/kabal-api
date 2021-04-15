@@ -5,7 +5,6 @@ import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.elasticsearch.client.RestHighLevelClient
@@ -63,7 +62,7 @@ class RelatedKlagebehandlingerTest {
     lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 
     @Autowired
-    lateinit var repository: ElasticsearchRepository
+    lateinit var service: ElasticsearchService
 
     @Autowired
     lateinit var esTemplate: ElasticsearchRestTemplate
@@ -140,7 +139,7 @@ class RelatedKlagebehandlingerTest {
     @Test
     @Order(4)
     fun `related klagebehandlinger gives correct answer`() {
-        val related = repository.findRelatedKlagebehandlinger("01019012345", "AAA123", listOf("333444", "777888"))
+        val related = service.findRelatedKlagebehandlinger("01019012345", "AAA123", listOf("333444", "777888"))
         assertThat(related.aapneByFnr.map { it.id }).containsExactly("1001")
         assertThat(related.avsluttedeByFnr.map { it.id }).containsExactly("1004")
         assertThat(related.aapneBySaksreferanse.map { it.id }).containsExactly("1001")
