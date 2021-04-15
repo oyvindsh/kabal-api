@@ -30,7 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @SpringBootTest(classes = [RetryConfig::class])
 @ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
 @Disabled("kan brukes for å generere settings og mapping, for så å lagre som fil. Må da endre i ElasticsearchService")
-class CreateIndexFromEsOppgaveTest {
+class CreateIndexFromEsKlagebehandlingTest {
 
     companion object {
         @Container
