@@ -42,16 +42,11 @@ class MottakService(
             logger.warn("We have received oversendtKlage with uuid {} before", uuid)
             throw OversendtKlageReceivedBeforeException("Oversendt klage med uuid $uuid er et duplikat av tidligere oversendt klage, avbryter mottak")
         }
-        oversendelsesbrevJournalpostId?.let {
-            validateJournalpost(it)
-        }
-        brukersKlageJournalpostId?.let {
-            validateJournalpost(it)
-        }
+        tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
 
         validateEnhet(avsenderEnhet)
         validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
-        oversendtEnhet.let {
+        oversendtEnhet?.let {
             validateEnhet(it)
             validateKaEnhet(it)
         }

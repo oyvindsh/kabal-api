@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.db
 
+import no.nav.klage.oppgave.domain.klage.PartId
+import no.nav.klage.oppgave.domain.klage.PartIdType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,16 +33,16 @@ class FlywayMigrationTest {
 
     @Test
     fun flyway_should_run() {
-        val statuser: List<Utfall> = jdbcTemplate.query(
-            "SELECT * FROM kodeverk.utfall"
+        val statuser: List<PartId> = jdbcTemplate.query(
+            "SELECT * FROM klage.part_id"
         ) { rs: ResultSet, _: Int ->
-            Utfall(
-                rs.getLong("id"),
-                rs.getString("navn")
+            PartId(
+                type = PartIdType.valueOf(rs.getString("type")),
+                value = rs.getString("value")
             )
         }
 
-        assertThat(statuser).hasSize(8)
+        assertThat(statuser).hasSize(0)
     }
 
 }

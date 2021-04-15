@@ -71,8 +71,7 @@ class Klagebehandling(
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kilde")
-    @Enumerated(EnumType.STRING)
-    val kilde: Kilde
+    val kilde: String
 ) {
 
     override fun toString(): String {

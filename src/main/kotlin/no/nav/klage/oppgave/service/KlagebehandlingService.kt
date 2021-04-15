@@ -269,10 +269,10 @@ class KlagebehandlingService(
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                foedselsnummer = mottak.foedselsnummer,
+                foedselsnummer = mottak.klagerPartId.value, // TODO Her må vi fikse
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
-                referanseId = mottak.referanseId,
+                referanseId = mottak.internReferanse,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
