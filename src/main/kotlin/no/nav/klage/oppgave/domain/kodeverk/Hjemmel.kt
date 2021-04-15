@@ -33,7 +33,7 @@ enum class Hjemmel(val id: Int, val lov: LovKilde, val kapittelOgParagraf: Kapit
 
         fun of(lov: LovKilde, kapittelOgParagraf: KapittelOgParagraf?): Hjemmel {
             return values().firstOrNull { it.lov == lov && it.kapittelOgParagraf == kapittelOgParagraf }
-                ?: throw IllegalArgumentException("No Hjemmel with lov $lov and posisjon $kapittelOgParagraf exists")
+                ?: throw IllegalArgumentException("No Hjemmel with lov $lov and kapittelOgParagraf $kapittelOgParagraf exists")
         }
     }
 
