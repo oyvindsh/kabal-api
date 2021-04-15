@@ -38,24 +38,36 @@ open class ElasticsearchRepository(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    fun recreateIndex() {
+        deleteIndex()
+        createIndex()
+    }
+
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         try {
-            logger.info("Trying to initialize Elasticsearch")
-            val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
-            logger.info("Does klagebehandling exist in Elasticsearch?")
-            if (!indexOps.exists()) {
-                logger.info("klagebehandling does not exist in Elasticsearch")
-                indexOps.create(readFromfile("settings.json"))
-                indexOps.putMapping(readFromfile("mapping.json"))
-            } else {
-                logger.info("klagebehandling does exist in Elasticsearch")
-                val mapping: MutableMap<String, Any> = indexOps.mapping
-                logger.debug("Current index has mapping $mapping")
-                mapping.forEach { (key, value) -> logger.debug("mapping key: $key, value: $value") }
-            }
+            createIndex()
         } catch (e: Exception) {
             logger.error("Unable to initialize Elasticsearch", e)
         }
+    }
+
+    private fun createIndex() {
+        logger.info("Trying to initialize Elasticsearch")
+        val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
+        logger.info("Does klagebehandling exist in Elasticsearch?")
+        if (!indexOps.exists()) {
+            logger.info("klagebehandling does not exist in Elasticsearch")
+            indexOps.create(readFromfile("settings.json"))
+            indexOps.putMapping(readFromfile("mapping.json"))
+        } else {
+            logger.info("klagebehandling does exist in Elasticsearch")
+        }
+    }
+
+    private fun deleteIndex() {
+        logger.info("Deleting index klagebehandling")
+        val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
+        indexOps.delete()
     }
 
     private fun readFromfile(filename: String): Document {

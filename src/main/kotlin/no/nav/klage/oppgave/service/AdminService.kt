@@ -21,6 +21,10 @@ class AdminService(private val indexService: IndexService) {
         Thread.sleep(TWO_SECONDS)
     }
 
+    fun recreateEsIndex() {
+        indexService.recreateIndex()
+    }
+
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
     fun findAndLogOutOfSyncKlagebehandlinger() =
         indexService.findAndLogOutOfSyncKlagebehandlinger()

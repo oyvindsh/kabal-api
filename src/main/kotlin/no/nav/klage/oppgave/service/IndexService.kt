@@ -84,4 +84,8 @@ class IndexService(
         }
     }
 
+    fun recreateIndex() {
+        elasticsearchRepository.recreateIndex()
+    }
+
 }

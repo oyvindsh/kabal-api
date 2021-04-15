@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class KlagebehandlingerSearchCriteria(
     val typer: List<Sakstype> = emptyList(),
     val temaer: List<Tema> = emptyList(),
-    val hjemler: List<String> = emptyList(),
+    val hjemler: List<Int> = emptyList(),
     val statuskategori: Statuskategori = Statuskategori.AAPEN,
 
     val opprettetFom: LocalDateTime? = null,
