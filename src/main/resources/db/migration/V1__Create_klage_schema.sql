@@ -37,9 +37,10 @@ CREATE TABLE klage.mottak
     versjon                             BIGINT                   NOT NULL,
     tema_id                             VARCHAR(3)               NOT NULL,
     sakstype_id                         VARCHAR(10)              NOT NULL,
-    klager_id                           UUID NOT NULL,
+    klager_id                           UUID                     NOT NULL,
+    saken_gjelder_part_id               UUID                     NOT NULL,
     sak_referanse                       TEXT,
-    intern_referanse                    TEXT NOT NULL,
+    intern_referanse                    TEXT                     NOT NULL,
     dvh_referanse                       TEXT,
     innsyn_url                          TEXT,
     hjemmel_liste                       TEXT,
@@ -55,7 +56,10 @@ CREATE TABLE klage.mottak
     modified                            TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_mottak_part
         FOREIGN KEY (klager_id)
-            REFERENCES klage.klager (id)
+            REFERENCES klage.klager (id),
+    CONSTRAINT fk_mottak_part
+        FOREIGN KEY (saken_gjelder_part_id)
+            REFERENCES klage.part_id (id)
 );
 
 CREATE TABLE klage.mottak_dokument
