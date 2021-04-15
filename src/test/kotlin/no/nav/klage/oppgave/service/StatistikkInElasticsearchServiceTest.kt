@@ -16,7 +16,6 @@ import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
@@ -25,9 +24,6 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
@@ -40,27 +36,14 @@ import java.time.LocalDate
 @SpringBootTest(classes = [ElasticsearchServiceConfiguration::class])
 @ImportAutoConfiguration(
     ElasticsearchRestClientAutoConfiguration::class,
-    ElasticsearchDataAutoConfiguration::class,
-    ElasticsearchRepositoriesAutoConfiguration::class
+    ElasticsearchDataAutoConfiguration::class
 )
 class StatistikkInElasticsearchServiceTest {
 
     companion object {
         @Container
         @JvmField
-        val ES_CONTAINER: ElasticsearchContainer =
-            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.9.3")
-
-        @JvmStatic
-        @DynamicPropertySource
-        fun aivenProperties(registry: DynamicPropertyRegistry) {
-            registry.add("AIVEN_ES_HOST", ES_CONTAINER::getHost)
-            registry.add("AIVEN_ES_PORT", ES_CONTAINER::getFirstMappedPort)
-            registry.add("AIVEN_ES_USERNAME_ADM") { "elastic" }
-            registry.add("AIVEN_ES_PASSWORD_ADM") { "changeme" }
-            registry.add("AIVEN_ES_SCHEME") { "http" }
-            registry.add("AIVEN_ES_USE_SSL") { false }
-        }
+        val esContainer: TestElasticsearchContainer = TestElasticsearchContainer.instance
     }
 
     @MockkBean(relaxed = true)
@@ -78,7 +61,8 @@ class StatistikkInElasticsearchServiceTest {
     @Test
     @Order(1)
     fun `es is running`() {
-        assertThat(ES_CONTAINER.isRunning).isTrue
+        assertThat(esContainer.isRunning).isTrue
+        service.recreateIndex()
     }
 
     @Test

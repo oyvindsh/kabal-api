@@ -54,7 +54,7 @@ open class ElasticsearchService(
         }
     }
 
-    private fun createIndex() {
+    fun createIndex() {
         logger.info("Trying to initialize Elasticsearch")
         val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
         logger.info("Does klagebehandling exist in Elasticsearch?")
@@ -67,7 +67,7 @@ open class ElasticsearchService(
         }
     }
 
-    private fun deleteIndex() {
+    fun deleteIndex() {
         logger.info("Deleting index klagebehandling")
         val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
         indexOps.delete()
