@@ -48,7 +48,7 @@ data class EsKlagebehandling(
     val startet: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val avsluttet: LocalDate? = null,
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Integer)
     val hjemler: List<Int>? = null,
     @Field(type = FieldType.Keyword)
     val foedselsnummer: String? = null,

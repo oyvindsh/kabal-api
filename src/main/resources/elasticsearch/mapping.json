@@ -48,7 +48,7 @@
       "format": "date"
     },
     "hjemler": {
-      "type": "keyword"
+      "type": "integer"
     },
     "foedselsnummer": {
       "type": "keyword"
