@@ -21,7 +21,7 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
     fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
         typer = queryParams.typer.map { Sakstype.of(it) },
         temaer = queryParams.temaer.map { Tema.of(it) },
-        hjemler = queryParams.hjemler,
+        hjemler = queryParams.hjemler.mapNotNull { toIntOrNull(it) },
         order = if (queryParams.rekkefoelge == KlagebehandlingerQueryParams.Rekkefoelge.SYNKENDE) {
             KlagebehandlingerSearchCriteria.Order.DESC
         } else {
@@ -40,11 +40,17 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
         }
     )
 
+    private fun toIntOrNull(it: String) = try {
+        it.toInt()
+    } catch (e: Exception) {
+        null
+    }
+
     fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) =
         KlagebehandlingerSearchCriteria(
             typer = queryParams.typer.map { Sakstype.of(it) },
             temaer = queryParams.temaer.map { Tema.of(it) },
-            hjemler = queryParams.hjemler,
+            hjemler = queryParams.hjemler.mapNotNull { toIntOrNull(it) },
             offset = 0,
             limit = 1,
             erTildeltSaksbehandler = false,
