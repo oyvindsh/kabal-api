@@ -51,23 +51,33 @@ class SafGraphQlClient(
     @Retryable
     fun getJournalpost(journalpostId: String): Journalpost? {
         return runWithTimingAndLogging {
-            safWebClient.post()
-                .uri("graphql")
-                .header(
-                    HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
-                )
-                .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
-
-                .bodyValue(hentJournalpostQuery(journalpostId))
-                .retrieve()
-                .bodyToMono<JournalpostResponse>()
-                .block()
-                ?.let { logErrorsFromSaf(it, journalpostId); it }
-                ?.let { failOnErrors(it); it }
-                ?.data?.journalpost
+            val token = tokenService.getSaksbehandlerAccessTokenWithSafScope()
+            getJournalpostWithToken(journalpostId, token)
         }
     }
+
+    @Retryable
+    fun getJournalpostAsSystembruker(journalpostId: String): Journalpost? {
+        return runWithTimingAndLogging {
+            val token = tokenService.getStsSystembrukerToken()
+            getJournalpostWithToken(journalpostId, token)
+        }
+    }
+
+    private fun getJournalpostWithToken(journalpostId: String, token: String) = safWebClient.post()
+        .uri("graphql")
+        .header(
+            HttpHeaders.AUTHORIZATION,
+            "Bearer ${token}"
+        )
+        .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
+        .bodyValue(hentJournalpostQuery(journalpostId))
+        .retrieve()
+        .bodyToMono<JournalpostResponse>()
+        .block()
+        ?.let { logErrorsFromSaf(it, journalpostId); it }
+        ?.let { failOnErrors(it); it }
+        ?.data?.journalpost
 
     private fun failOnErrors(response: JournalpostResponse) {
         if (response.data == null || response.errors != null && response.errors.map { it.extensions.classification }
