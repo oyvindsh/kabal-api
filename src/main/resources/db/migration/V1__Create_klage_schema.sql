@@ -17,6 +17,20 @@ CREATE TABLE klage.part_id
     value       TEXT NOT NULL
 );
 
+CREATE TABLE klage.klager
+(
+    id                          UUID    PRIMARY KEY,
+    part_id                     UUID    NOT NULL,
+    prosessfullmektig_part_id   UUID    DEFAULT NULL,
+    skal_motta_kopi             BOOLEAN DEFAULT NULL,
+    CONSTRAINT fk_mottak_part
+        FOREIGN KEY (part_id)
+            REFERENCES klage.part_id (id),
+    CONSTRAINT fk_mottak_part
+        FOREIGN KEY (prosessfullmektig_part_id)
+            REFERENCES klage.part_id (id)
+);
+
 CREATE TABLE klage.mottak
 (
     id                                  UUID PRIMARY KEY,
@@ -142,6 +156,7 @@ CREATE TABLE klage.brevmottaker
 (
     vedtak_id           UUID NOT NULL,
     mottaker_part_id    UUID,
+    rolle               TEXT, -- Må begrenses i kode til 'KLAGER', 'PROSESSFULLMEKTIG' eller 'RELEVANT_TREDJEPART'?
     CONSTRAINT fk_brevmottaker_mottak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),
