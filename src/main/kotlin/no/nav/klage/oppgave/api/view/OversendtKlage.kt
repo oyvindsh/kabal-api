@@ -17,7 +17,7 @@ data class OversendtKlage(
     val internReferanse: String,
     val dvhReferanse: String? = null,
     val innsynUrl: String,
-    val hjemler: List<String>,
+    val hjemler: List<HjemmelFraFoersteInstans>,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     val oversendtEnhet: String? = null,
@@ -39,7 +39,7 @@ data class OversendtKlage(
         sakReferanse = sakReferanse,
         internReferanse = internReferanse,
         dvhReferanse = dvhReferanse,
-        hjemmelListe = hjemler.joinToString(separator = ","),
+        hjemmelListe = hjemler.map { it.toMottakHjemmel() }.toMutableSet(),
         avsenderSaksbehandlerident = avsenderSaksbehandlerIdent,
         avsenderEnhet = avsenderEnhet,
         oversendtKaEnhet = oversendtEnhet,
@@ -51,6 +51,32 @@ data class OversendtKlage(
         fristFraFoersteinstans = frist,
         kilde = kilde
     )
+}
+
+class HjemmelFraFoersteInstans private constructor(
+    val kapittel: Int?,
+    val paragraf: Int?,
+    val lov: Lov,
+) {
+    constructor(lov: Lov) : this(null, null, lov)
+    constructor(lov: Lov, kapittel: Int) : this(kapittel, null, lov)
+    constructor(lov: Lov, kapittel: Int, paragraf: Int) : this(kapittel, paragraf, lov)
+
+    override fun toString(): String {
+        if (kapittel != null && paragraf != null) {
+            return "$lov $kapittel-$paragraf"
+        } else if (kapittel != null) {
+            return "$lov $kapittel"
+        } else {
+            return "$lov"
+        }
+    }
+
+    fun toMottakHjemmel() = MottakHjemmel(lov = lov, kapittel = kapittel, paragraf = paragraf)
+}
+
+enum class Lov {
+    FOLKETRYGDLOVEN, FORVALTNINGSLOVEN
 }
 
 data class OversendtKlagerPartId(

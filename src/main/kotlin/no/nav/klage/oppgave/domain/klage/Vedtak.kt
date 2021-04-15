@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
+import no.nav.klage.oppgave.domain.kodeverk.HjemmelConverter
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.domain.kodeverk.UtfallConverter
 import java.time.LocalDateTime
@@ -14,13 +16,14 @@ class Vedtak(
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     val utfall: Utfall,
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinTable(
+    @ElementCollection(targetClass = Hjemmel::class, fetch = FetchType.EAGER)
+    @CollectionTable(
         name = "vedtak_hjemmel",
         schema = "klage",
-        joinColumns = [JoinColumn(name = "vedtak_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
+        joinColumns = [JoinColumn(name = "vedtak_id", referencedColumnName = "id", nullable = false)]
     )
+    @Convert(converter = HjemmelConverter::class)
+    @Column(name = "id")
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),

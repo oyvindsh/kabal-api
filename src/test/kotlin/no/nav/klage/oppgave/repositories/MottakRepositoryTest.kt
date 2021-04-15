@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
+import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
@@ -42,17 +43,21 @@ class MottakRepositoryTest {
             sakReferanse = "12345",
             internReferanse = "54321",
             dvhReferanse = "5342523",
-            hjemmelListe = "8-4",
+            hjemmelListe = mutableSetOf(MottakHjemmel(lov = Lov.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
             avsenderSaksbehandlerident = "Z123456",
             avsenderEnhet = "1234",
-            mottakDokument = mutableSetOf(MottakDokument(
-                type = MottakDokumentType.OVERSENDELSESBREV,
-                journalpostId = "245245"
-            )),
-            brevmottakere = mutableSetOf(PartId(
-                type = PartIdType.PERSON,
-                value = "746574"
-            )),
+            mottakDokument = mutableSetOf(
+                MottakDokument(
+                    type = MottakDokumentType.OVERSENDELSESBREV,
+                    journalpostId = "245245"
+                )
+            ),
+            brevmottakere = mutableSetOf(
+                PartId(
+                    type = PartIdType.PERSON,
+                    value = "746574"
+                )
+            ),
             oversendtKaDato = LocalDate.now(),
             kilde = "Kilde"
         )

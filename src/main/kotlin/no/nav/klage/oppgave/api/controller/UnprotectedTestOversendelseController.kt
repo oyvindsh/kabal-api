@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.api.view.OversendtDokumentReferanse
-import no.nav.klage.oppgave.api.view.OversendtKlage
-import no.nav.klage.oppgave.api.view.OversendtKlagerPartId
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
@@ -56,7 +54,14 @@ class UnprotectedTestOversendelseController(
                 sakReferanse = "10000",
                 internReferanse = "REF_$fnr",
                 innsynUrl = "https://vg.no",
-                hjemler = listOf(listOf("8-4", "8-21", "8-22", "8-35").shuffled().first()),
+                hjemler = listOf(
+                    listOf(
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                    ).shuffled().first()
+                ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
@@ -80,7 +85,10 @@ class UnprotectedTestOversendelseController(
                 sakReferanse = "10001",
                 internReferanse = "SYK_27458422236",
                 innsynUrl = "https://vg.no",
-                hjemler = listOf("8-4", "8-21"),
+                hjemler = listOf(
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21)
+                ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
@@ -98,7 +106,10 @@ class UnprotectedTestOversendelseController(
                 sakReferanse = "10002",
                 internReferanse = "SYK_28488425473",
                 innsynUrl = "https://vg.no",
-                hjemler = listOf("8-4", "8-21"),
+                hjemler = listOf(
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21)
+                ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
@@ -116,7 +127,10 @@ class UnprotectedTestOversendelseController(
                 sakReferanse = "10003",
                 internReferanse = "SYK_02518418680",
                 innsynUrl = "https://vg.no",
-                hjemler = listOf("8-4", "8-21"),
+                hjemler = listOf(
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21)
+                ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
@@ -134,7 +148,10 @@ class UnprotectedTestOversendelseController(
                 sakReferanse = "10004",
                 internReferanse = "SYK_02508425425",
                 innsynUrl = "https://vg.no",
-                hjemler = listOf("8-4", "8-21"),
+                hjemler = listOf(
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21)
+                ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
@@ -152,7 +169,10 @@ class UnprotectedTestOversendelseController(
                 sakReferanse = "10005",
                 internReferanse = "SYK_23528406688",
                 innsynUrl = "https://vg.no",
-                hjemler = listOf("8-4", "8-21"),
+                hjemler = listOf(
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                    HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21)
+                ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",

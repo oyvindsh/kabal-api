@@ -1,12 +1,15 @@
 package no.nav.klage.oppgave.api.mapper
 
 
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
+import no.nav.klage.oppgave.api.view.KlagebehandlingListView
+import no.nav.klage.oppgave.api.view.KlagebehandlingView
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
-import no.nav.klage.oppgave.domain.klage.Hjemmel
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -46,7 +49,7 @@ class KlagebehandlingMapper(
             frist = klagebehandling.frist,
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,
-            hjemler = klagebehandling.hjemler.map { it.original },
+            hjemler = klagebehandling.hjemler.map { it.id },
             foedselsnummer = klagebehandling.foedselsnummer,
             navn = navn,
             egenAnsatt = erEgenAnsatt,
@@ -134,17 +137,8 @@ class KlagebehandlingMapper(
         )
     }
 
-    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<HjemmelView> {
-        return hjemler.map {
-            HjemmelView(
-                kapittel = it.kapittel,
-                paragraf = it.paragraf,
-                ledd = it.ledd,
-                bokstav = it.bokstav,
-                original = it.original
-            )
-        }.sortedBy { it.original }
-    }
+    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<Int> = hjemler.map { it.id }
+
 
     fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {
         val kvalitetsvurdering = klagebehandling.kvalitetsvurdering

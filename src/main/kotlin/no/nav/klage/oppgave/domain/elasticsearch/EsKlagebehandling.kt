@@ -42,11 +42,8 @@ data class EsKlagebehandling(
     val startet: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val avsluttet: LocalDate? = null,
-    @MultiField(
-        mainField = Field(type = FieldType.Keyword),
-        otherFields = [InnerField(type = FieldType.Text, suffix = "text")]
-    )
-    val hjemler: List<String>? = null,
+    @Field(type = FieldType.Keyword)
+    val hjemler: List<Int>? = null,
     @Field(type = FieldType.Keyword)
     val foedselsnummer: String? = null,
     @Field(type = FieldType.Text)

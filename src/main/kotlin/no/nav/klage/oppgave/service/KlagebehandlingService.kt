@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
@@ -21,6 +22,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
 import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.MottakHjemmel
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -39,7 +41,6 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val hjemmelService: HjemmelService,
     private val vedtakKafkaProducer: VedtakKafkaProducer,
     private val dokumentService: DokumentService
 ) {
@@ -286,7 +287,7 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
-                hjemler = mottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
+                hjemler = mottak.hjemmelListe.mapNotNull { mapMottakHjemmel(it) }.toMutableSet(),
                 saksdokumenter = createSaksdokumenter(mottak),
                 kilde = mottak.kilde
             )
@@ -298,6 +299,31 @@ class KlagebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
+    }
+
+
+    private fun mapMottakHjemmel(hjemmel: MottakHjemmel): Hjemmel? {
+        return try {
+            val lov = mapLov(hjemmel.lov)
+            val kapittelOgParagraf = mapKapittelOgParagraf(hjemmel.kapittel, hjemmel.paragraf)
+            Hjemmel.of(lov, kapittelOgParagraf)
+        } catch (e: Exception) {
+            logger.warn("Unable to map hjemmel", hjemmel, e)
+            null
+        }
+    }
+
+    private fun mapKapittelOgParagraf(kapittel: Int?, paragraf: Int?): KapittelOgParagraf? {
+        return if (kapittel != null) {
+            KapittelOgParagraf(kapittel, paragraf)
+        } else null
+    }
+
+    private fun mapLov(lov: Lov): LovKilde {
+        return when (lov) {
+            Lov.FOLKETRYGDLOVEN -> LovKilde.FOLKETRYGDLOVEN
+            Lov.FORVALTNINGSLOVEN -> LovKilde.FORVALTNINGSLOVEN
+        }
     }
 
     private fun createSaksdokumenter(mottak: Mottak): MutableSet<Saksdokument> {
