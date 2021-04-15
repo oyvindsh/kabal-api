@@ -108,6 +108,7 @@ CREATE TABLE klage.klagebehandling
     dato_behandling_avsluttet                  DATE,
     frist                                      DATE,
     tildelt_saksbehandlerident                 VARCHAR(50),
+    medunderskriverident                       VARCHAR(50),
     tildelt_enhet                              VARCHAR(10),
     avsender_enhet_foersteinstans              VARCHAR(10),
     avsender_saksbehandlerident_foersteinstans VARCHAR(50),

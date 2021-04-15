@@ -174,6 +174,22 @@ class KlagebehandlingDetaljerController(
         )
     }
 
+    @PutMapping("/klagebehandlinger/{id}/detaljer/medunderskriverident")
+    fun putMedunderskriverident(
+        @PathVariable("id") klagebehandlingId: String,
+        @RequestBody input: KlagebehandlingMedunderskriveridentInput
+    ): KlagebehandlingDetaljerView {
+        logMethodDetails("putAvsenderSaksbehandlerident", klagebehandlingId)
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
+            klagebehandlingService.setMedunderskriverident(
+                klagebehandlingId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
+                input.medunderskriverident,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
+        )
+    }
+
     @PutMapping("/klagebehandlinger/{id}/detaljer/grunn")
     fun putKvalitetsvurderingGrunn(
         @PathVariable("id") klagebehandlingId: String,
