@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpHeaders
@@ -22,6 +23,7 @@ import java.util.*
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class DokumentController(
+    private val klagebehandlingService: KlagebehandlingService,
     private val dokumentService: DokumentService,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
@@ -43,7 +45,7 @@ class DokumentController(
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null
     ): DokumenterResponse {
         val klagebehandlingId = parseAndValidate(behandlingsid)
-        return dokumentService.fetchDokumentlisteForKlagebehandling(klagebehandlingId, pageSize, previousPageRef)
+        return klagebehandlingService.fetchDokumentlisteForKlagebehandling(klagebehandlingId, pageSize, previousPageRef)
     }
 
     @ApiOperation(
@@ -56,7 +58,7 @@ class DokumentController(
         @PathVariable behandlingsid: String
     ): DokumenterResponse {
         val klagebehandlingId = parseAndValidate(behandlingsid)
-        return dokumentService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
+        return klagebehandlingService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
     }
 
     @ApiOperation(
@@ -70,7 +72,7 @@ class DokumentController(
     ): DokumentReferanserResponse {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         return DokumentReferanserResponse(
-            dokumentService.fetchJournalpostIderConnectedToKlagebehandling(
+            klagebehandlingService.fetchJournalpostIderConnectedToKlagebehandling(
                 klagebehandlingId
             )
         )
@@ -93,7 +95,7 @@ class DokumentController(
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsId)
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        dokumentService.disconnectDokumentFromKlagebehandling(
+        klagebehandlingService.disconnectDokumentFromKlagebehandling(
             klagebehandlingId,
             null, //dropper optimistic locking her
             journalpostId,
@@ -115,7 +117,7 @@ class DokumentController(
     ) {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        dokumentService.connectDokumentToKlagebehandling(
+        klagebehandlingService.connectDokumentToKlagebehandling(
             klagebehandlingId,
             null, //dropper optimistic locking her
             dokumentKnytning.journalpostId,

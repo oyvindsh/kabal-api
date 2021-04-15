@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
@@ -39,7 +40,8 @@ class KlagebehandlingService(
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val hjemmelService: HjemmelService,
-    private val vedtakKafkaProducer: VedtakKafkaProducer
+    private val vedtakKafkaProducer: VedtakKafkaProducer,
+    private val dokumentService: DokumentService
 ) {
 
     companion object {
@@ -264,6 +266,7 @@ class KlagebehandlingService(
             logger.error("We already have a klagebehandling for mottak ${mottak.id}. This is not supposed to happen.")
             throw RuntimeException("We already have a klagebehandling for mottak ${mottak.id}")
         }
+
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
                 foedselsnummer = mottak.foedselsnummer,
@@ -284,22 +287,7 @@ class KlagebehandlingService(
                 vedtak = mutableSetOf(),
                 kvalitetsvurdering = null,
                 hjemler = mottak.hjemler().map { hjemmelService.generateHjemmelFromText(it) }.toMutableSet(),
-                //TODO lookup actual documents
-                /*
-                saksdokumenter =
-                listOfNotNull(
-                    if (mottak.oversendelsesbrevJournalpostId != null) {
-                        Saksdokument(journalpostId = mottak.oversendelsesbrevJournalpostId!!)
-                    } else {
-                        null
-                    },
-                    if (mottak.brukersKlageJournalpostId != null) {
-                        Saksdokument(journalpostId = mottak.brukersKlageJournalpostId!!)
-                    } else {
-                        null
-                    },
-                ).toMutableSet(),
-                 */
+                saksdokumenter = createSaksdokumenter(mottak),
                 kilde = mottak.kilde
             )
         )
@@ -312,7 +300,17 @@ class KlagebehandlingService(
         )
     }
 
+    private fun createSaksdokumenter(mottak: Mottak): MutableSet<Saksdokument> {
+        val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf()
+        saksdokumenter.addAll(mottak.brukersKlageJournalpostId?.let { createSaksdokument(it) } ?: emptyList())
+        saksdokumenter.addAll(mottak.oversendelsesbrevJournalpostId?.let { createSaksdokument(it) } ?: emptyList())
+        return saksdokumenter
+    }
 
+    private fun createSaksdokument(journalpostId: String) =
+        dokumentService.fetchDokumentInfoIdForJournalposAsSystembruker(journalpostId)
+            .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
+    
     private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
 
     private fun mapTema(tema: String): Tema = Tema.of(tema)
@@ -382,6 +380,56 @@ class KlagebehandlingService(
         )
 
         vedtakKafkaProducer.sendVedtak(vedtakFattet)
+    }
+
+    fun fetchDokumentlisteForKlagebehandling(
+        klagebehandlingId: UUID,
+        pageSize: Int,
+        previousPageRef: String?
+    ): DokumenterResponse {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        return dokumentService.fetchDokumentlisteForKlagebehandling(klagebehandling, pageSize, previousPageRef)
+    }
+
+    fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> =
+        getKlagebehandling(klagebehandlingId).saksdokumenter.map { it.journalpostId }
+
+    fun fetchJournalposterConnectedToKlagebehandling(klagebehandlingId: UUID): DokumenterResponse {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+        return dokumentService.fetchJournalposterConnectedToKlagebehandling(klagebehandling)
+    }
+
+    fun connectDokumentToKlagebehandling(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
+        journalpostId: String,
+        dokumentInfoId: String,
+        saksbehandlerIdent: String
+    ) {
+        dokumentService.validateJournalpostExists(journalpostId)
+        addDokument(
+            klagebehandlingId,
+            klagebehandlingVersjon,
+            journalpostId,
+            dokumentInfoId,
+            saksbehandlerIdent
+        )
+    }
+
+    fun disconnectDokumentFromKlagebehandling(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
+        journalpostId: String,
+        dokumentInfoId: String,
+        saksbehandlerIdent: String
+    ) {
+        removeDokument(
+            klagebehandlingId,
+            klagebehandlingVersjon,
+            journalpostId,
+            dokumentInfoId,
+            saksbehandlerIdent
+        )
     }
 
     /*
