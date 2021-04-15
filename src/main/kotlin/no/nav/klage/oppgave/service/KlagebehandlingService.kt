@@ -324,9 +324,9 @@ class KlagebehandlingService(
         }
     }
 
-    private fun mapPosisjon(kapittel: Int?, paragraf: Int?): LovPosisjon? {
+    private fun mapPosisjon(kapittel: Int?, paragraf: Int?): KapittelOgParagraf? {
         return if (kapittel != null) {
-            LovPosisjon(kapittel, paragraf)
+            KapittelOgParagraf(kapittel, paragraf)
         } else null
     }
 
