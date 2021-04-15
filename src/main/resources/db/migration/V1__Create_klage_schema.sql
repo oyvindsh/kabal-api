@@ -38,7 +38,7 @@ CREATE TABLE klage.mottak
     tema_id                             VARCHAR(3)               NOT NULL,
     sakstype_id                         VARCHAR(10)              NOT NULL,
     klager_id                           UUID                     NOT NULL,
-    saken_gjelder_part_id               UUID                     NOT NULL,
+    saken_gjelder                       UUID,
     sak_referanse                       TEXT,
     intern_referanse                    TEXT                     NOT NULL,
     dvh_referanse                       TEXT,
@@ -54,12 +54,12 @@ CREATE TABLE klage.mottak
     kilde                               TEXT                     NOT NULL,
     created                             TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                            TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_mottak_part
+    CONSTRAINT fk_mottak_klager
         FOREIGN KEY (klager_id)
             REFERENCES klage.klager (id),
-    CONSTRAINT fk_mottak_part
-        FOREIGN KEY (saken_gjelder_part_id)
-            REFERENCES klage.part_id (id)
+    CONSTRAINT fk_mottak_saken_gjelder
+        FOREIGN KEY (saken_gjelder)
+            REFERENCES klage.klager (id)
 );
 
 CREATE TABLE klage.mottak_dokument
@@ -104,7 +104,8 @@ CREATE TABLE klage.klagebehandling
 (
     id                                         UUID PRIMARY KEY,
     versjon                                    BIGINT                   NOT NULL,
-    saken_gjelder_part_id                      UUID                     NOT NULL,
+    klager                                     UUID                     NOT NULL,
+    saken_gjelder                              UUID                     NOT NULL,
     tema_id                                    VARCHAR(3)               NOT NULL,
     sakstype_id                                VARCHAR(10)              NOT NULL,
     referanse_id                               TEXT,
@@ -129,9 +130,12 @@ CREATE TABLE klage.klagebehandling
     CONSTRAINT fk_behandling_mottak
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id),
-    CONSTRAINT fk_klagebehandling_gjelder_part
-        FOREIGN KEY (saken_gjelder_part_id)
-            REFERENCES klage.part_id (id)
+    CONSTRAINT fk_klagebehandling_gjelder
+        FOREIGN KEY (saken_gjelder)
+            REFERENCES klage.klager (id),
+    CONSTRAINT fk_klagebehandling_klager
+        FOREIGN KEY (klager)
+            REFERENCES klage.klager (id)
 );
 
 CREATE TABLE klage.vedtak
