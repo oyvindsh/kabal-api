@@ -77,7 +77,11 @@ class KlagebehandlingListController(
         )
 
         val uri = MvcUriComponentsBuilder
-            .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
+            .fromMethodName(
+                KlagebehandlingDetaljerController::class.java,
+                "getKlagebehandlingDetaljer",
+                klagebehandlingId
+            )
             .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
     }
@@ -99,7 +103,11 @@ class KlagebehandlingListController(
         )
 
         val uri = MvcUriComponentsBuilder
-            .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
+            .fromMethodName(
+                KlagebehandlingDetaljerController::class.java,
+                "getKlagebehandlingDetaljer",
+                klagebehandlingId
+            )
             .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
     }

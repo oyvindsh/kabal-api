@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
-import no.nav.klage.oppgave.api.view.KlagebehandlingView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -85,29 +84,6 @@ class KlagebehandlingMapper(
                 erMedunderskriver = esKlagebehandling.medunderskriverident?.equals(saksbehandler) ?: false
             )
         }
-    }
-
-    fun mapKlagebehandlingToKlagebehandlingView(klagebehandling: Klagebehandling): KlagebehandlingView {
-        return KlagebehandlingView(
-            id = klagebehandling.id,
-            klageInnsendtdato = klagebehandling.innsendt,
-            //TODO get name from norg2
-            fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
-            fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
-            mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
-            foedselsnummer = klagebehandling.foedselsnummer,
-            tema = klagebehandling.tema.id,
-            sakstype = klagebehandling.sakstype.navn,
-            mottatt = klagebehandling.mottattKlageinstans,
-            startet = klagebehandling.startet,
-            avsluttet = klagebehandling.avsluttet,
-            frist = klagebehandling.frist,
-            tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
-            hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
-            modified = klagebehandling.modified,
-            created = klagebehandling.created,
-            klagebehandlingVersjon = klagebehandling.versjon
-        )
     }
 
     fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
