@@ -17,6 +17,7 @@ data class KlagebehandlingDetaljerView(
     val avsluttet: LocalDate? = null,
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
+    val medunderskriverident: String? = null,
     val hjemler: List<Int>,
     val modified: LocalDateTime,
     val created: LocalDateTime,

@@ -36,6 +36,8 @@ data class EsKlagebehandling(
     val sakstype: Sakstype,
     @Field(type = FieldType.Keyword)
     val tildeltSaksbehandlerident: String? = null,
+    @Field(type = FieldType.Keyword)
+    val medunderskriverident: String? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val innsendt: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)

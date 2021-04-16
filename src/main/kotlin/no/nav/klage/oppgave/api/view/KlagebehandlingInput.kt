@@ -23,6 +23,11 @@ data class KlagebehandlingMottattKlageinstansInput(
 
 data class KlagebehandlingFristInput(val frist: LocalDate, val klagebehandlingVersjon: Long? = null)
 
+data class KlagebehandlingMedunderskriveridentInput(
+    val medunderskriverident: String,
+    val klagebehandlingVersjon: Long? = null
+)
+
 data class KlagebehandlingAvsenderSaksbehandleridentFoersteinstansInput(
     val avsenderSaksbehandlerident: String,
     val klagebehandlingVersjon: Long? = null

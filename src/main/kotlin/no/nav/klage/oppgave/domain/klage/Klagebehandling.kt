@@ -45,6 +45,8 @@ class Klagebehandling(
     var frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
     var tildeltSaksbehandlerident: String? = null,
+    @Column(name = "medunderskriverident")
+    var medunderskriverident: String? = null,
     @Column(name = "tildelt_enhet")
     var tildeltEnhet: String? = null,
     @Column(name = "mottak_id")

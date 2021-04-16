@@ -192,6 +192,25 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
+    fun Klagebehandling.setMedunderskriverident(
+        nyVerdi: String,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val gammelVerdi = medunderskriverident
+        val tidspunkt = LocalDateTime.now()
+        medunderskriverident = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.MEDUNDERSKRIVERIDENT,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
     fun Klagebehandling.setKvalitetsvurderingGrunn(
         nyVerdi: Grunn?,
         saksbehandlerident: String
