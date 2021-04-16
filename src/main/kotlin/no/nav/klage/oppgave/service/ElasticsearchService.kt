@@ -180,7 +180,10 @@ open class ElasticsearchService(
             }
         }
         saksbehandler?.let {
-            baseQuery.must(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
+            val innerQuerySaksbehandler = QueryBuilders.boolQuery()
+            innerQuerySaksbehandler.should(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
+            innerQuerySaksbehandler.should(QueryBuilders.termQuery("medunderskriverident", saksbehandler))
+            baseQuery.must(innerQuerySaksbehandler)
         }
 
         opprettetFom?.let {

@@ -43,6 +43,7 @@ class KlagebehandlingMapper(
             tema = klagebehandling.tema,
             sakstype = klagebehandling.sakstype,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
+            medunderskriverident = klagebehandling.medunderskriverident,
             innsendt = klagebehandling.innsendt,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             mottattKlageinstans = klagebehandling.mottattKlageinstans,
@@ -60,7 +61,8 @@ class KlagebehandlingMapper(
 
     fun mapEsKlagebehandlingerToListView(
         esKlagebehandlinger: List<EsKlagebehandling>,
-        fetchPersoner: Boolean
+        fetchPersoner: Boolean,
+        saksbehandler: String?
     ): List<KlagebehandlingListView> {
         return esKlagebehandlinger.map { esKlagebehandling ->
             KlagebehandlingListView(
@@ -79,8 +81,8 @@ class KlagebehandlingMapper(
                 frist = esKlagebehandling.frist,
                 mottatt = esKlagebehandling.mottattKlageinstans,
                 versjon = esKlagebehandling.versjon!!.toInt(),
-                klagebehandlingVersjon = esKlagebehandling.versjon
-
+                klagebehandlingVersjon = esKlagebehandling.versjon,
+                erMedunderskriver = esKlagebehandling.medunderskriverident?.equals(saksbehandler) ?: false
             )
         }
     }
@@ -124,6 +126,7 @@ class KlagebehandlingMapper(
             avsluttet = klagebehandling.avsluttet,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
+            medunderskriverident = klagebehandling.medunderskriverident,
             hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
             modified = klagebehandling.modified,
             created = klagebehandling.created,

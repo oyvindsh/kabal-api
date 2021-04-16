@@ -16,6 +16,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKva
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingRaadfoertMedLege
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingTilbakemelding
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverident
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
@@ -50,7 +51,7 @@ class KlagebehandlingService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    private fun checkTilgang(klagebehandling: Klagebehandling) {
+    private fun checkLeseTilgang(klagebehandling: Klagebehandling) {
         klagebehandling.foedselsnummer?.let {
             tilgangService.verifySaksbehandlersTilgangTil(it)
         }
@@ -60,11 +61,11 @@ class KlagebehandlingService(
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.findById(klagebehandlingId)
             .orElseThrow { KlagebehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet") }
-            .also { checkTilgang(it) }
+            .also { checkLeseTilgang(it) }
 
     fun getKlagebehandlingForUpdate(klagebehandlingId: UUID, klagebehandlingVersjon: Long?): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
-            .also { checkTilgang(it) }
+            .also { checkLeseTilgang(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun assignKlagebehandling(
@@ -184,6 +185,22 @@ class KlagebehandlingService(
         val event =
             klagebehandling.setAvsenderEnhetFoersteinstans(
                 enhet,
+                utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setMedunderskriverident(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
+        medunderskriverIdent: String,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val event =
+            klagebehandling.setMedunderskriverident(
+                medunderskriverIdent,
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)

@@ -54,7 +54,8 @@ class KlagebehandlingListController(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
-                searchCriteria.isProjectionUtvidet()
+                searchCriteria.isProjectionUtvidet(),
+                searchCriteria.saksbehandler
             )
         )
     }
