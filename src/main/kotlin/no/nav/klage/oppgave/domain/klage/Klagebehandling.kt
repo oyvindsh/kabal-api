@@ -17,8 +17,12 @@ class Klagebehandling(
     @Version
     @Column(name = "versjon")
     val versjon: Long = 1L,
-    @Column(name = "foedselsnummer")
-    val foedselsnummer: String? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "klager_id", nullable = false)
+    var klager: Klager,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "saken_gjelder_id", nullable = false)
+    var sakenGjelder: Klager,
     @Column(name = "tema_id")
     @Convert(converter = TemaConverter::class)
     var tema: Tema,

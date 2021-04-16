@@ -24,11 +24,12 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling: Klagebehandling): EsKlagebehandling {
+        val foedselsnummer = foedselsnummer(klagebehandling)
 
-        val personInfo = klagebehandling.foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
+        val personInfo = foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
         val erStrengtFortrolig = personInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
-        val erEgenAnsatt = klagebehandling.foedselsnummer?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
+        val erEgenAnsatt = foedselsnummer?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
         val navn = personInfo?.navn
 
         return EsKlagebehandling(
@@ -47,7 +48,9 @@ class KlagebehandlingMapper(
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,
             hjemler = klagebehandling.hjemler.map { it.original },
-            foedselsnummer = klagebehandling.foedselsnummer,
+            foedselsnummer = foedselsnummer,
+            organisasjonsnummer = organisasjonsnummer(klagebehandling),
+            virksomhetsnummer = virksomhetsnummer(klagebehandling),
             navn = navn,
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
@@ -90,7 +93,9 @@ class KlagebehandlingMapper(
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
-            foedselsnummer = klagebehandling.foedselsnummer,
+            foedselsnummer = foedselsnummer(klagebehandling),
+            organisasjonsnummer = organisasjonsnummer(klagebehandling),
+            virksomhetsnummer = virksomhetsnummer(klagebehandling),
             tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
             mottatt = klagebehandling.mottattKlageinstans,
@@ -113,7 +118,9 @@ class KlagebehandlingMapper(
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
-            foedselsnummer = klagebehandling.foedselsnummer,
+            foedselsnummer = foedselsnummer(klagebehandling),
+            organisasjonsnummer = organisasjonsnummer(klagebehandling),
+            virksomhetsnummer = virksomhetsnummer(klagebehandling),
             tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
             mottatt = klagebehandling.mottattKlageinstans,
@@ -158,4 +165,25 @@ class KlagebehandlingMapper(
             klagebehandlingVersjon = klagebehandling.versjon
         )
     }
+
+    private fun foedselsnummer(klagebehandling: Klagebehandling) =
+        if (klagebehandling.klager.erPerson()) {
+            klagebehandling.klager.partId.value
+        } else {
+            null
+        }
+
+    private fun organisasjonsnummer(klagebehandling: Klagebehandling) =
+        if (klagebehandling.klager.erOrganisasjon()) {
+            klagebehandling.klager.partId.value
+        } else {
+            null
+        }
+
+    private fun virksomhetsnummer(klagebehandling: Klagebehandling) =
+        if (klagebehandling.klager.erVirksomhet()) {
+            klagebehandling.klager.partId.value
+        } else {
+            null
+        }
 }

@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.api.view.OversendtDokumentReferanse
-import no.nav.klage.oppgave.api.view.OversendtKlage
-import no.nav.klage.oppgave.api.view.OversendtKlagerPartId
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
@@ -52,9 +50,11 @@ class UnprotectedTestOversendelseController(
                 uuid = UUID.randomUUID(),
                 tema = listOf(Tema.SYK).shuffled().first(),
                 sakstype = Sakstype.KLAGE,
-                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, fnr),
+                klager = OversendtKlager(
+                    id = OversendtKlagerPartId(PartIdType.PERSON, fnr)
+                ),
                 sakReferanse = "10000",
-                internReferanse = "REF_$fnr",
+                kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://vg.no",
                 hjemler = listOf(listOf("8-4", "8-21", "8-22", "8-35").shuffled().first()),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -76,9 +76,11 @@ class UnprotectedTestOversendelseController(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
-                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "27458422236"),
+                klager = OversendtKlager(
+                    id = OversendtKlagerPartId(PartIdType.PERSON, "27458422236")
+                ),
                 sakReferanse = "10001",
-                internReferanse = "SYK_27458422236",
+                kildeReferanse = "SYK_27458422236",
                 innsynUrl = "https://vg.no",
                 hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -94,9 +96,11 @@ class UnprotectedTestOversendelseController(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
-                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "28488425473"),
+                klager = OversendtKlager(
+                    id = OversendtKlagerPartId(PartIdType.PERSON, "28488425473")
+                ),
                 sakReferanse = "10002",
-                internReferanse = "SYK_28488425473",
+                kildeReferanse = "SYK_28488425473",
                 innsynUrl = "https://vg.no",
                 hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -112,9 +116,11 @@ class UnprotectedTestOversendelseController(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
-                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "02518418680"),
+                klager = OversendtKlager(
+                    id = OversendtKlagerPartId(PartIdType.PERSON, "02518418680")
+                ),
                 sakReferanse = "10003",
-                internReferanse = "SYK_02518418680",
+                kildeReferanse = "SYK_02518418680",
                 innsynUrl = "https://vg.no",
                 hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -130,9 +136,11 @@ class UnprotectedTestOversendelseController(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
-                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "02508425425"),
+                klager = OversendtKlager(
+                    id = OversendtKlagerPartId(PartIdType.PERSON, "02508425425")
+                ),
                 sakReferanse = "10004",
-                internReferanse = "SYK_02508425425",
+                kildeReferanse = "SYK_02508425425",
                 innsynUrl = "https://vg.no",
                 hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -148,9 +156,15 @@ class UnprotectedTestOversendelseController(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
-                klagerPartId = OversendtKlagerPartId(PartIdType.PERSON, "23528406688"),
+                klager = OversendtKlager(
+                    id = OversendtKlagerPartId(PartIdType.PERSON, "23528406688"),
+                    klagersProsessfullmektig = OversendtProsessfullmektig(
+                        id = OversendtKlagerPartId(PartIdType.PERSON, "8301839832"),
+                        skalKlagerMottaKopi = true
+                    )
+                ),
                 sakReferanse = "10005",
-                internReferanse = "SYK_23528406688",
+                kildeReferanse = "SYK_23528406688",
                 innsynUrl = "https://vg.no",
                 hjemler = listOf("8-4", "8-21"),
                 avsenderSaksbehandlerIdent = "Z994674",

@@ -21,6 +21,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
 import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -50,8 +51,8 @@ class KlagebehandlingService(
     }
 
     private fun checkTilgang(klagebehandling: Klagebehandling) {
-        klagebehandling.foedselsnummer?.let {
-            tilgangService.verifySaksbehandlersTilgangTil(it)
+        if(klagebehandling.klager.partId.type == PartIdType.PERSON) {
+            tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.klager.partId.value)
         }
     }
 
@@ -269,10 +270,11 @@ class KlagebehandlingService(
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                foedselsnummer = mottak.klagerPartId.value, // TODO Her må vi fikse
+                klager = mottak.klager,
+                sakenGjelder = mottak.sakenGjelder ?: mottak.klager,
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
-                referanseId = mottak.internReferanse,
+                referanseId = mottak.kildeReferanse,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
@@ -376,9 +378,12 @@ class KlagebehandlingService(
         val vedtak = klage.vedtak.find { it.id == vedtakId }
         require(vedtak != null) { "Fant ikke vedtak på klage" }
         val vedtakFattet = KlagevedtakFattet(
-            id = klage.referanseId ?: "UKJENT", // TODO: Riktig?
+            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO: Riktig?
+            kilde = klage.kilde,
             utfall = vedtak.utfall,
-            vedtaksbrevReferanse = "TODO"
+            vedtaksbrevReferanse = "TODO",
+            sakReferanse = "TODO",
+            kabalReferanse = "TODO" // TODO: Human readable?
         )
 
         vedtakKafkaProducer.sendVedtak(vedtakFattet)

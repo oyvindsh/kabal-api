@@ -45,8 +45,8 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             kilde = "OPPGAVE",
-            internReferanse = "1234234",
-            klagerPartId = PartId(type = PartIdType.PERSON, value = "23452354"),
+            kildeReferanse = "1234234",
+            klager = PartId(type = PartIdType.PERSON, value = "23452354"),
             oversendtKaDato = LocalDate.now()
         )
 
@@ -84,8 +84,8 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             kilde = "OPPGAVE",
-            internReferanse = "1234234",
-            klagerPartId = PartId(type = PartIdType.PERSON, value = "23452354"),
+            kildeReferanse = "1234234",
+            klager = PartId(type = PartIdType.PERSON, value = "23452354"),
             oversendtKaDato = LocalDate.now()
         )
 
@@ -130,8 +130,8 @@ class KlagebehandlingRepositoryTest {
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             kilde = "OPPGAVE",
-            internReferanse = "1234234",
-            klagerPartId = PartId(type = PartIdType.PERSON, value = "23452354"),
+            kildeReferanse = "1234234",
+            klager = PartId(type = PartIdType.PERSON, value = "23452354"),
             oversendtKaDato = LocalDate.now()
         )
 

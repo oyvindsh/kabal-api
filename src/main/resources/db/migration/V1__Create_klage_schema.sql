@@ -38,9 +38,9 @@ CREATE TABLE klage.mottak
     tema_id                             VARCHAR(3)               NOT NULL,
     sakstype_id                         VARCHAR(10)              NOT NULL,
     klager_id                           UUID                     NOT NULL,
-    saken_gjelder                       UUID,
+    saken_gjelder_id                    UUID,
     sak_referanse                       TEXT,
-    intern_referanse                    TEXT                     NOT NULL,
+    kilde_referanse                     TEXT                     NOT NULL,
     dvh_referanse                       TEXT,
     innsyn_url                          TEXT,
     hjemmel_liste                       TEXT,
@@ -58,7 +58,7 @@ CREATE TABLE klage.mottak
         FOREIGN KEY (klager_id)
             REFERENCES klage.klager (id),
     CONSTRAINT fk_mottak_saken_gjelder
-        FOREIGN KEY (saken_gjelder)
+        FOREIGN KEY (saken_gjelder_id)
             REFERENCES klage.klager (id)
 );
 
@@ -104,8 +104,8 @@ CREATE TABLE klage.klagebehandling
 (
     id                                         UUID PRIMARY KEY,
     versjon                                    BIGINT                   NOT NULL,
-    klager                                     UUID                     NOT NULL,
-    saken_gjelder                              UUID                     NOT NULL,
+    klager_id                                  UUID                     NOT NULL,
+    saken_gjelder_id                           UUID                     NOT NULL,
     tema_id                                    VARCHAR(3)               NOT NULL,
     sakstype_id                                VARCHAR(10)              NOT NULL,
     referanse_id                               TEXT,
@@ -131,10 +131,10 @@ CREATE TABLE klage.klagebehandling
         FOREIGN KEY (mottak_id)
             REFERENCES klage.mottak (id),
     CONSTRAINT fk_klagebehandling_gjelder
-        FOREIGN KEY (saken_gjelder)
+        FOREIGN KEY (saken_gjelder_id)
             REFERENCES klage.klager (id),
     CONSTRAINT fk_klagebehandling_klager
-        FOREIGN KEY (klager)
+        FOREIGN KEY (klager_id)
             REFERENCES klage.klager (id)
 );
 

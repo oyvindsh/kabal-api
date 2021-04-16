@@ -21,12 +21,15 @@ class Mottak(
     @Convert(converter = SakstypeConverter::class)
     var sakstype: Sakstype,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "klager_part_id", nullable = false)
-    var klagerPartId: PartId,
+    @JoinColumn(name = "klager_id", nullable = false)
+    var klager: Klager,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "saken_gjelder_id", nullable = true)
+    var sakenGjelder: Klager?,
     @Column(name = "sak_referanse")
     var sakReferanse: String? = null,
-    @Column(name = "intern_referanse")
-    var internReferanse: String,
+    @Column(name = "kilde_referanse")
+    var kildeReferanse: String,
     @Column(name = "dvh_referanse")
     var dvhReferanse: String? = null,
     @Column(name = "innsyn_url")

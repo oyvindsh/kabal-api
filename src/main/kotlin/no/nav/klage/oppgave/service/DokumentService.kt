@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.util.getLogger
@@ -29,9 +30,9 @@ class DokumentService(
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
-        if (klagebehandling.foedselsnummer != null) {
+        if (klagebehandling.klager.partId.type == PartIdType.PERSON) {
             val dokumentoversiktBruker: DokumentoversiktBruker =
-                safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
+                safGraphQlClient.getDokumentoversiktBruker(klagebehandling.klager.partId.value, pageSize, previousPageRef)
             return DokumenterResponse(
                 dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
                     dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, klagebehandling)

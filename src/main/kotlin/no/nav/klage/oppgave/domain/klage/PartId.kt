@@ -12,7 +12,7 @@ class PartId(
     @Enumerated(EnumType.STRING)
     var type: PartIdType,
     @Column(name = "value")
-    val value: String? = null,
+    val value: String,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
