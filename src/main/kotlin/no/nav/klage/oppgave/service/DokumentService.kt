@@ -111,7 +111,7 @@ class DokumentMapper {
 
         val dokumentReferanse = DokumentReferanse(
             tittel = hoveddokument.tittel,
-            tema = journalpost.temanavn,
+            tema = journalpost.tema?.name,
             registrert = journalpost.datoOpprettet.toLocalDate(),
             dokumentInfoId = hoveddokument.dokumentInfoId,
             journalpostId = journalpost.journalpostId,
