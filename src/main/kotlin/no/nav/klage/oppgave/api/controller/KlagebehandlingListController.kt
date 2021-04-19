@@ -10,8 +10,8 @@ import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
-import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -26,7 +26,7 @@ import java.util.*
 class KlagebehandlingListController(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingMapper: KlagebehandlingMapper,
-    private val elasticsearchRepository: ElasticsearchRepository,
+    private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
@@ -49,12 +49,13 @@ class KlagebehandlingListController(
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
         val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
-        val esResponse = elasticsearchRepository.findByCriteria(searchCriteria)
+        val esResponse = elasticsearchService.findByCriteria(searchCriteria)
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
-                searchCriteria.isProjectionUtvidet()
+                searchCriteria.isProjectionUtvidet(),
+                searchCriteria.saksbehandler
             )
         )
     }
@@ -76,7 +77,11 @@ class KlagebehandlingListController(
         )
 
         val uri = MvcUriComponentsBuilder
-            .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
+            .fromMethodName(
+                KlagebehandlingDetaljerController::class.java,
+                "getKlagebehandlingDetaljer",
+                klagebehandlingId
+            )
             .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
     }
@@ -98,7 +103,11 @@ class KlagebehandlingListController(
         )
 
         val uri = MvcUriComponentsBuilder
-            .fromMethodName(KlagebehandlingController::class.java, "getKlagebehandling", klagebehandlingId)
+            .fromMethodName(
+                KlagebehandlingDetaljerController::class.java,
+                "getKlagebehandlingDetaljer",
+                klagebehandlingId
+            )
             .buildAndExpand(klagebehandlingId).toUri()
         return ResponseEntity.noContent().location(uri).build()
     }
@@ -116,7 +125,7 @@ class KlagebehandlingListController(
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
         return AntallUtgaatteFristerResponse(
-            antall = elasticsearchRepository.countByCriteria(
+            antall = elasticsearchService.countByCriteria(
                 klagebehandlingerQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(
                     navIdent,
                     queryParams

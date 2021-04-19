@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.repositories.ElasticsearchRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class IndexService(
-    private val elasticsearchRepository: ElasticsearchRepository,
+    private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val klagebehandlingMapper: KlagebehandlingMapper
 ) {
@@ -26,7 +25,7 @@ class IndexService(
     }
 
     fun deleteAllKlagebehandlinger() {
-        elasticsearchRepository.deleteAll()
+        elasticsearchService.deleteAll()
     }
 
     fun reindexAllKlagebehandlinger() {
@@ -37,7 +36,7 @@ class IndexService(
             page.content.map { klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it) }
                 .let {
                     try {
-                        elasticsearchRepository.save(it)
+                        elasticsearchService.save(it)
                     } catch (e: Exception) {
                         logger.warn("Exception during indexing", e)
                     }
@@ -47,7 +46,7 @@ class IndexService(
     }
 
     fun findAndLogOutOfSyncKlagebehandlinger() {
-        val idsInEs = elasticsearchRepository.findAllIds()
+        val idsInEs = elasticsearchService.findAllIds()
         val idsInDb = idsInDb()
         logger.info("Number of klagebehandlinger in ES: ${idsInEs.size}, number of klagebehandlinger in DB: ${idsInDb.size}")
         logger.info("Klagebehandlinger in ES that are not in DB: {}", idsInEs.minus(idsInDb))
@@ -71,7 +70,7 @@ class IndexService(
     @Retryable
     fun indexKlagebehandling(klagebehandling: Klagebehandling) {
         try {
-            elasticsearchRepository.save(
+            elasticsearchService.save(
                 klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
             )
         } catch (e: Exception) {
@@ -82,6 +81,10 @@ class IndexService(
                 securelogger.error("Unable to index klagebehandling ${klagebehandling.id}", e)
             }
         }
+    }
+
+    fun recreateIndex() {
+        elasticsearchService.recreateIndex()
     }
 
 }

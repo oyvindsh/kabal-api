@@ -6,7 +6,7 @@ data class KodeverkResponse(
     val eoes: List<KodeMedIntId> = Eoes.values().asList().map { KodeMedIntId(it.id, it.navn, it.beskrivelse) },
     val grunn: List<KodeMedIntId> = Grunn.values().asList().map { KodeMedIntId(it.id, it.navn, it.beskrivelse) },
     val kilde: List<Kilde> = Kilde.values().asList(),
-    val lov: List<KodeMedIntId> = Lov.values().asList().map { KodeMedIntId(it.id, it.navn, it.beskrivelse) },
+    val hjemmel: List<KodeMedIntId> = Hjemmel.values().asList().map { KodeMedIntId(it.id, it.navn, it.beskrivelse) },
     val raadfoertMedLege: List<KodeMedIntId> = RaadfoertMedLege.values().asList()
         .map { KodeMedIntId(it.id, it.navn, it.beskrivelse) },
     val sakstype: List<KodeMedStringId> = Sakstype.values().asList()

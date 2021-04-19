@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -26,9 +27,6 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
@@ -39,25 +37,16 @@ import java.time.LocalDate
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Testcontainers
 @SpringBootTest(classes = [ElasticsearchServiceConfiguration::class])
-@ImportAutoConfiguration(ElasticsearchRestClientAutoConfiguration::class, ElasticsearchDataAutoConfiguration::class)
+@ImportAutoConfiguration(
+    ElasticsearchRestClientAutoConfiguration::class,
+    ElasticsearchDataAutoConfiguration::class
+)
 class ElasticsearchIndexingTest {
 
     companion object {
         @Container
         @JvmField
-        val ES_CONTAINER: ElasticsearchContainer =
-            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.9.3")
-
-        @JvmStatic
-        @DynamicPropertySource
-        fun aivenProperties(registry: DynamicPropertyRegistry) {
-            registry.add("AIVEN_ES_HOST", ES_CONTAINER::getHost)
-            registry.add("AIVEN_ES_PORT", ES_CONTAINER::getFirstMappedPort)
-            registry.add("AIVEN_ES_USERNAME_ADM") { "elastic" }
-            registry.add("AIVEN_ES_PASSWORD_ADM") { "changeme" }
-            registry.add("AIVEN_ES_SCHEME") { "http" }
-            registry.add("AIVEN_ES_USE_SSL") { false }
-        }
+        val esContainer: TestElasticsearchContainer = TestElasticsearchContainer.instance
     }
 
     @MockkBean(relaxed = true)
@@ -66,10 +55,14 @@ class ElasticsearchIndexingTest {
     @Autowired
     lateinit var esTemplate: ElasticsearchRestTemplate
 
+    @Autowired
+    lateinit var service: ElasticsearchService
+
     @Test
     @Order(1)
     fun `es is running`() {
-        assertThat(ES_CONTAINER.isRunning).isTrue
+        assertThat(esContainer.isRunning).isTrue
+
     }
 
     @Test
@@ -77,6 +70,7 @@ class ElasticsearchIndexingTest {
     fun `index has been created by service`() {
         val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
         assertThat(indexOps.exists()).isTrue
+        service.recreateIndex()
     }
 
     @Test
@@ -175,7 +169,7 @@ class ElasticsearchIndexingTest {
             frist = null,
             startet = null,
             avsluttet = null,
-            hjemler = listOf(),
+            hjemler = listOf(Hjemmel.FTL_8_35.id),
             foedselsnummer = null,
             navn = null,
             egenAnsatt = false,

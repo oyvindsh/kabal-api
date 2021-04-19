@@ -12,13 +12,17 @@ class AdminService(private val indexService: IndexService) {
 
     fun syncEsWithDb() {
         indexService.reindexAllKlagebehandlinger()
-        //Thread.sleep(TWO_SECONDS)
+        Thread.sleep(TWO_SECONDS)
         indexService.findAndLogOutOfSyncKlagebehandlinger()
     }
 
     fun deleteAllInES() {
         indexService.deleteAllKlagebehandlinger()
-        //Thread.sleep(TWO_SECONDS)
+        Thread.sleep(TWO_SECONDS)
+    }
+
+    fun recreateEsIndex() {
+        indexService.recreateIndex()
     }
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")

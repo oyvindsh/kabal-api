@@ -1,10 +1,12 @@
-package no.nav.klage.oppgave.repositories
+package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
 import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
@@ -27,9 +29,10 @@ import org.springframework.data.elasticsearch.core.query.Query
 import java.time.format.DateTimeFormatter
 
 
-open class ElasticsearchRepository(
+open class ElasticsearchService(
     private val esTemplate: ElasticsearchOperations,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val esKlagebehandlingRepository: EsKlagebehandlingRepository
 ) :
     ApplicationListener<ContextRefreshedEvent> {
 
@@ -38,21 +41,36 @@ open class ElasticsearchRepository(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    fun recreateIndex() {
+        deleteIndex()
+        createIndex()
+    }
+
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         try {
-            logger.info("Trying to initialize Elasticsearch")
-            val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
-            logger.info("Does klagebehandling exist in Elasticsearch?")
-            if (!indexOps.exists()) {
-                logger.info("klagebehandling does not exist in Elasticsearch")
-                indexOps.create(readFromfile("settings.json"))
-                indexOps.putMapping(readFromfile("mapping.json"))
-            } else {
-                logger.info("klagebehandling does exist in Elasticsearch")
-            }
+            createIndex()
         } catch (e: Exception) {
             logger.error("Unable to initialize Elasticsearch", e)
         }
+    }
+
+    fun createIndex() {
+        logger.info("Trying to initialize Elasticsearch")
+        val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
+        logger.info("Does klagebehandling exist in Elasticsearch?")
+        if (!indexOps.exists()) {
+            logger.info("klagebehandling does not exist in Elasticsearch")
+            indexOps.create(readFromfile("settings.json"))
+            indexOps.putMapping(readFromfile("mapping.json"))
+        } else {
+            logger.info("klagebehandling does exist in Elasticsearch")
+        }
+    }
+
+    fun deleteIndex() {
+        logger.info("Deleting index klagebehandling")
+        val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
+        indexOps.delete()
     }
 
     private fun readFromfile(filename: String): Document {
@@ -62,13 +80,11 @@ open class ElasticsearchRepository(
     }
 
     fun save(klagebehandlinger: List<EsKlagebehandling>) {
-        esTemplate.save(klagebehandlinger)
-        refresh()
+        esKlagebehandlingRepository.saveAll(klagebehandlinger)
     }
 
     fun save(klagebehandling: EsKlagebehandling) {
-        esTemplate.save(klagebehandling)
-        refresh()
+        esKlagebehandlingRepository.save(klagebehandling)
     }
 
     open fun findByCriteria(criteria: KlagebehandlingerSearchCriteria): SearchHits<EsKlagebehandling> {
@@ -164,7 +180,10 @@ open class ElasticsearchRepository(
             }
         }
         saksbehandler?.let {
-            baseQuery.must(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
+            val innerQuerySaksbehandler = QueryBuilders.boolQuery()
+            innerQuerySaksbehandler.should(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
+            innerQuerySaksbehandler.should(QueryBuilders.termQuery("medunderskriverident", saksbehandler))
+            baseQuery.must(innerQuerySaksbehandler)
         }
 
         opprettetFom?.let {
@@ -215,11 +234,7 @@ open class ElasticsearchRepository(
     }
 
     fun deleteAll() {
-        val query: Query = NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.matchAllQuery())
-            .build()
-        esTemplate.delete(query, EsKlagebehandling::class.java)
-        refresh()
+        esKlagebehandlingRepository.deleteAll()
     }
 
     fun findAllIds(): List<String> {

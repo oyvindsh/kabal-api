@@ -48,6 +48,8 @@ class Klagebehandling(
     var frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
     var tildeltSaksbehandlerident: String? = null,
+    @Column(name = "medunderskriverident")
+    var medunderskriverident: String? = null,
     @Column(name = "tildelt_enhet")
     var tildeltEnhet: String? = null,
     @Column(name = "mottak_id")
@@ -55,13 +57,14 @@ class Klagebehandling(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "kvalitetsvurdering_id", nullable = true)
     var kvalitetsvurdering: Kvalitetsvurdering? = null,
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinTable(
+    @ElementCollection(targetClass = Hjemmel::class, fetch = FetchType.EAGER)
+    @CollectionTable(
         name = "klagebehandling_hjemmel",
         schema = "klage",
-        joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
+        joinColumns = [JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)]
     )
+    @Convert(converter = HjemmelConverter::class)
+    @Column(name = "id")
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)

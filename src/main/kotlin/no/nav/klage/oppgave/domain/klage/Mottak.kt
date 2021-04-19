@@ -1,6 +1,9 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.SakstypeConverter
+import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.TemaConverter
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -33,8 +36,9 @@ class Mottak(
     var dvhReferanse: String? = null,
     @Column(name = "innsyn_url")
     val innsynUrl: String? = null,
-    @Column(name = "hjemmel_liste")
-    var hjemmelListe: String? = null,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
+    var hjemmelListe: MutableSet<MottakHjemmel> = mutableSetOf(),
     @Column(name = "avsender_saksbehandlerident")
     var avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")
@@ -68,8 +72,6 @@ class Mottak(
     val kilde: String,
 ) {
 
-    fun hjemler(): List<String> = hjemmelListe?.split(",") ?: emptyList()
-
     override fun toString(): String {
         return "Mottak(id=$id, " +
                 "created=$created)"
@@ -89,5 +91,4 @@ class Mottak(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
 }

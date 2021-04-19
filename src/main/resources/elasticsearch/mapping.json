@@ -1,7 +1,7 @@
 {
   "properties": {
     "journalpostId": {
-      "type": "long"
+      "type": "keyword"
     },
     "saksreferanse": {
       "type": "keyword"
@@ -48,12 +48,10 @@
       "format": "date"
     },
     "hjemler": {
-      "type": "keyword",
-      "fields": {
-        "text": {
-          "type": "text"
-        }
-      }
+      "type": "integer"
+    },
+    "hjemlerAsText": {
+      "type": "text"
     },
     "foedselsnummer": {
       "type": "keyword"

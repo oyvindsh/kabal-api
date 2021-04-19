@@ -18,9 +18,14 @@ class AdminController(private val adminService: AdminService) {
     @GetMapping("/internal/elasticadmin/nuke", produces = ["application/json"])
     fun resetElasticIndex(): ElasticAdminResponse {
         //TODO: Make this more fancy.. Need auth, need a service, need to reindex from db.
-        adminService.deleteAllInES()
-        adminService.syncEsWithDb()
-        adminService.findAndLogOutOfSyncKlagebehandlinger()
+        try {
+            adminService.recreateEsIndex()
+            adminService.syncEsWithDb()
+            adminService.findAndLogOutOfSyncKlagebehandlinger()
+        } catch (e: Exception) {
+            logger.warn("Failed to reset ES index", e)
+            throw e
+        }
 
         return ElasticAdminResponse("ok")
     }

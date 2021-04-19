@@ -8,7 +8,13 @@ import org.springframework.data.annotation.Version
 import org.springframework.data.elasticsearch.annotations.*
 import java.time.LocalDate
 
-@Document(indexName = "klagebehandling", shards = 3, replicas = 2, versionType = VersionType.EXTERNAL)
+@Document(
+    indexName = "klagebehandling",
+    shards = 3,
+    replicas = 2,
+    versionType = VersionType.EXTERNAL,
+    createIndex = false
+)
 data class EsKlagebehandling(
     @Id
     val id: String,
@@ -30,6 +36,8 @@ data class EsKlagebehandling(
     val sakstype: Sakstype,
     @Field(type = FieldType.Keyword)
     val tildeltSaksbehandlerident: String? = null,
+    @Field(type = FieldType.Keyword)
+    val medunderskriverident: String? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val innsendt: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
@@ -42,11 +50,8 @@ data class EsKlagebehandling(
     val startet: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val avsluttet: LocalDate? = null,
-    @MultiField(
-        mainField = Field(type = FieldType.Keyword),
-        otherFields = [InnerField(type = FieldType.Text, suffix = "text")]
-    )
-    val hjemler: List<String>? = null,
+    @Field(type = FieldType.Integer)
+    val hjemler: List<Int>? = null,
     @Field(type = FieldType.Keyword)
     val foedselsnummer: String? = null,
     @Field(type = FieldType.Keyword)
