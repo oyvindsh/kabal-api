@@ -30,22 +30,22 @@ class DokumentService(
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
-        if (klagebehandling.klager.partId.type == PartIdType.PERSON) {
-            val dokumentoversiktBruker: DokumentoversiktBruker =
-                safGraphQlClient.getDokumentoversiktBruker(klagebehandling.klager.partId.value, pageSize, previousPageRef)
-            return DokumenterResponse(
-                dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
-                    dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, klagebehandling)
-                },
-                pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
-                    dokumentoversiktBruker.sideInfo.sluttpeker
-                } else {
-                    null
-                }
+        val dokumentoversiktBruker: DokumentoversiktBruker =
+            safGraphQlClient.getDokumentoversiktBruker(
+                klagebehandling.sakenGjelder,
+                pageSize,
+                previousPageRef
             )
-        } else {
-            return DokumenterResponse(dokumenter = emptyList(), pageReference = null)
-        }
+        return DokumenterResponse(
+            dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
+                dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, klagebehandling)
+            },
+            pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
+                dokumentoversiktBruker.sideInfo.sluttpeker
+            } else {
+                null
+            }
+        )
     }
 
     fun fetchJournalposterConnectedToKlagebehandling(klagebehandling: Klagebehandling): DokumenterResponse {

@@ -31,5 +31,5 @@ class PartId(
 }
 
 enum class PartIdType {
-    PERSON, ORGANISASJON, VIRKSOMHET
+    PERSON, VIRKSOMHET
 }

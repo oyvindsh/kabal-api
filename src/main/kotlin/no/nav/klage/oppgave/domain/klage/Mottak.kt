@@ -22,10 +22,9 @@ class Mottak(
     var sakstype: Sakstype,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klager_id", nullable = false)
-    var klager: Klager,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "saken_gjelder_id", nullable = true)
-    var sakenGjelder: Klager? = null,
+    var klagerPart: KlagerPart,
+    @Column(name = "saken_gjelder")
+    var sakenGjelder: String? = null,
     @Column(name = "sak_referanse")
     var sakReferanse: String? = null,
     @Column(name = "kilde_referanse")

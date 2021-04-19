@@ -13,7 +13,7 @@ data class OversendtKlage(
     val tema: Tema,
     val sakstype: Sakstype,
     val klager: OversendtKlager,
-    val sakenGjelder: OversendtPart? = null,
+    val sakenGjelder: String? = null,
     val sakReferanse: String? = null,
     val kildeReferanse: String,
     val dvhReferanse: String? = null,
@@ -35,8 +35,8 @@ data class OversendtKlage(
         id = uuid,
         tema = tema,
         sakstype = sakstype,
-        klager = klager.toKlager(),
-        sakenGjelder = sakenGjelder?.toKlager(),
+        klagerPart = klager.toKlager(),
+        sakenGjelder = sakenGjelder,
         innsynUrl = innsynUrl,
         sakReferanse = sakReferanse,
         kildeReferanse = kildeReferanse,
@@ -59,7 +59,7 @@ data class OversendtKlager(
     val id: OversendtKlagerPartId,
     val klagersProsessfullmektig: OversendtPart? = null
 ) {
-    fun toKlager() = Klager(
+    fun toKlager() = KlagerPart(
         partId = id.toPartId(),
         prosessfullmektig = klagersProsessfullmektig?.id?.toPartId(),
         skalMottaKopi = klagersProsessfullmektig?.skalKlagerMottaKopi
@@ -70,7 +70,7 @@ data class OversendtPart(
     val id: OversendtKlagerPartId,
     val skalKlagerMottaKopi: Boolean
 ) {
-    fun toKlager() = Klager(
+    fun toKlager() = KlagerPart(
         partId = id.toPartId(),
         skalMottaKopi = skalKlagerMottaKopi
     )

@@ -21,7 +21,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
 import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -51,9 +50,7 @@ class KlagebehandlingService(
     }
 
     private fun checkTilgang(klagebehandling: Klagebehandling) {
-        if(klagebehandling.klager.partId.type == PartIdType.PERSON) {
-            tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.klager.partId.value)
-        }
+        tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.sakenGjelder)
     }
 
     @Transactional(readOnly = true)
@@ -268,10 +265,14 @@ class KlagebehandlingService(
             throw RuntimeException("We already have a klagebehandling for mottak ${mottak.id}")
         }
 
+        if (mottak.sakenGjelder == null && mottak.klagerPart.erVirksomhet()) {
+            throw RuntimeException("Dersom den som klager er en virksomhet må feltet sakenGjelder settes til fødselsnummer for den klagen gjelder.")
+        }
+
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                klager = mottak.klager,
-                sakenGjelder = mottak.sakenGjelder ?: mottak.klager,
+                klagerPart = mottak.klagerPart,
+                sakenGjelder = mottak.sakenGjelder ?: mottak.klagerPart.partId.value,
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
                 referanseId = mottak.kildeReferanse,

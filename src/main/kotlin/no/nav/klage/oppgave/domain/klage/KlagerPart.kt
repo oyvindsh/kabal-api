@@ -4,8 +4,8 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Table(name = "klager", schema = "klage")
-class Klager(
+@Table(name = "klager_part", schema = "klage")
+class KlagerPart(
     @Id
     val id: UUID = UUID.randomUUID(),
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -19,15 +19,13 @@ class Klager(
 ) {
     fun erPerson() = partId.type == PartIdType.PERSON
 
-    fun erOrganisasjon() = partId.type == PartIdType.ORGANISASJON
-
     fun erVirksomhet() = partId.type == PartIdType.VIRKSOMHET
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Klager
+        other as KlagerPart
 
         if (id != other.id) return false
 

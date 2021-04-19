@@ -51,8 +51,6 @@ data class EsKlagebehandling(
     val foedselsnummer: String? = null,
     @Field(type = FieldType.Keyword)
     val virksomhetsnummer: String? = null,
-    @Field(type = FieldType.Keyword)
-    val organisasjonsnummer: String? = null,
     @Field(type = FieldType.Text)
     val navn: String? = null,
     @Field(type = FieldType.Boolean)

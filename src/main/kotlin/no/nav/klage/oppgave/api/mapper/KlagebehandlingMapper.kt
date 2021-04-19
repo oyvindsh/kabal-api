@@ -49,7 +49,6 @@ class KlagebehandlingMapper(
             avsluttet = klagebehandling.avsluttet,
             hjemler = klagebehandling.hjemler.map { it.original },
             foedselsnummer = foedselsnummer,
-            organisasjonsnummer = organisasjonsnummer(klagebehandling),
             virksomhetsnummer = virksomhetsnummer(klagebehandling),
             navn = navn,
             egenAnsatt = erEgenAnsatt,
@@ -94,7 +93,6 @@ class KlagebehandlingMapper(
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             foedselsnummer = foedselsnummer(klagebehandling),
-            organisasjonsnummer = organisasjonsnummer(klagebehandling),
             virksomhetsnummer = virksomhetsnummer(klagebehandling),
             tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
@@ -118,9 +116,8 @@ class KlagebehandlingMapper(
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
-            sakenGjelderFoedselsnummer = klagebehandling.sakenGjelder.partId.value,
+            sakenGjelderFoedselsnummer = klagebehandling.sakenGjelder,
             foedselsnummer = foedselsnummer(klagebehandling),
-            organisasjonsnummer = organisasjonsnummer(klagebehandling),
             virksomhetsnummer = virksomhetsnummer(klagebehandling),
             tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
@@ -168,22 +165,15 @@ class KlagebehandlingMapper(
     }
 
     private fun foedselsnummer(klagebehandling: Klagebehandling) =
-        if (klagebehandling.klager.erPerson()) {
-            klagebehandling.klager.partId.value
-        } else {
-            null
-        }
-
-    private fun organisasjonsnummer(klagebehandling: Klagebehandling) =
-        if (klagebehandling.klager.erOrganisasjon()) {
-            klagebehandling.klager.partId.value
+        if (klagebehandling.klagerPart.erPerson()) {
+            klagebehandling.klagerPart.partId.value
         } else {
             null
         }
 
     private fun virksomhetsnummer(klagebehandling: Klagebehandling) =
-        if (klagebehandling.klager.erVirksomhet()) {
-            klagebehandling.klager.partId.value
+        if (klagebehandling.klagerPart.erVirksomhet()) {
+            klagebehandling.klagerPart.partId.value
         } else {
             null
         }

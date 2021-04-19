@@ -11,7 +11,6 @@ data class KlagebehandlingDetaljerView(
     val mottattFoersteinstans: LocalDate? = null,
     val sakenGjelderFoedselsnummer: String,
     val foedselsnummer: String?,
-    val organisasjonsnummer: String?,
     val virksomhetsnummer: String?,
     val tema: String,
     val sakstype: String,
