@@ -13,7 +13,7 @@ data class OversendtKlage(
     val tema: Tema,
     val sakstype: Sakstype,
     val klager: OversendtKlager,
-    val sakenGjelder: OversendtKlager? = null,
+    val sakenGjelder: OversendtPart? = null,
     val sakReferanse: String? = null,
     val kildeReferanse: String,
     val dvhReferanse: String? = null,
@@ -57,7 +57,7 @@ data class OversendtKlage(
 
 data class OversendtKlager(
     val id: OversendtKlagerPartId,
-    val klagersProsessfullmektig: OversendtProsessfullmektig? = null
+    val klagersProsessfullmektig: OversendtPart? = null
 ) {
     fun toKlager() = Klager(
         partId = id.toPartId(),
@@ -66,10 +66,15 @@ data class OversendtKlager(
     )
 }
 
-data class OversendtProsessfullmektig(
+data class OversendtPart(
     val id: OversendtKlagerPartId,
     val skalKlagerMottaKopi: Boolean
-)
+) {
+    fun toKlager() = Klager(
+        partId = id.toPartId(),
+        skalMottaKopi = skalKlagerMottaKopi
+    )
+}
 
 data class OversendtKlagerPartId(
     val type: PartIdType,

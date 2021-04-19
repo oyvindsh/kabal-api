@@ -25,7 +25,7 @@ class Mottak(
     var klager: Klager,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "saken_gjelder_id", nullable = true)
-    var sakenGjelder: Klager?,
+    var sakenGjelder: Klager? = null,
     @Column(name = "sak_referanse")
     var sakReferanse: String? = null,
     @Column(name = "kilde_referanse")

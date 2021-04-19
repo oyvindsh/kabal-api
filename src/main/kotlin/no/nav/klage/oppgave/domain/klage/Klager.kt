@@ -13,9 +13,9 @@ class Klager(
     val partId: PartId,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "prosessfullmektig_part_id", nullable = true)
-    val prosessfullmektig: PartId?,
+    val prosessfullmektig: PartId? = null,
     @Column(name = "skal_motta_kopi")
-    val skalMottaKopi: Boolean?
+    val skalMottaKopi: Boolean? = null
 ) {
     fun erPerson() = partId.type == PartIdType.PERSON
 

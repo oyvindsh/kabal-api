@@ -158,7 +158,7 @@ class UnprotectedTestOversendelseController(
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtKlagerPartId(PartIdType.PERSON, "23528406688"),
-                    klagersProsessfullmektig = OversendtProsessfullmektig(
+                    klagersProsessfullmektig = OversendtPart(
                         id = OversendtKlagerPartId(PartIdType.PERSON, "8301839832"),
                         skalKlagerMottaKopi = true
                     )
