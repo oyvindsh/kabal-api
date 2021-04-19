@@ -118,6 +118,7 @@ class KlagebehandlingMapper(
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
+            sakenGjelderFoedselsnummer = klagebehandling.sakenGjelder.partId.value,
             foedselsnummer = foedselsnummer(klagebehandling),
             organisasjonsnummer = organisasjonsnummer(klagebehandling),
             virksomhetsnummer = virksomhetsnummer(klagebehandling),

@@ -22,6 +22,14 @@ class Vedtak(
         inverseJoinColumns = [JoinColumn(name = "hjemmel_id", referencedColumnName = "id")]
     )
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "brevmottaker",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "vedtak_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "mottaker_part_id", referencedColumnName = "id")]
+    )
+    val brevmottakere: MutableSet<PartId> = mutableSetOf(),
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
