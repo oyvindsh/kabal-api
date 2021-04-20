@@ -25,9 +25,10 @@ class Mottak(
     var sakstype: Sakstype,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klager_id", nullable = false)
-    var klagerPart: KlagerPart,
-    @Column(name = "saken_gjelder")
-    var sakenGjelder: String? = null,
+    var klagepart: Klagepart,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "saken_gjelder_id", nullable = true)
+    var sakenGjelder: SakenGjelder? = null,
     @Column(name = "sak_referanse")
     var sakReferanse: String? = null,
     @Column(name = "kilde_referanse")
@@ -48,14 +49,6 @@ class Mottak(
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
     val mottakDokument: MutableSet<MottakDokument> = mutableSetOf(),
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "mottak_brevmottaker",
-        schema = "klage",
-        joinColumns = [JoinColumn(name = "mottak_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "mottaker_part_id", referencedColumnName = "id")]
-    )
-    val brevmottakere: MutableSet<PartId> = mutableSetOf(),
     @Column(name = "dato_innsendt")
     val innsendtDato: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")

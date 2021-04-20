@@ -51,7 +51,7 @@ class UnprotectedTestOversendelseController(
                 tema = listOf(Tema.SYK).shuffled().first(),
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtKlagerPartId(PartIdType.PERSON, fnr)
+                    id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
                 sakReferanse = "10000",
                 kildeReferanse = "REF_$fnr",
@@ -84,7 +84,7 @@ class UnprotectedTestOversendelseController(
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtKlagerPartId(PartIdType.PERSON, "27458422236")
+                    id = OversendtPartId(PartIdType.PERSON, "27458422236")
                 ),
                 sakReferanse = "10001",
                 kildeReferanse = "SYK_27458422236",
@@ -107,7 +107,7 @@ class UnprotectedTestOversendelseController(
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtKlagerPartId(PartIdType.PERSON, "28488425473")
+                    id = OversendtPartId(PartIdType.PERSON, "28488425473")
                 ),
                 sakReferanse = "10002",
                 kildeReferanse = "SYK_28488425473",
@@ -130,7 +130,7 @@ class UnprotectedTestOversendelseController(
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtKlagerPartId(PartIdType.PERSON, "02518418680")
+                    id = OversendtPartId(PartIdType.PERSON, "02518418680")
                 ),
                 sakReferanse = "10003",
                 kildeReferanse = "SYK_02518418680",
@@ -153,7 +153,7 @@ class UnprotectedTestOversendelseController(
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtKlagerPartId(PartIdType.PERSON, "02508425425")
+                    id = OversendtPartId(PartIdType.PERSON, "02508425425")
                 ),
                 sakReferanse = "10004",
                 kildeReferanse = "SYK_02508425425",
@@ -176,9 +176,9 @@ class UnprotectedTestOversendelseController(
                 tema = Tema.SYK,
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtKlagerPartId(PartIdType.PERSON, "23528406688"),
-                    klagersProsessfullmektig = OversendtPart(
-                        id = OversendtKlagerPartId(PartIdType.PERSON, "8301839832"),
+                    id = OversendtPartId(PartIdType.PERSON, "23528406688"),
+                    klagersProsessfullmektig = OversendtProsessfullmektig(
+                        id = OversendtPartId(PartIdType.PERSON, "8301839832"),
                         skalKlagerMottaKopi = true
                     )
                 ),

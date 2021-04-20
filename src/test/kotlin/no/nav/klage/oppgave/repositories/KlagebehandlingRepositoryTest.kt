@@ -47,15 +47,15 @@ class KlagebehandlingRepositoryTest {
             sakstype = Sakstype.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
-            klagerPart = KlagerPart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
 
         val klage = Klagebehandling(
-            klagerPart = KlagerPart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = "23452354",
+            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(partId = PartId(type = PartIdType.PERSON, value = "23452354"), skalMottaKopi = false),
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
@@ -85,15 +85,15 @@ class KlagebehandlingRepositoryTest {
             sakstype = Sakstype.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
-            klagerPart = KlagerPart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
 
         val klage = Klagebehandling(
-            klagerPart = KlagerPart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = "23452354",
+            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(partId = PartId(type = PartIdType.PERSON, value = "23452354"), skalMottaKopi = false),
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),
@@ -130,15 +130,15 @@ class KlagebehandlingRepositoryTest {
             sakstype = Sakstype.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
-            klagerPart = KlagerPart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
 
         val klage = Klagebehandling(
-            klagerPart = KlagerPart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = "23452354",
+            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(partId = PartId(type = PartIdType.PERSON, value = "23452354"), skalMottaKopi = false),
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
             frist = LocalDate.now(),

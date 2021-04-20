@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderEnhetFoersteinstans
@@ -22,9 +22,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMot
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
-import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.MottakHjemmel
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
@@ -52,7 +49,9 @@ class KlagebehandlingService(
     }
 
     private fun checkLeseTilgang(klagebehandling: Klagebehandling) {
-        tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.sakenGjelder)
+        if (klagebehandling.sakenGjelder.erPerson()) {
+            tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.sakenGjelder.partId.value)
+        }
     }
 
     @Transactional(readOnly = true)
@@ -283,14 +282,10 @@ class KlagebehandlingService(
             throw RuntimeException("We already have a klagebehandling for mottak ${mottak.id}")
         }
 
-        if (mottak.sakenGjelder == null && mottak.klagerPart.erVirksomhet()) {
-            throw RuntimeException("Dersom den som klager er en virksomhet må feltet sakenGjelder settes til fødselsnummer for den klagen gjelder.")
-        }
-
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                klagerPart = mottak.klagerPart,
-                sakenGjelder = mottak.sakenGjelder ?: mottak.klagerPart.partId.value,
+                klagepart = mottak.klagepart,
+                sakenGjelder = mottak.sakenGjelder ?: mottak.klagepart.toSakenGjelder(),
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
                 referanseId = mottak.kildeReferanse,
@@ -320,6 +315,11 @@ class KlagebehandlingService(
             )
         )
     }
+
+    private fun Klagepart.toSakenGjelder() = SakenGjelder(
+        partId = this.partId,
+        skalMottaKopi = false // Siden denne nå peker på samme som klager trenger ikke brev sendes
+    )
 
 
     private fun mapMottakHjemmel(hjemmel: MottakHjemmel): Hjemmel? {
