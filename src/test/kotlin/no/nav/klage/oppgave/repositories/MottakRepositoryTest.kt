@@ -39,7 +39,7 @@ class MottakRepositoryTest {
         val mottak = Mottak(
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
-            klagepart = Klagepart(partId = PartId(type = PartIdType.PERSON, value = "123454")),
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "123454")),
             sakReferanse = "12345",
             kildeReferanse = "54321",
             dvhReferanse = "5342523",

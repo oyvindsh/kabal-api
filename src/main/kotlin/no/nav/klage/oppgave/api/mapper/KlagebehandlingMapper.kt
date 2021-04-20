@@ -28,7 +28,7 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling: Klagebehandling): EsKlagebehandling {
-        val foedselsnummer = foedselsnummer(klagebehandling.klagepart.partId)
+        val foedselsnummer = foedselsnummer(klagebehandling.klager.partId)
 
         val personInfo = foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
@@ -54,7 +54,7 @@ class KlagebehandlingMapper(
             avsluttet = klagebehandling.avsluttet,
             hjemler = klagebehandling.hjemler.map { it.id },
             foedselsnummer = foedselsnummer,
-            virksomhetsnummer = virksomhetsnummer(klagebehandling.klagepart.partId),
+            virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             navn = navn,
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
@@ -100,8 +100,8 @@ class KlagebehandlingMapper(
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId),
             sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId),
-            foedselsnummer = foedselsnummer(klagebehandling.klagepart.partId),
-            virksomhetsnummer = virksomhetsnummer(klagebehandling.klagepart.partId),
+            foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
+            virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
             mottatt = klagebehandling.mottattKlageinstans,

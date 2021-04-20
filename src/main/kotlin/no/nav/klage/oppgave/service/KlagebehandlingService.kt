@@ -284,8 +284,8 @@ class KlagebehandlingService(
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                klagepart = mottak.klagepart,
-                sakenGjelder = mottak.sakenGjelder ?: mottak.klagepart.toSakenGjelder(),
+                klager = mottak.klager.copy(),
+                sakenGjelder = mottak.sakenGjelder?.copy() ?: mottak.klager.toSakenGjelder(),
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
                 referanseId = mottak.kildeReferanse,
@@ -316,8 +316,8 @@ class KlagebehandlingService(
         )
     }
 
-    private fun Klagepart.toSakenGjelder() = SakenGjelder(
-        partId = this.partId,
+    private fun Klager.toSakenGjelder() = SakenGjelder(
+        partId = this.partId.copy(),
         skalMottaKopi = false // Siden denne nå peker på samme som klager trenger ikke brev sendes
     )
 

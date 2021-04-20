@@ -14,6 +14,11 @@ class Prosessfullmektig(
     @Column(name = "skal_klager_motta_kopi")
     val skalKlagerMottaKopi: Boolean
 ) {
+    fun copy() = Prosessfullmektig(
+        partId = this.partId.copy(),
+        skalKlagerMottaKopi = this.skalKlagerMottaKopi
+    )
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -27,7 +27,7 @@ CREATE TABLE klage.prosessfullmektig
             REFERENCES klage.part_id (id)
 );
 
-CREATE TABLE klage.klagepart
+CREATE TABLE klage.klager
 (
     id                          UUID    PRIMARY KEY,
     part_id                     UUID    NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE klage.mottak
     modified                      TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_mottak_klager
         FOREIGN KEY (klager_id)
-            REFERENCES klage.klagepart (id),
+            REFERENCES klage.klager (id),
     CONSTRAINT fk_mottak_saken_gjelder
         FOREIGN KEY (saken_gjelder_id)
             REFERENCES klage.saken_gjelder (id)
@@ -151,7 +151,7 @@ CREATE TABLE klage.klagebehandling
             REFERENCES klage.mottak (id),
     CONSTRAINT fk_klagebehandling_klager
         FOREIGN KEY (klager_id)
-            REFERENCES klage.klagepart (id),
+            REFERENCES klage.klager (id),
     CONSTRAINT fk_klagebehandling_saken_gjelder
         FOREIGN KEY (saken_gjelder_id)
             REFERENCES klage.saken_gjelder (id)

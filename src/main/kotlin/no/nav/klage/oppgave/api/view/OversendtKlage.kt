@@ -34,7 +34,7 @@ data class OversendtKlage(
         id = uuid,
         tema = tema,
         sakstype = sakstype,
-        klagepart = klager.toKlagepart(),
+        klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,
         sakReferanse = sakReferanse,
@@ -93,7 +93,7 @@ data class OversendtKlager(
     val id: OversendtPartId,
     val klagersProsessfullmektig: OversendtProsessfullmektig? = null
 ) {
-    fun toKlagepart() = Klagepart(
+    fun toKlagepart() = Klager(
         partId = id.toPartId(),
         prosessfullmektig = klagersProsessfullmektig?.toProsessfullmektig()
     )

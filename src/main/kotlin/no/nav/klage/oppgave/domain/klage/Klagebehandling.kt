@@ -19,7 +19,7 @@ class Klagebehandling(
     val versjon: Long = 1L,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klager_id", nullable = false)
-    var klagepart: Klagepart,
+    var klager: Klager,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "saken_gjelder_id", nullable = false)
     var sakenGjelder: SakenGjelder,
