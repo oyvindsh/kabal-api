@@ -10,6 +10,7 @@ externalHosts:
   - saf.dev-fss-pub.nais.io
 springProfile: dev-gcp
 tenant: trygdeetaten.no
+jobname: klage-job-123
 db_tier: db-custom-1-3840
 db_size: 10
 db_ha: true

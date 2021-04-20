@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: klage-oppgave-e2e-
+  name: {{jobname}}
   namespace: klage
 spec:
   backoffLimit: 4
@@ -10,6 +10,7 @@ spec:
   template:
     metadata:
       labels:
+        job-name: {{jobname}}
         app: klage-oppgave-e2e
     spec:
       imagePullSecrets:
