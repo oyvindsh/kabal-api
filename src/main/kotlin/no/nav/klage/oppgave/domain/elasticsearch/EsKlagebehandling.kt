@@ -33,7 +33,7 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Keyword)
     val tema: Tema,
     @Field(type = FieldType.Keyword)
-    val sakstype: Type,
+    val type: Type,
     @Field(type = FieldType.Keyword)
     val tildeltSaksbehandlerident: String? = null,
     @Field(type = FieldType.Keyword)
