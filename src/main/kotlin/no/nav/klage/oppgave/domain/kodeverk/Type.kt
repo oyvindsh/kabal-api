@@ -9,7 +9,7 @@ enum class Type(override val id: Int, override val navn: String, override val be
     ANKE(2, "Anke", "Anke");
 
     override fun toString(): String {
-        return "Sakstype(id=$id, " +
+        return "Type(id=$id, " +
                 "navn=$navn)"
     }
 
