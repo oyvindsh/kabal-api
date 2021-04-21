@@ -29,9 +29,13 @@ class DokumentService(
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
-        if (klagebehandling.foedselsnummer != null) {
+        if (klagebehandling.sakenGjelder.erPerson()) {
             val dokumentoversiktBruker: DokumentoversiktBruker =
-                safGraphQlClient.getDokumentoversiktBruker(klagebehandling.foedselsnummer, pageSize, previousPageRef)
+                safGraphQlClient.getDokumentoversiktBruker(
+                    klagebehandling.sakenGjelder.partId.value,
+                    pageSize,
+                    previousPageRef
+                )
             return DokumenterResponse(
                 dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
                     dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, klagebehandling)

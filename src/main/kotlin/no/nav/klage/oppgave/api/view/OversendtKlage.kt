@@ -12,9 +12,10 @@ data class OversendtKlage(
     val uuid: UUID,
     val tema: Tema,
     val sakstype: Sakstype,
-    val klagerPartId: OversendtKlagerPartId,
+    val klager: OversendtKlager,
+    val sakenGjelder: OversendtSakenGjelder? = null,
     val sakReferanse: String? = null,
-    val internReferanse: String,
+    val kildeReferanse: String,
     val dvhReferanse: String? = null,
     val innsynUrl: String,
     val hjemler: List<HjemmelFraFoersteInstans>,
@@ -22,7 +23,6 @@ data class OversendtKlage(
     val avsenderEnhet: String,
     val oversendtEnhet: String? = null,
     val tilknyttedeJournalposter: List<OversendtDokumentReferanse>,
-    val brevmottakere: List<OversendtKlagerPartId>? = null,
     @field:Past(message = "Dato for mottatt førsteinstans må være i fortiden")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val mottattFoersteinstans: LocalDate,
@@ -34,17 +34,17 @@ data class OversendtKlage(
         id = uuid,
         tema = tema,
         sakstype = sakstype,
-        klagerPartId = klagerPartId.toPartId(),
+        klager = klager.toKlagepart(),
+        sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,
         sakReferanse = sakReferanse,
-        internReferanse = internReferanse,
+        kildeReferanse = kildeReferanse,
         dvhReferanse = dvhReferanse,
         hjemmelListe = hjemler.map { it.toMottakHjemmel() }.toMutableSet(),
         avsenderSaksbehandlerident = avsenderSaksbehandlerIdent,
         avsenderEnhet = avsenderEnhet,
         oversendtKaEnhet = oversendtEnhet,
         mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),
-        brevmottakere = brevmottakere?.map { it.toPartId() }?.toMutableSet() ?: mutableSetOf(),
         innsendtDato = innsendtTilNav,
         mottattNavDato = mottattFoersteinstans,
         oversendtKaDato = LocalDate.now(),
@@ -79,7 +79,37 @@ enum class Lov {
     FOLKETRYGDLOVEN, FORVALTNINGSLOVEN
 }
 
-data class OversendtKlagerPartId(
+data class OversendtSakenGjelder(
+    val id: OversendtPartId,
+    val skalMottaKopi: Boolean
+) {
+    fun toSakenGjelder() = SakenGjelder(
+        partId = id.toPartId(),
+        skalMottaKopi = skalMottaKopi
+    )
+}
+
+data class OversendtKlager(
+    val id: OversendtPartId,
+    val klagersProsessfullmektig: OversendtProsessfullmektig? = null
+) {
+    fun toKlagepart() = Klager(
+        partId = id.toPartId(),
+        prosessfullmektig = klagersProsessfullmektig?.toProsessfullmektig()
+    )
+}
+
+data class OversendtProsessfullmektig(
+    val id: OversendtPartId,
+    val skalKlagerMottaKopi: Boolean
+) {
+    fun toProsessfullmektig() = Prosessfullmektig(
+        partId = id.toPartId(),
+        skalKlagerMottaKopi = skalKlagerMottaKopi
+    )
+}
+
+data class OversendtPartId(
     val type: PartIdType,
     val verdi: String
 ) {

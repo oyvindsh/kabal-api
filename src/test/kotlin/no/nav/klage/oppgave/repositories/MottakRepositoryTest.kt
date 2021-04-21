@@ -39,9 +39,9 @@ class MottakRepositoryTest {
         val mottak = Mottak(
             tema = Tema.SYK,
             sakstype = Sakstype.KLAGE,
-            klagerPartId = PartId(type = PartIdType.PERSON, value = "123454"),
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "123454")),
             sakReferanse = "12345",
-            internReferanse = "54321",
+            kildeReferanse = "54321",
             dvhReferanse = "5342523",
             hjemmelListe = mutableSetOf(MottakHjemmel(lov = Lov.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
             avsenderSaksbehandlerident = "Z123456",
@@ -50,12 +50,6 @@ class MottakRepositoryTest {
                 MottakDokument(
                     type = MottakDokumentType.OVERSENDELSESBREV,
                     journalpostId = "245245"
-                )
-            ),
-            brevmottakere = mutableSetOf(
-                PartId(
-                    type = PartIdType.PERSON,
-                    value = "746574"
                 )
             ),
             oversendtKaDato = LocalDate.now(),

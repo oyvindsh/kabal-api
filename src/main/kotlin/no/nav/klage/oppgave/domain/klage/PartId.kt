@@ -12,8 +12,10 @@ class PartId(
     @Enumerated(EnumType.STRING)
     var type: PartIdType,
     @Column(name = "value")
-    val value: String? = null,
+    val value: String,
 ) {
+    fun copy() = PartId(type = this.type, value = this.value)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -31,5 +33,5 @@ class PartId(
 }
 
 enum class PartIdType {
-    PERSON, ORGANISASJON, VIRKSOMHET
+    PERSON, VIRKSOMHET
 }

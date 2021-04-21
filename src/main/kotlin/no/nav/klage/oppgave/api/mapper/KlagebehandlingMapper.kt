@@ -8,6 +8,8 @@ import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.PartId
+import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -26,11 +28,12 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling: Klagebehandling): EsKlagebehandling {
+        val foedselsnummer = foedselsnummer(klagebehandling.klager.partId)
 
-        val personInfo = klagebehandling.foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
+        val personInfo = foedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val erFortrolig = personInfo?.harBeskyttelsesbehovFortrolig() ?: false
         val erStrengtFortrolig = personInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
-        val erEgenAnsatt = klagebehandling.foedselsnummer?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
+        val erEgenAnsatt = foedselsnummer?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
         val navn = personInfo?.navn
 
         return EsKlagebehandling(
@@ -50,7 +53,8 @@ class KlagebehandlingMapper(
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,
             hjemler = klagebehandling.hjemler.map { it.id },
-            foedselsnummer = klagebehandling.foedselsnummer,
+            foedselsnummer = foedselsnummer,
+            virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             navn = navn,
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
@@ -94,7 +98,10 @@ class KlagebehandlingMapper(
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
-            foedselsnummer = klagebehandling.foedselsnummer,
+            sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId),
+            sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId),
+            foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
+            virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             tema = klagebehandling.tema.id,
             sakstype = klagebehandling.sakstype.navn,
             mottatt = klagebehandling.mottattKlageinstans,
@@ -131,4 +138,18 @@ class KlagebehandlingMapper(
             klagebehandlingVersjon = klagebehandling.versjon
         )
     }
+
+    private fun foedselsnummer(partId: PartId) =
+        if (partId.type == PartIdType.PERSON) {
+            partId.value
+        } else {
+            null
+        }
+
+    private fun virksomhetsnummer(partId: PartId) =
+        if (partId.type == PartIdType.VIRKSOMHET) {
+            partId.value
+        } else {
+            null
+        }
 }

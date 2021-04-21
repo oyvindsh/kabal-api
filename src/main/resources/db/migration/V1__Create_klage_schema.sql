@@ -17,15 +17,49 @@ CREATE TABLE klage.part_id
     value TEXT NOT NULL
 );
 
+CREATE TABLE klage.prosessfullmektig
+(
+    id                          UUID    PRIMARY KEY,
+    part_id                     UUID    NOT NULL,
+    skal_klager_motta_kopi      BOOLEAN NOT NULL,
+    CONSTRAINT fk_prosessfullmektig_part_id
+        FOREIGN KEY (part_id)
+            REFERENCES klage.part_id (id)
+);
+
+CREATE TABLE klage.klager
+(
+    id                          UUID    PRIMARY KEY,
+    part_id                     UUID    NOT NULL,
+    prosessfullmektig_id        UUID    DEFAULT NULL,
+    CONSTRAINT fk_klagepart_part_id
+        FOREIGN KEY (part_id)
+            REFERENCES klage.part_id (id),
+    CONSTRAINT fk_klagepart_prosessfullmektig
+        FOREIGN KEY (prosessfullmektig_id)
+            REFERENCES klage.prosessfullmektig (id)
+);
+
+CREATE TABLE klage.saken_gjelder
+(
+    id                          UUID    PRIMARY KEY,
+    part_id                     UUID    NOT NULL,
+    skal_motta_kopi             BOOLEAN NOT NULL,
+    CONSTRAINT fk_prosessfullmektig_part_id
+        FOREIGN KEY (part_id)
+            REFERENCES klage.part_id (id)
+);
+
 CREATE TABLE klage.mottak
 (
     id                            UUID PRIMARY KEY,
     versjon                       BIGINT                   NOT NULL,
     tema_id                       VARCHAR(3)               NOT NULL,
     sakstype_id                   VARCHAR(10)              NOT NULL,
-    klager_part_id                UUID                     NOT NULL,
+    klager_id                     UUID                     NOT NULL,
+    saken_gjelder_id              UUID,
     sak_referanse                 TEXT,
-    intern_referanse              TEXT                     NOT NULL,
+    kilde_referanse               TEXT                     NOT NULL,
     dvh_referanse                 TEXT,
     innsyn_url                    TEXT,
     avsender_saksbehandlerident   TEXT,
@@ -38,9 +72,12 @@ CREATE TABLE klage.mottak
     kilde                         TEXT                     NOT NULL,
     created                       TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                      TIMESTAMP WITH TIME ZONE NOT NULL,
-    CONSTRAINT fk_mottak_part
-        FOREIGN KEY (klager_part_id)
-            REFERENCES klage.part_id (id)
+    CONSTRAINT fk_mottak_klager
+        FOREIGN KEY (klager_id)
+            REFERENCES klage.klager (id),
+    CONSTRAINT fk_mottak_saken_gjelder
+        FOREIGN KEY (saken_gjelder_id)
+            REFERENCES klage.saken_gjelder (id)
 );
 
 CREATE TABLE klage.mottak_dokument
@@ -66,18 +103,6 @@ CREATE TABLE klage.mottak_hjemmel
             REFERENCES klage.mottak (id)
 );
 
-CREATE TABLE klage.mottak_brevmottaker
-(
-    mottak_id        UUID NOT NULL,
-    mottaker_part_id UUID NOT NULL,
-    CONSTRAINT fk_mottak_brevmottaker_mottak
-        FOREIGN KEY (mottak_id)
-            REFERENCES klage.mottak (id),
-    CONSTRAINT fk_mottak_brevmottaker_part
-        FOREIGN KEY (mottaker_part_id)
-            REFERENCES klage.part_id (id)
-);
-
 CREATE TABLE klage.kvalitetsvurdering
 (
     id                          UUID PRIMARY KEY,
@@ -97,7 +122,8 @@ CREATE TABLE klage.klagebehandling
 (
     id                                         UUID PRIMARY KEY,
     versjon                                    BIGINT                   NOT NULL,
-    foedselsnummer                             VARCHAR(11),
+    klager_id                                  UUID                     NOT NULL,
+    saken_gjelder_id                           UUID                     NOT NULL,
     tema_id                                    VARCHAR(3)               NOT NULL,
     sakstype_id                                VARCHAR(10)              NOT NULL,
     referanse_id                               TEXT,
@@ -122,7 +148,13 @@ CREATE TABLE klage.klagebehandling
             REFERENCES klage.kvalitetsvurdering (id),
     CONSTRAINT fk_behandling_mottak
         FOREIGN KEY (mottak_id)
-            REFERENCES klage.mottak (id)
+            REFERENCES klage.mottak (id),
+    CONSTRAINT fk_klagebehandling_klager
+        FOREIGN KEY (klager_id)
+            REFERENCES klage.klager (id),
+    CONSTRAINT fk_klagebehandling_saken_gjelder
+        FOREIGN KEY (saken_gjelder_id)
+            REFERENCES klage.saken_gjelder (id)
 );
 
 CREATE TABLE klage.vedtak
@@ -154,6 +186,7 @@ CREATE TABLE klage.brevmottaker
 (
     vedtak_id        UUID NOT NULL,
     mottaker_part_id UUID,
+    rolle               TEXT, -- Må begrenses i kode til 'KLAGER', 'PROSESSFULLMEKTIG' eller 'RELEVANT_TREDJEPART'?
     CONSTRAINT fk_brevmottaker_mottak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),

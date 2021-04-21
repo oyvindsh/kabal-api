@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderEnhetFoersteinstans
@@ -22,9 +22,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMot
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
-import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.MottakHjemmel
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
@@ -52,8 +49,8 @@ class KlagebehandlingService(
     }
 
     private fun checkLeseTilgang(klagebehandling: Klagebehandling) {
-        klagebehandling.foedselsnummer?.let {
-            tilgangService.verifySaksbehandlersTilgangTil(it)
+        if (klagebehandling.sakenGjelder.erPerson()) {
+            tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.sakenGjelder.partId.value)
         }
     }
 
@@ -287,10 +284,11 @@ class KlagebehandlingService(
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
-                foedselsnummer = mottak.klagerPartId.value, // TODO Her må vi fikse
+                klager = mottak.klager.copy(),
+                sakenGjelder = mottak.sakenGjelder?.copy() ?: mottak.klager.toSakenGjelder(),
                 tema = mottak.tema,
                 sakstype = mottak.sakstype,
-                referanseId = mottak.internReferanse,
+                referanseId = mottak.kildeReferanse,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
@@ -317,6 +315,11 @@ class KlagebehandlingService(
             )
         )
     }
+
+    private fun Klager.toSakenGjelder() = SakenGjelder(
+        partId = this.partId.copy(),
+        skalMottaKopi = false // Siden denne nå peker på samme som klager trenger ikke brev sendes
+    )
 
 
     private fun mapMottakHjemmel(hjemmel: MottakHjemmel): Hjemmel? {
@@ -419,9 +422,12 @@ class KlagebehandlingService(
         val vedtak = klage.vedtak.find { it.id == vedtakId }
         require(vedtak != null) { "Fant ikke vedtak på klage" }
         val vedtakFattet = KlagevedtakFattet(
-            id = klage.referanseId ?: "UKJENT", // TODO: Riktig?
+            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO: Riktig?
+            kilde = klage.kilde,
             utfall = vedtak.utfall,
-            vedtaksbrevReferanse = "TODO"
+            vedtaksbrevReferanse = "TODO",
+            sakReferanse = "TODO",
+            kabalReferanse = "TODO" // TODO: Human readable?
         )
 
         vedtakKafkaProducer.sendVedtak(vedtakFattet)
