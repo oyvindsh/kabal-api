@@ -17,7 +17,7 @@
     "tema": {
       "type": "keyword"
     },
-    "sakstype": {
+    "type": {
       "type": "keyword"
     },
     "tildeltSaksbehandlerident": {

@@ -4,8 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -161,7 +161,7 @@ class ElasticsearchIndexingTest {
             saksreferanse = saksreferanse,
             tildeltEnhet = "",
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             tildeltSaksbehandlerident = null,
             innsendt = null,
             mottattFoersteinstans = null,

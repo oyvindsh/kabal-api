@@ -49,14 +49,14 @@ class KlagebehandlingDetaljerController(
     @PutMapping("/klagebehandlinger/{id}/detaljer/sakstype")
     fun putSakstype(
         @PathVariable("id") klagebehandlingId: String,
-        @RequestBody input: KlagebehandlingSakstypeInput
+        @RequestBody input: KlagebehandlingTypeInput
     ): KlagebehandlingDetaljerView {
         logMethodDetails("putSakstype", klagebehandlingId)
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
             klagebehandlingService.setSakstype(
                 klagebehandlingId.toUUIDOrException(),
                 input.klagebehandlingVersjon,
-                input.sakstype,
+                input.type,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )

@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.api.view
 
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.util.*
@@ -11,7 +11,7 @@ import javax.validation.constraints.Past
 data class OversendtKlage(
     val uuid: UUID,
     val tema: Tema,
-    val sakstype: Sakstype,
+    val sakstype: Type,
     val klager: OversendtKlager,
     val sakenGjelder: OversendtSakenGjelder? = null,
     val sakReferanse: String? = null,
@@ -33,7 +33,7 @@ data class OversendtKlage(
     fun toMottak() = Mottak(
         id = uuid,
         tema = tema,
-        sakstype = sakstype,
+        type = sakstype,
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,

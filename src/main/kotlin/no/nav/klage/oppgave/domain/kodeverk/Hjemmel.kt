@@ -4,12 +4,12 @@ import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
 enum class Hjemmel(
-    val id: Int,
+    override val id: Int,
     val lov: LovKilde,
     val kapittelOgParagraf: KapittelOgParagraf? = null,
-    val navn: String,
-    val beskrivelse: String? = null
-) {
+    override val navn: String,
+    override val beskrivelse: String
+) : Kode {
 
     FTL(1000, LovKilde.FOLKETRYGDLOVEN, null, "FTL", "Folketrygdloven"),
 

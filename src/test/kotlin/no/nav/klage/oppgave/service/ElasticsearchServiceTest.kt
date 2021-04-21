@@ -4,8 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.elasticsearch.client.RestHighLevelClient
@@ -84,7 +84,7 @@ class ElasticsearchServiceTest {
             versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             tildeltSaksbehandlerident = null,
             innsendt = LocalDate.of(2019, 10, 1),
             mottattFoersteinstans = LocalDate.of(2019, 11, 1),
@@ -98,7 +98,7 @@ class ElasticsearchServiceTest {
                 versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.FOR,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 tildeltSaksbehandlerident = null,
                 innsendt = LocalDate.of(2018, 10, 1),
                 mottattFoersteinstans = LocalDate.of(2018, 11, 1),

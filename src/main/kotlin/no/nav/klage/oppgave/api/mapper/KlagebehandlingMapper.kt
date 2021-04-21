@@ -43,7 +43,7 @@ class KlagebehandlingMapper(
             saksreferanse = klagebehandling.referanseId,
             tildeltEnhet = klagebehandling.tildeltEnhet,
             tema = klagebehandling.tema,
-            sakstype = klagebehandling.sakstype,
+            type = klagebehandling.type,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
             innsendt = klagebehandling.innsendt,
@@ -78,7 +78,7 @@ class KlagebehandlingMapper(
                 } else {
                     null
                 },
-                type = esKlagebehandling.sakstype.id,
+                type = esKlagebehandling.type.id,
                 tema = esKlagebehandling.tema.id,
                 hjemmel = esKlagebehandling.hjemler?.firstOrNull(),
                 frist = esKlagebehandling.frist,
@@ -103,7 +103,7 @@ class KlagebehandlingMapper(
             foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
             virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             tema = klagebehandling.tema.id,
-            sakstype = klagebehandling.sakstype.navn,
+            type = klagebehandling.type.id,
             mottatt = klagebehandling.mottattKlageinstans,
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,

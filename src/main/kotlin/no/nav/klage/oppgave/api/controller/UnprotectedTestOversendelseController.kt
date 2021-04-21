@@ -3,8 +3,8 @@ package no.nav.klage.oppgave.api.controller
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.domain.klage.PartIdType
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
@@ -49,7 +49,7 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = listOf(Tema.SYK).shuffled().first(),
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -82,7 +82,7 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, "27458422236")
                 ),
@@ -105,7 +105,7 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, "28488425473")
                 ),
@@ -128,7 +128,7 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, "02518418680")
                 ),
@@ -151,7 +151,7 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, "02508425425")
                 ),
@@ -174,7 +174,7 @@ class UnprotectedTestOversendelseController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, "23528406688"),
                     klagersProsessfullmektig = OversendtProsessfullmektig(
