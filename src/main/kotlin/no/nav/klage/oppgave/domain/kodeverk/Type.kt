@@ -27,7 +27,7 @@ enum class Type(override val id: Int, override val navn: String, override val be
 }
 
 @Converter
-class SakstypeConverter : AttributeConverter<Type, Int?> {
+class TypeConverter : AttributeConverter<Type, Int?> {
 
     override fun convertToDatabaseColumn(entity: Type?): Int? =
         entity?.let { it.id }

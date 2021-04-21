@@ -56,9 +56,9 @@ object KlagebehandlingAggregatFunctions {
         nyVerdi: Type,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val gammelVerdi = sakstype
+        val gammelVerdi = type
         val tidspunkt = LocalDateTime.now()
-        sakstype = nyVerdi
+        type = nyVerdi
         modified = tidspunkt
         val endringslogg =
             endringslogg(saksbehandlerident, Felt.SAKSTYPE, gammelVerdi.id.toString(), nyVerdi.id.toString(), tidspunkt)

@@ -287,7 +287,7 @@ class KlagebehandlingService(
                 klager = mottak.klager.copy(),
                 sakenGjelder = mottak.sakenGjelder?.copy() ?: mottak.klager.toSakenGjelder(),
                 tema = mottak.tema,
-                sakstype = mottak.sakstype,
+                type = mottak.type,
                 referanseId = mottak.kildeReferanse,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,

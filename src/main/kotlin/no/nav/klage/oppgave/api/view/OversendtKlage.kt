@@ -33,7 +33,7 @@ data class OversendtKlage(
     fun toMottak() = Mottak(
         id = uuid,
         tema = tema,
-        sakstype = sakstype,
+        type = sakstype,
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,

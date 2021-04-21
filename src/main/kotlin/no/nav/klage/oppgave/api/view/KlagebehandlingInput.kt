@@ -5,7 +5,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Type
 import java.time.LocalDate
 
 
-data class KlagebehandlingSakstypeInput(val sakstype: Type, val klagebehandlingVersjon: Long? = null)
+data class KlagebehandlingTypeInput(val type: Type, val klagebehandlingVersjon: Long? = null)
 
 data class KlagebehandlingTemaInput(val tema: Tema, val klagebehandlingVersjon: Long? = null)
 

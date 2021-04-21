@@ -44,7 +44,7 @@ class KlagebehandlingRepositoryTest {
 
         val mottak = Mottak(
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -60,7 +60,7 @@ class KlagebehandlingRepositoryTest {
                 skalMottaKopi = false
             ),
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
                 Hjemmel.FTL_8_7
@@ -85,7 +85,7 @@ class KlagebehandlingRepositoryTest {
 
         val mottak = Mottak(
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -101,7 +101,7 @@ class KlagebehandlingRepositoryTest {
                 skalMottaKopi = false
             ),
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
                 Hjemmel.FTL_8_7
@@ -133,7 +133,7 @@ class KlagebehandlingRepositoryTest {
 
         val mottak = Mottak(
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -149,7 +149,7 @@ class KlagebehandlingRepositoryTest {
                 skalMottaKopi = false
             ),
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
                 Hjemmel.FTL_8_7
