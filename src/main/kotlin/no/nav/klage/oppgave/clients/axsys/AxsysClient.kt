@@ -59,9 +59,8 @@ class AxsysClient(
             )
             tilganger
         } catch (notFound: WebClientResponseException.NotFound) {
-            logger.warn("Got a 404 fetching tilganger for saksbehandler {}, returning empty object", navIdent)
-            //TODO: Burde det smelle hardt her isf å returnere tomt objekt?
-            Tilganger(emptyList())
+            logger.warn("Got a 404 fetching tilganger for saksbehandler {}, throwing exception", navIdent, notFound)
+            throw RuntimeException("Tilganger could not be fetched")
         }
     }
 

@@ -134,7 +134,6 @@ open class ElasticsearchService(
         logger.debug("Search criteria: {}", this)
 
         val filterQuery = QueryBuilders.boolQuery()
-        //TODO: Kunne nok vurdert å bruke filters også til andre ting enn sikkerhet, ref https://stackoverflow.com/questions/14595988/queries-vs-filters
         baseQuery.filter(filterQuery)
         if (!innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
             filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))

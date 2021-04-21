@@ -17,7 +17,7 @@ class AdminController(private val adminService: AdminService) {
     @Unprotected
     @GetMapping("/internal/elasticadmin/nuke", produces = ["application/json"])
     fun resetElasticIndex(): ElasticAdminResponse {
-        //TODO: Make this more fancy.. Need auth, need a service, need to reindex from db.
+        //TODO: Trenger auth så ikke hvem som helst kan kalle denne
         try {
             adminService.recreateEsIndex()
             adminService.syncEsWithDb()

@@ -11,6 +11,7 @@ data class KlagebehandlingDetaljerView(
     val mottattFoersteinstans: LocalDate? = null,
     val sakenGjelderFoedselsnummer: String?,
     val sakenGjelderVirksomhetsnummer: String?,
+    //TODO: Mangler navn på den saken gjelder
     val foedselsnummer: String?,
     val virksomhetsnummer: String?,
     val tema: Int,
