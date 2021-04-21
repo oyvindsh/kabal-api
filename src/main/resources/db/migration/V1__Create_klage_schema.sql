@@ -4,6 +4,8 @@ $$
         IF EXISTS
             (SELECT 1 from pg_roles where rolname = 'cloudsqliamuser')
         THEN
+            GRANT SELECT ON ALL TABLES IN SCHEMA public TO cloudsqliamuser;
+            GRANT SELECT ON ALL TABLES IN SCHEMA klage TO cloudsqliamuser;
             ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO cloudsqliamuser;
             ALTER DEFAULT PRIVILEGES IN SCHEMA klage GRANT SELECT ON TABLES TO cloudsqliamuser;
         END IF;
@@ -19,9 +21,9 @@ CREATE TABLE klage.part_id
 
 CREATE TABLE klage.prosessfullmektig
 (
-    id                          UUID    PRIMARY KEY,
-    part_id                     UUID    NOT NULL,
-    skal_klager_motta_kopi      BOOLEAN NOT NULL,
+    id                     UUID PRIMARY KEY,
+    part_id                UUID    NOT NULL,
+    skal_klager_motta_kopi BOOLEAN NOT NULL,
     CONSTRAINT fk_prosessfullmektig_part_id
         FOREIGN KEY (part_id)
             REFERENCES klage.part_id (id)
@@ -29,9 +31,9 @@ CREATE TABLE klage.prosessfullmektig
 
 CREATE TABLE klage.klager
 (
-    id                          UUID    PRIMARY KEY,
-    part_id                     UUID    NOT NULL,
-    prosessfullmektig_id        UUID    DEFAULT NULL,
+    id                   UUID PRIMARY KEY,
+    part_id              UUID NOT NULL,
+    prosessfullmektig_id UUID DEFAULT NULL,
     CONSTRAINT fk_klagepart_part_id
         FOREIGN KEY (part_id)
             REFERENCES klage.part_id (id),
@@ -42,9 +44,9 @@ CREATE TABLE klage.klager
 
 CREATE TABLE klage.saken_gjelder
 (
-    id                          UUID    PRIMARY KEY,
-    part_id                     UUID    NOT NULL,
-    skal_motta_kopi             BOOLEAN NOT NULL,
+    id              UUID PRIMARY KEY,
+    part_id         UUID    NOT NULL,
+    skal_motta_kopi BOOLEAN NOT NULL,
     CONSTRAINT fk_prosessfullmektig_part_id
         FOREIGN KEY (part_id)
             REFERENCES klage.part_id (id)
@@ -186,7 +188,7 @@ CREATE TABLE klage.brevmottaker
 (
     vedtak_id        UUID NOT NULL,
     mottaker_part_id UUID,
-    rolle               TEXT, -- Må begrenses i kode til 'KLAGER', 'PROSESSFULLMEKTIG' eller 'RELEVANT_TREDJEPART'?
+    rolle            TEXT, -- Må begrenses i kode til 'KLAGER', 'PROSESSFULLMEKTIG' eller 'RELEVANT_TREDJEPART'?
     CONSTRAINT fk_brevmottaker_mottak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id),
