@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.SakstypeConverter
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.TemaConverter
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -22,7 +22,7 @@ class Mottak(
     var tema: Tema,
     @Column(name = "sakstype_id")
     @Convert(converter = SakstypeConverter::class)
-    var sakstype: Sakstype,
+    var sakstype: Type,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "klager_id", nullable = false)
     var klager: Klager,

@@ -2,8 +2,8 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingerQueryParams
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.exceptions.NotOwnEnhetException
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -19,7 +19,7 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
     }
 
     fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
-        typer = queryParams.typer.map { Sakstype.of(it) },
+        typer = queryParams.typer.map { Type.of(it) },
         temaer = queryParams.temaer.map { Tema.of(it) },
         hjemler = queryParams.hjemler.mapNotNull { it.toIntOrNull() },
         order = if (queryParams.rekkefoelge == KlagebehandlingerQueryParams.Rekkefoelge.SYNKENDE) {
@@ -42,7 +42,7 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
 
     fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) =
         KlagebehandlingerSearchCriteria(
-            typer = queryParams.typer.map { Sakstype.of(it) },
+            typer = queryParams.typer.map { Type.of(it) },
             temaer = queryParams.temaer.map { Tema.of(it) },
             hjemler = queryParams.hjemler.mapNotNull { it.toIntOrNull() },
             offset = 0,

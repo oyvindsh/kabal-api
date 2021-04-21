@@ -3,8 +3,8 @@ package no.nav.klage.oppgave.repositories
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,7 +44,7 @@ class KlagebehandlingRepositoryTest {
 
         val mottak = Mottak(
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -55,9 +55,12 @@ class KlagebehandlingRepositoryTest {
 
         val klage = Klagebehandling(
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(partId = PartId(type = PartIdType.PERSON, value = "23452354"), skalMottaKopi = false),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
                 Hjemmel.FTL_8_7
@@ -82,7 +85,7 @@ class KlagebehandlingRepositoryTest {
 
         val mottak = Mottak(
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -93,9 +96,12 @@ class KlagebehandlingRepositoryTest {
 
         val klage = Klagebehandling(
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(partId = PartId(type = PartIdType.PERSON, value = "23452354"), skalMottaKopi = false),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
                 Hjemmel.FTL_8_7
@@ -127,7 +133,7 @@ class KlagebehandlingRepositoryTest {
 
         val mottak = Mottak(
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -138,9 +144,12 @@ class KlagebehandlingRepositoryTest {
 
         val klage = Klagebehandling(
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(partId = PartId(type = PartIdType.PERSON, value = "23452354"), skalMottaKopi = false),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
             tema = Tema.SYK,
-            sakstype = Sakstype.KLAGE,
+            sakstype = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
                 Hjemmel.FTL_8_7

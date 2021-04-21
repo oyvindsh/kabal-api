@@ -1,12 +1,12 @@
 package no.nav.klage.oppgave.domain
 
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class KlagebehandlingerSearchCriteria(
-    val typer: List<Sakstype> = emptyList(),
+    val typer: List<Type> = emptyList(),
     val temaer: List<Tema> = emptyList(),
     val hjemler: List<Int> = emptyList(),
     val statuskategori: Statuskategori = Statuskategori.AAPEN,

@@ -4,7 +4,7 @@ import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -163,7 +163,7 @@ open class ElasticsearchService(
                 innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", it.name))
             }
         } else {
-            innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", Sakstype.KLAGE.name))
+            innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", Type.KLAGE.name))
         }
 
         val innerQueryTema = QueryBuilders.boolQuery()

@@ -103,7 +103,7 @@ class KlagebehandlingMapper(
             foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
             virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             tema = klagebehandling.tema.id,
-            sakstype = klagebehandling.sakstype.navn,
+            sakstype = klagebehandling.sakstype.id,
             mottatt = klagebehandling.mottattKlageinstans,
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,

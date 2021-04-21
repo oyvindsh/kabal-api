@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.domain.kodeverk
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
-enum class Eoes(val id: Int, val navn: String, val beskrivelse: String?) {
+enum class Eoes(override val id: Int, override val navn: String, override val beskrivelse: String) : Kode {
 
     RIKTIG(1, "Riktig", "Problemstilling knyttet til EØS/utland er godt håndtert"),
     IKKE_OPPDAGET(2, "Ikke oppdaget", "Vedtaksinstansen har ikke oppdaget at saken gjelder EØS/utland"),
@@ -17,7 +17,7 @@ enum class Eoes(val id: Int, val navn: String, val beskrivelse: String?) {
 
     companion object {
         fun of(id: Int): Eoes {
-            return Eoes.values().firstOrNull { it.id == id }
+            return values().firstOrNull { it.id == id }
                 ?: throw IllegalArgumentException("No Eoes with ${id} exists")
         }
     }

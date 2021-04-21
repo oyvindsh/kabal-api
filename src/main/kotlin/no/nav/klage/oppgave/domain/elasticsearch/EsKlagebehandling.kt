@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.domain.elasticsearch
 
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.elasticsearch.index.VersionType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
@@ -33,7 +33,7 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Keyword)
     val tema: Tema,
     @Field(type = FieldType.Keyword)
-    val sakstype: Sakstype,
+    val sakstype: Type,
     @Field(type = FieldType.Keyword)
     val tildeltSaksbehandlerident: String? = null,
     @Field(type = FieldType.Keyword)

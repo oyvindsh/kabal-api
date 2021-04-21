@@ -78,12 +78,12 @@ class SaksbehandlerRepository(
             EnhetMedLovligeTemaer(
                 enhet.enhetId,
                 enhet.navn,
-                enhet.temaer?.mapNotNull { mapTemaToTemaName(it) } ?: emptyList())
+                enhet.temaer?.mapNotNull { mapTemaNavnToTema(it) } ?: emptyList())
         })
 
-    private fun mapTemaToTemaName(tema: String): Tema? =
+    private fun mapTemaNavnToTema(tema: String): Tema? =
         try {
-            Tema.of(tema)
+            Tema.fromNavn(tema)
         } catch (e: Exception) {
             logger.error("Unable to map Tema $tema", e)
             null

@@ -81,12 +81,12 @@ class KlagebehandlingService(
     fun setSakstype(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
-        sakstype: Sakstype,
+        type: Type,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event =
-            klagebehandling.setSakstype(sakstype, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setSakstype(type, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -358,10 +358,6 @@ class KlagebehandlingService(
     private fun createSaksdokument(journalpostId: String) =
         dokumentService.fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
-
-    private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
-
-    private fun mapTema(tema: String): Tema = Tema.of(tema)
 
     fun addDokument(
         klagebehandlingId: UUID,

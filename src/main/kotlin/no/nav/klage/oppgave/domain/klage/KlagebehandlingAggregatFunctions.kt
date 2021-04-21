@@ -53,7 +53,7 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setSakstype(
-        nyVerdi: Sakstype,
+        nyVerdi: Type,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val gammelVerdi = sakstype
@@ -61,7 +61,7 @@ object KlagebehandlingAggregatFunctions {
         sakstype = nyVerdi
         modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.SAKSTYPE, gammelVerdi.id, nyVerdi.id, tidspunkt)
+            endringslogg(saksbehandlerident, Felt.SAKSTYPE, gammelVerdi.id.toString(), nyVerdi.id.toString(), tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
@@ -74,7 +74,7 @@ object KlagebehandlingAggregatFunctions {
         tema = nyVerdi
         modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TEMA, gammelVerdi.id, nyVerdi.id, tidspunkt)
+            endringslogg(saksbehandlerident, Felt.TEMA, gammelVerdi.id.toString(), nyVerdi.id.toString(), tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
