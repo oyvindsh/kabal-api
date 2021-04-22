@@ -18,6 +18,6 @@ class Norg2Client(private val norg2WebClient: WebClient) {
             .retrieve()
             .bodyToMono<EnhetResponse>()
             .block()
-            ?.asEnhet() ?: throw RuntimeException("Enhet not found") // TODO: Handle with 404
+            ?.asEnhet() ?: Enhet(navn = "Ukjent enhet")
 
 }

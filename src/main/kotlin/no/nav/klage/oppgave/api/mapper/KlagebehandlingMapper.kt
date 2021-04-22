@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
+import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Service
 @Service
 class KlagebehandlingMapper(
     private val pdlFacade: PdlFacade,
-    private val egenAnsattService: EgenAnsattService
+    private val egenAnsattService: EgenAnsattService,
+    private val norg2Client: Norg2Client
 ) {
 
     companion object {
@@ -91,11 +93,13 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
+        val enhetNavn = klagebehandling.avsenderEnhetFoersteinstans?.let { norg2Client.fetchEnhet(it) }?.navn
+
         return KlagebehandlingDetaljerView(
             id = klagebehandling.id,
             klageInnsendtdato = klagebehandling.innsendt,
-            //TODO get name from norg2
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
+            fraNAVEnhetNavn = enhetNavn,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId),
