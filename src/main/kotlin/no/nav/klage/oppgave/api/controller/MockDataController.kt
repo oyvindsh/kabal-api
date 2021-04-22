@@ -24,7 +24,7 @@ class MockDataController(
     private val safClient: SafGraphQlClient
 ) {
 
-    // Alle personer er registrert under https://dolly.dev.adeo.no/gruppe/2960
+    // Alle syntetiske personer under her er registrert under https://dolly.dev.adeo.no/gruppe/2960
 
     @PostMapping("/randomklage")
     fun sendInnRandomKlage() {
