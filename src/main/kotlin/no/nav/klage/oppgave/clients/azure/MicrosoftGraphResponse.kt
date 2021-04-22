@@ -9,3 +9,19 @@ data class MicrosoftGraphNameResponse(val value: List<Value>?) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class Value(val onPremisesSamAccountName: String?, val displayName: String?)
 }
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class MicrosoftGraphUsersResponse(val value: List<Value>?) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class Value(val userPrincipalName: String)
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class MicrosoftGraphMemberOfResponse(val value: List<Group>)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Group(
+    val id: String,
+    val displayName: String? = null,
+    val mailNickname: String? = null,
+)
