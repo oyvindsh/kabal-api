@@ -82,7 +82,7 @@ class MockDataController(
 
     @PostMapping("/kode6")
     fun createKode6Person() {
-        val fnr = "15436621822"
+        val fnr = "15436621822" // ÅPENHJERTIG SAKS
         val journalpostId = "493357084"
         val journalpost = safClient.getJournalpost(journalpostId)
         val saknr = journalpost?.sak?.fagsakId
@@ -120,7 +120,7 @@ class MockDataController(
 
     @PostMapping("/kode7")
     fun createKode7Person() {
-        val fnr = "28107122119"
+        val fnr = "28107122119" // GOD STAFFELI
         val journalpostId = "493357085"
         val journalpost = safClient.getJournalpost(journalpostId)
         val saknr = journalpost?.sak?.fagsakId
@@ -158,7 +158,7 @@ class MockDataController(
 
     @PostMapping("/fullmakt")
     fun createPersonWithFullmakt() {
-        val fnr = "17117323862"
+        val fnr = "17117323862" // SNILL VEPS
         val journalpostId = "493357182"
         val journalpost = safClient.getJournalpost(journalpostId)
         val saknr = journalpost?.sak?.fagsakId
