@@ -24,7 +24,9 @@ class MockDataController(
     private val safClient: SafGraphQlClient
 ) {
 
-    @PostMapping("/oversendtklage")
+    // Alle personer er registrert under https://dolly.dev.adeo.no/gruppe/2960
+
+    @PostMapping("/randomklage")
     fun sendInnRandomKlage() {
         val dollyDoc = listOf(
             SyntheticWithDoc("02446701749", "493357061"),
@@ -55,6 +57,124 @@ class MockDataController(
                 sakstype = Sakstype.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
+                ),
+                sakReferanse = saknr,
+                kildeReferanse = "REF_$fnr",
+                innsynUrl = "https://nav.no",
+                hjemler = listOf(
+                    listOf(
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                    ).shuffled().first()
+                ),
+                avsenderSaksbehandlerIdent = "Z994674",
+                avsenderEnhet = "0104", //NAV Moss
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                mottattFoersteinstans = dato,
+                innsendtTilNav = dato.minusDays(3),
+                kilde = "OPPGAVE"
+            )
+        )
+    }
+
+    @PostMapping("/kode6")
+    fun createKode6Person() {
+        val fnr = "15436621822"
+        val journalpostId = "493357084"
+        val journalpost = safClient.getJournalpost(journalpostId)
+        val saknr = journalpost?.sak?.fagsakId
+        val dato = LocalDate.of(2020, 1, 13)
+
+        mottakService.createMottakForKlage(
+            OversendtKlage(
+                uuid = UUID.randomUUID(),
+                tema = Tema.FOR,
+                sakstype = Sakstype.KLAGE,
+                klager = OversendtKlager(
+                    id = OversendtPartId(PartIdType.PERSON, fnr)
+                ),
+                sakReferanse = saknr,
+                kildeReferanse = "REF_$fnr",
+                innsynUrl = "https://nav.no",
+                hjemler = listOf(
+                    listOf(
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                    ).shuffled().first()
+                ),
+                avsenderSaksbehandlerIdent = "Z994674",
+                avsenderEnhet = "0104", //NAV Moss
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                mottattFoersteinstans = dato,
+                innsendtTilNav = dato.minusDays(3),
+                kilde = "OPPGAVE"
+            )
+        )
+    }
+
+    @PostMapping("/kode7")
+    fun createKode7Person() {
+        val fnr = "28107122119"
+        val journalpostId = "493357085"
+        val journalpost = safClient.getJournalpost(journalpostId)
+        val saknr = journalpost?.sak?.fagsakId
+        val dato = LocalDate.of(2020, 1, 13)
+
+        mottakService.createMottakForKlage(
+            OversendtKlage(
+                uuid = UUID.randomUUID(),
+                tema = Tema.SYK,
+                sakstype = Sakstype.KLAGE,
+                klager = OversendtKlager(
+                    id = OversendtPartId(PartIdType.PERSON, fnr)
+                ),
+                sakReferanse = saknr,
+                kildeReferanse = "REF_$fnr",
+                innsynUrl = "https://nav.no",
+                hjemler = listOf(
+                    listOf(
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                    ).shuffled().first()
+                ),
+                avsenderSaksbehandlerIdent = "Z994674",
+                avsenderEnhet = "0104", //NAV Moss
+                oversendtEnhet = "4291",
+                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                mottattFoersteinstans = dato,
+                innsendtTilNav = dato.minusDays(3),
+                kilde = "OPPGAVE"
+            )
+        )
+    }
+
+    @PostMapping("/fullmakt")
+    fun createPersonWithFullmakt() {
+        val fnr = "17117323862"
+        val journalpostId = "493357182"
+        val journalpost = safClient.getJournalpost(journalpostId)
+        val saknr = journalpost?.sak?.fagsakId
+        val dato = LocalDate.of(2020, 1, 13)
+
+        mottakService.createMottakForKlage(
+            OversendtKlage(
+                uuid = UUID.randomUUID(),
+                tema = Tema.SYK,
+                sakstype = Sakstype.KLAGE,
+                klager = OversendtKlager(
+                    id = OversendtPartId(PartIdType.PERSON, fnr),
+                    klagersProsessfullmektig = OversendtProsessfullmektig(
+                        id = OversendtPartId(PartIdType.PERSON, "25017820926"),
+                        skalKlagerMottaKopi = true
+                    )
                 ),
                 sakReferanse = saknr,
                 kildeReferanse = "REF_$fnr",
