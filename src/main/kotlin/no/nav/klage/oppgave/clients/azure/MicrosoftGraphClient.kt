@@ -90,6 +90,7 @@ class MicrosoftGraphClient(
                         uriBuilder
                             .path("/users")
                             .queryParam("\$filter", "mailnickname in $idents")
+                            .queryParam("\$select", "userPrincipalName")
                             .build()
                     }
                     .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
