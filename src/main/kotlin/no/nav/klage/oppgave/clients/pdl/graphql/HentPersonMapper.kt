@@ -24,7 +24,8 @@ class HentPersonMapper {
             mellomnavn = pdlPerson.navn.firstOrNull()?.mellomnavn,
             etternavn = pdlPerson.navn.firstOrNull()?.etternavn,
             navn = sammensattNavn(pdlPerson.navn.firstOrNull()),
-            beskyttelsesbehov = pdlPerson.adressebeskyttelse.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
+            beskyttelsesbehov = pdlPerson.adressebeskyttelse.firstOrNull()?.gradering?.mapToBeskyttelsesbehov(),
+            kjoenn = pdlPerson.kjoenn.firstOrNull()?.kjoenn?.name
         )
     }
 
@@ -40,7 +41,8 @@ class HentPersonMapper {
                 mellomnavn = it.person?.navn?.firstOrNull()?.mellomnavn,
                 etternavn = it.person?.navn?.firstOrNull()?.etternavn,
                 navn = sammensattNavn(it.person?.navn?.firstOrNull()),
-                beskyttelsesbehov = it.person?.adressebeskyttelse?.firstOrNull()?.gradering?.mapToBeskyttelsesbehov()
+                beskyttelsesbehov = it.person?.adressebeskyttelse?.firstOrNull()?.gradering?.mapToBeskyttelsesbehov(),
+                kjoenn = it.person?.kjoenn?.firstOrNull()?.kjoenn?.name
             )
         }
     }

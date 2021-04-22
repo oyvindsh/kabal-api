@@ -6,7 +6,8 @@ data class Person(
     val mellomnavn: String?,
     val etternavn: String?,
     val navn: String?,
-    val beskyttelsesbehov: Beskyttelsesbehov?
+    val beskyttelsesbehov: Beskyttelsesbehov?,
+    val kjoenn: String?
 ) {
     fun harBeskyttelsesbehovFortrolig() = beskyttelsesbehov == Beskyttelsesbehov.FORTROLIG
 
