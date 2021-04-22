@@ -161,7 +161,7 @@ class ElasticsearchIndexingTest {
             saksreferanse = saksreferanse,
             tildeltEnhet = "",
             tema = Tema.SYK,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             tildeltSaksbehandlerident = null,
             innsendt = null,
             mottattFoersteinstans = null,

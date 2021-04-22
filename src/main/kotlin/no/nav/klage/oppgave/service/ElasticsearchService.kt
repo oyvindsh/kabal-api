@@ -159,10 +159,10 @@ open class ElasticsearchService(
         baseQuery.must(innerQueryBehandlingtype)
         if (typer.isNotEmpty()) {
             typer.forEach {
-                innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", it.name))
+                innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", it.name))
             }
         } else {
-            innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", Type.KLAGE.name))
+            innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", Type.KLAGE.name))
         }
 
         val innerQueryTema = QueryBuilders.boolQuery()

@@ -85,7 +85,7 @@ class RelatedKlagebehandlingerTest {
             versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.FOR,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             tildeltSaksbehandlerident = null,
             innsendt = LocalDate.now(),
             mottattFoersteinstans = LocalDate.now(),

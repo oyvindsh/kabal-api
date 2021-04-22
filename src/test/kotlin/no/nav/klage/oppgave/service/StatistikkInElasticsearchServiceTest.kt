@@ -79,7 +79,7 @@ class StatistikkInElasticsearchServiceTest {
             versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.FOR,
-            sakstype = Type.KLAGE,
+            type = Type.KLAGE,
             tildeltSaksbehandlerident = null,
             innsendt = innsendt,
             mottattFoersteinstans = LocalDate.of(2018, 11, 1),
