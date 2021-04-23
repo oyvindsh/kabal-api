@@ -1,11 +1,11 @@
 package no.nav.klage.oppgave.api.view
 
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import java.time.LocalDate
 
 
-data class KlagebehandlingSakstypeInput(val sakstype: Sakstype, val klagebehandlingVersjon: Long? = null)
+data class KlagebehandlingTypeInput(val type: Type, val klagebehandlingVersjon: Long? = null)
 
 data class KlagebehandlingTemaInput(val tema: Tema, val klagebehandlingVersjon: Long? = null)
 

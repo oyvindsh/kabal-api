@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
+import no.nav.klage.oppgave.clients.pdl.graphql.PdlPerson
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -8,13 +9,17 @@ data class KlagebehandlingDetaljerView(
     val id: UUID,
     val klageInnsendtdato: LocalDate?,
     val fraNAVEnhet: String?,
+    val fraNAVEnhetNavn: String?,
     val mottattFoersteinstans: LocalDate? = null,
     val sakenGjelderFoedselsnummer: String?,
+    val sakenGjelderNavn: String?,
+    val sakenGjelderKjoenn: String?,
     val sakenGjelderVirksomhetsnummer: String?,
+    // TODO Legge til virksomhetsnavn (mangler ereg integrasjon)
     val foedselsnummer: String?,
     val virksomhetsnummer: String?,
-    val tema: String,
-    val sakstype: String,
+    val tema: Int,
+    val type: Int,
     val mottatt: LocalDate?,
     val startet: LocalDate? = null,
     val avsluttet: LocalDate? = null,

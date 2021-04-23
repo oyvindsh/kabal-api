@@ -4,7 +4,7 @@ import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -134,7 +134,6 @@ open class ElasticsearchService(
         logger.debug("Search criteria: {}", this)
 
         val filterQuery = QueryBuilders.boolQuery()
-        //TODO: Kunne nok vurdert å bruke filters også til andre ting enn sikkerhet, ref https://stackoverflow.com/questions/14595988/queries-vs-filters
         baseQuery.filter(filterQuery)
         if (!innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
             filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))
@@ -160,10 +159,10 @@ open class ElasticsearchService(
         baseQuery.must(innerQueryBehandlingtype)
         if (typer.isNotEmpty()) {
             typer.forEach {
-                innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", it.name))
+                innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", it.name))
             }
         } else {
-            innerQueryBehandlingtype.should(QueryBuilders.termQuery("sakstype", Sakstype.KLAGE.name))
+            innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", Type.KLAGE.name))
         }
 
         val innerQueryTema = QueryBuilders.boolQuery()

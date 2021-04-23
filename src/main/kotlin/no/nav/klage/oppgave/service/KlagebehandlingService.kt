@@ -81,12 +81,12 @@ class KlagebehandlingService(
     fun setSakstype(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
-        sakstype: Sakstype,
+        type: Type,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event =
-            klagebehandling.setSakstype(sakstype, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setSakstype(type, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -287,7 +287,7 @@ class KlagebehandlingService(
                 klager = mottak.klager.copy(),
                 sakenGjelder = mottak.sakenGjelder?.copy() ?: mottak.klager.toSakenGjelder(),
                 tema = mottak.tema,
-                sakstype = mottak.sakstype,
+                type = mottak.type,
                 referanseId = mottak.kildeReferanse,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,
@@ -359,10 +359,6 @@ class KlagebehandlingService(
         dokumentService.fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
-    private fun mapSakstype(behandlingstype: String): Sakstype = Sakstype.of(behandlingstype)
-
-    private fun mapTema(tema: String): Tema = Tema.of(tema)
-
     fun addDokument(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
@@ -417,17 +413,18 @@ class KlagebehandlingService(
         }
     }
 
+    //TODO: Denne trenger å fullføres!
     fun fullfoerVedtak(klagebehandlingId: UUID, vedtakId: UUID) {
         val klage = klagebehandlingRepository.findById(klagebehandlingId).orElseThrow()
         val vedtak = klage.vedtak.find { it.id == vedtakId }
         require(vedtak != null) { "Fant ikke vedtak på klage" }
         val vedtakFattet = KlagevedtakFattet(
-            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO: Riktig?
+            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO1: Riktig?
             kilde = klage.kilde,
             utfall = vedtak.utfall,
-            vedtaksbrevReferanse = "TODO",
-            sakReferanse = "TODO",
-            kabalReferanse = "TODO" // TODO: Human readable?
+            vedtaksbrevReferanse = "TODO2",
+            sakReferanse = "TODO3",
+            kabalReferanse = "TODO4" // Human readable?
         )
 
         vedtakKafkaProducer.sendVedtak(vedtakFattet)

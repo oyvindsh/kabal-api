@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.domain.kodeverk
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
-enum class RaadfoertMedLege(val id: Int, val navn: String, val beskrivelse: String?) {
+enum class RaadfoertMedLege(override val id: Int, override val navn: String, override val beskrivelse: String) : Kode {
 
     MANGLER(1, "Mangler", "Saken burde vært forelagt for ROL i vedtaksinstansen"),
     RIKTIG(
@@ -25,7 +25,7 @@ enum class RaadfoertMedLege(val id: Int, val navn: String, val beskrivelse: Stri
 
     companion object {
         fun of(id: Int): RaadfoertMedLege {
-            return RaadfoertMedLege.values().firstOrNull { it.id == id }
+            return values().firstOrNull { it.id == id }
                 ?: throw IllegalArgumentException("No RaadfoertMedLege with ${id} exists")
         }
     }

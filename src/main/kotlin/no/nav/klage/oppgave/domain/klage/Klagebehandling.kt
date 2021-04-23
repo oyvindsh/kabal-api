@@ -26,9 +26,9 @@ class Klagebehandling(
     @Column(name = "tema_id")
     @Convert(converter = TemaConverter::class)
     var tema: Tema,
-    @Column(name = "sakstype_id")
-    @Convert(converter = SakstypeConverter::class)
-    var sakstype: Sakstype,
+    @Column(name = "type_id")
+    @Convert(converter = TypeConverter::class)
+    var type: Type,
     @Column(name = "referanse_id")
     var referanseId: String? = null,
     @Column(name = "dato_innsendt")

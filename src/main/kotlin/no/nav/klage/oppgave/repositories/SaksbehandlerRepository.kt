@@ -69,7 +69,7 @@ class SaksbehandlerRepository(
 
     fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_EGEN_ANSATT)
 
-    private fun getRoller(ident: String): List<String> = TODO()
+    private fun getRoller(ident: String): List<String> = TODO("Hente roller fra Azure AD på ikke-innlogget bruker")
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 
@@ -78,12 +78,12 @@ class SaksbehandlerRepository(
             EnhetMedLovligeTemaer(
                 enhet.enhetId,
                 enhet.navn,
-                enhet.temaer?.mapNotNull { mapTemaToTemaName(it) } ?: emptyList())
+                enhet.temaer?.mapNotNull { mapTemaNavnToTema(it) } ?: emptyList())
         })
 
-    private fun mapTemaToTemaName(tema: String): Tema? =
+    private fun mapTemaNavnToTema(tema: String): Tema? =
         try {
-            Tema.of(tema)
+            Tema.fromNavn(tema)
         } catch (e: Exception) {
             logger.error("Unable to map Tema $tema", e)
             null

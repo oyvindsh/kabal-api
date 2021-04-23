@@ -10,8 +10,8 @@ data class KlagebehandlingerListRespons(
 data class KlagebehandlingListView(
     val id: String,
     val person: Person? = null,
-    val type: String,
-    val tema: String,
+    val type: Int,
+    val tema: Int,
     val hjemmel: Int?,
     val frist: LocalDate?,
     val mottatt: LocalDate?,

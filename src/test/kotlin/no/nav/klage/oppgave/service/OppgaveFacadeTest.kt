@@ -2,8 +2,8 @@ package no.nav.klage.oppgave.service
 
 internal class OppgaveFacadeTest {
 
-    //TODO: Fiks denne. Jeg skjønte den ikke helt ved første øyekast, mye mock i øst og vest..
-    
+    //TODO: Fiks denne testen
+
     /*
     @Test
     fun `type is klage`() {

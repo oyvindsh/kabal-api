@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
+import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Service
 @Service
 class KlagebehandlingMapper(
     private val pdlFacade: PdlFacade,
-    private val egenAnsattService: EgenAnsattService
+    private val egenAnsattService: EgenAnsattService,
+    private val norg2Client: Norg2Client
 ) {
 
     companion object {
@@ -43,7 +45,7 @@ class KlagebehandlingMapper(
             saksreferanse = klagebehandling.referanseId,
             tildeltEnhet = klagebehandling.tildeltEnhet,
             tema = klagebehandling.tema,
-            sakstype = klagebehandling.sakstype,
+            type = klagebehandling.type,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
             innsendt = klagebehandling.innsendt,
@@ -78,7 +80,7 @@ class KlagebehandlingMapper(
                 } else {
                     null
                 },
-                type = esKlagebehandling.sakstype.id,
+                type = esKlagebehandling.type.id,
                 tema = esKlagebehandling.tema.id,
                 hjemmel = esKlagebehandling.hjemler?.firstOrNull(),
                 frist = esKlagebehandling.frist,
@@ -91,19 +93,25 @@ class KlagebehandlingMapper(
     }
 
     fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
+        val enhetNavn = klagebehandling.avsenderEnhetFoersteinstans?.let { norg2Client.fetchEnhet(it) }?.navn
+        val sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId)
+        val sakenGjelder = sakenGjelderFoedselsnummer?.let { pdlFacade.getPersonInfo(it) }
+
         return KlagebehandlingDetaljerView(
             id = klagebehandling.id,
             klageInnsendtdato = klagebehandling.innsendt,
-            //TODO get name from norg2
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
+            fraNAVEnhetNavn = enhetNavn,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
-            sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId),
+            sakenGjelderFoedselsnummer = sakenGjelderFoedselsnummer,
+            sakenGjelderNavn = sakenGjelder?.navn,
+            sakenGjelderKjoenn = sakenGjelder?.kjoenn,
             sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId),
             foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
             virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
             tema = klagebehandling.tema.id,
-            sakstype = klagebehandling.sakstype.navn,
+            type = klagebehandling.type.id,
             mottatt = klagebehandling.mottattKlageinstans,
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,
