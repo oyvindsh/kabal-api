@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.api.controller.KlagebehandlingDetaljerController
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.ResponseEntity
+import springfox.documentation.builders.PathSelectors.regex
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.service.Tag
 import springfox.documentation.spi.DocumentationType
@@ -17,9 +18,8 @@ class OpenApiConfig {
     fun apiExternal(): Docket {
         return Docket(DocumentationType.OAS_30)
             .select()
-            .apis(RequestHandlerSelectors.basePackage(ExternalApiController::class.java.packageName))
+            .paths(regex(".*api.*"))
             .build()
-            .pathMapping("/api")
             .groupName("external")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(Tag("kabal-api-external", "eksternt api for Kabal"))
@@ -31,7 +31,6 @@ class OpenApiConfig {
             .select()
             .apis(RequestHandlerSelectors.basePackage(KlagebehandlingDetaljerController::class.java.packageName))
             .build()
-            .pathMapping("/")
             .groupName("internal")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(Tag("kabal-api", "api for saksbehandlere ved klageinstansen"))
