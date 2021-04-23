@@ -12,18 +12,12 @@ import javax.validation.constraints.Past
 @ApiModel
 data class OversendtKlage(
     @ApiModelProperty(
-        name = "tema",
-        notes = "Tema for klage, gyldige verdier finnes i https://kodeverk-web.nais.adeo.no/kodeverksoversikt/kodeverk/Tema",
         required = true,
-        dataType = "String",
         example = "OMS"
     )
     val tema: Tema,
     @ApiModelProperty(
-        name = "type",
-        notes = "Type klage",
         required = true,
-        dataType = "String",
         example = "KLAGE"
     )
     val type: Type,
@@ -104,7 +98,15 @@ data class OversendtSakenGjelder(
 }
 
 data class OversendtKlager(
+    @ApiModelProperty(
+        required = true
+    )
     val id: OversendtPartId,
+    @ApiModelProperty(
+        name = "klagersProsessfullmektig",
+        notes = "Kan settes dersom klager har en prosessfullmektig",
+        required = false
+    )
     val klagersProsessfullmektig: OversendtProsessfullmektig? = null
 ) {
     fun toKlagepart() = Klager(
@@ -114,7 +116,14 @@ data class OversendtKlager(
 }
 
 data class OversendtProsessfullmektig(
+    @ApiModelProperty(
+        required = true
+    )
     val id: OversendtPartId,
+    @ApiModelProperty(
+        required = true,
+        example = "true"
+    )
     val skalKlagerMottaKopi: Boolean
 ) {
     fun toProsessfullmektig() = Prosessfullmektig(
@@ -124,7 +133,15 @@ data class OversendtProsessfullmektig(
 }
 
 data class OversendtPartId(
+    @ApiModelProperty(
+        required = true,
+        example = "PERSON / VIRKSOMHET"
+    )
     val type: PartIdType,
+    @ApiModelProperty(
+        required = true,
+        example = "12345678910"
+    )
     val verdi: String
 ) {
     fun toPartId() = PartId(
@@ -134,6 +151,10 @@ data class OversendtPartId(
 }
 
 data class OversendtDokumentReferanse(
+    @ApiModelProperty(
+        required = true,
+        example = "BRUKERS_KLAGE"
+    )
     val type: MottakDokumentType,
     val journalpostId: String
 ) {
