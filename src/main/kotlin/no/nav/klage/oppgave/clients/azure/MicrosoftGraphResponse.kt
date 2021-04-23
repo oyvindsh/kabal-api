@@ -13,7 +13,7 @@ data class MicrosoftGraphNameResponse(val value: List<Value>?) {
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class MicrosoftGraphUsersResponse(val value: List<Value>?) {
     @JsonIgnoreProperties(ignoreUnknown = true)
-    data class Value(val userPrincipalName: String)
+    data class Value(val id: String, val displayName: String?, val userPrincipalName: String?)
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

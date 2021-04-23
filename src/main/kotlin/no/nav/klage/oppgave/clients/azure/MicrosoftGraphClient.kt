@@ -84,7 +84,7 @@ class MicrosoftGraphClient(
     fun getRoller(ident: String): List<String> {
         return try {
             val idents = listOf<String>(ident).joinToString(separator = "','", prefix = "('", postfix = "')")
-            val userPrincipalName =
+            val user =
                 microsoftGraphWebClient.get()
                     .uri { uriBuilder ->
                         uriBuilder
@@ -95,13 +95,15 @@ class MicrosoftGraphClient(
                     }
                     .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
                     .retrieve()
-                    .bodyToMono<MicrosoftGraphUsersResponse>().block().value!!.first().userPrincipalName
+                    .bodyToMono<MicrosoftGraphUsersResponse>().block().value!!.first()
+            logger.debug("Retrieved user {}", user)
 
+            val userPrincipalName = user.userPrincipalName
             val aadGroups: List<Group> = microsoftGraphWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder
                         .path("/users/{userPrincipalName}/memberOf")
-                        .build("userPrincipalName" to userPrincipalName)
+                        .build(userPrincipalName)
                 }
                 .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
                 .retrieve()
