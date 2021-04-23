@@ -4,8 +4,8 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.domain.klage.PartIdType
-import no.nav.klage.oppgave.domain.kodeverk.Sakstype
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
@@ -54,7 +54,7 @@ class MockDataController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = listOf(Tema.OMS, Tema.SYK, Tema.FOR, Tema.AAP).shuffled().first(),
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -92,7 +92,7 @@ class MockDataController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.FOR,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -130,7 +130,7 @@ class MockDataController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -168,7 +168,7 @@ class MockDataController(
             OversendtKlage(
                 uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Sakstype.KLAGE,
+                sakstype = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr),
                     klagersProsessfullmektig = OversendtProsessfullmektig(
