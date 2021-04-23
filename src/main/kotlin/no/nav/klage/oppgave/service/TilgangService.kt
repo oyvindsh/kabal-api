@@ -29,27 +29,22 @@ class TilgangService(
 
     fun harSaksbehandlerTilgangTil(fnr: String): Boolean {
         val personInfo = pdlFacade.getPersonInfo(fnr)
-        if (personInfo == null) {
-            //TODO: Hva defaulter vi til? Velger å ikke deny nå, så får vi se..
-            securelogger.error("PDL didnt return anything for fnr $fnr, we default to give access")
-        } else {
-            if (personInfo.harBeskyttelsesbehovFortrolig()) {
-                securelogger.info("erFortrolig")
-                if (innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
-                    securelogger.info("Access granted to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                } else {
-                    securelogger.info("Access denied to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                    return false
-                }
+        if (personInfo.harBeskyttelsesbehovFortrolig()) {
+            securelogger.info("erFortrolig")
+            if (innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
+                securelogger.info("Access granted to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
+            } else {
+                securelogger.info("Access denied to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
+                return false
             }
-            if (personInfo.harBeskyttelsesbehovStrengtFortrolig()) {
-                securelogger.info("erStrengtFortrolig")
-                if (innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
-                    securelogger.info("Access granted to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                } else {
-                    securelogger.info("Access denied to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                    return false
-                }
+        }
+        if (personInfo.harBeskyttelsesbehovStrengtFortrolig()) {
+            securelogger.info("erStrengtFortrolig")
+            if (innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
+                securelogger.info("Access granted to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
+            } else {
+                securelogger.info("Access denied to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
+                return false
             }
         }
         if (egenAnsattService.erEgenAnsatt(fnr)) {

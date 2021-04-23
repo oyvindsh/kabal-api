@@ -95,7 +95,7 @@ class KlagebehandlingMapper(
     fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
         val enhetNavn = klagebehandling.avsenderEnhetFoersteinstans?.let { norg2Client.fetchEnhet(it) }?.navn
         val sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId)
-        val sakenGjelder = sakenGjelderFoedselsnummer?.let { pdlFacade.getPersonInfo(sakenGjelderFoedselsnummer) }
+        val sakenGjelder = sakenGjelderFoedselsnummer?.let { pdlFacade.getPersonInfo(it) }
 
         return KlagebehandlingDetaljerView(
             id = klagebehandling.id,
