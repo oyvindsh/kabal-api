@@ -304,7 +304,8 @@ class KlagebehandlingService(
                 kvalitetsvurdering = null,
                 hjemler = mottak.hjemmelListe.mapNotNull { mapMottakHjemmel(it) }.toMutableSet(),
                 saksdokumenter = createSaksdokumenter(mottak),
-                kilde = mottak.kilde
+                kilde = mottak.kilde,
+                kommentarFraFoersteinstans = mottak.kommentar
             )
         )
         logger.debug("Created behandling ${klagebehandling.id} for mottak ${mottak.id}")

@@ -130,7 +130,8 @@ class KlagebehandlingMapper(
             sendTilbakemelding = klagebehandling.kvalitetsvurdering?.sendTilbakemelding,
             tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding,
             klagebehandlingVersjon = klagebehandling.versjon,
-            vedtak = klagebehandling.vedtak.map { mapVedtakToVedtakView(it) }
+            vedtak = klagebehandling.vedtak.map { mapVedtakToVedtakView(it) },
+            kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans
         )
     }
 

@@ -78,7 +78,9 @@ class Klagebehandling(
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kilde")
-    val kilde: String
+    val kilde: String,
+    @Column(name = "kommentar_fra_foersteinstans")
+    val kommentarFraFoersteinstans: String? = null,
 ) {
 
     override fun toString(): String {
