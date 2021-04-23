@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
-@Api(tags = ["kabal-api"])
+@Api(tags = ["kabal-api-external"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 @RequestMapping("api")
 class ExternalApiController(
