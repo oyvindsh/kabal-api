@@ -21,22 +21,68 @@ data class OversendtKlage(
         example = "KLAGE"
     )
     val type: Type,
+    @ApiModelProperty(
+        required = true
+    )
     val klager: OversendtKlager,
+    @ApiModelProperty(
+        notes = "Kan settes dersom klagen gjelder en annen enn den som har levert klagen",
+        required = false
+    )
     val sakenGjelder: OversendtSakenGjelder? = null,
+    @ApiModelProperty(
+        notes = "Saksnummer brukt til journalføring. Vi oppretter sak dersom denne er tom",
+        required = false
+    )
     val sakReferanse: String? = null,
+    @ApiModelProperty(
+        notes = "Id som er intern for kildesystemet så vedtak fra oss knyttes riktig i kilde",
+        required = true
+    )
     val kildeReferanse: String,
+    @ApiModelProperty(
+        notes = "Id som rapporters på til DVH, bruker kildeReferanse hvis denne ikke er satt",
+        required = false
+    )
     val dvhReferanse: String? = null,
+    @ApiModelProperty(
+        notes = "Url tilbake til kildesystem for innsyn i sak",
+        required = false,
+        example = "https://k9-sak.adeo.no/behandling/12345678"
+    )
     val innsynUrl: String?,
+    @ApiModelProperty(
+        notes = "Hjemler knyttet til klagen",
+        required = true
+    )
     val hjemler: List<HjemmelFraFoersteInstans>,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
+    @ApiModelProperty(
+        notes = "Kan settes dersom klagen skal til en spesifikk klageinstans",
+        required = false,
+        example = "4219"
+    )
     val oversendtEnhet: String? = null,
+    @ApiModelProperty(
+        notes = "Liste med relevante journalposter til klagen. Liste kan være tom.",
+        required = true
+    )
     val tilknyttedeJournalposter: List<OversendtDokumentReferanse>,
     @field:Past(message = "Dato for mottatt førsteinstans må være i fortiden")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val mottattFoersteinstans: LocalDate,
     val innsendtTilNav: LocalDate,
+    @ApiModelProperty(
+        notes = "Kan settes dersom førsteinstans ønsker å overstyre frist",
+        required = false
+    )
     val frist: LocalDate? = null,
+    @ApiModelProperty(
+        notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
+        required = true,
+        example = "K9-sak"
+    )
     val kilde: String
 ) {
     fun toMottak() = Mottak(
@@ -62,9 +108,20 @@ data class OversendtKlage(
 }
 
 class HjemmelFraFoersteInstans private constructor(
+    @ApiModelProperty(
+        required = false,
+        example = "9"
+    )
     val kapittel: Int?,
+    @ApiModelProperty(
+        required = false,
+        example = "1"
+    )
     val paragraf: Int?,
-    val lov: Lov,
+    @ApiModelProperty(
+        required = true
+    )
+    val lov: Lov
 ) {
     constructor(lov: Lov) : this(null, null, lov)
     constructor(lov: Lov, kapittel: Int) : this(kapittel, null, lov)
@@ -88,7 +145,14 @@ enum class Lov {
 }
 
 data class OversendtSakenGjelder(
+    @ApiModelProperty(
+        required = true
+    )
     val id: OversendtPartId,
+    @ApiModelProperty(
+        required = true,
+        example = "true"
+    )
     val skalMottaKopi: Boolean
 ) {
     fun toSakenGjelder() = SakenGjelder(
@@ -156,6 +220,10 @@ data class OversendtDokumentReferanse(
         example = "BRUKERS_KLAGE"
     )
     val type: MottakDokumentType,
+    @ApiModelProperty(
+        required = true,
+        example = "830498203"
+    )
     val journalpostId: String
 ) {
     fun toMottakDokument() = MottakDokument(
