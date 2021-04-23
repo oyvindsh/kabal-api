@@ -52,9 +52,8 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                uuid = UUID.randomUUID(),
                 tema = listOf(Tema.OMS, Tema.SYK, Tema.FOR, Tema.AAP).shuffled().first(),
-                sakstype = Type.KLAGE,
+                type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -90,9 +89,8 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                uuid = UUID.randomUUID(),
                 tema = Tema.FOR,
-                sakstype = Type.KLAGE,
+                type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -128,9 +126,8 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Type.KLAGE,
+                type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
@@ -166,9 +163,8 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                uuid = UUID.randomUUID(),
                 tema = Tema.SYK,
-                sakstype = Type.KLAGE,
+                type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr),
                     klagersProsessfullmektig = OversendtProsessfullmektig(

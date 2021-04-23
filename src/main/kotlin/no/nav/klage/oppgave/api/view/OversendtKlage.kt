@@ -1,23 +1,38 @@
 package no.nav.klage.oppgave.api.view
 
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
-import java.util.*
 import javax.validation.constraints.Past
 
+@ApiModel
 data class OversendtKlage(
-    val uuid: UUID,
+    @ApiModelProperty(
+        name = "tema",
+        notes = "Tema for klage, gyldige verdier finnes i https://kodeverk-web.nais.adeo.no/kodeverksoversikt/kodeverk/Tema",
+        required = true,
+        dataType = "String",
+        example = "OMS"
+    )
     val tema: Tema,
-    val sakstype: Type,
+    @ApiModelProperty(
+        name = "type",
+        notes = "Type klage",
+        required = true,
+        dataType = "String",
+        example = "KLAGE"
+    )
+    val type: Type,
     val klager: OversendtKlager,
     val sakenGjelder: OversendtSakenGjelder? = null,
     val sakReferanse: String? = null,
     val kildeReferanse: String,
     val dvhReferanse: String? = null,
-    val innsynUrl: String,
+    val innsynUrl: String?,
     val hjemler: List<HjemmelFraFoersteInstans>,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
@@ -31,9 +46,8 @@ data class OversendtKlage(
     val kilde: String
 ) {
     fun toMottak() = Mottak(
-        id = uuid,
         tema = tema,
-        type = sakstype,
+        type = type,
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,

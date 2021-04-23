@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
+import io.swagger.annotations.ApiModel
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
+@ApiModel
 enum class Type(override val id: Int, override val navn: String, override val beskrivelse: String) : Kode {
 
     KLAGE(1, "Klage", "Klage"),

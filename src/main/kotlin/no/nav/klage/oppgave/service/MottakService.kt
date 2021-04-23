@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
 import no.nav.klage.oppgave.events.MottakLagretEvent
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
-import no.nav.klage.oppgave.exceptions.OversendtKlageReceivedBeforeException
 import no.nav.klage.oppgave.repositories.EnhetRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -38,10 +37,6 @@ class MottakService(
     }
 
     fun OversendtKlage.validate() {
-        if (mottakRepository.existsById(uuid)) {
-            logger.warn("We have received oversendtKlage with uuid {} before", uuid)
-            throw OversendtKlageReceivedBeforeException("Oversendt klage med uuid $uuid er et duplikat av tidligere oversendt klage, avbryter mottak")
-        }
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
 
         validateEnhet(avsenderEnhet)
