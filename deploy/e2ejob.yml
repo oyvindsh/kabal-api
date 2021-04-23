@@ -18,10 +18,7 @@ spec:
       serviceAccount: default
       serviceAccountName: default
       containers:
-        - command:
-            - sh
-            - tests.sh
-          image: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:latest
+        - image: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:latest
           imagePullPolicy: IfNotPresent
           name: klage-oppgave-e2e
       dnsPolicy: ClusterFirst

@@ -1,39 +1,93 @@
 package no.nav.klage.oppgave.api.view
 
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
-import java.util.*
 import javax.validation.constraints.Past
 
+@ApiModel
 data class OversendtKlage(
-    val uuid: UUID,
+    @ApiModelProperty(
+        required = true,
+        example = "OMS"
+    )
     val tema: Tema,
-    val sakstype: Type,
+    @ApiModelProperty(
+        required = true,
+        example = "KLAGE"
+    )
+    val type: Type,
+    @ApiModelProperty(
+        required = true
+    )
     val klager: OversendtKlager,
+    @ApiModelProperty(
+        notes = "Kan settes dersom klagen gjelder en annen enn den som har levert klagen",
+        required = false
+    )
     val sakenGjelder: OversendtSakenGjelder? = null,
+    @ApiModelProperty(
+        notes = "Saksnummer brukt til journalføring. Vi oppretter sak dersom denne er tom",
+        required = false
+    )
     val sakReferanse: String? = null,
+    @ApiModelProperty(
+        notes = "Id som er intern for kildesystemet så vedtak fra oss knyttes riktig i kilde",
+        required = true
+    )
     val kildeReferanse: String,
+    @ApiModelProperty(
+        notes = "Id som rapporters på til DVH, bruker kildeReferanse hvis denne ikke er satt",
+        required = false
+    )
     val dvhReferanse: String? = null,
-    val innsynUrl: String,
+    @ApiModelProperty(
+        notes = "Url tilbake til kildesystem for innsyn i sak",
+        required = false,
+        example = "https://k9-sak.adeo.no/behandling/12345678"
+    )
+    val innsynUrl: String?,
+    @ApiModelProperty(
+        notes = "Hjemler knyttet til klagen",
+        required = true
+    )
     val hjemler: List<HjemmelFraFoersteInstans>,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
+    @ApiModelProperty(
+        notes = "Kan settes dersom klagen skal til en spesifikk klageinstans",
+        required = false,
+        example = "4219"
+    )
     val oversendtEnhet: String? = null,
+    @ApiModelProperty(
+        notes = "Liste med relevante journalposter til klagen. Liste kan være tom.",
+        required = true
+    )
     val tilknyttedeJournalposter: List<OversendtDokumentReferanse>,
     @field:Past(message = "Dato for mottatt førsteinstans må være i fortiden")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val mottattFoersteinstans: LocalDate,
     val innsendtTilNav: LocalDate,
+    @ApiModelProperty(
+        notes = "Kan settes dersom førsteinstans ønsker å overstyre frist",
+        required = false
+    )
     val frist: LocalDate? = null,
+    @ApiModelProperty(
+        notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
+        required = true,
+        example = "K9-sak"
+    )
     val kilde: String
 ) {
     fun toMottak() = Mottak(
-        id = uuid,
         tema = tema,
-        type = sakstype,
+        type = type,
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,
@@ -54,9 +108,20 @@ data class OversendtKlage(
 }
 
 class HjemmelFraFoersteInstans private constructor(
+    @ApiModelProperty(
+        required = false,
+        example = "9"
+    )
     val kapittel: Int?,
+    @ApiModelProperty(
+        required = false,
+        example = "1"
+    )
     val paragraf: Int?,
-    val lov: Lov,
+    @ApiModelProperty(
+        required = true
+    )
+    val lov: Lov
 ) {
     constructor(lov: Lov) : this(null, null, lov)
     constructor(lov: Lov, kapittel: Int) : this(kapittel, null, lov)
@@ -80,7 +145,14 @@ enum class Lov {
 }
 
 data class OversendtSakenGjelder(
+    @ApiModelProperty(
+        required = true
+    )
     val id: OversendtPartId,
+    @ApiModelProperty(
+        required = true,
+        example = "true"
+    )
     val skalMottaKopi: Boolean
 ) {
     fun toSakenGjelder() = SakenGjelder(
@@ -90,7 +162,15 @@ data class OversendtSakenGjelder(
 }
 
 data class OversendtKlager(
+    @ApiModelProperty(
+        required = true
+    )
     val id: OversendtPartId,
+    @ApiModelProperty(
+        name = "klagersProsessfullmektig",
+        notes = "Kan settes dersom klager har en prosessfullmektig",
+        required = false
+    )
     val klagersProsessfullmektig: OversendtProsessfullmektig? = null
 ) {
     fun toKlagepart() = Klager(
@@ -100,7 +180,14 @@ data class OversendtKlager(
 }
 
 data class OversendtProsessfullmektig(
+    @ApiModelProperty(
+        required = true
+    )
     val id: OversendtPartId,
+    @ApiModelProperty(
+        required = true,
+        example = "true"
+    )
     val skalKlagerMottaKopi: Boolean
 ) {
     fun toProsessfullmektig() = Prosessfullmektig(
@@ -110,7 +197,15 @@ data class OversendtProsessfullmektig(
 }
 
 data class OversendtPartId(
+    @ApiModelProperty(
+        required = true,
+        example = "PERSON / VIRKSOMHET"
+    )
     val type: PartIdType,
+    @ApiModelProperty(
+        required = true,
+        example = "12345678910"
+    )
     val verdi: String
 ) {
     fun toPartId() = PartId(
@@ -120,7 +215,15 @@ data class OversendtPartId(
 }
 
 data class OversendtDokumentReferanse(
+    @ApiModelProperty(
+        required = true,
+        example = "BRUKERS_KLAGE"
+    )
     val type: MottakDokumentType,
+    @ApiModelProperty(
+        required = true,
+        example = "830498203"
+    )
     val journalpostId: String
 ) {
     fun toMottakDokument() = MottakDokument(

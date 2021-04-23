@@ -4,6 +4,7 @@ package no.nav.klage.oppgave.api.mapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
+import no.nav.klage.oppgave.api.view.VedtakView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -11,6 +12,7 @@ import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.klage.PartIdType
+import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -95,7 +97,7 @@ class KlagebehandlingMapper(
     fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
         val enhetNavn = klagebehandling.avsenderEnhetFoersteinstans?.let { norg2Client.fetchEnhet(it) }?.navn
         val sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId)
-        val sakenGjelder = sakenGjelderFoedselsnummer?.let { pdlFacade.getPersonInfo(sakenGjelderFoedselsnummer) }
+        val sakenGjelder = sakenGjelderFoedselsnummer?.let { pdlFacade.getPersonInfo(it) }
 
         return KlagebehandlingDetaljerView(
             id = klagebehandling.id,
@@ -127,11 +129,20 @@ class KlagebehandlingMapper(
             internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
             sendTilbakemelding = klagebehandling.kvalitetsvurdering?.sendTilbakemelding,
             tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding,
-            klagebehandlingVersjon = klagebehandling.versjon
+            klagebehandlingVersjon = klagebehandling.versjon,
+            vedtak = klagebehandling.vedtak.map { mapVedtakToVedtakView(it) }
         )
     }
 
     private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<Int> = hjemler.map { it.id }
+
+    fun mapVedtakToVedtakView(vedtak: Vedtak): VedtakView =
+        VedtakView(
+            id = vedtak.id,
+            utfall = vedtak.utfall,
+            hjemler = vedtak.hjemler,
+            brevMottakere = vedtak.brevmottakere
+        )
 
 
     fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {

@@ -42,26 +42,22 @@ class PdlFacade(
         newPersoner.forEach { personCacheService.updatePersonCache(it) }
     }
 
-    fun getPersonInfo(fnr: String): Person? {
+    fun getPersonInfo(fnr: String): Person {
         if (personCacheService.isCached(fnr)) {
             return personCacheService.getPerson(fnr)
         }
         val hentPersonResponse: HentPersonResponse = pdlClient.getPersonInfo(fnr)
         val pdlPerson = hentPersonResponse.getPersonOrLogErrors(fnr)
-        return pdlPerson?.let {
-            val person = hentPersonMapper.mapToPerson(fnr, it)
-            personCacheService.updatePersonCache(person)
-            person
-        }
+        return hentPersonMapper.mapToPerson(fnr, pdlPerson).also { personCacheService.updatePersonCache(it) }
     }
 
-    private fun HentPersonResponse.getPersonOrLogErrors(fnr: String): PdlPerson? =
-        if (this.errors.isNullOrEmpty()) {
-            this.data?.hentPerson
+    private fun HentPersonResponse.getPersonOrLogErrors(fnr: String): PdlPerson =
+        if (this.errors.isNullOrEmpty() && this.data != null && this.data.hentPerson != null) {
+            this.data.hentPerson
         } else {
-            logger.warn("Errors returned from PDL. See securelogs for details.")
+            logger.warn("Errors returned from PDL or person not found. See securelogs for details.")
             secureLogger.warn("Errors returned for hentPerson($fnr) from PDL: ${this.errors}")
-            null
+            throw RuntimeException("Klarte ikke å hente person fra PDL")
         }
 
     private fun HentPersonerResponse.getHentPersonBolkAndLogErrors(): List<HentPersonBolkResult> {
