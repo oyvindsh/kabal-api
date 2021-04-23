@@ -17,8 +17,8 @@ import javax.validation.Valid
 @RestController
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
-@RequestMapping("oversendelse")
-class OversendelseController(
+@RequestMapping("api")
+class ExternalApiController(
     private val mottakService: MottakService
 ) {
 
@@ -31,8 +31,8 @@ class OversendelseController(
         value = "Send inn klage til klageinstans",
         notes = "Endepunkt for å registrere en klage/anke som skal behandles av klageinstans"
     )
-    @PostMapping("/klage")
-    fun sendInnKlage(
+    @PostMapping("/oversendelse/v1/klage")
+    fun sendInnKlageV1(
         @ApiParam(value = "Oversendt klage")
         @Valid @RequestBody oversendtKlage: OversendtKlage
     ) {

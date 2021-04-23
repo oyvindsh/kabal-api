@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config
 
+import no.nav.klage.oppgave.api.controller.ExternalApiController
 import no.nav.klage.oppgave.api.controller.KlagebehandlingDetaljerController
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,12 +14,25 @@ import springfox.documentation.spring.web.plugins.Docket
 class OpenApiConfig {
 
     @Bean
-    fun api(): Docket {
+    fun apiExternal(): Docket {
+        return Docket(DocumentationType.OAS_30)
+            .select()
+            .apis(RequestHandlerSelectors.basePackage(ExternalApiController::class.java.packageName))
+            .build()
+            .pathMapping("/api")
+            .groupName("external")
+            .genericModelSubstitutes(ResponseEntity::class.java)
+            .tags(Tag("kabal-api-external", "eksternt api for Kabal"))
+    }
+
+    @Bean
+    fun apiInternal(): Docket {
         return Docket(DocumentationType.OAS_30)
             .select()
             .apis(RequestHandlerSelectors.basePackage(KlagebehandlingDetaljerController::class.java.packageName))
             .build()
             .pathMapping("/")
+            .groupName("internal")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(Tag("kabal-api", "api for saksbehandlere ved klageinstansen"))
     }
