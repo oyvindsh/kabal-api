@@ -7,13 +7,22 @@ import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import kotlin.system.measureTimeMillis
 
 @Service
 class SaksbehandlerRepository(
     private val client: MicrosoftGraphClient,
-    private val axsysClient: AxsysClient
+    private val axsysClient: AxsysClient,
+    @Value("\${ROLE_GOSYS_OPPGAVE_BEHANDLER}") private val gosysSaksbehandlerRole: String,
+    @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
+    @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
+    @Value("\${ROLE_KLAGE_LEDER}") private val lederRole: String,
+    @Value("\${ROLE_KLAGE_MERKANTIL}") private val merkantilRole: String,
+    @Value("\${ROLE_KLAGE_FORTROLIG}") private val kanBehandleFortroligRole: String,
+    @Value("\${ROLE_KLAGE_STRENGT_FORTROLIG}") private val kanBehandleStrengtFortroligRole: String,
+    @Value("\${ROLE_KLAGE_EGEN_ANSATT}") private val kanBehandleEgenAnsattRole: String
 ) {
 
     companion object {
@@ -21,15 +30,6 @@ class SaksbehandlerRepository(
         private val logger = getLogger(javaClass.enclosingClass)
 
         val saksbehandlerNameCache = mutableMapOf<String, String>()
-
-        const val ROLE_ONPREM_GOSYS_OPPGAVE_BEHANDLER = "0000-GA-GOSYS_OPPGAVE_BEHANDLER"
-        const val ROLE_ONPREM_KLAGE_SAKSBEHANDLER = "0000-GA-KLAGE_SAKSBEHANDLER"
-        const val ROLE_ONPREM_KLAGE_FAGANSVARLIG = "0000-GA-KLAGE_FAGANSVARLIG"
-        const val ROLE_ONPREM_KLAGE_LEDER = "0000-GA-KLAGE_LEDER"
-        const val ROLE_ONPREM_KLAGE_MERKANTIL = "0000-GA-KLAGE_MERKANTIL"
-        const val ROLE_ONPREM_KLAGE_FORTROLIG = "0000-GA-KLAGE_FORTROLIG"
-        const val ROLE_ONPREM_KLAGE_STRENGT_FORTROLIG = "0000-GA-KLAGE_STRENGT_FORTROLIG"
-        const val ROLE_ONPREM_KLAGE_EGEN_ANSATT = "0000-GA-GOSYS-EGEN_ANSATT"
 
         const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
@@ -54,22 +54,22 @@ class SaksbehandlerRepository(
         return saksbehandlerNameCache
     }
 
-    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_FAGANSVARLIG)
+    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).hasRole(fagansvarligRole)
 
-    fun erLeder(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_LEDER)
+    fun erLeder(ident: String): Boolean = getRoller(ident).hasRole(lederRole)
 
     fun erSaksbehandler(ident: String): Boolean =
-        getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_SAKSBEHANDLER)
-                || getRoller(ident).hasRole(ROLE_ONPREM_GOSYS_OPPGAVE_BEHANDLER)
+        getRoller(ident).hasRole(saksbehandlerRole)
+                || getRoller(ident).hasRole(gosysSaksbehandlerRole)
 
-    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_FORTROLIG)
+    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleFortroligRole)
 
     fun kanBehandleStrengtFortrolig(ident: String): Boolean =
-        getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_STRENGT_FORTROLIG)
+        getRoller(ident).hasRole(kanBehandleStrengtFortroligRole)
 
-    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(ROLE_ONPREM_KLAGE_EGEN_ANSATT)
+    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleEgenAnsattRole)
 
-    private fun getRoller(ident: String): List<String> = TODO("Hente roller fra Azure AD på ikke-innlogget bruker")
+    private fun getRoller(ident: String): List<String> = client.getRoller(ident)
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 
