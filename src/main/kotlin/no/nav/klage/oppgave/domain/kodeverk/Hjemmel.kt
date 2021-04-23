@@ -12,6 +12,7 @@ enum class Hjemmel(
 ) : Kode {
 
     FTL(1000, LovKilde.FOLKETRYGDLOVEN, null, "FTL", "Folketrygdloven"),
+    G_FTL(1001, LovKilde.FOLKETRYGDLOVEN, null, "Gammel FTL", "Gammel versjon av Folketrygdloven"),
 
     //id = lov+kapittel+paragraf. FTL = 1000, kapittel=008, paragraf = 02
     FTL_8_2(100000802, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(8, 2), "FTL 8-2", "Folketrygdloven §8-2"),
@@ -40,8 +41,55 @@ enum class Hjemmel(
     FTL_8_49(100000849, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(8, 49), "FTL 8-49", "Folketrygdloven §8-49"),
     FTL_22_3(100000849, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(22, 3), "FTL 22-3", "Folketrygdloven §22-3"),
     FTL_22_12(100000849, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(22, 12), "FTL 22-12", "Folketrygdloven §22-12"),
-    FTL_9(1000009, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9), "FTL 9", "Folketrygdloven §9"),
-    FTL_9_1(100000901, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 1), "FTL 9-1", "Folketrygdloven §9-1"),
+    FTL_9(1000009, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9), "FTL 9", "Folketrygdloven kapittel 9"),
+    FTL_9_2(100000902, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 2), "FTL 9-2", "Folketrygdloven §9-2"),
+    FTL_9_3(100000903, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 3), "FTL 9-3", "Folketrygdloven §9-3"),
+    FTL_9_5(100000905, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 5), "FTL 9-5", "Folketrygdloven §9-5"),
+    FTL_9_6(100000906, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 6), "FTL 9-6", "Folketrygdloven §9-6"),
+    FTL_9_10(100000910, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 10), "FTL 9-10", "Folketrygdloven §9-10"),
+    FTL_9_11(100000911, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 11), "FTL 9-11", "Folketrygdloven §9-11"),
+    FTL_9_12(100000912, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 12), "FTL 9-12", "Folketrygdloven §9-12"),
+    FTL_9_13(100000913, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 13), "FTL 9-13", "Folketrygdloven §9-13"),
+    FTL_9_14(100000914, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 14), "FTL 9-14", "Folketrygdloven §9-14"),
+    FTL_9_15(100000915, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 15), "FTL 9-15", "Folketrygdloven §9-15"),
+    FTL_9_16(100000916, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 16), "FTL 9-16", "Folketrygdloven §9-16"),
+    G_FTL_9(
+        1000009,
+        LovKilde.FOLKETRYGDLOVEN,
+        KapittelOgParagraf(9),
+        "FTL G9",
+        "Gammel versjon av Folketrygdloven kapittel 9"
+    ),
+    G_FTL_9_10(
+        100100910,
+        LovKilde.FOLKETRYGDLOVEN,
+        KapittelOgParagraf(9, 10),
+        "FTL G9-10",
+        "Gammel versjon av Folketrygdloven §9-10"
+    ),
+    G_FTL_9_11(
+        100100911,
+        LovKilde.FOLKETRYGDLOVEN,
+        KapittelOgParagraf(9, 11),
+        "FTL G9-11",
+        "Gammel versjon av Folketrygdloven §9-11"
+    ),
+
+    //G_FTL_9_11_A(100100911, LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 11), "FTL 9-11a", "Gammel versjon av Folketrygdloven §9-11 a"),
+    G_FTL_9_14(
+        100100914,
+        LovKilde.FOLKETRYGDLOVEN,
+        KapittelOgParagraf(9, 14),
+        "FTL G9-14",
+        "Gammel versjon av Folketrygdloven §9-14"
+    ),
+    G_FTL_9_16(
+        100100916,
+        LovKilde.FOLKETRYGDLOVEN,
+        KapittelOgParagraf(9, 16),
+        "FTL G9-16",
+        "Gammel versjon av Folketrygdloven §9-16"
+    ),
     ;
 
     fun toSearchableString(): String {
