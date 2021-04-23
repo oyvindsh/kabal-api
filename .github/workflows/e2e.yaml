@@ -18,9 +18,9 @@ jobs:
         uses: nais/deploy/actions/deploy@master
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
-          IMAGE: docker.pkg.github.com/navikt/klage-oppgave-e2e/klage-oppgave-e2e:latest
+          IMAGE: docker.pkg.github.com/navikt/kabal-e2e-tests/kabal-e2e-tests:latest
           CLUSTER: dev-gcp
-          VAR: app=klage-oppgave,jobname=klage-job-${{ steps.generate-uuid.outputs.uuid }}
+          VAR: app=kabal,jobname=klage-job-${{ steps.generate-uuid.outputs.uuid }}
           TEAM: klage
           RESOURCE: deploy/e2ejob.yml
         timeout-minutes: 5
