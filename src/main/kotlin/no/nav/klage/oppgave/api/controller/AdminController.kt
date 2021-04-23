@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
@@ -8,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class AdminController(private val adminService: AdminService, private val microsoftGraphClient: MicrosoftGraphClient) {
+class AdminController(private val adminService: AdminService) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -29,13 +28,6 @@ class AdminController(private val adminService: AdminService, private val micros
         }
 
         return ElasticAdminResponse("ok")
-    }
-
-    @Unprotected
-    @GetMapping("/internal/testAad", produces = ["application/json"])
-    fun slaaOppSaksbehandlersGrupperIAzure(): List<String> {
-        val roller = microsoftGraphClient.getRoller("Z994488")
-        return roller
     }
 }
 
