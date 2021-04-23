@@ -337,7 +337,7 @@ object KlagebehandlingAggregatFunctions {
         vedtakId: UUID,
         nyVerdi: Utfall,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent? {
+    ): KlagebehandlingEndretEvent {
         val vedtak = getVedtakFromKlagebehandling(this, vedtakId)
         val gammelVerdi = vedtak.utfall
         val tidspunkt = LocalDateTime.now()

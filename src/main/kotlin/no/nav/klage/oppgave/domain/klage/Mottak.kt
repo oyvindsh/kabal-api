@@ -63,6 +63,8 @@ class Mottak(
     val modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kilde")
     val kilde: String,
+    @Column(name = "kommentar")
+    val kommentar: String? = null,
 ) {
 
     override fun toString(): String {
