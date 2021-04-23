@@ -8,10 +8,7 @@ import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
@@ -37,5 +34,17 @@ class ExternalApiController(
         @Valid @RequestBody oversendtKlage: OversendtKlage
     ) {
         mottakService.createMottakForKlage(oversendtKlage)
+    }
+
+    @ApiOperation(
+        value = "Hent informasjon om en klagebehandling",
+        notes = "Endepunkt for å se detaljert informasjon om en klagebehandling fra "
+    )
+    @GetMapping("innsyn/v1/behandling/{id}")
+    fun InnsynBehandling(
+        @ApiParam(value = "Id for klagebehandling")
+        @PathVariable("id") nehandlingId: String
+    ): String {
+        return "Not implemented yet"
     }
 }
