@@ -31,7 +31,7 @@ class ExternalApiController(
         value = "Send inn klage til klageinstans",
         notes = "Endepunkt for å registrere en klage/anke som skal behandles av klageinstans"
     )
-    @PostMapping("/oversendelse/v1//klage")
+    @PostMapping("/oversendelse/v1/klage")
     fun sendInnKlageV1(
         @ApiParam(value = "Oversendt klage")
         @Valid @RequestBody oversendtKlage: OversendtKlage
