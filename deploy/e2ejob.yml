@@ -19,7 +19,6 @@ spec:
       serviceAccountName: default
       containers:
         - image: docker.pkg.github.com/navikt/kabal-e2e-tests/kabal-e2e-tests:latest
-          imagePullPolicy: IfNotPresent
           name: klage-oppgave-e2e
       dnsPolicy: ClusterFirst
       restartPolicy: Never
