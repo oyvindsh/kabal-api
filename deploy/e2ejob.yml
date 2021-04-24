@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         job-name: {{jobname}}
-        app: klage-oppgave-e2e
+        app: kabal-e2e-tests
     spec:
       imagePullSecrets:
         - name: gpr-credentials
@@ -19,7 +19,6 @@ spec:
       serviceAccountName: default
       containers:
         - image: docker.pkg.github.com/navikt/kabal-e2e-tests/kabal-e2e-tests:latest
-          imagePullPolicy: IfNotPresent
-          name: klage-oppgave-e2e
+          name: kabal-e2e-tests
       dnsPolicy: ClusterFirst
       restartPolicy: Never
