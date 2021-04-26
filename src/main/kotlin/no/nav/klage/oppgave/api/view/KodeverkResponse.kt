@@ -17,20 +17,8 @@ data class KodeDto(override val id: String, override val navn: String, override 
 
 data class HjemlerPerTema(val temaId: String, val hjemler: List<KodeDto>)
 
-fun List<Kode>.toDto() = map { it.toDto() }
-
 fun Kode.toDto() = KodeDto(id, navn, beskrivelse)
 
-fun hjemlerPerTema(): List<HjemlerPerTema> =
-    listOf(
-        HjemlerPerTema(
-            Tema.OMS.id,
-            Hjemmel.values().filter { it.kapittelOgParagraf != null && it.kapittelOgParagraf.kapittel == 9 }.toDto()
-                    + Hjemmel.FTL.toDto()
-        ),
-        HjemlerPerTema(
-            Tema.SYK.id,
-            Hjemmel.values().filter { it.kapittelOgParagraf != null && it.kapittelOgParagraf.kapittel == 8 }.toDto()
-                    + Hjemmel.FTL.toDto()
-        ),
-    )
+fun List<Kode>.toDto() = map { it.toDto() }
+
+fun hjemlerPerTema(): List<HjemlerPerTema> = hjemlerPerTema.map { HjemlerPerTema(it.tema.id, it.hjemler.toDto()) }
