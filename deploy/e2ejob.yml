@@ -4,7 +4,7 @@ metadata:
   name: {{jobname}}
   namespace: klage
 spec:
-  backoffLimit: 4
+  backoffLimit: 0
   completions: 1
   parallelism: 1
   template:
