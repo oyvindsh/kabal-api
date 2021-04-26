@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.config
 
-import no.nav.klage.oppgave.api.controller.ExternalApiController
 import no.nav.klage.oppgave.api.controller.KlagebehandlingDetaljerController
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
