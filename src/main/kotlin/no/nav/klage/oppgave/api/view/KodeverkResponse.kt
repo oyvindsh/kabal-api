@@ -10,8 +10,15 @@ data class KodeverkResponse(
     val type: List<Kode> = Type.values().asList().toDto(),
     val tema: List<Kode> = Tema.values().asList().toDto(),
     val utfall: List<Kode> = Utfall.values().asList().toDto(),
+    val hjemlerPerTema: List<HjemlerPerTema> = hjemlerPerTema()
 )
 
-data class KodeDto(override val id: Int, override val navn: String, override val beskrivelse: String) : Kode
+data class KodeDto(override val id: String, override val navn: String, override val beskrivelse: String) : Kode
 
-fun List<Kode>.toDto() = map { KodeDto(it.id, it.navn, it.beskrivelse) }
+data class HjemlerPerTema(val temaId: String, val hjemler: List<KodeDto>)
+
+fun Kode.toDto() = KodeDto(id, navn, beskrivelse)
+
+fun List<Kode>.toDto() = map { it.toDto() }
+
+fun hjemlerPerTema(): List<HjemlerPerTema> = hjemlerPerTema.map { HjemlerPerTema(it.tema.id, it.hjemler.toDto()) }

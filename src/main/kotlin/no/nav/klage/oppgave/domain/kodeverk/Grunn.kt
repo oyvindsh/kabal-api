@@ -3,15 +3,15 @@ package no.nav.klage.oppgave.domain.kodeverk
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
-enum class Grunn(override val id: Int, override val navn: String, override val beskrivelse: String) : Kode {
+enum class Grunn(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
 
-    MANGELFULL_UTREDNING(1, "Mangelfull utredning", "Mangelfull utredning"),
-    ANDRE_SAKSBEHANDLINGSFEIL(2, "Andre saksbehandlingsfeil", "Andre saksbehandlingsfeil"),
-    ENDRET_FAKTUM(3, "Endret faktum", "Endret faktum"),
-    FEIL_I_BEVISVURDERINGEN(4, "Feil i bevisvurderingen", "Feil i bevisvurderingen"),
-    FEIL_I_DEN_GENERELLE_LOVTOLKNINGEN(5, "Feil i den generelle lovtolkningen", "Feil i den generelle lovtolkningen"),
+    MANGELFULL_UTREDNING("1", "Mangelfull utredning", "Mangelfull utredning"),
+    ANDRE_SAKSBEHANDLINGSFEIL("2", "Andre saksbehandlingsfeil", "Andre saksbehandlingsfeil"),
+    ENDRET_FAKTUM("3", "Endret faktum", "Endret faktum"),
+    FEIL_I_BEVISVURDERINGEN("4", "Feil i bevisvurderingen", "Feil i bevisvurderingen"),
+    FEIL_I_DEN_GENERELLE_LOVTOLKNINGEN("5", "Feil i den generelle lovtolkningen", "Feil i den generelle lovtolkningen"),
     FEIL_I_DEN_KONKRETE_RETTSANVENDELSEN(
-        6, "Feil i den konkrete rettsanvendelsen", "Feil i den konkrete rettsanvendelsen"
+        "6", "Feil i den konkrete rettsanvendelsen", "Feil i den konkrete rettsanvendelsen"
     );
 
     override fun toString(): String {
@@ -20,7 +20,7 @@ enum class Grunn(override val id: Int, override val navn: String, override val b
     }
 
     companion object {
-        fun of(id: Int): Grunn {
+        fun of(id: String): Grunn {
             return values().firstOrNull { it.id == id }
                 ?: throw IllegalArgumentException("No Grunn with ${id} exists")
         }
@@ -29,11 +29,11 @@ enum class Grunn(override val id: Int, override val navn: String, override val b
 }
 
 @Converter
-class GrunnConverter : AttributeConverter<Grunn, Int?> {
+class GrunnConverter : AttributeConverter<Grunn, String?> {
 
-    override fun convertToDatabaseColumn(entity: Grunn?): Int? =
+    override fun convertToDatabaseColumn(entity: Grunn?): String? =
         entity?.let { it.id }
 
-    override fun convertToEntityAttribute(id: Int?): Grunn? =
+    override fun convertToEntityAttribute(id: String?): Grunn? =
         id?.let { Grunn.of(it) }
 }

@@ -5,10 +5,10 @@ import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
 @ApiModel
-enum class Type(override val id: Int, override val navn: String, override val beskrivelse: String) : Kode {
+enum class Type(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
 
-    KLAGE(1, "Klage", "Klage"),
-    ANKE(2, "Anke", "Anke");
+    KLAGE("1", "Klage", "Klage"),
+    ANKE("2", "Anke", "Anke");
 
     override fun toString(): String {
         return "Type(id=$id, " +
@@ -16,7 +16,7 @@ enum class Type(override val id: Int, override val navn: String, override val be
     }
 
     companion object {
-        fun of(id: Int): Type {
+        fun of(id: String): Type {
             return values().firstOrNull { it.id == id }
                 ?: throw IllegalArgumentException("No Type with ${id} exists")
         }
@@ -29,11 +29,11 @@ enum class Type(override val id: Int, override val navn: String, override val be
 }
 
 @Converter
-class TypeConverter : AttributeConverter<Type, Int?> {
+class TypeConverter : AttributeConverter<Type, String?> {
 
-    override fun convertToDatabaseColumn(entity: Type?): Int? =
+    override fun convertToDatabaseColumn(entity: Type?): String? =
         entity?.let { it.id }
 
-    override fun convertToEntityAttribute(id: Int?): Type? =
+    override fun convertToEntityAttribute(id: String?): Type? =
         id?.let { Type.of(it) }
 }
