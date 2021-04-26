@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.api.view
 
 data class KlagebehandlingerQueryParams(
-    var typer: List<Int> = emptyList(),
-    var temaer: List<Int> = emptyList(),
+    var typer: List<String> = emptyList(),
+    var temaer: List<String> = emptyList(),
     var hjemler: List<String> = emptyList(),
     val rekkefoelge: Rekkefoelge? = Rekkefoelge.STIGENDE,
     val sortering: Sortering? = Sortering.FRIST,
