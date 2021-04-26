@@ -166,7 +166,7 @@ CREATE TABLE klage.klagebehandling
 CREATE TABLE klage.vedtak
 (
     id                 UUID PRIMARY KEY,
-    utfall_id          TEXT                     NOT NULL,
+    utfall_id          TEXT,
     klagebehandling_id UUID                     NOT NULL,
     journalpost_id     TEXT,
     modified           TIMESTAMP WITH TIME ZONE NOT NULL,
