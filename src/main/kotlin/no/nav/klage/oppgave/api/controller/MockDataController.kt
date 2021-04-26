@@ -44,7 +44,7 @@ class MockDataController(
 
         val fnr = dollyDoc.fnr
         val journalpostId = dollyDoc.journalpost
-        val journalpost = safClient.getJournalpost(journalpostId)
+        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val saknr = journalpost?.sak?.fagsakId
 
         val dato = LocalDate.of(2020, (1..12).random(), (1..28).random())
