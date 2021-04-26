@@ -18,28 +18,58 @@ POST <kabal-api-url>/oversendelse/klage <oversendt-klage-json>
 - DEV-url: `https://kabal-api.dev.nav.no`
 - PROD-url: `https://kabal-api.intern.nav.no`
 
-Skjema for oversendt klage kan finnes [her](../schema/oversendt-klage.json).
+Skjema for oversendt klage kan finnes [her](https://kabal-api.dev.nav.no/swagger-ui/?urls.primaryName=external#/).
 
 Eksempel
 ````
 {
-    "uuid": "123e4567-e89b-12d3-a456-426614174000",
-    "tema": "SYK",
-    "eksternReferanse": "1234",
-    "innsynUrl": "https://sykepenger.intern.nav.no/behandling/1234",
-    "foedselsnummer": "12345678910",
-    "beskrivelse": "Enkel eskrivelse",
-    "avsenderSaksbehandlerIdent": "Z123456",
-    "avsenderEnhet": "2334",
-    "hjemler": ["8-4", "8-5"],
-    "mottattFoersteinstans": "2020-01-01",
-    "innsendtTilNav": "2019-12-20",
-    "sakstype": "KLAGE",
-    "oversendtEnhet": "4291",
-    "oversendelsesbrevJournalpostId": "5766798",
-    "brukersKlageJournalpostId": "578654",
-    "frist": "2021-12-12",
-    "kilde": "SPEIL"
+  "avsenderEnhet": "2312",
+  "avsenderSaksbehandlerIdent": "W123456",
+  "dvhReferanse": "687686978",
+  "frist": "2021-04-26",
+  "hjemler": [
+    {
+      "kapittel": 9,
+      "lov": "FOLKETRYGDLOVEN",
+      "paragraf": 1
+    }
+  ],
+  "innsendtTilNav": "2021-04-26",
+  "innsynUrl": "https://k9-sak.adeo.no/behandling/12345678",
+  "kilde": "K9-sak",
+  "kildeReferanse": "687687",
+  "klager": {
+    "id": {
+      "type": "PERSON / VIRKSOMHET",
+      "verdi": "12345678910"
+    },
+    "klagersProsessfullmektig": {
+      "id": {
+        "type": "PERSON / VIRKSOMHET",
+        "verdi": "12345678910"
+      },
+      "skalKlagerMottaKopi": true
+    }
+  },
+  "kommentar": "string",
+  "mottattFoersteinstans": "2021-04-26",
+  "oversendtEnhet": "4219",
+  "sakReferanse": "576585",
+  "sakenGjelder": {
+    "id": {
+      "type": "PERSON",
+      "verdi": "12345678910"
+    },
+    "skalMottaKopi": true
+  },
+  "tema": "OMS",
+  "tilknyttedeJournalposter": [
+    {
+      "journalpostId": "830498203",
+      "type": "BRUKERS_KLAGE"
+    }
+  ],
+  "type": "KLAGE"
 }
 ````
 
