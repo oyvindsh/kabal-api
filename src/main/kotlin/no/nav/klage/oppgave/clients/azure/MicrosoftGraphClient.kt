@@ -80,4 +80,38 @@ class MicrosoftGraphClient(
             Mono.empty()
         }
     }
+
+    @Retryable
+    fun getRoller(ident: String): List<String> {
+        return try {
+            val idents = listOf(ident).joinToString(separator = "','", prefix = "('", postfix = "')")
+            val user =
+                microsoftGraphWebClient.get()
+                    .uri { uriBuilder ->
+                        uriBuilder
+                            .path("/users")
+                            .queryParam("\$filter", "mailnickname in $idents")
+                            .queryParam("\$select", "userPrincipalName")
+                            .build()
+                    }
+                    .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+                    .retrieve()
+                    .bodyToMono<MicrosoftGraphUsersResponse>().block().value!!.first()
+
+            val userPrincipalName = user.userPrincipalName
+            val aadGroups: List<Group> = microsoftGraphWebClient.get()
+                .uri { uriBuilder ->
+                    uriBuilder
+                        .path("/users/{userPrincipalName}/memberOf")
+                        .build(userPrincipalName)
+                }
+                .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+                .retrieve()
+                .bodyToMono<MicrosoftGraphMemberOfResponse>().block().value
+            aadGroups.map { it.id }
+        } catch (e: Exception) {
+            logger.error("Failed to retrieve AAD groups for $ident", e)
+            emptyList()
+        }
+    }
 }

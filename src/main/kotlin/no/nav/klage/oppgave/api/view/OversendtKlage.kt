@@ -83,7 +83,12 @@ data class OversendtKlage(
         required = true,
         example = "K9-sak"
     )
-    val kilde: String
+    val kilde: String,
+    @ApiModelProperty(
+        notes = "Kommentarer fra saksbehandler i førsteinstans som ikke er med i oversendelsesbrevet klager mottar",
+        required = false
+    )
+    val kommentar: String? = null
 ) {
     fun toMottak() = Mottak(
         tema = tema,

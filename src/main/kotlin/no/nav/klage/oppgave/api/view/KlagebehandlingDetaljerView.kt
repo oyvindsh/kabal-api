@@ -36,5 +36,6 @@ data class KlagebehandlingDetaljerView(
     val sendTilbakemelding: Boolean?,
     val tilbakemelding: String?,
     val klagebehandlingVersjon: Long,
-    val vedtak: List<VedtakView>
+    val vedtak: List<VedtakView>,
+    val kommentarFraFoersteinstans: String?
 )

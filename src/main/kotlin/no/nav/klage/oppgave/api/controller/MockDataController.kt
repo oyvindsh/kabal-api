@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
-import java.util.*
 
 @Profile("dev-gcp")
 @RestController
-@Unprotected
 @RequestMapping("mockdata")
 class MockDataController(
     private val mottakService: MottakService,
@@ -26,6 +24,7 @@ class MockDataController(
 
     // Alle syntetiske personer under her er registrert under https://dolly.dev.adeo.no/gruppe/2960
 
+    @Unprotected
     @PostMapping("/randomklage")
     fun sendInnRandomKlage() {
         val dollyDoc = listOf(
@@ -45,7 +44,7 @@ class MockDataController(
 
         val fnr = dollyDoc.fnr
         val journalpostId = dollyDoc.journalpost
-        val journalpost = safClient.getJournalpost(journalpostId)
+        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val saknr = journalpost?.sak?.fagsakId
 
         val dato = LocalDate.of(2020, (1..12).random(), (1..28).random())
@@ -71,7 +70,12 @@ class MockDataController(
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
-                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                tilknyttedeJournalposter = listOf(
+                    OversendtDokumentReferanse(
+                        randomMottakDokumentType(),
+                        journalpostId
+                    )
+                ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = "OPPGAVE"
@@ -79,6 +83,7 @@ class MockDataController(
         )
     }
 
+    @Unprotected
     @PostMapping("/kode6")
     fun createKode6Person() {
         val fnr = "15436621822" // ÅPENHJERTIG SAKS
@@ -108,7 +113,12 @@ class MockDataController(
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
-                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                tilknyttedeJournalposter = listOf(
+                    OversendtDokumentReferanse(
+                        randomMottakDokumentType(),
+                        journalpostId
+                    )
+                ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = "OPPGAVE"
@@ -116,6 +126,7 @@ class MockDataController(
         )
     }
 
+    @Unprotected
     @PostMapping("/kode7")
     fun createKode7Person() {
         val fnr = "28107122119" // GOD STAFFELI
@@ -145,7 +156,12 @@ class MockDataController(
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
-                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                tilknyttedeJournalposter = listOf(
+                    OversendtDokumentReferanse(
+                        randomMottakDokumentType(),
+                        journalpostId
+                    )
+                ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = "OPPGAVE"
@@ -153,6 +169,7 @@ class MockDataController(
         )
     }
 
+    @Unprotected
     @PostMapping("/fullmakt")
     fun createPersonWithFullmakt() {
         val fnr = "17117323862" // SNILL VEPS
@@ -186,7 +203,12 @@ class MockDataController(
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 oversendtEnhet = "4291",
-                tilknyttedeJournalposter = listOf(OversendtDokumentReferanse(randomMottakDokumentType(), journalpostId)),
+                tilknyttedeJournalposter = listOf(
+                    OversendtDokumentReferanse(
+                        randomMottakDokumentType(),
+                        journalpostId
+                    )
+                ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = "OPPGAVE"
