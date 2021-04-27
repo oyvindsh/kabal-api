@@ -96,7 +96,7 @@ data class OversendtKlage(
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,
-        sakFagsystem = fagsak?.fagsystemId,
+        sakFagsystem = fagsak?.fagsystemId?.name,
         sakFagsakId = fagsak?.fagsakId,
         kildeReferanse = kildeReferanse,
         dvhReferanse = dvhReferanse,
@@ -248,5 +248,11 @@ data class OversendtSak(
         required = true,
         example = "FS39"
     )
-    val fagsystemId: String
+    val fagsystemId: Fagsystem
 )
+
+enum class Fagsystem(name: String) {
+    FS36("Vedtaksløsning Foreldrepenger"),
+    FS39("Saksbehandling for Folketrygdloven kapittel 9"),
+    AO01("Arena") // Blir satt av Dolly
+}

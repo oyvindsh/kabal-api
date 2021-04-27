@@ -57,7 +57,7 @@ class MockDataController(
                 ),
                 fagsak = journalpost?.sak?.let { OversendtSak(
                     fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                    fagsystemId = Fagsystem.AO01
                 ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
@@ -102,7 +102,7 @@ class MockDataController(
                 ),
                 fagsak = journalpost?.sak?.let { OversendtSak(
                     fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                    fagsystemId = Fagsystem.AO01
                 ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
@@ -147,7 +147,7 @@ class MockDataController(
                 ),
                 fagsak = journalpost?.sak?.let { OversendtSak(
                     fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                    fagsystemId = Fagsystem.AO01
                 ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
@@ -196,7 +196,7 @@ class MockDataController(
                 ),
                 fagsak = journalpost?.sak?.let { OversendtSak(
                     fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                    fagsystemId = Fagsystem.AO01
                 ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
