@@ -45,7 +45,6 @@ class MockDataController(
         val fnr = dollyDoc.fnr
         val journalpostId = dollyDoc.journalpost
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
-        val saknr = journalpost?.sak?.fagsakId
 
         val dato = LocalDate.of(2020, (1..12).random(), (1..28).random())
 
@@ -56,7 +55,10 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                fagsak = saknr,
+                fagsak = journalpost?.sak?.let { OversendtSak(
+                    fagsakId = it.fagsakId ?: "UKJENT",
+                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -89,7 +91,6 @@ class MockDataController(
         val fnr = "15436621822" // ÅPENHJERTIG SAKS
         val journalpostId = "493357084"
         val journalpost = safClient.getJournalpost(journalpostId)
-        val saknr = journalpost?.sak?.fagsakId
         val dato = LocalDate.of(2020, 1, 13)
 
         mottakService.createMottakForKlage(
@@ -99,7 +100,10 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                fagsak = saknr,
+                fagsak = journalpost?.sak?.let { OversendtSak(
+                    fagsakId = it.fagsakId ?: "UKJENT",
+                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -132,7 +136,6 @@ class MockDataController(
         val fnr = "28107122119" // GOD STAFFELI
         val journalpostId = "493357085"
         val journalpost = safClient.getJournalpost(journalpostId)
-        val saknr = journalpost?.sak?.fagsakId
         val dato = LocalDate.of(2020, 1, 13)
 
         mottakService.createMottakForKlage(
@@ -142,7 +145,10 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                fagsak = saknr,
+                fagsak = journalpost?.sak?.let { OversendtSak(
+                    fagsakId = it.fagsakId ?: "UKJENT",
+                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -175,7 +181,6 @@ class MockDataController(
         val fnr = "17117323862" // SNILL VEPS
         val journalpostId = "493357182"
         val journalpost = safClient.getJournalpost(journalpostId)
-        val saknr = journalpost?.sak?.fagsakId
         val dato = LocalDate.of(2020, 1, 13)
 
         mottakService.createMottakForKlage(
@@ -189,7 +194,10 @@ class MockDataController(
                         skalKlagerMottaKopi = true
                     )
                 ),
-                fagsak = saknr,
+                fagsak = journalpost?.sak?.let { OversendtSak(
+                    fagsakId = it.fagsakId ?: "UKJENT",
+                    fagsystemId = it.fagsaksystem ?: "UKJENT"
+                ) },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
