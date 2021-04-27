@@ -256,9 +256,9 @@ data class OversendtSak(
 
 @ApiModel
 enum class Fagsystem(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
-    FS36("FS36", "Vedtaksløsning Foreldrepenger", "Vedtaksløsning Foreldrepenger"),
-    FS39("FS39", "Saksbehandling for Folketrygdloven kapittel 9", "Saksbehandling for Folketrygdloven kapittel 9"),
-    AO01("AO01", "Arena", "Arena"); // Blir satt av Dolly
+    FS36("1", "FS36", "Vedtaksløsning Foreldrepenger"),
+    FS39("2", "FS39", "Saksbehandling for Folketrygdloven kapittel 9"),
+    AO01("3", "AO01", "Arena"); // Blir satt av Dolly
 
     companion object {
         fun of(id: String): Fagsystem {
