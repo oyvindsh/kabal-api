@@ -288,7 +288,9 @@ class KlagebehandlingService(
                 sakenGjelder = mottak.sakenGjelder?.copy() ?: mottak.klager.toSakenGjelder(),
                 tema = mottak.tema,
                 type = mottak.type,
-                referanseId = mottak.kildeReferanse,
+                kildeReferanse = mottak.kildeReferanse,
+                sakFagsystem = mottak.sakFagsystem,
+                sakFagsakId = mottak.sakFagsakId,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
@@ -422,7 +424,7 @@ class KlagebehandlingService(
         require(vedtak.utfall != null) { "Utfall på vedtak må være satt" }
         val utfall = vedtak.utfall!!
         val vedtakFattet = KlagevedtakFattet(
-            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO1: Riktig?
+            kildeReferanse = klage.kildeReferanse ?: "UKJENT", // TODO1: Riktig?
             kilde = klage.kilde,
             utfall = utfall,
             vedtaksbrevReferanse = "TODO2",
