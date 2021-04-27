@@ -23,6 +23,9 @@
     "tildeltSaksbehandlerident": {
       "type": "keyword"
     },
+    "medunderskriverident": {
+      "type": "keyword"
+    },
     "innsendt": {
       "type": "date",
       "format": "date"
@@ -48,12 +51,17 @@
       "format": "date"
     },
     "hjemler": {
-      "type": "integer"
-    },
-    "hjemlerAsText": {
-      "type": "text"
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text"
+        }
+      }
     },
     "foedselsnummer": {
+      "type": "keyword"
+    },
+    "virksomhetsnummer": {
       "type": "keyword"
     },
     "navn": {

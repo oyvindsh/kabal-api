@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingerQueryParams
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.exceptions.NotOwnEnhetException
@@ -21,7 +22,7 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
     fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
         typer = queryParams.typer.map { Type.of(it) },
         temaer = queryParams.temaer.map { Tema.of(it) },
-        hjemler = queryParams.hjemler.mapNotNull { it.toIntOrNull() },
+        hjemler = queryParams.hjemler.map { Hjemmel.of(it) },
         order = if (queryParams.rekkefoelge == KlagebehandlingerQueryParams.Rekkefoelge.SYNKENDE) {
             KlagebehandlingerSearchCriteria.Order.DESC
         } else {
@@ -44,7 +45,7 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
         KlagebehandlingerSearchCriteria(
             typer = queryParams.typer.map { Type.of(it) },
             temaer = queryParams.temaer.map { Tema.of(it) },
-            hjemler = queryParams.hjemler.mapNotNull { it.toIntOrNull() },
+            hjemler = queryParams.hjemler.map { Hjemmel.of(it) },
             offset = 0,
             limit = 1,
             erTildeltSaksbehandler = false,

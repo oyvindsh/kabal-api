@@ -13,7 +13,6 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.klage.Vedtak
-import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -44,10 +43,10 @@ class KlagebehandlingMapper(
             id = klagebehandling.id.toString(),
             versjon = klagebehandling.versjon,
             journalpostId = klagebehandling.saksdokumenter.map { it.journalpostId },
-            saksreferanse = klagebehandling.referanseId,
+            saksreferanse = klagebehandling.kildeReferanse,
             tildeltEnhet = klagebehandling.tildeltEnhet,
-            tema = klagebehandling.tema,
-            type = klagebehandling.type,
+            tema = klagebehandling.tema.id,
+            type = klagebehandling.type.id,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
             innsendt = klagebehandling.innsendt,
@@ -82,8 +81,8 @@ class KlagebehandlingMapper(
                 } else {
                     null
                 },
-                type = esKlagebehandling.type.id,
-                tema = esKlagebehandling.tema.id,
+                type = esKlagebehandling.type,
+                tema = esKlagebehandling.tema,
                 hjemmel = esKlagebehandling.hjemler?.firstOrNull(),
                 frist = esKlagebehandling.frist,
                 mottatt = esKlagebehandling.mottattKlageinstans,
@@ -120,7 +119,7 @@ class KlagebehandlingMapper(
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
-            hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
+            hjemler = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
             grunn = klagebehandling.kvalitetsvurdering?.grunn?.id,
@@ -134,8 +133,6 @@ class KlagebehandlingMapper(
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans
         )
     }
-
-    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<Int> = hjemler.map { it.id }
 
     fun mapVedtakToVedtakView(vedtak: Vedtak): VedtakView =
         VedtakView(

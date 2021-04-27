@@ -159,16 +159,16 @@ open class ElasticsearchService(
         baseQuery.must(innerQueryBehandlingtype)
         if (typer.isNotEmpty()) {
             typer.forEach {
-                innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", it.name))
+                innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", it.id))
             }
         } else {
-            innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", Type.KLAGE.name))
+            innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", Type.KLAGE.id))
         }
 
         val innerQueryTema = QueryBuilders.boolQuery()
         baseQuery.must(innerQueryTema)
         temaer.forEach {
-            innerQueryTema.should(QueryBuilders.termQuery("tema", it.name))
+            innerQueryTema.should(QueryBuilders.termQuery("tema", it.id))
         }
 
         erTildeltSaksbehandler?.let {
@@ -220,7 +220,7 @@ open class ElasticsearchService(
             val innerQueryHjemler = QueryBuilders.boolQuery()
             baseQuery.must(innerQueryHjemler)
             hjemler.forEach {
-                innerQueryHjemler.should(QueryBuilders.termQuery("hjemler", it))
+                innerQueryHjemler.should(QueryBuilders.termQuery("hjemler", it.id))
             }
         }
 

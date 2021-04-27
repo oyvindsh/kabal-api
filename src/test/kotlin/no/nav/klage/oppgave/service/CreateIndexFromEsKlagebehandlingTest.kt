@@ -64,7 +64,6 @@ class CreateIndexFromEsKlagebehandlingTest {
         val mappingResponse = client.lowLevelClient.performRequest(Request("GET", "/_all/_mapping"))
         val mapping: String = EntityUtils.toString(mappingResponse.entity)
         println(mapping)
-        assertThat(mapping).containsIgnoringCase("hjemlerAsText")
     }
 
     @Test
@@ -73,7 +72,6 @@ class CreateIndexFromEsKlagebehandlingTest {
         service.recreateIndex()
         val mappingResponse = client.lowLevelClient.performRequest(Request("GET", "/_all/_mapping"))
         val mapping: String = EntityUtils.toString(mappingResponse.entity)
-        assertThat(mapping).containsIgnoringCase("hjemlerAsText")
     }
 
     @Test

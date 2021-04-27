@@ -1,7 +1,5 @@
 package no.nav.klage.oppgave.domain.elasticsearch
 
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.elasticsearch.index.VersionType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
@@ -31,9 +29,9 @@ data class EsKlagebehandling(
     )
     val tildeltEnhet: String?,
     @Field(type = FieldType.Keyword)
-    val tema: Tema,
+    val tema: String,
     @Field(type = FieldType.Keyword)
-    val type: Type,
+    val type: String,
     @Field(type = FieldType.Keyword)
     val tildeltSaksbehandlerident: String? = null,
     @Field(type = FieldType.Keyword)
@@ -50,8 +48,11 @@ data class EsKlagebehandling(
     val startet: LocalDate? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val avsluttet: LocalDate? = null,
-    @Field(type = FieldType.Integer)
-    val hjemler: List<Int>? = null,
+    @MultiField(
+        mainField = Field(type = FieldType.Keyword),
+        otherFields = [InnerField(type = FieldType.Text, suffix = "text")]
+    )
+    val hjemler: List<String>? = null,
     @Field(type = FieldType.Keyword)
     val foedselsnummer: String? = null,
     @Field(type = FieldType.Keyword)
