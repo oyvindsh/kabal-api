@@ -7,6 +7,5 @@ data class KlagevedtakFattet (
     val kilde: String,
     val utfall: Utfall,
     val vedtaksbrevReferanse: String?,
-    val sakReferanse: String,
     val kabalReferanse: String
 )

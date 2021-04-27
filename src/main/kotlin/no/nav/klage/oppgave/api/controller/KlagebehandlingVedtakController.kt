@@ -72,6 +72,14 @@ class KlagebehandlingVedtakController(
         )
     }
 
+    @PostMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/")
+    fun fullfoerVedtak(
+        @PathVariable("klagebehandlingid") klagebehandlingId: String,
+        @PathVariable("vedtakid") vedtakId: String,
+    ) {
+        vedtakService.dispatchVedtakToKafka(klagebehandlingId.toUUIDOrException(), vedtakId.toUUIDOrException())
+    }
+
     private fun String.toUUIDOrException() =
         try {
             UUID.fromString(this)

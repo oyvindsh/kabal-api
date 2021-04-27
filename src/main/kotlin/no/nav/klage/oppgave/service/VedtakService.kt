@@ -44,8 +44,7 @@ class VedtakService(
 
     }
 
-    //TODO: Denne trenger å fullføres!
-    fun fullfoerVedtak(klagebehandlingId: UUID, vedtakId: UUID) {
+    fun dispatchVedtakToKafka(klagebehandlingId: UUID, vedtakId: UUID) {
         val klage = klagebehandlingRepository.findById(klagebehandlingId).orElseThrow()
         val vedtak = klage.vedtak.find { it.id == vedtakId }
         require(vedtak != null) { "Fant ikke vedtak på klage" }
@@ -53,12 +52,11 @@ class VedtakService(
         require(vedtak.journalpostId != null) { "Kan ikke fullføre et vedtak uten journalført vedtaksbrev" }
         val utfall = vedtak.utfall!!
         val vedtakFattet = KlagevedtakFattet(
-            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO1: Riktig?
+            kildeReferanse = klage.kildeReferanse ?: "UKJENT",
             kilde = klage.kilde,
             utfall = utfall,
             vedtaksbrevReferanse = vedtak.journalpostId,
-            sakReferanse = "TODO3",
-            kabalReferanse = "TODO4" // Human readable?
+            kabalReferanse = vedtakId.toString()
         )
 
         vedtakKafkaProducer.sendVedtak(vedtakFattet)
