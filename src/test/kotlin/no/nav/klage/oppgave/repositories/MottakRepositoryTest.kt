@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
+import no.nav.klage.oppgave.api.view.Fagsystem
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
@@ -41,7 +42,7 @@ class MottakRepositoryTest {
             type = Type.KLAGE,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "123454")),
             sakFagsakId = "12345",
-            sakFagsystem = "AO01",
+            sakFagsystem = Fagsystem.AO01,
             kildeReferanse = "54321",
             dvhReferanse = "5342523",
             hjemmelListe = mutableSetOf(MottakHjemmel(lov = Lov.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
