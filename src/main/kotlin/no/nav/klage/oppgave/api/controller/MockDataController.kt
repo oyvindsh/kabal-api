@@ -56,7 +56,7 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                sakReferanse = saknr,
+                fagsak = saknr,
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -99,7 +99,7 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                sakReferanse = saknr,
+                fagsak = saknr,
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -142,7 +142,7 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                sakReferanse = saknr,
+                fagsak = saknr,
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -189,7 +189,7 @@ class MockDataController(
                         skalKlagerMottaKopi = true
                     )
                 ),
-                sakReferanse = saknr,
+                fagsak = saknr,
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(

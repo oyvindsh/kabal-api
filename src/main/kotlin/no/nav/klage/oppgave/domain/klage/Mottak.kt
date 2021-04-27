@@ -29,8 +29,10 @@ class Mottak(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "saken_gjelder_id", nullable = true)
     var sakenGjelder: SakenGjelder? = null,
-    @Column(name = "sak_referanse")
-    var sakReferanse: String? = null,
+    @Column(name = "sak_fagsystem")
+    var sakFagsystem: String? = null,
+    @Column(name = "sak_fagsak_id")
+    var sakFagsakId: String? = null,
     @Column(name = "kilde_referanse")
     var kildeReferanse: String,
     @Column(name = "dvh_referanse")

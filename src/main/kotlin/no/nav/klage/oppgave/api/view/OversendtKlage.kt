@@ -31,10 +31,10 @@ data class OversendtKlage(
     )
     val sakenGjelder: OversendtSakenGjelder? = null,
     @ApiModelProperty(
-        notes = "Saksnummer brukt til journalføring. Vi oppretter sak dersom denne er tom",
+        notes = "Fagsak brukt til journalføring. Dersom denne er tom journalfører vi på generell sak",
         required = false
     )
-    val sakReferanse: String? = null,
+    val fagsak: OversendtSak? = null,
     @ApiModelProperty(
         notes = "Id som er intern for kildesystemet så vedtak fra oss knyttes riktig i kilde",
         required = true
@@ -96,7 +96,8 @@ data class OversendtKlage(
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,
-        sakReferanse = sakReferanse,
+        sakFagsystem = fagsak?.fagsystemId,
+        sakFagsakId = fagsak?.fagsakId,
         kildeReferanse = kildeReferanse,
         dvhReferanse = dvhReferanse,
         hjemmelListe = hjemler.map { it.toMottakHjemmel() }.toMutableSet(),
@@ -236,3 +237,16 @@ data class OversendtDokumentReferanse(
         journalpostId = journalpostId
     )
 }
+
+data class OversendtSak(
+    @ApiModelProperty(
+        required = true,
+        example = "134132412"
+    )
+    val fagsakId: String,
+    @ApiModelProperty(
+        required = true,
+        example = "FS39"
+    )
+    val fagsystemId: String
+)

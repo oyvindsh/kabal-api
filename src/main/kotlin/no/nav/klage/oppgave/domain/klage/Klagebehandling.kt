@@ -30,7 +30,11 @@ class Klagebehandling(
     @Convert(converter = TypeConverter::class)
     var type: Type,
     @Column(name = "referanse_id")
-    var referanseId: String? = null,
+    var kildeReferanse: String? = null,
+    @Column(name = "sak_fagsystem")
+    var sakFagsystem: String? = null,
+    @Column(name = "sak_fagsak_id")
+    var sakFagsakId: String? = null,
     @Column(name = "dato_innsendt")
     var innsendt: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
