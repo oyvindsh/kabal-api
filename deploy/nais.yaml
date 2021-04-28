@@ -95,6 +95,7 @@ spec:
     - secret: norg2
     - secret: axsys
     - secret: elastic
+    - secret: ereg
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}

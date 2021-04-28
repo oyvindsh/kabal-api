@@ -10,6 +10,8 @@ OPPGAVE_APP_CLIENT_ID: bef7cd4d-e65e-41f8-a743-b643e81f2aea
 
 OPPGAVE_URL: https://api-gw-q1.oera.no/oppgave/api/v1/oppgaver
 
+EREG_URL: https://api-gw-q1.oera.no/ereg/api
+
 AXSYS_URL: https://api-gw-q1.oera.no/axsys/api/v2
 AXSYS_CLUSTER: dev-fss
 AXSYS_NAMESPACE: org
