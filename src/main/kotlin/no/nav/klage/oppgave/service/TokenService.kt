@@ -86,6 +86,7 @@ class TokenService(
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
             .jwtTokenClaims?.getAsList("groups").orEmpty().toList()
 
+    //Brukes ikke per nå:
     fun erMaskinTilMaskinToken(): Boolean {
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
             .jwtTokenClaims?.allClaims?.forEach { securelogger.info("${it.key} - ${it.value}") }

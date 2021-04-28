@@ -58,7 +58,7 @@ class AdminController(
     }
 
     private fun krevAdminTilgang() {
-        if (!innloggetSaksbehandlerRepository.debug()) {
+        if (!innloggetSaksbehandlerRepository.erAdmin()) {
             throw MissingTilgangException("Not an admin")
         }
     }
