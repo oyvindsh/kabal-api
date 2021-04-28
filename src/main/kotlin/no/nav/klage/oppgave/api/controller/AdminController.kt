@@ -1,17 +1,13 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.security.token.support.core.api.Unprotected
-
-<<<<<<< HEAD
+import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-=======
-import no.nav.klage.oppgave.clients.ereg.EregClient
->>>>>>> main
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -43,7 +39,7 @@ class AdminController(
 
         return ElasticAdminResponse("ok")
     }
-    
+
     private fun krevAdminTilgang() {
         if (!innloggetSaksbehandlerRepository.erAdmin()) {
             throw MissingTilgangException("Not an admin")
