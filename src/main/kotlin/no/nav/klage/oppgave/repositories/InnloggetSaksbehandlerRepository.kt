@@ -27,6 +27,8 @@ class InnloggetSaksbehandlerRepository(
 
     fun erAdmin(): Boolean = tokenService.getRollerFromToken().hasRole(adminRole)
 
+    fun debug(): Boolean = tokenService.erMaskinTilMaskinToken()
+
     fun erLeder(): Boolean = tokenService.getRollerFromToken().hasRole(lederRole)
 
     fun erFagansvarlig(): Boolean = tokenService.getRollerFromToken().hasRole(fagansvarligRole)

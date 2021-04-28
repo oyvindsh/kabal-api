@@ -86,4 +86,14 @@ class TokenService(
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
             .jwtTokenClaims?.getAsList("groups").orEmpty().toList()
 
+    fun erMaskinTilMaskinToken(): Boolean {
+        tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
+            .jwtTokenClaims?.allClaims?.forEach { securelogger.info("${it.key} - ${it.value}") }
+
+        return getClaim("sub") == getClaim("oid")
+    }
+
+    private fun getClaim(name: String) =
+        tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
+            .jwtTokenClaims?.getStringClaim(name)
 }
