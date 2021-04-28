@@ -1,24 +1,50 @@
 package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.clients.ereg.EregClient
+import no.nav.klage.oppgave.config.SecurityConfiguration
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class AdminController(private val adminService: AdminService, private val eregClient: EregClient) {
+
+@ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
+class AdminController(
+    private val adminService: AdminService,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val eregClient: EregClient
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Unprotected
+    @PostMapping("/internal/elasticadmin/rebuild", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun resetElasticIndexWithPost() {
+        krevAdminTilgang()
+        try {
+            adminService.recreateEsIndex()
+            adminService.syncEsWithDb()
+            adminService.findAndLogOutOfSyncKlagebehandlinger()
+        } catch (e: Exception) {
+            logger.warn("Failed to reset ES index", e)
+            throw e
+        }
+    }
+
     @GetMapping("/internal/elasticadmin/nuke", produces = ["application/json"])
     fun resetElasticIndex(): ElasticAdminResponse {
-        //TODO: Trenger auth så ikke hvem som helst kan kalle denne
+        krevAdminTilgang()
         try {
             adminService.recreateEsIndex()
             adminService.syncEsWithDb()
@@ -29,6 +55,12 @@ class AdminController(private val adminService: AdminService, private val eregCl
         }
 
         return ElasticAdminResponse("ok")
+    }
+
+    private fun krevAdminTilgang() {
+        if (!innloggetSaksbehandlerRepository.erAdmin()) {
+            throw MissingTilgangException("Not an admin")
+        }
     }
 
     @Unprotected
@@ -47,7 +79,6 @@ class AdminController(private val adminService: AdminService, private val eregCl
 
         return "ok"
     }
-
 
 }
 

@@ -16,13 +16,16 @@ class InnloggetSaksbehandlerRepository(
     @Value("\${ROLE_KLAGE_MERKANTIL}") private val merkantilRole: String,
     @Value("\${ROLE_KLAGE_FORTROLIG}") private val kanBehandleFortroligRole: String,
     @Value("\${ROLE_KLAGE_STRENGT_FORTROLIG}") private val kanBehandleStrengtFortroligRole: String,
-    @Value("\${ROLE_KLAGE_EGEN_ANSATT}") private val kanBehandleEgenAnsattRole: String
+    @Value("\${ROLE_KLAGE_EGEN_ANSATT}") private val kanBehandleEgenAnsattRole: String,
+    @Value("\${ROLE_ADMIN}") private val adminRole: String
 ) {
 
     fun getTilgangerForSaksbehandler(): EnheterMedLovligeTemaer =
         saksbehandlerRepository.getTilgangerForSaksbehandler(getInnloggetIdent())
 
     fun getInnloggetIdent() = tokenService.getIdent()
+
+    fun erAdmin(): Boolean = tokenService.getRollerFromToken().hasRole(adminRole)
 
     fun erLeder(): Boolean = tokenService.getRollerFromToken().hasRole(lederRole)
 
