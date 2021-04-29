@@ -11,7 +11,7 @@ data class KlagebehandlingDetaljerView(
     val fraNAVEnhetNavn: String?,
     val mottattFoersteinstans: LocalDate? = null,
     val sakenGjelderFoedselsnummer: String?,
-    val sakenGjelderNavn: String?,
+    val sakenGjelderNavn: Navn?,
     val sakenGjelderKjoenn: String?,
     val sakenGjelderVirksomhetsnummer: String?,
     // TODO Legge til virksomhetsnavn (mangler ereg integrasjon)
@@ -38,4 +38,10 @@ data class KlagebehandlingDetaljerView(
     val klagebehandlingVersjon: Long,
     val vedtak: List<VedtakView>,
     val kommentarFraFoersteinstans: String?
-)
+) {
+    data class Navn(
+        val fornavn: String?,
+        val mellomnavn: String?,
+        val etternavn: String?,
+    )
+}

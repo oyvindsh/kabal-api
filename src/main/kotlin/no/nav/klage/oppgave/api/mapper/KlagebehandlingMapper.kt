@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.view.VedtakView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
@@ -106,7 +107,7 @@ class KlagebehandlingMapper(
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             sakenGjelderFoedselsnummer = sakenGjelderFoedselsnummer,
-            sakenGjelderNavn = sakenGjelder?.navn,
+            sakenGjelderNavn = sakenGjelder.getNavn(),
             sakenGjelderKjoenn = sakenGjelder?.kjoenn,
             sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId),
             foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
@@ -169,4 +170,17 @@ class KlagebehandlingMapper(
         } else {
             null
         }
+
+    private fun Person?.getNavn(): KlagebehandlingDetaljerView.Navn? =
+        if (this != null) {
+            KlagebehandlingDetaljerView.Navn(
+                fornavn = fornavn,
+                mellomnavn = mellomnavn,
+                etternavn = etternavn
+            )
+        } else {
+            null
+        }
+
 }
+
