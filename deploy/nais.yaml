@@ -79,7 +79,7 @@ spec:
         - application: klage-oppgave
         - application: klage-oppgave-consumer
         - application: k9-klage
-          namespace: default
+          namespace: k9saksbehandling
           cluster: {{k9_cluster}}
     outbound:
       rules:
