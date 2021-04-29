@@ -42,21 +42,6 @@ class AdminController(
         }
     }
 
-    @GetMapping("/internal/elasticadmin/nuke", produces = ["application/json"])
-    fun resetElasticIndex(): ElasticAdminResponse {
-        krevAdminTilgang()
-        try {
-            adminService.recreateEsIndex()
-            adminService.syncEsWithDb()
-            adminService.findAndLogOutOfSyncKlagebehandlinger()
-        } catch (e: Exception) {
-            logger.warn("Failed to reset ES index", e)
-            throw e
-        }
-
-        return ElasticAdminResponse("ok")
-    }
-
     private fun krevAdminTilgang() {
         if (!innloggetSaksbehandlerRepository.erAdmin()) {
             throw MissingTilgangException("Not an admin")
@@ -81,5 +66,3 @@ class AdminController(
     }
 
 }
-
-data class ElasticAdminResponse(private val status: String)
