@@ -78,6 +78,9 @@ spec:
         - application: kabal
         - application: klage-oppgave
         - application: klage-oppgave-consumer
+        - application: k9-klage
+          namespace: default
+          cluster: {{k9_cluster}}
     outbound:
       rules:
         - application: klage-redis
