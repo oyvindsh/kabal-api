@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.Lov
-import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
@@ -39,7 +38,6 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val vedtakKafkaProducer: VedtakKafkaProducer,
     private val dokumentService: DokumentService
 ) {
 
@@ -288,7 +286,9 @@ class KlagebehandlingService(
                 sakenGjelder = mottak.sakenGjelder?.copy() ?: mottak.klager.toSakenGjelder(),
                 tema = mottak.tema,
                 type = mottak.type,
-                referanseId = mottak.kildeReferanse,
+                kildeReferanse = mottak.kildeReferanse,
+                sakFagsystem = mottak.sakFagsystem,
+                sakFagsakId = mottak.sakFagsakId,
                 innsendt = mottak.innsendtDato,
                 mottattFoersteinstans = mottak.mottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
@@ -412,25 +412,6 @@ class KlagebehandlingService(
             logger.error("Error disconnecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
             throw e
         }
-    }
-
-    //TODO: Denne trenger å fullføres!
-    fun fullfoerVedtak(klagebehandlingId: UUID, vedtakId: UUID) {
-        val klage = klagebehandlingRepository.findById(klagebehandlingId).orElseThrow()
-        val vedtak = klage.vedtak.find { it.id == vedtakId }
-        require(vedtak != null) { "Fant ikke vedtak på klage" }
-        require(vedtak.utfall != null) { "Utfall på vedtak må være satt" }
-        val utfall = vedtak.utfall!!
-        val vedtakFattet = KlagevedtakFattet(
-            kildeReferanse = klage.referanseId ?: "UKJENT", // TODO1: Riktig?
-            kilde = klage.kilde,
-            utfall = utfall,
-            vedtaksbrevReferanse = "TODO2",
-            sakReferanse = "TODO3",
-            kabalReferanse = "TODO4" // Human readable?
-        )
-
-        vedtakKafkaProducer.sendVedtak(vedtakFattet)
     }
 
     fun fetchDokumentlisteForKlagebehandling(

@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.api.view.Fagsystem
+import no.nav.klage.oppgave.api.view.FagsystemConverter
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import java.time.LocalDate
@@ -30,7 +32,12 @@ class Klagebehandling(
     @Convert(converter = TypeConverter::class)
     var type: Type,
     @Column(name = "referanse_id")
-    var referanseId: String? = null,
+    var kildeReferanse: String? = null,
+    @Column(name = "sak_fagsystem")
+    @Convert(converter = FagsystemConverter::class)
+    var sakFagsystem: Fagsystem? = null,
+    @Column(name = "sak_fagsak_id")
+    var sakFagsakId: String? = null,
     @Column(name = "dato_innsendt")
     var innsendt: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")

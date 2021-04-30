@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.api.view.Fagsystem
+import no.nav.klage.oppgave.api.view.FagsystemConverter
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.TemaConverter
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -29,8 +31,11 @@ class Mottak(
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "saken_gjelder_id", nullable = true)
     var sakenGjelder: SakenGjelder? = null,
-    @Column(name = "sak_referanse")
-    var sakReferanse: String? = null,
+    @Column(name = "sak_fagsystem")
+    @Convert(converter = FagsystemConverter::class)
+    var sakFagsystem: Fagsystem? = null,
+    @Column(name = "sak_fagsak_id")
+    var sakFagsakId: String? = null,
     @Column(name = "kilde_referanse")
     var kildeReferanse: String,
     @Column(name = "dvh_referanse")

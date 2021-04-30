@@ -33,7 +33,21 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         @PathVariable navIdent: String
     ): List<Enhet> {
         logger.debug("getEnheter is requested by $navIdent")
-        return saksbehandlerService.getTilgangerForSaksbehandler().toEnheter()
+        val enheter = saksbehandlerService.getTilgangerForSaksbehandler().toEnheter()
+        logEnheter(enheter, navIdent)
+        return enheter
+    }
+
+    private fun logEnheter(enheter: List<Enhet>, navIdent: String) {
+        enheter.forEach { enhet ->
+            logger.debug(
+                "{} has access to {} ({}) with temaer {}",
+                navIdent,
+                enhet.id,
+                enhet.navn,
+                enhet.lovligeTemaer.joinToString(separator = ",")
+            )
+        }
     }
 
     private fun EnheterMedLovligeTemaer.toEnheter() =

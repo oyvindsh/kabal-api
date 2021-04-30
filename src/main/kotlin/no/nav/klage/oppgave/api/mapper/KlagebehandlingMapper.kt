@@ -8,15 +8,17 @@ import no.nav.klage.oppgave.api.view.VedtakView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.pdl.Person
+import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.klage.Vedtak
-import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class KlagebehandlingMapper(
@@ -44,10 +46,10 @@ class KlagebehandlingMapper(
             id = klagebehandling.id.toString(),
             versjon = klagebehandling.versjon,
             journalpostId = klagebehandling.saksdokumenter.map { it.journalpostId },
-            saksreferanse = klagebehandling.referanseId,
+            saksreferanse = klagebehandling.kildeReferanse,
             tildeltEnhet = klagebehandling.tildeltEnhet,
-            tema = klagebehandling.tema,
-            type = klagebehandling.type,
+            tema = klagebehandling.tema.id,
+            type = klagebehandling.type.id,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
             innsendt = klagebehandling.innsendt,
@@ -82,8 +84,8 @@ class KlagebehandlingMapper(
                 } else {
                     null
                 },
-                type = esKlagebehandling.type.id,
-                tema = esKlagebehandling.tema.id,
+                type = esKlagebehandling.type,
+                tema = esKlagebehandling.tema,
                 hjemmel = esKlagebehandling.hjemler?.firstOrNull(),
                 frist = esKlagebehandling.frist,
                 mottatt = esKlagebehandling.mottattKlageinstans,
@@ -107,7 +109,7 @@ class KlagebehandlingMapper(
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
             sakenGjelderFoedselsnummer = sakenGjelderFoedselsnummer,
-            sakenGjelderNavn = sakenGjelder?.navn,
+            sakenGjelderNavn = sakenGjelder.getNavn(),
             sakenGjelderKjoenn = sakenGjelder?.kjoenn,
             sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId),
             foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
@@ -120,7 +122,7 @@ class KlagebehandlingMapper(
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
-            hjemler = hjemmelToHjemmelView(klagebehandling.hjemler),
+            hjemler = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
             grunn = klagebehandling.kvalitetsvurdering?.grunn?.id,
@@ -135,15 +137,26 @@ class KlagebehandlingMapper(
         )
     }
 
-    private fun hjemmelToHjemmelView(hjemler: Set<Hjemmel>): List<Int> = hjemler.map { it.id }
-
-    fun mapVedtakToVedtakView(vedtak: Vedtak): VedtakView =
-        VedtakView(
-            id = vedtak.id,
-            utfall = vedtak.utfall,
-            hjemler = vedtak.hjemler,
-            brevMottakere = vedtak.brevmottakere
-        )
+    fun mapVedtakToVedtakView(vedtak: Vedtak, dokument: ArkivertDokument? = null): VedtakView {
+        if (dokument != null) {
+            return VedtakView(
+                id = vedtak.id,
+                utfall = vedtak.utfall,
+                hjemler = vedtak.hjemler,
+                brevMottakere = vedtak.brevmottakere,
+                finalized = vedtak.finalized,
+                content = Base64.getEncoder().encodeToString(dokument.bytes)
+            )
+        } else {
+            return VedtakView(
+                id = vedtak.id,
+                utfall = vedtak.utfall,
+                hjemler = vedtak.hjemler,
+                brevMottakere = vedtak.brevmottakere,
+                finalized = vedtak.finalized
+            )
+        }
+    }
 
 
     fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {
@@ -172,4 +185,17 @@ class KlagebehandlingMapper(
         } else {
             null
         }
+
+    private fun Person?.getNavn(): KlagebehandlingDetaljerView.Navn? =
+        if (this != null) {
+            KlagebehandlingDetaljerView.Navn(
+                fornavn = fornavn,
+                mellomnavn = mellomnavn,
+                etternavn = etternavn
+            )
+        } else {
+            null
+        }
+
 }
+

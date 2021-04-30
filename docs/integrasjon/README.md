@@ -26,6 +26,10 @@ Eksempel
   "avsenderEnhet": "2312",
   "avsenderSaksbehandlerIdent": "W123456",
   "dvhReferanse": "687686978",
+  "fagsak": {
+    "fagsakId": "123455",
+    "fagsystem": "FS39"
+  },
   "frist": "2021-04-26",
   "hjemler": [
     {
@@ -54,7 +58,6 @@ Eksempel
   "kommentar": "string",
   "mottattFoersteinstans": "2021-04-26",
   "oversendtEnhet": "4219",
-  "sakReferanse": "576585",
   "sakenGjelder": {
     "id": {
       "type": "PERSON",
