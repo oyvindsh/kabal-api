@@ -55,9 +55,9 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
         )
 
     private fun validateAndGetEnhetId(navIdent: String, enhetId: String): String {
-        val tilgangerForSaksbehandler = saksbehandlerRepository.getTilgangerForSaksbehandler(navIdent)
+        val enheterForSaksbehandler = saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(navIdent)
 
-        if (tilgangerForSaksbehandler.enheter.none { e -> e.enhetId == enhetId }) {
+        if (enheterForSaksbehandler.enheter.none { e -> e.enhetId == enhetId }) {
             throw NotOwnEnhetException("$navIdent is not part of enhet $enhetId")
         }
         return enhetId

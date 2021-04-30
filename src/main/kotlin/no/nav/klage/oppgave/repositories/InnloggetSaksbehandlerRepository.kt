@@ -20,8 +20,8 @@ class InnloggetSaksbehandlerRepository(
     @Value("\${ROLE_ADMIN}") private val adminRole: String
 ) {
 
-    fun getTilgangerForSaksbehandler(): EnheterMedLovligeTemaer =
-        saksbehandlerRepository.getTilgangerForSaksbehandler(getInnloggetIdent())
+    fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
+        saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(getInnloggetIdent())
 
     fun getInnloggetIdent() = tokenService.getIdent()
 

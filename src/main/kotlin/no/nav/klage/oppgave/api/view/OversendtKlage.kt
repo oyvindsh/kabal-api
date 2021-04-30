@@ -16,12 +16,14 @@ import javax.validation.constraints.Past
 data class OversendtKlage(
     @ApiModelProperty(
         required = true,
-        example = "OMS"
+        example = "OMS",
+        notes = "Gyldige verdier er OMS i prod, OMS og SYK i dev"
     )
     val tema: Tema,
     @ApiModelProperty(
         required = true,
-        example = "KLAGE"
+        example = "KLAGE",
+        notes = "Gyldige verdier er KLAGE i både prod og dev"
     )
     val type: Type,
     @ApiModelProperty(

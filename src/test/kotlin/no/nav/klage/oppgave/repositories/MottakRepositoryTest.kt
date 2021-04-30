@@ -38,7 +38,7 @@ class MottakRepositoryTest {
     @Test
     fun `persist mottak works`() {
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "123454")),
             sakFagsakId = "12345",
