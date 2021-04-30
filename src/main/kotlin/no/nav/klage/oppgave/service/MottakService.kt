@@ -98,6 +98,5 @@ class MottakService(
             logger.warn("Unable to validate journalpost from oversendt klage: {}", journalpostId, e)
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
-
-
+    
 }

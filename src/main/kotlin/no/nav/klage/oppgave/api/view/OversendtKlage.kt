@@ -58,9 +58,9 @@ data class OversendtKlage(
     val innsynUrl: String?,
     @ApiModelProperty(
         notes = "Hjemler knyttet til klagen",
-        required = true
+        required = false
     )
-    val hjemler: List<HjemmelFraFoersteInstans>,
+    val hjemler: List<HjemmelFraFoersteInstans>?,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     @ApiModelProperty(
@@ -105,7 +105,7 @@ data class OversendtKlage(
         sakFagsakId = fagsak?.fagsakId,
         kildeReferanse = kildeReferanse,
         dvhReferanse = dvhReferanse,
-        hjemmelListe = hjemler.map { it.toMottakHjemmel() }.toMutableSet(),
+        hjemmelListe = hjemler?.map { it.toMottakHjemmel() }?.toMutableSet(),
         avsenderSaksbehandlerident = avsenderSaksbehandlerIdent,
         avsenderEnhet = avsenderEnhet,
         oversendtKaEnhet = oversendtEnhet,

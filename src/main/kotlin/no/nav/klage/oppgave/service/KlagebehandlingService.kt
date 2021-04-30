@@ -302,7 +302,7 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(Vedtak()),
                 kvalitetsvurdering = null,
-                hjemler = mottak.hjemmelListe.mapNotNull { mapMottakHjemmel(it) }.toMutableSet(),
+                hjemler = createHjemmelSetFromMottak(mottak.hjemmelListe),
                 saksdokumenter = createSaksdokumenter(mottak),
                 kilde = mottak.kilde,
                 kommentarFraFoersteinstans = mottak.kommentar
@@ -316,6 +316,14 @@ class KlagebehandlingService(
             )
         )
     }
+
+    private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =
+        if (hjemler == null || hjemler.isEmpty()) {
+            mutableSetOf(Hjemmel.MANGLER)
+        } else {
+            hjemler.mapNotNull { mapMottakHjemmel(it) }.toMutableSet()
+        }
+
 
     private fun Klager.toSakenGjelder() = SakenGjelder(
         partId = this.partId.copy(),
