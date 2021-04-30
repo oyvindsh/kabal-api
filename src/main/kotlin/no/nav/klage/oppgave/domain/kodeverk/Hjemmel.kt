@@ -75,7 +75,7 @@ enum class Hjemmel(
     FTL_9_15("1000.009.015", LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 15), "FTL 9-15", "Folketrygdloven §9-15"),
     FTL_9_16("1000.009.016", LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 16), "FTL 9-16", "Folketrygdloven §9-16"),
 
-    MANGLER("MANGLER", LovKilde.UKJENT, KapittelOgParagraf(0, 0), "MANGLER", "Hjemmel mangler")
+    MANGLER("1002", LovKilde.UKJENT, null, "MANGLER", "Hjemmel mangler")
     ;
 
     fun toSearchableString(): String {
