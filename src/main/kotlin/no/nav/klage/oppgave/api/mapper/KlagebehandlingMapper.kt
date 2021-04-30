@@ -125,7 +125,7 @@ class KlagebehandlingMapper(
             hjemler = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
-            grunn = klagebehandling.kvalitetsvurdering?.grunn?.id,
+            grunn = klagebehandling.vedtak.firstOrNull()?.grunn?.id,
             eoes = klagebehandling.kvalitetsvurdering?.eoes?.id,
             raadfoertMedLege = klagebehandling.kvalitetsvurdering?.raadfoertMedLege?.id,
             internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
@@ -141,8 +141,9 @@ class KlagebehandlingMapper(
         if (dokument != null) {
             return VedtakView(
                 id = vedtak.id,
-                utfall = vedtak.utfall,
-                hjemler = vedtak.hjemler,
+                utfall = vedtak.utfall?.id,
+                grunn = vedtak.grunn?.id,
+                hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere,
                 finalized = vedtak.finalized,
                 content = Base64.getEncoder().encodeToString(dokument.bytes)
@@ -150,8 +151,9 @@ class KlagebehandlingMapper(
         } else {
             return VedtakView(
                 id = vedtak.id,
-                utfall = vedtak.utfall,
-                hjemler = vedtak.hjemler,
+                utfall = vedtak.utfall?.id,
+                grunn = vedtak.grunn?.id,
+                hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere,
                 finalized = vedtak.finalized
             )
@@ -162,7 +164,7 @@ class KlagebehandlingMapper(
     fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {
         val kvalitetsvurdering = klagebehandling.kvalitetsvurdering
         return KvalitetsvurderingView(
-            grunn = kvalitetsvurdering?.grunn?.id,
+            grunn = klagebehandling.vedtak.firstOrNull()?.grunn?.id,
             eoes = kvalitetsvurdering?.eoes?.id,
             raadfoertMedLege = kvalitetsvurdering?.raadfoertMedLege?.id,
             internVurdering = kvalitetsvurdering?.internVurdering,

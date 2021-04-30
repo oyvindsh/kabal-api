@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
-import no.nav.klage.oppgave.domain.kodeverk.HjemmelConverter
-import no.nav.klage.oppgave.domain.kodeverk.Utfall
-import no.nav.klage.oppgave.domain.kodeverk.UtfallConverter
+import no.nav.klage.oppgave.domain.kodeverk.*
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -16,6 +13,9 @@ class Vedtak(
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     var utfall: Utfall? = null,
+    @Column(name = "grunn_id")
+    @Convert(converter = GrunnConverter::class)
+    var grunn: Grunn? = null,
     @ElementCollection(targetClass = Hjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "vedtak_hjemmel",

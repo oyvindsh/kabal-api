@@ -213,21 +213,20 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setKvalitetsvurderingGrunn(
+    fun Klagebehandling.setVedtakGrunn(
+        vedtakId: UUID,
         nyVerdi: Grunn?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering()
-        }
-        val gammelVerdi = kvalitetsvurdering!!.grunn
+        val vedtak = getVedtakFromKlagebehandling(this, vedtakId)
+        val gammelVerdi = vedtak.grunn
         val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.grunn = nyVerdi
-        kvalitetsvurdering!!.modified = tidspunkt
+        vedtak.grunn = nyVerdi
+        vedtak.modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.OMGJOERINGSGRUNN,
                 gammelVerdi?.id.toString(),
                 nyVerdi?.id.toString(),
                 tidspunkt
@@ -249,7 +248,7 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.EOES,
                 gammelVerdi?.id.toString(),
                 nyVerdi?.id.toString(),
                 tidspunkt
@@ -271,7 +270,7 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.RAADGIVENDE_OVERLEGE,
                 gammelVerdi?.id.toString(),
                 nyVerdi?.id.toString(),
                 tidspunkt
@@ -291,7 +290,7 @@ object KlagebehandlingAggregatFunctions {
         kvalitetsvurdering!!.internVurdering = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TILDELT_SAKSBEHANDLERIDENT, gammelVerdi, nyVerdi, tidspunkt)
+            endringslogg(saksbehandlerident, Felt.KVALITETSVURDERING, gammelVerdi, nyVerdi, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
@@ -309,7 +308,7 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.SEND_TILBAKEMELDING,
                 gammelVerdi?.toString(),
                 nyVerdi?.toString(),
                 tidspunkt
@@ -329,7 +328,7 @@ object KlagebehandlingAggregatFunctions {
         kvalitetsvurdering!!.tilbakemelding = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TILDELT_SAKSBEHANDLERIDENT, gammelVerdi, nyVerdi, tidspunkt)
+            endringslogg(saksbehandlerident, Felt.TILBAKEMELDING, gammelVerdi, nyVerdi, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
@@ -346,7 +345,7 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.UTFALL,
                 gammelVerdi.toString(),
                 nyVerdi.toString(),
                 tidspunkt
@@ -367,7 +366,7 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.JOURNALPOST_I_VEDTAK,
                 gammelVerdi,
                 nyVerdi,
                 tidspunkt
@@ -388,7 +387,7 @@ object KlagebehandlingAggregatFunctions {
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.TILDELT_SAKSBEHANDLERIDENT,
+                Felt.SLUTTFOERT,
                 gammelVerdi.toString(),
                 nyVerdi.toString(),
                 tidspunkt

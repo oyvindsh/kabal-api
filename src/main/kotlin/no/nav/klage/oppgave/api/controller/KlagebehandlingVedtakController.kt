@@ -2,10 +2,7 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
-import no.nav.klage.oppgave.api.view.VedtakUtfallInput
-import no.nav.klage.oppgave.api.view.VedtakVedleggInput
-import no.nav.klage.oppgave.api.view.VedtakView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
@@ -83,6 +80,24 @@ class KlagebehandlingVedtakController(
                 ),
                 vedtakId.toUUIDOrException(),
                 input.utfall,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
+        )
+    }
+
+    @PutMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/grunn")
+    fun putGrunn(
+        @PathVariable("klagebehandlingid") klagebehandlingId: String,
+        @PathVariable("vedtakid") vedtakId: String,
+        @RequestBody input: VedtakGrunnInput
+    ): KlagebehandlingDetaljerView {
+        logMethodDetails("putGrunn", klagebehandlingId, vedtakId)
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
+            klagebehandlingService.setVedtakGrunn(
+                klagebehandlingId.toUUIDOrException(),
+                vedtakId.toUUIDOrException(),
+                input.klagebehandlingVersjon,
+                input.grunn,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )

@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvs
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingGrunn
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInternvurdering
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingRaadfoertMedLege
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
@@ -21,6 +20,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMot
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakGrunn
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
@@ -202,14 +202,15 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
-    fun setKvalitetsvurderingGrunn(
+    fun setVedtakGrunn(
         klagebehandlingId: UUID,
+        vedtakId: UUID,
         klagebehandlingVersjon: Long?,
         grunn: Grunn?,
         saksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        val event = klagebehandling.setKvalitetsvurderingGrunn(grunn, saksbehandlerIdent)
+        val event = klagebehandling.setVedtakGrunn(vedtakId, grunn, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

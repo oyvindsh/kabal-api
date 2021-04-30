@@ -1,10 +1,7 @@
 package no.nav.klage.oppgave.api.view
 
 import no.nav.klage.oppgave.domain.kodeverk.Eoes
-import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
-
-data class KvalitetsvurderingGrunnInput(val grunn: Grunn?, val klagebehandlingVersjon: Long? = null)
 
 data class KvalitetsvurderingEoesInput(val eoes: Eoes?, val klagebehandlingVersjon: Long? = null)
 
