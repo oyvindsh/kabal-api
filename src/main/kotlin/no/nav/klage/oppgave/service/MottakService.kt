@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
@@ -45,7 +44,6 @@ class MottakService(
             validateEnhet(it)
             validateKaEnhet(it)
         }
-        hjemler.forEach { validateHjemmel(it) }
     }
 
     private fun validateSaksbehandler(saksbehandlerident: String, enhet: String) {
@@ -53,15 +51,6 @@ class MottakService(
             throw OversendtKlageNotValidException("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
         }
     }
-
-    private fun validateHjemmel(hjemmel: HjemmelFraFoersteInstans) =
-        try {
-            //hjemmelService.generateHjemmelFromText(hjemmel)
-        } catch (e: Exception) {
-            logger.warn("Unable to parse hjemmel from oversendt klage: {}", hjemmel, e)
-            throw OversendtKlageNotValidException("$hjemmel er ikke en gyldig hjemmel")
-        }
-
 
     private fun validateKaEnhet(enhet: String) {
         if (!enhet.startsWith(KLAGEENHET_PREFIX)) {
