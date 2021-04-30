@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service
 class SaksbehandlerService(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
-    fun getTilgangerForSaksbehandler(): EnheterMedLovligeTemaer =
-        innloggetSaksbehandlerRepository.getTilgangerForSaksbehandler()
+    fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
+        innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
 }

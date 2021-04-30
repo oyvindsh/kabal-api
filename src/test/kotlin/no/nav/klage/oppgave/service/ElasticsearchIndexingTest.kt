@@ -160,7 +160,7 @@ class ElasticsearchIndexingTest {
             journalpostId = emptyList(),
             saksreferanse = saksreferanse,
             tildeltEnhet = "",
-            tema = Tema.SYK.id,
+            tema = Tema.OMS.id,
             type = Type.KLAGE.id,
             tildeltSaksbehandlerident = null,
             innsendt = null,

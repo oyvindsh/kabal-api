@@ -78,7 +78,7 @@ class StatistikkInElasticsearchServiceTest {
             id = id.toString(),
             versjon = 1L,
             tildeltEnhet = "4219",
-            tema = Tema.FOR.id,
+            tema = Tema.OMS.id,
             type = Type.KLAGE.id,
             tildeltSaksbehandlerident = null,
             innsendt = innsendt,

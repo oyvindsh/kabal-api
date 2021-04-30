@@ -1,11 +1,8 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.clients.axsys.AxsysClient
-import no.nav.klage.oppgave.clients.axsys.Tilganger
 import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
-import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
-import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -15,6 +12,7 @@ import kotlin.system.measureTimeMillis
 class SaksbehandlerRepository(
     private val client: MicrosoftGraphClient,
     private val axsysClient: AxsysClient,
+    private val saksbehandlerMapper: SaksbehandlerMapper,
     @Value("\${ROLE_GOSYS_OPPGAVE_BEHANDLER}") private val gosysSaksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
@@ -34,8 +32,8 @@ class SaksbehandlerRepository(
         const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
 
-    fun getTilgangerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =
-        axsysClient.getTilgangerForSaksbehandler(ident).mapToInterntDomene()
+    fun getEnheterMedTemaerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =
+        saksbehandlerMapper.mapTilgangerToEnheterMedLovligeTemaer(axsysClient.getTilgangerForSaksbehandler(ident))
 
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
@@ -72,20 +70,4 @@ class SaksbehandlerRepository(
     private fun getRoller(ident: String): List<String> = client.getRoller(ident)
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
-
-    private fun Tilganger.mapToInterntDomene(): EnheterMedLovligeTemaer =
-        EnheterMedLovligeTemaer(this.enheter.map { enhet ->
-            EnhetMedLovligeTemaer(
-                enhet.enhetId,
-                enhet.navn,
-                enhet.temaer?.mapNotNull { mapTemaNavnToTema(it) } ?: emptyList())
-        })
-
-    private fun mapTemaNavnToTema(tema: String): Tema? =
-        try {
-            Tema.fromNavn(tema)
-        } catch (e: Exception) {
-            logger.error("Unable to map Tema $tema", e)
-            null
-        }
 }

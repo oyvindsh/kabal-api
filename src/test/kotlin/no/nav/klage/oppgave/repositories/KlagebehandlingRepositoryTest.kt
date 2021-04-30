@@ -43,7 +43,7 @@ class KlagebehandlingRepositoryTest {
     fun `persist klage works`() {
 
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
@@ -59,7 +59,7 @@ class KlagebehandlingRepositoryTest {
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
                 skalMottaKopi = false
             ),
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
@@ -84,7 +84,7 @@ class KlagebehandlingRepositoryTest {
     fun `persist klage with saksdokumenter works`() {
 
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
@@ -100,7 +100,7 @@ class KlagebehandlingRepositoryTest {
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
                 skalMottaKopi = false
             ),
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
@@ -132,7 +132,7 @@ class KlagebehandlingRepositoryTest {
         testEntityManager.clear()
 
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             kilde = "OPPGAVE",
             kildeReferanse = "1234234",
@@ -148,7 +148,7 @@ class KlagebehandlingRepositoryTest {
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
                 skalMottaKopi = false
             ),
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(

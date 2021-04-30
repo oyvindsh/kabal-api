@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
 import io.swagger.annotations.ApiModel
+import org.springframework.core.env.Environment
+import java.util.*
 import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
@@ -62,7 +64,8 @@ enum class Tema(override val id: String, override val navn: String, override val
     VEN("53", "VEN", "Ventelønn"),
     YRA("54", "YRA", "Yrkesrettet attføring"),
     YRK("55", "YRK", "Yrkesskade / Menerstatning"),
-    GOS("56", "GOS", "Gosys"); //Er ikke egentlig et tema, men returneres fra Axsys likevel
+    GOS("56", "GOS", "Gosys") //Er ikke egentlig et tema, men returneres fra Axsys likevel
+    ;
 
     override fun toString(): String {
         return "Tema(id=$id, " +
@@ -79,6 +82,17 @@ enum class Tema(override val id: String, override val navn: String, override val
             return values().firstOrNull { it.navn == navn }
                 ?: throw IllegalArgumentException("No Tema with ${navn} exists")
         }
+    }
+}
+
+object LovligeTemaer {
+    private val lovligeTemaerIProdGcp = EnumSet.of(Tema.OMS)
+    private val lovligeTemaerIDevGcp = EnumSet.of(Tema.OMS, Tema.SYK)
+
+    fun lovligeTemaer(environment: Environment): EnumSet<Tema> = if (environment.activeProfiles.contains("prod-gcp")) {
+        lovligeTemaerIProdGcp
+    } else {
+        lovligeTemaerIDevGcp
     }
 }
 

@@ -83,7 +83,7 @@ class ElasticsearchServiceTest {
             id = "1001L",
             versjon = 1L,
             tildeltEnhet = "4219",
-            tema = Tema.SYK.id,
+            tema = Tema.OMS.id,
             type = Type.KLAGE.id,
             tildeltSaksbehandlerident = null,
             innsendt = LocalDate.of(2019, 10, 1),
@@ -97,7 +97,7 @@ class ElasticsearchServiceTest {
                 id = "1002L",
                 versjon = 1L,
                 tildeltEnhet = "4219",
-                tema = Tema.FOR.id,
+                tema = Tema.SYK.id,
                 type = Type.KLAGE.id,
                 tildeltSaksbehandlerident = null,
                 innsendt = LocalDate.of(2018, 10, 1),
@@ -124,7 +124,7 @@ class ElasticsearchServiceTest {
         val klagebehandlinger: List<EsKlagebehandling> =
             service.findByCriteria(
                 KlagebehandlingerSearchCriteria(
-                    temaer = listOf(Tema.SYK),
+                    temaer = listOf(Tema.OMS),
                     offset = 0,
                     limit = 10
                 )
