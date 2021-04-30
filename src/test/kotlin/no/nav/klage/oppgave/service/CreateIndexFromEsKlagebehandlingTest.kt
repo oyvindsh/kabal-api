@@ -71,12 +71,11 @@ class CreateIndexFromEsKlagebehandlingTest {
     fun `recreating index works`() {
         service.recreateIndex()
         val mappingResponse = client.lowLevelClient.performRequest(Request("GET", "/_all/_mapping"))
-        val mapping: String = EntityUtils.toString(mappingResponse.entity)
+        EntityUtils.toString(mappingResponse.entity)
     }
 
     @Test
     @Order(3)
-    //@Disabled("kan brukes for å generere mapping, for så å lagre som fil")
     fun `denne vil printe ut mapping generert fra EsKlagebehandling`() {
         val indexOps = esTemplate.indexOps(EsKlagebehandling::class.java)
         val mappingDocument = indexOps.createMapping(EsKlagebehandling::class.java)

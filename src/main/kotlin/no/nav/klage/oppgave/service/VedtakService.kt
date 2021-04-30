@@ -5,9 +5,11 @@ import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFinalizedIdInVedtak
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
 import no.nav.klage.oppgave.domain.klage.Vedtak
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
@@ -50,6 +52,18 @@ class VedtakService(
     ): Vedtak {
         val event =
             klagebehandling.setUtfallInVedtak(vedtakId, utfall, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
+    }
+
+    fun setGrunn(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        grunn: Grunn?,
+        utfoerendeSaksbehandlerIdent: String
+    ): Vedtak {
+        val event =
+            klagebehandling.setGrunnInVedtak(vedtakId, grunn, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
     }
@@ -153,4 +167,6 @@ class VedtakService(
             it.id == vedtakId
         } ?: throw VedtakNotFoundException("Vedtak med id $vedtakId ikke funnet")
     }
+
+
 }

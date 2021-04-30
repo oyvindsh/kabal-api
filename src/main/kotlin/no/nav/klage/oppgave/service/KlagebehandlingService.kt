@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvs
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingGrunn
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInternvurdering
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingRaadfoertMedLege
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
@@ -198,18 +197,6 @@ class KlagebehandlingService(
                 medunderskriverIdent,
                 utfoerendeSaksbehandlerIdent
             )
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setKvalitetsvurderingGrunn(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
-        grunn: Grunn?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        val event = klagebehandling.setKvalitetsvurderingGrunn(grunn, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

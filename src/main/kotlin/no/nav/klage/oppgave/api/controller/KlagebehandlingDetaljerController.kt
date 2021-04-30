@@ -190,22 +190,6 @@ class KlagebehandlingDetaljerController(
         )
     }
 
-    @PutMapping("/klagebehandlinger/{id}/detaljer/grunn")
-    fun putKvalitetsvurderingGrunn(
-        @PathVariable("id") klagebehandlingId: String,
-        @RequestBody input: KvalitetsvurderingGrunnInput
-    ): KlagebehandlingDetaljerView {
-        logMethodDetails("putKvalitetsvurderingGrunn", klagebehandlingId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            klagebehandlingService.setKvalitetsvurderingGrunn(
-                klagebehandlingId.toUUIDOrException(),
-                input.klagebehandlingVersjon,
-                input.grunn,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
-    }
-
     @PutMapping("/klagebehandlinger/{id}/detaljer/eoes")
     fun putKvalitetsvurderingEoes(
         @PathVariable("id") klagebehandlingId: String,

@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingView
 import no.nav.klage.oppgave.api.view.VedtakView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
@@ -125,7 +124,6 @@ class KlagebehandlingMapper(
             hjemler = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
-            grunn = klagebehandling.kvalitetsvurdering?.grunn?.id,
             eoes = klagebehandling.kvalitetsvurdering?.eoes?.id,
             raadfoertMedLege = klagebehandling.kvalitetsvurdering?.raadfoertMedLege?.id,
             internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
@@ -141,8 +139,9 @@ class KlagebehandlingMapper(
         if (dokument != null) {
             return VedtakView(
                 id = vedtak.id,
-                utfall = vedtak.utfall,
-                hjemler = vedtak.hjemler,
+                utfall = vedtak.utfall?.id,
+                grunn = vedtak.grunn?.id,
+                hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere,
                 finalized = vedtak.finalized,
                 content = Base64.getEncoder().encodeToString(dokument.bytes)
@@ -150,26 +149,13 @@ class KlagebehandlingMapper(
         } else {
             return VedtakView(
                 id = vedtak.id,
-                utfall = vedtak.utfall,
-                hjemler = vedtak.hjemler,
+                utfall = vedtak.utfall?.id,
+                grunn = vedtak.grunn?.id,
+                hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere,
                 finalized = vedtak.finalized
             )
         }
-    }
-
-
-    fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KvalitetsvurderingView {
-        val kvalitetsvurdering = klagebehandling.kvalitetsvurdering
-        return KvalitetsvurderingView(
-            grunn = kvalitetsvurdering?.grunn?.id,
-            eoes = kvalitetsvurdering?.eoes?.id,
-            raadfoertMedLege = kvalitetsvurdering?.raadfoertMedLege?.id,
-            internVurdering = kvalitetsvurdering?.internVurdering,
-            sendTilbakemelding = kvalitetsvurdering?.sendTilbakemelding,
-            tilbakemelding = kvalitetsvurdering?.tilbakemelding,
-            klagebehandlingVersjon = klagebehandling.versjon
-        )
     }
 
     private fun foedselsnummer(partId: PartId) =
