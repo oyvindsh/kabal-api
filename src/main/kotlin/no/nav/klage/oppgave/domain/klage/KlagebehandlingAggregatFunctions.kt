@@ -213,7 +213,7 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setVedtakGrunn(
+    fun Klagebehandling.setGrunnInVedtak(
         vedtakId: UUID,
         nyVerdi: Grunn?,
         saksbehandlerident: String

@@ -29,7 +29,6 @@ data class KlagebehandlingDetaljerView(
     val modified: LocalDateTime,
     val created: LocalDateTime,
     val fraSaksbehandlerident: String? = null,
-    val grunn: String?,
     val eoes: String?,
     val raadfoertMedLege: String?,
     val internVurdering: String?,

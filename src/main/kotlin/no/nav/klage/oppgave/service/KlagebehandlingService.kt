@@ -20,7 +20,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMot
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakGrunn
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
@@ -198,19 +197,6 @@ class KlagebehandlingService(
                 medunderskriverIdent,
                 utfoerendeSaksbehandlerIdent
             )
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setVedtakGrunn(
-        klagebehandlingId: UUID,
-        vedtakId: UUID,
-        klagebehandlingVersjon: Long?,
-        grunn: Grunn?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        val event = klagebehandling.setVedtakGrunn(vedtakId, grunn, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

@@ -90,13 +90,15 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakGrunnInput
-    ): KlagebehandlingDetaljerView {
+    ): VedtakView {
         logMethodDetails("putGrunn", klagebehandlingId, vedtakId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            klagebehandlingService.setVedtakGrunn(
-                klagebehandlingId.toUUIDOrException(),
+        return klagebehandlingMapper.mapVedtakToVedtakView(
+            vedtakService.setGrunn(
+                klagebehandlingService.getKlagebehandlingForUpdate(
+                    klagebehandlingId.toUUIDOrException(),
+                    input.klagebehandlingVersjon
+                ),
                 vedtakId.toUUIDOrException(),
-                input.klagebehandlingVersjon,
                 input.grunn,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
