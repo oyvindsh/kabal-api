@@ -48,3 +48,5 @@ OPPGAVE_URL: https://api-gw-q1.oera.no/oppgave/api/v1/oppgaver
 
 JOARK_SERVICE_URL: http://localhost:1234
 JOURNALPOST_APIKEY: none
+DOKDIST_SERVICE_URL: TODO
+DOKDIST_APIKEY: TODO

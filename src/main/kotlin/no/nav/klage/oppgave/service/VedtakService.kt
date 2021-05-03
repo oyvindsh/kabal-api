@@ -1,11 +1,13 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.clients.dokdistfordeling.DokDistFordelingClient
 import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.KafkaVedtakEvent
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setBestillingsIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFinalizedIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
@@ -37,7 +39,8 @@ class VedtakService(
     private val attachmentValidator: AttachmentValidator,
     private val joarkClient: JoarkClient,
     private val dokumentService: DokumentService,
-    private val kafkaVedtakEventRepository: KafkaVedtakEventRepository
+    private val kafkaVedtakEventRepository: KafkaVedtakEventRepository,
+    private val dokDistFordelingClient: DokDistFordelingClient
 ) {
 
     companion object {
@@ -109,6 +112,55 @@ class VedtakService(
         applicationEventPublisher.publishEvent(event)
         return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
     }
+
+    fun setBestillingsId(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        bestillingsId: UUID,
+        utfoerendeSaksbehandlerIdent: String
+    ): Vedtak {
+        val event =
+            klagebehandling.setBestillingsIdInVedtak(vedtakId, bestillingsId, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
+    }
+
+    fun finalizeJournalpost(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        utfoerendeSaksbehandlerIdent: String,
+        journalfoerendeEnhet: String
+    ): Vedtak? {
+        val vedtak = getVedtakFromKlagebehandling(klagebehandling, vedtakId)
+        if (vedtak.finalized != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        return try {
+            joarkClient.finalizeJournalpost(vedtak.journalpostId!!, journalfoerendeEnhet)
+            setFinalized(klagebehandling, vedtakId, utfoerendeSaksbehandlerIdent)
+        } catch (e: Exception) {
+            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
+            null
+        }
+    }
+
+    fun distributeJournalpost(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        utfoerendeSaksbehandlerIdent: String,
+        journalfoerendeEnhet: String
+    ): Vedtak? {
+        val vedtak = getVedtakFromKlagebehandling(klagebehandling, vedtakId)
+        if (vedtak.finalized == null) throw VedtakFinalizedException("Vedtak med id $vedtakId er ikke ferdigstilt")
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        return try {
+            val bestillingsId = dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
+            setBestillingsId(klagebehandling, vedtakId, bestillingsId, utfoerendeSaksbehandlerIdent)
+        } catch (e: Exception) {
+            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
+            null
+        }
+    }
+
 
     fun addVedlegg(
         klagebehandling: Klagebehandling,

@@ -134,6 +134,7 @@ CREATE TABLE klage.vedtak
     modified           TIMESTAMP WITH TIME ZONE NOT NULL,
     created            TIMESTAMP WITH TIME ZONE NOT NULL,
     finalized          TIMESTAMP WITH TIME ZONE,
+    bestillings_id     UUID,
     CONSTRAINT fk_vedtak_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)

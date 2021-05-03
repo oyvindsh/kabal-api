@@ -35,7 +35,9 @@ class Vedtak(
     @Column(name = "journalpost_id")
     var journalpostId: String? = null,
     @Column(name = "finalized")
-    var finalized: LocalDateTime? = null
+    var finalized: LocalDateTime? = null,
+    @Column(name = "bestillings_id")
+    var bestillingsId: UUID? = null,
 ) {
     override fun toString(): String {
         return "Vedtak(id=$id, " +
