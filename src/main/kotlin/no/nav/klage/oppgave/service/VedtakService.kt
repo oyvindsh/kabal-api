@@ -6,10 +6,12 @@ import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFinalizedIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
 import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
@@ -64,6 +66,18 @@ class VedtakService(
     ): Vedtak {
         val event =
             klagebehandling.setGrunnInVedtak(vedtakId, grunn, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
+    }
+
+    fun setHjemler(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        hjemler: Set<Hjemmel>,
+        utfoerendeSaksbehandlerIdent: String
+    ): Vedtak {
+        val event =
+            klagebehandling.setHjemlerInVedtak(vedtakId, hjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
     }

@@ -20,6 +20,7 @@ data class KlagebehandlingDetaljerView(
     val tema: String,
     val type: String,
     val mottatt: LocalDate?,
+    val mottattKlageinstans: LocalDate?,
     val startet: LocalDate? = null,
     val avsluttet: LocalDate? = null,
     val frist: LocalDate? = null,

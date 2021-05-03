@@ -28,6 +28,19 @@ enum class Grunn(override val id: String, override val navn: String, override va
 
 }
 
+data class GrunnerPerUtfall(val utfall: Utfall, val grunner: List<Grunn>)
+
+val grunnerPerUtfall: List<GrunnerPerUtfall> = listOf(
+    GrunnerPerUtfall(Utfall.DELVIS_MEDHOLD, Grunn.values().asList()),
+    GrunnerPerUtfall(Utfall.MEDHOLD, Grunn.values().asList()),
+    GrunnerPerUtfall(Utfall.OPPHEVET, Grunn.values().asList()),
+    GrunnerPerUtfall(Utfall.AVVIST, emptyList()),
+    GrunnerPerUtfall(Utfall.OPPRETTHOLDT, emptyList()),
+    GrunnerPerUtfall(Utfall.RETUR, emptyList()),
+    GrunnerPerUtfall(Utfall.TRUKKET, emptyList()),
+    GrunnerPerUtfall(Utfall.UGUNST, emptyList())
+)
+
 @Converter
 class GrunnConverter : AttributeConverter<Grunn, String?> {
 

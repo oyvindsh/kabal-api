@@ -116,6 +116,7 @@ class KlagebehandlingMapper(
             tema = klagebehandling.tema.id,
             type = klagebehandling.type.id,
             mottatt = klagebehandling.mottattKlageinstans,
+            mottattKlageinstans = klagebehandling.mottattKlageinstans,
             startet = klagebehandling.startet,
             avsluttet = klagebehandling.avsluttet,
             frist = klagebehandling.frist,

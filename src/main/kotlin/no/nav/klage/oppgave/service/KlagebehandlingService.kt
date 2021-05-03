@@ -17,9 +17,9 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKva
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverident
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
@@ -75,7 +75,7 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
-    fun setSakstype(
+    fun setType(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
         type: Type,
@@ -83,7 +83,7 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event =
-            klagebehandling.setSakstype(type, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setType(type, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

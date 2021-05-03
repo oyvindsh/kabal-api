@@ -54,7 +54,7 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setSakstype(
+    fun Klagebehandling.setType(
         nyVerdi: Type,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
@@ -229,6 +229,27 @@ object KlagebehandlingAggregatFunctions {
                 Felt.OMGJOERINGSGRUNN,
                 gammelVerdi?.id.toString(),
                 nyVerdi?.id.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setHjemlerInVedtak(
+        vedtakId: UUID,
+        nyVerdi: Set<Hjemmel>,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val vedtak = getVedtakFromKlagebehandling(this, vedtakId)
+        val gammelVerdi = vedtak.hjemler
+        val tidspunkt = LocalDateTime.now()
+        vedtak.hjemler = nyVerdi.toMutableSet()
+        vedtak.modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.HJEMLER_I_VEDTAK,
+                gammelVerdi.map { it.id }.joinToString(),
+                nyVerdi.map { it.id }.joinToString(),
                 tidspunkt
             )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
