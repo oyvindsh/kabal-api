@@ -248,8 +248,8 @@ object KlagebehandlingAggregatFunctions {
             endringslogg(
                 saksbehandlerident,
                 Felt.HJEMLER_I_VEDTAK,
-                gammelVerdi.map { it.id }.joinToString { "," },
-                nyVerdi.map { it.id }.joinToString { "," },
+                gammelVerdi.map { it.id }.joinToString(),
+                nyVerdi.map { it.id }.joinToString(),
                 tidspunkt
             )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
