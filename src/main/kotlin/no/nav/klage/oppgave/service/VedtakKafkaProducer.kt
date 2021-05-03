@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class VedtakKafkaProducer(
-    private val kafkaTemplate: KafkaTemplate<String, KlagevedtakFattet>
+    private val kafkaTemplate: KafkaTemplate<String, String>
 ) {
     @Value("\${VEDTAK_FATTET_TOPIC}")
     lateinit var topic: String
@@ -18,13 +20,14 @@ class VedtakKafkaProducer(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+        private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
     }
 
     fun sendVedtak(vedtak: KlagevedtakFattet) {
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nVedtak: {}", topic, vedtak)
         runCatching {
-            kafkaTemplate.send(topic, vedtak)
+            kafkaTemplate.send(topic, vedtak.toJson())
             logger.debug("Vedtak sent to Kafka.")
         }.onFailure {
             val errorMessage = "Could not send vedtak to Kafka. Check secure logs for more information."
@@ -33,4 +36,6 @@ class VedtakKafkaProducer(
             throw RuntimeException(errorMessage)
         }
     }
+
+    private fun Any.toJson(): String = objectMapper.writeValueAsString(this)
 }
