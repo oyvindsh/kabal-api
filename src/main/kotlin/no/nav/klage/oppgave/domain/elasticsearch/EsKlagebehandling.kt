@@ -28,6 +28,8 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Text)
     val klagerFornavn: String? = null,
     @Field(type = FieldType.Text)
+    val klagerMellomnavn: String? = null,
+    @Field(type = FieldType.Text)
     val klagerEtternavn: String? = null,
     @Field(type = FieldType.Keyword)
     val klagerOrgnr: String? = null,
@@ -39,6 +41,8 @@ data class EsKlagebehandling(
     val sakenGjelderNavn: String? = null,
     @Field(type = FieldType.Text)
     val sakenGjelderFornavn: String? = null,
+    @Field(type = FieldType.Text)
+    val sakenGjelderMellomnavn: String? = null,
     @Field(type = FieldType.Text)
     val sakenGjelderEtternavn: String? = null,
     @Field(type = FieldType.Keyword)
