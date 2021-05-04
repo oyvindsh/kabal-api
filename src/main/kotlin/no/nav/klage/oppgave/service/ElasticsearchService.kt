@@ -26,6 +26,7 @@ import org.springframework.data.elasticsearch.core.document.Document
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
@@ -236,12 +237,12 @@ open class ElasticsearchService(
         esKlagebehandlingRepository.deleteAll()
     }
 
-    fun findAllIds(): List<String> {
+    fun findAllIdAndModified(): Map<String, LocalDateTime> {
         val allQuery: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(allQuery, EsKlagebehandling::class.java)
-        return searchHits.searchHits.map { it.id!! }
+        return searchHits.searchHits.map { it.id!! to it.content.modified }.toMap()
     }
 
     open fun findRelatedKlagebehandlinger(
