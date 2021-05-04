@@ -268,13 +268,13 @@ open class ElasticsearchService(
 
     private fun klagebehandlingerMedFoedselsnummer(fnr: String, aapen: Boolean): List<EsKlagebehandling> {
         return findWithBaseQueryAndAapen(
-            QueryBuilders.boolQuery().must(QueryBuilders.termQuery("foedselsnummer", fnr)), aapen
+            QueryBuilders.boolQuery().must(QueryBuilders.termQuery("sakenGjelderFnr", fnr)), aapen
         )
     }
 
     private fun klagebehandlingerMedSaksreferanse(saksreferanse: String, aapen: Boolean): List<EsKlagebehandling> {
         return findWithBaseQueryAndAapen(
-            QueryBuilders.boolQuery().must(QueryBuilders.termQuery("saksreferanse", saksreferanse)), aapen
+            QueryBuilders.boolQuery().must(QueryBuilders.termQuery("kildeReferanse", saksreferanse)), aapen
         )
     }
 
@@ -283,7 +283,8 @@ open class ElasticsearchService(
         aapen: Boolean
     ): List<EsKlagebehandling> {
         return findWithBaseQueryAndAapen(
-            QueryBuilders.boolQuery().must(QueryBuilders.termsQuery("journalpostId", journalpostIder)), aapen
+            QueryBuilders.boolQuery().must(QueryBuilders.termsQuery("saksdokumenterJournalpostId", journalpostIder)),
+            aapen
         )
     }
 

@@ -28,6 +28,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 @ActiveProfiles("local")
@@ -86,7 +87,10 @@ class StatistikkInElasticsearchServiceTest {
             mottattKlageinstans = LocalDate.of(2018, 12, 1),
             frist = frist,
             avsluttet = avsluttet,
-            hjemler = listOf()
+            hjemler = listOf(),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            kilde = "K9"
         )
 
     @Test

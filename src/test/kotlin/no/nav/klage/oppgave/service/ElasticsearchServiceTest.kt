@@ -29,6 +29,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 @ActiveProfiles("local")
@@ -90,7 +91,10 @@ class ElasticsearchServiceTest {
             mottattFoersteinstans = LocalDate.of(2019, 11, 1),
             mottattKlageinstans = LocalDate.of(2019, 12, 1),
             frist = LocalDate.of(2020, 12, 1),
-            hjemler = listOf()
+            hjemler = listOf(),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            kilde = "K9"
         )
         val klagebehandling2 =
             EsKlagebehandling(
@@ -104,7 +108,10 @@ class ElasticsearchServiceTest {
                 mottattFoersteinstans = LocalDate.of(2018, 11, 1),
                 mottattKlageinstans = LocalDate.of(2018, 12, 1),
                 frist = LocalDate.of(2019, 12, 1),
-                hjemler = listOf()
+                hjemler = listOf(),
+                created = LocalDateTime.now(),
+                modified = LocalDateTime.now(),
+                kilde = "K9"
             )
         esTemplate.save(klagebehandling1)
         esTemplate.save(klagebehandling2)

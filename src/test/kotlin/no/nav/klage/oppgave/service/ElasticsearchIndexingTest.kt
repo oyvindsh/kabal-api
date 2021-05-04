@@ -31,6 +31,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 @ActiveProfiles("local")
@@ -91,7 +92,7 @@ class ElasticsearchIndexingTest {
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.saksreferanse).isEqualTo("hei")
+        assertThat(searchHits.searchHits.first().content.kildeReferanse).isEqualTo("hei")
     }
 
     @Test
@@ -118,7 +119,7 @@ class ElasticsearchIndexingTest {
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.saksreferanse).isEqualTo("hallo")
+        assertThat(searchHits.searchHits.first().content.kildeReferanse).isEqualTo("hallo")
     }
 
     @Test
@@ -150,15 +151,14 @@ class ElasticsearchIndexingTest {
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
         assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.saksreferanse).isEqualTo("hei")
+        assertThat(searchHits.searchHits.first().content.kildeReferanse).isEqualTo("hei")
     }
 
     private fun klagebehandlingWith(id: String, versjon: Long, saksreferanse: String): EsKlagebehandling {
         return EsKlagebehandling(
             id = id,
             versjon = versjon,
-            journalpostId = emptyList(),
-            saksreferanse = saksreferanse,
+            kildeReferanse = saksreferanse,
             tildeltEnhet = "",
             tema = Tema.OMS.id,
             type = Type.KLAGE.id,
@@ -170,12 +170,14 @@ class ElasticsearchIndexingTest {
             startet = null,
             avsluttet = null,
             hjemler = listOf(Hjemmel.FTL_8_35.id),
-            foedselsnummer = null,
-            navn = null,
+            sakenGjelderFnr = null,
+            sakenGjelderNavn = null,
             egenAnsatt = false,
             fortrolig = false,
-            strengtFortrolig = false
-
+            strengtFortrolig = false,
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            kilde = "K9"
         )
     }
 }
