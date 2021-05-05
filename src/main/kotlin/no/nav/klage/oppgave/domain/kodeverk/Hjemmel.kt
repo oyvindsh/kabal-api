@@ -114,7 +114,7 @@ val hjemlerPerTema: List<HjemlerPerTema> = listOf(
     HjemlerPerTema(
         Tema.OMS,
         Hjemmel.values().filter { it.kapittelOgParagraf != null && it.kapittelOgParagraf.kapittel == 9 }
-                + Hjemmel.FTL
+                + Hjemmel.FTL + Hjemmel.MANGLER
     )
 )
 
