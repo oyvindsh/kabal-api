@@ -17,6 +17,8 @@ data class KlagebehandlingDetaljerView(
     // TODO Legge til virksomhetsnavn (mangler ereg integrasjon)
     val foedselsnummer: String?,
     val virksomhetsnummer: String?,
+    val navn: Navn?,
+    val kjoenn: String?,
     val tema: String,
     val type: String,
     val mottatt: LocalDate?,
