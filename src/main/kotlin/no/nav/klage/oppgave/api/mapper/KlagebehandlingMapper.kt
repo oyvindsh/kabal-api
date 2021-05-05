@@ -178,8 +178,8 @@ class KlagebehandlingMapper(
             sakenGjelderKjoenn = sakenGjelder?.kjoenn,
             sakenGjelderVirksomhetsnummer = sakenGjelderVirksomhetsnummer,
             sakenGjelderVirksomhetsnavn = sakenGjelderVirksomhet?.navn?.sammensattNavn(),
-            foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
-            virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
+            foedselsnummer = klagerFoedselsnummer, // TODO deprecate
+            virksomhetsnummer = klagerVirksomhetsnummer, // TODO deprecate
             klagerFoedselsnummer = klagerFoedselsnummer,
             klagerVirksomhetsnummer = klagerVirksomhetsnummer,
             klagerVirksomhetsnavn = klagerVirksomhet?.navn?.sammensattNavn(),
