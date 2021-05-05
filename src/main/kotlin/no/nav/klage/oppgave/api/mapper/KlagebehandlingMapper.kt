@@ -159,6 +159,12 @@ class KlagebehandlingMapper(
         val enhetNavn = klagebehandling.avsenderEnhetFoersteinstans?.let { norg2Client.fetchEnhet(it) }?.navn
         val sakenGjelderFoedselsnummer = foedselsnummer(klagebehandling.sakenGjelder.partId)
         val sakenGjelder = sakenGjelderFoedselsnummer?.let { pdlFacade.getPersonInfo(it) }
+        val sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId)
+        val sakenGjelderVirksomhet = sakenGjelderVirksomhetsnummer?.let { eregClient.hentOrganisasjon(it) }
+        val klagerFoedselsnummer = foedselsnummer(klagebehandling.klager.partId)
+        val klager = klagerFoedselsnummer?.let { pdlFacade.getPersonInfo(it) }
+        val klagerVirksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId)
+        val klagerVirksomhet = klagerVirksomhetsnummer?.let { eregClient.hentOrganisasjon(it) }
 
         return KlagebehandlingDetaljerView(
             id = klagebehandling.id,
@@ -170,9 +176,15 @@ class KlagebehandlingMapper(
             sakenGjelderFoedselsnummer = sakenGjelderFoedselsnummer,
             sakenGjelderNavn = sakenGjelder.getNavn(),
             sakenGjelderKjoenn = sakenGjelder?.kjoenn,
-            sakenGjelderVirksomhetsnummer = virksomhetsnummer(klagebehandling.sakenGjelder.partId),
-            foedselsnummer = foedselsnummer(klagebehandling.klager.partId),
-            virksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId),
+            sakenGjelderVirksomhetsnummer = sakenGjelderVirksomhetsnummer,
+            sakenGjelderVirksomhetsnavn = sakenGjelderVirksomhet?.navn?.sammensattNavn(),
+            foedselsnummer = klagerFoedselsnummer, // TODO deprecate
+            virksomhetsnummer = klagerVirksomhetsnummer, // TODO deprecate
+            klagerFoedselsnummer = klagerFoedselsnummer,
+            klagerVirksomhetsnummer = klagerVirksomhetsnummer,
+            klagerVirksomhetsnavn = klagerVirksomhet?.navn?.sammensattNavn(),
+            klagerNavn = klager.getNavn(),
+            klagerKjoenn = klager?.kjoenn,
             tema = klagebehandling.tema.id,
             type = klagebehandling.type.id,
             mottatt = klagebehandling.mottattKlageinstans,
