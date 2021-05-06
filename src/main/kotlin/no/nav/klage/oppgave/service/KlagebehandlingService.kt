@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
@@ -37,7 +38,8 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val dokumentService: DokumentService
+    private val dokumentService: DokumentService,
+    private val tokenService: TokenService
 ) {
 
     companion object {
@@ -302,6 +304,58 @@ class KlagebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
+    }
+
+    fun createKlagebehandlingFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
+        val klager = Klager(
+            partId = PartId(
+                type = PartIdType.PERSON,
+                value = kvalitetsvurdering.foedslsnummer
+            )
+        )
+
+        val hjemler = createHjemmelSetFromMottak(kvalitetsvurdering.hjemler)
+
+        val klagebehandling = klagebehandlingRepository.save(
+            Klagebehandling(
+                klager = klager,
+                sakenGjelder = klager.toSakenGjelder(),
+                tema = kvalitetsvurdering.tema,
+                type = Type.KLAGE, // TODO
+                mottakId = UUID.randomUUID(), // TODO
+                kilde = "MANUELL",
+                mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
+                tildeltSaksbehandlerident = tokenService.getIdent(),
+                tildeltEnhet = kvalitetsvurdering.tildeltKlageenhet,
+                hjemler = hjemler,
+                kvalitetsvurdering = Kvalitetsvurdering(
+                    eoes = kvalitetsvurdering.eoes,
+                    raadfoertMedLege = kvalitetsvurdering.raadfoertMedLege,
+                    internVurdering = kvalitetsvurdering.internVurdering,
+                    sendTilbakemelding = kvalitetsvurdering.sendTilbakemelding,
+                    tilbakemelding = kvalitetsvurdering.tilbakemelding,
+                    mottakerSaksbehandlerident = kvalitetsvurdering.foersteinstansSaksbehandler,
+                    mottakerEnhet = kvalitetsvurdering.foersteinstansEnhet
+                ),
+                vedtak = mutableSetOf(
+                    Vedtak(
+                        utfall = kvalitetsvurdering.utfall,
+                        grunn = kvalitetsvurdering.grunn,
+                        journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
+                        hjemler = hjemler
+                    )
+                )
+            )
+        )
+        logger.debug("Created behandling ${klagebehandling.id} from manuell kvalitetsvurdering")
+        applicationEventPublisher.publishEvent(
+            KlagebehandlingEndretEvent(
+                klagebehandling = klagebehandling,
+                endringslogginnslag = emptyList()
+            )
+        )
+
+        return klagebehandling.id
     }
 
     private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =
