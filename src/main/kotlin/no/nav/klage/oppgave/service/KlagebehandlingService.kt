@@ -306,7 +306,10 @@ class KlagebehandlingService(
         )
     }
 
-    fun createKlagebehandlingFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
+    fun createKlagebehandlingFromKvalitetsvurdering(
+        kvalitetsvurdering: KvalitetsvurderingManuellInput,
+        mottakId: UUID
+    ): UUID {
         val klager = Klager(
             partId = PartId(
                 type = PartIdType.PERSON,
@@ -322,7 +325,7 @@ class KlagebehandlingService(
                 sakenGjelder = klager.toSakenGjelder(),
                 tema = kvalitetsvurdering.tema,
                 type = Type.KLAGE, // TODO
-                mottakId = UUID.randomUUID(), // TODO
+                mottakId = mottakId,
                 kilde = "MANUELL",
                 mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
                 tildeltSaksbehandlerident = tokenService.getIdent(),

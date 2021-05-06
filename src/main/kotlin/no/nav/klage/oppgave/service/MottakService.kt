@@ -1,8 +1,9 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
-import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -17,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 class MottakService(
@@ -43,6 +45,26 @@ class MottakService(
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
+    }
+
+    fun createMottakFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
+        val klager = Klager(
+            partId = PartId(
+                type = PartIdType.PERSON,
+                value = kvalitetsvurdering.foedslsnummer
+            )
+        )
+
+        val mottak = mottakRepository.save(Mottak(
+            tema = kvalitetsvurdering.tema,
+            klager = klager,
+            kildeReferanse = "MANUELL",
+            kilde = "KABAL",
+            oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
+            type = Type.KLAGE
+        ))
+
+        return mottak.id
     }
 
     fun OversendtKlage.validate() {
@@ -98,5 +120,5 @@ class MottakService(
             logger.warn("Unable to validate journalpost from oversendt klage: {}", journalpostId, e)
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
-    
+
 }
