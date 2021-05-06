@@ -20,5 +20,8 @@ spec:
       containers:
         - image: docker.pkg.github.com/navikt/kabal-e2e-tests/kabal-e2e-tests:latest
           name: kabal-e2e-tests
+          envFrom:
+            - secretRef:
+                name: slack-e2e-secrets
       dnsPolicy: ClusterFirst
       restartPolicy: Never
