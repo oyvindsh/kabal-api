@@ -313,7 +313,7 @@ class KlagebehandlingService(
         val klager = Klager(
             partId = PartId(
                 type = PartIdType.PERSON,
-                value = kvalitetsvurdering.foedslsnummer
+                value = kvalitetsvurdering.foedselsnummer
             )
         )
 

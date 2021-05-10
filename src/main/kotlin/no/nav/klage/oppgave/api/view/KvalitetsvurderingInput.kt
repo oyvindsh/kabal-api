@@ -34,7 +34,7 @@ data class KvalitetsvurderingManuellInput(
     val foersteinstansEnhet: String,
     val foersteinstansSaksbehandler: String,
     val tildeltKlageenhet: String?,
-    val foedslsnummer: String,
+    val foedselsnummer: String,
     val hjemler: MutableSet<MottakHjemmel>,
     val utfall: Utfall,
     val grunn: Grunn,
