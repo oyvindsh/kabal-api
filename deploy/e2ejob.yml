@@ -23,7 +23,7 @@ spec:
           envFrom:
             - secretRef:
                 name: slack-e2e-secrets
-            - configMapKeyRef:
+            - configMapRef:
                  name: slack-e2e-configmap
       dnsPolicy: ClusterFirst
       restartPolicy: Never
