@@ -59,7 +59,6 @@ class MottakService(
             tema = kvalitetsvurdering.tema,
             klager = klager,
             kildeReferanse = "N/A",
-            dvhReferanse = UUID.randomUUID().toString(),
             kilde = "MANUELL",
             oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
             type = Type.KLAGE
