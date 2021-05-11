@@ -102,6 +102,7 @@ spec:
     - secret: elastic
     - secret: journalpost-apikey
     - secret: ereg
+    - secret: influx
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
