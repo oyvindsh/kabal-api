@@ -1,7 +1,5 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.api.view.Fagsystem
-import no.nav.klage.oppgave.api.view.FagsystemConverter
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import java.time.LocalDate
@@ -84,8 +82,9 @@ class Klagebehandling(
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "kilde")
-    val kilde: String,
+    @Column(name = "kildesystem")
+    @Convert(converter = FagsystemConverter::class)
+    val kildesystem: Fagsystem,
     @Column(name = "kommentar_fra_foersteinstans")
     val kommentarFraFoersteinstans: String? = null,
 ) {

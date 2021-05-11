@@ -88,7 +88,7 @@ class KlagebehandlingMapper(
             hjemler = klagebehandling.hjemler.map { it.id },
             created = klagebehandling.created,
             modified = klagebehandling.modified,
-            kilde = klagebehandling.kilde,
+            kilde = klagebehandling.kildesystem.id,
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
             vedtak = klagebehandling.vedtak.map { vedtak ->

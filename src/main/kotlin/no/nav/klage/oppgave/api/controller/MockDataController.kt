@@ -58,7 +58,7 @@ class MockDataController(
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
                         fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = Fagsystem.AO01
+                        fagsystem = KildeFagsystem.AO01
                     )
                 },
                 kildeReferanse = "REF_$fnr",
@@ -82,7 +82,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
@@ -105,7 +105,7 @@ class MockDataController(
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
                         fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = Fagsystem.AO01
+                        fagsystem = KildeFagsystem.AO01
                     )
                 },
                 kildeReferanse = "REF_$fnr",
@@ -129,7 +129,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
@@ -152,7 +152,7 @@ class MockDataController(
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
                         fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = Fagsystem.AO01
+                        fagsystem = KildeFagsystem.AO01
                     )
                 },
                 kildeReferanse = "REF_$fnr",
@@ -176,7 +176,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
@@ -203,7 +203,7 @@ class MockDataController(
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
                         fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = Fagsystem.AO01
+                        fagsystem = KildeFagsystem.AO01
                     )
                 },
                 kildeReferanse = "REF_$fnr",
@@ -227,7 +227,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
