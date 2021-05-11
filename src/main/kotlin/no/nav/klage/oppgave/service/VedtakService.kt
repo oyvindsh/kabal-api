@@ -167,7 +167,7 @@ class VedtakService(
         val utfall = vedtak.utfall!!
         val vedtakFattet = KlagevedtakFattet(
             kildeReferanse = klage.kildeReferanse ?: "UKJENT",
-            kilde = klage.kilde,
+            kilde = klage.kildesystem.name,
             utfall = utfall,
             vedtaksbrevReferanse = vedtak.journalpostId,
             kabalReferanse = vedtakId.toString()

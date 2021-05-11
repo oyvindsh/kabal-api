@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -45,7 +46,7 @@ class KlagebehandlingRepositoryTest {
         val mottak = Mottak(
             tema = Tema.OMS,
             type = Type.KLAGE,
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
@@ -68,7 +69,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDate.now(),
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
 
@@ -86,7 +87,7 @@ class KlagebehandlingRepositoryTest {
         val mottak = Mottak(
             tema = Tema.OMS,
             type = Type.KLAGE,
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
@@ -113,7 +114,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDate.now(),
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
 
@@ -134,7 +135,7 @@ class KlagebehandlingRepositoryTest {
         val mottak = Mottak(
             tema = Tema.OMS,
             type = Type.KLAGE,
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
@@ -161,7 +162,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDate.now(),
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
 

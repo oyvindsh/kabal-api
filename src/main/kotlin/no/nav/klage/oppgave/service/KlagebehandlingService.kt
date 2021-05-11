@@ -291,7 +291,7 @@ class KlagebehandlingService(
                 kvalitetsvurdering = null,
                 hjemler = createHjemmelSetFromMottak(mottak.hjemmelListe),
                 saksdokumenter = createSaksdokumenter(mottak),
-                kilde = mottak.kilde,
+                kildesystem = mottak.kildesystem,
                 kommentarFraFoersteinstans = mottak.kommentar
             )
         )
