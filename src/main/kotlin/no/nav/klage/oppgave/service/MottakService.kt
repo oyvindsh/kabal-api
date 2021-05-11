@@ -58,8 +58,9 @@ class MottakService(
         val mottak = mottakRepository.save(Mottak(
             tema = kvalitetsvurdering.tema,
             klager = klager,
-            kildeReferanse = "MANUELL",
-            kilde = "KABAL",
+            kildeReferanse = "N/A",
+            dvhReferanse = UUID.randomUUID().toString(),
+            kilde = "MANUELL",
             oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
             type = Type.KLAGE
         ))
