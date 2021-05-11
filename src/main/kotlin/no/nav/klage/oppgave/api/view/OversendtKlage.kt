@@ -3,13 +3,11 @@ package no.nav.klage.oppgave.api.view
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.Kode
+import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
-import javax.persistence.AttributeConverter
-import javax.persistence.Converter
 import javax.validation.constraints.Past
 
 @ApiModel
@@ -86,9 +84,9 @@ data class OversendtKlage(
     @ApiModelProperty(
         notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
         required = true,
-        example = "K9-sak"
+        example = "FS39"
     )
-    val kilde: String,
+    val kilde: KildeFagsystem,
     @ApiModelProperty(
         notes = "Kommentarer fra saksbehandler i førsteinstans som ikke er med i oversendelsesbrevet klager mottar",
         required = false
@@ -101,7 +99,7 @@ data class OversendtKlage(
         klager = klager.toKlagepart(),
         sakenGjelder = sakenGjelder?.toSakenGjelder(),
         innsynUrl = innsynUrl,
-        sakFagsystem = fagsak?.fagsystem,
+        sakFagsystem = fagsak?.fagsystem?.mapFagsystem(),
         sakFagsakId = fagsak?.fagsakId,
         kildeReferanse = kildeReferanse,
         dvhReferanse = dvhReferanse,
@@ -114,9 +112,16 @@ data class OversendtKlage(
         mottattNavDato = mottattFoersteinstans,
         oversendtKaDato = LocalDate.now(),
         fristFraFoersteinstans = frist,
-        kilde = kilde
+        kildesystem = kilde.mapFagsystem()
     )
 }
+
+private fun KildeFagsystem.mapFagsystem(): Fagsystem =
+    when (this) {
+        KildeFagsystem.AO01 -> Fagsystem.AO01
+        KildeFagsystem.FS36 -> Fagsystem.FS36
+        KildeFagsystem.FS39 -> Fagsystem.FS39
+    }
 
 class HjemmelFraFoersteInstans private constructor(
     @ApiModelProperty(
@@ -253,34 +258,13 @@ data class OversendtSak(
         required = true,
         example = "FS39"
     )
-    val fagsystem: Fagsystem
+    val fagsystem: KildeFagsystem
 )
 
 @ApiModel
-enum class Fagsystem(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
-    FS36("1", "FS36", "Vedtaksløsning Foreldrepenger"),
-    FS39("2", "FS39", "Saksbehandling for Folketrygdloven kapittel 9"),
-    AO01("3", "AO01", "Arena"); // Blir satt av Dolly
-
-    companion object {
-        fun of(id: String): Fagsystem {
-            return Fagsystem.values().firstOrNull { it.id == id }
-                ?: throw IllegalArgumentException("No Fagsystem with $id exists")
-        }
-
-        fun fromNavn(navn: String): Fagsystem {
-            return Fagsystem.values().firstOrNull { it.navn == navn }
-                ?: throw IllegalArgumentException("No Fagsystem with $navn exists")
-        }
-    }
+enum class KildeFagsystem {
+    FS36,
+    FS39,
+    AO01; // Blir satt av Dolly
 }
 
-@Converter
-class FagsystemConverter : AttributeConverter<Fagsystem, String?> {
-
-    override fun convertToDatabaseColumn(entity: Fagsystem?): String? =
-        entity?.let { it.id }
-
-    override fun convertToEntityAttribute(id: String?): Fagsystem? =
-        id?.let { Fagsystem.of(it) }
-}

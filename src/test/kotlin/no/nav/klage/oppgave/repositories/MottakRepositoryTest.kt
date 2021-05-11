@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.api.view.Fagsystem
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.assertj.core.api.Assertions.assertThat
@@ -55,7 +55,7 @@ class MottakRepositoryTest {
                 )
             ),
             oversendtKaDato = LocalDate.now(),
-            kilde = "Kilde"
+            kildesystem = Fagsystem.AO01
         )
 
         mottakRepository.save(mottak)
