@@ -92,7 +92,7 @@ spec:
       {{/each}}
         - host: influx-klage-nav-dev.aivencloud.com
           ports:
-            - name: http
+            - name: https
               port: 26482
               protocol: TCP
   envFrom:

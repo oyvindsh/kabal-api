@@ -81,7 +81,7 @@ management:
         enabled: true
         auto-create-db: false
         db: defaultdb
-        uri: http://${INFLUX_HOST}:${INFLUX_PORT}
+        uri: https://${INFLUX_HOST}:${INFLUX_PORT}
         user-name: ${INFLUX_USERNAME}
         password: ${INFLUX_PASSWORD}
     tags:
