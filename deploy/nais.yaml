@@ -90,6 +90,10 @@ spec:
       {{#each externalHosts as |host|}}
         - host: {{host}}
       {{/each}}
+        - host: influx-klage-nav-dev.aivencloud.com
+          ports:
+            - port: 26482
+              protocol: TCP
   envFrom:
     - secret: srvklage-saksbeh
     - secret: sts-apikey
