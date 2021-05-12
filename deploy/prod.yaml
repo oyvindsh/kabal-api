@@ -2,12 +2,17 @@ ingresses:
   - https://klage-oppgave-api.intern.nav.no
   - https://kabal-api.intern.nav.no
 externalHosts:
-  - login.microsoftonline.com
-  - hooks.slack.com
-  - unleash.nais.io
-  - klage-fss-proxy.prod-fss-pub.nais.io
-  - kafka-schema-registry.nais.adeo.no
-  - saf.prod-fss-pub.nais.io
+  - host: login.microsoftonline.com
+  - host: hooks.slack.com
+  - host: unleash.nais.io
+  - host: klage-fss-proxy.prod-fss-pub.nais.io
+  - host: kafka-schema-registry.nais.adeo.no
+  - host: saf.prod-fss-pub.nais.io
+  - host: influx-klage-nav-prod.aivencloud.com
+    ports:
+      - name: https
+        port: 26482
+        protocol: TCP
 springProfile: prod-gcp
 tenant: nav.no
 db_tier: db-custom-4-15360
