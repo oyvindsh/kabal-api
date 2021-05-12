@@ -8,7 +8,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
-import javax.validation.constraints.Past
+import javax.validation.constraints.PastOrPresent
 
 @ApiModel
 data class OversendtKlage(
@@ -72,7 +72,7 @@ data class OversendtKlage(
         required = true
     )
     val tilknyttedeJournalposter: List<OversendtDokumentReferanse>,
-    @field:Past(message = "Dato for mottatt førsteinstans må være i fortiden")
+    @field:PastOrPresent(message = "Dato for mottatt førsteinstans må være i fortiden eller i dag")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val mottattFoersteinstans: LocalDate,
     val innsendtTilNav: LocalDate,
