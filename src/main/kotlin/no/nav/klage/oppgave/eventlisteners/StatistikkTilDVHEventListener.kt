@@ -1,10 +1,7 @@
 package no.nav.klage.oppgave.eventlisteners
 
 import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
-import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
-import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
@@ -82,12 +79,12 @@ class StatistikkTilDVHEventListener(
             beslutter = klagebehandling.medunderskriverident,
             endringstid = now,
             hjemmel = klagebehandling.hjemler.joinToString(separator = ",") { it.toSearchableString() },
-            klager = "TODO",
+            klager = getPart(klagebehandling.klager.partId.type, klagebehandling.klager.partId.value),
             omgjoeringsgrunn = vedtak?.grunn?.navn,
             opprinneligFagsaksystem = mottak.kildesystem.navn,
             overfoertKA = mottak.created.toLocalDate(),
             resultat = vedtak?.utfall?.navn,
-            sakenGjelder = "TODO",
+            sakenGjelder = getPart(klagebehandling.sakenGjelder.partId.type, klagebehandling.sakenGjelder.partId.value),
             saksbehandler = klagebehandling.tildeltSaksbehandlerident,
             saksbehandlerEnhet = klagebehandling.tildeltEnhet,
             tekniskTid = now,
@@ -96,4 +93,20 @@ class StatistikkTilDVHEventListener(
             ytelseType = "TODO"
         )
     }
+
+    private fun getPart(type: PartIdType, value: String) =
+        when (type) {
+            PartIdType.PERSON -> {
+                KlageStatistikkTilDVH.Part(
+                    verdi = value,
+                    type = KlageStatistikkTilDVH.PartIdType.PERSON
+                )
+            }
+            PartIdType.VIRKSOMHET -> {
+                KlageStatistikkTilDVH.Part(
+                    verdi = value,
+                    type = KlageStatistikkTilDVH.PartIdType.VIRKSOMHET
+                )
+            }
+        }
 }

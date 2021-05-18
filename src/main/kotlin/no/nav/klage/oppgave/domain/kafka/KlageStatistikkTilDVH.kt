@@ -58,12 +58,11 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i kildesystemet. (format:$DATE_TIME_FORMAT) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endrings tidspunktet, mens funksjonellTid angir tidspunktet da endringen offisielt gjelder fra.")
     val endringstid: LocalDateTime,
 
-    @JsonSchemaDescription("Liste pr utfall.")
+    @JsonSchemaDescription("Kommaseparert liste av hjemler.")
     val hjemmel: String,
 
-//    TODO: Type som fnr/virksomhetsnr
     @JsonSchemaDescription("Den som sendt inn klagen.")
-    val klager: String,
+    val klager: Part,
 
     @JsonSchemaDescription("Grunn til utfallet, hvis det finnes.")
     val omgjoeringsgrunn: String?,
@@ -92,12 +91,8 @@ data class KlageStatistikkTilDVH(
 //     */
 //    val utenlandstilsnitt: String,
 
-    /**
-     * Den som har rettigheten
-    TODO: Type som fnr/virksomhetsnr
-     */
-    @JsonSchemaDescription("Den som har rettigheten.a")
-    val sakenGjelder: String,
+    @JsonSchemaDescription("Den som har rettigheten.")
+    val sakenGjelder: Part,
 
     @JsonSchemaDescription("Bruker IDen til saksbehandler ansvarlig for saken på gjeldende tidspunkt. Kan etterlates tom ved helautomatiske delprosesser i behandlingen. Bør bare fylles når det er manuelle skritt i saksbehandlingen som utføres.")
     val saksbehandler: String?,
@@ -131,5 +126,14 @@ data class KlageStatistikkTilDVH(
     DVH har et eget kodeverk for disse. Kan være vi kan bruke dette.
      */
     @JsonSchemaDescription("Stønaden eller ytelsen det er saken omhandler. Hva gjelder saken?")
-    val ytelseType: String,
-)
+    val ytelseType: String
+) {
+    data class Part(
+        val verdi: String,
+        val type: PartIdType
+    )
+
+    enum class PartIdType {
+        PERSON, VIRKSOMHET
+    }
+}
