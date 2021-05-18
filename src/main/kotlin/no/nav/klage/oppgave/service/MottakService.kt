@@ -1,13 +1,13 @@
 package no.nav.klage.oppgave.service
 
+
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
+import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
-import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.MottakLagretEvent
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
@@ -27,7 +27,8 @@ class MottakService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
-    private val enhetRepository: EnhetRepository
+    private val enhetRepository: EnhetRepository,
+    private val meterRegistry: MeterRegistry
 ) {
 
     private val lovligeTemaerIKabal = LovligeTemaer.lovligeTemaer(environment)
@@ -45,6 +46,7 @@ class MottakService(
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
+        meterRegistry.incrementMottattKlage(mottak.kildesystem, mottak.tema)
     }
 
     fun createMottakFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
@@ -55,14 +57,16 @@ class MottakService(
             )
         )
 
-        val mottak = mottakRepository.save(Mottak(
-            tema = kvalitetsvurdering.tema,
-            klager = klager,
-            kildeReferanse = "N/A",
-            kilde = "MANUELL",
-            oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
-            type = Type.KLAGE
-        ))
+        val mottak = mottakRepository.save(
+            Mottak(
+                tema = kvalitetsvurdering.tema,
+                klager = klager,
+                kildeReferanse = "N/A",
+                kildesystem = Fagsystem.MANUELL,
+                oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
+                type = Type.KLAGE
+            )
+        )
 
         return mottak.id
     }

@@ -37,6 +37,9 @@ spec:
           - id: {{ROLE_KLAGE_STRENGT_FORTROLIG}}
           - id: {{ROLE_KLAGE_EGEN_ANSATT}}
           - id: {{ROLE_GOSYS_OPPGAVE_BEHANDLER}}
+          {{#if ROLE_ADMIN}}
+          - id: {{ROLE_ADMIN}}
+          {{/if}}
         extra:
           - NAVident
   elastic:
