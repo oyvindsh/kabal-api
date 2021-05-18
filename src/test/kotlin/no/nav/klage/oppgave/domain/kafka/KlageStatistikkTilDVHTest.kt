@@ -5,6 +5,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig
 import com.kjetland.jackson.jsonSchema.JsonSchemaDraft
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 internal class KlageStatistikkTilDVHTest {
 
@@ -18,6 +20,36 @@ internal class KlageStatistikkTilDVHTest {
         val jsonSchema = schemaGen.generateJsonSchema(KlageStatistikkTilDVH::class.java)
 
         println(objectMapper.writeValueAsString(jsonSchema))
+
+        val klageStatistikkTilDVH = KlageStatistikkTilDVH(
+            ansvarligEnhetKode = "kode",
+            ansvarligEnhetType = "type",
+            avsender = "avsender",
+            behandlingId = "arsta-rstz-xct-trstrst34-sft",
+            behandlingIdKabal = "arst-arsdt-drt-j8z-89",
+            behandlingStartetKA = LocalDate.now(),
+            behandlingStatus = "status",
+            behandlingType = "behType",
+            beslutter = "beslutter",
+            endringstid = LocalDateTime.now(),
+            hjemmel = "8-14",
+            klager = "20127529618",
+            omgjoeringsgrunn = "grunn",
+            opprinneligFagsaksystem = "K9Sak",
+            overfoertKA = LocalDate.now(),
+            vedtaksDato = LocalDate.now(),
+            resultat = "resultatet",
+            sakenGjelder = "20127431578",
+            saksbehandler = "Z405060",
+            saksbehandlerEnhet = "4291",
+            tekniskTid = LocalDateTime.now(),
+            vedtakId = "ers-8sdt-80s-89u",
+            vedtaksdato = LocalDate.now(),
+            versjon = 1,
+            ytelseType = "OMS"
+        )
+
+        println(objectMapper.writeValueAsString(klageStatistikkTilDVH))
     }
 
 }
