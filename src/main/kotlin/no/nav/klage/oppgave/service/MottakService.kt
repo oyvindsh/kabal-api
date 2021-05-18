@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.service
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
+import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
@@ -25,7 +27,8 @@ class MottakService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
-    private val enhetRepository: EnhetRepository
+    private val enhetRepository: EnhetRepository,
+    private val meterRegistry: MeterRegistry
 ) {
 
     private val lovligeTemaerIKabal = LovligeTemaer.lovligeTemaer(environment)
@@ -43,6 +46,7 @@ class MottakService(
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
+        meterRegistry.incrementMottattKlage()
     }
 
     fun OversendtKlage.validate() {
@@ -98,5 +102,5 @@ class MottakService(
             logger.warn("Unable to validate journalpost from oversendt klage: {}", journalpostId, e)
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
-    
+
 }
