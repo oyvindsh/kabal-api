@@ -7,10 +7,7 @@ import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
-import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.MottakLagretEvent
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
@@ -65,7 +62,7 @@ class MottakService(
                 tema = kvalitetsvurdering.tema,
                 klager = klager,
                 kildeReferanse = "N/A",
-                kilde = "MANUELL",
+                kildesystem = Fagsystem.MANUELL,
                 oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
                 type = Type.KLAGE
             )

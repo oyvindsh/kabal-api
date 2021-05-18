@@ -326,7 +326,7 @@ class KlagebehandlingService(
                 tema = kvalitetsvurdering.tema,
                 type = Type.KLAGE, // TODO
                 mottakId = mottakId,
-                kilde = "MANUELL",
+                kildesystem = Fagsystem.MANUELL,
                 mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
                 tildeltSaksbehandlerident = tokenService.getIdent(),
                 tildeltEnhet = kvalitetsvurdering.tildeltKlageenhet,
