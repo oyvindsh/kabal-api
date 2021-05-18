@@ -10,11 +10,17 @@
     "vedtaksbrevReferanse"
   ],
   "properties": {
-    "id": {
-      "$id": "#KlagevedtakFattet/id",
-      "title": "Identifikator",
+    "kildeReferanse": {
+      "$id": "#KlagevedtakFattet/kildeReferanse",
+      "title": "Kildereferanse",
       "type": "string",
       "description": "Ekstern id for klage. Skal stemme overens med id sendt inn."
+    },
+    "kilde": {
+      "$id": "#KlagevedtakFattet/kilde",
+      "title": "Kilde",
+      "type": "string",
+      "description": "Kilden som sendte inn klage. Skal stemme overens med kilde sendt inn."
     },
     "utfall": {
       "$id": "#KlagevedtakFattet/utfall",
@@ -37,6 +43,12 @@
       "title": "Vedtaksbrevreferanse",
       "type": "string",
       "description": "Journalpost id til vedtaksbrev."
+    },
+    "kabalReferanse": {
+      "$id": "#KlagevedtakFattet/kabalReferanse",
+      "title": "Kabalreferanse",
+      "type": "string",
+      "description": "Intern referanse fra kabal. Skal i fremtiden brukes for å hente data om vedtak fra Kabal (se Swagger doc)"
     }
   }
 }
