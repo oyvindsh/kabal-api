@@ -80,7 +80,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.module:jackson-module-jsonSchema")
+    implementation("com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39")
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
