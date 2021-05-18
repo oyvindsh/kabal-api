@@ -78,9 +78,6 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Når KA mottok oversendelsen.")
     val overfoertKA: LocalDate,
 
-    /**
-     * Eventuell liste? Kodeverk?
-     */
     @JsonSchemaDescription("Utfall.")
     val resultat: String?,
 
