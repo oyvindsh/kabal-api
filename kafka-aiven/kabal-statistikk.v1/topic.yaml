@@ -1,7 +1,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: kvalitet.v1
+  name: kabal-statistikk.v1
   namespace: klage
   labels:
     team: klage
