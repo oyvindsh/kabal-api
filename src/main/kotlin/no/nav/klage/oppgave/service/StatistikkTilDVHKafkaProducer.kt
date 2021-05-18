@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class StatistikkTilDVHKafkaProducer(
     private val kafkaTemplate: KafkaTemplate<String, KlageStatistikkTilDVH>
 ) {
-    @Value("\${KVALITET_TOPIC}")
+    @Value("\${DVH_STATISTIKK_TOPIC}")
     lateinit var topic: String
 
     companion object {
@@ -22,14 +22,14 @@ class StatistikkTilDVHKafkaProducer(
 
     fun sendStatistikkTilDVH(statistikk: KlageStatistikkTilDVH) {
         logger.debug("Sending to Kafka topic: {}", topic)
-        secureLogger.debug("Sending to Kafka topic: {}\nKvalitet: {}", topic, statistikk)
+        secureLogger.debug("Sending to Kafka topic: {}\nKlageStatistikkTilDVH: {}", topic, statistikk)
         runCatching {
             kafkaTemplate.send(topic, statistikk)
-            logger.debug("Kvalitet sent to Kafka.")
+            logger.debug("KlageStatistikkTilDVH sent to Kafka.")
         }.onFailure {
-            val errorMessage = "Could not send kvalitet to Kafka. Check secure logs for more information."
+            val errorMessage = "Could not send KlageStatistikkTilDVH to Kafka. Check secure logs for more information."
             logger.error(errorMessage)
-            secureLogger.error("Could not send kvalitet to Kafka", it)
+            secureLogger.error("Could not send KlageStatistikkTilDVH to Kafka", it)
             throw RuntimeException(errorMessage)
         }
     }
