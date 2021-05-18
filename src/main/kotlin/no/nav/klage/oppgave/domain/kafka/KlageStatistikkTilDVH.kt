@@ -29,6 +29,11 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Nøkkel til den aktuelle behandling, som kan identifisere den i Kabal.")
     val behandlingIdKabal: String,
 
+    @JsonFormat(
+        shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd"
+    )
+    @JsonSchemaFormat("yyyy-MM-dd")
     @JsonSchemaDescription("Når behandlingen startet i KA")
     val behandlingStartetKA: LocalDate,
 
@@ -41,7 +46,12 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Bruker IDen til den ansvarlige beslutningstageren for saken. Medunderskriver.")
     val beslutter: String,
 
-    @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i kildesystemet. (format:yyyy-mm-ddThh24:mn:ss.FF6) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endrings tidspunktet, mens funksjonellTid angir tidspunktet da endringen offisielt gjelder fra.")
+    @JsonFormat(
+        shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+    )
+    @JsonSchemaFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+    @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i kildesystemet. (format:yyyy-MM-dd'T'HH:mm:ss.SSSSSS) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endrings tidspunktet, mens funksjonellTid angir tidspunktet da endringen offisielt gjelder fra.")
     val endringstid: LocalDateTime,
 
     @JsonSchemaDescription("Liste pr utfall.")
@@ -57,9 +67,19 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("F.eks. Foreldrepenger. Det finnes kodeverk for dette.")
     val opprinneligFagsaksystem: String,
 
+    @JsonFormat(
+        shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd"
+    )
+    @JsonSchemaFormat("yyyy-MM-dd")
     @JsonSchemaDescription("Når KA mottok oversendelsen.")
     val overfoertKA: LocalDate,
 
+    @JsonFormat(
+        shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd"
+    )
+    @JsonSchemaFormat("yyyy-MM-dd")
     @JsonSchemaDescription("Tidspunkt da vedtaket på behandlingen falt.")
     val vedtaksDato: LocalDate,
 
@@ -89,20 +109,22 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Enhet til gjeldende saksbehandler.")
     val saksbehandlerEnhet: String,
 
-    /**
-    Tidspunktet da kildesystemet ble klar over hendelsen. (format:yyyy-mm-ddThh24:mn:ss.FF6). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.
-     */
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
     )
-    @JsonSchemaDescription("Tidspunktet da kildesystemet ble klar over hendelsen. (format:yyyy-mm-ddThh24:mn:ss.FF6). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
-    @JsonSchemaFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonSchemaFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+    @JsonSchemaDescription("Tidspunktet da kildesystemet ble klar over hendelsen. (format:yyyy-MM-dd'T'HH:mm:ss.SSSSSS). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
     val tekniskTid: LocalDateTime,
 
     @JsonSchemaDescription("Nøkkel til det aktuelle vedtaket da behandlingen blir tilknyttet et slikt. Vi skal helst kunne identifisere vedtaket i kildensystemet.")
     val vedtakId: String,
 
+    @JsonFormat(
+        shape = JsonFormat.Shape.STRING,
+        pattern = "yyyy-MM-dd"
+    )
+    @JsonSchemaFormat("yyyy-MM-dd")
     @JsonSchemaDescription("Dato for vedtaket i KA.")
     val vedtaksdato: LocalDate,
 
