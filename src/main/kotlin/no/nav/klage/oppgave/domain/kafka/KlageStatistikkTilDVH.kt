@@ -7,6 +7,9 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+const val DATE_FORMAT = "yyyy-MM-dd"
+
 /**
  * Brukes av DVH
  * KlageKvalitetStatistikk er en hendelse i en Sak, knyttet til en konkret behandlingstype (eks. søknad, revurdering, endring, klage).
@@ -16,7 +19,7 @@ import java.time.LocalDateTime
 data class KlageStatistikkTilDVH(
 
     @JsonSchemaDescription("Kode som angir hvilken enhet som er ansvarlig for behandlingen på det gjeldende tidspunktet")
-    val ansvarligEnhetKode: String,
+    val ansvarligEnhetKode: String?,
 
     @JsonSchemaDescription("Kode som angir hvilken type enhetskode det er snakk om, som oftest NORG.")
     val ansvarligEnhetType: String,
@@ -32,11 +35,11 @@ data class KlageStatistikkTilDVH(
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd"
+        pattern = DATE_FORMAT
     )
-    @JsonSchemaFormat("yyyy-MM-dd")
+    @JsonSchemaFormat(DATE_FORMAT)
     @JsonSchemaDescription("Når behandlingen startet i KA")
-    val behandlingStartetKA: LocalDate,
+    val behandlingStartetKA: LocalDate?,
 
     @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt. Ha med alle mulige statuser som er naturlig for det enkelte system/ytelse. Som minimum, angi om saken har følgende status: Registrert, Klar for behandling, Venter på bruker, venter på ekstern (arbeidsgiver, lege etc.), venter på utland, Avsluttet.Her bør det også angis at saken er behandlet av beslutter, men sendt i retur for ny behandling.")
     val behandlingStatus: String,
@@ -45,14 +48,14 @@ data class KlageStatistikkTilDVH(
     val behandlingType: String,
 
     @JsonSchemaDescription("Bruker IDen til den ansvarlige beslutningstageren for saken. Medunderskriver.")
-    val beslutter: String,
+    val beslutter: String?,
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        pattern = DATE_TIME_FORMAT
     )
-    @JsonSchemaFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-    @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i kildesystemet. (format:yyyy-MM-dd'T'HH:mm:ss.SSSSSS) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endrings tidspunktet, mens funksjonellTid angir tidspunktet da endringen offisielt gjelder fra.")
+    @JsonSchemaFormat(DATE_TIME_FORMAT)
+    @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i kildesystemet. (format:$DATE_TIME_FORMAT) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endrings tidspunktet, mens funksjonellTid angir tidspunktet da endringen offisielt gjelder fra.")
     val endringstid: LocalDateTime,
 
     @JsonSchemaDescription("Liste pr utfall.")
@@ -70,25 +73,17 @@ data class KlageStatistikkTilDVH(
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd"
+        pattern = DATE_FORMAT
     )
-    @JsonSchemaFormat("yyyy-MM-dd")
+    @JsonSchemaFormat(DATE_FORMAT)
     @JsonSchemaDescription("Når KA mottok oversendelsen.")
     val overfoertKA: LocalDate,
-
-    @JsonFormat(
-        shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd"
-    )
-    @JsonSchemaFormat("yyyy-MM-dd")
-    @JsonSchemaDescription("Tidspunkt da vedtaket på behandlingen falt.")
-    val vedtaksDato: LocalDate,
 
     /**
      * Eventuell liste? Kodeverk?
      */
     @JsonSchemaDescription("Utfall.")
-    val resultat: String,
+    val resultat: String?,
 
     //Hvis EØS kommer tilbake så legg til dette.
 //    /**
@@ -105,17 +100,17 @@ data class KlageStatistikkTilDVH(
     val sakenGjelder: String,
 
     @JsonSchemaDescription("Bruker IDen til saksbehandler ansvarlig for saken på gjeldende tidspunkt. Kan etterlates tom ved helautomatiske delprosesser i behandlingen. Bør bare fylles når det er manuelle skritt i saksbehandlingen som utføres.")
-    val saksbehandler: String,
+    val saksbehandler: String?,
 
     @JsonSchemaDescription("Enhet til gjeldende saksbehandler.")
-    val saksbehandlerEnhet: String,
+    val saksbehandlerEnhet: String?,
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        pattern = DATE_TIME_FORMAT
     )
-    @JsonSchemaFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-    @JsonSchemaDescription("Tidspunktet da kildesystemet ble klar over hendelsen. (format:yyyy-MM-dd'T'HH:mm:ss.SSSSSS). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
+    @JsonSchemaFormat(DATE_TIME_FORMAT)
+    @JsonSchemaDescription("Tidspunktet da kildesystemet ble klar over hendelsen. (format:$DATE_TIME_FORMAT). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
     val tekniskTid: LocalDateTime,
 
     @JsonSchemaDescription("Nøkkel til det aktuelle vedtaket da behandlingen blir tilknyttet et slikt. Vi skal helst kunne identifisere vedtaket i kildensystemet.")
@@ -123,11 +118,11 @@ data class KlageStatistikkTilDVH(
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "yyyy-MM-dd"
+        pattern = DATE_FORMAT
     )
-    @JsonSchemaFormat("yyyy-MM-dd")
+    @JsonSchemaFormat(DATE_FORMAT)
     @JsonSchemaDescription("Dato for vedtaket i KA.")
-    val vedtaksdato: LocalDate,
+    val vedtaksdato: LocalDate?,
 
     @JsonSchemaDescription("Angir på hvilken versjon av kildekoden JSON stringen er generert på bakgrunn av.")
     val versjon: Int,
