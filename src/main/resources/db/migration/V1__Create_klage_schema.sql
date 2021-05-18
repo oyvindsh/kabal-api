@@ -74,7 +74,7 @@ CREATE TABLE klage.mottak
     dato_mottatt_foersteinstans   DATE,
     dato_oversendt_klageinstans   DATE                     NOT NULL,
     dato_frist_fra_foersteinstans DATE,
-    kilde                         TEXT                     NOT NULL,
+    kildesystem                   TEXT                     NOT NULL,
     kommentar                     TEXT,
     created                       TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                      TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -112,7 +112,6 @@ CREATE TABLE klage.mottak_hjemmel
 CREATE TABLE klage.kvalitetsvurdering
 (
     id                          UUID PRIMARY KEY,
-    grunn_id                    TEXT,
     eoes_id                     TEXT,
     raadfoert_med_lege_id       TEXT,
     intern_vurdering            TEXT,
@@ -148,7 +147,7 @@ CREATE TABLE klage.klagebehandling
     avsender_saksbehandlerident_foersteinstans TEXT,
     mottak_id                                  UUID                     NOT NULL,
     kvalitetsvurdering_id                      UUID,
-    kilde                                      TEXT                     NOT NULL,
+    kildesystem                                TEXT                     NOT NULL,
     kommentar_fra_foersteinstans               TEXT,
     created                                    TIMESTAMP WITH TIME ZONE NOT NULL,
     modified                                   TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -170,6 +169,7 @@ CREATE TABLE klage.vedtak
 (
     id                 UUID PRIMARY KEY,
     utfall_id          TEXT,
+    grunn_id           TEXT,
     klagebehandling_id UUID                     NOT NULL,
     journalpost_id     TEXT,
     modified           TIMESTAMP WITH TIME ZONE NOT NULL,

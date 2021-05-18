@@ -1,11 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.api.view.Fagsystem
-import no.nav.klage.oppgave.api.view.FagsystemConverter
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.TemaConverter
-import no.nav.klage.oppgave.domain.kodeverk.Type
-import no.nav.klage.oppgave.domain.kodeverk.TypeConverter
+import no.nav.klage.oppgave.domain.kodeverk.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -44,7 +39,7 @@ class Mottak(
     val innsynUrl: String? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
-    var hjemmelListe: MutableSet<MottakHjemmel> = mutableSetOf(),
+    var hjemmelListe: MutableSet<MottakHjemmel>? = null,
     @Column(name = "avsender_saksbehandlerident")
     var avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")
@@ -66,8 +61,9 @@ class Mottak(
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
     val modified: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "kilde")
-    val kilde: String,
+    @Column(name = "kildesystem")
+    @Convert(converter = FagsystemConverter::class)
+    val kildesystem: Fagsystem,
     @Column(name = "kommentar")
     val kommentar: String? = null,
 ) {

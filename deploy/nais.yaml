@@ -87,8 +87,16 @@ spec:
         - application: clamav
           namespace: clamav
       external:
-      {{#each externalHosts as |host|}}
+      {{#each externalHosts}}
         - host: {{host}}
+          {{#if ports}}
+          ports:
+            {{#each ports}}
+            - name: {{name}}
+              port: {{port}}
+              protocol: {{protocol}}
+            {{/each}}
+          {{/if}}
       {{/each}}
   envFrom:
     - secret: srvklage-saksbeh
@@ -102,6 +110,7 @@ spec:
     - secret: elastic
     - secret: journalpost-apikey
     - secret: ereg
+    - secret: influx
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}

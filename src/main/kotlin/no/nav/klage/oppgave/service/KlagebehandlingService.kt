@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
@@ -10,7 +11,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvs
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingGrunn
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInternvurdering
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingRaadfoertMedLege
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
@@ -18,9 +18,9 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKva
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverident
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSakstype
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
@@ -38,7 +38,8 @@ class KlagebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val dokumentService: DokumentService
+    private val dokumentService: DokumentService,
+    private val tokenService: TokenService
 ) {
 
     companion object {
@@ -76,7 +77,7 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
-    fun setSakstype(
+    fun setType(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
         type: Type,
@@ -84,7 +85,7 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event =
-            klagebehandling.setSakstype(type, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setType(type, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -202,18 +203,6 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
-    fun setKvalitetsvurderingGrunn(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
-        grunn: Grunn?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        val event = klagebehandling.setKvalitetsvurderingGrunn(grunn, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
     fun setKvalitetsvurderingEoes(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
@@ -302,9 +291,9 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(Vedtak()),
                 kvalitetsvurdering = null,
-                hjemler = mottak.hjemmelListe.mapNotNull { mapMottakHjemmel(it) }.toMutableSet(),
+                hjemler = createHjemmelSetFromMottak(mottak.hjemmelListe),
                 saksdokumenter = createSaksdokumenter(mottak),
-                kilde = mottak.kilde,
+                kildesystem = mottak.kildesystem,
                 kommentarFraFoersteinstans = mottak.kommentar
             )
         )
@@ -316,6 +305,69 @@ class KlagebehandlingService(
             )
         )
     }
+
+    fun createKlagebehandlingFromKvalitetsvurdering(
+        kvalitetsvurdering: KvalitetsvurderingManuellInput,
+        mottakId: UUID
+    ): UUID {
+        val klager = Klager(
+            partId = PartId(
+                type = PartIdType.PERSON,
+                value = kvalitetsvurdering.foedselsnummer
+            )
+        )
+
+        val hjemler = createHjemmelSetFromMottak(kvalitetsvurdering.hjemler)
+
+        val klagebehandling = klagebehandlingRepository.save(
+            Klagebehandling(
+                klager = klager,
+                sakenGjelder = klager.toSakenGjelder(),
+                tema = kvalitetsvurdering.tema,
+                type = Type.KLAGE, // TODO
+                mottakId = mottakId,
+                kilde = "MANUELL",
+                mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
+                tildeltSaksbehandlerident = tokenService.getIdent(),
+                tildeltEnhet = kvalitetsvurdering.tildeltKlageenhet,
+                hjemler = hjemler,
+                kvalitetsvurdering = Kvalitetsvurdering(
+                    eoes = kvalitetsvurdering.eoes,
+                    raadfoertMedLege = kvalitetsvurdering.raadfoertMedLege,
+                    internVurdering = kvalitetsvurdering.internVurdering,
+                    sendTilbakemelding = kvalitetsvurdering.sendTilbakemelding,
+                    tilbakemelding = kvalitetsvurdering.tilbakemelding,
+                    mottakerSaksbehandlerident = kvalitetsvurdering.foersteinstansSaksbehandler,
+                    mottakerEnhet = kvalitetsvurdering.foersteinstansEnhet
+                ),
+                vedtak = mutableSetOf(
+                    Vedtak(
+                        utfall = kvalitetsvurdering.utfall,
+                        grunn = kvalitetsvurdering.grunn,
+                        journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
+                        hjemler = hjemler
+                    )
+                )
+            )
+        )
+        logger.debug("Created behandling ${klagebehandling.id} from manuell kvalitetsvurdering")
+        applicationEventPublisher.publishEvent(
+            KlagebehandlingEndretEvent(
+                klagebehandling = klagebehandling,
+                endringslogginnslag = emptyList()
+            )
+        )
+
+        return klagebehandling.id
+    }
+
+    private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =
+        if (hjemler == null || hjemler.isEmpty()) {
+            mutableSetOf(Hjemmel.MANGLER)
+        } else {
+            hjemler.mapNotNull { mapMottakHjemmel(it) }.toMutableSet()
+        }
+
 
     private fun Klager.toSakenGjelder() = SakenGjelder(
         partId = this.partId.copy(),

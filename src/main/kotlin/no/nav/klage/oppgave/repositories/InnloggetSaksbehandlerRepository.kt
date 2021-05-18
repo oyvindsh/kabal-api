@@ -20,8 +20,8 @@ class InnloggetSaksbehandlerRepository(
     @Value("\${ROLE_ADMIN}") private val adminRole: String
 ) {
 
-    fun getTilgangerForSaksbehandler(): EnheterMedLovligeTemaer =
-        saksbehandlerRepository.getTilgangerForSaksbehandler(getInnloggetIdent())
+    fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
+        saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(getInnloggetIdent())
 
     fun getInnloggetIdent() = tokenService.getIdent()
 
@@ -43,7 +43,7 @@ class InnloggetSaksbehandlerRepository(
     fun kanBehandleEgenAnsatt(): Boolean = tokenService.getRollerFromToken().hasRole(kanBehandleEgenAnsattRole)
 
     fun harTilgangTilEnhet(enhetId: String): Boolean {
-        return getTilgangerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId } != null
+        return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId } != null
     }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }

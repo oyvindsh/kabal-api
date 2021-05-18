@@ -2,12 +2,17 @@ ingresses:
   - https://kabal-api.dev.nav.no
   - https://kabal-api.dev.intern.nav.no
 externalHosts:
-  - login.microsoftonline.com
-  - hooks.slack.com
-  - unleash.nais.io
-  - klage-fss-proxy.dev-fss-pub.nais.io
-  - kafka-schema-registry.nais-q.adeo.no
-  - saf.dev-fss-pub.nais.io
+  - host: login.microsoftonline.com
+  - host: hooks.slack.com
+  - host: unleash.nais.io
+  - host: klage-fss-proxy.dev-fss-pub.nais.io
+  - host: kafka-schema-registry.nais-q.adeo.no
+  - host: saf.dev-fss-pub.nais.io
+  - host: influx-klage-nav-dev.aivencloud.com
+    ports:
+      - name: https
+        port: 26482
+        protocol: TCP
 springProfile: dev-gcp
 tenant: trygdeetaten.no
 db_tier: db-custom-1-3840

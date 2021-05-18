@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class IndexService(
@@ -46,24 +47,39 @@ class IndexService(
     }
 
     fun findAndLogOutOfSyncKlagebehandlinger() {
-        val idsInEs = elasticsearchService.findAllIds()
-        val idsInDb = idsInDb()
-        logger.info("Number of klagebehandlinger in ES: ${idsInEs.size}, number of klagebehandlinger in DB: ${idsInDb.size}")
-        logger.info("Klagebehandlinger in ES that are not in DB: {}", idsInEs.minus(idsInDb))
-        logger.info("Klagebehandlinger in DB that are not in ES: {}", idsInDb.minus(idsInEs))
-        //TODO: Are they up to date?
+        val esData = elasticsearchService.findAllIdAndModified()
+        val dbData = idAndModifiedInDb()
+        logger.info("Number of klagebehandlinger in ES: ${esData.size}, number of klagebehandlinger in DB: ${dbData.size}")
+        logger.info(
+            "Klagebehandlinger in ES that are not in DB: {}",
+            esData.keys.minus(dbData.keys)
+        )
+        logger.info(
+            "Klagebehandlinger in DB that are not in ES: {}",
+            dbData.keys.minus(esData.keys)
+        )
+        dbData.keys.forEach {
+            if (!dbData.getValue(it).isEqual(esData[it])) {
+                logger.info(
+                    "Klagebehandling {} is not up-to-date in ES, modified is {} in DB and {} in ES",
+                    it,
+                    dbData.getValue(it),
+                    esData[it]
+                )
+            }
+        }
     }
 
-    private fun idsInDb(): List<String> {
-        val idsInDb = mutableListOf<String>()
+    private fun idAndModifiedInDb(): Map<String, LocalDateTime> {
+        val idsInDb = mutableListOf<Pair<String, LocalDateTime>>()
         var pageable: Pageable =
             PageRequest.of(0, 50)
         do {
             val page = klagebehandlingRepository.findAll(pageable)
-            page.content.map { it.id.toString() }.let { idsInDb.addAll(it) }
+            page.content.map { it.id.toString() to it.modified }.let { idsInDb.addAll(it) }
             pageable = page.nextPageable();
         } while (pageable.isPaged)
-        return idsInDb
+        return idsInDb.toMap()
     }
 
 

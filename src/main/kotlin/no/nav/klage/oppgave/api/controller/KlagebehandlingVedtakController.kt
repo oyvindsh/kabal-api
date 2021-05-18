@@ -2,12 +2,12 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
-import no.nav.klage.oppgave.api.view.VedtakUtfallInput
-import no.nav.klage.oppgave.api.view.VedtakVedleggInput
-import no.nav.klage.oppgave.api.view.VedtakView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
+import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -82,7 +82,47 @@ class KlagebehandlingVedtakController(
                     input.klagebehandlingVersjon
                 ),
                 vedtakId.toUUIDOrException(),
-                input.utfall,
+                Utfall.of(input.utfall),
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
+        )
+    }
+
+    @PutMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/grunn")
+    fun putGrunn(
+        @PathVariable("klagebehandlingid") klagebehandlingId: String,
+        @PathVariable("vedtakid") vedtakId: String,
+        @RequestBody input: VedtakGrunnInput
+    ): VedtakView {
+        logMethodDetails("putGrunn", klagebehandlingId, vedtakId)
+        return klagebehandlingMapper.mapVedtakToVedtakView(
+            vedtakService.setGrunn(
+                klagebehandlingService.getKlagebehandlingForUpdate(
+                    klagebehandlingId.toUUIDOrException(),
+                    input.klagebehandlingVersjon
+                ),
+                vedtakId.toUUIDOrException(),
+                input.grunn?.let { Grunn.of(it) },
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
+        )
+    }
+
+    @PutMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/hjemler")
+    fun putHjemler(
+        @PathVariable("klagebehandlingid") klagebehandlingId: String,
+        @PathVariable("vedtakid") vedtakId: String,
+        @RequestBody input: VedtakHjemlerInput
+    ): VedtakView {
+        logMethodDetails("putHjemler", klagebehandlingId, vedtakId)
+        return klagebehandlingMapper.mapVedtakToVedtakView(
+            vedtakService.setHjemler(
+                klagebehandlingService.getKlagebehandlingForUpdate(
+                    klagebehandlingId.toUUIDOrException(),
+                    input.klagebehandlingVersjon
+                ),
+                vedtakId.toUUIDOrException(),
+                input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet(),
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )

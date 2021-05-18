@@ -50,15 +50,17 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                tema = listOf(Tema.OMS, Tema.SYK, Tema.FOR, Tema.AAP).shuffled().first(),
+                tema = listOf(Tema.OMS, Tema.SYK).shuffled().first(),
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                fagsak = journalpost?.sak?.let { OversendtSak(
-                    fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystem = Fagsystem.AO01
-                ) },
+                fagsak = journalpost?.sak?.let {
+                    OversendtSak(
+                        fagsakId = it.fagsakId ?: "UKJENT",
+                        fagsystem = KildeFagsystem.AO01
+                    )
+                },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -80,7 +82,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
@@ -95,15 +97,17 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                tema = Tema.FOR,
+                tema = Tema.OMS,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                fagsak = journalpost?.sak?.let { OversendtSak(
-                    fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystem = Fagsystem.AO01
-                ) },
+                fagsak = journalpost?.sak?.let {
+                    OversendtSak(
+                        fagsakId = it.fagsakId ?: "UKJENT",
+                        fagsystem = KildeFagsystem.AO01
+                    )
+                },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -125,7 +129,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
@@ -140,15 +144,17 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                tema = Tema.SYK,
+                tema = Tema.OMS,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr)
                 ),
-                fagsak = journalpost?.sak?.let { OversendtSak(
-                    fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystem = Fagsystem.AO01
-                ) },
+                fagsak = journalpost?.sak?.let {
+                    OversendtSak(
+                        fagsakId = it.fagsakId ?: "UKJENT",
+                        fagsystem = KildeFagsystem.AO01
+                    )
+                },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -170,7 +176,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }
@@ -185,7 +191,7 @@ class MockDataController(
 
         mottakService.createMottakForKlage(
             OversendtKlage(
-                tema = Tema.SYK,
+                tema = Tema.OMS,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(PartIdType.PERSON, fnr),
@@ -194,10 +200,12 @@ class MockDataController(
                         skalKlagerMottaKopi = true
                     )
                 ),
-                fagsak = journalpost?.sak?.let { OversendtSak(
-                    fagsakId = it.fagsakId ?: "UKJENT",
-                    fagsystem = Fagsystem.AO01
-                ) },
+                fagsak = journalpost?.sak?.let {
+                    OversendtSak(
+                        fagsakId = it.fagsakId ?: "UKJENT",
+                        fagsystem = KildeFagsystem.AO01
+                    )
+                },
                 kildeReferanse = "REF_$fnr",
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -219,7 +227,7 @@ class MockDataController(
                 ),
                 mottattFoersteinstans = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = "OPPGAVE"
+                kilde = KildeFagsystem.AO01
             )
         )
     }

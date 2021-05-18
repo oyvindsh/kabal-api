@@ -5,3 +5,9 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      group-id: kabal-api
+
+VEDTAK_FATTET_TOPIC: klage.vedtak-fattet.v1

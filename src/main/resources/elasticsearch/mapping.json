@@ -1,18 +1,40 @@
 {
   "properties": {
-    "journalpostId": {
+    "klagerFnr": {
       "type": "keyword"
     },
-    "saksreferanse": {
+    "klagerNavn": {
+      "type": "text"
+    },
+    "klagerFornavn": {
+      "type": "text"
+    },
+    "klagerEtternavn": {
+      "type": "text"
+    },
+    "klagerOrgnr": {
       "type": "keyword"
     },
-    "tildeltEnhet": {
-      "type": "keyword",
-      "fields": {
-        "text": {
-          "type": "text"
-        }
-      }
+    "klagerOrgnavn": {
+      "type": "text"
+    },
+    "sakenGjelderFnr": {
+      "type": "keyword"
+    },
+    "sakenGjelderNavn": {
+      "type": "text"
+    },
+    "sakenGjelderFornavn": {
+      "type": "text"
+    },
+    "sakenGjelderEtternavn": {
+      "type": "text"
+    },
+    "sakenGjelderOrgnr": {
+      "type": "keyword"
+    },
+    "sakenGjelderOrgnavn": {
+      "type": "text"
     },
     "tema": {
       "type": "keyword"
@@ -20,10 +42,13 @@
     "type": {
       "type": "keyword"
     },
-    "tildeltSaksbehandlerident": {
+    "kildeReferanse": {
       "type": "keyword"
     },
-    "medunderskriverident": {
+    "sakFagsystem": {
+      "type": "keyword"
+    },
+    "sakFagsakId": {
       "type": "keyword"
     },
     "innsendt": {
@@ -34,11 +59,18 @@
       "type": "date",
       "format": "date"
     },
-    "mottattKlageinstans": {
-      "type": "date",
-      "format": "date"
+    "avsenderSaksbehandleridentFoersteinstans": {
+      "type": "keyword"
     },
-    "frist": {
+    "avsenderEnhetFoersteinstans": {
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text"
+        }
+      }
+    },
+    "mottattKlageinstans": {
       "type": "date",
       "format": "date"
     },
@@ -50,6 +82,24 @@
       "type": "date",
       "format": "date"
     },
+    "frist": {
+      "type": "date",
+      "format": "date"
+    },
+    "tildeltSaksbehandlerident": {
+      "type": "keyword"
+    },
+    "medunderskriverident": {
+      "type": "keyword"
+    },
+    "tildeltEnhet": {
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text"
+        }
+      }
+    },
     "hjemler": {
       "type": "keyword",
       "fields": {
@@ -58,14 +108,79 @@
         }
       }
     },
-    "foedselsnummer": {
+    "created": {
+      "type": "date",
+      "format": "date_time"
+    },
+    "modified": {
+      "type": "date",
+      "format": "date_time"
+    },
+    "kilde": {
       "type": "keyword"
     },
-    "virksomhetsnummer": {
-      "type": "keyword"
-    },
-    "navn": {
+    "kommentarFraFoersteinstans": {
       "type": "text"
+    },
+    "internVurdering": {
+      "type": "text"
+    },
+    "vedtak": {
+      "type": "nested",
+      "properties": {
+        "utfall": {
+          "type": "keyword"
+        },
+        "grunn": {
+          "type": "keyword"
+        },
+        "hjemler": {
+          "type": "keyword",
+          "fields": {
+            "text": {
+              "type": "text"
+            }
+          }
+        },
+        "brevmottakerFnr": {
+          "type": "keyword"
+        },
+        "brevmottakerOrgnr": {
+          "type": "keyword"
+        },
+        "journalpostId": {
+          "type": "keyword"
+        },
+        "created": {
+          "type": "date",
+          "format": "date_time"
+        },
+        "modified": {
+          "type": "date",
+          "format": "date_time"
+        },
+        "finalized": {
+          "type": "date",
+          "format": "date_time"
+        }
+      }
+    },
+    "saksdokumenter": {
+      "type": "nested",
+      "properties": {
+        "journalpostId": {
+          "type": "keyword"
+        },
+        "dokumentInfoId": {
+          "type": "keyword"
+        }
+      }
+    },
+    "saksdokumenterJournalpostId": {
+      "type": "keyword"
+    },
+    "saksdokumenterJournalpostIdOgDokumentInfoId": {
+      "type": "keyword"
     },
     "egenAnsatt": {
       "type": "boolean"
@@ -75,6 +190,39 @@
     },
     "strengtFortrolig": {
       "type": "boolean"
+    },
+    "vedtakUtfall": {
+      "type": "keyword"
+    },
+    "vedtakGrunn": {
+      "type": "keyword"
+    },
+    "vedtakHjemler": {
+      "type": "keyword"
+    },
+    "vedtakHjemmelTekster": {
+      "type": "text"
+    },
+    "vedtakBrevmottakerFnr": {
+      "type": "keyword"
+    },
+    "vedtakBrevmottakerOrgnr": {
+      "type": "keyword"
+    },
+    "vedtakJournalpostId": {
+      "type": "keyword"
+    },
+    "vedtakCreated": {
+      "type": "date",
+      "format": "date_time"
+    },
+    "vedtakModified": {
+      "type": "date",
+      "format": "date_time"
+    },
+    "vedtakFinalized": {
+      "type": "date",
+      "format": "date_time"
     }
   }
 }

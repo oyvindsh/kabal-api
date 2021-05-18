@@ -1,6 +1,9 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.domain.kodeverk.Eoes
+import no.nav.klage.oppgave.domain.kodeverk.EoesConverter
+import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
+import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLegeConverter
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -10,9 +13,6 @@ import javax.persistence.*
 class Kvalitetsvurdering(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "grunn_id")
-    @Convert(converter = GrunnConverter::class)
-    var grunn: Grunn? = null,
     @Column(name = "eoes_id")
     @Convert(converter = EoesConverter::class)
     var eoes: Eoes? = null,

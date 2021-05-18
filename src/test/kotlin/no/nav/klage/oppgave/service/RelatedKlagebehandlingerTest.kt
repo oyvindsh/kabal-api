@@ -28,6 +28,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.lang.Thread.sleep
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 @ActiveProfiles("local")
@@ -84,7 +85,7 @@ class RelatedKlagebehandlingerTest {
             id = id.toString(),
             versjon = 1L,
             tildeltEnhet = "4219",
-            tema = Tema.FOR.id,
+            tema = Tema.OMS.id,
             type = Type.KLAGE.id,
             tildeltSaksbehandlerident = null,
             innsendt = LocalDate.now(),
@@ -97,9 +98,12 @@ class RelatedKlagebehandlingerTest {
                 LocalDate.now()
             },
             hjemler = listOf(),
-            foedselsnummer = fnr,
-            saksreferanse = saksreferanse,
-            journalpostId = journalpostIder
+            sakenGjelderFnr = fnr,
+            kildeReferanse = saksreferanse,
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            kilde = "K9",
+            saksdokumenterJournalpostId = journalpostIder
         )
 
     @Test

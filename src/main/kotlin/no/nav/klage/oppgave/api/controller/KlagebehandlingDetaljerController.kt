@@ -5,6 +5,8 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
+import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -46,17 +48,17 @@ class KlagebehandlingDetaljerController(
         }
     }
 
-    @PutMapping("/klagebehandlinger/{id}/detaljer/sakstype")
-    fun putSakstype(
+    @PutMapping("/klagebehandlinger/{id}/detaljer/type")
+    fun putType(
         @PathVariable("id") klagebehandlingId: String,
         @RequestBody input: KlagebehandlingTypeInput
     ): KlagebehandlingDetaljerView {
-        logMethodDetails("putSakstype", klagebehandlingId)
+        logMethodDetails("putType", klagebehandlingId)
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            klagebehandlingService.setSakstype(
+            klagebehandlingService.setType(
                 klagebehandlingId.toUUIDOrException(),
                 input.klagebehandlingVersjon,
-                input.type,
+                Type.of(input.type),
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )
@@ -72,7 +74,7 @@ class KlagebehandlingDetaljerController(
             klagebehandlingService.setTema(
                 klagebehandlingId.toUUIDOrException(),
                 input.klagebehandlingVersjon,
-                input.tema,
+                Tema.of(input.tema),
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )
@@ -185,22 +187,6 @@ class KlagebehandlingDetaljerController(
                 klagebehandlingId.toUUIDOrException(),
                 input.klagebehandlingVersjon,
                 input.medunderskriverident,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
-    }
-
-    @PutMapping("/klagebehandlinger/{id}/detaljer/grunn")
-    fun putKvalitetsvurderingGrunn(
-        @PathVariable("id") klagebehandlingId: String,
-        @RequestBody input: KvalitetsvurderingGrunnInput
-    ): KlagebehandlingDetaljerView {
-        logMethodDetails("putKvalitetsvurderingGrunn", klagebehandlingId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            klagebehandlingService.setKvalitetsvurderingGrunn(
-                klagebehandlingId.toUUIDOrException(),
-                input.klagebehandlingVersjon,
-                input.grunn,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )

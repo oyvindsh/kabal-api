@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -43,9 +44,9 @@ class KlagebehandlingRepositoryTest {
     fun `persist klage works`() {
 
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
@@ -59,7 +60,7 @@ class KlagebehandlingRepositoryTest {
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
                 skalMottaKopi = false
             ),
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
@@ -68,7 +69,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDate.now(),
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
 
@@ -84,9 +85,9 @@ class KlagebehandlingRepositoryTest {
     fun `persist klage with saksdokumenter works`() {
 
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
@@ -100,7 +101,7 @@ class KlagebehandlingRepositoryTest {
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
                 skalMottaKopi = false
             ),
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
@@ -113,7 +114,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDate.now(),
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
 
@@ -132,9 +133,9 @@ class KlagebehandlingRepositoryTest {
         testEntityManager.clear()
 
         val mottak = Mottak(
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             oversendtKaDato = LocalDate.now()
@@ -148,7 +149,7 @@ class KlagebehandlingRepositoryTest {
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
                 skalMottaKopi = false
             ),
-            tema = Tema.SYK,
+            tema = Tema.OMS,
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
@@ -161,7 +162,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDate.now(),
-            kilde = "OPPGAVE",
+            kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
 

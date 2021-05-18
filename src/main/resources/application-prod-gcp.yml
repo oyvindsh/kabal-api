@@ -41,3 +41,6 @@ ROLE_ADMIN: cd78b8e8-73a3-4fb6-8234-7bebb5e5b9e9
 JOARK_SERVICE_URL: https://api-gw.oera.no/dokarkiv/rest/journalpostapi/v1/journalpost
 
 CLAM_AV_URL: http://clamav.clamav/scan
+
+INFLUX_HOST: influx-klage-nav-prod.aivencloud.com
+INFLUX_PORT: 26482

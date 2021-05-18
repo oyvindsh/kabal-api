@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.clients.gosys
 
 import brave.Tracer
-import no.nav.klage.oppgave.domain.BEHANDLINGSTYPE_KLAGE
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.exceptions.OppgaveNotFoundException
@@ -35,6 +34,7 @@ class OppgaveClient(
 
         const val STATUSKATEGORI_AAPEN = "AAPEN"
         const val HJEMMEL = "HJEMMEL"
+        const val BEHANDLINGSTYPE_KLAGE = "ae0058"
     }
 
     @Retryable
