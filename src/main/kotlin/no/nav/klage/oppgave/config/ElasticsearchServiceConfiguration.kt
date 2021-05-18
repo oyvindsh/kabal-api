@@ -13,7 +13,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 class ElasticsearchServiceConfiguration {
 
     @Bean
-    fun elasticsearchRepository(
+    fun elasticsearchService(
         elasticsearchRestTemplate: ElasticsearchRestTemplate,
         innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
         esKlagebehandlingRepository: EsKlagebehandlingRepository

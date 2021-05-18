@@ -5,9 +5,9 @@ import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.QueryBuilders
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -26,7 +26,6 @@ import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.lang.Thread.sleep
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -54,10 +53,10 @@ class StatistikkInElasticsearchServiceTest {
     lateinit var service: ElasticsearchService
 
     @Autowired
-    lateinit var esTemplate: ElasticsearchRestTemplate
+    lateinit var repo: EsKlagebehandlingRepository
 
     @Autowired
-    lateinit var client: RestHighLevelClient
+    lateinit var esTemplate: ElasticsearchRestTemplate
 
     @Test
     @Order(1)
@@ -71,7 +70,7 @@ class StatistikkInElasticsearchServiceTest {
     fun `index has been created by service`() {
 
         val indexOps = esTemplate.indexOps(IndexCoordinates.of("klagebehandling"))
-        assertThat(indexOps.exists()).isTrue()
+        assertThat(indexOps.exists()).isTrue
     }
 
     private fun klagebehandling(id: Long, innsendt: LocalDate, frist: LocalDate, avsluttet: LocalDate? = null) =
@@ -117,9 +116,7 @@ class StatistikkInElasticsearchServiceTest {
             klagebehandling(2006L, idag().minusDays(30), uviktigdag(), idag().minusDays(30)),
             klagebehandling(2007L, idag().minusDays(31), uviktigdag(), idag().minusDays(31)),
         )
-        esTemplate.save(klagebehandlinger)
-
-        sleep(2000L)
+        repo.saveAll(klagebehandlinger)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())

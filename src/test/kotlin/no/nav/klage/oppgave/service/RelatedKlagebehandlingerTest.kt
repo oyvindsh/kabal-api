@@ -5,9 +5,9 @@ import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.elasticsearch.client.RestHighLevelClient
 import org.elasticsearch.index.query.QueryBuilders
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -26,7 +26,6 @@ import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.lang.Thread.sleep
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -57,7 +56,7 @@ class RelatedKlagebehandlingerTest {
     lateinit var esTemplate: ElasticsearchRestTemplate
 
     @Autowired
-    lateinit var client: RestHighLevelClient
+    lateinit var repo: EsKlagebehandlingRepository
 
     @Test
     @Order(1)
@@ -118,9 +117,7 @@ class RelatedKlagebehandlingerTest {
             klagebehandling(1005L, "02019012345", "CCC123", listOf("111222", "333444"), true),
             klagebehandling(1006L, "03019012345", "CCC123", listOf("333444", "555666"), false)
         )
-        esTemplate.save(klagebehandlinger)
-
-        sleep(2000L)
+        repo.saveAll(klagebehandlinger)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
