@@ -8,8 +8,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
- * Used by DVH
- * KlageKvalitetStatistikk er en avgjørelse i en Sak, knyttet til en konkret behandlingstype (eks. søknad, revurdering, endring, klage)
+ * Brukes av DVH
+ * KlageKvalitetStatistikk er en hendelse i en Sak, knyttet til en konkret behandlingstype (eks. søknad, revurdering, endring, klage).
+ * Vi sender dette typisk ved mottak, tildeling og fullføring.
  */
 @JsonSchemaTitle("SaksbehandlingKA")
 data class KlageStatistikkTilDVH(
