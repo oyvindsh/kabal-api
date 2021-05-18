@@ -20,7 +20,8 @@ enum class Fagsystem(override val id: String, override val navn: String, overrid
     EF("14", "EF", "Enslig forsørger"),
     KONT("15", "KONT", "Kontantstøtte"),
     SUPSTONAD("16", "SUPSTONAD", "Supplerende Stønad"),
-    OMSORGSPENGER("17", "OMSORGSPENGER", "Omsorgspenger");
+    OMSORGSPENGER("17", "OMSORGSPENGER", "Omsorgspenger"),
+    MANUELL("18", "MANUELL", "Manuell registrering av kvalitetsskjema");
 
     companion object {
         fun of(id: String): Fagsystem {
