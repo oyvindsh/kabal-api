@@ -1,6 +1,6 @@
 # Kafka topics
 For å legge til topic trenger man bare å lage en ny folder og legge til
-følgende filer:
+følgende filer (og fikse på github action):
 - topic.yaml
 - dev-vars.yaml
 - prod-vars.yaml

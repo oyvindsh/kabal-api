@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -29,7 +30,6 @@ import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.lang.Thread.sleep
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -59,11 +59,13 @@ class ElasticsearchIndexingTest {
     @Autowired
     lateinit var service: ElasticsearchService
 
+    @Autowired
+    lateinit var repo: EsKlagebehandlingRepository
+
     @Test
     @Order(1)
     fun `es is running`() {
         assertThat(esContainer.isRunning).isTrue
-
     }
 
     @Test
@@ -83,9 +85,7 @@ class ElasticsearchIndexingTest {
             versjon = 1L,
             saksreferanse = "hei"
         )
-        esTemplate.save(klagebehandling)
-
-        sleep(2000L)
+        repo.save(klagebehandling)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
@@ -104,15 +104,14 @@ class ElasticsearchIndexingTest {
             versjon = 1L,
             saksreferanse = "hei"
         )
-        esTemplate.save(klagebehandling)
+        repo.save(klagebehandling)
 
         klagebehandling = klagebehandlingWith(
             id = "2001L",
             versjon = 2L,
             saksreferanse = "hallo"
         )
-        esTemplate.save(klagebehandling)
-        sleep(2000L)
+        repo.save(klagebehandling)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.idsQuery().addIds("2001L"))
@@ -131,7 +130,7 @@ class ElasticsearchIndexingTest {
             versjon = 2L,
             saksreferanse = "hei"
         )
-        esTemplate.save(klagebehandling)
+        repo.save(klagebehandling)
 
         klagebehandling = klagebehandlingWith(
             id = "3001L",
@@ -139,12 +138,10 @@ class ElasticsearchIndexingTest {
             saksreferanse = "hallo"
         )
         assertThatThrownBy {
-            esTemplate.save(klagebehandling)
+            repo.save(klagebehandling)
         }.isInstanceOf(UncategorizedElasticsearchException::class.java)
             .hasRootCauseInstanceOf(ElasticsearchStatusException::class.java)
             .hasMessageContaining("type=version_conflict_engine_exception")
-
-        sleep(2000L)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.idsQuery().addIds("3001L"))
