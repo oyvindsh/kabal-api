@@ -22,7 +22,7 @@ data class KlageStatistikkTilDVH(
     val ansvarligEnhetKode: String?,
 
     @JsonSchemaDescription("Kode som angir hvilken type enhetskode det er snakk om, som oftest NORG.")
-    val ansvarligEnhetType: String,
+    val ansvarligEnhetType: String = "NORG",
 
     @JsonSchemaDescription("Feltet angir hvem som er avsender av dataene, (navnet på kildesystemet).")
     val avsender: String = "Kabal",
@@ -125,7 +125,7 @@ data class KlageStatistikkTilDVH(
     val vedtaksdato: LocalDate?,
 
     @JsonSchemaDescription("Angir på hvilken versjon av kildekoden JSON stringen er generert på bakgrunn av.")
-    val versjon: Int,
+    val versjon: Int = 1,
 
     /**
     DVH har et eget kodeverk for disse. Kan være vi kan bruke dette.

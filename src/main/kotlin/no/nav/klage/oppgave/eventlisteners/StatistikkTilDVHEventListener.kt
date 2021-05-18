@@ -36,26 +36,48 @@ class StatistikkTilDVHEventListener(
         val mottak = mottakRepository.getOne(klagebehandling.mottakId)
 
         if (shouldSendStats(klagebehandlingEndretEvent.endringslogginnslag)) {
-            val klageStatistikkTilDVH = createDTO(klagebehandling, mottak)
+            val klageStatistikkTilDVH = createDTO(
+                klagebehandling,
+                mottak,
+                getKlagebehandlingState(klagebehandlingEndretEvent.endringslogginnslag)
+            )
             statistikkTilDVHKafkaProducer.sendStatistikkTilDVH(klageStatistikkTilDVH)
         }
     }
 
-    private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>): Boolean {
-        return endringslogginnslag.isEmpty() ||
+    private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
+        endringslogginnslag.isEmpty() ||
                 endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.SLUTTFOERT }
+
+    private fun getKlagebehandlingState(endringslogginnslag: List<Endringslogginnslag>): String {
+        return when {
+            endringslogginnslag.isEmpty() -> "MOTTATT"
+            endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> "TILDELT_SAKSBEHANDLER"
+            endringslogginnslag.any { it.felt === Felt.SLUTTFOERT } -> "SLUTTFOERT"
+            else -> "UNKNOWN".also {
+                logger.warn(
+                    "unknown state for klagebehandling with id {}",
+                    endringslogginnslag.first().klagebehandlingId
+                )
+            }
+        }
     }
 
-    private fun createDTO(klagebehandling: Klagebehandling, mottak: Mottak): KlageStatistikkTilDVH {
+    private fun createDTO(
+        klagebehandling: Klagebehandling,
+        mottak: Mottak,
+        klagebehandlingState: String
+    ): KlageStatistikkTilDVH {
+        //Only works as long as we only have one
         val vedtak = klagebehandling.vedtak.firstOrNull()
         val now = LocalDateTime.now()
+
         return KlageStatistikkTilDVH(
             ansvarligEnhetKode = klagebehandling.tildeltEnhet,
-            ansvarligEnhetType = "NORG",
             behandlingId = mottak.dvhReferanse,
             behandlingIdKabal = klagebehandling.id.toString(),
             behandlingStartetKA = klagebehandling.startet,
-            behandlingStatus = "TODO",
+            behandlingStatus = klagebehandlingState,
             behandlingType = klagebehandling.type.navn,
             beslutter = klagebehandling.medunderskriverident,
             endringstid = now,
@@ -71,7 +93,6 @@ class StatistikkTilDVHEventListener(
             tekniskTid = now,
             vedtakId = vedtak?.id.toString(),
             vedtaksdato = vedtak?.finalized?.toLocalDate(),
-            versjon = 1,
             ytelseType = "TODO"
         )
     }
