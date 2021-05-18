@@ -56,7 +56,7 @@ class StatistikkTilDVHEventListener(
             behandlingIdKabal = klagebehandling.id.toString(),
             behandlingStartetKA = klagebehandling.startet,
             behandlingStatus = "TODO",
-            behandlingType = "TODO",
+            behandlingType = klagebehandling.type.navn,
             beslutter = klagebehandling.medunderskriverident,
             endringstid = now,
             hjemmel = klagebehandling.hjemler.joinToString(separator = ",") { it.toSearchableString() },
