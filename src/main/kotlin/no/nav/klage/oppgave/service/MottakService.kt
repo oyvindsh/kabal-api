@@ -1,10 +1,12 @@
 package no.nav.klage.oppgave.service
 
+
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
-import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -19,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 class MottakService(
@@ -47,6 +50,28 @@ class MottakService(
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
         meterRegistry.incrementMottattKlage()
+    }
+
+    fun createMottakFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
+        val klager = Klager(
+            partId = PartId(
+                type = PartIdType.PERSON,
+                value = kvalitetsvurdering.foedselsnummer
+            )
+        )
+
+        val mottak = mottakRepository.save(
+            Mottak(
+                tema = kvalitetsvurdering.tema,
+                klager = klager,
+                kildeReferanse = "N/A",
+                kilde = "MANUELL",
+                oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
+                type = Type.KLAGE
+            )
+        )
+
+        return mottak.id
     }
 
     fun OversendtKlage.validate() {
