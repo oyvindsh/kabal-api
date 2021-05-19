@@ -224,8 +224,6 @@ class VedtakService(
             }.onSuccess {
                 event.status = UtsendingStatus.SENDT
                 event.melding = null
-                logger.info("Event ${event.id} dispatched to kafka")
-                secureLogger.info("Event $event dispatched to kafka")
             }
         }
     }
