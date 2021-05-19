@@ -288,7 +288,6 @@ class KlagebehandlingService(
                 avsluttet = null,
                 frist = mottak.generateFrist(),
                 tildeltSaksbehandlerident = null,
-                tildeltEnhet = mottak.oversendtKaEnhet,
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(Vedtak()),
                 kvalitetsvurdering = null,
