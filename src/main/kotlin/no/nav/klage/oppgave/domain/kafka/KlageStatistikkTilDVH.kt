@@ -18,16 +18,16 @@ const val DATE_FORMAT = "yyyy-MM-dd"
 @JsonSchemaTitle("SaksbehandlingKA")
 data class KlageStatistikkTilDVH(
 
-    @JsonSchemaDescription("Kode som angir hvilken enhet som er ansvarlig for behandlingen på det gjeldende tidspunktet")
-    val ansvarligEnhetKode: String?,
+    @JsonSchemaDescription("Kode som angir hvilken enhet som er ansvarlig for behandlingen på det gjeldende tidspunktet. Dette begrepet har vi ikke helt i Kabal per nå.")
+    val ansvarligEnhetKode: String? = null,
 
     @JsonSchemaDescription("Kode som angir hvilken type enhetskode det er snakk om, som oftest NORG.")
     val ansvarligEnhetType: String = "NORG",
 
-    @JsonSchemaDescription("Feltet angir hvem som er avsender av dataene, (navnet på kildesystemet).")
+    @JsonSchemaDescription("Feltet angir hvem som er avsender av dataene, (navnet på systemet).")
     val avsender: String = "Kabal",
 
-    @JsonSchemaDescription("Nøkkel til den aktuelle behandling, som kan identifisere den i kildesystemet.")
+    @JsonSchemaDescription("Nøkkel til den aktuelle behandling, som kan identifisere den i kildesystemet. Typisk førsteinstans.")
     val behandlingId: String?,
 
     @JsonSchemaDescription("Nøkkel til den aktuelle behandling, som kan identifisere den i Kabal.")
@@ -41,7 +41,7 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Når behandlingen startet i KA")
     val behandlingStartetKA: LocalDate?,
 
-    @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt. Ha med alle mulige statuser som er naturlig for det enkelte system/ytelse. Som minimum, angi om saken har følgende status: Registrert, Klar for behandling, Venter på bruker, venter på ekstern (arbeidsgiver, lege etc.), venter på utland, Avsluttet.Her bør det også angis at saken er behandlet av beslutter, men sendt i retur for ny behandling.")
+    @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt. Opprettet/tildelt/ferdigstilt.")
     val behandlingStatus: String,
 
     @JsonSchemaDescription("Kode som beskriver behandlingen, for eksempel, søknad, revurdering, klage, anke, endring, gjenopptak, tilbakekreving o.l.")
@@ -102,10 +102,10 @@ data class KlageStatistikkTilDVH(
         pattern = DATE_TIME_FORMAT
     )
     @JsonSchemaFormat(DATE_TIME_FORMAT)
-    @JsonSchemaDescription("Tidspunktet da kildesystemet ble klar over hendelsen. (format:$DATE_TIME_FORMAT). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
+    @JsonSchemaDescription("Tidspunktet da systemet ble klar over hendelsen. (format:$DATE_TIME_FORMAT). Dette er tidspunkt hendelsen ble endret i systemet. Sammen med funksjonellTid/endringstid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
     val tekniskTid: LocalDateTime,
 
-    @JsonSchemaDescription("Nøkkel til det aktuelle vedtaket da behandlingen blir tilknyttet et slikt. Vi skal helst kunne identifisere vedtaket i kildensystemet.")
+    @JsonSchemaDescription("Nøkkel til det aktuelle vedtaket da behandlingen blir tilknyttet et slikt. Vedtaket i Kabal.")
     val vedtakId: String,
 
     @JsonFormat(
@@ -133,4 +133,8 @@ data class KlageStatistikkTilDVH(
     enum class PartIdType {
         PERSON, VIRKSOMHET
     }
+}
+
+enum class KlagebehandlingState {
+    MOTTATT, TILDELT_SAKSBEHANDLER, AVSLUTTET, UKJENT
 }
