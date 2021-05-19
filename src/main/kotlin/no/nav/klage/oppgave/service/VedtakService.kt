@@ -16,6 +16,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
+import no.nav.klage.oppgave.exceptions.JournalpostFinalizationException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
 import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
@@ -183,7 +184,7 @@ class VedtakService(
             setFinalized(klagebehandling, vedtak.id, utfoerendeSaksbehandlerIdent)
         } catch (e: Exception) {
             logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
-            null
+            throw JournalpostFinalizationException("Klarte ikke å journalføre vedtak")
         }
     }
 
@@ -204,7 +205,7 @@ class VedtakService(
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
     private fun dispatchUnsendtVedtakToKafka() {
-        kafkaVedtakEventRepository.fetchAllVedtakIkkeSendt().forEach { event ->
+        kafkaVedtakEventRepository.getAllByStatusIsNotLikeSENDT().forEach { event ->
             runCatching {
                 vedtakKafkaProducer.sendVedtak(
                     KlagevedtakFattet(
