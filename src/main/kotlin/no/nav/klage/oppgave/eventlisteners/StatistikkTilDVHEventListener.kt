@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.eventlisteners
 
 import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
+import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState
+import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState.*
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
@@ -27,13 +29,12 @@ class StatistikkTilDVHEventListener(
     fun klagebehandlingEndretEventToDVH(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
         logger.debug("Received KlagebehandlingEndretEvent for klagebehandlingId ${klagebehandlingEndretEvent.klagebehandling.id} in StatistikkTilDVHEventListener")
 
-        val klagebehandling =
-            klagebehandlingRepository.findById(klagebehandlingEndretEvent.klagebehandling.id).orElseThrow()
+        val klagebehandling = klagebehandlingEndretEvent.klagebehandling
 
         val mottak = mottakRepository.getOne(klagebehandling.mottakId)
 
         if (shouldSendStats(klagebehandlingEndretEvent.endringslogginnslag)) {
-            val klageStatistikkTilDVH = createDTO(
+            val klageStatistikkTilDVH = createKlageStatistikkTilDVH(
                 klagebehandling,
                 mottak,
                 getKlagebehandlingState(klagebehandlingEndretEvent.endringslogginnslag)
@@ -46,12 +47,12 @@ class StatistikkTilDVHEventListener(
         endringslogginnslag.isEmpty() ||
                 endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.SLUTTFOERT }
 
-    private fun getKlagebehandlingState(endringslogginnslag: List<Endringslogginnslag>): String {
+    private fun getKlagebehandlingState(endringslogginnslag: List<Endringslogginnslag>): KlagebehandlingState {
         return when {
-            endringslogginnslag.isEmpty() -> "MOTTATT"
-            endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> "TILDELT_SAKSBEHANDLER"
-            endringslogginnslag.any { it.felt === Felt.SLUTTFOERT } -> "SLUTTFOERT"
-            else -> "UNKNOWN".also {
+            endringslogginnslag.isEmpty() -> MOTTATT
+            endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> TILDELT_SAKSBEHANDLER
+            endringslogginnslag.any { it.felt === Felt.SLUTTFOERT } -> AVSLUTTET
+            else -> UKJENT.also {
                 logger.warn(
                     "unknown state for klagebehandling with id {}",
                     endringslogginnslag.first().klagebehandlingId
@@ -60,21 +61,20 @@ class StatistikkTilDVHEventListener(
         }
     }
 
-    private fun createDTO(
+    private fun createKlageStatistikkTilDVH(
         klagebehandling: Klagebehandling,
         mottak: Mottak,
-        klagebehandlingState: String
+        klagebehandlingState: KlagebehandlingState
     ): KlageStatistikkTilDVH {
         //Only works as long as we only have one
         val vedtak = klagebehandling.vedtak.firstOrNull()
         val now = LocalDateTime.now()
 
         return KlageStatistikkTilDVH(
-            ansvarligEnhetKode = klagebehandling.tildeltEnhet,
             behandlingId = mottak.dvhReferanse,
             behandlingIdKabal = klagebehandling.id.toString(),
             behandlingStartetKA = klagebehandling.startet,
-            behandlingStatus = klagebehandlingState,
+            behandlingStatus = klagebehandlingState.name,
             behandlingType = klagebehandling.type.navn,
             beslutter = klagebehandling.medunderskriverident,
             endringstid = now,
