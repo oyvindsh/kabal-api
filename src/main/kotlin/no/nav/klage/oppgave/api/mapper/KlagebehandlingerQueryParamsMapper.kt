@@ -38,6 +38,12 @@ class KlagebehandlingerQueryParamsMapper(private val saksbehandlerRepository: Sa
             KlagebehandlingerSearchCriteria.SortField.MOTTATT
         } else {
             KlagebehandlingerSearchCriteria.SortField.FRIST
+        },
+        ferdigstiltFom = queryParams.ferdigstiltFom,
+        statuskategori = if (queryParams.ferdigstiltFom != null) {
+            KlagebehandlingerSearchCriteria.Statuskategori.AVSLUTTET
+        } else {
+            KlagebehandlingerSearchCriteria.Statuskategori.AAPEN
         }
     )
 

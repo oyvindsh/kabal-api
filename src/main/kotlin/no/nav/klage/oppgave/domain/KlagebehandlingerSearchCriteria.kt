@@ -14,8 +14,8 @@ data class KlagebehandlingerSearchCriteria(
 
     val opprettetFom: LocalDateTime? = null,
     val opprettetTom: LocalDateTime? = null,
-    val ferdigstiltFom: LocalDateTime? = null,
-    val ferdigstiltTom: LocalDateTime? = null,
+    val ferdigstiltFom: LocalDate? = null,
+    val ferdigstiltTom: LocalDate? = null,
     val fristFom: LocalDate? = null,
     val fristTom: LocalDate? = null,
 
