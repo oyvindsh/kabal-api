@@ -286,12 +286,12 @@ CREATE TABLE klage.brevutsending
 
 CREATE TABLE klage.kafka_vedtak_event
 (
-    id                   UUID PRIMARY KEY,
-    kildeReferanse       TEXT NOT NULL,
-    kilde                TEXT NOT NULL,
-    utfall_id            TEXT NOT NULL,
-    vedtaksbrevReferanse TEXT,
-    kabalReferanse       TEXT NOT NULL,
-    status_id            TEXT NOT NULL DEFAULT '1',
-    melding              TEXT
+    id                      UUID PRIMARY KEY,
+    kilde_referanse         TEXT NOT NULL,
+    kilde                   TEXT NOT NULL,
+    utfall_id               TEXT NOT NULL,
+    vedtaksbrev_referanse   TEXT,
+    kabal_referanse         TEXT NOT NULL,
+    status_id               TEXT NOT NULL DEFAULT '1',
+    melding                 TEXT
 );

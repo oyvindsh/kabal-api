@@ -12,16 +12,16 @@ import javax.persistence.*
 class KafkaVedtakEvent(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "kildeReferanse")
+    @Column(name = "kilde_referanse")
     var kildeReferanse: String,
     @Column(name = "kilde")
     var kilde: String,
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     var utfall: Utfall,
-    @Column(name = "vedtaksbrevReferanse")
+    @Column(name = "vedtaksbrev_referanse")
     var vedtaksbrevReferanse: String?,
-    @Column(name = "kabalReferanse")
+    @Column(name = "kabal_referanse")
     var kabalReferanse: String,
     @Column(name = "status_id")
     @Convert(converter = UtsendingStatusConverter::class)

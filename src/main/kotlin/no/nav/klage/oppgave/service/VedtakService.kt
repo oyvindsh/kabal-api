@@ -205,7 +205,7 @@ class VedtakService(
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
     private fun dispatchUnsendtVedtakToKafka() {
-        kafkaVedtakEventRepository.getAllByStatusIsNotLikeSENDT().forEach { event ->
+        kafkaVedtakEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
             runCatching {
                 vedtakKafkaProducer.sendVedtak(
                     KlagevedtakFattet(
