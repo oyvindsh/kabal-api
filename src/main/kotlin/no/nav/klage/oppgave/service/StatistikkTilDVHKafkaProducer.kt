@@ -24,13 +24,12 @@ class StatistikkTilDVHKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nKlageStatistikkTilDVH: {}", topic, statistikk)
         runCatching {
-            kafkaTemplate.send(topic, statistikk)
+            kafkaTemplate.send(topic, statistikk).get()
             logger.debug("KlageStatistikkTilDVH sent to Kafka.")
         }.onFailure {
             val errorMessage = "Could not send KlageStatistikkTilDVH to Kafka. Check secure logs for more information."
             logger.error(errorMessage)
             secureLogger.error("Could not send KlageStatistikkTilDVH to Kafka", it)
-            throw RuntimeException(errorMessage)
         }
     }
 }

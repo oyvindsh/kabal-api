@@ -55,11 +55,11 @@ data class KlageStatistikkTilDVH(
         pattern = DATE_TIME_FORMAT
     )
     @JsonSchemaFormat(DATE_TIME_FORMAT)
-    @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i kildesystemet. (format:$DATE_TIME_FORMAT) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endrings tidspunktet, mens funksjonellTid angir tidspunktet da endringen offisielt gjelder fra.")
+    @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i systemet. (format:$DATE_TIME_FORMAT) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endringstidspunktet, mens endringstid angir tidspunktet da endringen offisielt gjelder fra.")
     val endringstid: LocalDateTime,
 
-    @JsonSchemaDescription("Kommaseparert liste av hjemler.")
-    val hjemmel: String,
+    @JsonSchemaDescription("Liste av hjemler.")
+    val hjemmel: List<String>,
 
     @JsonSchemaDescription("Den som sendt inn klagen.")
     val klager: Part,

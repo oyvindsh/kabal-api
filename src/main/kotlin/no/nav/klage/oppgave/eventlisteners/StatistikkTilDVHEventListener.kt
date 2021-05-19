@@ -78,7 +78,7 @@ class StatistikkTilDVHEventListener(
             behandlingType = klagebehandling.type.navn,
             beslutter = klagebehandling.medunderskriverident,
             endringstid = now,
-            hjemmel = klagebehandling.hjemler.joinToString(separator = ",") { it.toSearchableString() },
+            hjemmel = klagebehandling.hjemler.map { it.toSearchableString() },
             klager = getPart(klagebehandling.klager.partId.type, klagebehandling.klager.partId.value),
             omgjoeringsgrunn = vedtak?.grunn?.navn,
             opprinneligFagsaksystem = mottak.kildesystem.navn,
