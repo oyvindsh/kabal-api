@@ -3,9 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.view.DokumentKnytning
-import no.nav.klage.oppgave.api.view.DokumentReferanserResponse
-import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -124,6 +122,29 @@ class DokumentController(
             dokumentKnytning.dokumentInfoId,
             innloggetIdent
         )
+    }
+
+    @ApiOperation(
+        value = "Toggler et dokument til en klagebehandling",
+        notes = "Toggler et dokument fra SAF til klagebehandlingen."
+    )
+    @PostMapping("/klagebehandlinger/{behandlingsid}/toggledokument", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun toggleDokumentConnected(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable behandlingsid: String,
+        @RequestBody toggleDokument: ToggleDokument
+    ): ToggleDokumentResponse {
+        val klagebehandlingId = parseAndValidate(behandlingsid)
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val bleTilknyttet = klagebehandlingService.toggleDokumentFromKlagebehandling(
+            klagebehandlingId,
+            null, //dropper optimistic locking her
+            toggleDokument.journalpostId,
+            toggleDokument.dokumentInfoId,
+            innloggetIdent
+        )
+        return ToggleDokumentResponse(tilknyttet = bleTilknyttet)
     }
 
     @ResponseBody

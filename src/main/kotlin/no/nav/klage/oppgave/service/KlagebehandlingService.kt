@@ -427,8 +427,8 @@ class KlagebehandlingService(
     ) {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         try {
-            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId }) {
-                logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
+            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
+                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 val event =
                     klagebehandling.addSaksdokument(
@@ -455,7 +455,7 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         try {
             if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
-                logger.debug("Journalpost $journalpostId is not connected to klagebehandling $klagebehandlingId, doing nothing")
+                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is not connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 val event =
                     klagebehandling.removeSaksdokument(
@@ -520,6 +520,36 @@ class KlagebehandlingService(
             dokumentInfoId,
             saksbehandlerIdent
         )
+    }
+
+    fun toggleDokumentFromKlagebehandling(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
+        journalpostId: String,
+        dokumentInfoId: String,
+        saksbehandlerIdent: String
+    ): Boolean {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+
+        if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
+            connectDokumentToKlagebehandling(
+                klagebehandlingId,
+                klagebehandlingVersjon,
+                journalpostId,
+                dokumentInfoId,
+                saksbehandlerIdent
+            )
+            return true
+        } else {
+            disconnectDokumentFromKlagebehandling(
+                klagebehandlingId,
+                klagebehandlingVersjon,
+                journalpostId,
+                dokumentInfoId,
+                saksbehandlerIdent
+            )
+            return false
+        }
     }
 
     private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)
