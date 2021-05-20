@@ -27,7 +27,7 @@ class VedtakKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nVedtak: {}", topic, vedtak)
         runCatching {
-            kafkaTemplate.send(topic, vedtak.toJson())
+            kafkaTemplate.send(topic, vedtak.toJson()).get()
             logger.debug("Vedtak sent to Kafka.")
         }.onFailure {
             val errorMessage = "Could not send vedtak to Kafka. Check secure logs for more information."
