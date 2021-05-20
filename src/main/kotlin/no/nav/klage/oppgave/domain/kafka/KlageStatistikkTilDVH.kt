@@ -41,8 +41,8 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Når behandlingen startet i KA")
     val behandlingStartetKA: LocalDate?,
 
-    @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt. Opprettet/tildelt/ferdigstilt.")
-    val behandlingStatus: String,
+    @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt.")
+    val behandlingStatus: KlagebehandlingState,
 
     @JsonSchemaDescription("Kode som beskriver behandlingen, for eksempel, søknad, revurdering, klage, anke, endring, gjenopptak, tilbakekreving o.l.")
     val behandlingType: String,

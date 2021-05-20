@@ -75,7 +75,7 @@ class StatistikkTilDVHEventListener(
             behandlingId = mottak.dvhReferanse,
             behandlingIdKabal = klagebehandling.id.toString(),
             behandlingStartetKA = klagebehandling.tildelt?.toLocalDate(),
-            behandlingStatus = klagebehandlingState.name,
+            behandlingStatus = klagebehandlingState,
             behandlingType = klagebehandling.type.navn,
             beslutter = klagebehandling.medunderskriverident,
             endringstid = funksjoneltEndringstidspunkt,
