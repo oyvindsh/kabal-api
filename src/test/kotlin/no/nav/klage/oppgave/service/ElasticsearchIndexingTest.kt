@@ -30,7 +30,6 @@ import org.springframework.data.elasticsearch.core.query.Query
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -162,9 +161,9 @@ class ElasticsearchIndexingTest {
             tildeltSaksbehandlerident = null,
             innsendt = null,
             mottattFoersteinstans = null,
-            mottattKlageinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDateTime.now(),
             frist = null,
-            startet = null,
+            tildelt = null,
             avsluttet = null,
             hjemler = listOf(Hjemmel.FTL_8_35.id),
             sakenGjelderFnr = null,

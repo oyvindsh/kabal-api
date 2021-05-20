@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Period
 import java.util.*
 
@@ -133,7 +134,7 @@ class KlagebehandlingService(
     fun setMottattKlageinstans(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
-        mottattKlageinstans: LocalDate,
+        mottattKlageinstans: LocalDateTime,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
@@ -284,7 +285,7 @@ class KlagebehandlingService(
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
                 mottattKlageinstans = mottak.oversendtKaDato,
-                startet = null,
+                tildelt = null,
                 avsluttet = null,
                 frist = mottak.generateFrist(),
                 tildeltSaksbehandlerident = null,
@@ -517,5 +518,5 @@ class KlagebehandlingService(
         )
     }
 
-    private fun Mottak.generateFrist() = oversendtKaDato + Period.ofWeeks(12)
+    private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)
 }

@@ -67,8 +67,8 @@ jobs:
           MESSAGE: "Deploy til dev feilet"
           CHANNEL: "#klage-notifications"
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-  e2e-tests:
-    name: Run end-to-end tests
+  acceptance-tests:
+    name: Run acceptance tests
     needs: deploytodev
     runs-on: ubuntu-latest
     steps:
@@ -86,4 +86,4 @@ jobs:
           VAR: app=kabal,jobname=klage-job-${{ steps.generate-uuid.outputs.uuid }}
           TEAM: klage
           RESOURCE: deploy/e2ejob.yml
-        timeout-minutes: 5          
+        timeout-minutes: 5

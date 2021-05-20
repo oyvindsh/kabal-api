@@ -73,7 +73,7 @@ class StatistikkInElasticsearchServiceTest {
         assertThat(indexOps.exists()).isTrue
     }
 
-    private fun klagebehandling(id: Long, innsendt: LocalDate, frist: LocalDate, avsluttet: LocalDate? = null) =
+    private fun klagebehandling(id: Long, innsendt: LocalDate, frist: LocalDate, avsluttet: LocalDateTime? = null) =
         EsKlagebehandling(
             id = id.toString(),
             versjon = 1L,
@@ -83,7 +83,7 @@ class StatistikkInElasticsearchServiceTest {
             tildeltSaksbehandlerident = null,
             innsendt = innsendt,
             mottattFoersteinstans = LocalDate.of(2018, 11, 1),
-            mottattKlageinstans = LocalDate.of(2018, 12, 1),
+            mottattKlageinstans = LocalDateTime.of(2018, 12, 1, 0, 0),
             frist = frist,
             avsluttet = avsluttet,
             hjemler = listOf(),
@@ -108,13 +108,13 @@ class StatistikkInElasticsearchServiceTest {
             klagebehandling(1005L, idag().minusDays(8), idag().plusDays(7)),
             klagebehandling(1006L, idag().minusDays(30), idag().minusDays(30)),
             klagebehandling(1007L, idag().minusDays(31), idag().plusDays(30)),
-            klagebehandling(2001L, idag(), idag(), idag()),
-            klagebehandling(2002L, idag().minusDays(1), uviktigdag(), idag().minusDays(1)),
-            klagebehandling(2003L, idag().minusDays(6), uviktigdag(), idag().minusDays(6)),
-            klagebehandling(2004L, idag().minusDays(7), uviktigdag(), idag().minusDays(7)),
-            klagebehandling(2005L, idag().minusDays(8), uviktigdag(), idag().minusDays(8)),
-            klagebehandling(2006L, idag().minusDays(30), uviktigdag(), idag().minusDays(30)),
-            klagebehandling(2007L, idag().minusDays(31), uviktigdag(), idag().minusDays(31)),
+            klagebehandling(2001L, idag(), idag(), idag().atTime(0, 0)),
+            klagebehandling(2002L, idag().minusDays(1), uviktigdag(), idag().atTime(0, 0).minusDays(1)),
+            klagebehandling(2003L, idag().minusDays(6), uviktigdag(), idag().atTime(0, 0).minusDays(6)),
+            klagebehandling(2004L, idag().minusDays(7), uviktigdag(), idag().atTime(0, 0).minusDays(7)),
+            klagebehandling(2005L, idag().minusDays(8), uviktigdag(), idag().atTime(0, 0).minusDays(8)),
+            klagebehandling(2006L, idag().minusDays(30), uviktigdag(), idag().atTime(0, 0).minusDays(30)),
+            klagebehandling(2007L, idag().minusDays(31), uviktigdag(), idag().atTime(0, 0).minusDays(31)),
         )
         repo.saveAll(klagebehandlinger)
 

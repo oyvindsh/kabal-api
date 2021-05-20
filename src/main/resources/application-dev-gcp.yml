@@ -20,6 +20,7 @@ AXSYS_APP: axsys
 KAFKA_BOOTSTRAP_SERVERS: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
 KAFKA_SCHEMA_REGISTRY_URL: https://kafka-schema-registry.nais-q.adeo.no/
 VEDTAK_FATTET_TOPIC: klage.vedtak-fattet.v1
+DVH_STATISTIKK_TOPIC: klage.kabal-statistikk.v1
 
 AIVEN_ES_HOST: elastic-klage-oppgave-es-nav-dev.aivencloud.com
 AIVEN_ES_PORT: 26482

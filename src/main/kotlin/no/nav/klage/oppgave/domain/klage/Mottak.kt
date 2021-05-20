@@ -54,7 +54,7 @@ class Mottak(
     @Column(name = "dato_mottatt_foersteinstans")
     val mottattNavDato: LocalDate? = null,
     @Column(name = "dato_oversendt_klageinstans")
-    var oversendtKaDato: LocalDate,
+    var oversendtKaDato: LocalDateTime,
     @Column(name = "dato_frist_fra_foersteinstans")
     var fristFraFoersteinstans: LocalDate? = null,
     @Column(name = "created")
