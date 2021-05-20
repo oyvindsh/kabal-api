@@ -72,7 +72,7 @@ CREATE TABLE klage.mottak
     oversendt_klageinstans_enhet  TEXT,
     dato_innsendt                 DATE,
     dato_mottatt_foersteinstans   DATE,
-    dato_oversendt_klageinstans   DATE                     NOT NULL,
+    dato_oversendt_klageinstans   TIMESTAMP WITH TIME ZONE NOT NULL,
     dato_frist_fra_foersteinstans DATE,
     kildesystem                   TEXT                     NOT NULL,
     kommentar                     TEXT,

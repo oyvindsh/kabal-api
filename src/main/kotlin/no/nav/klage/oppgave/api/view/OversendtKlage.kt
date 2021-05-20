@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.validation.constraints.PastOrPresent
 
 @ApiModel
@@ -110,7 +111,7 @@ data class OversendtKlage(
         mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),
         innsendtDato = innsendtTilNav,
         mottattNavDato = mottattFoersteinstans,
-        oversendtKaDato = LocalDate.now(),
+        oversendtKaDato = LocalDateTime.now(),
         fristFraFoersteinstans = frist,
         kildesystem = kilde.mapFagsystem()
     )

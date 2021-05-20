@@ -89,12 +89,12 @@ class RelatedKlagebehandlingerTest {
             tildeltSaksbehandlerident = null,
             innsendt = LocalDate.now(),
             mottattFoersteinstans = LocalDate.now(),
-            mottattKlageinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDateTime.now(),
             frist = LocalDate.now(),
             avsluttet = if (aapen) {
                 null
             } else {
-                LocalDate.now()
+                LocalDateTime.now()
             },
             hjemler = listOf(),
             sakenGjelderFnr = fnr,

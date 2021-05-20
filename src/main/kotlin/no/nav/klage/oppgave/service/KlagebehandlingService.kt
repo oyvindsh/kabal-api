@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -132,7 +133,7 @@ class KlagebehandlingService(
     fun setMottattKlageinstans(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
-        mottattKlageinstans: LocalDate,
+        mottattKlageinstans: LocalDateTime,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)

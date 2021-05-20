@@ -72,15 +72,15 @@
     },
     "mottattKlageinstans": {
       "type": "date",
-      "format": "date"
+      "format": "date_time"
     },
     "tildelt": {
       "type": "date",
-      "format": "date"
+      "format": "date_time"
     },
     "avsluttet": {
       "type": "date",
-      "format": "date"
+      "format": "date_time"
     },
     "frist": {
       "type": "date",

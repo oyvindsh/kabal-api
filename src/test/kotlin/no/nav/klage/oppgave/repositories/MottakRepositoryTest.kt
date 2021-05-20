@@ -15,7 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -54,7 +54,7 @@ class MottakRepositoryTest {
                     journalpostId = "245245"
                 )
             ),
-            oversendtKaDato = LocalDate.now(),
+            oversendtKaDato = LocalDateTime.now(),
             kildesystem = Fagsystem.AO01
         )
 

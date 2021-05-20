@@ -21,7 +21,7 @@ object KlagebehandlingAggregatFunctions {
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
         if (tildelt == null) {
-            tildelt = tidspunkt.toLocalDate()
+            tildelt = tidspunkt
             endringslogg(
                 saksbehandlerident,
                 Felt.TILDELT,
@@ -119,7 +119,7 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setMottattKlageinstans(
-        nyVerdi: LocalDate,
+        nyVerdi: LocalDateTime,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val gammelVerdi = mottattKlageinstans
