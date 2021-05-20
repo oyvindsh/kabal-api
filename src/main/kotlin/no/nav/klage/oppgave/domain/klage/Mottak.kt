@@ -44,8 +44,6 @@ class Mottak(
     var avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")
     var avsenderEnhet: String? = null,
-    @Column(name = "oversendt_klageinstans_enhet")
-    var oversendtKaEnhet: String? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
     val mottakDokument: MutableSet<MottakDokument> = mutableSetOf(),

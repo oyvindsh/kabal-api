@@ -6,7 +6,10 @@ import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.OversendtKlage
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
-import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.Klager
+import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.PartId
+import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.MottakLagretEvent
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
@@ -78,10 +81,6 @@ class MottakService(
         validateType(type)
         validateEnhet(avsenderEnhet)
         validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
-        oversendtEnhet?.let {
-            validateEnhet(it)
-            validateKaEnhet(it)
-        }
     }
 
     private fun validateType(type: Type) {
@@ -99,13 +98,6 @@ class MottakService(
     private fun validateSaksbehandler(saksbehandlerident: String, enhet: String) {
         if (enhetRepository.getAnsatteIEnhet(enhet).none { it == saksbehandlerident }) {
             throw OversendtKlageNotValidException("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
-        }
-    }
-
-    private fun validateKaEnhet(enhet: String) {
-        if (!enhet.startsWith(KLAGEENHET_PREFIX)) {
-            logger.warn("{} is not a klageinstansen enhet", enhet)
-            throw OversendtKlageNotValidException("$enhet er ikke en enhet i klageinstansen")
         }
     }
 

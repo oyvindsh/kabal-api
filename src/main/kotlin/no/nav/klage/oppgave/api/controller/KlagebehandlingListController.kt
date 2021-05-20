@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
@@ -28,7 +29,8 @@ class KlagebehandlingListController(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
     companion object {
@@ -73,6 +75,7 @@ class KlagebehandlingListController(
             klagebehandlingId.toUUIDOrException(),
             saksbehandlertildeling.klagebehandlingVersjon,
             saksbehandlertildeling.navIdent,
+            saksbehandlertildeling.angittEnhetOrDefault(),
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
@@ -98,6 +101,7 @@ class KlagebehandlingListController(
         klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
             saksbehandlerfradeling?.klagebehandlingVersjon,
+            null,
             null,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
@@ -156,6 +160,9 @@ class KlagebehandlingListController(
         }
     }
 
+    private fun Saksbehandlertildeling.angittEnhetOrDefault(): String =
+        enhetId ?: saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(navIdent).enheter.first().enhetId
+
     //    @PutMapping("/oppgaver/{id}/hjemmel")
 //    fun setHjemmel(
 //        @PathVariable("id") oppgaveId: String,
@@ -170,5 +177,5 @@ class KlagebehandlingListController(
 //        return ResponseEntity.ok().location(uri).body(oppgave)
 //    }
 //
-
 }
+

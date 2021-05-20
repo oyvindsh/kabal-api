@@ -69,7 +69,6 @@ CREATE TABLE klage.mottak
     innsyn_url                    TEXT,
     avsender_saksbehandlerident   TEXT,
     avsender_enhet                TEXT,
-    oversendt_klageinstans_enhet  TEXT,
     dato_innsendt                 DATE,
     dato_mottatt_foersteinstans   DATE,
     dato_oversendt_klageinstans   TIMESTAMP WITH TIME ZONE NOT NULL,
