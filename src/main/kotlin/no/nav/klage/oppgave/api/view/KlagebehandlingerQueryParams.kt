@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.api.view
 
-import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 
 data class KlagebehandlingerQueryParams(
@@ -15,7 +14,6 @@ data class KlagebehandlingerQueryParams(
     val erTildeltSaksbehandler: Boolean? = null,
     val tildeltSaksbehandler: String? = null,
     val enhetId: String,
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val ferdigstiltFom: LocalDate? = null
 ) {
 
