@@ -1,0 +1,86 @@
+{
+  "bool": {
+    "must": [
+      {
+        "term": {
+          "tildeltEnhet": {
+            "value": "4291",
+            "boost": 1.0
+          }
+        }
+      },
+      {
+        "bool": {
+          "should": [
+            {
+              "term": {
+                "type": {
+                  "value": "1",
+                  "boost": 1.0
+                }
+              }
+            }
+          ],
+          "adjust_pure_negative": true,
+          "boost": 1.0
+        }
+      },
+      {
+        "bool": {
+          "adjust_pure_negative": true,
+          "boost": 1.0
+        }
+      }
+    ],
+    "filter": [
+      {
+        "bool": {
+          "must_not": [
+            {
+              "term": {
+                "egenAnsatt": {
+                  "value": true,
+                  "boost": 1.0
+                }
+              }
+            },
+            {
+              "term": {
+                "fortrolig": {
+                  "value": true,
+                  "boost": 1.0
+                }
+              }
+            },
+            {
+              "term": {
+                "strengtFortrolig": {
+                  "value": true,
+                  "boost": 1.0
+                }
+              }
+            }
+          ],
+          "adjust_pure_negative": true,
+          "boost": 1.0
+        }
+      }
+    ],
+    "must_not": [
+      {
+        "exists": {
+          "field": "avsluttet",
+          "boost": 1.0
+        }
+      },
+      {
+        "exists": {
+          "field": "tildeltSaksbehandlerident",
+          "boost": 1.0
+        }
+      }
+    ],
+    "adjust_pure_negative": true,
+    "boost": 1.0
+  }
+}

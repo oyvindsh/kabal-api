@@ -19,7 +19,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMed
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerOgEnhet
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -74,7 +74,11 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event =
-            klagebehandling.setTildeltSaksbehandlerident(tildeltSaksbehandlerIdent, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setTildeltSaksbehandlerOgEnhet(
+                tildeltSaksbehandlerIdent,
+                enhetId,
+                utfoerendeSaksbehandlerIdent
+            )
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
