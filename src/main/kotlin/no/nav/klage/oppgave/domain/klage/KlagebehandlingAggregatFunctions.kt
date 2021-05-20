@@ -10,13 +10,14 @@ import java.util.*
 
 object KlagebehandlingAggregatFunctions {
 
-    fun Klagebehandling.setTildeltSaksbehandlerident(
-        nyVerdi: String?,
+    fun Klagebehandling.setTildeltSaksbehandler(
+        nyVerdiSaksbehandlerident: String?,
+        nyVerdiEnhetId: String,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val gammelVerdi = tildeltSaksbehandlerident
         val tidspunkt = LocalDateTime.now()
-        tildeltSaksbehandlerident = nyVerdi
+        tildeltSaksbehandlerident = nyVerdiSaksbehandlerident
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
@@ -35,7 +36,7 @@ object KlagebehandlingAggregatFunctions {
             saksbehandlerident,
             Felt.TILDELT_SAKSBEHANDLERIDENT,
             gammelVerdi,
-            nyVerdi,
+            nyVerdiSaksbehandlerident,
             tidspunkt
         )?.let { endringslogginnslag.add(it) }
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)

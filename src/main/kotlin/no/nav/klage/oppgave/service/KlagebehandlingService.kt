@@ -69,6 +69,7 @@ class KlagebehandlingService(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
         tildeltSaksbehandlerIdent: String?,
+        enhetId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
