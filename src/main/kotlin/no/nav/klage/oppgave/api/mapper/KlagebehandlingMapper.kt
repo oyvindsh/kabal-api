@@ -129,13 +129,14 @@ class KlagebehandlingMapper(
 
     fun mapEsKlagebehandlingerToListView(
         esKlagebehandlinger: List<EsKlagebehandling>,
-        fetchPersoner: Boolean,
+        viseUtvidet: Boolean,
+        viseFullfoerte: Boolean,
         saksbehandler: String?
     ): List<KlagebehandlingListView> {
         return esKlagebehandlinger.map { esKlagebehandling ->
             KlagebehandlingListView(
                 id = esKlagebehandling.id,
-                person = if (fetchPersoner) {
+                person = if (viseUtvidet) {
                     KlagebehandlingListView.Person(
                         esKlagebehandling.sakenGjelderFnr,
                         esKlagebehandling.sakenGjelderNavn
@@ -152,7 +153,17 @@ class KlagebehandlingMapper(
                 klagebehandlingVersjon = esKlagebehandling.versjon,
                 erMedunderskriver = if (esKlagebehandling.medunderskriverident != null) {
                     esKlagebehandling.medunderskriverident == saksbehandler
-                } else null
+                } else null,
+                utfall = if (viseFullfoerte) {
+                    esKlagebehandling.vedtakUtfall
+                } else {
+                    null
+                },
+                avsluttet = if (viseFullfoerte) {
+                    esKlagebehandling.avsluttet?.toLocalDate()
+                } else {
+                    null
+                }
             )
         }
     }

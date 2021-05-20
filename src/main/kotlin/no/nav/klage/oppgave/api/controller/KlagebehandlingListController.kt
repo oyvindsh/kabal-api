@@ -57,6 +57,7 @@ class KlagebehandlingListController(
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
+                searchCriteria.ferdigstiltFom != null,
                 searchCriteria.saksbehandler
             )
         )
