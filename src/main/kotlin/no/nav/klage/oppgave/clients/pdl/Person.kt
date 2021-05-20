@@ -5,7 +5,7 @@ data class Person(
     val fornavn: String?,
     val mellomnavn: String?,
     val etternavn: String?,
-    val navn: String?,
+    val sammensattNavn: String?,
     val beskyttelsesbehov: Beskyttelsesbehov?,
     val kjoenn: String?
 ) {
