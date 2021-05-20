@@ -44,12 +44,12 @@ class Klagebehandling(
     var avsenderSaksbehandleridentFoersteinstans: String? = null,
     @Column(name = "avsender_enhet_foersteinstans")
     var avsenderEnhetFoersteinstans: String? = null,
-    @Column(name = " dato_mottatt_klageinstans")
-    var mottattKlageinstans: LocalDate,
+    @Column(name = "dato_mottatt_klageinstans")
+    var mottattKlageinstans: LocalDateTime,
     @Column(name = "dato_behandling_tildelt")
-    var tildelt: LocalDate? = null,
+    var tildelt: LocalDateTime? = null,
     @Column(name = "dato_behandling_avsluttet")
-    var avsluttet: LocalDate? = null,
+    var avsluttet: LocalDateTime? = null,
     @Column(name = "frist")
     var frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
