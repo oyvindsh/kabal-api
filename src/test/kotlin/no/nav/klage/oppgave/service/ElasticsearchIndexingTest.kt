@@ -164,7 +164,7 @@ class ElasticsearchIndexingTest {
             mottattFoersteinstans = null,
             mottattKlageinstans = LocalDate.now(),
             frist = null,
-            startet = null,
+            tildelt = null,
             avsluttet = null,
             hjemler = listOf(Hjemmel.FTL_8_35.id),
             sakenGjelderFnr = null,

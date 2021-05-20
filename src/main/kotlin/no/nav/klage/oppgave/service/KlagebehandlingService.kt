@@ -283,7 +283,7 @@ class KlagebehandlingService(
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
                 mottattKlageinstans = mottak.oversendtKaDato,
-                startet = null,
+                tildelt = null,
                 avsluttet = null,
                 frist = mottak.fristFraFoersteinstans,
                 tildeltSaksbehandlerident = null,

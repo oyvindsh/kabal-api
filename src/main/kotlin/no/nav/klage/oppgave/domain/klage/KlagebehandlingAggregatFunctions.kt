@@ -20,13 +20,13 @@ object KlagebehandlingAggregatFunctions {
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
-        if (startet == null) {
-            startet = tidspunkt.toLocalDate()
+        if (tildelt == null) {
+            tildelt = tidspunkt.toLocalDate()
             endringslogg(
                 saksbehandlerident,
-                Felt.STARTET,
+                Felt.TILDELT,
                 null,
-                startet?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tildelt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
                 tidspunkt
             )?.let { endringslogginnslag.add(it) }
         }

@@ -46,8 +46,8 @@ class Klagebehandling(
     var avsenderEnhetFoersteinstans: String? = null,
     @Column(name = " dato_mottatt_klageinstans")
     var mottattKlageinstans: LocalDate,
-    @Column(name = "dato_behandling_startet")
-    var startet: LocalDate? = null,
+    @Column(name = "dato_behandling_tildelt")
+    var tildelt: LocalDate? = null,
     @Column(name = "dato_behandling_avsluttet")
     var avsluttet: LocalDate? = null,
     @Column(name = "frist")

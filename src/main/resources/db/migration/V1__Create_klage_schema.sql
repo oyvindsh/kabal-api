@@ -137,7 +137,7 @@ CREATE TABLE klage.klagebehandling
     dato_innsendt                              DATE,
     dato_mottatt_foersteinstans                DATE,
     dato_mottatt_klageinstans                  DATE                     NOT NULL,
-    dato_behandling_startet                    DATE,
+    dato_behandling_tildelt                    DATE,
     dato_behandling_avsluttet                  DATE,
     frist                                      DATE,
     tildelt_saksbehandlerident                 TEXT,

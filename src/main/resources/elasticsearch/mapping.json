@@ -74,7 +74,7 @@
       "type": "date",
       "format": "date"
     },
-    "startet": {
+    "tildelt": {
       "type": "date",
       "format": "date"
     },
