@@ -27,7 +27,6 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 
 open class ElasticsearchService(
@@ -188,32 +187,32 @@ open class ElasticsearchService(
 
         opprettetFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format("yyyy-MM-dd")
             )
         }
         opprettetTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format("yyyy-MM-dd")
             )
         }
         ferdigstiltFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttet").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("avsluttet").gte(it).format("yyyy-MM-dd")
             )
         }
         ferdigstiltTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttet").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("avsluttet").lte(it).format("yyyy-MM-dd")
             )
         }
         fristFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("frist").gte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("frist").gte(it)
             )
         }
         fristTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("frist").lte(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                QueryBuilders.rangeQuery("frist").lte(it)
             )
         }
 
