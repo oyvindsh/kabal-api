@@ -16,10 +16,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
-import no.nav.klage.oppgave.exceptions.JournalpostFinalizationException
-import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
-import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
-import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
+import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
 import no.nav.klage.oppgave.util.AttachmentValidator
 import no.nav.klage.oppgave.util.getLogger
@@ -161,7 +158,7 @@ class VedtakService(
         val vedtak = getVedtakFromKlagebehandling(klage, vedtakId)
         if (vedtak.finalized != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
         if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        require(vedtak.utfall != null) { "Utfall på vedtak må være satt" }
+        if (vedtak.utfall != null) throw UtfallNotSetException("Utfall på vedtak $vedtakId er ikke satt")
 
         finalizeJournalpost(
             klage,
@@ -204,7 +201,8 @@ class VedtakService(
     }
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
-    private fun dispatchUnsendtVedtakToKafka() {
+    @Transactional
+    fun dispatchUnsendtVedtakToKafka() {
         kafkaVedtakEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
             runCatching {
                 vedtakKafkaProducer.sendVedtak(
