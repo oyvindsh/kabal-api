@@ -9,6 +9,9 @@
     "klagerFornavn": {
       "type": "text"
     },
+    "klagerMellomnavn": {
+      "type": "text"
+    },
     "klagerEtternavn": {
       "type": "text"
     },
@@ -25,6 +28,9 @@
       "type": "text"
     },
     "sakenGjelderFornavn": {
+      "type": "text"
+    },
+    "sakenGjelderMellomnavn": {
       "type": "text"
     },
     "sakenGjelderEtternavn": {
