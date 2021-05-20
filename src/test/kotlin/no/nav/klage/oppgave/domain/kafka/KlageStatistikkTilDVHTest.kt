@@ -32,7 +32,7 @@ internal class KlageStatistikkTilDVHTest {
             behandlingType = "behType",
             beslutter = "beslutter",
             endringstid = LocalDateTime.now(),
-            hjemmel = "8-14",
+            hjemmel = listOf("8-14"),
             klager = KlageStatistikkTilDVH.Part(verdi = "8005138513", KlageStatistikkTilDVH.PartIdType.VIRKSOMHET),
             omgjoeringsgrunn = "grunn",
             opprinneligFagsaksystem = "K9Sak",
