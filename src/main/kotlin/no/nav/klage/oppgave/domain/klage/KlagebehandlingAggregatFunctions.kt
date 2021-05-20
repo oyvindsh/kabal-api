@@ -355,7 +355,7 @@ object KlagebehandlingAggregatFunctions {
 
     fun Klagebehandling.setUtfallInVedtak(
         vedtakId: UUID,
-        nyVerdi: Utfall,
+        nyVerdi: Utfall?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val vedtak = getVedtakFromKlagebehandling(this, vedtakId)

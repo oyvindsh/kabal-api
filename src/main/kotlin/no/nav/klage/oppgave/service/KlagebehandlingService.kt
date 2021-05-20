@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.util.*
 
 @Service
@@ -286,7 +287,7 @@ class KlagebehandlingService(
                 mottattKlageinstans = mottak.oversendtKaDato,
                 tildelt = null,
                 avsluttet = null,
-                frist = mottak.fristFraFoersteinstans,
+                frist = mottak.generateFrist(),
                 tildeltSaksbehandlerident = null,
                 tildeltEnhet = mottak.oversendtKaEnhet,
                 mottakId = mottak.id,
@@ -516,4 +517,6 @@ class KlagebehandlingService(
             saksbehandlerIdent
         )
     }
+
+    private fun Mottak.generateFrist() = oversendtKaDato + Period.ofWeeks(12)
 }
