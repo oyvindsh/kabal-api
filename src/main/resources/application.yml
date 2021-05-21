@@ -153,9 +153,6 @@ no.nav.security.jwt:
           client-jwk: ${AZURE_APP_JWK}
           client-auth-method: private_key_jwt
 
-aiven-kafka:
-  security-protocol: SSL
-
 navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 

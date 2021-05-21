@@ -17,8 +17,6 @@ class AivenKafkaConfiguration(
     private val kafkaBrokers: String,
     @Value("\${KAFKA_TRUSTSTORE_PATH}")
     private val kafkaTruststorePath: String,
-    @Value("\${aiven-kafka.security-protocol}")
-    private val kafkaSecurityProtocol: String,
     @Value("\${KAFKA_CREDSTORE_PASSWORD}")
     private val kafkaCredstorePassword: String,
     @Value("\${KAFKA_KEYSTORE_PATH}")
@@ -30,7 +28,7 @@ class AivenKafkaConfiguration(
     ) + securityConfig()
 
     private fun securityConfig() = mapOf(
-        CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to kafkaSecurityProtocol,
+        CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "SSL",
         SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG to "", // Disable server host name verification
         SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG to "JKS",
         SslConfigs.SSL_KEYSTORE_TYPE_CONFIG to "PKCS12",
