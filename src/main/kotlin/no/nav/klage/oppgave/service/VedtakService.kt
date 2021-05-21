@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
+import no.nav.klage.oppgave.domain.klage.KafkaVedtakEvent
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFinalizedIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
@@ -13,13 +15,14 @@ import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
-import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
-import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
-import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
-import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
+import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
+import no.nav.klage.oppgave.exceptions.*
+import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
 import no.nav.klage.oppgave.util.AttachmentValidator
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -28,17 +31,19 @@ import java.util.*
 @Service
 @Transactional
 class VedtakService(
-    private val klagebehandlingRepository: KlagebehandlingRepository,
+    private val klagebehandlingService: KlagebehandlingService,
     private val vedtakKafkaProducer: VedtakKafkaProducer,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val attachmentValidator: AttachmentValidator,
     private val joarkClient: JoarkClient,
-    private val dokumentService: DokumentService
+    private val dokumentService: DokumentService,
+    private val kafkaVedtakEventRepository: KafkaVedtakEventRepository
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @Transactional(readOnly = true)
@@ -105,24 +110,6 @@ class VedtakService(
         return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
     }
 
-    fun finalizeJournalpost(
-        klagebehandling: Klagebehandling,
-        vedtakId: UUID,
-        utfoerendeSaksbehandlerIdent: String,
-        journalfoerendeEnhet: String
-    ): Vedtak? {
-        val vedtak = getVedtakFromKlagebehandling(klagebehandling, vedtakId)
-        if (vedtak.finalized != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
-        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        return try {
-            joarkClient.finalizeJournalpost(vedtak.journalpostId!!, journalfoerendeEnhet)
-            setFinalized(klagebehandling, vedtakId, utfoerendeSaksbehandlerIdent)
-        } catch (e: Exception) {
-            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
-            null
-        }
-    }
-
     fun addVedlegg(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,
@@ -158,22 +145,85 @@ class VedtakService(
         }
     }
 
-    fun dispatchVedtakToKafka(klagebehandlingId: UUID, vedtakId: UUID) {
-        val klage = klagebehandlingRepository.findById(klagebehandlingId).orElseThrow()
-        val vedtak = klage.vedtak.find { it.id == vedtakId }
-        require(vedtak != null) { "Fant ikke vedtak på klage" }
-        require(vedtak.utfall != null) { "Utfall på vedtak må være satt" }
-        require(vedtak.journalpostId != null) { "Kan ikke fullføre et vedtak uten journalført vedtaksbrev" }
-        val utfall = vedtak.utfall!!
-        val vedtakFattet = KlagevedtakFattet(
-            kildeReferanse = klage.kildeReferanse ?: "UKJENT",
-            kilde = klage.kildesystem.name,
-            utfall = utfall,
-            vedtaksbrevReferanse = vedtak.journalpostId,
-            kabalReferanse = vedtakId.toString()
+    fun finalizeVedtak(
+        klagebehandlingId: UUID,
+        vedtakId: UUID,
+        input: VedtakFullfoerInput,
+        innloggetIdent: String
+    ) {
+        val klage = klagebehandlingService.getKlagebehandlingForUpdate(
+            klagebehandlingId,
+            input.klagebehandlingVersjon
+        )
+        val vedtak = getVedtakFromKlagebehandling(klage, vedtakId)
+        if (vedtak.finalized != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        if (vedtak.utfall != null) throw UtfallNotSetException("Utfall på vedtak $vedtakId er ikke satt")
+
+        finalizeJournalpost(
+            klage,
+            vedtak,
+            innloggetIdent,
+            input.journalfoerendeEnhet
         )
 
-        vedtakKafkaProducer.sendVedtak(vedtakFattet)
+        addVedtakToStore(klage, vedtak)
+    }
+
+    private fun finalizeJournalpost(
+        klagebehandling: Klagebehandling,
+        vedtak: Vedtak,
+        utfoerendeSaksbehandlerIdent: String,
+        journalfoerendeEnhet: String
+    ): Vedtak? {
+        return try {
+            joarkClient.finalizeJournalpost(vedtak.journalpostId!!, journalfoerendeEnhet)
+            setFinalized(klagebehandling, vedtak.id, utfoerendeSaksbehandlerIdent)
+        } catch (e: Exception) {
+            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
+            throw JournalpostFinalizationException("Klarte ikke å journalføre vedtak")
+        }
+    }
+
+    // TODO Legg til brevutsending i eget steg?
+
+    private fun addVedtakToStore(klage: Klagebehandling, vedtak: Vedtak) {
+        kafkaVedtakEventRepository.save(
+            KafkaVedtakEvent(
+                kildeReferanse = klage.kildeReferanse ?: "UKJENT",
+                kilde = klage.kildesystem.name,
+                utfall = vedtak.utfall!!,
+                vedtaksbrevReferanse = vedtak.journalpostId,
+                kabalReferanse = vedtak.id.toString(),
+                status = UtsendingStatus.IKKE_SENDT
+            )
+        )
+    }
+
+    @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
+    @Transactional
+    fun dispatchUnsendtVedtakToKafka() {
+        kafkaVedtakEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
+            runCatching {
+                vedtakKafkaProducer.sendVedtak(
+                    KlagevedtakFattet(
+                        kildeReferanse = event.kildeReferanse,
+                        kilde = event.kilde,
+                        utfall = event.utfall,
+                        vedtaksbrevReferanse = event.vedtaksbrevReferanse,
+                        kabalReferanse = event.kabalReferanse
+                    )
+                )
+            }.onFailure {
+                event.status = UtsendingStatus.FEILET
+                event.melding = it.message
+                logger.error("Send event ${event.id} to kafka failed, see secure log for details")
+                secureLogger.error("Send event ${event.id} to kafka failed. Object: $event")
+            }.onSuccess {
+                event.status = UtsendingStatus.SENDT
+                event.melding = null
+            }
+        }
     }
 
     private fun getVedtakFromKlagebehandling(klagebehandling: Klagebehandling, vedtakId: UUID): Vedtak {

@@ -275,3 +275,22 @@ CREATE TABLE klage.brevelement
     CONSTRAINT unique_element_brev_id_key UNIQUE (brev_id, key),
     CONSTRAINT fk_brevelement_brev_id FOREIGN KEY (brev_id) REFERENCES klage.vedtaksbrev (id)
 );
+
+CREATE TABLE klage.brevutsending
+(
+    id      UUID PRIMARY KEY,
+    status  TEXT NOT NULL DEFAULT 'IKKE_SENDT',
+    melding TEXT
+);
+
+CREATE TABLE klage.kafka_vedtak_event
+(
+    id                      UUID PRIMARY KEY,
+    kilde_referanse         TEXT NOT NULL,
+    kilde                   TEXT NOT NULL,
+    utfall_id               TEXT NOT NULL,
+    vedtaksbrev_referanse   TEXT,
+    kabal_referanse         TEXT NOT NULL,
+    status_id               TEXT NOT NULL DEFAULT '1',
+    melding                 TEXT
+);

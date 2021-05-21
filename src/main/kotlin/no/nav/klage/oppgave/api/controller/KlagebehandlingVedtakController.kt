@@ -166,17 +166,12 @@ class KlagebehandlingVedtakController(
         @RequestBody input: VedtakFullfoerInput
     ) {
         logMethodDetails("fullfoerVedtak", klagebehandlingId, vedtakId)
-        vedtakService.finalizeJournalpost(
-            klagebehandlingService.getKlagebehandlingForUpdate(
-                klagebehandlingId.toUUIDOrException(),
-                input.klagebehandlingVersjon
-            ),
+        vedtakService.finalizeVedtak(
+            klagebehandlingId.toUUIDOrException(),
             vedtakId.toUUIDOrException(),
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            input.journalfoerendeEnhet
+            input,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-
-        vedtakService.dispatchVedtakToKafka(klagebehandlingId.toUUIDOrException(), vedtakId.toUUIDOrException())
     }
 
     @ResponseBody
