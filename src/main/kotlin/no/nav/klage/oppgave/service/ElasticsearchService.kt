@@ -39,6 +39,8 @@ open class ElasticsearchService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        private const val ISO8601 = "yyyy-MM-dd"
     }
 
     fun recreateIndex() {
@@ -187,22 +189,22 @@ open class ElasticsearchService(
 
         opprettetFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format("yyyy-MM-dd")
+                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format(ISO8601)
             )
         }
         opprettetTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format("yyyy-MM-dd")
+                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format(ISO8601)
             )
         }
         ferdigstiltFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttet").gte(it).format("yyyy-MM-dd")
+                QueryBuilders.rangeQuery("avsluttet").gte(it).format(ISO8601)
             )
         }
         ferdigstiltTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttet").lte(it).format("yyyy-MM-dd")
+                QueryBuilders.rangeQuery("avsluttet").lte(it).format(ISO8601)
             )
         }
         fristFom?.let {
@@ -355,7 +357,7 @@ open class ElasticsearchService(
     private fun addAggregationsForOverFrist(querybuilder: NativeSearchQueryBuilder) {
         querybuilder
             .addAggregation(
-                AggregationBuilders.dateRange("over_frist").field("frist").addUnboundedTo("now/d").format("yyyy-MM-dd")
+                AggregationBuilders.dateRange("over_frist").field("frist").addUnboundedTo("now/d").format(ISO8601)
             )
     }
 
@@ -363,27 +365,27 @@ open class ElasticsearchService(
         querybuilder
             .addAggregation(
                 AggregationBuilders.dateRange("innsendt_yesterday").field("innsendt").addRange("now-1d/d", "now/d")
-                    .format("yyyy-MM-dd")
+                    .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("innsendt_last7days").field("innsendt").addRange("now-7d/d", "now/d")
-                    .format("yyyy-MM-dd")
+                    .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("innsendt_last30days").field("innsendt").addRange("now-30d/d", "now/d")
-                    .format("yyyy-MM-dd")
+                    .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttet").addRange("now-1d/d", "now/d")
-                    .format("yyyy-MM-dd")
+                    .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttet").addRange("now-7d/d", "now/d")
-                    .format("yyyy-MM-dd")
+                    .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttet").addRange("now-30d/d", "now/d")
-                    .format("yyyy-MM-dd")
+                    .format(ISO8601)
             )
     }
 }
