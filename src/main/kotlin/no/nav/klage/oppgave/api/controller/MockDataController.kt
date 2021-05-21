@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
-import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.service.MottakService
@@ -53,7 +52,7 @@ class MockDataController(
                 tema = listOf(Tema.OMS, Tema.SYK).shuffled().first(),
                 type = Type.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtPartId(PartIdType.PERSON, fnr)
+                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
                 ),
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
@@ -99,7 +98,7 @@ class MockDataController(
                 tema = Tema.OMS,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtPartId(PartIdType.PERSON, fnr)
+                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
                 ),
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
@@ -145,7 +144,7 @@ class MockDataController(
                 tema = Tema.OMS,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtPartId(PartIdType.PERSON, fnr)
+                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
                 ),
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
@@ -191,9 +190,9 @@ class MockDataController(
                 tema = Tema.OMS,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
-                    id = OversendtPartId(PartIdType.PERSON, fnr),
+                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr),
                     klagersProsessfullmektig = OversendtProsessfullmektig(
-                        id = OversendtPartId(PartIdType.PERSON, "25017820926"),
+                        id = OversendtPartId(OversendtPartIdType.PERSON, "25017820926"),
                         skalKlagerMottaKopi = true
                     )
                 ),

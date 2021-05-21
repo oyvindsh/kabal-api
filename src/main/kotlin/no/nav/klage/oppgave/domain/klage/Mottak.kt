@@ -20,11 +20,9 @@ class Mottak(
     @Column(name = "type_id")
     @Convert(converter = TypeConverter::class)
     var type: Type,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "klager_id", nullable = false)
+    @Embedded
     var klager: Klager,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "saken_gjelder_id", nullable = true)
+    @Embedded
     var sakenGjelder: SakenGjelder? = null,
     @Column(name = "sak_fagsystem")
     @Convert(converter = FagsystemConverter::class)

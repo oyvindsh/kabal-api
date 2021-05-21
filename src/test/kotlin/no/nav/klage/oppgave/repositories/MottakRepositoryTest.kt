@@ -4,6 +4,7 @@ import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
+import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.assertj.core.api.Assertions.assertThat

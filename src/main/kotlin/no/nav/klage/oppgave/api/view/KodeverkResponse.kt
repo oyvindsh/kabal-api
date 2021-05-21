@@ -11,7 +11,12 @@ data class KodeverkResponse(
     val tema: List<Kode> = Tema.values().asList().toDto(),
     val utfall: List<Kode> = Utfall.values().asList().toDto(),
     val hjemlerPerTema: List<HjemlerPerTema> = hjemlerPerTema(),
-    val grunnerPerUtfall: List<GrunnerPerUtfall> = grunnerPerUtfall()
+    val grunnerPerUtfall: List<GrunnerPerUtfall> = grunnerPerUtfall(),
+    val partIdType: List<Kode> = PartIdType.values().asList().toDto(),
+    val rolle: List<Kode> = Rolle.values().asList().toDto(),
+    val fagsystem: List<Kode> = Fagsystem.values().asList().toDto(),
+    val utsendingStatus: List<Kode> = UtsendingStatus.values().asList().toDto()
+
 )
 
 data class KodeDto(override val id: String, override val navn: String, override val beskrivelse: String) : Kode

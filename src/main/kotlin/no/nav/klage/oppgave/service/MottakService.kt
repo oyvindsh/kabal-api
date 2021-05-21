@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.klage.Klager
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.PartId
-import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.MottakLagretEvent
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException

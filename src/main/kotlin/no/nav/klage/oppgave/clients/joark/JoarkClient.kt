@@ -5,7 +5,7 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.joark.*
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.PartIdType
+import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.service.TokenService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -33,7 +33,11 @@ class JoarkClient(
         private const val BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS = "ab0164"
     }
 
-    fun createJournalpost(klagebehandling: Klagebehandling, uploadedDocument: MultipartFile, journalfoerendeEnhet: String): String {
+    fun createJournalpost(
+        klagebehandling: Klagebehandling,
+        uploadedDocument: MultipartFile,
+        journalfoerendeEnhet: String
+    ): String {
 
         val journalpost = this.createJournalpostObject(klagebehandling, uploadedDocument, journalfoerendeEnhet)
 
