@@ -1,5 +1,8 @@
 package no.nav.klage.oppgave.api.view
 
+import org.springframework.format.annotation.DateTimeFormat
+import java.time.LocalDate
+
 data class KlagebehandlingerQueryParams(
     var typer: List<String> = emptyList(),
     var temaer: List<String> = emptyList(),
@@ -11,7 +14,9 @@ data class KlagebehandlingerQueryParams(
     val projeksjon: Projeksjon? = null,
     val erTildeltSaksbehandler: Boolean? = null,
     val tildeltSaksbehandler: String? = null,
-    val enhetId: String
+    val enhetId: String,
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    val ferdigstiltFom: LocalDate? = null
 ) {
 
     enum class Rekkefoelge {

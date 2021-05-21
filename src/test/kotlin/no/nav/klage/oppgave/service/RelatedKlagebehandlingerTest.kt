@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -89,12 +90,12 @@ class RelatedKlagebehandlingerTest {
             tildeltSaksbehandlerident = null,
             innsendt = LocalDate.now(),
             mottattFoersteinstans = LocalDate.now(),
-            mottattKlageinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDateTime.now(),
             frist = LocalDate.now(),
             avsluttet = if (aapen) {
                 null
             } else {
-                LocalDate.now()
+                LocalDateTime.now()
             },
             hjemler = listOf(),
             sakenGjelderFnr = fnr,
@@ -138,5 +139,19 @@ class RelatedKlagebehandlingerTest {
         assertThat(related.avsluttedeByJournalpostid.map { it.id }).containsExactly("1006")
     }
 
+    @Test
+    @Order(5)
+    fun `format date works`() {
+
+        val searchCriteria = KlagebehandlingerSearchCriteria(
+            ferdigstiltFom = LocalDate.now(),
+            offset = 0,
+            limit = 10,
+            statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.AVSLUTTET
+        )
+
+        val results = service.findByCriteria(searchCriteria)
+        assertThat(results.searchHits).hasSize(3)
+    }
 
 }

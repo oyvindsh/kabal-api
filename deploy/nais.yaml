@@ -44,6 +44,8 @@ spec:
           - NAVident
   elastic:
     instance: oppgave-es
+  kafka:
+    pool: {{kafka_pool}}
   port: 7081
   liveness:
     path: /internal/health

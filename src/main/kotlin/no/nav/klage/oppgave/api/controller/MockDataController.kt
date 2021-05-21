@@ -73,7 +73,6 @@ class MockDataController(
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                oversendtEnhet = "4291",
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
@@ -120,7 +119,6 @@ class MockDataController(
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                oversendtEnhet = "4291",
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
@@ -167,7 +165,6 @@ class MockDataController(
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                oversendtEnhet = "4291",
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
@@ -218,7 +215,6 @@ class MockDataController(
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
-                oversendtEnhet = "4291",
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),

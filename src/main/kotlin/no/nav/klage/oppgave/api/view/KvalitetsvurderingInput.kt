@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api.view
 import no.nav.klage.oppgave.domain.klage.MottakHjemmel
 import no.nav.klage.oppgave.domain.kodeverk.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class KvalitetsvurderingEoesInput(
     val eoes: Eoes?,
@@ -46,6 +47,6 @@ data class KvalitetsvurderingManuellInput(
     val tilbakemelding: String?,
     val datoRegistrertFoersteinstans: LocalDate,
     val datoMottattNav: LocalDate,
-    val datoMottattKlageinstans: LocalDate,
+    val datoMottattKlageinstans: LocalDateTime,
     val datoFullfoertKlageinstans: LocalDate
 )

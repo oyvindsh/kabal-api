@@ -58,14 +58,16 @@ class KlagebehandlingMapper(
             id = klagebehandling.id.toString(),
             versjon = klagebehandling.versjon,
             klagerFnr = klagerFnr,
-            klagerNavn = klagerPersonInfo?.navn,
+            klagerNavn = klagerPersonInfo?.sammensattNavn,
             klagerFornavn = klagerPersonInfo?.fornavn,
+            klagerMellomnavn = klagerPersonInfo?.mellomnavn,
             klagerEtternavn = klagerPersonInfo?.etternavn,
             klagerOrgnr = klagerOrgnr,
             klagerOrgnavn = klagerOrgnavn,
             sakenGjelderFnr = sakenGjelderFnr,
-            sakenGjelderNavn = sakenGjelderPersonInfo?.navn,
+            sakenGjelderNavn = sakenGjelderPersonInfo?.sammensattNavn,
             sakenGjelderFornavn = sakenGjelderPersonInfo?.fornavn,
+            sakenGjelderMellomnavn = sakenGjelderPersonInfo?.mellomnavn,
             sakenGjelderEtternavn = sakenGjelderPersonInfo?.etternavn,
             sakenGjelderOrgnr = sakenGjelderOrgnr,
             sakenGjelderOrgnavn = sakenGjelderOrgnavn,
@@ -79,7 +81,7 @@ class KlagebehandlingMapper(
             avsenderSaksbehandleridentFoersteinstans = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             avsenderEnhetFoersteinstans = klagebehandling.avsenderEnhetFoersteinstans,
             mottattKlageinstans = klagebehandling.mottattKlageinstans,
-            startet = klagebehandling.startet,
+            tildelt = klagebehandling.tildelt,
             avsluttet = klagebehandling.avsluttet,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
@@ -129,13 +131,14 @@ class KlagebehandlingMapper(
 
     fun mapEsKlagebehandlingerToListView(
         esKlagebehandlinger: List<EsKlagebehandling>,
-        fetchPersoner: Boolean,
+        viseUtvidet: Boolean,
+        viseFullfoerte: Boolean,
         saksbehandler: String?
     ): List<KlagebehandlingListView> {
         return esKlagebehandlinger.map { esKlagebehandling ->
             KlagebehandlingListView(
                 id = esKlagebehandling.id,
-                person = if (fetchPersoner) {
+                person = if (viseUtvidet) {
                     KlagebehandlingListView.Person(
                         esKlagebehandling.sakenGjelderFnr,
                         esKlagebehandling.sakenGjelderNavn
@@ -147,12 +150,22 @@ class KlagebehandlingMapper(
                 tema = esKlagebehandling.tema,
                 hjemmel = esKlagebehandling.hjemler.firstOrNull(),
                 frist = esKlagebehandling.frist,
-                mottatt = esKlagebehandling.mottattKlageinstans,
+                mottatt = esKlagebehandling.mottattKlageinstans?.toLocalDate(),
                 versjon = esKlagebehandling.versjon!!.toInt(),
                 klagebehandlingVersjon = esKlagebehandling.versjon,
                 erMedunderskriver = if (esKlagebehandling.medunderskriverident != null) {
                     esKlagebehandling.medunderskriverident == saksbehandler
-                } else null
+                } else null,
+                utfall = if (viseFullfoerte) {
+                    esKlagebehandling.vedtakUtfall
+                } else {
+                    null
+                },
+                avsluttet = if (viseFullfoerte) {
+                    esKlagebehandling.avsluttet?.toLocalDate()
+                } else {
+                    null
+                }
             )
         }
     }
@@ -189,10 +202,10 @@ class KlagebehandlingMapper(
             klagerKjoenn = klager?.kjoenn,
             tema = klagebehandling.tema.id,
             type = klagebehandling.type.id,
-            mottatt = klagebehandling.mottattKlageinstans,
-            mottattKlageinstans = klagebehandling.mottattKlageinstans,
-            startet = klagebehandling.startet,
-            avsluttet = klagebehandling.avsluttet,
+            mottatt = klagebehandling.mottattKlageinstans.toLocalDate(),
+            mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
+            tildelt = klagebehandling.tildelt?.toLocalDate(),
+            avsluttet = klagebehandling.avsluttet?.toLocalDate(),
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,

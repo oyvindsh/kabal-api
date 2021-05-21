@@ -82,7 +82,7 @@ class KlagebehandlingVedtakController(
                     input.klagebehandlingVersjon
                 ),
                 vedtakId.toUUIDOrException(),
-                Utfall.of(input.utfall),
+                input.utfall?.let { Utfall.of(it) },
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )

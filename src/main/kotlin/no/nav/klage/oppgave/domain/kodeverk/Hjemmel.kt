@@ -115,6 +115,11 @@ val hjemlerPerTema: List<HjemlerPerTema> = listOf(
         Tema.OMS,
         Hjemmel.values().filter { it.kapittelOgParagraf != null && it.kapittelOgParagraf.kapittel == 9 }
                 + Hjemmel.FTL + Hjemmel.MANGLER
+    ),
+    HjemlerPerTema(
+        Tema.SYK,
+        Hjemmel.values().filter { it.kapittelOgParagraf != null && it.kapittelOgParagraf.kapittel == 8 }
+                + Hjemmel.FTL + Hjemmel.MANGLER
     )
 )
 

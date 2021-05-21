@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class VedtakKafkaProducer(
-    private val kafkaTemplate: KafkaTemplate<String, String>
+    private val aivenKafkaTemplate: KafkaTemplate<String, String>
 ) {
     @Value("\${VEDTAK_FATTET_TOPIC}")
     lateinit var topic: String
@@ -27,7 +27,7 @@ class VedtakKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nVedtak: {}", topic, vedtak)
         runCatching {
-            val result = kafkaTemplate.send(topic, vedtak.toJson()).get()
+            val result = aivenKafkaTemplate.send(topic, vedtak.toJson()).get()
             logger.info("Vedtak sent to Kafka.")
             secureLogger.debug("Vedtak $vedtak sent to kafka ($result)")
         }.onFailure {

@@ -75,12 +75,12 @@ data class EsKlagebehandling(
     )
     val avsenderEnhetFoersteinstans: String? = null,
 
-    @Field(type = FieldType.Date, format = DateFormat.date)
-    val mottattKlageinstans: LocalDate?,
-    @Field(type = FieldType.Date, format = DateFormat.date)
-    val startet: LocalDate? = null,
-    @Field(type = FieldType.Date, format = DateFormat.date)
-    val avsluttet: LocalDate? = null,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val mottattKlageinstans: LocalDateTime?,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val tildelt: LocalDateTime? = null,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val avsluttet: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val frist: LocalDate?,
 

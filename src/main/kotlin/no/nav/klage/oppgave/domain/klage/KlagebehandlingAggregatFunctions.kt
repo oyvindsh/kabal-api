@@ -10,23 +10,26 @@ import java.util.*
 
 object KlagebehandlingAggregatFunctions {
 
-    fun Klagebehandling.setTildeltSaksbehandlerident(
-        nyVerdi: String?,
+    fun Klagebehandling.setTildeltSaksbehandlerOgEnhet(
+        nyVerdiSaksbehandlerident: String?,
+        nyVerdiEnhet: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val gammelVerdi = tildeltSaksbehandlerident
+        val gammelVerdiSaksbehandlerident = tildeltSaksbehandlerident
+        val gammelVerdiEnhet = tildeltEnhet
         val tidspunkt = LocalDateTime.now()
-        tildeltSaksbehandlerident = nyVerdi
+        tildeltSaksbehandlerident = nyVerdiSaksbehandlerident
+        tildeltEnhet = nyVerdiEnhet
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
-        if (startet == null) {
-            startet = tidspunkt.toLocalDate()
+        if (tildelt == null) {
+            tildelt = tidspunkt
             endringslogg(
                 saksbehandlerident,
-                Felt.STARTET,
+                Felt.TILDELT,
                 null,
-                startet?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                tildelt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
                 tidspunkt
             )?.let { endringslogginnslag.add(it) }
         }
@@ -34,24 +37,15 @@ object KlagebehandlingAggregatFunctions {
         endringslogg(
             saksbehandlerident,
             Felt.TILDELT_SAKSBEHANDLERIDENT,
-            gammelVerdi,
-            nyVerdi,
+            gammelVerdiSaksbehandlerident,
+            nyVerdiSaksbehandlerident,
             tidspunkt
         )?.let { endringslogginnslag.add(it) }
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
-    }
 
-    fun Klagebehandling.setTildeltEnhet(
-        nyVerdi: String?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = tildeltEnhet
-        val tidspunkt = LocalDateTime.now()
-        tildeltEnhet = nyVerdi
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TILDELT_ENHET, gammelVerdi, nyVerdi, tidspunkt)
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        endringslogg(saksbehandlerident, Felt.TILDELT_ENHET, gammelVerdiEnhet, nyVerdiEnhet, tidspunkt)
+            ?.let { endringslogginnslag.add(it) }
+        
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
     }
 
     fun Klagebehandling.setType(
@@ -119,7 +113,7 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setMottattKlageinstans(
-        nyVerdi: LocalDate,
+        nyVerdi: LocalDateTime,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val gammelVerdi = mottattKlageinstans
@@ -355,7 +349,7 @@ object KlagebehandlingAggregatFunctions {
 
     fun Klagebehandling.setUtfallInVedtak(
         vedtakId: UUID,
-        nyVerdi: Utfall,
+        nyVerdi: Utfall?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val vedtak = getVedtakFromKlagebehandling(this, vedtakId)

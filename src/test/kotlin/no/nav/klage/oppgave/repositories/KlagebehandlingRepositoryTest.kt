@@ -49,7 +49,7 @@ class KlagebehandlingRepositoryTest {
             kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            oversendtKaDato = LocalDate.now()
+            oversendtKaDato = LocalDateTime.now()
         )
 
         mottakRepository.save(mottak)
@@ -68,7 +68,7 @@ class KlagebehandlingRepositoryTest {
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
@@ -90,7 +90,7 @@ class KlagebehandlingRepositoryTest {
             kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            oversendtKaDato = LocalDate.now()
+            oversendtKaDato = LocalDateTime.now()
         )
 
         mottakRepository.save(mottak)
@@ -113,7 +113,7 @@ class KlagebehandlingRepositoryTest {
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )
@@ -138,7 +138,7 @@ class KlagebehandlingRepositoryTest {
             kildesystem = Fagsystem.FS39,
             kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            oversendtKaDato = LocalDate.now()
+            oversendtKaDato = LocalDateTime.now()
         )
 
         mottakRepository.save(mottak)
@@ -161,7 +161,7 @@ class KlagebehandlingRepositoryTest {
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDate.now(),
+            mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.FS39,
             mottakId = mottak.id
         )

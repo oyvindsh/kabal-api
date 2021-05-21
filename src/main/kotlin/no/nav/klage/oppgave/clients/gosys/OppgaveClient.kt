@@ -104,10 +104,16 @@ class OppgaveClient(
             uriBuilder.queryParam("opprettetTom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
         }
         ferdigstiltFom?.let {
-            uriBuilder.queryParam("ferdigstiltFom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+            uriBuilder.queryParam(
+                "ferdigstiltFom",
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it.atTime(0, 0))
+            )
         }
         ferdigstiltTom?.let {
-            uriBuilder.queryParam("ferdigstiltTom", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it))
+            uriBuilder.queryParam(
+                "ferdigstiltTom",
+                DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it.atTime(23, 59))
+            )
         }
         fristFom?.let {
             uriBuilder.queryParam("fristFom", DateTimeFormatter.ISO_LOCAL_DATE.format(it))

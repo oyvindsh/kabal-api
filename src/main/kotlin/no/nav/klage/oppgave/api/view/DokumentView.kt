@@ -26,3 +26,7 @@ data class DokumentReferanse(
 }
 
 data class DokumentKnytning(val journalpostId: String, val dokumentInfoId: String)
+
+data class ToggleDokument(val journalpostId: String, val dokumentInfoId: String)
+
+data class ToggleDokumentResponse(val tilknyttet: Boolean)

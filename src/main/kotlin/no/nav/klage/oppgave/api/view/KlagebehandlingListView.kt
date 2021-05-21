@@ -17,7 +17,9 @@ data class KlagebehandlingListView(
     val mottatt: LocalDate?,
     val versjon: Int,
     val klagebehandlingVersjon: Long,
-    val erMedunderskriver: Boolean?
+    val erMedunderskriver: Boolean?,
+    val utfall: String?,
+    val avsluttet: LocalDate?
 ) {
     data class Person(
         val fnr: String?,

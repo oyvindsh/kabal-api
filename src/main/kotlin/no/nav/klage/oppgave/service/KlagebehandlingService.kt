@@ -19,7 +19,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMed
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerident
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerOgEnhet
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -30,6 +30,8 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Period
 import java.util.*
 
 @Service
@@ -68,11 +70,16 @@ class KlagebehandlingService(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
         tildeltSaksbehandlerIdent: String?,
+        enhetId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event =
-            klagebehandling.setTildeltSaksbehandlerident(tildeltSaksbehandlerIdent, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setTildeltSaksbehandlerOgEnhet(
+                tildeltSaksbehandlerIdent,
+                enhetId,
+                utfoerendeSaksbehandlerIdent
+            )
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -132,7 +139,7 @@ class KlagebehandlingService(
     fun setMottattKlageinstans(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
-        mottattKlageinstans: LocalDate,
+        mottattKlageinstans: LocalDateTime,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
@@ -283,11 +290,10 @@ class KlagebehandlingService(
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
                 mottattKlageinstans = mottak.oversendtKaDato,
-                startet = null,
+                tildelt = null,
                 avsluttet = null,
-                frist = mottak.fristFraFoersteinstans,
+                frist = mottak.generateFrist(),
                 tildeltSaksbehandlerident = null,
-                tildeltEnhet = mottak.oversendtKaEnhet,
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(Vedtak()),
                 kvalitetsvurdering = null,
@@ -421,8 +427,8 @@ class KlagebehandlingService(
     ) {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         try {
-            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId }) {
-                logger.debug("Journalpost $journalpostId is already connected to klagebehandling $klagebehandlingId, doing nothing")
+            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
+                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 val event =
                     klagebehandling.addSaksdokument(
@@ -449,7 +455,7 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         try {
             if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
-                logger.debug("Journalpost $journalpostId is not connected to klagebehandling $klagebehandlingId, doing nothing")
+                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is not connected to klagebehandling $klagebehandlingId, doing nothing")
             } else {
                 val event =
                     klagebehandling.removeSaksdokument(
@@ -515,4 +521,36 @@ class KlagebehandlingService(
             saksbehandlerIdent
         )
     }
+
+    fun toggleDokumentFromKlagebehandling(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
+        journalpostId: String,
+        dokumentInfoId: String,
+        saksbehandlerIdent: String
+    ): Boolean {
+        val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
+
+        if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
+            connectDokumentToKlagebehandling(
+                klagebehandlingId,
+                klagebehandlingVersjon,
+                journalpostId,
+                dokumentInfoId,
+                saksbehandlerIdent
+            )
+            return true
+        } else {
+            disconnectDokumentFromKlagebehandling(
+                klagebehandlingId,
+                klagebehandlingVersjon,
+                journalpostId,
+                dokumentInfoId,
+                saksbehandlerIdent
+            )
+            return false
+        }
+    }
+
+    private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)
 }

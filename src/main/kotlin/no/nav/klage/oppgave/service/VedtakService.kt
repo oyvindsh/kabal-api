@@ -54,7 +54,7 @@ class VedtakService(
     fun setUtfall(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,
-        utfall: Utfall,
+        utfall: Utfall?,
         utfoerendeSaksbehandlerIdent: String
     ): Vedtak {
         val event =
