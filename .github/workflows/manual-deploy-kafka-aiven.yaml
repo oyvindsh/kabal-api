@@ -1,6 +1,12 @@
 name: Deploy kafka topics
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - kafka-aiven/**
+      - '!kafka-aiven/README.md'
   workflow_dispatch:
 
 jobs:
@@ -9,7 +15,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: deploy to dev
+      - name: deploy vedtak-fattet-topic to dev
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
@@ -17,11 +23,27 @@ jobs:
           RESOURCE: kafka-aiven/vedtak-fattet.v1/topic.yaml
           VARS: kafka-aiven/vedtak-fattet.v1/dev-vars.yaml
           PRINT_PAYLOAD: true
-      - name: deploy to prod
+      - name: deploy dvh-topic to dev
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: kafka-aiven/kabal-statistikk.v1/topic.yaml
+          VARS: kafka-aiven/kabal-statistikk.v1/dev-vars.yaml
+          PRINT_PAYLOAD: true
+      - name: deploy vedtak-fattet-topic to prod
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
           CLUSTER: prod-gcp
           RESOURCE: kafka-aiven/vedtak-fattet.v1/topic.yaml
           VARS: kafka-aiven/vedtak-fattet.v1/prod-vars.yaml
+          PRINT_PAYLOAD: true
+      - name: deploy dvh-topic to prod
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: kafka-aiven/kabal-statistikk.v1/topic.yaml
+          VARS: kafka-aiven/kabal-statistikk.v1/prod-vars.yaml
           PRINT_PAYLOAD: true
