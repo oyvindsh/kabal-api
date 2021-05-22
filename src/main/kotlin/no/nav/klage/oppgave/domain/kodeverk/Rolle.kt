@@ -5,9 +5,9 @@ import javax.persistence.Converter
 
 enum class Rolle(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
     KLAGER("1", "Klager", "Klager"),
-    SAKEN_GJELDER("1", "Saken gjelder", "Den saken gjelder"),
-    PROSESSFULLMEKTIG("2", "Prosessfullmektig", "Prosessfullmektig"),
-    RELEVANT_TREDJEPART("3", "Tredjepart", "Relevant tredjepart");
+    SAKEN_GJELDER("2", "Saken gjelder", "Den saken gjelder"),
+    PROSESSFULLMEKTIG("3", "Prosessfullmektig", "Prosessfullmektig"),
+    RELEVANT_TREDJEPART("4", "Tredjepart", "Relevant tredjepart");
 
     override fun toString(): String {
         return "Rolle(id=$id, " +
