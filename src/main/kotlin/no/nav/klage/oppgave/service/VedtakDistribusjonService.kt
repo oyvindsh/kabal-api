@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokdistReferanseInVedtaksmottaker
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigDistribuert
 import no.nav.klage.oppgave.domain.kodeverk.Rolle
 import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
 import no.nav.klage.oppgave.util.AttachmentValidator
@@ -123,5 +124,11 @@ class VedtakDistribusjonService(
     fun lagKopiAvJournalpostForMottaker(vedtak: Vedtak, brevMottaker: BrevMottaker) {
         //TODO: Kod opp dette
         throw IllegalStateException("Dette har vi ikke kodet opp ennå, K9 støtter bare en mottaker")
+    }
+
+    @Transactional(propagation = Propagation.NESTED)
+    fun markerVedtakSomFerdigDistribuert(klagebehandling: Klagebehandling, vedtak: Vedtak) {
+        val event = klagebehandling.setVedtakFerdigDistribuert(vedtak.id, SYSTEMBRUKER)
+        applicationEventPublisher.publishEvent(event)
     }
 }

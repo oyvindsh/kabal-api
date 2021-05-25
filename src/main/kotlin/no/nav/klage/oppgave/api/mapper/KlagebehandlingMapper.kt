@@ -107,7 +107,7 @@ class KlagebehandlingMapper(
                     journalpostId = vedtak.journalpostId,
                     created = vedtak.created,
                     modified = vedtak.modified,
-                    finalized = vedtak.ferdigstiltIJoark
+                    ferdigstiltIJoark = vedtak.ferdigstiltIJoark
                 )
             },
             saksdokumenter = klagebehandling.saksdokumenter.map { EsSaksdokument(it.journalpostId, it.dokumentInfoId) },

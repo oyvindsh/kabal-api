@@ -24,5 +24,5 @@ data class EsVedtak(
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val modified: LocalDateTime,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val finalized: LocalDateTime?
+    val ferdigstiltIJoark: LocalDateTime?
 )

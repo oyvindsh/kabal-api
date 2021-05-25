@@ -28,22 +28,26 @@ class KlagebehandlingDistribusjonService(
     fun distribuerKlagebehandling(klagebehandlingId: UUID) {
         try {
             val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
-            klagebehandling.vedtak.forEach { vedtak ->
-                if (vedtak.brevmottakere.isEmpty()) {
-                    vedtakDistribusjonService.lagBrevmottakere(klagebehandling, vedtak)
-                }
-                vedtak.brevmottakere.forEach { brevMottaker ->
-                    if (brevMottaker.journalpostId != vedtak.journalpostId) {
-                        vedtakDistribusjonService.lagKopiAvJournalpostForMottaker(vedtak, brevMottaker)
+            klagebehandling.vedtak
+                .filter { null == it.ferdigDistribuert }
+                .forEach { vedtak ->
+                    if (vedtak.brevmottakere.isEmpty()) {
+                        vedtakDistribusjonService.lagBrevmottakere(klagebehandling, vedtak)
                     }
-                    distribuerVedtakTilMottaker(klagebehandling, vedtak, brevMottaker)
+                    vedtak.brevmottakere.forEach { brevMottaker ->
+                        if (brevMottaker.journalpostId != vedtak.journalpostId) {
+                            vedtakDistribusjonService.lagKopiAvJournalpostForMottaker(vedtak, brevMottaker)
+                        }
+                        distribuerVedtakTilMottaker(klagebehandling, vedtak, brevMottaker)
+                    }
+                    vedtakDistribusjonService.markerVedtakSomFerdigDistribuert(klagebehandling, vedtak)
                 }
-            }
             klagebehandlingAvslutningService.avsluttKlagebehandling(klagebehandling)
         } catch (e: Exception) {
             logger.error("Feilet under distribuering av klagebehandling $klagebehandlingId", e)
         }
     }
+
 
     private fun distribuerVedtakTilMottaker(
         klagebehandling: Klagebehandling,

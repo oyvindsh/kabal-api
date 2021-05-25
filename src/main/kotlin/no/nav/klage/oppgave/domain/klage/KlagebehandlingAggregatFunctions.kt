@@ -388,6 +388,27 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
+    fun Klagebehandling.setVedtakFerdigDistribuert(
+        vedtakId: UUID,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val vedtak = this.getVedtak(vedtakId)
+        val gammelVerdi = vedtak.ferdigDistribuert
+        val tidspunkt = LocalDateTime.now()
+        val nyVerdi = tidspunkt
+        vedtak.ferdigDistribuert = nyVerdi
+        vedtak.modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.VEDTAK_DISTRIBUERT,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
     fun Klagebehandling.setVedtakFerdigstiltIJoark(
         vedtakId: UUID,
         saksbehandlerident: String
