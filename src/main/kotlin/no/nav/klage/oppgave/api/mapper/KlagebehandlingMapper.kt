@@ -107,7 +107,7 @@ class KlagebehandlingMapper(
                     journalpostId = vedtak.journalpostId,
                     created = vedtak.created,
                     modified = vedtak.modified,
-                    finalized = vedtak.finalized
+                    ferdigstiltIJoark = vedtak.ferdigstiltIJoark
                 )
             },
             saksdokumenter = klagebehandling.saksdokumenter.map { EsSaksdokument(it.journalpostId, it.dokumentInfoId) },
@@ -128,7 +128,7 @@ class KlagebehandlingMapper(
             vedtakJournalpostId = klagebehandling.vedtak.firstOrNull()?.journalpostId,
             vedtakCreated = klagebehandling.vedtak.firstOrNull()?.created,
             vedtakModified = klagebehandling.vedtak.firstOrNull()?.modified,
-            vedtakFinalized = klagebehandling.vedtak.firstOrNull()?.finalized
+            vedtakFerdigstiltIJoark = klagebehandling.vedtak.firstOrNull()?.ferdigstiltIJoark
         )
     }
 
@@ -234,7 +234,6 @@ class KlagebehandlingMapper(
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-                finalized = vedtak.finalized,
                 content = Base64.getEncoder().encodeToString(dokument.bytes)
             )
         } else {
@@ -244,7 +243,6 @@ class KlagebehandlingMapper(
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-                finalized = vedtak.finalized
             )
         }
     }
@@ -252,8 +250,7 @@ class KlagebehandlingMapper(
     private fun mapBrevmottaker(it: BrevMottaker) = BrevMottakerView(
         it.partId.type.id,
         it.partId.value,
-        it.rolle.id,
-        it.dokdistReferanse
+        it.rolle.id
     )
 
     private fun foedselsnummer(partId: PartId) =

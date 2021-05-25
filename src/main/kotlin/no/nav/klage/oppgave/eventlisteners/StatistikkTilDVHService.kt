@@ -44,13 +44,13 @@ class StatistikkTilDVHService(
 
     private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
         endringslogginnslag.isEmpty() ||
-                endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.SLUTTFOERT }
+                endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.VEDTAK_SLUTTFOERT }
 
     private fun getKlagebehandlingState(endringslogginnslag: List<Endringslogginnslag>): KlagebehandlingState {
         return when {
             endringslogginnslag.isEmpty() -> KlagebehandlingState.MOTTATT
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> KlagebehandlingState.TILDELT_SAKSBEHANDLER
-            endringslogginnslag.any { it.felt === Felt.SLUTTFOERT } -> KlagebehandlingState.AVSLUTTET
+            endringslogginnslag.any { it.felt === Felt.VEDTAK_SLUTTFOERT } -> KlagebehandlingState.AVSLUTTET
             else -> KlagebehandlingState.UKJENT.also {
                 logger.warn(
                     "unknown state for klagebehandling with id {}",
@@ -89,7 +89,7 @@ class StatistikkTilDVHService(
             saksbehandlerEnhet = klagebehandling.tildeltEnhet,
             tekniskTid = klagebehandling.modified,
             vedtakId = vedtak?.id.toString(),
-            vedtaksdato = vedtak?.finalized?.toLocalDate(),
+            vedtaksdato = vedtak?.ferdigstiltIJoark?.toLocalDate(),
             ytelseType = "TODO"
         )
     }

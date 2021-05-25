@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.exceptions.BrevMottakerNotFoundException
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -34,10 +35,10 @@ class Vedtak(
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "journalpost_id")
     var journalpostId: String? = null,
-    @Column(name = "finalized")
-    var finalized: LocalDateTime? = null,
-    @Column(name = "bestillings_id")
-    var bestillingsId: UUID? = null,
+    @Column(name = "ferdigstilt_i_joark")
+    var ferdigstiltIJoark: LocalDateTime? = null,
+    @Column(name = "ferdig_distribuert")
+    var ferdigDistribuert: LocalDateTime? = null
 ) {
     override fun toString(): String {
         return "Vedtak(id=$id, " +
@@ -59,4 +60,8 @@ class Vedtak(
     override fun hashCode(): Int {
         return id.hashCode()
     }
+
+    fun getMottaker(mottakerId: UUID): BrevMottaker =
+        brevmottakere.firstOrNull { it.id == mottakerId }
+            ?: throw BrevMottakerNotFoundException("Brevmottaker med id $mottakerId ikke funnet")
 }

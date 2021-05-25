@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
+import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -48,6 +49,8 @@ class Klagebehandling(
     var tildelt: LocalDateTime? = null,
     @Column(name = "dato_behandling_avsluttet")
     var avsluttet: LocalDateTime? = null,
+    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
+    var avsluttetAvSaksbehandler: LocalDateTime? = null,
     @Column(name = "frist")
     var frist: LocalDate? = null,
     @Column(name = "tildelt_saksbehandlerident")
@@ -112,6 +115,10 @@ class Klagebehandling(
         if (klagebehandlingVersjon != null) {
             if (klagebehandlingVersjon != this.versjon) throw KlagebehandlingSamtidigEndretException("Angitt versjon er $klagebehandlingVersjon, men nyeste klagebehandling har versjon ${this.versjon}")
         }
+    }
 
+    fun getVedtak(vedtakId: UUID): Vedtak {
+        return vedtak.firstOrNull { it.id == vedtakId }
+            ?: throw VedtakNotFoundException("Vedtak med id $vedtakId ikke funnet")
     }
 }
