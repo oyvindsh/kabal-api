@@ -5,4 +5,4 @@ config:
   partitions: 1
   replication: 3
   retentionBytes: -1
-  retentionHours: 24
+  retentionHours: 120
