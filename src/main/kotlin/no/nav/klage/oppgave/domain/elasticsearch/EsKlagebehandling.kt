@@ -154,5 +154,5 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val vedtakModified: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val vedtakFinalized: LocalDateTime? = null
+    val vedtakFerdigstiltIJoark: LocalDateTime? = null
 )

@@ -25,7 +25,7 @@ class BrevMottaker(
     @Column(name = "journalpost_id")
     var journalpostId: String? = null,
     @Column(name = "dokdist_referanse")
-    val dokdistReferanse: String
+    var dokdistReferanse: UUID? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

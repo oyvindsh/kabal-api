@@ -138,6 +138,7 @@ class KlagebehandlingVedtakController(
 
         tilgangService.verifySaksbehandlersTilgangTilEnhet(input.journalfoerendeEnhet)
 
+        //TODO: Det er for mye som skjer her, koden under her burde ligge i en service, og wrappes i Transactional. (Med unntak av mapper-koden..)
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
             klagebehandlingId.toUUIDOrException(),
             input.klagebehandlingVersjon
@@ -166,7 +167,7 @@ class KlagebehandlingVedtakController(
         @RequestBody input: VedtakFullfoerInput
     ) {
         logMethodDetails("fullfoerVedtak", klagebehandlingId, vedtakId)
-        vedtakService.finalizeVedtak(
+        vedtakService.ferdigstillVedtak(
             klagebehandlingId.toUUIDOrException(),
             vedtakId.toUUIDOrException(),
             input,

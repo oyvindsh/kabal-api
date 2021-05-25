@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderEnhetFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderSaksbehandleridentFoersteinstans
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
@@ -553,4 +554,18 @@ class KlagebehandlingService(
     }
 
     private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)
+
+    fun findKlagebehandlingForDistribusjon(): List<UUID> =
+        klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull().map { it.id }
+
+    fun markerKlagebehandlingSomAvsluttetAvSaksbehandler(
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ): Klagebehandling {
+        val event =
+            klagebehandling.setAvsluttetAvSaksbehandler(innloggetIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
 }

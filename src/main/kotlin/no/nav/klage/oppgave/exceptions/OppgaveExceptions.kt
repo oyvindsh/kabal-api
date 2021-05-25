@@ -12,6 +12,8 @@ class KlagebehandlingNotFoundException(msg: String) : RuntimeException(msg)
 
 class VedtakNotFoundException(msg: String) : RuntimeException(msg)
 
+class BrevMottakerNotFoundException(msg: String) : RuntimeException(msg)
+
 class VedtakFinalizedException(msg: String) : RuntimeException(msg)
 
 open class ValidationException(msg: String) : RuntimeException(msg)

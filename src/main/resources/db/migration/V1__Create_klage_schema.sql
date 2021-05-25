@@ -104,6 +104,7 @@ CREATE TABLE klage.klagebehandling
     dato_mottatt_klageinstans                  TIMESTAMP WITH TIME ZONE NOT NULL,
     dato_behandling_tildelt                    TIMESTAMP WITH TIME ZONE,
     dato_behandling_avsluttet                  TIMESTAMP WITH TIME ZONE,
+    dato_behandling_avsluttet_av_saksbehandler TIMESTAMP WITH TIME ZONE,
     frist                                      DATE,
     tildelt_saksbehandlerident                 TEXT,
     medunderskriverident                       TEXT,
@@ -126,15 +127,16 @@ CREATE TABLE klage.klagebehandling
 
 CREATE TABLE klage.vedtak
 (
-    id                 UUID PRIMARY KEY,
-    utfall_id          TEXT,
-    grunn_id           TEXT,
-    klagebehandling_id UUID                     NOT NULL,
-    journalpost_id     TEXT,
-    modified           TIMESTAMP WITH TIME ZONE NOT NULL,
-    created            TIMESTAMP WITH TIME ZONE NOT NULL,
-    finalized          TIMESTAMP WITH TIME ZONE,
-    bestillings_id     UUID,
+    id                  UUID PRIMARY KEY,
+    utfall_id           TEXT,
+    grunn_id            TEXT,
+    klagebehandling_id  UUID                     NOT NULL,
+    journalpost_id      TEXT,
+    modified            TIMESTAMP WITH TIME ZONE NOT NULL,
+    created             TIMESTAMP WITH TIME ZONE NOT NULL,
+    ferdigstilt_i_joark TIMESTAMP WITH TIME ZONE NOT NULL,
+    utsending_startet   TIMESTAMP WITH TIME ZONE,
+    utsending_ferdig    TIMESTAMP WITH TIME ZONE,
     CONSTRAINT fk_vedtak_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
@@ -161,7 +163,7 @@ CREATE TABLE klage.brevmottaker
     mottaker_value    TEXT,
     rolle_id          TEXT,
     journalpost_id    TEXT,
-    dokdist_referanse TEXT,
+    dokdist_referanse UUID,
     CONSTRAINT fk_brevmottaker_vedtak
         FOREIGN KEY (vedtak_id)
             REFERENCES klage.vedtak (id)
