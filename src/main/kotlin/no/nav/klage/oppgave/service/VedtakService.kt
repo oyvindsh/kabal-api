@@ -125,36 +125,17 @@ class VedtakService(
         return getVedtakFromKlagebehandling(klagebehandling, vedtakId)
     }
 
-    fun finalizeJournalpost(
-        klagebehandling: Klagebehandling,
-        vedtakId: UUID,
-        utfoerendeSaksbehandlerIdent: String,
-        journalfoerendeEnhet: String
-    ): Vedtak? {
-        val vedtak = getVedtakFromKlagebehandling(klagebehandling, vedtakId)
-        if (vedtak.finalized != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
-        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        return try {
-            joarkClient.finalizeJournalpost(vedtak.journalpostId!!, journalfoerendeEnhet)
-            setFinalized(klagebehandling, vedtakId, utfoerendeSaksbehandlerIdent)
-        } catch (e: Exception) {
-            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
-            null
-        }
-    }
-
     fun distributeJournalpost(
         klagebehandling: Klagebehandling,
-        vedtakId: UUID,
+        vedtak: Vedtak,
         utfoerendeSaksbehandlerIdent: String,
         journalfoerendeEnhet: String
     ): Vedtak? {
-        val vedtak = getVedtakFromKlagebehandling(klagebehandling, vedtakId)
-        if (vedtak.finalized == null) throw VedtakFinalizedException("Vedtak med id $vedtakId er ikke ferdigstilt")
-        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        if (vedtak.finalized == null) throw VedtakFinalizedException("Vedtak med id $vedtak.id er ikke ferdigstilt")
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtak.id er ikke journalført")
         return try {
             val bestillingsId = dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
-            setBestillingsId(klagebehandling, vedtakId, bestillingsId, utfoerendeSaksbehandlerIdent)
+            setBestillingsId(klagebehandling, vedtak.id, bestillingsId, utfoerendeSaksbehandlerIdent)
         } catch (e: Exception) {
             logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
             null
@@ -215,6 +196,13 @@ class VedtakService(
         finalizeJournalpost(
             klage,
             vedtak,
+            innloggetIdent,
+            input.journalfoerendeEnhet
+        )
+
+        distributeJournalpost(
+            klage,
+            getVedtakFromKlagebehandling(klage, vedtakId),
             innloggetIdent,
             input.journalfoerendeEnhet
         )

@@ -20,13 +20,14 @@ class DokDistFordelingClientConfiguration(
     @Value("\${DOKDIST_SERVICE_URL}")
     private lateinit var dokDistServiceURL: String
 
-    @Value("\${DOKDIST_APIKEY}")
-    private lateinit var apiKey: String
+    //TODO: Legg inn nøkkel i pod
+//    @Value("\${DOKDIST_APIKEY}")
+//    private lateinit var apiKey: String
 
     @Bean
     fun dokDistWebClient(): WebClient {
         return webClientBuilder
-            .defaultHeader("x-nav-apiKey", apiKey)
+//            .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(dokDistServiceURL)
             .build()
     }

@@ -172,18 +172,6 @@ class KlagebehandlingVedtakController(
             input,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-
-        vedtakService.distributeJournalpost(
-            klagebehandlingService.getKlagebehandlingForUpdate(
-                klagebehandlingId.toUUIDOrException(),
-                input.klagebehandlingVersjon
-            ),
-            vedtakId.toUUIDOrException(),
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            input.journalfoerendeEnhet
-        )
-
-        vedtakService.dispatchVedtakToKafka(klagebehandlingId.toUUIDOrException(), vedtakId.toUUIDOrException())
     }
 
     @ResponseBody
