@@ -17,11 +17,9 @@ class Klagebehandling(
     @Version
     @Column(name = "versjon")
     val versjon: Long = 1L,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "klager_id", nullable = false)
+    @Embedded
     var klager: Klager,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinColumn(name = "saken_gjelder_id", nullable = false)
+    @Embedded
     var sakenGjelder: SakenGjelder,
     @Column(name = "tema_id")
     @Convert(converter = TemaConverter::class)

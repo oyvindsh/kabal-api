@@ -26,13 +26,8 @@ class Vedtak(
     @Column(name = "id")
     var hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "brevmottaker",
-        schema = "klage",
-        joinColumns = [JoinColumn(name = "vedtak_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "mottaker_part_id", referencedColumnName = "id")]
-    )
-    var brevmottakere: MutableSet<PartId> = mutableSetOf(),
+    @JoinColumn(name = "vedtak_id", referencedColumnName = "id", nullable = false)
+    var brevmottakere: MutableSet<BrevMottaker> = mutableSetOf(),
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")

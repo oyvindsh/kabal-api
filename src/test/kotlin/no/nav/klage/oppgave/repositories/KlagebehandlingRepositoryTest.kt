@@ -2,10 +2,7 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
-import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.domain.kodeverk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

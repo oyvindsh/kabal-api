@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
+import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import org.springframework.format.annotation.DateTimeFormat
@@ -216,7 +217,7 @@ data class OversendtProsessfullmektig(
 ) {
     fun toProsessfullmektig() = Prosessfullmektig(
         partId = id.toPartId(),
-        skalKlagerMottaKopi = skalKlagerMottaKopi
+        skalPartenMottaKopi = skalKlagerMottaKopi
     )
 }
 
@@ -225,7 +226,7 @@ data class OversendtPartId(
         required = true,
         example = "PERSON / VIRKSOMHET"
     )
-    val type: PartIdType,
+    val type: OversendtPartIdType,
     @ApiModelProperty(
         required = true,
         example = "12345678910"
@@ -233,10 +234,18 @@ data class OversendtPartId(
     val verdi: String
 ) {
     fun toPartId() = PartId(
-        type = type,
+        type = type.toPartIdType(),
         value = verdi
     )
 }
+
+enum class OversendtPartIdType { PERSON, VIRKSOMHET }
+
+fun OversendtPartIdType.toPartIdType(): PartIdType =
+    when (this) {
+        OversendtPartIdType.PERSON -> PartIdType.PERSON
+        OversendtPartIdType.VIRKSOMHET -> PartIdType.VIRKSOMHET
+    }
 
 data class OversendtDokumentReferanse(
     @ApiModelProperty(

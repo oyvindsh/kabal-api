@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.mapper
 
 
+import no.nav.klage.oppgave.api.view.BrevMottakerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.VedtakView
@@ -13,10 +14,11 @@ import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsSaksdokument
 import no.nav.klage.oppgave.domain.elasticsearch.EsVedtak
+import no.nav.klage.oppgave.domain.klage.BrevMottaker
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
-import no.nav.klage.oppgave.domain.klage.PartIdType
 import no.nav.klage.oppgave.domain.klage.Vedtak
+import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -98,9 +100,10 @@ class KlagebehandlingMapper(
                     utfall = vedtak.utfall?.id,
                     grunn = vedtak.grunn?.id,
                     hjemler = vedtak.hjemler.map { hjemmel -> hjemmel.id },
-                    brevmottakerFnr = vedtak.brevmottakere.filter { it.type == PartIdType.PERSON }.map { it.value },
-                    brevmottakerOrgnr = vedtak.brevmottakere.filter { it.type == PartIdType.VIRKSOMHET }
-                        .map { it.value },
+                    brevmottakerFnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.PERSON }
+                        .map { it.partId.value },
+                    brevmottakerOrgnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.VIRKSOMHET }
+                        .map { it.partId.value },
                     journalpostId = vedtak.journalpostId,
                     created = vedtak.created,
                     modified = vedtak.modified,
@@ -118,10 +121,10 @@ class KlagebehandlingMapper(
             vedtakUtfall = klagebehandling.vedtak.firstOrNull()?.utfall?.id,
             vedtakGrunn = klagebehandling.vedtak.firstOrNull()?.grunn?.id,
             vedtakHjemler = klagebehandling.vedtak.firstOrNull()?.hjemler?.map { hjemmel -> hjemmel.id } ?: emptyList(),
-            vedtakBrevmottakerFnr = klagebehandling.vedtak.firstOrNull()?.brevmottakere?.filter { it.type == PartIdType.PERSON }
-                ?.map { it.value } ?: emptyList(),
-            vedtakBrevmottakerOrgnr = klagebehandling.vedtak.firstOrNull()?.brevmottakere?.filter { it.type == PartIdType.VIRKSOMHET }
-                ?.map { it.value } ?: emptyList(),
+            vedtakBrevmottakerFnr = klagebehandling.vedtak.firstOrNull()?.brevmottakere?.filter { it.partId.type == PartIdType.PERSON }
+                ?.map { it.partId.value } ?: emptyList(),
+            vedtakBrevmottakerOrgnr = klagebehandling.vedtak.firstOrNull()?.brevmottakere?.filter { it.partId.type == PartIdType.VIRKSOMHET }
+                ?.map { it.partId.value } ?: emptyList(),
             vedtakJournalpostId = klagebehandling.vedtak.firstOrNull()?.journalpostId,
             vedtakCreated = klagebehandling.vedtak.firstOrNull()?.created,
             vedtakModified = klagebehandling.vedtak.firstOrNull()?.modified,
@@ -230,7 +233,7 @@ class KlagebehandlingMapper(
                 utfall = vedtak.utfall?.id,
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
-                brevMottakere = vedtak.brevmottakere,
+                brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
                 finalized = vedtak.finalized,
                 content = Base64.getEncoder().encodeToString(dokument.bytes)
             )
@@ -240,11 +243,18 @@ class KlagebehandlingMapper(
                 utfall = vedtak.utfall?.id,
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
-                brevMottakere = vedtak.brevmottakere,
+                brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
                 finalized = vedtak.finalized
             )
         }
     }
+
+    private fun mapBrevmottaker(it: BrevMottaker) = BrevMottakerView(
+        it.partId.type.id,
+        it.partId.value,
+        it.rolle.id,
+        it.dokdistReferanse
+    )
 
     private fun foedselsnummer(partId: PartId) =
         if (partId.type == PartIdType.PERSON) {
