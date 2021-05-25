@@ -130,6 +130,7 @@ private fun KildeFagsystem.mapFagsystem(): Fagsystem =
         KildeFagsystem.KONT -> Fagsystem.KONT
         KildeFagsystem.SUPSTONAD -> Fagsystem.SUPSTONAD
         KildeFagsystem.OMSORGSPENGER -> Fagsystem.OMSORGSPENGER
+        KildeFagsystem.MANUELL -> Fagsystem.MANUELL
     }
 
 class HjemmelFraFoersteInstans private constructor(
@@ -296,6 +297,7 @@ enum class KildeFagsystem {
     EF,
     KONT,
     SUPSTONAD,
-    OMSORGSPENGER
+    OMSORGSPENGER,
+    MANUELL
 }
 
