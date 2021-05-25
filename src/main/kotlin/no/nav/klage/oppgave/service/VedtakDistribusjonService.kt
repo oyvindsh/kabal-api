@@ -1,14 +1,10 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.dokdistfordeling.DokDistFordelingClient
-import no.nav.klage.oppgave.clients.joark.JoarkClient
-import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokdistReferanseInVedtaksmottaker
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigDistribuert
 import no.nav.klage.oppgave.domain.kodeverk.Rolle
-import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
-import no.nav.klage.oppgave.util.AttachmentValidator
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
@@ -20,15 +16,8 @@ import java.util.*
 @Service
 @Transactional
 class VedtakDistribusjonService(
-    private val klagebehandlingService: KlagebehandlingService,
-    private val vedtakKafkaProducer: VedtakKafkaProducer,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val attachmentValidator: AttachmentValidator,
-    private val joarkClient: JoarkClient,
-    private val dokumentService: DokumentService,
-    private val kafkaVedtakEventRepository: KafkaVedtakEventRepository,
     private val dokDistFordelingClient: DokDistFordelingClient,
-    private val safClient: SafGraphQlClient
 ) {
 
     companion object {
