@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.service.distribusjon
 
 import no.nav.klage.oppgave.clients.dokdistfordeling.DokDistFordelingClient
 import no.nav.klage.oppgave.domain.klage.*

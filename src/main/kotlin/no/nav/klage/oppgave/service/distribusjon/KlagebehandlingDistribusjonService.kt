@@ -1,8 +1,9 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.service.distribusjon
 
 import no.nav.klage.oppgave.domain.klage.BrevMottaker
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Vedtak
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service

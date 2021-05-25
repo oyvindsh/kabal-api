@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.service.distribusjon
 
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.KafkaVedtakEvent
@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttet
 import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
 import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
+import no.nav.klage.oppgave.service.VedtakKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.scheduling.annotation.Scheduled

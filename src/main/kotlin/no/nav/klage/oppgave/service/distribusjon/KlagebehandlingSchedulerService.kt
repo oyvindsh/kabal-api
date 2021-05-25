@@ -1,5 +1,6 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.service.distribusjon
 
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
