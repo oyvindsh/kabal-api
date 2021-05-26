@@ -17,6 +17,12 @@ data class MicrosoftGraphUsersResponse(val value: List<Value>?) {
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+data class MicrosoftGraphGroupMembersResponse(val value: List<Value>?) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class Value(val id: String, val mail: String?)
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class MicrosoftGraphMemberOfResponse(val value: List<Group>)
 
 @JsonIgnoreProperties(ignoreUnknown = true)

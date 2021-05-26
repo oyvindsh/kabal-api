@@ -16,6 +16,7 @@ val testContainersVersion = "1.15.1"
 val tikaVersion = "1.24.1"
 val nimbusVersion = "8.20.1"
 val threeTenExtraVersion = "1.6.0"
+val shedlockVersion = "4.23.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -61,6 +62,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
+    implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.confluent:kafka-avro-serializer:$kafkaAvroVersion") {
