@@ -56,6 +56,10 @@ class KlagebehandlingService(
         }
     }
 
+    private fun checkSkrivetilgang(klagebehandling: Klagebehandling) {
+        tilgangService.verifySaksbehandlersSkrivetilgang(klagebehandling)
+    }
+
     @Transactional(readOnly = true)
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.findById(klagebehandlingId)
@@ -65,6 +69,7 @@ class KlagebehandlingService(
     fun getKlagebehandlingForUpdate(klagebehandlingId: UUID, klagebehandlingVersjon: Long?): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
+            .also { checkSkrivetilgang(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun assignKlagebehandling(
