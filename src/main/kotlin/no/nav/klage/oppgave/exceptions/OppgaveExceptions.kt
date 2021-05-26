@@ -39,3 +39,5 @@ class OversendtKlageNotValidException(msg: String) : RuntimeException(msg)
 class OversendtKlageReceivedBeforeException(msg: String) : RuntimeException(msg)
 
 class KlagebehandlingSamtidigEndretException(msg: String) : RuntimeException(msg)
+
+class KlagebehandlingAvsluttetException(msg: String) : RuntimeException(msg)
