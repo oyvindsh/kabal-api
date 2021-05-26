@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.Enhet
+import no.nav.klage.oppgave.api.view.Medunderskrivere
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -38,6 +39,21 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         return enheter
     }
 
+    @ApiOperation(
+        value = "Hent medunderskriver for en ansatt",
+        notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for et gitt tema."
+    )
+    @GetMapping("/ansatte/{navIdent}/medunderskrivere/{tema}", produces = ["application/json"])
+    fun getMedunderskrivere(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        @ApiParam(value = "Tema man trenger medunderskrivere for")
+        @PathVariable tema: String
+    ): Medunderskrivere {
+        logger.debug("getMedunderskrivere is requested by $navIdent")
+        return saksbehandlerService.getMedunderskrivere(navIdent, tema)
+    }
+    
     private fun logEnheter(enheter: List<Enhet>, navIdent: String) {
         enheter.forEach { enhet ->
             logger.debug(

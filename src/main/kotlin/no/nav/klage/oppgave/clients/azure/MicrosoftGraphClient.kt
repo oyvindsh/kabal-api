@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.clients.azure
 
+import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration
 import no.nav.klage.oppgave.service.TokenService
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -79,6 +81,20 @@ class MicrosoftGraphClient(
             logger.warn("Could not fetch displayname for idents: $idents", e)
             Mono.empty()
         }
+    }
+
+    @Retryable
+    @Cacheable(CacheWithJCacheConfiguration.GROUPMEMBERS_CACHE)
+    fun getGroupMembers(groupid: String): List<String> {
+        return microsoftGraphWebClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/groups/{groupid}/members")
+                    .build(groupid)
+            }
+            .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+            .retrieve()
+            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!.map { it.id }
     }
 
     @Retryable
