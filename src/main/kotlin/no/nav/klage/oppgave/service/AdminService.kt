@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
@@ -26,6 +27,7 @@ class AdminService(private val indexService: IndexService) {
     }
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
+    @SchedulerLock(name = "findAndLogOutOfSyncKlagebehandlinger")
     fun findAndLogOutOfSyncKlagebehandlinger() =
         indexService.findAndLogOutOfSyncKlagebehandlinger()
 
