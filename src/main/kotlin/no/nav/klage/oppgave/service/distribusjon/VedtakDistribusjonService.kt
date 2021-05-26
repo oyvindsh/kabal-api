@@ -6,11 +6,11 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokdistReferanseInVedtaksmottaker
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigDistribuert
 import no.nav.klage.oppgave.domain.klage.Vedtak
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
@@ -19,6 +19,7 @@ import java.util.*
 class VedtakDistribusjonService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokDistFordelingClient: DokDistFordelingClient,
+    private val klagebehandlingService: KlagebehandlingService
 ) {
 
     companion object {
@@ -28,23 +29,25 @@ class VedtakDistribusjonService(
         const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     fun distribuerJournalpostTilMottaker(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         vedtak: Vedtak,
         mottaker: BrevMottaker
-    ): Vedtak? {
+    ): Klagebehandling {
         return try {
+            val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
             val dokdistReferanse: UUID =
                 dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
             setDokdistReferanse(klagebehandling, vedtak.id, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
+            return klagebehandling
         } catch (e: Exception) {
             logger.warn("Kunne ikke distribuere journalpost ${vedtak.journalpostId}")
             throw e
         }
     }
 
-    fun setDokdistReferanse(
+    private fun setDokdistReferanse(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,
         mottakerId: UUID,
@@ -61,21 +64,29 @@ class VedtakDistribusjonService(
         return klagebehandling.getVedtak(vedtakId)
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun lagBrevmottakere(klagebehandling: Klagebehandling, vedtakId: UUID) {
+    @Transactional
+    fun lagBrevmottakere(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
         logger.debug("Lager brevmottakere for vedtak $vedtakId i klagebehandling ${klagebehandling.id}")
         klagebehandling.lagBrevmottakereForVedtak(vedtakId)
+        return klagebehandling
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun lagKopiAvJournalpostForMottaker(vedtak: Vedtak, brevMottaker: BrevMottaker) {
+    @Transactional
+    fun lagKopiAvJournalpostForMottaker(
+        klagebehandling: Klagebehandling,
+        vedtak: Vedtak,
+        brevMottaker: BrevMottaker
+    ): Klagebehandling {
         //TODO: Kod opp dette
         throw IllegalStateException("Dette har vi ikke kodet opp ennå, K9 støtter bare en mottaker")
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun markerVedtakSomFerdigDistribuert(klagebehandling: Klagebehandling, vedtak: Vedtak) {
+    @Transactional
+    fun markerVedtakSomFerdigDistribuert(klagebehandlingId: UUID, vedtak: Vedtak): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
         val event = klagebehandling.setVedtakFerdigDistribuert(vedtak.id, SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
+        return klagebehandling
     }
 }

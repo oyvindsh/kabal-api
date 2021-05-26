@@ -10,22 +10,19 @@ import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.service.*
 import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.domain.EntityScan
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.test.annotation.Rollback
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.support.TransactionCallbackWithoutResult
-import org.springframework.transaction.support.TransactionTemplate
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
@@ -40,7 +37,7 @@ import java.util.*
 @EntityScan("no.nav.klage.oppgave.domain")
 @AutoConfigureDataJpa
 @Testcontainers
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 //@AutoConfigureTestEntityManager
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class KlagebehandlingDistribusjonServiceTest {
@@ -92,81 +89,50 @@ internal class KlagebehandlingDistribusjonServiceTest {
     @Autowired
     lateinit var klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService
 
-    @Autowired
-    lateinit var txTemplate: TransactionTemplate
-
     private val klagebehandlingId = UUID.randomUUID()
 
     @Test
-    @Order(1)
-    @Rollback(false)
     fun `save klagebehandling`() {
-        txTemplate.execute(object : TransactionCallbackWithoutResult() {
-            override fun doInTransactionWithoutResult(status: TransactionStatus?) {
-                val mottak = Mottak(
-                    tema = Tema.OMS,
-                    type = Type.KLAGE,
-                    kildesystem = Fagsystem.FS39,
-                    kildeReferanse = "1234234",
-                    klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-                    oversendtKaDato = LocalDateTime.now()
-                )
 
-                mottakRepository.save(mottak)
+        val mottak = Mottak(
+            tema = Tema.OMS,
+            type = Type.KLAGE,
+            kildesystem = Fagsystem.FS39,
+            kildeReferanse = "1234234",
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            oversendtKaDato = LocalDateTime.now()
+        )
 
-                val klage = Klagebehandling(
-                    id = klagebehandlingId,
-                    klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-                    sakenGjelder = SakenGjelder(
-                        partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                        skalMottaKopi = false
-                    ),
-                    tema = Tema.OMS,
-                    type = Type.KLAGE,
-                    frist = LocalDate.now(),
-                    hjemler = mutableSetOf(
-                        Hjemmel.FTL_8_7
-                    ),
-                    created = LocalDateTime.now(),
-                    modified = LocalDateTime.now(),
-                    mottattKlageinstans = LocalDateTime.now(),
-                    kildesystem = Fagsystem.FS39,
-                    mottakId = mottak.id,
-                    vedtak = mutableSetOf(Vedtak(journalpostId = "1"))
-                )
+        mottakRepository.save(mottak)
 
-                klagebehandlingRepository.save(klage)
-            }
-        })
+        val klage = Klagebehandling(
+            id = klagebehandlingId,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            tema = Tema.OMS,
+            type = Type.KLAGE,
+            frist = LocalDate.now(),
+            hjemler = mutableSetOf(
+                Hjemmel.FTL_8_7
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDateTime.now(),
+            kildesystem = Fagsystem.FS39,
+            mottakId = mottak.id,
+            vedtak = mutableSetOf(Vedtak(journalpostId = "1"))
+        )
 
-        txTemplate.execute(object : TransactionCallbackWithoutResult() {
-            override fun doInTransactionWithoutResult(status: TransactionStatus?) {
-                klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
-            }
-        })
+        klagebehandlingRepository.save(klage)
 
-        txTemplate.execute(object : TransactionCallbackWithoutResult() {
-            override fun doInTransactionWithoutResult(status: TransactionStatus?) {
-                val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-                println(klagebehandling.versjon)
-            }
-        })
+        klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
-    }
-
-    @Test
-    @Order(2)
-    @Rollback(false)
-    fun `distribuer klagebehandling`() {
-        //klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
-    }
-
-    @Test
-    @Order(3)
-    @Rollback(false)
-    fun `sjekk klagebehandling`() {
-        //val klagebehandling = klagebehandlingRepository.getOne(klagebehandlingId)
-        //println(klagebehandling.versjon)
+        val klagebehandling =
+            klagebehandlingRepository.findByIdOrNull(klagebehandlingId) ?: throw NullPointerException()
+        println(klagebehandling.versjon)
     }
 
 }
