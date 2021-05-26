@@ -19,7 +19,6 @@ data class VedtakHjemlerInput(
 
 data class VedtakVedleggInput(
     val vedlegg: MultipartFile,
-    val journalfoerendeEnhet: String,
     val klagebehandlingVersjon: Long
 )
 

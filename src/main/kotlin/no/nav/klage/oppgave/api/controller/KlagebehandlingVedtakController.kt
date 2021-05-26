@@ -10,8 +10,8 @@ import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.KlagebehandlingService
-import no.nav.klage.oppgave.service.TilgangService
 import no.nav.klage.oppgave.service.VedtakService
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
@@ -32,7 +32,7 @@ class KlagebehandlingVedtakController(
     private val vedtakService: VedtakService,
     private val auditLogger: AuditLogger,
     private val klagebehandlingService: KlagebehandlingService,
-    private val tilgangService: TilgangService
+    private val dokumentService: DokumentService
 ) {
 
     companion object {
@@ -60,7 +60,7 @@ class KlagebehandlingVedtakController(
                 klagebehandling,
                 vedtakId.toUUIDOrException()
             ),
-            vedtakService.getVedlegg(
+            vedtakService.getVedleggView(
                 klagebehandling,
                 vedtakId.toUUIDOrException(),
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
@@ -132,31 +132,15 @@ class KlagebehandlingVedtakController(
     fun postVedlegg(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
-        @RequestBody input: VedtakVedleggInput
-    ): VedtakView {
+        @ModelAttribute input: VedtakVedleggInput
+    ): VedleggView? {
         logMethodDetails("postVedlegg", klagebehandlingId, vedtakId)
 
-        tilgangService.verifySaksbehandlersTilgangTilEnhet(input.journalfoerendeEnhet)
-
-        //TODO: Det er for mye som skjer her, koden under her burde ligge i en service, og wrappes i Transactional. (Med unntak av mapper-koden..)
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
+        return vedtakService.knyttVedtaksFilTilVedtak(
             klagebehandlingId.toUUIDOrException(),
-            input.klagebehandlingVersjon
-        )
-
-        return klagebehandlingMapper.mapVedtakToVedtakView(
-            vedtakService.addVedlegg(
-                klagebehandling,
-                vedtakId.toUUIDOrException(),
-                input.vedlegg,
-                innloggetSaksbehandlerRepository.getInnloggetIdent(),
-                input.journalfoerendeEnhet
-            ),
-            vedtakService.getVedlegg(
-                klagebehandling,
-                vedtakId.toUUIDOrException(),
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
+            vedtakId.toUUIDOrException(),
+            input,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
     }
 
@@ -183,16 +167,21 @@ class KlagebehandlingVedtakController(
     ): ResponseEntity<ByteArray> {
         logMethodDetails("getVedlegg", klagebehandlingId, vedtakId)
         val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId.toUUIDOrException())
-        val content = vedtakService.getVedlegg(
+        val arkivertDokument = vedtakService.getVedleggArkivertDokument(
+            klagebehandling,
+            vedtakId.toUUIDOrException(),
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+        val vedleggView = vedtakService.getVedleggView(
             klagebehandling,
             vedtakId.toUUIDOrException(),
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.valueOf("application/pdf")
-        responseHeaders.add("Content-Disposition", "inline; filename=" + "vedlegg.pdf")
+        responseHeaders.add("Content-Disposition", "inline; filename=${vedleggView?.name}")
         return ResponseEntity(
-            content?.bytes,
+            arkivertDokument.bytes,
             responseHeaders,
             HttpStatus.OK
         )
