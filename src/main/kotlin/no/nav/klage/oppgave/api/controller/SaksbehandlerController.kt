@@ -46,7 +46,7 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         value = "Hent medunderskriver for en ansatt",
         notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for et gitt tema."
     )
-    @GetMapping("/ansatte/{navIdent}/medunderskriver/{tema}", produces = ["application/json"])
+    @GetMapping("/ansatte/{navIdent}/medunderskrivere/{tema}", produces = ["application/json"])
     fun getMedunderskrivere(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
