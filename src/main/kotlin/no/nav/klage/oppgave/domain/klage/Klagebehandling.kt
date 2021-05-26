@@ -134,7 +134,7 @@ class Klagebehandling(
             vedtak.leggTilKlagerSomBrevmottaker(klager, true)
         }
         val sakenGjelder = sakenGjelder
-        if (sakenGjelder.partId != klager.partId) {
+        if (sakenGjelder.partId != klager.partId && sakenGjelder.skalMottaKopi) {
             vedtak.leggTilSakenGjelderSomBrevmottaker(sakenGjelder)
         }
     }
