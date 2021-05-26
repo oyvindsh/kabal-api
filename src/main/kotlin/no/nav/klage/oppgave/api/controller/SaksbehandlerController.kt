@@ -24,6 +24,7 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
     }
 
     //@ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
+    @Unprotected
     @ApiOperation(
         value = "Hent klageenheter for en ansatt",
         notes = "Henter alle klageenheter som saksbehandler er knyttet til."
