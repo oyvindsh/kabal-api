@@ -2,6 +2,8 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -19,6 +21,18 @@ class TilgangService(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val securelogger = getSecureLogger()
+    }
+
+    fun verifySaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
+        if (klagebehandling.avsluttetAvSaksbehandler != null || klagebehandling.avsluttet != null) {
+            throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
+        }
+        val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        if (klagebehandling.tildeltSaksbehandlerident == null ||
+            ident != klagebehandling.tildeltSaksbehandlerident
+        ) {
+            throw MissingTilgangException("Kun saksbehandler tildelt klage kan endre")
+        }
     }
 
     fun verifySaksbehandlersTilgangTil(fnr: String) {

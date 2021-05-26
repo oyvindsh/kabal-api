@@ -1,6 +1,9 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
+import no.nav.klage.oppgave.api.view.VedleggView
 import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
+import no.nav.klage.oppgave.api.view.VedtakVedleggInput
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
@@ -37,6 +40,8 @@ class VedtakService(
     private val joarkClient: JoarkClient,
     private val dokumentService: DokumentService,
     private val safClient: SafGraphQlClient,
+    private val tilgangService: TilgangService,
+    private val klagebehandlingMapper: KlagebehandlingMapper
 ) {
 
     companion object {
@@ -110,39 +115,79 @@ class VedtakService(
         return klagebehandling.getVedtak(vedtakId)
     }
 
-    fun addVedlegg(
-        klagebehandling: Klagebehandling,
+    @Transactional
+    fun knyttVedtaksFilTilVedtak(
+        klagebehandlingId: UUID,
         vedtakId: UUID,
-        vedlegg: MultipartFile,
-        utfoerendeSaksbehandlerIdent: String,
-        journalfoerendeEnhet: String
-    ): Vedtak {
+        input: VedtakVedleggInput,
+        innloggetIdent: String
+    ): VedleggView? {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
+            klagebehandlingId,
+            input.klagebehandlingVersjon
+        )
+
+        tilgangService.verifySaksbehandlersTilgangTilEnhet(klagebehandling.tildeltEnhet!!)
+
         val vedtak = klagebehandling.getVedtak(vedtakId)
+
         if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er ferdigstilt")
+
+        addFileToVedtak(
+            klagebehandling,
+            vedtak,
+            input.vedlegg,
+            innloggetIdent
+        )
+
+        return getVedleggView(
+            klagebehandling,
+            vedtakId,
+            innloggetIdent
+        )
+    }
+
+
+    private fun addFileToVedtak(
+        klagebehandling: Klagebehandling,
+        vedtak: Vedtak,
+        vedlegg: MultipartFile,
+        utfoerendeSaksbehandlerIdent: String
+    ): Vedtak {
         attachmentValidator.validateAttachment(vedlegg)
-        if (vedtak.journalpostId != null) {
-            joarkClient.cancelJournalpost(vedtak.journalpostId!!, journalfoerendeEnhet)
-        }
+        val journalpostId = joarkClient.createJournalpost(klagebehandling, vedlegg, klagebehandling.tildeltEnhet!!)
 
         return setJournalpostId(
             klagebehandling,
-            vedtakId,
-            joarkClient.createJournalpost(klagebehandling, vedlegg, journalfoerendeEnhet),
+            vedtak.id,
+            journalpostId,
             utfoerendeSaksbehandlerIdent
         )
     }
 
-    fun getVedlegg(
+    fun getVedleggView(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,
         utfoerendeSaksbehandlerIdent: String
-    ): ArkivertDokument? {
+    ): VedleggView? {
         val vedtak = klagebehandling.getVedtak(vedtakId)
-        return if (vedtak.journalpostId != null) {
-            dokumentService.getMainDokument(vedtak.journalpostId!!)
-        } else {
-            null
-        }
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        val mainDokument = dokumentService.getMainDokument(vedtak.journalpostId!!)
+        val mainDokumentName = dokumentService.getMainDokumentTitle(vedtak.journalpostId!!)
+        return klagebehandlingMapper.mapArkivertDokumentToVedleggView(
+            mainDokument,
+            mainDokumentName
+        )
+    }
+
+    fun getVedleggArkivertDokument(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        utfoerendeSaksbehandlerIdent: String
+    ): ArkivertDokument {
+        val vedtak = klagebehandling.getVedtak(vedtakId)
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        return dokumentService.getMainDokument(vedtak.journalpostId!!)
     }
 
     fun ferdigstillVedtak(
