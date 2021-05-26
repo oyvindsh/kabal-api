@@ -82,6 +82,19 @@ class MicrosoftGraphClient(
     }
 
     @Retryable
+    fun getGroupMembers(groupid: String): List<String> {
+        return microsoftGraphWebClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/groups/{groupid}/members")
+                    .build(groupid)
+            }
+            .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+            .retrieve()
+            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!.map { it.id }
+    }
+
+    @Retryable
     fun getRoller(ident: String): List<String> {
         return try {
             val idents = listOf(ident).joinToString(separator = "','", prefix = "('", postfix = "')")

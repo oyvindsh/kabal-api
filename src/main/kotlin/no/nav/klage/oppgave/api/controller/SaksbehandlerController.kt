@@ -8,6 +8,8 @@ import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -18,13 +20,14 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
-class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerService) {
+class SaksbehandlerController(
+    private val saksbehandlerService: SaksbehandlerService,
+    private val saksbehandlerRepository: SaksbehandlerRepository
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val HARDKODA_MEDUNDERSKRIVERE: List<Medunderskriver> =
-            listOf(Medunderskriver("AA12345", "Ola Nordmann"), Medunderskriver("AB12345", "Kari Nordmann"))
     }
 
     @ApiOperation(
@@ -54,8 +57,19 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         @PathVariable tema: String
     ): Medunderskrivere {
         logger.debug("getMedunderskrivere is requested by $navIdent")
-        return Medunderskrivere(tema, HARDKODA_MEDUNDERSKRIVERE.filter { it.ident != navIdent })
+        val medunderskrivere = saksbehandlerRepository.getAlleSaksbehandlerIdenter()
+            .filter { it != navIdent }
+            .filter { saksbehandlerHarTilgangTilTema(it, tema) }
+            .map { Medunderskriver(it, getNameForIdent(it)) }
+        return Medunderskrivere(tema, medunderskrivere)
     }
+
+    private fun saksbehandlerHarTilgangTilTema(ident: String, tema: String) =
+        saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(ident).enheter.flatMap { it.temaer }
+            .contains(Tema.of(tema))
+
+    private fun getNameForIdent(it: String) =
+        saksbehandlerRepository.getNamesForSaksbehandlere(setOf(it)).getOrDefault(it, "Ukjent navn")
 
     private fun logEnheter(enheter: List<Enhet>, navIdent: String) {
         enheter.forEach { enhet ->

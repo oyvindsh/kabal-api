@@ -35,6 +35,10 @@ class SaksbehandlerRepository(
     fun getEnheterMedTemaerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =
         saksbehandlerMapper.mapTilgangerToEnheterMedLovligeTemaer(axsysClient.getTilgangerForSaksbehandler(ident))
 
+    fun getAlleSaksbehandlerIdenter(): List<String> {
+        return client.getGroupMembers(saksbehandlerRole)
+    }
+
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
 
