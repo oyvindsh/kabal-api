@@ -40,12 +40,12 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         return enheter
     }
 
+    @Unprotected
     @ApiOperation(
         value = "Hent medunderskriver for en ansatt",
         notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for et gitt tema."
     )
     @GetMapping("/ansatte/{navIdent}/medunderskrivere/{tema}", produces = ["application/json"])
-    @Unprotected
     fun getMedunderskrivere(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
