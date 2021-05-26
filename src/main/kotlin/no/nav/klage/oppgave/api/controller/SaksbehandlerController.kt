@@ -5,11 +5,9 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.Enhet
 import no.nav.klage.oppgave.api.view.Medunderskrivere
-import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -24,7 +22,7 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
+    //@ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
     @ApiOperation(
         value = "Hent klageenheter for en ansatt",
         notes = "Henter alle klageenheter som saksbehandler er knyttet til."
