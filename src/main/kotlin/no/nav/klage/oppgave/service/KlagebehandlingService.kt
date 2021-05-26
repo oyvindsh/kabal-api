@@ -69,7 +69,7 @@ class KlagebehandlingService(
     fun getKlagebehandlingForUpdate(klagebehandlingId: UUID, klagebehandlingVersjon: Long?): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
-            .also { checkSkrivetilgang(it) }
+            //.also { checkSkrivetilgang(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun assignKlagebehandling(
