@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Api(tags = ["kabal-api"])
-@ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerService) {
 
     companion object {
@@ -25,6 +24,7 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
     @ApiOperation(
         value = "Hent klageenheter for en ansatt",
         notes = "Henter alle klageenheter som saksbehandler er knyttet til."
