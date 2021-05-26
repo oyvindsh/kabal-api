@@ -1,10 +1,11 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import no.nav.klage.oppgave.clients.dokdistfordeling.DokDistFordelingClient
-import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.BrevMottaker
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokdistReferanseInVedtaksmottaker
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigDistribuert
-import no.nav.klage.oppgave.domain.kodeverk.Rolle
+import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
@@ -27,21 +28,19 @@ class VedtakDistribusjonService(
         const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
     }
 
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun distribuerJournalpostTilMottaker(
         klagebehandling: Klagebehandling,
         vedtak: Vedtak,
-        mottaker: BrevMottaker,
-        utfoerendeSaksbehandlerIdent: String,
-        journalfoerendeEnhet: String
+        mottaker: BrevMottaker
     ): Vedtak? {
         return try {
             val dokdistReferanse: UUID =
                 dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
-            setDokdistReferanse(klagebehandling, vedtak.id, mottaker.id, dokdistReferanse, utfoerendeSaksbehandlerIdent)
+            setDokdistReferanse(klagebehandling, vedtak.id, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
         } catch (e: Exception) {
-            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
-            null
+            logger.warn("Kunne ikke distribuere journalpost ${vedtak.journalpostId}")
+            throw e
         }
     }
 
@@ -62,60 +61,19 @@ class VedtakDistribusjonService(
         return klagebehandling.getVedtak(vedtakId)
     }
 
-    @Transactional(propagation = Propagation.NESTED)
-    fun lagBrevmottakere(klagebehandling: Klagebehandling, vedtak: Vedtak) {
-        val klager = klagebehandling.klager
-        if (klager.prosessfullmektig != null) {
-            leggTilProsessfullmektigSomBrevmottaker(vedtak, klager.prosessfullmektig)
-            if (klager.prosessfullmektig.skalPartenMottaKopi) {
-                leggTilKlagerSomBrevmottaker(vedtak, klager, false)
-            }
-        } else {
-            leggTilKlagerSomBrevmottaker(vedtak, klager, true)
-        }
-        val sakenGjelder = klagebehandling.sakenGjelder
-        if (sakenGjelder.partId != klager.partId) {
-            leggTilSakenGjelderSomBrevmottaker(vedtak, sakenGjelder)
-        }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun lagBrevmottakere(klagebehandling: Klagebehandling, vedtakId: UUID) {
+        logger.debug("Lager brevmottakere for vedtak $vedtakId i klagebehandling ${klagebehandling.id}")
+        klagebehandling.lagBrevmottakereForVedtak(vedtakId)
     }
 
-    private fun leggTilSakenGjelderSomBrevmottaker(vedtak: Vedtak, sakenGjelder: SakenGjelder) {
-        vedtak.brevmottakere.add(
-            BrevMottaker(
-                partId = sakenGjelder.partId,
-                rolle = Rolle.SAKEN_GJELDER,
-                journalpostId = null
-            )
-        )
-    }
-
-    private fun leggTilKlagerSomBrevmottaker(vedtak: Vedtak, klager: Klager, klagerErHovedmottaker: Boolean) {
-        vedtak.brevmottakere.add(
-            BrevMottaker(
-                partId = klager.partId,
-                rolle = Rolle.KLAGER,
-                journalpostId = if (klagerErHovedmottaker) vedtak.journalpostId else null
-            )
-        )
-    }
-
-    private fun leggTilProsessfullmektigSomBrevmottaker(vedtak: Vedtak, prosessfullmektig: Prosessfullmektig) {
-        vedtak.brevmottakere.add(
-            BrevMottaker(
-                partId = prosessfullmektig.partId,
-                rolle = Rolle.PROSESSFULLMEKTIG,
-                journalpostId = vedtak.journalpostId
-            )
-        )
-    }
-
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun lagKopiAvJournalpostForMottaker(vedtak: Vedtak, brevMottaker: BrevMottaker) {
         //TODO: Kod opp dette
         throw IllegalStateException("Dette har vi ikke kodet opp ennå, K9 støtter bare en mottaker")
     }
 
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun markerVedtakSomFerdigDistribuert(klagebehandling: Klagebehandling, vedtak: Vedtak) {
         val event = klagebehandling.setVedtakFerdigDistribuert(vedtak.id, SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)

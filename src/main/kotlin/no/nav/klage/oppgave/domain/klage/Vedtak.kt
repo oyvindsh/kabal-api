@@ -64,4 +64,34 @@ class Vedtak(
     fun getMottaker(mottakerId: UUID): BrevMottaker =
         brevmottakere.firstOrNull { it.id == mottakerId }
             ?: throw BrevMottakerNotFoundException("Brevmottaker med id $mottakerId ikke funnet")
+
+    fun leggTilSakenGjelderSomBrevmottaker(sakenGjelder: SakenGjelder) {
+        brevmottakere.add(
+            BrevMottaker(
+                partId = sakenGjelder.partId,
+                rolle = Rolle.SAKEN_GJELDER,
+                journalpostId = null
+            )
+        )
+    }
+
+    fun leggTilKlagerSomBrevmottaker(klager: Klager, klagerErHovedmottaker: Boolean) {
+        brevmottakere.add(
+            BrevMottaker(
+                partId = klager.partId,
+                rolle = Rolle.KLAGER,
+                journalpostId = if (klagerErHovedmottaker) journalpostId else null
+            )
+        )
+    }
+
+    fun leggTilProsessfullmektigSomBrevmottaker(prosessfullmektig: Prosessfullmektig) {
+        brevmottakere.add(
+            BrevMottaker(
+                partId = prosessfullmektig.partId,
+                rolle = Rolle.PROSESSFULLMEKTIG,
+                journalpostId = journalpostId
+            )
+        )
+    }
 }

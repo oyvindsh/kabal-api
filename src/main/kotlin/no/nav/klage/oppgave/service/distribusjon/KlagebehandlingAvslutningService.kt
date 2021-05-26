@@ -27,7 +27,7 @@ class KlagebehandlingAvslutningService(
         private val secureLogger = getSecureLogger()
     }
 
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     fun avsluttKlagebehandling(klagebehandling: Klagebehandling) {
 
         val vedtak = klagebehandling.vedtak.first()

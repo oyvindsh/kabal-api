@@ -14,7 +14,6 @@ class KlagebehandlingSchedulerService(
 ) {
 
     @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
-    @Transactional
     fun distribuerVedtak() {
 
         val klagebehandlinger: List<UUID> = klagebehandlingService.findKlagebehandlingForDistribusjon()

@@ -555,6 +555,7 @@ class KlagebehandlingService(
 
     private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)
 
+    @Transactional(readOnly = true)
     fun findKlagebehandlingForDistribusjon(): List<UUID> =
         klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull().map { it.id }
 
