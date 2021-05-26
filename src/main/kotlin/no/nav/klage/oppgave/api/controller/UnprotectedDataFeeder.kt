@@ -22,7 +22,7 @@ class UnprotectedDataFeeder(
     }
 
     @Unprotected
-    @PostMapping("/unprotected/feed")
+    @PostMapping("/internal/manualfeed")
     fun sendInnKlageV1(
         @Valid @RequestBody oversendtKlage: OversendtKlage
     ) {
