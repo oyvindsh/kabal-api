@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -44,6 +45,7 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for et gitt tema."
     )
     @GetMapping("/ansatte/{navIdent}/medunderskrivere/{tema}", produces = ["application/json"])
+    @Unprotected
     fun getMedunderskrivere(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
@@ -53,7 +55,7 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         logger.debug("getMedunderskrivere is requested by $navIdent")
         return saksbehandlerService.getMedunderskrivere(navIdent, tema)
     }
-    
+
     private fun logEnheter(enheter: List<Enhet>, navIdent: String) {
         enheter.forEach { enhet ->
             logger.debug(
