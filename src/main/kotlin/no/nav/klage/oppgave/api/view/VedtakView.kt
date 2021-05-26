@@ -8,7 +8,7 @@ data class VedtakView(
     val grunn: String? = null,
     val hjemler: Set<String> = setOf(),
     val brevMottakere: Set<BrevMottakerView> = setOf(),
-    val content: String? = null
+    val file: VedleggView? = null
 )
 
 data class BrevMottakerView(
