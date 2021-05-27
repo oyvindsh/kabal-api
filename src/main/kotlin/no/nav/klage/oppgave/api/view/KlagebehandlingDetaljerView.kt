@@ -28,6 +28,7 @@ data class KlagebehandlingDetaljerView(
     val mottattKlageinstans: LocalDate?,
     val tildelt: LocalDate? = null,
     val avsluttet: LocalDate? = null,
+    val avsluttetAvSaksbehandler: LocalDate?,
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
     val medunderskriverident: String? = null,
@@ -42,7 +43,7 @@ data class KlagebehandlingDetaljerView(
     val tilbakemelding: String?,
     val klagebehandlingVersjon: Long,
     val vedtak: List<VedtakView>,
-    val kommentarFraFoersteinstans: String?
+    val kommentarFraFoersteinstans: String?,
 ) {
     data class Navn(
         val fornavn: String?,

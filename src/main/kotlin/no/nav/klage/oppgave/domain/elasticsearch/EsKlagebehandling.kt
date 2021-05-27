@@ -81,6 +81,8 @@ data class EsKlagebehandling(
     val tildelt: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val avsluttet: LocalDateTime? = null,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val avsluttetAvSaksbehandler: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date)
     val frist: LocalDate?,
 

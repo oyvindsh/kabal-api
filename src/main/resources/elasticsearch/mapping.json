@@ -88,6 +88,10 @@
       "type": "date",
       "format": "date_time"
     },
+    "avsluttetAvSaksbehandler": {
+      "type": "date",
+      "format": "date_time"
+    },
     "frist": {
       "type": "date",
       "format": "date"
@@ -165,7 +169,7 @@
           "type": "date",
           "format": "date_time"
         },
-        "finalized": {
+        "ferdigstiltIJoark": {
           "type": "date",
           "format": "date_time"
         }
@@ -226,7 +230,7 @@
       "type": "date",
       "format": "date_time"
     },
-    "vedtakFinalized": {
+    "vedtakFerdigstiltIJoark": {
       "type": "date",
       "format": "date_time"
     }

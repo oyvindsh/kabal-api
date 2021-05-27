@@ -148,9 +148,9 @@ open class ElasticsearchService(
         }
 
         if (statuskategori == KlagebehandlingerSearchCriteria.Statuskategori.AAPEN) {
-            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttet"))
+            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         } else {
-            baseQuery.must(QueryBuilders.existsQuery("avsluttet"))
+            baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         }
 
         enhetsnr?.let {
@@ -199,12 +199,12 @@ open class ElasticsearchService(
         }
         ferdigstiltFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttet").gte(it).format(ISO8601)
+                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").gte(it).format(ISO8601)
             )
         }
         ferdigstiltTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttet").lte(it).format(ISO8601)
+                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").lte(it).format(ISO8601)
             )
         }
         fristFom?.let {
@@ -292,9 +292,9 @@ open class ElasticsearchService(
 
     private fun findWithBaseQueryAndAapen(baseQuery: BoolQueryBuilder, aapen: Boolean): List<EsKlagebehandling> {
         if (aapen) {
-            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttet"))
+            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         } else {
-            baseQuery.must(QueryBuilders.existsQuery("avsluttet"))
+            baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         }
         return try {
             esTemplate.search(
@@ -332,7 +332,7 @@ open class ElasticsearchService(
             innsendtOgAvsluttetAggs.get<ParsedDateRange>("avsluttet_last30days").buckets.firstOrNull()?.docCount ?: 0
 
         val baseQueryOverFrist: BoolQueryBuilder = QueryBuilders.boolQuery()
-        baseQueryOverFrist.mustNot(QueryBuilders.existsQuery("avsluttet"))
+        baseQueryOverFrist.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         val queryBuilderOverFrist: NativeSearchQueryBuilder = NativeSearchQueryBuilder()
             .withQuery(baseQueryOverFrist)
         addAggregationsForOverFrist(queryBuilderOverFrist)
@@ -376,15 +376,15 @@ open class ElasticsearchService(
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttet").addRange("now-1d/d", "now/d")
+                AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttetAvSaksbehandler").addRange("now-1d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttet").addRange("now-7d/d", "now/d")
+                AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttetAvSaksbehandler").addRange("now-7d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttet").addRange("now-30d/d", "now/d")
+                AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttetAvSaksbehandler").addRange("now-30d/d", "now/d")
                     .format(ISO8601)
             )
     }

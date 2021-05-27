@@ -82,6 +82,7 @@ class KlagebehandlingMapper(
             mottattKlageinstans = klagebehandling.mottattKlageinstans,
             tildelt = klagebehandling.tildelt,
             avsluttet = klagebehandling.avsluttet,
+            avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
@@ -161,8 +162,14 @@ class KlagebehandlingMapper(
                 } else {
                     null
                 },
+                //TODO: Skal fjernes eller få ny betydning når frontend tatt i bruk avsluttetAvSaksbehandler.
                 avsluttet = if (viseFullfoerte) {
-                    esKlagebehandling.avsluttet?.toLocalDate()
+                    esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
+                } else {
+                    null
+                },
+                avsluttetAvSaksbehandler = if (viseFullfoerte) {
+                    esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
                 } else {
                     null
                 }
@@ -205,7 +212,9 @@ class KlagebehandlingMapper(
             mottatt = klagebehandling.mottattKlageinstans.toLocalDate(),
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = klagebehandling.tildelt?.toLocalDate(),
-            avsluttet = klagebehandling.avsluttet?.toLocalDate(),
+            //TODO: Skal fjernes eller få ny betydning når frontend tatt i bruk avsluttetAvSaksbehandler.
+            avsluttet = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
+            avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeltSaksbehandlerident,
             medunderskriverident = klagebehandling.medunderskriverident,
