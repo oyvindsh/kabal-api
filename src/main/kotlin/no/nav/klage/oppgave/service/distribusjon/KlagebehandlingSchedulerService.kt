@@ -9,10 +9,11 @@ import java.util.*
 @Service
 class KlagebehandlingSchedulerService(
     private val klagebehandlingService: KlagebehandlingService,
-    private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService
+    private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService,
+    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService
 ) {
 
-    @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
+    @Scheduled(fixedDelay = 240000, initialDelay = 240000)
     @SchedulerLock(name = "distribuerVedtak")
     fun distribuerVedtak() {
 
@@ -21,5 +22,11 @@ class KlagebehandlingSchedulerService(
         klagebehandlinger.forEach { klagebehandling ->
             klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandling)
         }
+    }
+
+    @Scheduled(fixedDelay = 240000, initialDelay = 300000)
+    @SchedulerLock(name = "dispatchUnsendtVedtakToKafka")
+    fun dispatchUnsendtVedtakToKafka() {
+        klagebehandlingAvslutningService.dispatchUnsendtVedtakToKafka()
     }
 }

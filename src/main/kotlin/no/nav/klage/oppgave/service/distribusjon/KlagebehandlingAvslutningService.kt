@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service.distribusjon
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.KafkaVedtakEvent
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
@@ -11,7 +10,6 @@ import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.VedtakKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -48,9 +46,7 @@ class KlagebehandlingAvslutningService(
         klagebehandling.setAvsluttet(VedtakDistribusjonService.SYSTEMBRUKER)
         return klagebehandling
     }
-
-    @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Paris")
-    @SchedulerLock(name = "dispatchUnsendtVedtakToKafka")
+    
     @Transactional
     fun dispatchUnsendtVedtakToKafka() {
         kafkaVedtakEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
