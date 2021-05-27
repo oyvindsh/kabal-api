@@ -121,4 +121,21 @@ class Klagebehandling(
         return vedtak.firstOrNull { it.id == vedtakId }
             ?: throw VedtakNotFoundException("Vedtak med id $vedtakId ikke funnet")
     }
+
+    fun lagBrevmottakereForVedtak(vedtakId: UUID) {
+        val vedtak = getVedtak(vedtakId)
+        val klager = klager
+        if (klager.prosessfullmektig != null) {
+            vedtak.leggTilProsessfullmektigSomBrevmottaker(klager.prosessfullmektig)
+            if (klager.prosessfullmektig.skalPartenMottaKopi) {
+                vedtak.leggTilKlagerSomBrevmottaker(klager, false)
+            }
+        } else {
+            vedtak.leggTilKlagerSomBrevmottaker(klager, true)
+        }
+        val sakenGjelder = sakenGjelder
+        if (sakenGjelder.partId != klager.partId && sakenGjelder.skalMottaKopi) {
+            vedtak.leggTilSakenGjelderSomBrevmottaker(sakenGjelder)
+        }
+    }
 }

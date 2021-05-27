@@ -9,5 +9,9 @@ spring:
     consumer:
       auto-offset-reset: earliest
       group-id: kabal-api
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
 
 VEDTAK_FATTET_TOPIC: klage.vedtak-fattet.v1
