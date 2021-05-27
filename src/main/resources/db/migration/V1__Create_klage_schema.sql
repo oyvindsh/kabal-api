@@ -17,9 +17,9 @@ $$;
 CREATE TABLE klage.mottak
 (
     id                             UUID PRIMARY KEY,
-    versjon                        BIGINT                   NOT NULL,
-    tema_id                        TEXT                     NOT NULL,
-    type_id                        TEXT                     NOT NULL,
+    versjon                        BIGINT    NOT NULL,
+    tema_id                        TEXT      NOT NULL,
+    type_id                        TEXT      NOT NULL,
     klager_type                    TEXT,
     klager_value                   TEXT,
     klager_prosessfullmektig_type  TEXT,
@@ -30,19 +30,19 @@ CREATE TABLE klage.mottak
     saken_gjelder_skal_motta_kopi  BOOLEAN,
     sak_fagsystem                  TEXT,
     sak_fagsak_id                  TEXT,
-    kilde_referanse                TEXT                     NOT NULL,
+    kilde_referanse                TEXT      NOT NULL,
     dvh_referanse                  TEXT,
     innsyn_url                     TEXT,
     avsender_saksbehandlerident    TEXT,
     avsender_enhet                 TEXT,
     dato_innsendt                  DATE,
     dato_mottatt_foersteinstans    DATE,
-    dato_oversendt_klageinstans    TIMESTAMP WITH TIME ZONE NOT NULL,
+    dato_oversendt_klageinstans    TIMESTAMP NOT NULL,
     dato_frist_fra_foersteinstans  DATE,
-    kildesystem                    TEXT                     NOT NULL,
+    kildesystem                    TEXT      NOT NULL,
     kommentar                      TEXT,
-    created                        TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified                       TIMESTAMP WITH TIME ZONE NOT NULL
+    created                        TIMESTAMP NOT NULL,
+    modified                       TIMESTAMP NOT NULL
 );
 
 CREATE TABLE klage.mottak_dokument
@@ -78,14 +78,14 @@ CREATE TABLE klage.kvalitetsvurdering
     tilbakemelding              TEXT,
     mottaker_saksbehandlerident TEXT,
     mottaker_enhet              TEXT,
-    created                     TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified                    TIMESTAMP WITH TIME ZONE NOT NULL
+    created                     TIMESTAMP NOT NULL,
+    modified                    TIMESTAMP NOT NULL
 );
 
 CREATE TABLE klage.klagebehandling
 (
     id                                         UUID PRIMARY KEY,
-    versjon                                    BIGINT                   NOT NULL,
+    versjon                                    BIGINT    NOT NULL,
     klager_type                                TEXT,
     klager_value                               TEXT,
     klager_prosessfullmektig_type              TEXT,
@@ -94,29 +94,29 @@ CREATE TABLE klage.klagebehandling
     saken_gjelder_type                         TEXT,
     saken_gjelder_value                        TEXT,
     saken_gjelder_skal_motta_kopi              BOOLEAN,
-    tema_id                                    TEXT                     NOT NULL,
-    type_id                                    TEXT                     NOT NULL,
+    tema_id                                    TEXT      NOT NULL,
+    type_id                                    TEXT      NOT NULL,
     referanse_id                               TEXT,
     sak_fagsystem                              TEXT,
     sak_fagsak_id                              TEXT,
     dato_innsendt                              DATE,
     dato_mottatt_foersteinstans                DATE,
-    dato_mottatt_klageinstans                  TIMESTAMP WITH TIME ZONE NOT NULL,
-    dato_behandling_tildelt                    TIMESTAMP WITH TIME ZONE,
-    dato_behandling_avsluttet                  TIMESTAMP WITH TIME ZONE,
-    dato_behandling_avsluttet_av_saksbehandler TIMESTAMP WITH TIME ZONE,
+    dato_mottatt_klageinstans                  TIMESTAMP NOT NULL,
+    dato_behandling_tildelt                    TIMESTAMP,
+    dato_behandling_avsluttet                  TIMESTAMP,
+    dato_behandling_avsluttet_av_saksbehandler TIMESTAMP,
     frist                                      DATE,
     tildelt_saksbehandlerident                 TEXT,
     medunderskriverident                       TEXT,
     tildelt_enhet                              TEXT,
     avsender_enhet_foersteinstans              TEXT,
     avsender_saksbehandlerident_foersteinstans TEXT,
-    mottak_id                                  UUID                     NOT NULL,
+    mottak_id                                  UUID      NOT NULL,
     kvalitetsvurdering_id                      UUID,
-    kildesystem                                TEXT                     NOT NULL,
+    kildesystem                                TEXT      NOT NULL,
     kommentar_fra_foersteinstans               TEXT,
-    created                                    TIMESTAMP WITH TIME ZONE NOT NULL,
-    modified                                   TIMESTAMP WITH TIME ZONE NOT NULL,
+    created                                    TIMESTAMP NOT NULL,
+    modified                                   TIMESTAMP NOT NULL,
     CONSTRAINT fk_behandling_kvalitetsvurdering
         FOREIGN KEY (kvalitetsvurdering_id)
             REFERENCES klage.kvalitetsvurdering (id),
@@ -130,12 +130,12 @@ CREATE TABLE klage.vedtak
     id                  UUID PRIMARY KEY,
     utfall_id           TEXT,
     grunn_id            TEXT,
-    klagebehandling_id  UUID                     NOT NULL,
+    klagebehandling_id  UUID      NOT NULL,
     journalpost_id      TEXT,
-    modified            TIMESTAMP WITH TIME ZONE NOT NULL,
-    created             TIMESTAMP WITH TIME ZONE NOT NULL,
-    ferdigstilt_i_joark TIMESTAMP WITH TIME ZONE,
-    ferdig_distribuert  TIMESTAMP WITH TIME ZONE,
+    modified            TIMESTAMP NOT NULL,
+    created             TIMESTAMP NOT NULL,
+    ferdigstilt_i_joark TIMESTAMP,
+    ferdig_distribuert  TIMESTAMP,
     CONSTRAINT fk_vedtak_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
@@ -202,14 +202,14 @@ CREATE TABLE klage.vedtak_hjemmel
 CREATE TABLE klage.endringslogginnslag
 (
     id                 UUID PRIMARY KEY,
-    klagebehandling_id UUID                     NOT NULL,
+    klagebehandling_id UUID      NOT NULL,
     saksbehandlerident TEXT,
-    kilde              TEXT                     NOT NULL,
-    handling           TEXT                     NOT NULL,
-    felt               TEXT                     NOT NULL,
+    kilde              TEXT      NOT NULL,
+    handling           TEXT      NOT NULL,
+    felt               TEXT      NOT NULL,
     fraverdi           TEXT,
     tilverdi           TEXT,
-    tidspunkt          TIMESTAMP WITH TIME ZONE NOT NULL,
+    tidspunkt          TIMESTAMP NOT NULL,
     CONSTRAINT fk_endringslogginnslag_klagebehandling
         FOREIGN KEY (klagebehandling_id)
             REFERENCES klage.klagebehandling (id)
