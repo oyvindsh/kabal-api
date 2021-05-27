@@ -100,6 +100,37 @@ open class ElasticsearchService(
         return searchHits
     }
 
+    open fun countIkkeTildelt(): Long {
+        return 10L
+        //TODO: Andreas må fikse dette!! :-)
+    }
+
+    open fun countTildelt(): Long {
+        return 20L
+        //TODO: Andreas må fikse dette!! :-)
+    }
+
+    open fun countSendtTilMedunderskriver(): Long {
+        return 30L
+        //TODO: Andreas må fikse dette!! :-)
+    }
+
+    open fun countAvsluttetAvMedunderskriver(): Long {
+        return 40L
+        //TODO: Andreas må fikse dette!! :-)
+    }
+
+    open fun countAvsluttet(): Long {
+        return 50L
+        //TODO: Andreas må fikse dette!! :-)
+    }
+
+    open fun countAntallSaksdokumenterMedian(): Long {
+        return 3L
+        //TODO: Andreas må fikse dette!! :-)
+    }
+
+
     open fun countByCriteria(criteria: KlagebehandlingerSearchCriteria): Int {
         val query = NativeSearchQueryBuilder()
             .withQuery(criteria.toEsQuery())
@@ -376,15 +407,18 @@ open class ElasticsearchService(
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttetAvSaksbehandler").addRange("now-1d/d", "now/d")
+                AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttetAvSaksbehandler")
+                    .addRange("now-1d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttetAvSaksbehandler").addRange("now-7d/d", "now/d")
+                AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttetAvSaksbehandler")
+                    .addRange("now-7d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttetAvSaksbehandler").addRange("now-30d/d", "now/d")
+                AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttetAvSaksbehandler")
+                    .addRange("now-30d/d", "now/d")
                     .format(ISO8601)
             )
     }
