@@ -1,10 +1,7 @@
 package no.nav.klage.oppgave.api.mapper
 
 
-import no.nav.klage.oppgave.api.view.BrevMottakerView
-import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
-import no.nav.klage.oppgave.api.view.KlagebehandlingListView
-import no.nav.klage.oppgave.api.view.VedtakView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
@@ -226,15 +223,15 @@ class KlagebehandlingMapper(
         )
     }
 
-    fun mapVedtakToVedtakView(vedtak: Vedtak, dokument: ArkivertDokument? = null): VedtakView {
-        if (dokument != null) {
+    fun mapVedtakToVedtakView(vedtak: Vedtak, vedleggView: VedleggView? = null): VedtakView {
+        if (vedleggView != null) {
             return VedtakView(
                 id = vedtak.id,
                 utfall = vedtak.utfall?.id,
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-                content = Base64.getEncoder().encodeToString(dokument.bytes)
+                file = vedleggView
             )
         } else {
             return VedtakView(
@@ -245,6 +242,14 @@ class KlagebehandlingMapper(
                 brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
             )
         }
+    }
+
+    fun mapArkivertDokumentToVedleggView(arkivertDokument: ArkivertDokument, dokumentName: String): VedleggView {
+        return VedleggView(
+            dokumentName,
+            arkivertDokument.bytes.size.toLong(),
+            Base64.getEncoder().encodeToString(arkivertDokument.bytes)
+        )
     }
 
     private fun mapBrevmottaker(it: BrevMottaker) = BrevMottakerView(
