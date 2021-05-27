@@ -86,6 +86,7 @@ class StatistikkInElasticsearchServiceTest {
             mottattKlageinstans = LocalDateTime.of(2018, 12, 1, 0, 0),
             frist = frist,
             avsluttet = avsluttet,
+            avsluttetAvSaksbehandler = avsluttet,
             hjemler = listOf(),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),

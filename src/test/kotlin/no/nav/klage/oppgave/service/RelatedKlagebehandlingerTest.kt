@@ -97,6 +97,11 @@ class RelatedKlagebehandlingerTest {
             } else {
                 LocalDateTime.now()
             },
+            avsluttetAvSaksbehandler = if (aapen) {
+                null
+            } else {
+                LocalDateTime.now()
+            },
             hjemler = listOf(),
             sakenGjelderFnr = fnr,
             kildeReferanse = saksreferanse,
