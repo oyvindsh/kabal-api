@@ -7,7 +7,9 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+const val DATE_TIME_FORMAT_LABEL = "date-time"
 const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+const val DATE_FORMAT_LABEL = "date"
 const val DATE_FORMAT = "yyyy-MM-dd"
 
 /**
@@ -37,24 +39,24 @@ data class KlageStatistikkTilDVH(
         shape = JsonFormat.Shape.STRING,
         pattern = DATE_FORMAT
     )
-    @JsonSchemaFormat(DATE_FORMAT)
+    @JsonSchemaFormat(DATE_FORMAT_LABEL)
     @JsonSchemaDescription("Når behandlingen startet i KA")
     val behandlingStartetKA: LocalDate?,
 
     @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt.")
     val behandlingStatus: KlagebehandlingState,
 
-    @JsonSchemaDescription("Kode som beskriver behandlingen, for eksempel, søknad, revurdering, klage, anke, endring, gjenopptak, tilbakekreving o.l.")
+    @JsonSchemaDescription("Kode som beskriver behandlingen, for eksempel, klage, anke, tilbakekreving o.l.")
     val behandlingType: String,
 
-    @JsonSchemaDescription("Bruker IDen til den ansvarlige beslutningstageren for saken. Medunderskriver.")
+    @JsonSchemaDescription("BrukerIDen til den ansvarlige beslutningstageren for saken. Medunderskriver.")
     val beslutter: String?,
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
         pattern = DATE_TIME_FORMAT
     )
-    @JsonSchemaFormat(DATE_TIME_FORMAT)
+    @JsonSchemaFormat(DATE_TIME_FORMAT_LABEL)
     @JsonSchemaDescription("Tidspunktet da hendelsen faktisk ble gjennomført eller registrert i systemet. (format:$DATE_TIME_FORMAT) Dette er det tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller oppdatering tilbake i tid, skal tekniskTid være lik endringstidspunktet, mens endringstid angir tidspunktet da endringen offisielt gjelder fra.")
     val endringstid: LocalDateTime,
 
@@ -67,14 +69,14 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Grunn til utfallet, hvis det finnes.")
     val omgjoeringsgrunn: String?,
 
-    @JsonSchemaDescription("F.eks. Foreldrepenger. Det finnes kodeverk for dette.")
+    @JsonSchemaDescription("F.eks. Foreldrepenger. Kodeverk.")
     val opprinneligFagsaksystem: String,
 
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
         pattern = DATE_FORMAT
     )
-    @JsonSchemaFormat(DATE_FORMAT)
+    @JsonSchemaFormat(DATE_FORMAT_LABEL)
     @JsonSchemaDescription("Når KA mottok oversendelsen.")
     val overfoertKA: LocalDate,
 
@@ -101,7 +103,7 @@ data class KlageStatistikkTilDVH(
         shape = JsonFormat.Shape.STRING,
         pattern = DATE_TIME_FORMAT
     )
-    @JsonSchemaFormat(DATE_TIME_FORMAT)
+    @JsonSchemaFormat(DATE_TIME_FORMAT_LABEL)
     @JsonSchemaDescription("Tidspunktet da systemet ble klar over hendelsen. (format:$DATE_TIME_FORMAT). Dette er tidspunkt hendelsen ble endret i systemet. Sammen med funksjonellTid/endringstid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
     val tekniskTid: LocalDateTime,
 
@@ -119,10 +121,7 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Angir på hvilken versjon av kildekoden JSON stringen er generert på bakgrunn av.")
     val versjon: Int = 1,
 
-    /**
-    DVH har et eget kodeverk for disse. Kan være vi kan bruke dette.
-     */
-    @JsonSchemaDescription("Stønaden eller ytelsen det er saken omhandler. Hva gjelder saken?")
+    @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH")
     val ytelseType: String
 ) {
     data class Part(
