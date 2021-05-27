@@ -35,7 +35,7 @@ class VedtakDistribusjonService(
         vedtak: Vedtak,
         mottaker: BrevMottaker
     ): Klagebehandling {
-        return try {
+        try {
             val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
             val dokdistReferanse: UUID =
                 dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
