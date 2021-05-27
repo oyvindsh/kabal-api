@@ -66,10 +66,13 @@ class KlagebehandlingService(
             .orElseThrow { KlagebehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet") }
             .also { checkLeseTilgang(it) }
 
-    fun getKlagebehandlingForUpdate(klagebehandlingId: UUID, klagebehandlingVersjon: Long?): Klagebehandling =
+    fun getKlagebehandlingForUpdate(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?,
+        updateIsAssign: Boolean = false): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
-            //.also { checkSkrivetilgang(it) }
+            .also { if(!updateIsAssign) checkSkrivetilgang(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun assignKlagebehandling(
@@ -79,7 +82,7 @@ class KlagebehandlingService(
         enhetId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon, true)
         val event =
             klagebehandling.setTildeltSaksbehandlerOgEnhet(
                 tildeltSaksbehandlerIdent,
