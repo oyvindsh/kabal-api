@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.UKJENT
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -110,7 +111,8 @@ class RelatedKlagebehandlingerTest {
             kilde = "K9",
             saksdokumenterJournalpostId = journalpostIder,
             temaNavn = Tema.OMS.name,
-            typeNavn = Type.KLAGE.name
+            typeNavn = Type.KLAGE.name,
+            status = UKJENT
         )
 
     @Test

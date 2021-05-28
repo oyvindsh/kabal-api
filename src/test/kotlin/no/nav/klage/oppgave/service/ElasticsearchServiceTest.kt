@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.IKKE_TILDELT
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -78,7 +79,6 @@ class ElasticsearchServiceTest {
     @Order(3)
     fun `lagrer to oppgaver for senere tester`() {
 
-
         val klagebehandling1 = EsKlagebehandling(
             id = "1001L",
             versjon = 1L,
@@ -95,7 +95,8 @@ class ElasticsearchServiceTest {
             modified = LocalDateTime.now(),
             kilde = "K9",
             temaNavn = Tema.OMS.name,
-            typeNavn = Type.KLAGE.name
+            typeNavn = Type.KLAGE.name,
+            status = IKKE_TILDELT
         )
         val klagebehandling2 =
             EsKlagebehandling(
@@ -114,7 +115,8 @@ class ElasticsearchServiceTest {
                 modified = LocalDateTime.now(),
                 kilde = "K9",
                 temaNavn = Tema.SYK.name,
-                typeNavn = Type.KLAGE.name
+                typeNavn = Type.KLAGE.name,
+                status = IKKE_TILDELT
             )
         repo.save(klagebehandling1)
         repo.save(klagebehandling2)

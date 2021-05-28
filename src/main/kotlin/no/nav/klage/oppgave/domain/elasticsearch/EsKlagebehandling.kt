@@ -177,5 +177,11 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val vedtakModified: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val vedtakFerdigstiltIJoark: LocalDateTime? = null
-)
+    val vedtakFerdigstiltIJoark: LocalDateTime? = null,
+    @Field(type = FieldType.Keyword)
+    val status: Status
+) {
+    enum class Status {
+        IKKE_TILDELT, TILDELT, SENDT_TIL_MEDUNDERSKRIVER, GODKJENT_AV_MEDUNDERSKRIVER, FULLFOERT, UKJENT
+    }
+}

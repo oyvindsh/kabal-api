@@ -93,6 +93,14 @@
       "type": "date",
       "format": "date_time"
     },
+    "foerstTildelt": {
+      "type": "date",
+      "format": "date_time"
+    },
+    "sistTildelt": {
+      "type": "date",
+      "format": "date_time"
+    },
     "sendtMedunderskriver": {
       "type": "date",
       "format": "date_time"
@@ -260,6 +268,9 @@
     "vedtakFerdigstiltIJoark": {
       "type": "date",
       "format": "date_time"
+    },
+    "status": {
+      "type": "keyword"
     }
   }
 }

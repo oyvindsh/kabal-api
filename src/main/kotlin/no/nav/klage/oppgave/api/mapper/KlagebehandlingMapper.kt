@@ -135,7 +135,8 @@ class KlagebehandlingMapper(
             hjemlerNavn = klagebehandling.hjemler.map { it.name },
             vedtakUtfallNavn = klagebehandling.vedtak.firstOrNull()?.utfall?.name,
             vedtakGrunnNavn = klagebehandling.vedtak.firstOrNull()?.grunn?.name,
-            sakFagsystemNavn = klagebehandling.sakFagsystem?.name
+            sakFagsystemNavn = klagebehandling.sakFagsystem?.name,
+            status = EsKlagebehandling.Status.valueOf(klagebehandling.getStatus().name)
         )
     }
 
