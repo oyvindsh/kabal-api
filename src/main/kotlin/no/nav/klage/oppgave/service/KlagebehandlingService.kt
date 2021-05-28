@@ -20,7 +20,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMed
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeltSaksbehandlerOgEnhet
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
@@ -69,10 +69,11 @@ class KlagebehandlingService(
     fun getKlagebehandlingForUpdate(
         klagebehandlingId: UUID,
         klagebehandlingVersjon: Long?,
-        updateIsAssign: Boolean = false): Klagebehandling =
+        updateIsAssign: Boolean = false
+    ): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
-            .also { if(!updateIsAssign) checkSkrivetilgang(it) }
+            .also { if (!updateIsAssign) checkSkrivetilgang(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun assignKlagebehandling(
@@ -84,7 +85,7 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon, true)
         val event =
-            klagebehandling.setTildeltSaksbehandlerOgEnhet(
+            klagebehandling.setTildeling(
                 tildeltSaksbehandlerIdent,
                 enhetId,
                 utfoerendeSaksbehandlerIdent
@@ -299,10 +300,9 @@ class KlagebehandlingService(
                 avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
                 avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
                 mottattKlageinstans = mottak.oversendtKaDato,
-                tildelt = null,
+                tildeling = null,
                 avsluttet = null,
                 frist = mottak.generateFrist(),
-                tildeltSaksbehandlerident = null,
                 mottakId = mottak.id,
                 vedtak = mutableSetOf(Vedtak()),
                 kvalitetsvurdering = null,
@@ -343,8 +343,11 @@ class KlagebehandlingService(
                 mottakId = mottakId,
                 kildesystem = Fagsystem.MANUELL,
                 mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
-                tildeltSaksbehandlerident = tokenService.getIdent(),
-                tildeltEnhet = kvalitetsvurdering.tildeltKlageenhet,
+                tildeling = Tildeling(
+                    tokenService.getIdent(),
+                    kvalitetsvurdering.tildeltKlageenhet,
+                    kvalitetsvurdering.datoMottattKlageinstans
+                ),
                 hjemler = hjemler,
                 kvalitetsvurdering = Kvalitetsvurdering(
                     eoes = kvalitetsvurdering.eoes,

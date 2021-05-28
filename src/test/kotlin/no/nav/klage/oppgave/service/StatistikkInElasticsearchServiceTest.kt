@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions
 import org.elasticsearch.index.query.QueryBuilders
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -92,6 +93,8 @@ class StatistikkInElasticsearchServiceTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             kilde = "K9",
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name,
             status = UKJENT
         )
 
@@ -130,16 +133,28 @@ class StatistikkInElasticsearchServiceTest {
 
     @Test
     @Order(4)
+    fun `Klagebehandling enkle spoerringer gives correct numbers`() {
+        val query: Query = NativeSearchQueryBuilder()
+            .withQuery(QueryBuilders.matchAllQuery())
+            .build()
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
+        assertThat(searchHits.totalHits).isEqualTo(14L)
+    }
+
+    @Test
+    @Order(5)
     fun `Klagebehandling statistikk gives correct numbers`() {
         val statistikkTall = service.statistikkQuery()
-        assertThat(statistikkTall.ubehandlede).isEqualTo(7)
-        assertThat(statistikkTall.overFrist).isEqualTo(3)
-        assertThat(statistikkTall.innsendtIGaar).isEqualTo(2)
-        assertThat(statistikkTall.innsendtSiste7Dager).isEqualTo(6)
-        assertThat(statistikkTall.innsendtSiste30Dager).isEqualTo(10)
-        assertThat(statistikkTall.behandletIGaar).isEqualTo(1)
-        assertThat(statistikkTall.behandletSiste7Dager).isEqualTo(3)
-        assertThat(statistikkTall.behandletSiste30Dager).isEqualTo(5)
+        val softly = SoftAssertions()
+        softly.assertThat(statistikkTall.ubehandlede).isEqualTo(7)
+        softly.assertThat(statistikkTall.overFrist).isEqualTo(3)
+        softly.assertThat(statistikkTall.innsendtIGaar).isEqualTo(2)
+        softly.assertThat(statistikkTall.innsendtSiste7Dager).isEqualTo(6)
+        softly.assertThat(statistikkTall.innsendtSiste30Dager).isEqualTo(10)
+        softly.assertThat(statistikkTall.behandletIGaar).isEqualTo(1)
+        softly.assertThat(statistikkTall.behandletSiste7Dager).isEqualTo(3)
+        softly.assertThat(statistikkTall.behandletSiste30Dager).isEqualTo(5)
+        softly.assertAll()
     }
 
 

@@ -10,7 +10,7 @@ import javax.persistence.Embeddable
 data class PartId(
     @Column(name = "type")
     @Convert(converter = PartIdTypeConverter::class)
-    var type: PartIdType,
+    val type: PartIdType,
     @Column(name = "value")
     val value: String,
 )

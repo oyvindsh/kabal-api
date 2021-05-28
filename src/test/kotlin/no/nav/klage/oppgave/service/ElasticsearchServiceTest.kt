@@ -94,6 +94,8 @@ class ElasticsearchServiceTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             kilde = "K9",
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT
         )
         val klagebehandling2 =
@@ -112,6 +114,8 @@ class ElasticsearchServiceTest {
                 created = LocalDateTime.now(),
                 modified = LocalDateTime.now(),
                 kilde = "K9",
+                temaNavn = Tema.SYK.name,
+                typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT
             )
         repo.save(klagebehandling1)

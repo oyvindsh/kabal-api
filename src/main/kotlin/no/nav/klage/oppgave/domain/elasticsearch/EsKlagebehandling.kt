@@ -53,12 +53,18 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Keyword)
     val tema: String,
     @Field(type = FieldType.Keyword)
+    val temaNavn: String,
+    @Field(type = FieldType.Keyword)
     val type: String,
+    @Field(type = FieldType.Keyword)
+    val typeNavn: String,
 
     @Field(type = FieldType.Keyword)
     val kildeReferanse: String? = null,
     @Field(type = FieldType.Keyword)
     val sakFagsystem: String? = null,
+    @Field(type = FieldType.Keyword)
+    val sakFagsystemNavn: String? = null,
     @Field(type = FieldType.Keyword)
     val sakFagsakId: String? = null,
 
@@ -79,6 +85,12 @@ data class EsKlagebehandling(
     val mottattKlageinstans: LocalDateTime?,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val tildelt: LocalDateTime? = null,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val foerstTildelt: LocalDateTime? = null,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val sistTildelt: LocalDateTime? = null,
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    val sendtMedunderskriver: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val avsluttet: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
@@ -102,6 +114,8 @@ data class EsKlagebehandling(
         otherFields = [InnerField(type = FieldType.Text, suffix = "text")]
     )
     val hjemler: List<String> = emptyList(),
+    @Field(type = FieldType.Keyword)
+    val hjemlerNavn: List<String> = emptyList(),
 
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val created: LocalDateTime,
@@ -140,11 +154,18 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Keyword)
     val vedtakUtfall: String? = null,
     @Field(type = FieldType.Keyword)
+    val vedtakUtfallNavn: String? = null,
+    @Field(type = FieldType.Keyword)
     val vedtakGrunn: String? = null,
     @Field(type = FieldType.Keyword)
+    val vedtakGrunnNavn: String? = null,
+    @MultiField(
+        mainField = Field(type = FieldType.Keyword),
+        otherFields = [InnerField(type = FieldType.Text, suffix = "text")]
+    )
     val vedtakHjemler: List<String> = emptyList(),
-    @Field(type = FieldType.Text)
-    val vedtakHjemmelTekster: List<String> = emptyList(),
+    @Field(type = FieldType.Keyword)
+    val vedtakHjemlerNavn: List<String> = emptyList(),
     @Field(type = FieldType.Keyword)
     val vedtakBrevmottakerFnr: List<String> = emptyList(),
     @Field(type = FieldType.Keyword)

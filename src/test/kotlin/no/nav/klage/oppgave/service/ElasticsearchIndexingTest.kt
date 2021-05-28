@@ -175,6 +175,8 @@ class ElasticsearchIndexingTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             kilde = "K9",
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT
         )
     }

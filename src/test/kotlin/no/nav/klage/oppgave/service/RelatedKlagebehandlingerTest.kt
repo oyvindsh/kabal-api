@@ -110,6 +110,8 @@ class RelatedKlagebehandlingerTest {
             modified = LocalDateTime.now(),
             kilde = "K9",
             saksdokumenterJournalpostId = journalpostIder,
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name,
             status = UKJENT
         )
 

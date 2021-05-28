@@ -32,6 +32,7 @@ data class KlagebehandlingDetaljerView(
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
     val medunderskriverident: String? = null,
+    val datoSendtMedunderskriver: LocalDate?,
     val hjemler: List<String>,
     val modified: LocalDateTime,
     val created: LocalDateTime,
@@ -43,7 +44,7 @@ data class KlagebehandlingDetaljerView(
     val tilbakemelding: String?,
     val klagebehandlingVersjon: Long,
     val vedtak: List<VedtakView>,
-    val kommentarFraFoersteinstans: String?,
+    val kommentarFraFoersteinstans: String?
 ) {
     data class Navn(
         val fornavn: String?,
