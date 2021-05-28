@@ -138,14 +138,16 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakSlettVedleggInput
-    ): Vedtak {
+    ): VedtakView {
         logMethodDetails("deleteVedlegg", klagebehandlingId, vedtakId)
 
-        return vedtakService.slettFilTilknyttetVedtak(
-            klagebehandlingId.toUUIDOrException(),
-            vedtakId.toUUIDOrException(),
-            input,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return klagebehandlingMapper.mapVedtakToVedtakView(
+            vedtakService.slettFilTilknyttetVedtak(
+                klagebehandlingId.toUUIDOrException(),
+                vedtakId.toUUIDOrException(),
+                input,
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            )
         )
     }
 
