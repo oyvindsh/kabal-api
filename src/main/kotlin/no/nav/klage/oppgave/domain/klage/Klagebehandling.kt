@@ -45,20 +45,36 @@ class Klagebehandling(
     var avsenderEnhetFoersteinstans: String? = null,
     @Column(name = "dato_mottatt_klageinstans")
     var mottattKlageinstans: LocalDateTime,
-    @Column(name = "dato_behandling_tildelt")
-    var tildelt: LocalDateTime? = null,
     @Column(name = "dato_behandling_avsluttet")
     var avsluttet: LocalDateTime? = null,
     @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
     var avsluttetAvSaksbehandler: LocalDateTime? = null,
     @Column(name = "frist")
     var frist: LocalDate? = null,
-    @Column(name = "tildelt_saksbehandlerident")
-    var tildeltSaksbehandlerident: String? = null,
-    @Column(name = "medunderskriverident")
-    var medunderskriverident: String? = null,
-    @Column(name = "tildelt_enhet")
-    var tildeltEnhet: String? = null,
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "saksbehandlerident", column = Column(name = "medunderskriverident")),
+            AttributeOverride(name = "enhet", column = Column(name = "medunderskriver_enhet")),
+            AttributeOverride(name = "tidspunkt", column = Column(name = "dato_sendt_medunderskriver"))
+        ]
+    )
+    var medunderskriver: Tildeling? = null,
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "saksbehandlerident", column = Column(name = "tildelt_saksbehandlerident")),
+            AttributeOverride(name = "enhet", column = Column(name = "tildelt_enhet")),
+            AttributeOverride(name = "tidspunkt", column = Column(name = "dato_behandling_tildelt"))
+        ]
+    )
+    var tildeling: Tildeling? = null,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    val tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    val medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
     @Column(name = "mottak_id")
     val mottakId: UUID,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)

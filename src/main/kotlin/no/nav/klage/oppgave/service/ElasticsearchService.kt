@@ -27,6 +27,7 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.data.elasticsearch.core.query.Query
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 
 open class ElasticsearchService(
@@ -220,32 +221,32 @@ open class ElasticsearchService(
 
         opprettetFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format(ISO8601)
+                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format(ISO8601).timeZone("Europe/Paris")
             )
         }
         opprettetTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format(ISO8601)
+                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format(ISO8601).timeZone("Europe/Paris")
             )
         }
         ferdigstiltFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").gte(it).format(ISO8601)
+                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").gte(it).format(ISO8601).timeZone("Europe/Paris")
             )
         }
         ferdigstiltTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").lte(it).format(ISO8601)
+                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").lte(it).format(ISO8601).timeZone("Europe/Paris")
             )
         }
         fristFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("frist").gte(it)
+                QueryBuilders.rangeQuery("frist").gte(it).format(ISO8601).timeZone("Europe/Paris")
             )
         }
         fristTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("frist").lte(it)
+                QueryBuilders.rangeQuery("frist").lte(it).format(ISO8601).timeZone("Europe/Paris")
             )
         }
 
@@ -372,6 +373,10 @@ open class ElasticsearchService(
             esTemplate.search(queryBuilderOverFrist.build(), EsKlagebehandling::class.java)
         val sumOverFrist =
             searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.firstOrNull()?.docCount ?: 0
+        searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.forEach {
+            println(it.fromAsString)
+            println(it.toAsString)
+        }
         val sumUbehandlede = searchHitsOverFrist.totalHits
         return KlageStatistikk(
             sumUbehandlede,
@@ -388,36 +393,48 @@ open class ElasticsearchService(
     private fun addAggregationsForOverFrist(querybuilder: NativeSearchQueryBuilder) {
         querybuilder
             .addAggregation(
-                AggregationBuilders.dateRange("over_frist").field("frist").addUnboundedTo("now/d").format(ISO8601)
+                AggregationBuilders.dateRange("over_frist").field("frist")
+                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .addUnboundedTo("now/d")
+                    .format(ISO8601)
             )
     }
 
     private fun addAggregationsForInnsendtAndAvsluttet(querybuilder: NativeSearchQueryBuilder) {
         querybuilder
             .addAggregation(
-                AggregationBuilders.dateRange("innsendt_yesterday").field("innsendt").addRange("now-1d/d", "now/d")
+                AggregationBuilders.dateRange("innsendt_yesterday").field("innsendt")
+                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .addRange("now-1d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("innsendt_last7days").field("innsendt").addRange("now-7d/d", "now/d")
+                AggregationBuilders.dateRange("innsendt_last7days").field("innsendt")
+                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .addRange("now-7d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
-                AggregationBuilders.dateRange("innsendt_last30days").field("innsendt").addRange("now-30d/d", "now/d")
+                AggregationBuilders.dateRange("innsendt_last30days").field("innsendt")
+                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .addRange("now-30d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttetAvSaksbehandler")
+                    .timeZone(ZoneId.of("Europe/Paris"))
                     .addRange("now-1d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttetAvSaksbehandler")
+                    .timeZone(ZoneId.of("Europe/Paris"))
                     .addRange("now-7d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttetAvSaksbehandler")
+                    .timeZone(ZoneId.of("Europe/Paris"))
                     .addRange("now-30d/d", "now/d")
                     .format(ISO8601)
             )

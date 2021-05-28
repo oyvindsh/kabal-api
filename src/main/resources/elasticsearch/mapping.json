@@ -45,13 +45,22 @@
     "tema": {
       "type": "keyword"
     },
+    "temaNavn": {
+      "type": "keyword"
+    },
     "type": {
+      "type": "keyword"
+    },
+    "typeNavn": {
       "type": "keyword"
     },
     "kildeReferanse": {
       "type": "keyword"
     },
     "sakFagsystem": {
+      "type": "keyword"
+    },
+    "sakFagsystemNavn": {
       "type": "keyword"
     },
     "sakFagsakId": {
@@ -81,6 +90,10 @@
       "format": "date_time"
     },
     "tildelt": {
+      "type": "date",
+      "format": "date_time"
+    },
+    "sendtMedunderskriver": {
       "type": "date",
       "format": "date_time"
     },
@@ -117,6 +130,9 @@
           "type": "text"
         }
       }
+    },
+    "hjemlerNavn": {
+      "type": "keyword"
     },
     "created": {
       "type": "date",
@@ -204,14 +220,25 @@
     "vedtakUtfall": {
       "type": "keyword"
     },
+    "vedtakUtfallNavn": {
+      "type": "keyword"
+    },
     "vedtakGrunn": {
       "type": "keyword"
     },
-    "vedtakHjemler": {
+    "vedtakGrunnNavn": {
       "type": "keyword"
     },
-    "vedtakHjemmelTekster": {
-      "type": "text"
+    "vedtakHjemler": {
+      "type": "keyword",
+      "fields": {
+        "text": {
+          "type": "text"
+        }
+      }
+    },
+    "vedtakHjemlerNavn": {
+      "type": "keyword"
     },
     "vedtakBrevmottakerFnr": {
       "type": "keyword"

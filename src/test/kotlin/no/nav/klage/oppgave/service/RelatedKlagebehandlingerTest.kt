@@ -108,7 +108,9 @@ class RelatedKlagebehandlingerTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             kilde = "K9",
-            saksdokumenterJournalpostId = journalpostIder
+            saksdokumenterJournalpostId = journalpostIder,
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name
         )
 
     @Test
