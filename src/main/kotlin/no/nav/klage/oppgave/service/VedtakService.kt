@@ -281,7 +281,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakFullfoerInput,
         innloggetIdent: String
-    ) {
+    ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
             klagebehandlingId,
             input.klagebehandlingVersjon
@@ -300,6 +300,7 @@ class VedtakService(
         if (klagebehandling.vedtak.all { it.ferdigstiltIJoark != null }) {
             klagebehandlingService.markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
         }
+        return klagebehandling
     }
 
     private fun ferdigstillJournalpost(
