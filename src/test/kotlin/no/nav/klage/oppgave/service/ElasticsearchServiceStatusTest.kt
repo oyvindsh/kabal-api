@@ -97,21 +97,23 @@ class ElasticsearchServiceStatusTest {
     }
 
     private fun getKlagebehandling(status: EsKlagebehandling.Status) = EsKlagebehandling(
-         id = UUID.randomUUID().toString(),
-         versjon = 1L,
-         tildeltEnhet = "4219",
-         tema = Tema.OMS.id,
-         type = Type.KLAGE.id,
-         tildeltSaksbehandlerident = null,
-         innsendt = LocalDate.of(2019, 10, 1),
-         mottattFoersteinstans = LocalDate.of(2019, 11, 1),
-         mottattKlageinstans = LocalDateTime.of(2019, 12, 1, 0, 0),
-         frist = LocalDate.of(2020, 12, 1),
-         hjemler = listOf(),
-         created = LocalDateTime.now(),
-         modified = LocalDateTime.now(),
-         kilde = "K9",
-         status = status
-     )
+        id = UUID.randomUUID().toString(),
+        versjon = 1L,
+        tildeltEnhet = "4219",
+        tema = Tema.OMS.id,
+        type = Type.KLAGE.id,
+        tildeltSaksbehandlerident = null,
+        innsendt = LocalDate.of(2019, 10, 1),
+        mottattFoersteinstans = LocalDate.of(2019, 11, 1),
+        mottattKlageinstans = LocalDateTime.of(2019, 12, 1, 0, 0),
+        frist = LocalDate.of(2020, 12, 1),
+        hjemler = listOf(),
+        created = LocalDateTime.now(),
+        modified = LocalDateTime.now(),
+        kilde = "K9",
+        temaNavn = "",
+        typeNavn = "",
+        status = status
+    )
 
 }

@@ -35,8 +35,7 @@ internal class KlagebehandlingTest {
             mottattKlageinstans = LocalDateTime.now(),
             tema = Tema.AAP,
             type = Type.KLAGE,
-            tildelt = LocalDateTime.now(),
-            tildeltSaksbehandlerident = "abc123"
+            tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now())
         )
         assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.TILDELT)
     }
@@ -51,7 +50,7 @@ internal class KlagebehandlingTest {
             mottattKlageinstans = LocalDateTime.now(),
             tema = Tema.AAP,
             type = Type.KLAGE,
-            medunderskriverident = "abc123"
+            medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now())
         )
         assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
     }
@@ -66,7 +65,7 @@ internal class KlagebehandlingTest {
             mottattKlageinstans = LocalDateTime.now(),
             tema = Tema.AAP,
             type = Type.KLAGE,
-            medunderskriverident = "abc123",
+            medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
             avsluttetAvSaksbehandler = LocalDateTime.now()
         )
         assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.GODKJENT_AV_MEDUNDERSKRIVER)
@@ -82,7 +81,7 @@ internal class KlagebehandlingTest {
             mottattKlageinstans = LocalDateTime.now(),
             tema = Tema.AAP,
             type = Type.KLAGE,
-            medunderskriverident = "abc123",
+            medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
             avsluttet = LocalDateTime.now()
         )
         assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.FULLFOERT)
