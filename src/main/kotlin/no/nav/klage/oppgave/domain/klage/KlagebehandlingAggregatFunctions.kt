@@ -198,7 +198,7 @@ object KlagebehandlingAggregatFunctions {
         if (medunderskriver != null) {
             medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = medunderskriver!!.copy()))
         }
-        medunderskriver = Tildeling(nyVerdiMedunderskriverident, null, tidspunkt)
+        medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()

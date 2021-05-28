@@ -55,11 +55,10 @@ class Klagebehandling(
     @AttributeOverrides(
         value = [
             AttributeOverride(name = "saksbehandlerident", column = Column(name = "medunderskriverident")),
-            AttributeOverride(name = "enhet", column = Column(name = "medunderskriver_enhet")),
             AttributeOverride(name = "tidspunkt", column = Column(name = "dato_sendt_medunderskriver"))
         ]
     )
-    var medunderskriver: Tildeling? = null,
+    var medunderskriver: MedunderskriverTildeling? = null,
     @Embedded
     @AttributeOverrides(
         value = [

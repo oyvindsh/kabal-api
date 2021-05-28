@@ -42,6 +42,7 @@ open class ElasticsearchService(
         private val logger = getLogger(javaClass.enclosingClass)
 
         private const val ISO8601 = "yyyy-MM-dd"
+        private const val ZONEID_UTC = "Z"
     }
 
     fun recreateIndex() {
@@ -221,32 +222,32 @@ open class ElasticsearchService(
 
         opprettetFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format(ISO8601).timeZone("Europe/Paris")
+                QueryBuilders.rangeQuery("mottattKlageinstans").gte(it).format(ISO8601).timeZone(ZONEID_UTC)
             )
         }
         opprettetTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format(ISO8601).timeZone("Europe/Paris")
+                QueryBuilders.rangeQuery("mottattKlageinstans").lte(it).format(ISO8601).timeZone(ZONEID_UTC)
             )
         }
         ferdigstiltFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").gte(it).format(ISO8601).timeZone("Europe/Paris")
+                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").gte(it).format(ISO8601).timeZone(ZONEID_UTC)
             )
         }
         ferdigstiltTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").lte(it).format(ISO8601).timeZone("Europe/Paris")
+                QueryBuilders.rangeQuery("avsluttetAvSaksbehandler").lte(it).format(ISO8601).timeZone(ZONEID_UTC)
             )
         }
         fristFom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("frist").gte(it).format(ISO8601).timeZone("Europe/Paris")
+                QueryBuilders.rangeQuery("frist").gte(it).format(ISO8601).timeZone(ZONEID_UTC)
             )
         }
         fristTom?.let {
             baseQuery.must(
-                QueryBuilders.rangeQuery("frist").lte(it).format(ISO8601).timeZone("Europe/Paris")
+                QueryBuilders.rangeQuery("frist").lte(it).format(ISO8601).timeZone(ZONEID_UTC)
             )
         }
 
@@ -374,8 +375,8 @@ open class ElasticsearchService(
         val sumOverFrist =
             searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.firstOrNull()?.docCount ?: 0
         searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.forEach {
-            logger.debug("from clause in over_frist is ${it.fromAsString}")
-            logger.debug("to clause in over_frist is ${it.toAsString}")
+            logger.debug("from clause in over_frist is ${it.from}")
+            logger.debug("to clause in over_frist is ${it.to}")
         }
         val sumUbehandlede = searchHitsOverFrist.totalHits
         return KlageStatistikk(
@@ -394,7 +395,7 @@ open class ElasticsearchService(
         querybuilder
             .addAggregation(
                 AggregationBuilders.dateRange("over_frist").field("frist")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addUnboundedTo("now/d")
                     .format(ISO8601)
             )
@@ -404,37 +405,37 @@ open class ElasticsearchService(
         querybuilder
             .addAggregation(
                 AggregationBuilders.dateRange("innsendt_yesterday").field("innsendt")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addRange("now-1d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("innsendt_last7days").field("innsendt")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addRange("now-7d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("innsendt_last30days").field("innsendt")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addRange("now-30d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_yesterday").field("avsluttetAvSaksbehandler")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addRange("now-1d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_last7days").field("avsluttetAvSaksbehandler")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addRange("now-7d/d", "now/d")
                     .format(ISO8601)
             )
             .addAggregation(
                 AggregationBuilders.dateRange("avsluttet_last30days").field("avsluttetAvSaksbehandler")
-                    .timeZone(ZoneId.of("Europe/Paris"))
+                    .timeZone(ZoneId.of(ZONEID_UTC))
                     .addRange("now-30d/d", "now/d")
                     .format(ISO8601)
             )
