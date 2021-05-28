@@ -28,8 +28,8 @@ class TilgangService(
             throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
         val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        if (klagebehandling.tildeltSaksbehandlerident == null ||
-            ident != klagebehandling.tildeltSaksbehandlerident
+        if (klagebehandling.tildeling?.saksbehandlerident == null ||
+            ident != klagebehandling.tildeling?.saksbehandlerident
         ) {
             throw MissingTilgangException("Kun saksbehandler tildelt klage kan endre")
         }

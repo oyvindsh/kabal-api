@@ -9,29 +9,30 @@ import java.util.*
 
 object KlagebehandlingAggregatFunctions {
 
-    fun Klagebehandling.setTildeltSaksbehandlerOgEnhet(
+    fun Klagebehandling.setTildeling(
         nyVerdiSaksbehandlerident: String?,
         nyVerdiEnhet: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val gammelVerdiSaksbehandlerident = tildeltSaksbehandlerident
-        val gammelVerdiEnhet = tildeltEnhet
+        val gammelVerdiSaksbehandlerident = tildeling?.saksbehandlerident
+        val gammelVerdiEnhet = tildeling?.enhet
+        val gammelVerdiTidspunkt = tildeling?.tidspunkt
         val tidspunkt = LocalDateTime.now()
-        tildeltSaksbehandlerident = nyVerdiSaksbehandlerident
-        tildeltEnhet = nyVerdiEnhet
+        if (tildeling != null) {
+            tildelingHistorikk.add(TildelingHistorikk(tildeling = tildeling!!.copy()))
+        }
+        tildeling = Tildeling(nyVerdiSaksbehandlerident, nyVerdiEnhet, tidspunkt)
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
-        if (tildelt == null) {
-            tildelt = tidspunkt
-            endringslogg(
-                saksbehandlerident,
-                Felt.TILDELT,
-                null,
-                tildelt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                tidspunkt
-            )?.let { endringslogginnslag.add(it) }
-        }
+
+        endringslogg(
+            saksbehandlerident,
+            Felt.TILDELT,
+            gammelVerdiTidspunkt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            tidspunkt.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            tidspunkt
+        )?.let { endringslogginnslag.add(it) }
 
         endringslogg(
             saksbehandlerident,
@@ -188,22 +189,37 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setMedunderskriverident(
-        nyVerdi: String,
+        nyVerdiMedunderskriverident: String,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val gammelVerdi = medunderskriverident
+        val gammelVerdiMedunderskriverident = medunderskriver?.saksbehandlerident
+        val gammelVerdiTidspunkt = medunderskriver?.tidspunkt
         val tidspunkt = LocalDateTime.now()
-        medunderskriverident = nyVerdi
+        if (medunderskriver != null) {
+            medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = medunderskriver!!.copy()))
+        }
+        medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
         modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.MEDUNDERSKRIVERIDENT,
-                gammelVerdi,
-                nyVerdi,
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        endringslogg(
+            saksbehandlerident,
+            Felt.OVERSENDT_MEDUNDERSKRIVER,
+            gammelVerdiTidspunkt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            tidspunkt.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            tidspunkt
+        )?.let { endringslogginnslag.add(it) }
+
+        endringslogg(
+            saksbehandlerident,
+            Felt.MEDUNDERSKRIVERIDENT,
+            gammelVerdiMedunderskriverident,
+            nyVerdiMedunderskriverident,
+            tidspunkt
+        )?.let { endringslogginnslag.add(it) }
+
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
     }
 
     fun Klagebehandling.setGrunnInVedtak(

@@ -173,7 +173,9 @@ class ElasticsearchIndexingTest {
             strengtFortrolig = false,
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            kilde = "K9"
+            kilde = "K9",
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name
         )
     }
 }

@@ -73,10 +73,10 @@ class StatistikkTilDVHService(
         return KlageStatistikkTilDVH(
             behandlingId = mottak.dvhReferanse,
             behandlingIdKabal = klagebehandling.id.toString(),
-            behandlingStartetKA = klagebehandling.tildelt?.toLocalDate(),
+            behandlingStartetKA = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
             behandlingStatus = klagebehandlingState,
             behandlingType = klagebehandling.type.navn,
-            beslutter = klagebehandling.medunderskriverident,
+            beslutter = klagebehandling.medunderskriver?.saksbehandlerident,
             endringstid = funksjoneltEndringstidspunkt,
             hjemmel = klagebehandling.hjemler.map { it.toSearchableString() },
             klager = getPart(klagebehandling.klager.partId.type, klagebehandling.klager.partId.value),
@@ -85,8 +85,8 @@ class StatistikkTilDVHService(
             overfoertKA = mottak.created.toLocalDate(),
             resultat = vedtak?.utfall?.navn,
             sakenGjelder = getPart(klagebehandling.sakenGjelder.partId.type, klagebehandling.sakenGjelder.partId.value),
-            saksbehandler = klagebehandling.tildeltSaksbehandlerident,
-            saksbehandlerEnhet = klagebehandling.tildeltEnhet,
+            saksbehandler = klagebehandling.tildeling?.saksbehandlerident,
+            saksbehandlerEnhet = klagebehandling.tildeling?.enhet,
             tekniskTid = klagebehandling.modified,
             vedtakId = vedtak?.id.toString(),
             vedtaksdato = vedtak?.ferdigstiltIJoark?.toLocalDate(),
@@ -100,7 +100,7 @@ class StatistikkTilDVHService(
     ): LocalDateTime {
         return when (klagebehandlingState) {
             KlagebehandlingState.MOTTATT -> klagebehandling.mottattKlageinstans
-            KlagebehandlingState.TILDELT_SAKSBEHANDLER -> klagebehandling.tildelt
+            KlagebehandlingState.TILDELT_SAKSBEHANDLER -> klagebehandling.tildeling?.tidspunkt
                 ?: throw RuntimeException("tildelt mangler")
             KlagebehandlingState.AVSLUTTET -> klagebehandling.avsluttet ?: throw RuntimeException("avsluttet mangler")
             KlagebehandlingState.UKJENT -> {

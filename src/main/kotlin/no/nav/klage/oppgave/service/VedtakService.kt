@@ -175,7 +175,7 @@ class VedtakService(
             input.klagebehandlingVersjon
         )
 
-        tilgangService.verifySaksbehandlersTilgangTilEnhet(klagebehandling.tildeltEnhet!!)
+        tilgangService.verifySaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
         val vedtak = klagebehandling.getVedtak(vedtakId)
 
@@ -203,7 +203,7 @@ class VedtakService(
         utfoerendeSaksbehandlerIdent: String
     ): Vedtak {
         attachmentValidator.validateAttachment(vedlegg)
-        val journalpostId = joarkClient.createJournalpost(klagebehandling, vedlegg, klagebehandling.tildeltEnhet!!)
+        val journalpostId = joarkClient.createJournalpost(klagebehandling, vedlegg, klagebehandling.tildeling!!.enhet!!)
 
         return setJournalpostId(
             klagebehandling,
@@ -257,7 +257,7 @@ class VedtakService(
             klagebehandling,
             vedtak,
             innloggetIdent,
-            klagebehandling.tildeltEnhet!!
+            klagebehandling.tildeling!!.enhet!!
         )
         if (klagebehandling.vedtak.all { it.ferdigstiltIJoark != null }) {
             klagebehandlingService.markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)

@@ -93,7 +93,9 @@ class ElasticsearchServiceTest {
             hjemler = listOf(),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            kilde = "K9"
+            kilde = "K9",
+            temaNavn = Tema.OMS.name,
+            typeNavn = Type.KLAGE.name
         )
         val klagebehandling2 =
             EsKlagebehandling(
@@ -110,7 +112,9 @@ class ElasticsearchServiceTest {
                 hjemler = listOf(),
                 created = LocalDateTime.now(),
                 modified = LocalDateTime.now(),
-                kilde = "K9"
+                kilde = "K9",
+                temaNavn = Tema.SYK.name,
+                typeNavn = Type.KLAGE.name
             )
         repo.save(klagebehandling1)
         repo.save(klagebehandling2)
