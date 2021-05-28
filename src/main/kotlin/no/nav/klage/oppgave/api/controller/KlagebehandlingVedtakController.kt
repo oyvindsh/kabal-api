@@ -137,15 +137,15 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakFullfoerInput
-    ): VedtakView {
+    ): KlagebehandlingDetaljerView {
         logMethodDetails("fullfoerVedtak", klagebehandlingId, vedtakId)
-        val vedtak = vedtakService.ferdigstillVedtak(
+        val klagebehandling = vedtakService.ferdigstillVedtak(
             klagebehandlingId.toUUIDOrException(),
             vedtakId.toUUIDOrException(),
             input,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return klagebehandlingMapper.mapVedtakToVedtakView(vedtak)
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling)
     }
 
     @ResponseBody
