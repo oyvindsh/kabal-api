@@ -5,9 +5,6 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
-import no.nav.klage.oppgave.domain.kodeverk.Grunn
-import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
-import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
@@ -140,14 +137,15 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakFullfoerInput
-    ) {
+    ): VedtakView {
         logMethodDetails("fullfoerVedtak", klagebehandlingId, vedtakId)
-        vedtakService.ferdigstillVedtak(
+        val vedtak = vedtakService.ferdigstillVedtak(
             klagebehandlingId.toUUIDOrException(),
             vedtakId.toUUIDOrException(),
             input,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
+        return klagebehandlingMapper.mapVedtakToVedtakView(vedtak)
     }
 
     @ResponseBody

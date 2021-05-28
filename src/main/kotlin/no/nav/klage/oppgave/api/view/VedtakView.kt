@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
+import java.time.LocalDateTime
 import java.util.*
 
 data class VedtakView(
@@ -8,7 +9,8 @@ data class VedtakView(
     val grunn: String? = null,
     val hjemler: Set<String> = setOf(),
     val brevMottakere: Set<BrevMottakerView> = setOf(),
-    val file: VedleggView? = null
+    val file: VedleggView? = null,
+    val ferdigstilt: LocalDateTime? = null
 )
 
 data class BrevMottakerView(

@@ -250,7 +250,8 @@ class KlagebehandlingMapper(
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-                file = vedleggView
+                file = vedleggView,
+                ferdigstilt = vedtak.ferdigstiltIJoark
             )
         } else {
             return VedtakView(
@@ -259,6 +260,7 @@ class KlagebehandlingMapper(
                 grunn = vedtak.grunn?.id,
                 hjemler = vedtak.hjemler.map { it.id }.toSet(),
                 brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
+                ferdigstilt = vedtak.ferdigstiltIJoark
             )
         }
     }
