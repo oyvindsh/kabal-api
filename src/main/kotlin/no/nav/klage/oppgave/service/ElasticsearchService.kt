@@ -374,8 +374,8 @@ open class ElasticsearchService(
         val sumOverFrist =
             searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.firstOrNull()?.docCount ?: 0
         searchHitsOverFrist.aggregations!!.get<ParsedDateRange>("over_frist").buckets.forEach {
-            println(it.fromAsString)
-            println(it.toAsString)
+            logger.debug("from clause in over_frist is ${it.fromAsString}")
+            logger.debug("to clause in over_frist is ${it.toAsString}")
         }
         val sumUbehandlede = searchHitsOverFrist.totalHits
         return KlageStatistikk(
