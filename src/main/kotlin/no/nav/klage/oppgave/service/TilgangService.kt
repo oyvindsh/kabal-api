@@ -23,7 +23,7 @@ class TilgangService(
         private val securelogger = getSecureLogger()
     }
 
-    fun verifySaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
+    fun verifySaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling): Boolean {
         if (klagebehandling.avsluttetAvSaksbehandler != null || klagebehandling.avsluttet != null) {
             throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
@@ -33,12 +33,14 @@ class TilgangService(
         ) {
             throw MissingTilgangException("Kun saksbehandler tildelt klage kan endre")
         }
+        return true
     }
 
-    fun verifySaksbehandlersTilgangTil(fnr: String) {
+    fun verifySaksbehandlersTilgangTil(fnr: String): Boolean {
         if (!harSaksbehandlerTilgangTil(fnr)) {
             throw MissingTilgangException("Not authorized to access this user")
         }
+        return true
     }
 
     fun verifySaksbehandlersTilgangTilEnhet(enhetId: String) {
