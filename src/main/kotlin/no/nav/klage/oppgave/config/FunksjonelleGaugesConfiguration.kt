@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration
 class FunksjonelleGaugesConfiguration {
 
     @Bean
-    fun queueSize(elasticsearchService: ElasticsearchService): MeterBinder {
+    fun registerFunctionalStats(elasticsearchService: ElasticsearchService): MeterBinder {
         return MeterBinder { registry: MeterRegistry ->
             Gauge.builder("funksjonell.ikketildelt") { elasticsearchService.countIkkeTildelt() }.register(registry)
             Gauge.builder("funksjonell.tildelt") { elasticsearchService.countTildelt() }.register(registry)

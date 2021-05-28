@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.UKJENT
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -90,7 +91,8 @@ class StatistikkInElasticsearchServiceTest {
             hjemler = listOf(),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            kilde = "K9"
+            kilde = "K9",
+            status = UKJENT
         )
 
     @Test

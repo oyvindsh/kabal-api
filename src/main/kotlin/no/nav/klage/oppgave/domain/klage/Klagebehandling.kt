@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.domain.klage.Klagebehandling.Status.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
@@ -137,5 +138,23 @@ class Klagebehandling(
         if (sakenGjelder.partId != klager.partId && sakenGjelder.skalMottaKopi) {
             vedtak.leggTilSakenGjelderSomBrevmottaker(sakenGjelder)
         }
+    }
+
+    /**
+     * Brukes til ES og statistikk per nå
+     */
+    fun getStatus(): Status {
+        return when {
+            avsluttet != null -> FULLFOERT
+            avsluttetAvSaksbehandler != null -> GODKJENT_AV_MEDUNDERSKRIVER
+            medunderskriverident != null -> SENDT_TIL_MEDUNDERSKRIVER
+            tildelt != null && tildeltSaksbehandlerident != null -> TILDELT
+            tildelt == null -> IKKE_TILDELT
+            else -> UKJENT
+        }
+    }
+
+    enum class Status {
+        IKKE_TILDELT, TILDELT, SENDT_TIL_MEDUNDERSKRIVER, GODKJENT_AV_MEDUNDERSKRIVER, FULLFOERT, UKJENT
     }
 }

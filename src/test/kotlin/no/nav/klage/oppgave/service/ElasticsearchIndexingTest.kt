@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.IKKE_TILDELT
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -173,7 +174,8 @@ class ElasticsearchIndexingTest {
             strengtFortrolig = false,
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            kilde = "K9"
+            kilde = "K9",
+            status = IKKE_TILDELT
         )
     }
 }

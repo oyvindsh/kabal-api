@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria.Statuskategori.AAPEN
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.*
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -101,28 +103,32 @@ open class ElasticsearchService(
     }
 
     open fun countIkkeTildelt(): Long {
-        return 10L
-        //TODO: Andreas må fikse dette!! :-)
+        return countByStatus(IKKE_TILDELT)
     }
 
     open fun countTildelt(): Long {
-        return 20L
-        //TODO: Andreas må fikse dette!! :-)
+        return countByStatus(TILDELT)
     }
 
     open fun countSendtTilMedunderskriver(): Long {
-        return 30L
-        //TODO: Andreas må fikse dette!! :-)
+        return countByStatus(SENDT_TIL_MEDUNDERSKRIVER)
     }
 
     open fun countAvsluttetAvMedunderskriver(): Long {
-        return 40L
-        //TODO: Andreas må fikse dette!! :-)
+        return countByStatus(GODKJENT_AV_MEDUNDERSKRIVER)
     }
 
     open fun countAvsluttet(): Long {
-        return 50L
-        //TODO: Andreas må fikse dette!! :-)
+        return countByStatus(FULLFOERT)
+    }
+
+    private fun countByStatus(status: EsKlagebehandling.Status): Long {
+        val baseQuery: BoolQueryBuilder = QueryBuilders.boolQuery()
+        baseQuery.must(QueryBuilders.termQuery("status", status))
+        val query = NativeSearchQueryBuilder()
+            .withQuery(baseQuery)
+            .build()
+        return esTemplate.count(query, IndexCoordinates.of("klagebehandling"))
     }
 
     open fun countAntallSaksdokumenterMedian(): Long {
@@ -178,7 +184,7 @@ open class ElasticsearchService(
             filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
         }
 
-        if (statuskategori == KlagebehandlingerSearchCriteria.Statuskategori.AAPEN) {
+        if (statuskategori == AAPEN) {
             baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         } else {
             baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))

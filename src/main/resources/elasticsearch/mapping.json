@@ -233,6 +233,9 @@
     "vedtakFerdigstiltIJoark": {
       "type": "date",
       "format": "date_time"
+    },
+    "status": {
+      "type": "keyword"
     }
   }
 }

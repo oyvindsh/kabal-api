@@ -126,7 +126,8 @@ class KlagebehandlingMapper(
             vedtakJournalpostId = klagebehandling.vedtak.firstOrNull()?.journalpostId,
             vedtakCreated = klagebehandling.vedtak.firstOrNull()?.created,
             vedtakModified = klagebehandling.vedtak.firstOrNull()?.modified,
-            vedtakFerdigstiltIJoark = klagebehandling.vedtak.firstOrNull()?.ferdigstiltIJoark
+            vedtakFerdigstiltIJoark = klagebehandling.vedtak.firstOrNull()?.ferdigstiltIJoark,
+            status = EsKlagebehandling.Status.valueOf(klagebehandling.getStatus().name)
         )
     }
 
