@@ -26,6 +26,21 @@ internal class KlagebehandlingTest {
     }
 
     @Test
+    fun `status IKKE_TILDELT etter tidligere tildeling`() {
+        val klagebehandling = Klagebehandling(
+            kildesystem = Fagsystem.AO01,
+            klager = Klager(PartId(PartIdType.PERSON, "123")),
+            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, "123"), false),
+            mottakId = UUID.randomUUID(),
+            mottattKlageinstans = LocalDateTime.now(),
+            tema = Tema.AAP,
+            type = Type.KLAGE,
+            tildeling = Tildeling(saksbehandlerident = null, tidspunkt = LocalDateTime.now())
+        )
+        assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.IKKE_TILDELT)
+    }
+
+    @Test
     fun `status TILDELT`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
@@ -53,6 +68,22 @@ internal class KlagebehandlingTest {
             medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now())
         )
         assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
+    }
+
+    @Test
+    fun `status status TILDELT når medunderskriver er fjernet`() {
+        val klagebehandling = Klagebehandling(
+            kildesystem = Fagsystem.AO01,
+            klager = Klager(PartId(PartIdType.PERSON, "123")),
+            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, "123"), false),
+            mottakId = UUID.randomUUID(),
+            mottattKlageinstans = LocalDateTime.now(),
+            tema = Tema.AAP,
+            type = Type.KLAGE,
+            tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now()),
+            medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now())
+        )
+        assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.TILDELT)
     }
 
     @Test

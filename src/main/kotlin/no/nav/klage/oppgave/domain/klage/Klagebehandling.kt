@@ -162,9 +162,9 @@ class Klagebehandling(
         return when {
             avsluttet != null -> FULLFOERT
             avsluttetAvSaksbehandler != null -> GODKJENT_AV_MEDUNDERSKRIVER
-            medunderskriver != null -> SENDT_TIL_MEDUNDERSKRIVER
-            tildeling != null -> TILDELT
-            tildeling == null -> IKKE_TILDELT
+            medunderskriver != null && medunderskriver?.saksbehandlerident != null -> SENDT_TIL_MEDUNDERSKRIVER
+            tildeling != null && tildeling?.saksbehandlerident != null -> TILDELT
+            tildeling == null || tildeling?.saksbehandlerident == null -> IKKE_TILDELT
             else -> UKJENT
         }
     }
