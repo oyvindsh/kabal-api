@@ -35,6 +35,12 @@ class TilgangService(
         }
     }
 
+    fun verifySystembrukersSkrivetilgang(klagebehandling: Klagebehandling) {
+        if (klagebehandling.avsluttet != null) {
+            throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
+        }
+    }
+
     fun verifySaksbehandlersTilgangTil(fnr: String) {
         if (!harSaksbehandlerTilgangTil(fnr)) {
             throw MissingTilgangException("Not authorized to access this user")

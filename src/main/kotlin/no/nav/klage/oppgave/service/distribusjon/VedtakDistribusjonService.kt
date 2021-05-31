@@ -36,7 +36,8 @@ class VedtakDistribusjonService(
         mottaker: BrevMottaker
     ): Klagebehandling {
         try {
-            val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
+            val klagebehandling =
+                klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
             val dokdistReferanse: UUID =
                 dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
             setDokdistReferanse(klagebehandling, vedtak.id, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
@@ -66,7 +67,7 @@ class VedtakDistribusjonService(
 
     @Transactional
     fun lagBrevmottakere(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
         logger.debug("Lager brevmottakere for vedtak $vedtakId i klagebehandling ${klagebehandling.id}")
         klagebehandling.lagBrevmottakereForVedtak(vedtakId)
         return klagebehandling
@@ -84,7 +85,7 @@ class VedtakDistribusjonService(
 
     @Transactional
     fun markerVedtakSomFerdigDistribuert(klagebehandlingId: UUID, vedtak: Vedtak): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
         val event = klagebehandling.setVedtakFerdigDistribuert(vedtak.id, SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling

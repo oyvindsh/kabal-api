@@ -60,6 +60,10 @@ class KlagebehandlingService(
         tilgangService.verifySaksbehandlersSkrivetilgang(klagebehandling)
     }
 
+    private fun checkSkrivetilgangForSystembruker(klagebehandling: Klagebehandling) {
+        tilgangService.verifySystembrukersSkrivetilgang(klagebehandling)
+    }
+
     @Transactional(readOnly = true)
     fun getKlagebehandling(klagebehandlingId: UUID): Klagebehandling =
         klagebehandlingRepository.findById(klagebehandlingId)
@@ -74,6 +78,15 @@ class KlagebehandlingService(
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
             .also { if (!updateIsAssign) checkSkrivetilgang(it) }
+            .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
+
+    fun getKlagebehandlingForUpdateBySystembruker(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?
+    ): Klagebehandling =
+        klagebehandlingRepository.getOne(klagebehandlingId)
+            .also { checkLeseTilgang(it) }
+            .also { checkSkrivetilgangForSystembruker(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun assignKlagebehandling(

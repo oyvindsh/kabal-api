@@ -97,7 +97,7 @@ class MicrosoftGraphClient(
             .retrieve()
             .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!
             .map { logger.debug("Har funnet $it"); it }
-            .map { it.mailnickname }
+            .map { it.onPremisesSamAccountName }
             .filterNotNull()
     }
 
