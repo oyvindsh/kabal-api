@@ -6,3 +6,7 @@ config:
   replication: 3
   retentionBytes: -1
   retentionHours: 720
+acl:
+  - team: k9saksbehandling
+    application: k9-klage
+    access: read
