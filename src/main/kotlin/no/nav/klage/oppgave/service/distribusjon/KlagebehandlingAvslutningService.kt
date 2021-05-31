@@ -30,7 +30,7 @@ class KlagebehandlingAvslutningService(
 
     @Transactional
     fun avsluttKlagebehandling(klagebehandlingId: UUID): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
         val vedtak = klagebehandling.vedtak.first()
         kafkaVedtakEventRepository.save(
             KafkaVedtakEvent(
@@ -46,7 +46,7 @@ class KlagebehandlingAvslutningService(
         klagebehandling.setAvsluttet(VedtakDistribusjonService.SYSTEMBRUKER)
         return klagebehandling
     }
-    
+
     @Transactional
     fun dispatchUnsendtVedtakToKafka() {
         kafkaVedtakEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
