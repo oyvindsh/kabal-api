@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.api.view.Lov
+import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
@@ -23,9 +24,9 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTem
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
-import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -42,7 +43,7 @@ class KlagebehandlingService(
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
-    private val tokenService: TokenService
+    private val tokenUtil: TokenUtil
 ) {
 
     companion object {
@@ -357,7 +358,7 @@ class KlagebehandlingService(
                 kildesystem = Fagsystem.MANUELL,
                 mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
                 tildeling = Tildeling(
-                    tokenService.getIdent(),
+                    tokenUtil.getIdent(),
                     kvalitetsvurdering.tildeltKlageenhet,
                     kvalitetsvurdering.datoMottattKlageinstans
                 ),

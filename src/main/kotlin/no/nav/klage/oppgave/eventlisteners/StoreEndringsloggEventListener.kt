@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.eventlisteners
 
-import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
+import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.event.EventListener

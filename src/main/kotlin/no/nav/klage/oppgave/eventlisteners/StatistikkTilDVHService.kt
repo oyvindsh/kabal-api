@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.eventlisteners
 
+import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
 import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
@@ -7,7 +8,6 @@ import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
-import no.nav.klage.oppgave.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.service.StatistikkTilDVHKafkaProducer
 import no.nav.klage.oppgave.util.getLogger

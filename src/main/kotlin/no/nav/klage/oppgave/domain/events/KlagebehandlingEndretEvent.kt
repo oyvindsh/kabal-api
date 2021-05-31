@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.events
+package no.nav.klage.oppgave.domain.events
 
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Klagebehandling

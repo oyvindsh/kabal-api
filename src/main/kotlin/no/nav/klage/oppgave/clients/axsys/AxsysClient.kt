@@ -4,7 +4,7 @@ import brave.Tracer
 import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration.Companion.SAKSBEHANDLERE_I_ENHET_CACHE
 import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration.Companion.TILGANGER_CACHE
 import no.nav.klage.oppgave.domain.klage.KLAGEENHET_PREFIX
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class AxsysClient(
     private val axsysWebClient: WebClient,
-    private val tokenService: TokenService,
+    private val tokenUtil: TokenUtil,
     private val tracer: Tracer
 ) {
 
@@ -43,7 +43,7 @@ class AxsysClient(
                         .queryParam("inkluderAlleEnheter", "true")
                         .build(navIdent)
                 }
-                .header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithAxsysScope()}")
+                .header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithAxsysScope()}")
                 .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
 
@@ -75,7 +75,7 @@ class AxsysClient(
                     .path("/enhet/{enhetId}/brukere")
                     .build(enhetId)
             }
-            .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithAxsysScope()}")
+            .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithAxsysScope()}")
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
 

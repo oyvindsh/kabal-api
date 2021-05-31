@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.saf.rest
 
 import brave.Tracer
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpHeaders
@@ -14,7 +14,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Component
 class SafRestClient(
     private val safWebClient: WebClient,
-    private val tokenService: TokenService,
+    private val tokenUtil: TokenUtil,
     private val tracer: Tracer,
 ) {
 
@@ -41,7 +41,7 @@ class SafRestClient(
                     )
                     .header(
                         HttpHeaders.AUTHORIZATION,
-                        "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
+                        "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
                     )
                     .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
                     .retrieve()
@@ -50,7 +50,8 @@ class SafRestClient(
                         val type = it.headers.contentType
                         ArkivertDokument(
                             bytes = it.body ?: throw RuntimeException("no document data"),
-                            contentType = type ?: throw RuntimeException("no content type"))
+                            contentType = type ?: throw RuntimeException("no content type")
+                        )
                     }
                     .block() ?: throw RuntimeException("no document data returned")
             }

@@ -6,7 +6,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.klage.oppgave.clients.saf.graphql.DokumentoversiktBruker
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
@@ -18,15 +18,15 @@ import org.junit.jupiter.api.extension.ExtendWith
 internal class SafDokumentoversiktBrukerTest {
 
     @MockK
-    lateinit var tokenServiceMock: TokenService
+    lateinit var tokenUtilMock: TokenUtil
 
     @MockK
     lateinit var tracerMock: Tracer
 
     @BeforeEach
     fun before() {
-        every { tokenServiceMock.getStsSystembrukerToken() } returns "abc"
-        every { tokenServiceMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
+        every { tokenUtilMock.getStsSystembrukerToken() } returns "abc"
+        every { tokenUtilMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
         every { tracerMock.currentSpan().context().traceIdString() } returns "def"
     }
 
@@ -51,7 +51,7 @@ internal class SafDokumentoversiktBrukerTest {
     fun getDokumentoversiktBruker(jsonResponse: String): DokumentoversiktBruker {
         val safClient = SafGraphQlClient(
             createShortCircuitWebClient(jsonResponse),
-            tokenServiceMock,
+            tokenUtilMock,
             tracerMock
         )
 

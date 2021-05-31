@@ -5,7 +5,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonResponse
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlClient
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
@@ -16,11 +16,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 internal class PdlClientTest {
 
     @MockK
-    lateinit var tokenServiceMock: TokenService
+    lateinit var tokenUtilMock: TokenUtil
 
     @BeforeEach
     fun before() {
-        every { tokenServiceMock.getStsSystembrukerToken() } returns "abc"
+        every { tokenUtilMock.getStsSystembrukerToken() } returns "abc"
     }
 
     @Test
@@ -33,7 +33,7 @@ internal class PdlClientTest {
     fun getHentPersonResponse(jsonResponse: String): HentPersonResponse {
         val pdlClient = PdlClient(
             createShortCircuitWebClient(jsonResponse),
-            tokenServiceMock
+            tokenUtilMock
         )
 
         return pdlClient.getPersonInfo("fnr")

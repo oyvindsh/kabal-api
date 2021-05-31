@@ -6,7 +6,7 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.joark.*
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.http.HttpHeaders
@@ -19,7 +19,7 @@ import java.util.*
 @Component
 class JoarkClient(
     private val joarkWebClient: WebClient,
-    private val tokenService: TokenService,
+    private val tokenUtil: TokenUtil,
     private val tracer: Tracer,
     private val pdlFacade: PdlFacade,
     private val eregClient: EregClient
@@ -43,8 +43,8 @@ class JoarkClient(
 
         val journalpostResponse = joarkWebClient.post()
 
-            .header("Nav-Consumer-Token", "Bearer ${tokenService.getStsSystembrukerToken()}")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenService.getSaksbehandlerAccessTokenWithJoarkScope()}")
+            .header("Nav-Consumer-Token", "Bearer ${tokenUtil.getStsSystembrukerToken()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithJoarkScope()}")
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(journalpost)
@@ -61,8 +61,8 @@ class JoarkClient(
     fun cancelJournalpost(journalpostId: String, journalfoerendeEnhet: String): String {
         val response = joarkWebClient.patch()
             .uri("/${journalpostId}/feilregistrer/avbryt")
-            .header("Nav-Consumer-Token", "Bearer ${tokenService.getStsSystembrukerToken()}")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenService.getSaksbehandlerAccessTokenWithJoarkScope()}")
+            .header("Nav-Consumer-Token", "Bearer ${tokenUtil.getStsSystembrukerToken()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithJoarkScope()}")
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(FerdigstillJournalpostPayload(journalfoerendeEnhet))
@@ -80,8 +80,8 @@ class JoarkClient(
     fun finalizeJournalpost(journalpostId: String, journalfoerendeEnhet: String): String {
         val response = joarkWebClient.patch()
             .uri("/${journalpostId}/ferdigstill")
-            .header("Nav-Consumer-Token", "Bearer ${tokenService.getStsSystembrukerToken()}")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenService.getSaksbehandlerAccessTokenWithJoarkScope()}")
+            .header("Nav-Consumer-Token", "Bearer ${tokenUtil.getStsSystembrukerToken()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithJoarkScope()}")
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(FerdigstillJournalpostPayload(journalfoerendeEnhet))

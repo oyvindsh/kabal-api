@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.azure
 
 import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.retry.annotation.Retryable
@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers
 @Component
 class MicrosoftGraphClient(
     private val microsoftGraphWebClient: WebClient,
-    private val tokenService: TokenService
+    private val tokenUtil: TokenUtil
 ) {
 
     companion object {
@@ -33,7 +33,7 @@ class MicrosoftGraphClient(
                     .path("/me")
                     .queryParam("\$select", "onPremisesSamAccountName")
                     .build()
-            }.header("Authorization", "Bearer ${tokenService.getSaksbehandlerAccessTokenWithGraphScope()}")
+            }.header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()}")
 
             .retrieve()
             .bodyToMono<MicrosoftGraphIdentResponse>()
@@ -74,7 +74,7 @@ class MicrosoftGraphClient(
                         .queryParam("\$filter", "mailnickname in $idents")
                         .queryParam("\$select", "onPremisesSamAccountName,displayName")
                         .build()
-                }.header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+                }.header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
                 .retrieve()
                 .bodyToMono()
         } catch (e: Exception) {
@@ -93,7 +93,7 @@ class MicrosoftGraphClient(
                     .queryParam("\$select", "mailnickname,onPremisesSamAccountName,displayName")
                     .build(groupid)
             }
-            .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+            .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
             .retrieve()
             .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!
             .map { logger.debug("Har funnet $it"); it }
@@ -114,7 +114,7 @@ class MicrosoftGraphClient(
                             .queryParam("\$select", "userPrincipalName")
                             .build()
                     }
-                    .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+                    .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
                     .retrieve()
                     .bodyToMono<MicrosoftGraphUsersResponse>().block().value!!.first()
 
@@ -125,7 +125,7 @@ class MicrosoftGraphClient(
                         .path("/users/{userPrincipalName}/memberOf")
                         .build(userPrincipalName)
                 }
-                .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
+                .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
                 .retrieve()
                 .bodyToMono<MicrosoftGraphMemberOfResponse>().block().value
             aadGroups.map { it.id }

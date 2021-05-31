@@ -8,7 +8,11 @@ import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
-import no.nav.klage.oppgave.service.*
+import no.nav.klage.oppgave.service.DokumentService
+import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.TilgangService
+import no.nav.klage.oppgave.service.VedtakKafkaProducer
+import no.nav.klage.oppgave.util.TokenUtil
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -61,7 +65,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
         lateinit var dokumentService: DokumentService
 
         @MockkBean(relaxed = true)
-        lateinit var tokenService: TokenService
+        lateinit var tokenUtil: TokenUtil
 
         @MockkBean(relaxed = true)
         lateinit var kafkaVedtakEventRepository: KafkaVedtakEventRepository

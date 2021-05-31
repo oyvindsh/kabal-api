@@ -24,17 +24,7 @@ data class BrevElement(
     @Enumerated(EnumType.STRING)
     val elementInputType: BrevElementInputType?,
 
-)
-
-fun BrevElement.toBrevElementView(): BrevElementView {
-    return BrevElementView(
-        key,
-        displayText,
-        content,
-        elementInputType = elementInputType,
-        placeholderText = key.getPlaceholderText()
     )
-}
 
 fun BrevElement.updateFields(inputElement: BrevElementView) {
     this.displayText = inputElement.displayText

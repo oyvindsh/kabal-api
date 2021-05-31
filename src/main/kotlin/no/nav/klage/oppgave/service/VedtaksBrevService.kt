@@ -1,19 +1,19 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.vedtaksbrev.*
-import no.nav.klage.oppgave.domain.vedtaksbrev.enums.BrevElementKey
-import no.nav.klage.oppgave.domain.vedtaksbrev.enums.VedtaksBrevMal
 import no.nav.klage.oppgave.repositories.BrevElementRepository
 import no.nav.klage.oppgave.repositories.VedtaksBrevRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
+@Transactional
 class VedtaksBrevService(
     private val vedtaksBrevRepository: VedtaksBrevRepository,
     private val brevElementRepository: BrevElementRepository
 ) {
-    fun createVedtaksBrev(vedtaksBrevView: VedtaksBrevView): VedtaksBrevView {
+    fun createVedtaksBrev(vedtaksBrevView: VedtaksBrevView): VedtaksBrev {
         val newVedtaksBrev = VedtaksBrev(
             klagebehandlingId = vedtaksBrevView.klagebehandlingId,
             brevMal = vedtaksBrevView.brevMal
@@ -22,35 +22,26 @@ class VedtaksBrevService(
             it.generateDefaultBrevElement(newVedtaksBrev.id)
         }
         vedtaksBrevRepository.save(newVedtaksBrev)
-        return newVedtaksBrev.toVedtaksBrevView()
+        return newVedtaksBrev
     }
 
-    fun getVedtaksBrev(brevId: UUID): VedtaksBrevView {
+    fun getVedtaksBrev(brevId: UUID): VedtaksBrev {
         val brev = vedtaksBrevRepository.getOne(brevId)
-        return brev.toVedtaksBrevView()
+        return brev
     }
 
-    fun getVedtaksBrevByKlagebehandlingId(klagebehandlingId: UUID): List<VedtaksBrevView> {
+    fun getVedtaksBrevByKlagebehandlingId(klagebehandlingId: UUID): List<VedtaksBrev> {
         val brevResults = vedtaksBrevRepository.findByKlagebehandlingId(klagebehandlingId)
-        return brevResults.map { it.toVedtaksBrevView() }
+        return brevResults
     }
 
     fun deleteVedtaksbrev(brevId: UUID) {
         vedtaksBrevRepository.deleteById(brevId)
     }
 
-    fun updateBrevElement(brevId: UUID, inputElement: BrevElementView): BrevElementView? {
+    fun updateBrevElement(brevId: UUID, inputElement: BrevElementView): BrevElement? {
         val existingElement = brevElementRepository.findByBrevIdAndKey(brevId, inputElement.key)
         existingElement.updateFields(inputElement)
-        return brevElementRepository.save(
-            existingElement
-        ).toBrevElementView()
-    }
-
-    class BrevElementComparator(elementOrder: List<BrevElementKey>) : Comparator<BrevElementView> {
-        private val currentElementOrder = elementOrder
-        override fun compare(a: BrevElementView, b: BrevElementView): Int {
-            return currentElementOrder.indexOf(a.key) - currentElementOrder.indexOf(b.key)
-        }
+        return existingElement
     }
 }

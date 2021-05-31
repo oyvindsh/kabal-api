@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.domain.vedtaksbrev
 
 import no.nav.klage.oppgave.domain.vedtaksbrev.enums.VedtaksBrevMal
-import no.nav.klage.oppgave.service.VedtaksBrevService
 import java.util.*
 import javax.persistence.*
 
@@ -21,14 +20,3 @@ data class VedtaksBrev(
     @JoinColumn(name = "brev_id", referencedColumnName = "id", nullable = false)
     var brevElements: List<BrevElement>? = null
 )
-
-fun VedtaksBrev.toVedtaksBrevView(): VedtaksBrevView {
-    return VedtaksBrevView(
-        id = id,
-        klagebehandlingId = klagebehandlingId,
-        brevMal = brevMal,
-        elements = brevElements
-            ?.map { it.toBrevElementView() }
-            ?.sortedWith(VedtaksBrevService.BrevElementComparator(brevMal.elementOrder))
-    )
-}
