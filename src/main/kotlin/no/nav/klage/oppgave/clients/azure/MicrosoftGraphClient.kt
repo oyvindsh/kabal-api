@@ -90,11 +90,12 @@ class MicrosoftGraphClient(
             .uri { uriBuilder ->
                 uriBuilder
                     .path("/groups/{groupid}/members")
+                    .queryParam("\$select", "onPremisesSamAccountName,displayName")
                     .build(groupid)
             }
             .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
             .retrieve()
-            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!.map { it.id }
+            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!.map { it.onPremisesSamAccountName }
     }
 
     @Retryable
