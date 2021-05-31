@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import io.mockk.Answer
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
@@ -71,7 +72,7 @@ class KlagebehandlingServiceTest {
     fun `getKlagebehandlingForUpdate ok`() {
         val klage = simpleInsert()
 
-        every { tilgangService.verifySaksbehandlersTilgangTil(any()) }.returns(true)
+        every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
 
         assertThat(klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId = klage.id, updateIsAssign = true) ).isEqualTo(klage)
     }
@@ -80,7 +81,7 @@ class KlagebehandlingServiceTest {
     fun `getKlagebehandlingForUpdate slår til på optimistic locking`() {
         val klage = simpleInsert()
 
-        every { tilgangService.verifySaksbehandlersTilgangTil(any()) }.returns(true)
+        every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
 
         assertThrows<KlagebehandlingSamtidigEndretException> { klagebehandlingService.getKlagebehandlingForUpdate(klage.id, 1L, true) }
     }
@@ -89,7 +90,7 @@ class KlagebehandlingServiceTest {
     fun `getKlagebehandlingForUpdate sjekker skrivetilgang, fanger riktig exception`() {
         val klage = simpleInsert()
 
-        every { tilgangService.verifySaksbehandlersTilgangTil(any()) }.returns(true)
+        every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
         every { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }.throws(KlagebehandlingAvsluttetException(""))
 
         assertThrows<KlagebehandlingAvsluttetException> { klagebehandlingService.getKlagebehandlingForUpdate(klage.id) }
