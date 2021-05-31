@@ -22,7 +22,8 @@ data class MicrosoftGraphGroupMembersResponse(val value: List<Value>?) {
     data class Value(
         val id: String,
         val mail: String?,
-        val onPremisesSamAccountName: String,
+        val mailnickname: String?,
+        val onPremisesSamAccountName: String?,
         val displayName: String?
     )
 }

@@ -90,12 +90,15 @@ class MicrosoftGraphClient(
             .uri { uriBuilder ->
                 uriBuilder
                     .path("/groups/{groupid}/members")
-                    .queryParam("\$select", "onPremisesSamAccountName,displayName")
+                    .queryParam("\$select", "mailnickname,onPremisesSamAccountName,displayName")
                     .build(groupid)
             }
             .header("Authorization", "Bearer ${tokenService.getAppAccessTokenWithGraphScope()}")
             .retrieve()
-            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!.map { it.onPremisesSamAccountName }
+            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!
+            .map { logger.debug("Har funnet $it"); it }
+            .map { it.mailnickname }
+            .filterNotNull()
     }
 
     @Retryable
