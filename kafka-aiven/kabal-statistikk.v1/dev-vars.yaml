@@ -6,3 +6,10 @@ config:
   replication: 3
   retentionBytes: -1
   retentionHours: 120
+acl:
+  - team: ptsak
+    application: pt-sak-k9-klage-dev
+    access: read
+  - team: ptsak
+    application: pt-sak-k9-klage-preprod
+    access: read

@@ -15,3 +15,8 @@ spec:
     - team: klage
       application: kabal-api
       access: write
+  {{#each acl}}
+    - team: {{team}}
+      application: {{application}}
+      access: {{access}}
+  {{/each}}
