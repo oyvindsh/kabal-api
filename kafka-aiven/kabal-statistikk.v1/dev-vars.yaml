@@ -8,8 +8,11 @@ config:
   retentionHours: 120
 acl:
   - team: ptsak
-    application: pt-sak-k9-klage-dev
+    application: pt-sak-kabal-dev
     access: read
   - team: ptsak
-    application: pt-sak-k9-klage-preprod
+    application: pt-sak-kabal-preprod
+    access: read
+  - team: klage
+    application: klage-kafka-manager
     access: read

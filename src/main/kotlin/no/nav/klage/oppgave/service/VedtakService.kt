@@ -40,8 +40,7 @@ class VedtakService(
     private val dokumentService: DokumentService,
     private val safClient: SafGraphQlClient,
     private val slackClient: SlackClient,
-    private val tilgangService: TilgangService,
-    private val klagebehandlingMapper: KlagebehandlingMapper
+    private val tilgangService: TilgangService
 ) {
 
     companion object {
@@ -200,7 +199,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakVedleggInput,
         innloggetIdent: String
-    ): VedleggView? {
+    ): Vedtak {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
             klagebehandlingId,
             input.klagebehandlingVersjon
@@ -212,16 +211,10 @@ class VedtakService(
 
         if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er ferdigstilt")
 
-        addFileToVedtak(
+        return addFileToVedtak(
             klagebehandling,
             vedtak,
             input.vedlegg,
-            innloggetIdent
-        )
-
-        return getVedleggView(
-            klagebehandling,
-            vedtakId,
             innloggetIdent
         )
     }
@@ -247,21 +240,6 @@ class VedtakService(
             vedtak.id,
             journalpostId,
             utfoerendeSaksbehandlerIdent
-        )
-    }
-
-    fun getVedleggView(
-        klagebehandling: Klagebehandling,
-        vedtakId: UUID,
-        utfoerendeSaksbehandlerIdent: String
-    ): VedleggView? {
-        val vedtak = klagebehandling.getVedtak(vedtakId)
-        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        val mainDokument = dokumentService.getMainDokument(vedtak.journalpostId!!)
-        val mainDokumentName = dokumentService.getMainDokumentTitle(vedtak.journalpostId!!)
-        return klagebehandlingMapper.mapArkivertDokumentToVedleggView(
-            mainDokument,
-            mainDokumentName
         )
     }
 

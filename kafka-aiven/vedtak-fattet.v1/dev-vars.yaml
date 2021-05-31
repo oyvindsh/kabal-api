@@ -6,3 +6,10 @@ config:
   replication: 3
   retentionBytes: -1
   retentionHours: 120
+acl:
+  - team: k9saksbehandling
+    application: k9-klage
+    access: read
+  - team: klage
+    application: klage-kafka-manager
+    access: read

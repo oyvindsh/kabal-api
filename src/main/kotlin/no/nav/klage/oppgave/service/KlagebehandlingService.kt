@@ -72,7 +72,7 @@ class KlagebehandlingService(
 
     fun getKlagebehandlingForUpdate(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandlingVersjon: Long? = null,
         updateIsAssign: Boolean = false
     ): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)

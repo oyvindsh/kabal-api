@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
+import no.nav.klage.oppgave.api.mapper.EsKlagebehandlingMapper
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 class IndexService(
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingRepository: KlagebehandlingRepository,
-    private val klagebehandlingMapper: KlagebehandlingMapper
+    private val esKlagebehandlingMapper: EsKlagebehandlingMapper
 ) {
 
     companion object {
@@ -34,7 +34,7 @@ class IndexService(
             PageRequest.of(0, 50, Sort.by("created").descending())
         do {
             val page = klagebehandlingRepository.findAll(pageable)
-            page.content.map { klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it) }
+            page.content.map { esKlagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it) }
                 .let {
                     try {
                         elasticsearchService.save(it)
@@ -87,7 +87,7 @@ class IndexService(
     fun indexKlagebehandling(klagebehandling: Klagebehandling) {
         try {
             elasticsearchService.save(
-                klagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
+                esKlagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
             )
         } catch (e: Exception) {
             if (e.message?.contains("version_conflict_engine_exception") == true) {

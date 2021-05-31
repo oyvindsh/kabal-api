@@ -8,5 +8,5 @@ config:
   retentionHours: 720
 acl:
   - team: ptsak
-    application: pt-sak-k9-klage
+    application: pt-sak-kabal
     access: read

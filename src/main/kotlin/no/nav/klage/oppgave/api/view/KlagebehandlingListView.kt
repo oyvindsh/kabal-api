@@ -19,6 +19,7 @@ data class KlagebehandlingListView(
     val klagebehandlingVersjon: Long,
     val erMedunderskriver: Boolean = false,
     val harMedunderskriver: Boolean = false,
+    val medunderskriverident: String?,
     val utfall: String?,
     val avsluttet: LocalDate?,
     val avsluttetAvSaksbehandler: LocalDate?
