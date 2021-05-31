@@ -61,8 +61,12 @@ class SaksbehandlerController(
             tema,
             listOf(
                 Medunderskriver("Z994488", "F_Z994488, E_Z994488"),
-                Medunderskriver("Z994330", "F_Z994330 E_Z994330")
-            )
+                Medunderskriver("Z994330", "F_Z994330 E_Z994330"),
+                Medunderskriver("Z994861", "F_Z994861 E_Z994861"),
+                Medunderskriver("Z994864", "F_Z994864 E_Z994864"),
+                Medunderskriver("Z994863", "F_Z994863 E_Z994863"),
+                Medunderskriver("Z994862", "F_Z994862 E_Z994862"),
+            ).filter { it.ident != navIdent }
         )
     }
 
