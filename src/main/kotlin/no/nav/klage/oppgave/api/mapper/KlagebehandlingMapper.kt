@@ -164,9 +164,8 @@ class KlagebehandlingMapper(
                 mottatt = esKlagebehandling.mottattKlageinstans?.toLocalDate(),
                 versjon = esKlagebehandling.versjon!!.toInt(),
                 klagebehandlingVersjon = esKlagebehandling.versjon,
-                erMedunderskriver = if (esKlagebehandling.medunderskriverident != null) {
-                    esKlagebehandling.medunderskriverident == saksbehandler
-                } else null,
+                erMedunderskriver = esKlagebehandling.medunderskriverident != null && esKlagebehandling.medunderskriverident == saksbehandler,
+                harMedunderskriver = esKlagebehandling.medunderskriverident != null,
                 utfall = if (viseFullfoerte) {
                     esKlagebehandling.vedtakUtfall
                 } else {
