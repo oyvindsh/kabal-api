@@ -4,12 +4,14 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.Enhet
+import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.core.env.Environment
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 @RestController
 @Api(tags = ["kabal-api"])
-class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerService) {
+class SaksbehandlerController(
+    private val saksbehandlerService: SaksbehandlerService, private val environment: Environment
+) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -51,7 +55,15 @@ class SaksbehandlerController(private val saksbehandlerService: SaksbehandlerSer
         @PathVariable tema: String
     ): Medunderskrivere {
         logger.debug("getMedunderskrivere is requested by $navIdent")
-        return saksbehandlerService.getMedunderskrivere(navIdent, tema)
+        return if (environment.activeProfiles.contains("prod-gcp")) {
+            saksbehandlerService.getMedunderskrivere(navIdent, tema)
+        } else Medunderskrivere(
+            tema,
+            listOf(
+                Medunderskriver("Z994488", "F_Z994488, E_Z994488"),
+                Medunderskriver("Z994330", "F_Z994330 E_Z994330")
+            )
+        )
     }
 
     private fun logEnheter(enheter: List<Enhet>, navIdent: String) {
