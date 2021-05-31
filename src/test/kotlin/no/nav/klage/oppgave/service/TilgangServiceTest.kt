@@ -160,7 +160,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
 
-        assertThat(tilgangService.verifySaksbehandlersSkrivetilgang(klage)).isEqualTo(true)
+        assertThat(tilgangService.verifySaksbehandlersSkrivetilgang(klage)).isEqualTo(Unit)
     }
 
     @Test
