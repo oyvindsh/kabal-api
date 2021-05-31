@@ -167,6 +167,7 @@ class KlagebehandlingMapper(
                 erMedunderskriver = if (esKlagebehandling.medunderskriverident != null) {
                     esKlagebehandling.medunderskriverident == saksbehandler
                 } else null,
+                medunderskriverident = esKlagebehandling.medunderskriverident,
                 utfall = if (viseFullfoerte) {
                     esKlagebehandling.vedtakUtfall
                 } else {
