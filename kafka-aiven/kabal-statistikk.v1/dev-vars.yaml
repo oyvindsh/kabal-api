@@ -13,3 +13,6 @@ acl:
   - team: ptsak
     application: pt-sak-kabal-preprod
     access: read
+  - team: klage
+    application: klage-kafka-manager
+    access: read
