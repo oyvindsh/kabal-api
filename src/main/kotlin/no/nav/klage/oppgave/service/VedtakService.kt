@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
-import no.nav.klage.oppgave.api.view.VedtakVedleggInput
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
@@ -289,7 +288,7 @@ class VedtakService(
         val vedtak = klagebehandling.getVedtak(vedtakId)
         if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
         if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        if (vedtak.utfall != null) throw UtfallNotSetException("Utfall på vedtak $vedtakId er ikke satt")
+        if (vedtak.utfall == null) throw UtfallNotSetException("Utfall på vedtak $vedtakId er ikke satt")
 
         ferdigstillJournalpost(
             klagebehandling,
