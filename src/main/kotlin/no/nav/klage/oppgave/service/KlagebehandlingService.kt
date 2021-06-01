@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
-import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
@@ -409,7 +408,7 @@ class KlagebehandlingService(
 
     private fun mapMottakHjemmel(hjemmel: MottakHjemmel): Hjemmel? {
         return try {
-            val lov = mapLov(hjemmel.lov)
+            val lov = hjemmel.lov
             val kapittelOgParagraf = mapKapittelOgParagraf(hjemmel.kapittel, hjemmel.paragraf)
             Hjemmel.of(lov, kapittelOgParagraf)
         } catch (e: Exception) {
@@ -422,13 +421,6 @@ class KlagebehandlingService(
         return if (kapittel != null) {
             KapittelOgParagraf(kapittel, paragraf)
         } else null
-    }
-
-    private fun mapLov(lov: Lov): LovKilde {
-        return when (lov) {
-            Lov.FOLKETRYGDLOVEN -> LovKilde.FOLKETRYGDLOVEN
-            Lov.FORVALTNINGSLOVEN -> LovKilde.FORVALTNINGSLOVEN
-        }
     }
 
     private fun createSaksdokumenter(mottak: Mottak): MutableSet<Saksdokument> {

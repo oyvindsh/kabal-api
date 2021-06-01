@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.api.view.Lov
+import no.nav.klage.oppgave.domain.kodeverk.LovKilde
 import java.util.*
 import javax.persistence.*
 
@@ -11,7 +11,7 @@ class MottakHjemmel(
     val id: UUID = UUID.randomUUID(),
     @Column(name = "lov")
     @Enumerated(EnumType.STRING)
-    val lov: Lov,
+    val lov: LovKilde,
     @Column(name = "kapittel")
     val kapittel: Int?,
     @Column(name = "paragraf")

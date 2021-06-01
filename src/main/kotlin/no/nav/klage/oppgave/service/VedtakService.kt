@@ -257,8 +257,8 @@ class VedtakService(
     ): VedleggView? {
         val vedtak = klagebehandling.getVedtak(vedtakId)
         if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        val mainDokument = dokumentService.getMainDokument(vedtak.journalpostId!!)
-        val mainDokumentName = dokumentService.getMainDokumentTitle(vedtak.journalpostId!!)
+        val mainDokument: ArkivertDokument = dokumentService.getMainDokument(vedtak.journalpostId!!)
+        val mainDokumentName: String = dokumentService.getMainDokumentTitle(vedtak.journalpostId!!)
         return klagebehandlingMapper.mapArkivertDokumentToVedleggView(
             mainDokument,
             mainDokumentName

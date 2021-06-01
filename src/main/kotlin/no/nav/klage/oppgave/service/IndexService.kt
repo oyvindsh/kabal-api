@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.mapper.EsKlagebehandlingMapper
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
+import no.nav.klage.oppgave.service.mapper.EsKlagebehandlingMapper
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.data.domain.PageRequest

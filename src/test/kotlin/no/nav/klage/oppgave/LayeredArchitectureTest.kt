@@ -11,7 +11,9 @@ import com.tngtech.archunit.library.Architectures.layeredArchitecture
 class LayeredArchitectureTest {
 
     fun kabalApiLayeredArchitecture() = layeredArchitecture()
-        .layer("Controllers").definedBy("no.nav.klage.oppgave.api..")
+        .layer("Controllers").definedBy("no.nav.klage.oppgave.api.controller")
+        .layer("ApiMappers").definedBy("no.nav.klage.oppgave.api.mapper")
+        .layer("View").definedBy("no.nav.klage.oppgave.api.view")
         .layer("Services").definedBy("no.nav.klage.oppgave.service..")
         .layer("Repositories").definedBy("no.nav.klage.oppgave.repositories..")
         .layer("Clients").definedBy("no.nav.klage.oppgave.clients..")
@@ -23,7 +25,15 @@ class LayeredArchitectureTest {
 
     @ArchTest
     val layer_dependencies_are_respected_for_controllers: ArchRule = kabalApiLayeredArchitecture()
-        .whereLayer("Controllers").mayNotBeAccessedByAnyLayer()
+        .whereLayer("Controllers").mayOnlyBeAccessedByLayers("Config")
+
+    @ArchTest
+    val layer_dependencies_are_respected_for_apimappers: ArchRule = kabalApiLayeredArchitecture()
+        .whereLayer("ApiMappers").mayOnlyBeAccessedByLayers("Controllers", "Services", "Config")
+
+    @ArchTest
+    val layer_dependencies_are_respected_for_view: ArchRule = kabalApiLayeredArchitecture()
+        .whereLayer("View").mayOnlyBeAccessedByLayers("Controllers", "Services", "Config", "ApiMappers")
 
     @ArchTest
     val layer_dependencies_are_respected_for_services: ArchRule = kabalApiLayeredArchitecture()
@@ -35,7 +45,8 @@ class LayeredArchitectureTest {
 
     @ArchTest
     val layer_dependencies_are_respected_for_clients: ArchRule = kabalApiLayeredArchitecture()
-        .whereLayer("Clients").mayOnlyBeAccessedByLayers("Services", "Repositories", "Config", "Controllers", "Util")
+        .whereLayer("Clients")
+        .mayOnlyBeAccessedByLayers("Services", "Repositories", "Config", "Controllers", "Util", "ApiMappers")
 
     @ArchTest
     val layer_dependencies_are_respected_for_eventlisteners: ArchRule = kabalApiLayeredArchitecture()
