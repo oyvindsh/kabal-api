@@ -67,12 +67,6 @@ class KlagebehandlingMapper(
                 } else {
                     null
                 },
-                //TODO: Skal fjernes eller få ny betydning når frontend tatt i bruk avsluttetAvSaksbehandler.
-                avsluttet = if (viseFullfoerte) {
-                    esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
-                } else {
-                    null
-                },
                 avsluttetAvSaksbehandler = if (viseFullfoerte) {
                     esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
                 } else {
@@ -105,8 +99,6 @@ class KlagebehandlingMapper(
             sakenGjelderKjoenn = sakenGjelder?.kjoenn,
             sakenGjelderVirksomhetsnummer = sakenGjelderVirksomhetsnummer,
             sakenGjelderVirksomhetsnavn = sakenGjelderVirksomhet?.navn?.sammensattNavn(),
-            foedselsnummer = klagerFoedselsnummer, // TODO deprecate
-            virksomhetsnummer = klagerVirksomhetsnummer, // TODO deprecate
             klagerFoedselsnummer = klagerFoedselsnummer,
             klagerVirksomhetsnummer = klagerVirksomhetsnummer,
             klagerVirksomhetsnavn = klagerVirksomhet?.navn?.sammensattNavn(),
@@ -117,8 +109,6 @@ class KlagebehandlingMapper(
             mottatt = klagebehandling.mottattKlageinstans.toLocalDate(),
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
-            //TODO: Skal fjernes eller få ny betydning når frontend tatt i bruk avsluttetAvSaksbehandler.
-            avsluttet = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
             avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,

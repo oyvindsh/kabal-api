@@ -21,7 +21,6 @@ data class KlagebehandlingListView(
     val harMedunderskriver: Boolean = false,
     val medunderskriverident: String?,
     val utfall: String?,
-    val avsluttet: LocalDate?,
     val avsluttetAvSaksbehandler: LocalDate?
 ) {
     data class Person(
