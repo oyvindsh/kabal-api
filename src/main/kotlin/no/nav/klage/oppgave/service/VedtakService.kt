@@ -4,6 +4,7 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
@@ -35,6 +36,7 @@ class VedtakService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val attachmentValidator: AttachmentValidator,
     private val joarkClient: JoarkClient,
+    private val dokumentService: DokumentService,
     private val safClient: SafGraphQlClient,
     private val slackClient: SlackClient,
     private val tilgangService: TilgangService
@@ -238,6 +240,17 @@ class VedtakService(
             journalpostId,
             utfoerendeSaksbehandlerIdent
         )
+    }
+
+    //TODO: Denne er ikke i bruk lenger? Burde den returnert ArkivertDokumentWithTitle hvis den skal brukes?
+    fun getVedleggArkivertDokument(
+        klagebehandling: Klagebehandling,
+        vedtakId: UUID,
+        utfoerendeSaksbehandlerIdent: String
+    ): ArkivertDokument {
+        val vedtak = klagebehandling.getVedtak(vedtakId)
+        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
+        return dokumentService.getMainDokument(vedtak.journalpostId!!)
     }
 
     fun ferdigstillVedtak(
