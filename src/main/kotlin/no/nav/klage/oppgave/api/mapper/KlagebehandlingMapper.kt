@@ -146,7 +146,8 @@ class KlagebehandlingMapper(
             hjemler = vedtak.hjemler.map { it.id }.toSet(),
             brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
             file = getVedleggView(vedtak.journalpostId),
-            ferdigstilt = vedtak.ferdigstiltIJoark
+            ferdigstilt = vedtak.ferdigstiltIJoark,
+            opplastet = vedtak.opplastet
         )
     }
 

@@ -10,6 +10,7 @@ data class VedtakView(
     val hjemler: Set<String> = setOf(),
     val brevMottakere: Set<BrevMottakerView> = setOf(),
     val file: VedleggView? = null,
+    val opplastet: LocalDateTime? = null,
     val ferdigstilt: LocalDateTime? = null
 )
 
