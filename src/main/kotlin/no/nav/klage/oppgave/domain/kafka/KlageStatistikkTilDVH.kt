@@ -121,7 +121,8 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Angir på hvilken versjon av kildekoden JSON stringen er generert på bakgrunn av.")
     val versjon: Int = 1,
 
-    @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH")
+    //TODO Fyll ut når kabal-api får tilgang til det
+    @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH. TODO.")
     val ytelseType: String
 ) {
     data class Part(
