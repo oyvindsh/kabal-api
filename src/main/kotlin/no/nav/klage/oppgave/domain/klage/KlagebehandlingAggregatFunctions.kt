@@ -232,6 +232,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         vedtak.grunn = nyVerdi
         vedtak.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -253,6 +254,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         vedtak.hjemler = nyVerdi.toMutableSet()
         vedtak.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -275,6 +277,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         kvalitetsvurdering!!.eoes = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -297,6 +300,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         kvalitetsvurdering!!.raadfoertMedLege = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -319,6 +323,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         kvalitetsvurdering!!.internVurdering = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(saksbehandlerident, Felt.KVALITETSVURDERING, gammelVerdi, nyVerdi, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
@@ -335,6 +340,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         kvalitetsvurdering!!.sendTilbakemelding = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -357,6 +363,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         kvalitetsvurdering!!.tilbakemelding = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(saksbehandlerident, Felt.TILBAKEMELDING, gammelVerdi, nyVerdi, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
@@ -372,6 +379,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         vedtak.utfall = nyVerdi
         vedtak.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -395,6 +403,7 @@ object KlagebehandlingAggregatFunctions {
         vedtak.journalpostId = nyVerdi
         vedtak.modified = tidspunkt
         vedtak.opplastet = tidspunkt
+        modified = tidspunkt
         val endringslogg = listOfNotNull(
             endringslogg(
                 saksbehandlerident,
@@ -424,6 +433,7 @@ object KlagebehandlingAggregatFunctions {
         val nyVerdi = tidspunkt
         vedtak.ferdigDistribuert = nyVerdi
         vedtak.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -445,6 +455,7 @@ object KlagebehandlingAggregatFunctions {
         val nyVerdi = tidspunkt
         vedtak.ferdigstiltIJoark = nyVerdi
         vedtak.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -506,6 +517,7 @@ object KlagebehandlingAggregatFunctions {
         val tidspunkt = LocalDateTime.now()
         mottaker.dokdistReferanse = nyVerdi
         vedtak.modified = tidspunkt
+        modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
@@ -524,6 +536,7 @@ object KlagebehandlingAggregatFunctions {
         if (saksdokumenter.none { it.journalpostId == saksdokument.journalpostId }) {
             val tidspunkt = LocalDateTime.now()
             saksdokumenter.add(saksdokument)
+            modified = tidspunkt
             val endringslogg = Endringslogginnslag.endringslogg(
                 saksbehandlerident,
                 Felt.SAKSDOKUMENT,
@@ -544,6 +557,7 @@ object KlagebehandlingAggregatFunctions {
         if (saksdokumenter.any { it.journalpostId == saksdokument.journalpostId && it.dokumentInfoId == saksdokument.dokumentInfoId }) {
             val tidspunkt = LocalDateTime.now()
             saksdokumenter.removeIf { it.journalpostId == saksdokument.journalpostId }
+            modified = tidspunkt
             val endringslogg = Endringslogginnslag.endringslogg(
                 saksbehandlerident,
                 Felt.SAKSDOKUMENT,

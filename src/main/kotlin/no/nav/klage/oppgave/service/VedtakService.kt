@@ -58,11 +58,11 @@ class VedtakService(
         vedtakId: UUID,
         utfall: Utfall?,
         utfoerendeSaksbehandlerIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val event =
             klagebehandling.setUtfallInVedtak(vedtakId, utfall, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
-        return klagebehandling.getVedtak(vedtakId)
+        return klagebehandling
     }
 
     fun setGrunn(
@@ -70,11 +70,11 @@ class VedtakService(
         vedtakId: UUID,
         grunn: Grunn?,
         utfoerendeSaksbehandlerIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val event =
             klagebehandling.setGrunnInVedtak(vedtakId, grunn, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
-        return klagebehandling.getVedtak(vedtakId)
+        return klagebehandling
     }
 
     fun setHjemler(
@@ -82,11 +82,11 @@ class VedtakService(
         vedtakId: UUID,
         hjemler: Set<Hjemmel>,
         utfoerendeSaksbehandlerIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val event =
             klagebehandling.setHjemlerInVedtak(vedtakId, hjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
-        return klagebehandling.getVedtak(vedtakId)
+        return klagebehandling
     }
 
     fun setJournalpostIdOgOpplastet(
@@ -94,11 +94,11 @@ class VedtakService(
         vedtakId: UUID,
         journalpostId: String?,
         utfoerendeSaksbehandlerIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val event =
             klagebehandling.setJournalpostIdOgOpplastetInVedtak(vedtakId, journalpostId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
-        return klagebehandling.getVedtak(vedtakId)
+        return klagebehandling
 
     }
 
@@ -106,11 +106,11 @@ class VedtakService(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,
         utfoerendeSaksbehandlerIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val event =
             klagebehandling.setVedtakFerdigstiltIJoark(vedtakId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
-        return klagebehandling.getVedtak(vedtakId)
+        return klagebehandling
     }
 
     fun slettFilTilknyttetVedtak(
@@ -118,7 +118,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakSlettVedleggInput,
         innloggetIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
             klagebehandlingId,
             input.klagebehandlingVersjon
@@ -129,7 +129,7 @@ class VedtakService(
         val vedtak = klagebehandling.getVedtak(vedtakId)
 
         if (vedtak.journalpostId == null) {
-            return vedtak
+            return klagebehandling
         }
 
         postJournalpostCancelledToSlack(vedtak.journalpostId!!)
@@ -147,7 +147,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakUtfallInput,
         innloggetIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         return setUtfall(
             klagebehandlingService.getKlagebehandlingForUpdate(
                 klagebehandlingId,
@@ -164,7 +164,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakGrunnInput,
         innloggetIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         return setGrunn(
             klagebehandlingService.getKlagebehandlingForUpdate(
                 klagebehandlingId,
@@ -181,7 +181,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakHjemlerInput,
         innloggetIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         return setHjemler(
             klagebehandlingService.getKlagebehandlingForUpdate(
                 klagebehandlingId,
@@ -198,7 +198,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakVedleggInput,
         innloggetIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
             klagebehandlingId,
             input.klagebehandlingVersjon
@@ -224,7 +224,7 @@ class VedtakService(
         vedtak: Vedtak,
         vedlegg: MultipartFile,
         utfoerendeSaksbehandlerIdent: String
-    ): Vedtak {
+    ): Klagebehandling {
         attachmentValidator.validateAttachment(vedlegg)
         if (vedtak.journalpostId != null) {
             postJournalpostCancelledToSlack(vedtak.journalpostId!!)
@@ -285,7 +285,7 @@ class VedtakService(
         vedtak: Vedtak,
         utfoerendeSaksbehandlerIdent: String,
         journalfoerendeEnhet: String
-    ): Vedtak? {
+    ): Klagebehandling {
         return try {
             val journalpost = safClient.getJournalpost(vedtak.journalpostId!!)
                 ?: throw JournalpostNotFoundException("Journalpost med id ${vedtak.journalpostId} finnes ikke")
