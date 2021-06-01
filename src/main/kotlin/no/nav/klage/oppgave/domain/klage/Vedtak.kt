@@ -35,6 +35,8 @@ class Vedtak(
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "journalpost_id")
     var journalpostId: String? = null,
+    @Column(name = "opplastet")
+    var opplastet: LocalDateTime? = null,
     @Column(name = "ferdigstilt_i_joark")
     var ferdigstiltIJoark: LocalDateTime? = null,
     @Column(name = "ferdig_distribuert")

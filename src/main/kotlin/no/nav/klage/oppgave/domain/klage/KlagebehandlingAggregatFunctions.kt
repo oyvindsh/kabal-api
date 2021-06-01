@@ -383,7 +383,7 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setJournalpostIdInVedtak(
+    fun Klagebehandling.setJournalpostIdOgOpplastetInVedtak(
         vedtakId: UUID,
         nyVerdi: String?,
         saksbehandlerident: String
@@ -391,17 +391,27 @@ object KlagebehandlingAggregatFunctions {
         val vedtak = this.getVedtak(vedtakId)
         val gammelVerdi = vedtak.journalpostId
         val tidspunkt = LocalDateTime.now()
+        val gammelVerdiOpplastet = vedtak.opplastet
         vedtak.journalpostId = nyVerdi
         vedtak.modified = tidspunkt
-        val endringslogg =
+        vedtak.opplastet = tidspunkt
+        val endringslogg = listOfNotNull(
             endringslogg(
                 saksbehandlerident,
                 Felt.JOURNALPOST_I_VEDTAK,
                 gammelVerdi,
                 nyVerdi,
                 tidspunkt
+            ),
+            endringslogg(
+                saksbehandlerident,
+                Felt.OPPLASTET_I_VEDTAK,
+                gammelVerdiOpplastet.toString(),
+                tidspunkt.toString(),
+                tidspunkt
             )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
     }
 
     fun Klagebehandling.setVedtakFerdigDistribuert(

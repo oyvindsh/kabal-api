@@ -8,7 +8,7 @@ import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdInVedtak
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdOgOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigstiltIJoark
 import no.nav.klage.oppgave.domain.klage.Vedtak
@@ -89,14 +89,14 @@ class VedtakService(
         return klagebehandling.getVedtak(vedtakId)
     }
 
-    fun setJournalpostId(
+    fun setJournalpostIdOgOpplastet(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,
         journalpostId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Vedtak {
         val event =
-            klagebehandling.setJournalpostIdInVedtak(vedtakId, journalpostId, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setJournalpostIdOgOpplastetInVedtak(vedtakId, journalpostId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling.getVedtak(vedtakId)
 
@@ -134,7 +134,7 @@ class VedtakService(
 
         postJournalpostCancelledToSlack(vedtak.journalpostId!!)
 
-        return setJournalpostId(
+        return setJournalpostIdOgOpplastet(
             klagebehandling,
             vedtak.id,
             null,
@@ -234,7 +234,7 @@ class VedtakService(
 
         val journalpostId = joarkClient.createJournalpost(klagebehandling, vedlegg, klagebehandling.tildeling!!.enhet!!)
 
-        return setJournalpostId(
+        return setJournalpostIdOgOpplastet(
             klagebehandling,
             vedtak.id,
             journalpostId,
