@@ -1,11 +1,9 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
-import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
@@ -37,11 +35,9 @@ class VedtakService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val attachmentValidator: AttachmentValidator,
     private val joarkClient: JoarkClient,
-    private val dokumentService: DokumentService,
     private val safClient: SafGraphQlClient,
     private val slackClient: SlackClient,
-    private val tilgangService: TilgangService,
-    private val klagebehandlingMapper: KlagebehandlingMapper
+    private val tilgangService: TilgangService
 ) {
 
     companion object {
@@ -200,7 +196,7 @@ class VedtakService(
         vedtakId: UUID,
         input: VedtakVedleggInput,
         innloggetIdent: String
-    ): VedleggView? {
+    ): Vedtak {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
             klagebehandlingId,
             input.klagebehandlingVersjon
@@ -212,16 +208,10 @@ class VedtakService(
 
         if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er ferdigstilt")
 
-        addFileToVedtak(
+        return addFileToVedtak(
             klagebehandling,
             vedtak,
             input.vedlegg,
-            innloggetIdent
-        )
-
-        return getVedleggView(
-            klagebehandling,
-            vedtakId,
             innloggetIdent
         )
     }
@@ -248,31 +238,6 @@ class VedtakService(
             journalpostId,
             utfoerendeSaksbehandlerIdent
         )
-    }
-
-    fun getVedleggView(
-        klagebehandling: Klagebehandling,
-        vedtakId: UUID,
-        utfoerendeSaksbehandlerIdent: String
-    ): VedleggView? {
-        val vedtak = klagebehandling.getVedtak(vedtakId)
-        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        val mainDokument: ArkivertDokument = dokumentService.getMainDokument(vedtak.journalpostId!!)
-        val mainDokumentName: String = dokumentService.getMainDokumentTitle(vedtak.journalpostId!!)
-        return klagebehandlingMapper.mapArkivertDokumentToVedleggView(
-            mainDokument,
-            mainDokumentName
-        )
-    }
-
-    fun getVedleggArkivertDokument(
-        klagebehandling: Klagebehandling,
-        vedtakId: UUID,
-        utfoerendeSaksbehandlerIdent: String
-    ): ArkivertDokument {
-        val vedtak = klagebehandling.getVedtak(vedtakId)
-        if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")
-        return dokumentService.getMainDokument(vedtak.journalpostId!!)
     }
 
     fun ferdigstillVedtak(
