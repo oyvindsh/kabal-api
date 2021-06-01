@@ -42,7 +42,7 @@ class KlagebehandlingDetaljerController(
             auditLogger.log(
                 AuditLogEvent(
                     navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
-                    personFnr = it.foedselsnummer
+                    personFnr = it.sakenGjelderFoedselsnummer
                 )
             )
         }
