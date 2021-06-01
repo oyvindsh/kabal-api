@@ -3,8 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.mapper.toBrevElementView
-import no.nav.klage.oppgave.api.mapper.toVedtaksBrevView
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.vedtaksbrev.BrevElementView
 import no.nav.klage.oppgave.domain.vedtaksbrev.VedtaksBrevView
@@ -35,7 +33,7 @@ class VedtaksBrevController(
     fun createVedtaksBrev(
         @RequestBody vedtaksBrevView: VedtaksBrevView
     ): VedtaksBrevView {
-        return vedtaksBrevService.createVedtaksBrev(vedtaksBrevView).toVedtaksBrevView()
+        return vedtaksBrevService.createVedtaksBrev(vedtaksBrevView)
     }
 
     @ApiOperation(
@@ -51,10 +49,10 @@ class VedtaksBrevController(
     ): List<VedtaksBrevView> {
         return when {
             klagebehandlingId != null -> {
-                vedtaksBrevService.getVedtaksBrevByKlagebehandlingId(klagebehandlingId).map { it.toVedtaksBrevView() }
+                vedtaksBrevService.getVedtaksBrevByKlagebehandlingId(klagebehandlingId)
             }
             brevId != null -> {
-                listOf(vedtaksBrevService.getVedtaksBrev(brevId)).map { it.toVedtaksBrevView() }
+                listOf(vedtaksBrevService.getVedtaksBrev(brevId))
             }
             else -> throw Exception()
         }
@@ -83,6 +81,6 @@ class VedtaksBrevController(
         @ApiParam(value = "Element i brevet som skal oppdateres.")
         @RequestBody element: BrevElementView
     ): BrevElementView? {
-        return vedtaksBrevService.updateBrevElement(brevId, element)?.toBrevElementView()
+        return vedtaksBrevService.updateBrevElement(brevId, element)
     }
 }
