@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.saf.graphql
 
 import brave.Tracer
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpHeaders
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class SafGraphQlClient(
     private val safWebClient: WebClient,
-    private val tokenService: TokenService,
+    private val tokenUtil: TokenUtil,
     private val tracer: Tracer,
 ) {
 
@@ -34,7 +34,7 @@ class SafGraphQlClient(
                 .uri("graphql")
                 .header(
                     HttpHeaders.AUTHORIZATION,
-                    "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}"
+                    "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
                 )
                 .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
 
@@ -51,7 +51,7 @@ class SafGraphQlClient(
     @Retryable
     fun getJournalpost(journalpostId: String): Journalpost? {
         return runWithTimingAndLogging {
-            val token = tokenService.getSaksbehandlerAccessTokenWithSafScope()
+            val token = tokenUtil.getSaksbehandlerAccessTokenWithSafScope()
             getJournalpostWithToken(journalpostId, token)
         }
     }
@@ -59,7 +59,7 @@ class SafGraphQlClient(
     @Retryable
     fun getJournalpostAsSystembruker(journalpostId: String): Journalpost? {
         return runWithTimingAndLogging {
-            val token = tokenService.getStsSystembrukerToken()
+            val token = tokenUtil.getStsSystembrukerToken()
             getJournalpostWithToken(journalpostId, token)
         }
     }

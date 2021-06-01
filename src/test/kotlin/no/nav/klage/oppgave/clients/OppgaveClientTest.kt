@@ -8,7 +8,7 @@ import no.nav.klage.oppgave.clients.gosys.Oppgave
 import no.nav.klage.oppgave.clients.gosys.OppgaveClient
 import no.nav.klage.oppgave.clients.gosys.OppgaveResponse
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions
@@ -24,15 +24,15 @@ import java.time.Month
 internal class OppgaveClientTest {
 
     @MockK
-    lateinit var tokenServiceMock: TokenService
+    lateinit var tokenUtilMock: TokenUtil
 
     @MockK
     lateinit var tracerMock: Tracer
 
     @BeforeEach
     fun before() {
-        every { tokenServiceMock.getStsSystembrukerToken() } returns "abc"
-        every { tokenServiceMock.getSaksbehandlerAccessTokenWithOppgaveScope() } returns "abc"
+        every { tokenUtilMock.getStsSystembrukerToken() } returns "abc"
+        every { tokenUtilMock.getSaksbehandlerAccessTokenWithOppgaveScope() } returns "abc"
         every { tracerMock.currentSpan().context().traceIdString() } returns "def"
     }
 
@@ -66,7 +66,7 @@ internal class OppgaveClientTest {
     fun getOppgaver(jsonResponse: String): OppgaveResponse {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClient(jsonResponse),
-            tokenServiceMock,
+            tokenUtilMock,
             tracerMock,
             "appName",
         )
@@ -82,7 +82,7 @@ internal class OppgaveClientTest {
     fun getNonExistingOppgave(): Oppgave {
         val oppgaveClient = OppgaveClient(
             createShortCircuitWebClientWithStatus(oppgave404(), HttpStatus.NOT_FOUND),
-            tokenServiceMock,
+            tokenUtilMock,
             tracerMock,
             "appName"
         )

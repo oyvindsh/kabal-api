@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
@@ -243,6 +242,7 @@ class VedtakService(
         )
     }
 
+    //TODO: Denne er ikke i bruk lenger? Burde den returnert ArkivertDokumentWithTitle hvis den skal brukes?
     fun getVedleggArkivertDokument(
         klagebehandling: Klagebehandling,
         vedtakId: UUID,

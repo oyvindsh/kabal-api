@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import io.mockk.Answer
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
@@ -10,7 +9,7 @@ import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
-import org.assertj.core.api.Assertions
+import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -53,7 +52,7 @@ class KlagebehandlingServiceTest {
 
     private val dokumentService: DokumentService = mockk()
 
-    private val tokenService: TokenService = mockk()
+    private val tokenUtil: TokenUtil = mockk()
 
     lateinit var klagebehandlingService: KlagebehandlingService
 
@@ -64,7 +63,7 @@ class KlagebehandlingServiceTest {
             tilgangService,
             applicationEventPublisher,
             dokumentService,
-            tokenService
+            tokenUtil
         )
     }
 
@@ -74,7 +73,12 @@ class KlagebehandlingServiceTest {
 
         every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
 
-        assertThat(klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId = klage.id, updateIsAssign = true) ).isEqualTo(klage)
+        assertThat(
+            klagebehandlingService.getKlagebehandlingForUpdate(
+                klagebehandlingId = klage.id,
+                updateIsAssign = true
+            )
+        ).isEqualTo(klage)
     }
 
     @Test
@@ -83,7 +87,13 @@ class KlagebehandlingServiceTest {
 
         every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
 
-        assertThrows<KlagebehandlingSamtidigEndretException> { klagebehandlingService.getKlagebehandlingForUpdate(klage.id, 1L, true) }
+        assertThrows<KlagebehandlingSamtidigEndretException> {
+            klagebehandlingService.getKlagebehandlingForUpdate(
+                klage.id,
+                1L,
+                true
+            )
+        }
     }
 
     @Test

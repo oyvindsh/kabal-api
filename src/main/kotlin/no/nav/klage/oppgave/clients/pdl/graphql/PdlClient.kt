@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients.pdl.graphql
 
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpHeaders
@@ -13,7 +13,7 @@ import java.lang.System.currentTimeMillis
 @Component
 class PdlClient(
     private val pdlWebClient: WebClient,
-    private val tokenService: TokenService
+    private val tokenUtil: TokenUtil
 ) {
 
     companion object {
@@ -25,7 +25,7 @@ class PdlClient(
     @Retryable
     fun getPersonerInfo(fnrList: List<String>): HentPersonerResponse {
         return runWithTiming {
-            val stsSystembrukerToken = tokenService.getStsSystembrukerToken()
+            val stsSystembrukerToken = tokenUtil.getStsSystembrukerToken()
             pdlWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $stsSystembrukerToken")
                 .header("Nav-Consumer-Token", "Bearer $stsSystembrukerToken")
@@ -49,7 +49,7 @@ class PdlClient(
     @Retryable
     fun getPersonInfo(fnr: String): HentPersonResponse {
         return runWithTiming {
-            val stsSystembrukerToken = tokenService.getStsSystembrukerToken()
+            val stsSystembrukerToken = tokenUtil.getStsSystembrukerToken()
             pdlWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $stsSystembrukerToken")
                 .header("Nav-Consumer-Token", "Bearer $stsSystembrukerToken")

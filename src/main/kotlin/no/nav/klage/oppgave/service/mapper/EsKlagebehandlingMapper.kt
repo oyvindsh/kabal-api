@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api.mapper
+package no.nav.klage.oppgave.service.mapper
 
 
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService

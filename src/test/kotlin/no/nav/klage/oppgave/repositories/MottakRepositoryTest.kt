@@ -1,12 +1,8 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.api.view.Lov
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
-import no.nav.klage.oppgave.domain.kodeverk.PartIdType
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.domain.kodeverk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,7 +42,7 @@ class MottakRepositoryTest {
             sakFagsystem = Fagsystem.AO01,
             kildeReferanse = "54321",
             dvhReferanse = "5342523",
-            hjemmelListe = mutableSetOf(MottakHjemmel(lov = Lov.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
+            hjemmelListe = mutableSetOf(MottakHjemmel(lov = LovKilde.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
             avsenderSaksbehandlerident = "Z123456",
             avsenderEnhet = "1234",
             mottakDokument = mutableSetOf(

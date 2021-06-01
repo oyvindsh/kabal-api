@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.dokdistfordeling
 
 import brave.Tracer
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.http.HttpHeaders
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient
 class DokDistFordelingClient(
     private val dokDistWebClient: WebClient,
     private val tracer: Tracer,
-    private val tokenService: TokenService
+    private val tokenUtil: TokenUtil
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -33,7 +33,7 @@ class DokDistFordelingClient(
         val distribuerJournalpostResponse = dokDistWebClient.post()
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenService.getSaksbehandlerAccessTokenWithSafScope()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}")
             .bodyValue(payload)
             .retrieve()
             .bodyToMono(DistribuerJournalpostResponse::class.java)

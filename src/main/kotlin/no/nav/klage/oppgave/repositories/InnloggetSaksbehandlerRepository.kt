@@ -1,14 +1,14 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
-import no.nav.klage.oppgave.service.TokenService
+import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class InnloggetSaksbehandlerRepository(
     private val saksbehandlerRepository: SaksbehandlerRepository,
-    private val tokenService: TokenService,
+    private val tokenUtil: TokenUtil,
     @Value("\${ROLE_GOSYS_OPPGAVE_BEHANDLER}") private val gosysSaksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
@@ -23,24 +23,24 @@ class InnloggetSaksbehandlerRepository(
     fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
         saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(getInnloggetIdent())
 
-    fun getInnloggetIdent() = tokenService.getIdent()
+    fun getInnloggetIdent() = tokenUtil.getIdent()
 
-    fun erAdmin(): Boolean = tokenService.getRollerFromToken().hasRole(adminRole)
+    fun erAdmin(): Boolean = tokenUtil.getRollerFromToken().hasRole(adminRole)
 
-    fun erLeder(): Boolean = tokenService.getRollerFromToken().hasRole(lederRole)
+    fun erLeder(): Boolean = tokenUtil.getRollerFromToken().hasRole(lederRole)
 
-    fun erFagansvarlig(): Boolean = tokenService.getRollerFromToken().hasRole(fagansvarligRole)
+    fun erFagansvarlig(): Boolean = tokenUtil.getRollerFromToken().hasRole(fagansvarligRole)
 
     fun erSaksbehandler(): Boolean =
-        tokenService.getRollerFromToken().hasRole(saksbehandlerRole) || tokenService.getRollerFromToken()
+        tokenUtil.getRollerFromToken().hasRole(saksbehandlerRole) || tokenUtil.getRollerFromToken()
             .hasRole(gosysSaksbehandlerRole)
 
-    fun kanBehandleFortrolig(): Boolean = tokenService.getRollerFromToken().hasRole(kanBehandleFortroligRole)
+    fun kanBehandleFortrolig(): Boolean = tokenUtil.getRollerFromToken().hasRole(kanBehandleFortroligRole)
 
     fun kanBehandleStrengtFortrolig(): Boolean =
-        tokenService.getRollerFromToken().hasRole(kanBehandleStrengtFortroligRole)
+        tokenUtil.getRollerFromToken().hasRole(kanBehandleStrengtFortroligRole)
 
-    fun kanBehandleEgenAnsatt(): Boolean = tokenService.getRollerFromToken().hasRole(kanBehandleEgenAnsattRole)
+    fun kanBehandleEgenAnsatt(): Boolean = tokenUtil.getRollerFromToken().hasRole(kanBehandleEgenAnsattRole)
 
     fun harTilgangTilEnhet(enhetId: String): Boolean {
         return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId } != null

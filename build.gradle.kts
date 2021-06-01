@@ -17,6 +17,7 @@ val tikaVersion = "1.24.1"
 val nimbusVersion = "8.20.1"
 val threeTenExtraVersion = "1.6.0"
 val shedlockVersion = "4.23.0"
+val archunitVersion = "0.19.0"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -111,6 +112,7 @@ dependencies {
     testImplementation("org.testcontainers:elasticsearch:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
     testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("com.tngtech.archunit:archunit-junit5:$archunitVersion")
 }
 
 idea {

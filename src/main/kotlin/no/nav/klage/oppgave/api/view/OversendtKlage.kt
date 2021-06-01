@@ -3,10 +3,7 @@ package no.nav.klage.oppgave.api.view
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
-import no.nav.klage.oppgave.domain.kodeverk.PartIdType
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.kodeverk.Type
+import no.nav.klage.oppgave.domain.kodeverk.*
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -163,12 +160,19 @@ class HjemmelFraFoersteInstans private constructor(
         }
     }
 
-    fun toMottakHjemmel() = MottakHjemmel(lov = lov, kapittel = kapittel, paragraf = paragraf)
+    fun toMottakHjemmel() = MottakHjemmel(lov = lov.toLovKilde(), kapittel = kapittel, paragraf = paragraf)
 }
 
 enum class Lov {
     FOLKETRYGDLOVEN, FORVALTNINGSLOVEN
 }
+
+fun Lov.toLovKilde(): LovKilde =
+    when (this) {
+        Lov.FOLKETRYGDLOVEN -> LovKilde.FOLKETRYGDLOVEN
+        Lov.FORVALTNINGSLOVEN -> LovKilde.FORVALTNINGSLOVEN
+    }
+
 
 data class OversendtSakenGjelder(
     @ApiModelProperty(

@@ -1,16 +1,14 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.util
 
 import no.nav.klage.oppgave.clients.sts.StsClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
-import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.springframework.stereotype.Service
 
 @Service
-class TokenService(
+class TokenUtil(
     private val clientConfigurationProperties: ClientConfigurationProperties,
     private val oAuth2AccessTokenService: OAuth2AccessTokenService,
     private val tokenValidationContextHolder: TokenValidationContextHolder,
