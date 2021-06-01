@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getMedian
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
@@ -133,11 +134,18 @@ open class ElasticsearchService(
         return esTemplate.count(query, IndexCoordinates.of("klagebehandling"))
     }
 
-    open fun countAntallSaksdokumenterMedian(): Long {
-        return 3L
-        //TODO: Andreas må fikse dette!! :-)
-    }
+    open fun countAntallSaksdokumenterIAvsluttedeBehandlingerMedian(): Double {
+        val baseQuery: BoolQueryBuilder = QueryBuilders.boolQuery()
+        baseQuery.must(QueryBuilders.termQuery("status", GODKJENT_AV_MEDUNDERSKRIVER))
+        val query = NativeSearchQueryBuilder()
+            .withQuery(baseQuery)
+            .build()
+        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
+        val saksdokumenterPerAvsluttetBehandling = searchHits.map { e -> e.content }
+            .map { e -> e.saksdokumenter.size }.toList()
 
+        return getMedian(saksdokumenterPerAvsluttetBehandling)
+    }
 
     open fun countByCriteria(criteria: KlagebehandlingerSearchCriteria): Int {
         val query = NativeSearchQueryBuilder()

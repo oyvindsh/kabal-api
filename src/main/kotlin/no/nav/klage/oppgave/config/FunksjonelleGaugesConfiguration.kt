@@ -21,7 +21,7 @@ class FunksjonelleGaugesConfiguration {
             Gauge.builder("funksjonell.avsluttetavsaksbehandler") { elasticsearchService.countAvsluttetAvMedunderskriver() }
                 .register(registry)
             Gauge.builder("funksjonell.avsluttet") { elasticsearchService.countAvsluttet() }.register(registry)
-            Gauge.builder("funksjonell.antallsaksdokumenter.median") { elasticsearchService.countAntallSaksdokumenterMedian() }
+            Gauge.builder("funksjonell.antallsaksdokumenterpaaavsluttedebehandlinger.median") { elasticsearchService.countAntallSaksdokumenterIAvsluttedeBehandlingerMedian() }
                 .register(registry)
             //TODO: Egentlig ønsker jeg å registrere antall saksdokumenter per klagebehandling, med klagebehandlingId'en som en tag i gaugen. Men hvordan i all verden gjør jeg det??
         }
