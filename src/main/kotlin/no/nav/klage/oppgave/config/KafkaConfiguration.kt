@@ -16,6 +16,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import java.io.File
+import java.time.Duration
 
 
 @Configuration
@@ -47,6 +48,11 @@ class KafkaConfiguration(
         factory.setErrorHandler { thrownException, data ->
             logger.error("Could not deserialize record. See secure logs for details.")
             secureLogger.error("Could not deserialize record: $data", thrownException)
+        }
+
+        //Retry consumer/listener even if authorization fails at first
+        factory.setContainerCustomizer { container ->
+            container.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(10L)
         }
 
         return factory
