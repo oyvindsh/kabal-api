@@ -15,9 +15,6 @@ class SafClientConfiguration(private val webClientBuilder: WebClient.Builder) {
     @Value("\${SAF_BASE_URL}")
     private lateinit var safUrl: String
 
-    @Value("\${spring.application.name}")
-    private lateinit var applicationName: String
-    
     @Bean
     fun safWebClient(): WebClient {
         return webClientBuilder
@@ -25,7 +22,6 @@ class SafClientConfiguration(private val webClientBuilder: WebClient.Builder) {
             .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader("Nav-Consumer-Id", applicationName)
             .build()
     }
 }

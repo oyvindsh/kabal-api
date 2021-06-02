@@ -43,7 +43,6 @@ class SafRestClient(
                         HttpHeaders.AUTHORIZATION,
                         "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
                     )
-                    .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
                     .retrieve()
                     .toEntity(ByteArray::class.java)
                     .map {

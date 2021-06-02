@@ -70,7 +70,6 @@ class SafGraphQlClient(
             HttpHeaders.AUTHORIZATION,
             "Bearer ${token}"
         )
-        .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
         .bodyValue(hentJournalpostQuery(journalpostId))
         .retrieve()
         .bodyToMono<JournalpostResponse>()
