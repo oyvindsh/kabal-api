@@ -9,7 +9,7 @@ fun getMedian(potentiallyUnsortedIntValues: List<Int>): Double {
         return 0.0
     }
     return if (sortedIntValues.size % 2 != 0) {
-        sortedIntValues[(sortedIntValues.size) / 2].toDouble()
+        sortedIntValues[sortedIntValues.size / 2].toDouble()
     } else {
         val val1 = sortedIntValues[(sortedIntValues.size / 2) - 1]
         val val2 = sortedIntValues[sortedIntValues.size / 2]

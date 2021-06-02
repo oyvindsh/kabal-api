@@ -136,7 +136,8 @@ open class ElasticsearchService(
 
     open fun countAntallSaksdokumenterIAvsluttedeBehandlingerMedian(): Double {
         val baseQuery: BoolQueryBuilder = QueryBuilders.boolQuery()
-        baseQuery.must(QueryBuilders.termQuery("status", GODKJENT_AV_MEDUNDERSKRIVER))
+        baseQuery.should(QueryBuilders.termQuery("status", GODKJENT_AV_MEDUNDERSKRIVER))
+        baseQuery.should(QueryBuilders.termQuery("status", FULLFOERT))
         val query = NativeSearchQueryBuilder()
             .withQuery(baseQuery)
             .build()
