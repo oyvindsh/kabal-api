@@ -29,4 +29,10 @@ internal class StatsUtilsTest {
         assertThat(getMedian(list)).isEqualTo(0.0)
     }
 
+    @Test
+    fun `median works for lists with only one element`() {
+        val list = listOf(1)
+        assertThat(getMedian(list)).isEqualTo(1.0)
+    }
+
 }
