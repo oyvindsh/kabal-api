@@ -5,31 +5,6 @@ import no.nav.klage.oppgave.domain.kodeverk.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class KvalitetsvurderingEoesInput(
-    val eoes: Eoes?,
-    val klagebehandlingVersjon: Long
-)
-
-data class KvalitetsvurderingRaadfoertMedLegeInput(
-    val raadfoertMedLege: RaadfoertMedLege?,
-    val klagebehandlingVersjon: Long
-)
-
-data class KvalitetsvurderingInternVurderingInput(
-    val internVurdering: String?,
-    val klagebehandlingVersjon: Long
-)
-
-data class KvalitetsvurderingSendTilbakemeldingInput(
-    val sendTilbakemelding: Boolean?,
-    val klagebehandlingVersjon: Long
-)
-
-data class KvalitetsvurderingTilbakemeldingInput(
-    val tilbakemelding: String?,
-    val klagebehandlingVersjon: Long
-)
-
 data class KvalitetsvurderingManuellInput(
     val tema: Tema,
     val foersteinstansEnhet: String,

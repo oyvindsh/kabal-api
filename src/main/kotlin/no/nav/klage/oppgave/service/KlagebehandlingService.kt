@@ -42,7 +42,7 @@ class KlagebehandlingService(
     private val tilgangService: TilgangService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
-    private val tokenUtil: TokenUtil
+    private val tokenUtil: TokenUtil,
 ) {
 
     companion object {

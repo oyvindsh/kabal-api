@@ -18,7 +18,6 @@ import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class KlagebehandlingMapper(
@@ -151,8 +150,7 @@ class KlagebehandlingMapper(
     fun mapArkivertDokumentWithTitleToVedleggView(arkivertDokumentWithTitle: ArkivertDokumentWithTitle): VedleggView {
         return VedleggView(
             arkivertDokumentWithTitle.title,
-            arkivertDokumentWithTitle.content.size.toLong(),
-            Base64.getEncoder().encodeToString(arkivertDokumentWithTitle.content)
+            arkivertDokumentWithTitle.content.size.toLong()
         )
     }
 
