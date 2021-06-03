@@ -2,8 +2,8 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.view.EditerbareFelterInput
-import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
+import no.nav.klage.oppgave.api.view.KlagebehandlingEditableFieldsInput
+import no.nav.klage.oppgave.api.view.KlagebehandlingEditedView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -20,7 +20,7 @@ import java.util.*
 @RestController
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class KlagebehandlingMegaPutController(
+class KlagebehandlingEditableFieldsController(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val auditLogger: AuditLogger,
@@ -33,13 +33,13 @@ class KlagebehandlingMegaPutController(
     }
 
     @PutMapping("/klagebehandlinger/{id}/detaljer/editerbare")
-    fun putEditerbareFelter(
+    fun putEditableFields(
         @PathVariable("id") klagebehandlingId: String,
-        @RequestBody input: EditerbareFelterInput
-    ): KlagebehandlingDetaljerView {
-        logMethodDetails("putEditerbareFelter", klagebehandlingId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            megaPutFacade.updateEditerbareFelter(
+        @RequestBody input: KlagebehandlingEditableFieldsInput
+    ): KlagebehandlingEditedView {
+        logMethodDetails("putEditableFields", klagebehandlingId)
+        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingEditableFieldsView(
+            megaPutFacade.updateEditableFields(
                 klagebehandlingId.toUUIDOrException(),
                 input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()

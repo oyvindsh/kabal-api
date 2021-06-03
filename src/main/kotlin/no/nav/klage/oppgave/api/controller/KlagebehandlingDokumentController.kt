@@ -3,7 +3,8 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.DokumentReferanserResponse
+import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -20,7 +21,7 @@ import java.util.*
 @RestController
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class DokumentController(
+class KlagebehandlingDokumentController(
     private val klagebehandlingService: KlagebehandlingService,
     private val dokumentService: DokumentService,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
@@ -46,6 +47,7 @@ class DokumentController(
         return klagebehandlingService.fetchDokumentlisteForKlagebehandling(klagebehandlingId, pageSize, previousPageRef)
     }
 
+    //TODO: Blir denne brukt?
     @ApiOperation(
         value = "Hent dokumenter knyttet til en klagebehandling",
         notes = "Henter dokumentene som saksbehandler har markert at skal knyttes til klagebehandlingen."
@@ -59,6 +61,7 @@ class DokumentController(
         return klagebehandlingService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
     }
 
+    //TODO: Blir denne brukt?
     @ApiOperation(
         value = "Hent IDene til dokumentene knyttet til en klagebehandling",
         notes = "Henter IDene til dokumentene som saksbehandler har markert at skal knyttes til klagebehandlingen."
@@ -74,77 +77,6 @@ class DokumentController(
                 klagebehandlingId
             )
         )
-    }
-
-    @ApiOperation(
-        value = "Fjerner et dokument fra en klagebehandling",
-        notes = "Sletter knytningen mellom en journalpost fra SAF og klagebehandlingen den har vært knyttet til."
-    )
-    @DeleteMapping(
-        "/klagebehandlinger/{behandlingsId}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}",
-        produces = ["application/json"]
-    )
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun disconnectDokument(
-        @ApiParam(value = "Id til klagebehandlingen i vårt system")
-        @PathVariable behandlingsId: String,
-        @PathVariable journalpostId: String,
-        @PathVariable dokumentInfoId: String
-    ) {
-        val klagebehandlingId = parseAndValidate(behandlingsId)
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        klagebehandlingService.disconnectDokumentFromKlagebehandling(
-            klagebehandlingId,
-            null, //dropper optimistic locking her
-            journalpostId,
-            dokumentInfoId,
-            innloggetIdent
-        )
-    }
-
-    @ApiOperation(
-        value = "Knytter et dokument til en klagebehandling",
-        notes = "Knytter en journalpost fra SAF til klagebehandlingen."
-    )
-    @PostMapping("/klagebehandlinger/{behandlingsid}/dokumenter", produces = ["application/json"])
-    @ResponseStatus(HttpStatus.CREATED)
-    fun connectDokument(
-        @ApiParam(value = "Id til klagebehandlingen i vårt system")
-        @PathVariable behandlingsid: String,
-        @RequestBody dokumentKnytning: DokumentKnytning
-    ) {
-        val klagebehandlingId = parseAndValidate(behandlingsid)
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        klagebehandlingService.connectDokumentToKlagebehandling(
-            klagebehandlingId,
-            null, //dropper optimistic locking her
-            dokumentKnytning.journalpostId,
-            dokumentKnytning.dokumentInfoId,
-            innloggetIdent
-        )
-    }
-
-    @ApiOperation(
-        value = "Toggler et dokument til en klagebehandling",
-        notes = "Toggler et dokument fra SAF til klagebehandlingen."
-    )
-    @PostMapping("/klagebehandlinger/{behandlingsid}/toggledokument", produces = ["application/json"])
-    @ResponseStatus(HttpStatus.OK)
-    fun toggleDokumentConnected(
-        @ApiParam(value = "Id til klagebehandlingen i vårt system")
-        @PathVariable behandlingsid: String,
-        @RequestBody toggleDokument: ToggleDokument
-    ): ToggleDokumentResponse {
-        val klagebehandlingId = parseAndValidate(behandlingsid)
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        val bleTilknyttet = klagebehandlingService.toggleDokumentFromKlagebehandling(
-            klagebehandlingId,
-            null, //dropper optimistic locking her
-            toggleDokument.journalpostId,
-            toggleDokument.dokumentInfoId,
-            innloggetIdent
-        )
-        return ToggleDokumentResponse(tilknyttet = bleTilknyttet)
     }
 
     @ResponseBody

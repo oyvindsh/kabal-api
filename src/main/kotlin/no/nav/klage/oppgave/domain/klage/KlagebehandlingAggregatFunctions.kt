@@ -402,7 +402,7 @@ object KlagebehandlingAggregatFunctions {
         val gammelVerdiOpplastet = vedtak.opplastet
         vedtak.journalpostId = nyVerdi
         vedtak.modified = tidspunkt
-        vedtak.opplastet = tidspunkt
+        vedtak.opplastet = if (nyVerdi == null) null else tidspunkt
         modified = tidspunkt
         val endringslogg = listOfNotNull(
             endringslogg(

@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.KlagebehandlingMedunderskriveridentInput
+import no.nav.klage.oppgave.api.view.SendtMedunderskriverView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
@@ -51,18 +52,21 @@ class KlagebehandlingDetaljerController(
     fun putMedunderskriverident(
         @PathVariable("id") klagebehandlingId: String,
         @RequestBody input: KlagebehandlingMedunderskriveridentInput
-    ): KlagebehandlingDetaljerView {
+    ): SendtMedunderskriverView {
         logMethodDetails("putMedunderskriverident", klagebehandlingId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            klagebehandlingService.setMedunderskriverident(
-                klagebehandlingId.toUUIDOrException(),
-                input.klagebehandlingVersjon,
-                input.medunderskriverident,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
+        val klagebehandling = klagebehandlingService.setMedunderskriverident(
+            klagebehandlingId.toUUIDOrException(),
+            input.klagebehandlingVersjon,
+            input.medunderskriverident,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+        return SendtMedunderskriverView(
+            klagebehandling.versjon,
+            klagebehandling.modified,
+            klagebehandling.medunderskriver!!.tidspunkt.toLocalDate()
         )
     }
-    
+
     private fun String.toUUIDOrException() =
         try {
             UUID.fromString(this)

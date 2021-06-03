@@ -1,7 +1,10 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.view.EditerbareFelterInput
+import no.nav.klage.oppgave.api.view.KlagebehandlingEditableFieldsInput
+import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Grunn
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,20 +17,139 @@ class KlagebehandlingMegaPutFacade(
     private val vedtakService: VedtakService
 ) {
 
-    fun updateEditerbareFelter(
+    fun updateEditableFields(
         klagebehandlingId: UUID,
-        input: EditerbareFelterInput,
+        input: KlagebehandlingEditableFieldsInput,
         innloggetIdent: String
     ): Klagebehandling {
         val klagebehandling =
             klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, input.klagebehandlingVersjon)
+
+        dirtyCheckAndUpdateInternVurdering(input, klagebehandling, innloggetIdent)
+        dirtyCheckAndUpdateSendTilbakemelding(input, klagebehandling, innloggetIdent)
+        dirtyCheckAndUpdateTilbakemelding(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateUtfall(input, klagebehandling, innloggetIdent)
-        //TODO: Alle de andre feltene også..
+        dirtyCheckAndUpdateGrunn(input, klagebehandling, innloggetIdent)
+        dirtyCheckAndUpdateHjemlerInVedtak(input, klagebehandling, innloggetIdent)
+        dirtyCheckAndUpdateDokumentReferanser(input, klagebehandling, innloggetIdent)
         return klagebehandling
     }
 
+    private fun dirtyCheckAndUpdateDokumentReferanser(
+        input: KlagebehandlingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.tilknyttedeDokumenter
+        val gammelVerdi =
+            klagebehandling.saksdokumenter.map { TilknyttetDokument(it.journalpostId, it.dokumentInfoId) }.toSet()
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            val nyeDokumenter = nyVerdi - gammelVerdi
+            val slettedeDokumenter = gammelVerdi - nyVerdi
+            nyeDokumenter.forEach {
+                klagebehandlingService.connectDokumentToKlagebehandling(
+                    klagebehandling,
+                    it.journalpostId,
+                    it.dokumentInfoId,
+                    innloggetIdent
+                )
+            }
+            slettedeDokumenter.forEach {
+                klagebehandlingService.disconnectDokumentFromKlagebehandling(
+                    klagebehandling,
+                    it.journalpostId,
+                    it.dokumentInfoId,
+                    innloggetIdent
+                )
+            }
+
+        }
+    }
+
+    private fun dirtyCheckAndUpdateHjemlerInVedtak(
+        input: KlagebehandlingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet()
+        val gammelVerdi = klagebehandling.vedtak.first().hjemler
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            vedtakService.setHjemler(
+                klagebehandling,
+                klagebehandling.vedtak.first().id,
+                nyVerdi,
+                innloggetIdent
+            )
+        }
+    }
+
+    private fun dirtyCheckAndUpdateTilbakemelding(
+        input: KlagebehandlingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.tilbakemelding
+        val gammelVerdi = klagebehandling.kvalitetsvurdering?.tilbakemelding
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            klagebehandlingService.setKvalitetsvurderingTilbakemelding(
+                klagebehandling,
+                nyVerdi,
+                innloggetIdent
+            )
+        }
+    }
+
+    private fun dirtyCheckAndUpdateSendTilbakemelding(
+        input: KlagebehandlingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.sendTilbakemelding
+        val gammelVerdi = klagebehandling.kvalitetsvurdering?.sendTilbakemelding
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            klagebehandlingService.setKvalitetsvurderingSendTilbakemelding(
+                klagebehandling,
+                nyVerdi,
+                innloggetIdent
+            )
+        }
+    }
+
+    private fun dirtyCheckAndUpdateInternVurdering(
+        input: KlagebehandlingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.internVurdering
+        val gammelVerdi = klagebehandling.kvalitetsvurdering?.internVurdering
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            klagebehandlingService.setKvalitetsvurderingInternVurdering(
+                klagebehandling,
+                nyVerdi,
+                innloggetIdent
+            )
+        }
+    }
+
+    private fun dirtyCheckAndUpdateGrunn(
+        input: KlagebehandlingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.grunn?.let { Grunn.of(it) }
+        val gammelVerdi = klagebehandling.vedtak.first().grunn
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            vedtakService.setGrunn(
+                klagebehandling,
+                klagebehandling.vedtak.first().id,
+                nyVerdi,
+                innloggetIdent
+            )
+        }
+    }
+
     private fun dirtyCheckAndUpdateUtfall(
-        input: EditerbareFelterInput,
+        input: KlagebehandlingEditableFieldsInput,
         klagebehandling: Klagebehandling,
         innloggetIdent: String
     ) {
@@ -44,18 +166,6 @@ class KlagebehandlingMegaPutFacade(
     }
 
     fun isDirty(gammelVerdi: Any?, nyVerdi: Any?): Boolean {
-        if (gammelVerdi == null && nyVerdi == null) {
-            return false
-        }
-        if (gammelVerdi == null && nyVerdi != null) {
-            return true
-        }
-        if (gammelVerdi != null && nyVerdi == null) {
-            return true
-        }
-        if (gammelVerdi == nyVerdi) {
-            return false
-        }
-        return true
+        return gammelVerdi != nyVerdi
     }
 }

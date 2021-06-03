@@ -258,36 +258,30 @@ class KlagebehandlingService(
     }
 
     fun setKvalitetsvurderingInternVurdering(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         internVurdering: String?,
         saksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event = klagebehandling.setKvalitetsvurderingInternvurdering(internVurdering, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun setKvalitetsvurderingSendTilbakemelding(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         sendTilbakemelding: Boolean?,
         saksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event = klagebehandling.setKvalitetsvurderingSendTilbakemelding(sendTilbakemelding, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun setKvalitetsvurderingTilbakemelding(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         tilbakemelding: String?,
         saksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
         val event = klagebehandling.setKvalitetsvurderingTilbakemelding(tilbakemelding, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
@@ -437,16 +431,14 @@ class KlagebehandlingService(
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
     fun addDokument(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ) {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+    ): Klagebehandling {
         try {
             if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
-                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to klagebehandling $klagebehandlingId, doing nothing")
+                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to klagebehandling ${klagebehandling.id}, doing nothing")
             } else {
                 val event =
                     klagebehandling.addSaksdokument(
@@ -457,23 +449,22 @@ class KlagebehandlingService(
                     )
                 event?.let { applicationEventPublisher.publishEvent(it) }
             }
+            return klagebehandling
         } catch (e: Exception) {
-            logger.error("Error connecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
+            logger.error("Error connecting journalpost $journalpostId to klagebehandling ${klagebehandling.id}", e)
             throw e
         }
     }
 
     fun removeDokument(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ) {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+    ): Klagebehandling {
         try {
             if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
-                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is not connected to klagebehandling $klagebehandlingId, doing nothing")
+                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is not connected to klagebehandling ${klagebehandling.id}, doing nothing")
             } else {
                 val event =
                     klagebehandling.removeSaksdokument(
@@ -484,8 +475,9 @@ class KlagebehandlingService(
                     )
                 event?.let { applicationEventPublisher.publishEvent(it) }
             }
+            return klagebehandling
         } catch (e: Exception) {
-            logger.error("Error disconnecting journalpost $journalpostId to klagebehandling $klagebehandlingId", e)
+            logger.error("Error disconnecting journalpost $journalpostId to klagebehandling ${klagebehandling.id}", e)
             throw e
         }
     }
@@ -508,16 +500,14 @@ class KlagebehandlingService(
     }
 
     fun connectDokumentToKlagebehandling(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
     ) {
         dokumentService.validateJournalpostExists(journalpostId)
         addDokument(
-            klagebehandlingId,
-            klagebehandlingVersjon,
+            klagebehandling,
             journalpostId,
             dokumentInfoId,
             saksbehandlerIdent
@@ -525,15 +515,13 @@ class KlagebehandlingService(
     }
 
     fun disconnectDokumentFromKlagebehandling(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
+        klagebehandling: Klagebehandling,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
     ) {
         removeDokument(
-            klagebehandlingId,
-            klagebehandlingVersjon,
+            klagebehandling,
             journalpostId,
             dokumentInfoId,
             saksbehandlerIdent
@@ -551,8 +539,7 @@ class KlagebehandlingService(
 
         if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
             connectDokumentToKlagebehandling(
-                klagebehandlingId,
-                klagebehandlingVersjon,
+                klagebehandling,
                 journalpostId,
                 dokumentInfoId,
                 saksbehandlerIdent
@@ -560,8 +547,7 @@ class KlagebehandlingService(
             return true
         } else {
             disconnectDokumentFromKlagebehandling(
-                klagebehandlingId,
-                klagebehandlingVersjon,
+                klagebehandling,
                 journalpostId,
                 dokumentInfoId,
                 saksbehandlerIdent
