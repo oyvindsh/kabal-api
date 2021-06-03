@@ -54,8 +54,15 @@ spring:
     open-in-view: false
   lifecycle:
     timeout-per-shutdown-phase: 20s
+  servlet:
+    multipart:
+      #       Size limitations are also handled by app itself to get nice fault messages, but this setting seems to fail faster?
+      max-request-size: 8MB
+      max-file-size: 8MB
   codec:
-    max-in-memory-size: 15MB
+    max-in-memory-size: 16MB
+
+maxAttachmentSize: 8MB
 
 server:
   port: 7081

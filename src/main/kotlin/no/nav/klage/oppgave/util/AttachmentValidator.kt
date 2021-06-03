@@ -4,15 +4,18 @@ import no.nav.klage.oppgave.clients.clamav.ClamAvClient
 import no.nav.klage.oppgave.exceptions.AttachmentEncryptedException
 import no.nav.klage.oppgave.exceptions.AttachmentHasVirusException
 import no.nav.klage.oppgave.exceptions.AttachmentIsEmptyException
+import no.nav.klage.oppgave.exceptions.AttachmentTooLargeException
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException
 import org.apache.tika.Tika
 import org.springframework.http.MediaType
+import org.springframework.util.unit.DataSize
 import org.springframework.web.multipart.MultipartFile
 
 
 class AttachmentValidator(
-    private val clamAvClient: ClamAvClient
+    private val clamAvClient: ClamAvClient,
+    private val maxAttachmentSize: DataSize
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -24,6 +27,11 @@ class AttachmentValidator(
         if (vedlegg.isEmpty) {
             logger.warn("Attachment is empty")
             throw AttachmentIsEmptyException()
+        }
+
+        if (vedlegg.isTooLarge()) {
+            logger.warn("Attachment too large")
+            throw AttachmentTooLargeException()
         }
 
         if (vedlegg.hasVirus()) {
@@ -49,6 +57,8 @@ class AttachmentValidator(
             true
         }
     }
+
+    private fun MultipartFile.isTooLarge() = this.bytes.size > maxAttachmentSize.toBytes()
 
     private fun MultipartFile.isPDF() =
         MediaType.valueOf(Tika().detect(this.bytes)) == MediaType.APPLICATION_PDF
