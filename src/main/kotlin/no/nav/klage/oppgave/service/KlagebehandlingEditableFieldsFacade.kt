@@ -26,8 +26,8 @@ class KlagebehandlingEditableFieldsFacade(
             klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, input.klagebehandlingVersjon)
 
         dirtyCheckAndUpdateInternVurdering(input, klagebehandling, innloggetIdent)
-        dirtyCheckAndUpdateSendTilbakemelding(input, klagebehandling, innloggetIdent)
-        dirtyCheckAndUpdateTilbakemelding(input, klagebehandling, innloggetIdent)
+        //dirtyCheckAndUpdateSendTilbakemelding(input, klagebehandling, innloggetIdent)
+        //dirtyCheckAndUpdateTilbakemelding(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateUtfall(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateGrunn(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateHjemlerInVedtak(input, klagebehandling, innloggetIdent)
@@ -83,6 +83,7 @@ class KlagebehandlingEditableFieldsFacade(
         }
     }
 
+    /*
     private fun dirtyCheckAndUpdateTilbakemelding(
         input: KlagebehandlingEditableFieldsInput,
         klagebehandling: Klagebehandling,
@@ -114,6 +115,7 @@ class KlagebehandlingEditableFieldsFacade(
             )
         }
     }
+     */
 
     private fun dirtyCheckAndUpdateInternVurdering(
         input: KlagebehandlingEditableFieldsInput,
