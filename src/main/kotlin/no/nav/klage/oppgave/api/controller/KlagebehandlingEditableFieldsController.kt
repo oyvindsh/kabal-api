@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.KlagebehandlingMegaPutFacade
-import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.PathVariable
@@ -23,7 +22,6 @@ import java.util.*
 class KlagebehandlingEditableFieldsController(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val klagebehandlingMapper: KlagebehandlingMapper,
-    private val auditLogger: AuditLogger,
     private val megaPutFacade: KlagebehandlingMegaPutFacade,
 ) {
 
