@@ -12,7 +12,7 @@ import java.util.*
 
 @Service
 @Transactional
-class KlagebehandlingMegaPutFacade(
+class KlagebehandlingEditableFieldsFacade(
     private val klagebehandlingService: KlagebehandlingService,
     private val vedtakService: VedtakService
 ) {

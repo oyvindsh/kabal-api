@@ -7,7 +7,7 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingEditedView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.KlagebehandlingMegaPutFacade
+import no.nav.klage.oppgave.service.KlagebehandlingEditableFieldsFacade
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,7 +22,7 @@ import java.util.*
 class KlagebehandlingEditableFieldsController(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val klagebehandlingMapper: KlagebehandlingMapper,
-    private val megaPutFacade: KlagebehandlingMegaPutFacade,
+    private val editableFieldsFacade: KlagebehandlingEditableFieldsFacade,
 ) {
 
     companion object {
@@ -37,7 +37,7 @@ class KlagebehandlingEditableFieldsController(
     ): KlagebehandlingEditedView {
         logMethodDetails("putEditableFields", klagebehandlingId)
         return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingEditableFieldsView(
-            megaPutFacade.updateEditableFields(
+            editableFieldsFacade.updateEditableFields(
                 klagebehandlingId.toUUIDOrException(),
                 input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
