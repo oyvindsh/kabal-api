@@ -50,6 +50,12 @@ spec:
   kafka:
     pool: {{kafka_pool}}
   port: 7081
+  startup:
+    failureThreshold: 20
+    initialDelay: 30
+    path: /internal/health
+    periodSeconds: 10
+    timeout: 2
   liveness:
     path: /internal/health
     initialDelay: 20
