@@ -41,7 +41,8 @@ data class KlagebehandlingDetaljerView(
     val tilbakemelding: String?,
     val klagebehandlingVersjon: Long,
     val vedtak: List<VedtakView>,
-    val kommentarFraFoersteinstans: String?
+    val kommentarFraFoersteinstans: String?,
+    val tilknyttedeDokumenter: Set<TilknyttetDokument>
 ) {
     data class Navn(
         val fornavn: String?,

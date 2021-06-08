@@ -122,7 +122,13 @@ class KlagebehandlingMapper(
             tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding,
             klagebehandlingVersjon = klagebehandling.versjon,
             vedtak = klagebehandling.vedtak.map { mapVedtakToVedtakView(it) },
-            kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans
+            kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
+            tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
+                TilknyttetDokument(
+                    journalpostId = it.journalpostId,
+                    dokumentInfoId = it.dokumentInfoId
+                )
+            }.toSet()
         )
     }
 
