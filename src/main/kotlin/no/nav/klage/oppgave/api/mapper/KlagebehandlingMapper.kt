@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.api.mapper
 
 
 import no.nav.klage.oppgave.api.view.*
-import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -23,7 +22,6 @@ import java.util.*
 @Service
 class KlagebehandlingMapper(
     private val pdlFacade: PdlFacade,
-    private val egenAnsattService: EgenAnsattService,
     private val norg2Client: Norg2Client,
     private val eregClient: EregClient,
     private val dokumentService: DokumentService
@@ -151,8 +149,7 @@ class KlagebehandlingMapper(
     fun mapArkivertDokumentWithTitleToVedleggView(arkivertDokumentWithTitle: ArkivertDokumentWithTitle): VedleggView {
         return VedleggView(
             arkivertDokumentWithTitle.title,
-            arkivertDokumentWithTitle.content.size.toLong(),
-            Base64.getEncoder().encodeToString(arkivertDokumentWithTitle.content)
+            arkivertDokumentWithTitle.content.size.toLong()
         )
     }
 
@@ -186,5 +183,26 @@ class KlagebehandlingMapper(
         } else {
             null
         }
+
+    fun mapKlagebehandlingToKlagebehandlingEditableFieldsView(klagebehandling: Klagebehandling): KlagebehandlingEditedView {
+        return KlagebehandlingEditedView(klagebehandling.versjon, klagebehandling.modified)
+    }
+
+    fun mapToVedleggEditedView(klagebehandling: Klagebehandling, vedtakId: UUID): VedleggEditedView {
+        return VedleggEditedView(
+            klagebehandling.versjon,
+            klagebehandling.modified,
+            klagebehandling.getVedtak(vedtakId).opplastet
+        )
+    }
+
+    fun mapToVedtakFullfoertView(klagebehandling: Klagebehandling, vedtakId: UUID): VedtakFullfoertView {
+        return VedtakFullfoertView(
+            klagebehandling.versjon,
+            klagebehandling.modified,
+            klagebehandling.getVedtak(vedtakId).ferdigstiltIJoark!!,
+            klagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
+        )
+    }
 }
 

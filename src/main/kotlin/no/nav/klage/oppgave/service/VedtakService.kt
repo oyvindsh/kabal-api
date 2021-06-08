@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
+import no.nav.klage.oppgave.api.view.VedtakSlettVedleggInput
+import no.nav.klage.oppgave.api.view.VedtakVedleggInput
 import no.nav.klage.oppgave.clients.joark.JoarkClient
 import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
@@ -131,57 +133,6 @@ class VedtakService(
         return kansellerJournalpost(
             klagebehandling,
             vedtak,
-            innloggetIdent
-        )
-    }
-
-    fun oppdaterUtfall(
-        klagebehandlingId: UUID,
-        vedtakId: UUID,
-        input: VedtakUtfallInput,
-        innloggetIdent: String
-    ): Klagebehandling {
-        return setUtfall(
-            klagebehandlingService.getKlagebehandlingForUpdate(
-                klagebehandlingId,
-                input.klagebehandlingVersjon
-            ),
-            vedtakId,
-            input.utfall?.let { Utfall.of(it) },
-            innloggetIdent
-        )
-    }
-
-    fun oppdaterGrunn(
-        klagebehandlingId: UUID,
-        vedtakId: UUID,
-        input: VedtakGrunnInput,
-        innloggetIdent: String
-    ): Klagebehandling {
-        return setGrunn(
-            klagebehandlingService.getKlagebehandlingForUpdate(
-                klagebehandlingId,
-                input.klagebehandlingVersjon
-            ),
-            vedtakId,
-            input.grunn?.let { Grunn.of(it) },
-            innloggetIdent
-        )
-    }
-
-    fun oppdaterHjemler(
-        klagebehandlingId: UUID,
-        vedtakId: UUID,
-        input: VedtakHjemlerInput,
-        innloggetIdent: String
-    ): Klagebehandling {
-        return setHjemler(
-            klagebehandlingService.getKlagebehandlingForUpdate(
-                klagebehandlingId,
-                input.klagebehandlingVersjon
-            ),
-            vedtakId,
-            input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet(),
             innloggetIdent
         )
     }

@@ -37,11 +37,12 @@ class KlagebehandlingVedtakController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    //TODO: Blir denne brukt?
     @GetMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}")
     fun getVedtak(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String
-    ): KlagebehandlingDetaljerView {
+    ): VedtakView {
         logMethodDetails("getVedtak", klagebehandlingId, vedtakId)
         val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId.toUUIDOrException())
             .also {
@@ -52,75 +53,24 @@ class KlagebehandlingVedtakController(
                     )
                 )
             }
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling)
-    }
-
-    @PutMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/utfall")
-    fun putUtfall(
-        @PathVariable("klagebehandlingid") klagebehandlingId: String,
-        @PathVariable("vedtakid") vedtakId: String,
-        @RequestBody input: VedtakUtfallInput
-    ): KlagebehandlingDetaljerView {
-        logMethodDetails("putUtfall", klagebehandlingId, vedtakId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            vedtakService.oppdaterUtfall(
-                klagebehandlingId.toUUIDOrException(),
-                vedtakId.toUUIDOrException(),
-                input,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
-    }
-
-    @PutMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/grunn")
-    fun putGrunn(
-        @PathVariable("klagebehandlingid") klagebehandlingId: String,
-        @PathVariable("vedtakid") vedtakId: String,
-        @RequestBody input: VedtakGrunnInput
-    ): KlagebehandlingDetaljerView {
-        logMethodDetails("putGrunn", klagebehandlingId, vedtakId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            vedtakService.oppdaterGrunn(
-                klagebehandlingId.toUUIDOrException(),
-                vedtakId.toUUIDOrException(),
-                input,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
-    }
-
-    @PutMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/hjemler")
-    fun putHjemler(
-        @PathVariable("klagebehandlingid") klagebehandlingId: String,
-        @PathVariable("vedtakid") vedtakId: String,
-        @RequestBody input: VedtakHjemlerInput
-    ): KlagebehandlingDetaljerView {
-        logMethodDetails("putHjemler", klagebehandlingId, vedtakId)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
-            vedtakService.oppdaterHjemler(
-                klagebehandlingId.toUUIDOrException(),
-                vedtakId.toUUIDOrException(),
-                input,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
+        return klagebehandlingMapper.mapVedtakToVedtakView(klagebehandling.getVedtak(vedtakId.toUUIDOrException()))
     }
 
     @PostMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/vedlegg")
     fun postVedlegg(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
-        @ModelAttribute input: VedtakVedleggInput
-    ): VedleggView? {
+        @RequestBody input: VedtakVedleggInput
+    ): VedleggEditedView? {
         logMethodDetails("postVedlegg", klagebehandlingId, vedtakId)
 
-        return klagebehandlingMapper.getVedleggView(
+        return klagebehandlingMapper.mapToVedleggEditedView(
             vedtakService.knyttVedtaksFilTilVedtak(
                 klagebehandlingId.toUUIDOrException(),
                 vedtakId.toUUIDOrException(),
                 input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
-            ).getVedtak(vedtakId.toUUIDOrException()).journalpostId
+            ), vedtakId.toUUIDOrException()
         )
     }
 
@@ -129,16 +79,16 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakSlettVedleggInput
-    ): KlagebehandlingDetaljerView {
+    ): VedleggEditedView {
         logMethodDetails("deleteVedlegg", klagebehandlingId, vedtakId)
 
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(
+        return klagebehandlingMapper.mapToVedleggEditedView(
             vedtakService.slettFilTilknyttetVedtak(
                 klagebehandlingId.toUUIDOrException(),
                 vedtakId.toUUIDOrException(),
                 input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
+            ), vedtakId.toUUIDOrException()
         )
     }
 
@@ -147,7 +97,7 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakFullfoerInput
-    ): KlagebehandlingDetaljerView {
+    ): VedtakFullfoertView {
         logMethodDetails("fullfoerVedtak", klagebehandlingId, vedtakId)
         val klagebehandling = vedtakService.ferdigstillVedtak(
             klagebehandlingId.toUUIDOrException(),
@@ -155,7 +105,7 @@ class KlagebehandlingVedtakController(
             input,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling)
+        return klagebehandlingMapper.mapToVedtakFullfoertView(klagebehandling, vedtakId.toUUIDOrException())
     }
 
     @ResponseBody

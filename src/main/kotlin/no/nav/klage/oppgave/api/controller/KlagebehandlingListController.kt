@@ -16,9 +16,7 @@ import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
 
 @RestController
@@ -70,24 +68,21 @@ class KlagebehandlingListController(
         @ApiParam(value = "Id til en klagebehandling")
         @PathVariable("id") klagebehandlingId: String,
         @RequestBody saksbehandlertildeling: Saksbehandlertildeling
-    ): ResponseEntity<Void> {
+    ): TildelingEditedView {
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
-        klagebehandlingService.assignKlagebehandling(
+        val klagebehandling = klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
             saksbehandlertildeling.klagebehandlingVersjon,
             saksbehandlertildeling.navIdent,
+            //TODO: Må sørge for at denne faktisk angis!
             saksbehandlertildeling.angittEnhetOrDefault(),
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-
-        val uri = MvcUriComponentsBuilder
-            .fromMethodName(
-                KlagebehandlingDetaljerController::class.java,
-                "getKlagebehandlingDetaljer",
-                klagebehandlingId
-            )
-            .buildAndExpand(klagebehandlingId).toUri()
-        return ResponseEntity.noContent().location(uri).build()
+        return TildelingEditedView(
+            klagebehandling.versjon,
+            klagebehandling.modified,
+            klagebehandling.tildeling!!.tidspunkt.toLocalDate()
+        )
     }
 
     @PostMapping("/ansatte/{navIdent}/klagebehandlinger/{id}/saksbehandlerfradeling")
@@ -97,9 +92,9 @@ class KlagebehandlingListController(
         @ApiParam(value = "Id til en klagebehandling")
         @PathVariable("id") klagebehandlingId: String,
         @RequestBody(required = false) saksbehandlerfradeling: Saksbehandlerfradeling?
-    ): ResponseEntity<Void> {
+    ): TildelingEditedView {
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
-        klagebehandlingService.assignKlagebehandling(
+        val klagebehandling = klagebehandlingService.assignKlagebehandling(
             klagebehandlingId.toUUIDOrException(),
             saksbehandlerfradeling?.klagebehandlingVersjon,
             null,
@@ -107,14 +102,11 @@ class KlagebehandlingListController(
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
-        val uri = MvcUriComponentsBuilder
-            .fromMethodName(
-                KlagebehandlingDetaljerController::class.java,
-                "getKlagebehandlingDetaljer",
-                klagebehandlingId
-            )
-            .buildAndExpand(klagebehandlingId).toUri()
-        return ResponseEntity.noContent().location(uri).build()
+        return TildelingEditedView(
+            klagebehandling.versjon,
+            klagebehandling.modified,
+            klagebehandling.tildeling!!.tidspunkt.toLocalDate()
+        )
     }
 
     @ApiOperation(
