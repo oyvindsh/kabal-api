@@ -174,8 +174,6 @@ navCallId: Nav-Callid
 navConsumerId: Nav-Consumer-Id
 
 allowed.origins:
-  https://klage-oppgave.nav.no,
-  https://klage-oppgave.dev.nav.no
   https://kabal.nav.no,
   https://kabal.dev.nav.no
 

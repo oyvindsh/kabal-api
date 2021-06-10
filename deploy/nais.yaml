@@ -89,9 +89,7 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: kabal
-        - application: klage-oppgave
-        - application: klage-oppgave-consumer
+        - application: kabal-frontend
         - application: k9-klage
           namespace: k9saksbehandling
           cluster: {{k9_cluster}}
