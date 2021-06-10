@@ -122,7 +122,7 @@ class KlagebehandlingEditableFieldsFacade(
         klagebehandling: Klagebehandling,
         innloggetIdent: String
     ) {
-        val nyVerdi = input.internVurdering
+        val nyVerdi = input.internVurdering.ifBlank { null }
         val gammelVerdi = klagebehandling.kvalitetsvurdering?.internVurdering
         if (isDirty(gammelVerdi, nyVerdi)) {
             klagebehandlingService.setKvalitetsvurderingInternVurdering(
