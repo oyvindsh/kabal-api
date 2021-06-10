@@ -117,7 +117,7 @@ class KlagebehandlingMapper(
             created = klagebehandling.created,
             eoes = klagebehandling.kvalitetsvurdering?.eoes?.id,
             raadfoertMedLege = klagebehandling.kvalitetsvurdering?.raadfoertMedLege?.id,
-            internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
+            internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering ?: "",
             sendTilbakemelding = klagebehandling.kvalitetsvurdering?.sendTilbakemelding,
             tilbakemelding = klagebehandling.kvalitetsvurdering?.tilbakemelding,
             klagebehandlingVersjon = klagebehandling.versjon,

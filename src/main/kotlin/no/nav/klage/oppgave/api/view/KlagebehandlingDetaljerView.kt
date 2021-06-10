@@ -36,7 +36,7 @@ data class KlagebehandlingDetaljerView(
     val fraSaksbehandlerident: String? = null,
     val eoes: String?,
     val raadfoertMedLege: String?,
-    val internVurdering: String?,
+    val internVurdering: String,
     val sendTilbakemelding: Boolean?,
     val tilbakemelding: String?,
     val klagebehandlingVersjon: Long,
