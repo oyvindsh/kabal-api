@@ -8,7 +8,7 @@ data class DokumentReferanserResponse(val journalpostIder: List<String>)
 
 data class DokumentReferanse(
     val journalpostId: String,
-    val dokumentInfoId: String?,
+    val dokumentInfoId: String,
     val tittel: String?,
     val tema: String?,
     val registrert: LocalDate,
