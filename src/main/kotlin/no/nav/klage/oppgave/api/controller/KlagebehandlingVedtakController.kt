@@ -60,7 +60,7 @@ class KlagebehandlingVedtakController(
     fun postVedlegg(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
-        @RequestBody input: VedtakVedleggInput
+        @ModelAttribute input: VedtakVedleggInput
     ): VedleggEditedView? {
         logMethodDetails("postVedlegg", klagebehandlingId, vedtakId)
 
