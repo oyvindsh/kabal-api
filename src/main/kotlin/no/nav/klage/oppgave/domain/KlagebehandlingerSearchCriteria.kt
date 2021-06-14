@@ -18,6 +18,7 @@ data class KlagebehandlingerSearchCriteria(
     val ferdigstiltTom: LocalDate? = null,
     val fristFom: LocalDate? = null,
     val fristTom: LocalDate? = null,
+    val foedselsnr: String? = null,
 
     val order: Order? = null,
     val offset: Int,
@@ -38,7 +39,7 @@ data class KlagebehandlingerSearchCriteria(
     }
 
     enum class Statuskategori {
-        AAPEN, AVSLUTTET
+        AAPEN, AVSLUTTET, ALLE
     }
 
 

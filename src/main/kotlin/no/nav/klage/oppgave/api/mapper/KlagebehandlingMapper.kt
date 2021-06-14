@@ -34,6 +34,20 @@ class KlagebehandlingMapper(
         private val secureLogger = getSecureLogger()
     }
 
+    fun mapEsKlagebehandlingerToPersonListView(
+        esKlagebehandlinger: List<EsKlagebehandling>,
+        viseUtvidet: Boolean,
+        saksbehandler: String?
+    ): List<PersonSokPersonView> {
+        return esKlagebehandlinger.groupBy { it.sakenGjelderFnr }.map {
+            PersonSokPersonView(
+                it.key!!,
+                it.value.first().sakenGjelderNavn,
+                mapEsKlagebehandlingerToListView(it.value, viseUtvidet, true, saksbehandler)
+            )
+        }
+    }
+
     fun mapEsKlagebehandlingerToListView(
         esKlagebehandlinger: List<EsKlagebehandling>,
         viseUtvidet: Boolean,
@@ -61,6 +75,8 @@ class KlagebehandlingMapper(
                 harMedunderskriver = esKlagebehandling.medunderskriverident != null,
                 erMedunderskriver = esKlagebehandling.medunderskriverident != null && esKlagebehandling.medunderskriverident == saksbehandler,
                 medunderskriverident = esKlagebehandling.medunderskriverident,
+                erTildelt = esKlagebehandling.tildeltSaksbehandlerident != null,
+                tildeltSaksbehandlerident = esKlagebehandling.tildeltSaksbehandlerident,
                 utfall = if (viseFullfoerte) {
                     esKlagebehandling.vedtakUtfall
                 } else {
@@ -153,7 +169,10 @@ class KlagebehandlingMapper(
         } else null
     }
 
-    fun mapArkivertDokumentWithTitleToVedleggView(arkivertDokumentWithTitle: ArkivertDokumentWithTitle, opplastet: LocalDateTime): VedleggView {
+    fun mapArkivertDokumentWithTitleToVedleggView(
+        arkivertDokumentWithTitle: ArkivertDokumentWithTitle,
+        opplastet: LocalDateTime
+    ): VedleggView {
         return VedleggView(
             arkivertDokumentWithTitle.title,
             arkivertDokumentWithTitle.content.size.toLong(),

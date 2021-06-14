@@ -61,6 +61,29 @@ class KlagebehandlingListController(
         )
     }
 
+    @ApiOperation(
+        value = "Hent oppgaver som gjelder en gitt person",
+        notes = "Henter alle oppgaver som saksbehandler har tilgang til som omhandler en gitt person."
+    )
+    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/personsok", produces = ["application/json"])
+    fun getOppgaverOmPerson(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        @RequestBody input: PersonSokInput
+    ): KlagebehandlingerPersonSokListRespons {
+        validateNavIdent(navIdent)
+        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, input)
+        val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        return KlagebehandlingerPersonSokListRespons(
+            antallTreffTotalt = esResponse.totalHits.toInt(),
+            personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
+                esResponse.searchHits.map { it.content },
+                searchCriteria.isProjectionUtvidet(),
+                searchCriteria.saksbehandler
+            )
+        )
+    }
+
     @PostMapping("/ansatte/{navIdent}/klagebehandlinger/{id}/saksbehandlertildeling")
     fun assignSaksbehandler(
         @ApiParam(value = "NavIdent til en ansatt")
