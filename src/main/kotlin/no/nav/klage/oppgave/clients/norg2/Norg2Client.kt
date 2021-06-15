@@ -18,12 +18,19 @@ class Norg2Client(private val norg2WebClient: WebClient) {
 
     @Retryable
     @Cacheable(ENHET_CACHE)
-    fun fetchEnhet(enhetNr: String): Enhet =
-        norg2WebClient.get()
-            .uri("/enhet/{enhetNr}", enhetNr)
-            .retrieve()
-            .bodyToMono<EnhetResponse>()
-            .block()
-            ?.asEnhet() ?: Enhet(navn = "Ukjent enhet").also { logger.warn("Enhet not found for $enhetNr") }
+    fun fetchEnhet(enhetNr: String): Enhet {
+        try {
+            return norg2WebClient.get()
+                .uri("/enhet/{enhetNr}", enhetNr)
+                .retrieve()
+                .bodyToMono<EnhetResponse>()
+                .block()
+                ?.asEnhet() ?: Enhet(navn = "Ukjent enhet").also { logger.warn("Enhet not found for $enhetNr") }
+        } catch (ex: Exception) {
+            val errorMessage = "Problems with getting enhet $enhetNr from Norg2"
+            logger.error(errorMessage, ex)
+            throw RuntimeException(errorMessage, ex)
+        }
+    }
 
 }
