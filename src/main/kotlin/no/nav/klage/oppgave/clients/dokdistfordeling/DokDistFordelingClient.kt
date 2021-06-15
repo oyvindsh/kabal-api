@@ -33,7 +33,7 @@ class DokDistFordelingClient(
         val distribuerJournalpostResponse = dokDistWebClient.post()
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .header("Nav-Consumer-Id", applicationName)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer ${tokenUtil.getStsSystembrukerToken()}")
             .bodyValue(payload)
             .retrieve()
             .bodyToMono(DistribuerJournalpostResponse::class.java)
