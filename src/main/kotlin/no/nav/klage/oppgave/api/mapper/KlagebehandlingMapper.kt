@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.ArkivertDokumentWithTitle
-import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.klage.BrevMottaker
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
@@ -32,47 +31,6 @@ class KlagebehandlingMapper(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-    }
-
-    fun mapEsKlagebehandlingerToListView(
-        esKlagebehandlinger: List<EsKlagebehandling>,
-        viseUtvidet: Boolean,
-        viseFullfoerte: Boolean,
-        saksbehandler: String?
-    ): List<KlagebehandlingListView> {
-        return esKlagebehandlinger.map { esKlagebehandling ->
-            KlagebehandlingListView(
-                id = esKlagebehandling.id,
-                person = if (viseUtvidet) {
-                    KlagebehandlingListView.Person(
-                        esKlagebehandling.sakenGjelderFnr,
-                        esKlagebehandling.sakenGjelderNavn
-                    )
-                } else {
-                    null
-                },
-                type = esKlagebehandling.type,
-                tema = esKlagebehandling.tema,
-                hjemmel = esKlagebehandling.hjemler.firstOrNull(),
-                frist = esKlagebehandling.frist,
-                mottatt = esKlagebehandling.mottattKlageinstans?.toLocalDate(),
-                versjon = esKlagebehandling.versjon!!.toInt(),
-                klagebehandlingVersjon = esKlagebehandling.versjon,
-                harMedunderskriver = esKlagebehandling.medunderskriverident != null,
-                erMedunderskriver = esKlagebehandling.medunderskriverident != null && esKlagebehandling.medunderskriverident == saksbehandler,
-                medunderskriverident = esKlagebehandling.medunderskriverident,
-                utfall = if (viseFullfoerte) {
-                    esKlagebehandling.vedtakUtfall
-                } else {
-                    null
-                },
-                avsluttetAvSaksbehandler = if (viseFullfoerte) {
-                    esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
-                } else {
-                    null
-                }
-            )
-        }
     }
 
     fun mapKlagebehandlingToKlagebehandlingDetaljerView(klagebehandling: Klagebehandling): KlagebehandlingDetaljerView {
@@ -153,7 +111,10 @@ class KlagebehandlingMapper(
         } else null
     }
 
-    fun mapArkivertDokumentWithTitleToVedleggView(arkivertDokumentWithTitle: ArkivertDokumentWithTitle, opplastet: LocalDateTime): VedleggView {
+    fun mapArkivertDokumentWithTitleToVedleggView(
+        arkivertDokumentWithTitle: ArkivertDokumentWithTitle,
+        opplastet: LocalDateTime
+    ): VedleggView {
         return VedleggView(
             arkivertDokumentWithTitle.title,
             arkivertDokumentWithTitle.content.size.toLong(),

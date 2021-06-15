@@ -21,10 +21,23 @@ data class KlagebehandlingListView(
     val harMedunderskriver: Boolean = false,
     val medunderskriverident: String?,
     val utfall: String?,
-    val avsluttetAvSaksbehandler: LocalDate?
+    val avsluttetAvSaksbehandler: LocalDate?,
+    val erTildelt: Boolean,
+    val tildeltSaksbehandlerident: String?
 ) {
     data class Person(
         val fnr: String?,
         val navn: String?
     )
 }
+
+data class KlagebehandlingerPersonSoekListRespons(
+    val antallTreffTotalt: Int,
+    val personer: List<PersonSoekPersonView>
+)
+
+data class PersonSoekPersonView(
+    val fnr: String,
+    val navn: String?,
+    val klagebehandlinger: List<KlagebehandlingListView>
+)
