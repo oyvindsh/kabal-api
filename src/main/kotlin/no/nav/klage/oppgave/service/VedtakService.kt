@@ -16,17 +16,13 @@ import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
-import no.nav.klage.oppgave.exceptions.JournalpostFinalizationException
-import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
-import no.nav.klage.oppgave.exceptions.UtfallNotSetException
-import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
+import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.AttachmentValidator
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @Service
@@ -164,7 +160,8 @@ class VedtakService(
 
         attachmentValidator.validateAttachment(input.vedlegg)
 
-        val journalpostId = joarkClient.createJournalpost(klagebehandling, input.vedlegg, klagebehandling.tildeling!!.enhet!!)
+        val journalpostId =
+            joarkClient.createJournalpost(klagebehandling, input.vedlegg, klagebehandling.tildeling!!.enhet!!)
 
         return setJournalpostIdOgOpplastet(
             klagebehandling,
@@ -184,6 +181,16 @@ class VedtakService(
             klagebehandlingId,
             input.klagebehandlingVersjon
         )
+
+        if (klagebehandling.medunderskriver?.saksbehandlerident != innloggetIdent) {
+            secureLogger.error(
+                "{} prøvde å fullføre vedtak for klagebehandling {}, men er ikke medunderskriver.",
+                innloggetIdent,
+                klagebehandlingId
+            )
+            throw MissingTilgangException("Vedtak kan kun ferdigstilles av medunderskriver")
+        }
+
         val vedtak = klagebehandling.getVedtak(vedtakId)
         if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
         if (vedtak.journalpostId == null) throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke journalført")

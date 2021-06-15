@@ -29,12 +29,12 @@ class TilgangService(
         }
         val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
         if (!saksbehandlerHarSkrivetilgang(klagebehandling, ident)) {
-            throw MissingTilgangException("Kun tildelt saksbehandler/medunderskriver kan endre klagebehandlingen")
+            throw MissingTilgangException("Kun tildelt saksbehandler kan endre klagebehandlingen")
         }
     }
 
     private fun saksbehandlerHarSkrivetilgang(klagebehandling: Klagebehandling, ident: String): Boolean =
-        ident == klagebehandling.tildeling?.saksbehandlerident || ident == klagebehandling.medunderskriver?.saksbehandlerident
+        ident == klagebehandling.tildeling?.saksbehandlerident
 
     fun verifySystembrukersSkrivetilgang(klagebehandling: Klagebehandling) {
         if (klagebehandling.avsluttet != null) {
