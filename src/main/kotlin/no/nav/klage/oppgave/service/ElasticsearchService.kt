@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria.Statuskategori.AAPEN
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria.Statuskategori.AVSLUTTET
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.*
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
@@ -183,22 +184,15 @@ open class ElasticsearchService(
         val baseQuery: BoolQueryBuilder = QueryBuilders.boolQuery()
         logger.debug("Search criteria: {}", this)
 
-        val filterQuery = QueryBuilders.boolQuery()
-        baseQuery.filter(filterQuery)
-        if (!innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
-            filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))
-        }
-        if (!innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
-            filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
-        }
-        if (!innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
-            filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+        addSecurityFilters(baseQuery)
+
+        foedselsnr?.let {
+            baseQuery.must(QueryBuilders.termQuery("sakenGjelderFnr", it))
         }
 
-        if (statuskategori == AAPEN) {
-            baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
-        } else {
-            baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
+        when (statuskategori) {
+            AAPEN -> baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
+            AVSLUTTET -> baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         }
 
         enhetsnr?.let {
@@ -276,6 +270,20 @@ open class ElasticsearchService(
 
         logger.info("Making search request with query {}", baseQuery.toString())
         return baseQuery
+    }
+
+    private fun addSecurityFilters(baseQuery: BoolQueryBuilder) {
+        val filterQuery = QueryBuilders.boolQuery()
+        baseQuery.filter(filterQuery)
+        if (!innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
+            filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))
+        }
+        if (!innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
+            filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
+        }
+        if (!innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
+            filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+        }
     }
 
     fun refresh() {

@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -24,7 +24,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class KlagebehandlingListController(
     private val klagebehandlingService: KlagebehandlingService,
-    private val klagebehandlingMapper: KlagebehandlingMapper,
+    private val klagebehandlingMapper: KlagebehandlingListMapper,
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
@@ -56,6 +56,29 @@ class KlagebehandlingListController(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
+                searchCriteria.saksbehandler
+            )
+        )
+    }
+
+    @ApiOperation(
+        value = "Hent oppgaver som gjelder en gitt person",
+        notes = "Henter alle oppgaver som saksbehandler har tilgang til som omhandler en gitt person."
+    )
+    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/personsoek", produces = ["application/json"])
+    fun getOppgaverOmPerson(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        @RequestBody input: PersonSoekInput
+    ): KlagebehandlingerPersonSoekListRespons {
+        validateNavIdent(navIdent)
+        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, input)
+        val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        return KlagebehandlingerPersonSoekListRespons(
+            antallTreffTotalt = esResponse.totalHits.toInt(),
+            personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
+                esResponse.searchHits.map { it.content },
+                searchCriteria.isProjectionUtvidet(),
                 searchCriteria.saksbehandler
             )
         )
