@@ -76,7 +76,7 @@ class KlagebehandlingServiceTest {
         assertThat(
             klagebehandlingService.getKlagebehandlingForUpdate(
                 klagebehandlingId = klage.id,
-                updateIsAssign = true
+                ignoreCheckSkrivetilgang = true
             )
         ).isEqualTo(klage)
     }
