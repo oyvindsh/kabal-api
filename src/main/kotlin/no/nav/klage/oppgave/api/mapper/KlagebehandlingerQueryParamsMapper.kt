@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingerQueryParams
-import no.nav.klage.oppgave.api.view.PersonSokInput
+import no.nav.klage.oppgave.api.view.PersonSoekInput
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -18,9 +18,9 @@ class KlagebehandlingerQueryParamsMapper {
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun toSearchCriteria(navIdent: String, input: PersonSokInput) = KlagebehandlingerSearchCriteria(
+    fun toSearchCriteria(navIdent: String, input: PersonSoekInput) = KlagebehandlingerSearchCriteria(
         foedselsnr = input.fnr,
-        order = if (input.rekkefoelge == PersonSokInput.Rekkefoelge.SYNKENDE) {
+        order = if (input.rekkefoelge == PersonSoekInput.Rekkefoelge.SYNKENDE) {
             KlagebehandlingerSearchCriteria.Order.DESC
         } else {
             KlagebehandlingerSearchCriteria.Order.ASC
@@ -28,7 +28,7 @@ class KlagebehandlingerQueryParamsMapper {
         offset = input.start,
         limit = input.antall,
         projection = input.projeksjon?.let { KlagebehandlingerSearchCriteria.Projection.valueOf(it.name) },
-        sortField = if (input.sortering == PersonSokInput.Sortering.MOTTATT) {
+        sortField = if (input.sortering == PersonSoekInput.Sortering.MOTTATT) {
             KlagebehandlingerSearchCriteria.SortField.MOTTATT
         } else {
             KlagebehandlingerSearchCriteria.SortField.FRIST

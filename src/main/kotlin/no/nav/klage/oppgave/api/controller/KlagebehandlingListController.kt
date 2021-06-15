@@ -65,16 +65,16 @@ class KlagebehandlingListController(
         value = "Hent oppgaver som gjelder en gitt person",
         notes = "Henter alle oppgaver som saksbehandler har tilgang til som omhandler en gitt person."
     )
-    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/personsok", produces = ["application/json"])
+    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/personsoek", produces = ["application/json"])
     fun getOppgaverOmPerson(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
-        @RequestBody input: PersonSokInput
-    ): KlagebehandlingerPersonSokListRespons {
+        @RequestBody input: PersonSoekInput
+    ): KlagebehandlingerPersonSoekListRespons {
         validateNavIdent(navIdent)
         val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, input)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
-        return KlagebehandlingerPersonSokListRespons(
+        return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
                 esResponse.searchHits.map { it.content },

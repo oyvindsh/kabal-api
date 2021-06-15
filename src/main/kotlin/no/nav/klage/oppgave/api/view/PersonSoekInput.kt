@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
-data class PersonSokInput(
+data class PersonSoekInput(
     val fnr: String,
     val rekkefoelge: Rekkefoelge? = Rekkefoelge.STIGENDE,
     val sortering: Sortering? = Sortering.FRIST,

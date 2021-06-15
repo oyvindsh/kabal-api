@@ -38,9 +38,9 @@ class KlagebehandlingMapper(
         esKlagebehandlinger: List<EsKlagebehandling>,
         viseUtvidet: Boolean,
         saksbehandler: String?
-    ): List<PersonSokPersonView> {
+    ): List<PersonSoekPersonView> {
         return esKlagebehandlinger.groupBy { it.sakenGjelderFnr }.map {
-            PersonSokPersonView(
+            PersonSoekPersonView(
                 it.key!!,
                 it.value.first().sakenGjelderNavn,
                 mapEsKlagebehandlingerToListView(it.value, viseUtvidet, true, saksbehandler)

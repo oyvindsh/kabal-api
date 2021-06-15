@@ -31,12 +31,12 @@ data class KlagebehandlingListView(
     )
 }
 
-data class KlagebehandlingerPersonSokListRespons(
+data class KlagebehandlingerPersonSoekListRespons(
     val antallTreffTotalt: Int,
-    val personer: List<PersonSokPersonView>
+    val personer: List<PersonSoekPersonView>
 )
 
-data class PersonSokPersonView(
+data class PersonSoekPersonView(
     val fnr: String,
     val navn: String?,
     val klagebehandlinger: List<KlagebehandlingListView>
