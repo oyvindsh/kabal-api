@@ -29,7 +29,7 @@ class Norg2Client(private val norg2WebClient: WebClient) {
         } catch (ex: Exception) {
             val errorMessage = "Problems with getting enhet $enhetNr from Norg2"
             logger.error(errorMessage, ex)
-            throw RuntimeException(errorMessage, ex)
+            return Enhet(navn = enhetNr)
         }
     }
 
