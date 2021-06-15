@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -24,7 +24,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class KlagebehandlingListController(
     private val klagebehandlingService: KlagebehandlingService,
-    private val klagebehandlingMapper: KlagebehandlingMapper,
+    private val klagebehandlingMapper: KlagebehandlingListMapper,
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
