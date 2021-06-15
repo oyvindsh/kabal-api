@@ -178,8 +178,9 @@ class VedtakService(
         innloggetIdent: String
     ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
-            klagebehandlingId,
-            input.klagebehandlingVersjon
+            klagebehandlingId = klagebehandlingId,
+            klagebehandlingVersjon = input.klagebehandlingVersjon,
+            ignoreCheckSkrivetilgang = true
         )
 
         if (klagebehandling.medunderskriver?.saksbehandlerident != innloggetIdent) {
