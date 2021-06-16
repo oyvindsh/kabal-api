@@ -4,7 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingerSearchCriteriaMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
@@ -26,7 +26,7 @@ class KlagebehandlingListController(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingMapper: KlagebehandlingListMapper,
     private val elasticsearchService: ElasticsearchService,
-    private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
+    private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val saksbehandlerRepository: SaksbehandlerRepository
 ) {
@@ -48,15 +48,18 @@ class KlagebehandlingListController(
     ): KlagebehandlingerListRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
+        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        val enheterMedTemaer = innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
-                searchCriteria.saksbehandler
+                searchCriteria.saksbehandler,
+                enheterMedTemaer.enheter.find { it.enhetId == searchCriteria.enhetId }?.temaer
+                    ?: enheterMedTemaer.enheter.first().temaer //TODO: KlagebehandlingerQueryParams.enhetId må bli obligatorisk
             )
         )
     }
@@ -72,14 +75,17 @@ class KlagebehandlingListController(
         @RequestBody input: PersonSoekInput
     ): KlagebehandlingerPersonSoekListRespons {
         validateNavIdent(navIdent)
-        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, input)
+        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        val enheterMedTemaer = innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
-                searchCriteria.saksbehandler
+                searchCriteria.saksbehandler,
+                enheterMedTemaer.enheter.find { it.enhetId == searchCriteria.enhetId }?.temaer
+                    ?: enheterMedTemaer.enheter.first().temaer //TODO: PersonSoekInput.enhetId må bli obligatorisk
             )
         )
     }
@@ -146,7 +152,7 @@ class KlagebehandlingListController(
         validateNavIdent(navIdent)
         return AntallUtgaatteFristerResponse(
             antall = elasticsearchService.countByCriteria(
-                klagebehandlingerQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(
+                klagebehandlingerSearchCriteriaMapper.toFristUtgaattIkkeTildeltSearchCriteria(
                     navIdent,
                     queryParams
                 )

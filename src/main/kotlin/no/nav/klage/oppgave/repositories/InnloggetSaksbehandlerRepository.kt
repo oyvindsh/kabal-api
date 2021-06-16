@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -44,6 +45,16 @@ class InnloggetSaksbehandlerRepository(
 
     fun harTilgangTilEnhet(enhetId: String): Boolean {
         return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId } != null
+    }
+
+    fun harTilgangTilTema(tema: Tema): Boolean {
+        return getEnheterMedTemaerForSaksbehandler().enheter.flatMap { it.temaer }.contains(tema)
+    }
+
+    fun harTilgangTilEnhetOgTema(enhetId: String, tema: Tema): Boolean {
+        return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId }?.temaer?.contains(
+            tema
+        ) ?: false
     }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }

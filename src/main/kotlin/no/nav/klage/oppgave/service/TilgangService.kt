@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -44,13 +45,25 @@ class TilgangService(
 
     fun verifySaksbehandlersTilgangTil(fnr: String) {
         if (!harSaksbehandlerTilgangTil(fnr)) {
-            throw MissingTilgangException("Not authorized to access this user")
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til denne brukeren")
         }
     }
 
     fun verifySaksbehandlersTilgangTilEnhet(enhetId: String) {
         if (!innloggetSaksbehandlerRepository.harTilgangTilEnhet(enhetId)) {
-            throw MissingTilgangException("Not authorized to act as this enhet")
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til enhet $enhetId")
+        }
+    }
+
+    fun verifySaksbehandlersTilgangTilEnhetOgTema(enhetId: String, tema: Tema) {
+        if (!innloggetSaksbehandlerRepository.harTilgangTilEnhetOgTema(enhetId, tema)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til tema $tema i enhet $enhetId")
+        }
+    }
+
+    fun verifySaksbehandlersTilgangTilTema(tema: Tema) {
+        if (!innloggetSaksbehandlerRepository.harTilgangTilTema(tema)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til tema $tema")
         }
     }
 

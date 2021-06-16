@@ -4,6 +4,7 @@ package no.nav.klage.oppgave.api.mapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.PersonSoekPersonView
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -20,13 +21,18 @@ class KlagebehandlingListMapper() {
     fun mapEsKlagebehandlingerToPersonListView(
         esKlagebehandlinger: List<EsKlagebehandling>,
         viseUtvidet: Boolean,
-        saksbehandler: String?
+        saksbehandler: String?,
+        tilgangTilTemaer: List<Tema>
     ): List<PersonSoekPersonView> {
-        return esKlagebehandlinger.groupBy { it.sakenGjelderFnr }.map {
+        return esKlagebehandlinger.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
+            val klagebehandlinger =
+                mapEsKlagebehandlingerToListView(value, viseUtvidet, true, saksbehandler, tilgangTilTemaer)
             PersonSoekPersonView(
-                it.key!!,
-                it.value.first().sakenGjelderNavn,
-                mapEsKlagebehandlingerToListView(it.value, viseUtvidet, true, saksbehandler)
+                fnr = key!!,
+                navn = value.first().sakenGjelderNavn,
+                klagebehandlinger = klagebehandlinger,
+                aapneKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler == null },
+                avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler != null }
             )
         }
     }
@@ -35,7 +41,8 @@ class KlagebehandlingListMapper() {
         esKlagebehandlinger: List<EsKlagebehandling>,
         viseUtvidet: Boolean,
         viseFullfoerte: Boolean,
-        saksbehandler: String?
+        saksbehandler: String?,
+        tilgangTilTemaer: List<Tema>
     ): List<KlagebehandlingListView> {
         return esKlagebehandlinger.map { esKlagebehandling ->
             KlagebehandlingListView(
@@ -69,7 +76,8 @@ class KlagebehandlingListMapper() {
                     esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
                 } else {
                     null
-                }
+                },
+                saksbehandlerHarTilgang = tilgangTilTemaer.contains(Tema.of(esKlagebehandling.tema))
             )
         }
     }

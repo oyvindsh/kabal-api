@@ -118,6 +118,7 @@ class VedtakService(
             input.klagebehandlingVersjon
         )
 
+        //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
         tilgangService.verifySaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
         val vedtak = klagebehandling.getVedtak(vedtakId)
@@ -144,6 +145,7 @@ class VedtakService(
             input.klagebehandlingVersjon
         )
 
+        //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
         tilgangService.verifySaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
         val vedtak = klagebehandling.getVedtak(vedtakId)

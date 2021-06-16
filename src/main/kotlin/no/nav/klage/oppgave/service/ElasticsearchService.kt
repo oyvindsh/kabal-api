@@ -195,8 +195,8 @@ open class ElasticsearchService(
             AVSLUTTET -> baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
         }
 
-        enhetsnr?.let {
-            baseQuery.must(QueryBuilders.termQuery("tildeltEnhet", enhetsnr))
+        enhetId?.let {
+            baseQuery.must(QueryBuilders.termQuery("tildeltEnhet", enhetId))
         }
 
         val innerQueryBehandlingtype = QueryBuilders.boolQuery()

@@ -54,6 +54,7 @@ class KlagebehandlingService(
         if (klagebehandling.sakenGjelder.erPerson()) {
             tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.sakenGjelder.partId.value)
         }
+        tilgangService.verifySaksbehandlersTilgangTilTema(klagebehandling.tema)
     }
 
     private fun checkSkrivetilgang(klagebehandling: Klagebehandling) {
@@ -62,6 +63,10 @@ class KlagebehandlingService(
 
     private fun checkSkrivetilgangForSystembruker(klagebehandling: Klagebehandling) {
         tilgangService.verifySystembrukersSkrivetilgang(klagebehandling)
+    }
+
+    private fun checkEnhetOgTemaTilgang(tildeltEnhetId: String, klagebehandling: Klagebehandling) {
+        tilgangService.verifySaksbehandlersTilgangTilEnhetOgTema(tildeltEnhetId, klagebehandling.tema)
     }
 
     @Transactional(readOnly = true)
@@ -97,6 +102,10 @@ class KlagebehandlingService(
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon, true)
+        if (tildeltSaksbehandlerIdent != null) {
+            //Dette er en assignment!
+            checkEnhetOgTemaTilgang(enhetId!!, klagebehandling)
+        }
         val event =
             klagebehandling.setTildeling(
                 tildeltSaksbehandlerIdent,

@@ -72,6 +72,7 @@ class KlagebehandlingServiceTest {
         val klage = simpleInsert()
 
         every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.verifySaksbehandlersTilgangTilTema(any()) } returns Unit
 
         assertThat(
             klagebehandlingService.getKlagebehandlingForUpdate(
@@ -86,6 +87,7 @@ class KlagebehandlingServiceTest {
         val klage = simpleInsert()
 
         every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.verifySaksbehandlersTilgangTilTema(any()) } returns Unit
 
         assertThrows<KlagebehandlingSamtidigEndretException> {
             klagebehandlingService.getKlagebehandlingForUpdate(
@@ -101,6 +103,7 @@ class KlagebehandlingServiceTest {
         val klage = simpleInsert()
 
         every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.verifySaksbehandlersTilgangTilTema(any()) } returns Unit
         every { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }.throws(KlagebehandlingAvsluttetException(""))
 
         assertThrows<KlagebehandlingAvsluttetException> { klagebehandlingService.getKlagebehandlingForUpdate(klage.id) }
