@@ -19,8 +19,8 @@ class Norg2Client(private val norg2WebClient: WebClient) {
     @Retryable
     @Cacheable(ENHET_CACHE)
     fun fetchEnhet(enhetNr: String): Enhet {
-        try {
-            return norg2WebClient.get()
+        return try {
+            norg2WebClient.get()
                 .uri("/enhet/{enhetNr}", enhetNr)
                 .retrieve()
                 .bodyToMono<EnhetResponse>()
@@ -29,7 +29,7 @@ class Norg2Client(private val norg2WebClient: WebClient) {
         } catch (ex: Exception) {
             val errorMessage = "Problems with getting enhet $enhetNr from Norg2"
             logger.error(errorMessage, ex)
-            return Enhet(navn = enhetNr)
+            throw RuntimeException(errorMessage, ex)
         }
     }
 
