@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.klage.ValgtEnhet
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.ValgtEnhetRepository
@@ -41,7 +42,7 @@ class SaksbehandlerService(
     @Transactional
     fun storeValgtEnhetId(ident: String, enhetId: String): EnhetMedLovligeTemaer {
         val enhet = getEnheterMedTemaerForSaksbehandler().enheter.find { it.enhetId == enhetId }
-            ?: throw IllegalArgumentException("Saksbehandler $ident har ikke tilgang til enhet $enhetId")
+            ?: throw MissingTilgangException("Saksbehandler $ident har ikke tilgang til enhet $enhetId")
 
         valgtEnhetRepository.save(
             mapToValgtEnhet(ident, enhet)

@@ -1,4 +1,4 @@
-CREATE TABLE klage.valgtenhet
+CREATE TABLE klage.valgt_enhet
 (
     saksbehandlerident TEXT PRIMARY KEY,
     enhet_id           TEXT      NOT NULL,

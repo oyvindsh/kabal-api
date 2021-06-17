@@ -7,7 +7,7 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "valgtenhet", schema = "klage")
+@Table(name = "valgt_enhet", schema = "klage")
 class ValgtEnhet(
     @Id
     @Column(name = "saksbehandlerident")
