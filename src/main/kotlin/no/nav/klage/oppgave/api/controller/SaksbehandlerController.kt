@@ -6,21 +6,24 @@ import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.Enhet
 import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
+import no.nav.klage.oppgave.api.view.ValgtEnhetInput
 import no.nav.klage.oppgave.config.SecurityConfiguration
+import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.exceptions.NotMatchingUserException
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.env.Environment
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 @RestController
 @Api(tags = ["kabal-api"])
 class SaksbehandlerController(
-    private val saksbehandlerService: SaksbehandlerService, private val environment: Environment
+    private val saksbehandlerService: SaksbehandlerService, private val environment: Environment,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
 
     companion object {
@@ -41,6 +44,32 @@ class SaksbehandlerController(
         val enheter = saksbehandlerService.getEnheterMedTemaerForSaksbehandler().toEnheter()
         logEnheter(enheter, navIdent)
         return enheter
+    }
+
+    @ApiOperation(
+        value = "Setter valgt klageenhet for en ansatt",
+        notes = "Setter valgt klageenhet som den ansatte jobber med. Må være en i lista over mulige enheter"
+    )
+    @PutMapping("/ansatte/{navIdent}/valgtenhet", produces = ["application/json"])
+    fun setValgtEnhet(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String,
+        @RequestBody input: ValgtEnhetInput
+    ): Enhet {
+        validateNavIdent(navIdent)
+        return saksbehandlerService.storeValgtEnhetId(navIdent, input.enhetId).toEnhet()
+    }
+
+    @ApiOperation(
+        value = "Henter valgt klageenhet for en ansatt",
+        notes = "Henter valgt klageenhet som den ansatte jobber med. Er fra lista over mulige enheter"
+    )
+    @GetMapping("/ansatte/{navIdent}/valgtenhet", produces = ["application/json"])
+    fun getValgtEnhet(
+        @ApiParam(value = "NavIdent til en ansatt")
+        @PathVariable navIdent: String
+    ): Enhet {
+        return saksbehandlerService.findValgtEnhet(navIdent).toEnhet()
     }
 
     @ApiOperation(
@@ -82,13 +111,24 @@ class SaksbehandlerController(
         }
     }
 
-    private fun EnheterMedLovligeTemaer.toEnheter() =
-        this.enheter.map { enhet ->
-            Enhet(
-                id = enhet.enhetId,
-                navn = enhet.navn,
-                lovligeTemaer = enhet.temaer.map { tema -> tema.id }
+    private fun EnheterMedLovligeTemaer.toEnheter() = this.enheter.map { enhet -> enhet.toEnhet() }
+
+    private fun EnhetMedLovligeTemaer.toEnhet() =
+        Enhet(
+            id = enhetId,
+            navn = navn,
+            lovligeTemaer = temaer.map { tema -> tema.id }
+        )
+
+    private fun validateNavIdent(navIdent: String) {
+        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        if (innloggetIdent != navIdent) {
+            throw NotMatchingUserException(
+                "logged in user does not match sent in user. " +
+                        "Logged in: $innloggetIdent, sent in: $navIdent"
             )
         }
+    }
+
 }
 
