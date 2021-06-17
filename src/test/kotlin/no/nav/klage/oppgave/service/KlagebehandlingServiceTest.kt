@@ -71,8 +71,8 @@ class KlagebehandlingServiceTest {
     fun `getKlagebehandlingForUpdate ok`() {
         val klage = simpleInsert()
 
-        every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
-        every { tilgangService.verifySaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
 
         assertThat(
             klagebehandlingService.getKlagebehandlingForUpdate(
@@ -86,8 +86,8 @@ class KlagebehandlingServiceTest {
     fun `getKlagebehandlingForUpdate slår til på optimistic locking`() {
         val klage = simpleInsert()
 
-        every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
-        every { tilgangService.verifySaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
 
         assertThrows<KlagebehandlingSamtidigEndretException> {
             klagebehandlingService.getKlagebehandlingForUpdate(
@@ -102,9 +102,11 @@ class KlagebehandlingServiceTest {
     fun `getKlagebehandlingForUpdate sjekker skrivetilgang, fanger riktig exception`() {
         val klage = simpleInsert()
 
-        every { tilgangService.verifySaksbehandlersTilgangTil(any()) } returns Unit
-        every { tilgangService.verifySaksbehandlersTilgangTilTema(any()) } returns Unit
-        every { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }.throws(KlagebehandlingAvsluttetException(""))
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }.throws(
+            KlagebehandlingAvsluttetException("")
+        )
 
         assertThrows<KlagebehandlingAvsluttetException> { klagebehandlingService.getKlagebehandlingForUpdate(klage.id) }
     }

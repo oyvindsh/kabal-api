@@ -52,21 +52,29 @@ class KlagebehandlingService(
 
     private fun checkLeseTilgang(klagebehandling: Klagebehandling) {
         if (klagebehandling.sakenGjelder.erPerson()) {
-            tilgangService.verifySaksbehandlersTilgangTil(klagebehandling.sakenGjelder.partId.value)
+            tilgangService.verifyInnloggetSaksbehandlersTilgangTil(klagebehandling.sakenGjelder.partId.value)
         }
-        tilgangService.verifySaksbehandlersTilgangTilTema(klagebehandling.tema)
+        tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(klagebehandling.tema)
     }
 
     private fun checkSkrivetilgang(klagebehandling: Klagebehandling) {
-        tilgangService.verifySaksbehandlersSkrivetilgang(klagebehandling)
+        tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling)
     }
 
     private fun checkSkrivetilgangForSystembruker(klagebehandling: Klagebehandling) {
         tilgangService.verifySystembrukersSkrivetilgang(klagebehandling)
     }
 
-    private fun checkEnhetOgTemaTilgang(tildeltEnhetId: String, klagebehandling: Klagebehandling) {
-        tilgangService.verifySaksbehandlersTilgangTilEnhetOgTema(tildeltEnhetId, klagebehandling.tema)
+    private fun checkEnhetOgTemaTilgang(
+        tildeltSaksbehandlerIdent: String,
+        tildeltEnhetId: String,
+        klagebehandling: Klagebehandling
+    ) {
+        tilgangService.verifySaksbehandlersTilgangTilEnhetOgTema(
+            tildeltSaksbehandlerIdent,
+            tildeltEnhetId,
+            klagebehandling.tema
+        )
     }
 
     @Transactional(readOnly = true)
@@ -104,7 +112,7 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon, true)
         if (tildeltSaksbehandlerIdent != null) {
             //Dette er en assignment!
-            checkEnhetOgTemaTilgang(enhetId!!, klagebehandling)
+            checkEnhetOgTemaTilgang(tildeltSaksbehandlerIdent, enhetId!!, klagebehandling)
         }
         val event =
             klagebehandling.setTildeling(

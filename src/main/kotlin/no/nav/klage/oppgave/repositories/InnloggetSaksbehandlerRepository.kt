@@ -44,17 +44,15 @@ class InnloggetSaksbehandlerRepository(
     fun kanBehandleEgenAnsatt(): Boolean = tokenUtil.getRollerFromToken().hasRole(kanBehandleEgenAnsattRole)
 
     fun harTilgangTilEnhet(enhetId: String): Boolean {
-        return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId } != null
+        return saksbehandlerRepository.harTilgangTilEnhet(getInnloggetIdent(), enhetId)
     }
 
     fun harTilgangTilTema(tema: Tema): Boolean {
-        return getEnheterMedTemaerForSaksbehandler().enheter.flatMap { it.temaer }.contains(tema)
+        return saksbehandlerRepository.harTilgangTilTema(getInnloggetIdent(), tema)
     }
 
     fun harTilgangTilEnhetOgTema(enhetId: String, tema: Tema): Boolean {
-        return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId }?.temaer?.contains(
-            tema
-        ) ?: false
+        return saksbehandlerRepository.harTilgangTilEnhetOgTema(getInnloggetIdent(), enhetId, tema)
     }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }

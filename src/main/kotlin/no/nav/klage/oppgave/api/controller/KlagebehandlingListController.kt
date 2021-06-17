@@ -14,6 +14,7 @@ import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
@@ -28,7 +29,8 @@ class KlagebehandlingListController(
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    private val saksbehandlerRepository: SaksbehandlerRepository
+    private val saksbehandlerRepository: SaksbehandlerRepository,
+    private val saksbehandlerService: SaksbehandlerService
 ) {
 
     companion object {
@@ -50,7 +52,7 @@ class KlagebehandlingListController(
         validateNavIdent(navIdent)
         val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
-        val enheterMedTemaer = innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
+        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
@@ -58,8 +60,7 @@ class KlagebehandlingListController(
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
                 searchCriteria.saksbehandler,
-                enheterMedTemaer.enheter.find { it.enhetId == searchCriteria.enhetId }?.temaer
-                    ?: enheterMedTemaer.enheter.first().temaer //TODO: KlagebehandlingerQueryParams.enhetId må bli obligatorisk
+                valgtEnhet.temaer
             )
         )
     }
@@ -77,15 +78,14 @@ class KlagebehandlingListController(
         validateNavIdent(navIdent)
         val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
-        val enheterMedTemaer = innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
+        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.saksbehandler,
-                enheterMedTemaer.enheter.find { it.enhetId == searchCriteria.enhetId }?.temaer
-                    ?: enheterMedTemaer.enheter.first().temaer //TODO: PersonSoekInput.enhetId må bli obligatorisk
+                valgtEnhet.temaer
             )
         )
     }
@@ -183,7 +183,7 @@ class KlagebehandlingListController(
     }
 
     private fun Saksbehandlertildeling.angittEnhetOrDefault(): String =
-        enhetId ?: saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(navIdent).enheter.first().enhetId
+        enhetId ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).enhetId
 
     //    @PutMapping("/oppgaver/{id}/hjemmel")
 //    fun setHjemmel(

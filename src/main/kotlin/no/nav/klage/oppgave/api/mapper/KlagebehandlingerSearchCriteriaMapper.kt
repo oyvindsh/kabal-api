@@ -33,8 +33,7 @@ class KlagebehandlingerSearchCriteriaMapper {
         } else {
             KlagebehandlingerSearchCriteria.SortField.FRIST
         },
-        statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE,
-        enhetId = input.enhetId
+        statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE
     )
 
     fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
@@ -61,8 +60,7 @@ class KlagebehandlingerSearchCriteriaMapper {
             KlagebehandlingerSearchCriteria.Statuskategori.AVSLUTTET
         } else {
             KlagebehandlingerSearchCriteria.Statuskategori.AAPEN
-        },
-        enhetId = queryParams.enhetId
+        }
     )
 
     fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) =
