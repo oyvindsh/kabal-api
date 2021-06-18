@@ -110,7 +110,7 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon, true)
         if (tildeltSaksbehandlerIdent != null) {
-            //Dette er en assignment!
+            //Denne sjekken gjøres kun når det er en tildeling:
             checkEnhetOgTemaTilgang(tildeltSaksbehandlerIdent, enhetId!!, klagebehandling)
         }
         val event =
