@@ -1,15 +1,10 @@
 package no.nav.klage.oppgave.clients.norg2
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class EnhetResponse(
-    val antallRessurser: Int,
-    val enhetId: Int,
-    val enhetNr: String,
-    val kanalstrategi: String? = null,
-    val navn: String,
-    val oppgavebehandler: Boolean,
-    val sosialeTjenester: String,
-    val status: String,
-    val type: String
+    val navn: String
 ) {
     fun asEnhet() = Enhet(navn)
 }
