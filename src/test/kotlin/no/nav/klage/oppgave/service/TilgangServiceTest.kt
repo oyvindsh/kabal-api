@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -26,7 +27,10 @@ class TilgangServiceTest {
 
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository = mockk()
 
-    private val tilgangService = TilgangService(pdlFacade, egenAnsattService, innloggetSaksbehandlerRepository)
+    private val saksbehandlerRepository: SaksbehandlerRepository = mockk()
+
+    private val tilgangService =
+        TilgangService(pdlFacade, egenAnsattService, innloggetSaksbehandlerRepository, saksbehandlerRepository)
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet`() {
@@ -51,7 +55,11 @@ class TilgangServiceTest {
             avsluttet = LocalDateTime.now()
         )
 
-        assertThrows<KlagebehandlingAvsluttetException> { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }
+        assertThrows<KlagebehandlingAvsluttetException> {
+            tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(
+                klage
+            )
+        }
     }
 
     @Test
@@ -77,7 +85,11 @@ class TilgangServiceTest {
             avsluttetAvSaksbehandler = LocalDateTime.now()
         )
 
-        assertThrows<KlagebehandlingAvsluttetException> { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }
+        assertThrows<KlagebehandlingAvsluttetException> {
+            tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(
+                klage
+            )
+        }
     }
 
     @Test
@@ -105,7 +117,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z654321")
 
-        assertThrows<MissingTilgangException> { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }
+        assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }
     }
 
     @Test
@@ -132,7 +144,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z654321")
 
-        assertThrows<MissingTilgangException> { tilgangService.verifySaksbehandlersSkrivetilgang(klage) }
+        assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }
     }
 
     @Test
@@ -160,7 +172,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
 
-        assertThat(tilgangService.verifySaksbehandlersSkrivetilgang(klage)).isEqualTo(Unit)
+        assertThat(tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage)).isEqualTo(Unit)
     }
 
     @Test
@@ -179,7 +191,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() }.returns(false)
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
-        assertThat(tilgangService.harSaksbehandlerTilgangTil("")).isEqualTo(false)
+        assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
 
     @Test
@@ -198,7 +210,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
-        assertThat(tilgangService.harSaksbehandlerTilgangTil("")).isEqualTo(false)
+        assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
 
     @Test
@@ -218,7 +230,6 @@ class TilgangServiceTest {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() }.returns(false)
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(true)
-        assertThat(tilgangService.harSaksbehandlerTilgangTil("")).isEqualTo(false)
+        assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
-
 }

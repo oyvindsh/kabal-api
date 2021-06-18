@@ -25,7 +25,7 @@ data class KlagebehandlingerSearchCriteria(
     val limit: Int,
     val erTildeltSaksbehandler: Boolean? = null,
     val saksbehandler: String? = null,
-    val enhetsnr: String? = null,
+    val enhetId: String? = null,
     val projection: Projection? = null,
     val sortField: SortField? = null
 ) {

@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -43,7 +44,15 @@ class InnloggetSaksbehandlerRepository(
     fun kanBehandleEgenAnsatt(): Boolean = tokenUtil.getRollerFromToken().hasRole(kanBehandleEgenAnsattRole)
 
     fun harTilgangTilEnhet(enhetId: String): Boolean {
-        return getEnheterMedTemaerForSaksbehandler().enheter.firstOrNull { it.enhetId == enhetId } != null
+        return saksbehandlerRepository.harTilgangTilEnhet(getInnloggetIdent(), enhetId)
+    }
+
+    fun harTilgangTilTema(tema: Tema): Boolean {
+        return saksbehandlerRepository.harTilgangTilTema(getInnloggetIdent(), tema)
+    }
+
+    fun harTilgangTilEnhetOgTema(enhetId: String, tema: Tema): Boolean {
+        return saksbehandlerRepository.harTilgangTilEnhetOgTema(getInnloggetIdent(), enhetId, tema)
     }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }

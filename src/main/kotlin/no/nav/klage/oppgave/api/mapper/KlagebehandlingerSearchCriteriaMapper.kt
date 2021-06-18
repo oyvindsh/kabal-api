@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class KlagebehandlingerQueryParamsMapper {
+class KlagebehandlingerSearchCriteriaMapper {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")

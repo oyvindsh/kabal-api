@@ -4,7 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingerQueryParamsMapper
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingerSearchCriteriaMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
@@ -14,6 +14,7 @@ import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
@@ -26,9 +27,10 @@ class KlagebehandlingListController(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingMapper: KlagebehandlingListMapper,
     private val elasticsearchService: ElasticsearchService,
-    private val klagebehandlingerQueryParamsMapper: KlagebehandlingerQueryParamsMapper,
+    private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    private val saksbehandlerRepository: SaksbehandlerRepository
+    private val saksbehandlerRepository: SaksbehandlerRepository,
+    private val saksbehandlerService: SaksbehandlerService
 ) {
 
     companion object {
@@ -48,15 +50,17 @@ class KlagebehandlingListController(
     ): KlagebehandlingerListRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, queryParams)
+        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
-                searchCriteria.saksbehandler
+                searchCriteria.saksbehandler,
+                valgtEnhet.temaer
             )
         )
     }
@@ -72,14 +76,16 @@ class KlagebehandlingListController(
         @RequestBody input: PersonSoekInput
     ): KlagebehandlingerPersonSoekListRespons {
         validateNavIdent(navIdent)
-        val searchCriteria = klagebehandlingerQueryParamsMapper.toSearchCriteria(navIdent, input)
+        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
-                searchCriteria.saksbehandler
+                searchCriteria.saksbehandler,
+                valgtEnhet.temaer
             )
         )
     }
@@ -146,7 +152,7 @@ class KlagebehandlingListController(
         validateNavIdent(navIdent)
         return AntallUtgaatteFristerResponse(
             antall = elasticsearchService.countByCriteria(
-                klagebehandlingerQueryParamsMapper.toFristUtgaattIkkeTildeltSearchCriteria(
+                klagebehandlingerSearchCriteriaMapper.toFristUtgaattIkkeTildeltSearchCriteria(
                     navIdent,
                     queryParams
                 )
@@ -177,7 +183,7 @@ class KlagebehandlingListController(
     }
 
     private fun Saksbehandlertildeling.angittEnhetOrDefault(): String =
-        enhetId ?: saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(navIdent).enheter.first().enhetId
+        enhetId ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).enhetId
 
     //    @PutMapping("/oppgaver/{id}/hjemmel")
 //    fun setHjemmel(

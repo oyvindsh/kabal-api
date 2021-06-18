@@ -74,8 +74,8 @@ class OppgaveClient(
             .queryParam("oppgavetype", "BEH_SAK_MK")
             .queryParam("oppgavetype", "BEH_SAK")
 
-        enhetsnr?.let {
-            uriBuilder.queryParam("tildeltEnhetsnr", enhetsnr)
+        enhetId?.let {
+            uriBuilder.queryParam("tildeltEnhetsnr", enhetId)
         }
 
         if (typer.isNotEmpty()) {

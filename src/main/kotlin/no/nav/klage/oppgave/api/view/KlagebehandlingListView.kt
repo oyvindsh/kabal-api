@@ -23,7 +23,8 @@ data class KlagebehandlingListView(
     val utfall: String?,
     val avsluttetAvSaksbehandler: LocalDate?,
     val erTildelt: Boolean,
-    val tildeltSaksbehandlerident: String?
+    val tildeltSaksbehandlerident: String?,
+    val saksbehandlerHarTilgang: Boolean
 ) {
     data class Person(
         val fnr: String?,
@@ -39,5 +40,7 @@ data class KlagebehandlingerPersonSoekListRespons(
 data class PersonSoekPersonView(
     val fnr: String,
     val navn: String?,
-    val klagebehandlinger: List<KlagebehandlingListView>
+    val klagebehandlinger: List<KlagebehandlingListView>,
+    val aapneKlagebehandlinger: List<KlagebehandlingListView>,
+    val avsluttedeKlagebehandlinger: List<KlagebehandlingListView>
 )

@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.repositories
 import no.nav.klage.oppgave.clients.axsys.AxsysClient
 import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -30,6 +31,20 @@ class SaksbehandlerRepository(
         val saksbehandlerNameCache = mutableMapOf<String, String>()
 
         const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
+    }
+
+    fun harTilgangTilEnhetOgTema(ident: String, enhetId: String, tema: Tema): Boolean {
+        return getEnheterMedTemaerForSaksbehandler(ident).enheter.firstOrNull { it.enhetId == enhetId }?.temaer?.contains(
+            tema
+        ) ?: false
+    }
+
+    fun harTilgangTilEnhet(ident: String, enhetId: String): Boolean {
+        return getEnheterMedTemaerForSaksbehandler(ident).enheter.firstOrNull { it.enhetId == enhetId } != null
+    }
+
+    fun harTilgangTilTema(ident: String, tema: Tema): Boolean {
+        return getEnheterMedTemaerForSaksbehandler(ident).enheter.flatMap { it.temaer }.contains(tema)
     }
 
     fun getEnheterMedTemaerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =

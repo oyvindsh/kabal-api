@@ -3,9 +3,11 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -14,7 +16,8 @@ import org.springframework.stereotype.Service
 class TilgangService(
     private val pdlFacade: PdlFacade,
     private val egenAnsattService: EgenAnsattService,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
     companion object {
@@ -23,7 +26,7 @@ class TilgangService(
         private val securelogger = getSecureLogger()
     }
 
-    fun verifySaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
+    fun verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
         if (klagebehandling.avsluttetAvSaksbehandler != null || klagebehandling.avsluttet != null) {
             throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
@@ -42,19 +45,31 @@ class TilgangService(
         }
     }
 
-    fun verifySaksbehandlersTilgangTil(fnr: String) {
-        if (!harSaksbehandlerTilgangTil(fnr)) {
-            throw MissingTilgangException("Not authorized to access this user")
+    fun verifyInnloggetSaksbehandlersTilgangTil(fnr: String) {
+        if (!harInnloggetSaksbehandlerTilgangTil(fnr)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til denne brukeren")
         }
     }
 
-    fun verifySaksbehandlersTilgangTilEnhet(enhetId: String) {
+    fun verifyInnloggetSaksbehandlersTilgangTilEnhet(enhetId: String) {
         if (!innloggetSaksbehandlerRepository.harTilgangTilEnhet(enhetId)) {
-            throw MissingTilgangException("Not authorized to act as this enhet")
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til enhet $enhetId")
         }
     }
 
-    fun harSaksbehandlerTilgangTil(fnr: String): Boolean {
+    fun verifySaksbehandlersTilgangTilEnhetOgTema(saksbehandlerIdent: String, enhetId: String, tema: Tema) {
+        if (!saksbehandlerRepository.harTilgangTilEnhetOgTema(saksbehandlerIdent, enhetId, tema)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til tema $tema i enhet $enhetId")
+        }
+    }
+
+    fun verifyInnloggetSaksbehandlersTilgangTilTema(tema: Tema) {
+        if (!innloggetSaksbehandlerRepository.harTilgangTilTema(tema)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til tema $tema")
+        }
+    }
+
+    fun harInnloggetSaksbehandlerTilgangTil(fnr: String): Boolean {
         val personInfo = pdlFacade.getPersonInfo(fnr)
         if (personInfo.harBeskyttelsesbehovFortrolig()) {
             securelogger.info("erFortrolig")
