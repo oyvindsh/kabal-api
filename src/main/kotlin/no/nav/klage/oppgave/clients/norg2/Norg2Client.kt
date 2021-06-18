@@ -25,7 +25,7 @@ class Norg2Client(private val norg2WebClient: WebClient) {
                 .retrieve()
                 .bodyToMono<EnhetResponse>()
                 .block()
-                ?.asEnhet() ?: Enhet(navn = "Ukjent enhet").also { logger.warn("Enhet not found for $enhetNr") }
+                ?.asEnhet() ?: throw RuntimeException("No enhet returned for enhetNr $enhetNr")
         } catch (ex: Exception) {
             val errorMessage = "Problems with getting enhet $enhetNr from Norg2"
             logger.error(errorMessage, ex)
