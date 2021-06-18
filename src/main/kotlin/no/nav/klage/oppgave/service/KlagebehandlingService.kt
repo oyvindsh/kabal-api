@@ -98,7 +98,6 @@ class KlagebehandlingService(
         klagebehandlingVersjon: Long?
     ): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
-            .also { checkLeseTilgang(it) }
             .also { checkSkrivetilgangForSystembruker(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 

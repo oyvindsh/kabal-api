@@ -232,5 +232,4 @@ class TilgangServiceTest {
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(true)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
-
 }
