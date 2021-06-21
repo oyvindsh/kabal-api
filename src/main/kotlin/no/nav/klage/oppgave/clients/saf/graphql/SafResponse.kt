@@ -14,7 +14,7 @@ data class DokumentoversiktBrukerDataWrapper(val dokumentoversiktBruker: Dokumen
 
 data class DokumentoversiktBruker(val journalposter: List<Journalpost>, val sideInfo: SideInfo)
 
-data class SideInfo(val sluttpeker: String?, val finnesNesteSide: Boolean)
+data class SideInfo(val sluttpeker: String?, val finnesNesteSide: Boolean, val antall: Int, val totaltAntall: Int)
 
 data class JournalpostResponse(val data: JournalpostDataWrapper?, val errors: List<Error>?)
 

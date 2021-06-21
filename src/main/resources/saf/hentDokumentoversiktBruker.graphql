@@ -53,6 +53,8 @@ query($brukerId: BrukerIdInput!, $foerste: Int, $etter: String) {
         sideInfo {
             sluttpeker
             finnesNesteSide
+            antall
+            totaltAntall
         }
     }
 }
