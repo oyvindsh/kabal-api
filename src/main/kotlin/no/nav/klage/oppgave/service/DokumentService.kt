@@ -50,15 +50,20 @@ class DokumentService(
                 totaltAntall = dokumentoversiktBruker.sideInfo.totaltAntall
             )
         } else {
-            return DokumenterResponse(dokumenter = emptyList(), pageReference = null)
+            return DokumenterResponse(dokumenter = emptyList(), pageReference = null, antall = 0, totaltAntall = 0)
         }
     }
 
     fun fetchJournalposterConnectedToKlagebehandling(klagebehandling: Klagebehandling): DokumenterResponse {
-        return klagebehandling.saksdokumenter
+        val dokumentReferanser = klagebehandling.saksdokumenter
             .mapNotNull { safGraphQlClient.getJournalpost(it.journalpostId) }
             .map { dokumentMapper.mapJournalpostToDokumentReferanse(it, klagebehandling) }
-            .let { DokumenterResponse(dokumenter = it, pageReference = null) }
+        return DokumenterResponse(
+            dokumenter = dokumentReferanser,
+            pageReference = null,
+            antall = dokumentReferanser.size,
+            totaltAntall = dokumentReferanser.size
+        )
     }
 
     fun validateJournalpostExists(journalpostId: String) {
