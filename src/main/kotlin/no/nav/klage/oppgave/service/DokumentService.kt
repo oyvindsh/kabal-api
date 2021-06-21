@@ -45,7 +45,9 @@ class DokumentService(
                     dokumentoversiktBruker.sideInfo.sluttpeker
                 } else {
                     null
-                }
+                },
+                antall = dokumentoversiktBruker.sideInfo.antall,
+                totaltAntall = dokumentoversiktBruker.sideInfo.totaltAntall
             )
         } else {
             return DokumenterResponse(dokumenter = emptyList(), pageReference = null)

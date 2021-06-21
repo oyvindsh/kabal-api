@@ -2,7 +2,12 @@ package no.nav.klage.oppgave.api.view
 
 import java.time.LocalDate
 
-data class DokumenterResponse(val dokumenter: List<DokumentReferanse>, val pageReference: String? = null)
+data class DokumenterResponse(
+    val dokumenter: List<DokumentReferanse>,
+    val pageReference: String? = null,
+    val antall: Int? = null,
+    val totaltAntall: Int? = null
+)
 
 data class DokumentReferanserResponse(val journalpostIder: List<String>)
 
