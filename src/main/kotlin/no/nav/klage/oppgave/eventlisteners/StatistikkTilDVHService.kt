@@ -3,10 +3,7 @@ package no.nav.klage.oppgave.eventlisteners
 import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
 import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState
-import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
-import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.service.StatistikkTilDVHKafkaProducer
@@ -68,7 +65,7 @@ class StatistikkTilDVHService(
         //Only works as long as we only have one
         val vedtak = klagebehandling.vedtak.firstOrNull()
 
-        val funksjoneltEndringstidspunkt = getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState)
+        val funksjoneltEndringstidspunkt = getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState, vedtak)
 
         return KlageStatistikkTilDVH(
             behandlingId = mottak.dvhReferanse,
@@ -96,13 +93,14 @@ class StatistikkTilDVHService(
 
     private fun getFunksjoneltEndringstidspunkt(
         klagebehandling: Klagebehandling,
-        klagebehandlingState: KlagebehandlingState
+        klagebehandlingState: KlagebehandlingState,
+        vedtak: Vedtak?
     ): LocalDateTime {
         return when (klagebehandlingState) {
             KlagebehandlingState.MOTTATT -> klagebehandling.mottattKlageinstans
             KlagebehandlingState.TILDELT_SAKSBEHANDLER -> klagebehandling.tildeling?.tidspunkt
                 ?: throw RuntimeException("tildelt mangler")
-            KlagebehandlingState.AVSLUTTET -> klagebehandling.avsluttet ?: throw RuntimeException("avsluttet mangler")
+            KlagebehandlingState.AVSLUTTET -> vedtak?.ferdigstiltIJoark ?: throw RuntimeException("ferdigstiltIJoark mangler")
             KlagebehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")
                 LocalDateTime.now()
