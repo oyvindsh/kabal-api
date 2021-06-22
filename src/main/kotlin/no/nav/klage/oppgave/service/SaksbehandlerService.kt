@@ -39,6 +39,9 @@ class SaksbehandlerService(
     private fun getNameForIdent(it: String) =
         saksbehandlerRepository.getNamesForSaksbehandlere(setOf(it)).getOrDefault(it, "Ukjent navn")
 
+    fun getNamesForSaksbehandlere(idents: Set<String>) =
+        saksbehandlerRepository.getNamesForSaksbehandlere(idents)
+
     @Transactional
     fun storeValgtEnhetId(ident: String, enhetId: String): EnhetMedLovligeTemaer {
         val enhet = getEnheterMedTemaerForSaksbehandler().enheter.find { it.enhetId == enhetId }

@@ -22,11 +22,19 @@ class KlagebehandlingListMapper() {
         esKlagebehandlinger: List<EsKlagebehandling>,
         viseUtvidet: Boolean,
         saksbehandler: String?,
-        tilgangTilTemaer: List<Tema>
+        tilgangTilTemaer: List<Tema>,
+        navnTilSaksbehandlere: Map<String, String>
     ): List<PersonSoekPersonView> {
         return esKlagebehandlinger.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
             val klagebehandlinger =
-                mapEsKlagebehandlingerToListView(value, viseUtvidet, true, saksbehandler, tilgangTilTemaer)
+                mapEsKlagebehandlingerToListView(
+                    value,
+                    viseUtvidet,
+                    true,
+                    saksbehandler,
+                    tilgangTilTemaer,
+                    navnTilSaksbehandlere
+                )
             PersonSoekPersonView(
                 fnr = key!!,
                 navn = value.first().sakenGjelderNavn,
@@ -42,7 +50,8 @@ class KlagebehandlingListMapper() {
         viseUtvidet: Boolean,
         viseFullfoerte: Boolean,
         saksbehandler: String?,
-        tilgangTilTemaer: List<Tema>
+        tilgangTilTemaer: List<Tema>,
+        navnTilSaksbehandlere: Map<String, String> = emptyMap()
     ): List<KlagebehandlingListView> {
         return esKlagebehandlinger.map { esKlagebehandling ->
             KlagebehandlingListView(
@@ -67,6 +76,7 @@ class KlagebehandlingListMapper() {
                 medunderskriverident = esKlagebehandling.medunderskriverident,
                 erTildelt = esKlagebehandling.tildeltSaksbehandlerident != null,
                 tildeltSaksbehandlerident = esKlagebehandling.tildeltSaksbehandlerident,
+                tildeltSaksbehandlerNavn = navnTilSaksbehandlere[esKlagebehandling.tildeltSaksbehandlerident],
                 utfall = if (viseFullfoerte) {
                     esKlagebehandling.vedtakUtfall
                 } else {
