@@ -24,6 +24,7 @@ data class KlagebehandlingListView(
     val avsluttetAvSaksbehandler: LocalDate?,
     val erTildelt: Boolean,
     val tildeltSaksbehandlerident: String?,
+    val tildeltSaksbehandlerNavn: String?,
     val saksbehandlerHarTilgang: Boolean
 ) {
     data class Person(

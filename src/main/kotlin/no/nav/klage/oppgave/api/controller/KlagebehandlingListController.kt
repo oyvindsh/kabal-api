@@ -11,7 +11,6 @@ import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -29,7 +28,6 @@ class KlagebehandlingListController(
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    private val saksbehandlerRepository: SaksbehandlerRepository,
     private val saksbehandlerService: SaksbehandlerService
 ) {
 
@@ -85,7 +83,10 @@ class KlagebehandlingListController(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.saksbehandler,
-                valgtEnhet.temaer
+                valgtEnhet.temaer,
+                saksbehandlerService.getNamesForSaksbehandlere(esResponse.searchHits.mapNotNull {
+                    it.content.tildeltSaksbehandlerident
+                }.toSet())
             )
         )
     }
