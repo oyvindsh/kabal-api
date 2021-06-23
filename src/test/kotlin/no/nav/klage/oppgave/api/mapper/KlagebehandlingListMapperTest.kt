@@ -13,7 +13,6 @@ internal class KlagebehandlingListMapperTest {
 
     val fnr1 = "01011012345"
     val fnr2 = "02022012345"
-    val someSaksbehandler = "A123456"
 
     val klagebehandling1 = EsKlagebehandling(
         id = "1001L",
@@ -22,7 +21,6 @@ internal class KlagebehandlingListMapperTest {
         tildeltEnhet = "4219",
         tema = Tema.OMS.id,
         type = Type.KLAGE.id,
-        tildeltSaksbehandlerident = someSaksbehandler,
         innsendt = LocalDate.of(2019, 10, 1),
         mottattFoersteinstans = LocalDate.of(2019, 11, 1),
         mottattKlageinstans = LocalDateTime.of(2019, 12, 1, 0, 0),
@@ -85,11 +83,10 @@ internal class KlagebehandlingListMapperTest {
         val mappedValue: List<PersonSoekPersonView> = mapper.mapEsKlagebehandlingerToPersonListView(
             viseUtvidet = false, saksbehandler = "AB12345", esKlagebehandlinger = listOf(
                 klagebehandling1, klagebehandling2, klagebehandling3
-            ), tilgangTilTemaer = emptyList(), navnTilSaksbehandlere = mapOf(someSaksbehandler to "Kalle Anka")
+            ), tilgangTilTemaer = emptyList()
         )
         assertThat(mappedValue.size).isEqualTo(2)
         assertThat(mappedValue.find { it.fnr == fnr1 }!!.klagebehandlinger.size).isEqualTo(2)
         assertThat(mappedValue.find { it.fnr == fnr2 }!!.klagebehandlinger.size).isEqualTo(1)
-        assertThat(mappedValue.find { it.fnr == fnr1 }!!.klagebehandlinger[0].tildeltSaksbehandlerNavn).isEqualTo("Kalle Anka")
     }
 }

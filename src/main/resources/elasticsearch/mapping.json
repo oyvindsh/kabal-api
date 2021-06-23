@@ -120,6 +120,9 @@
     "tildeltSaksbehandlerident": {
       "type": "keyword"
     },
+    "tildeltSaksbehandlernavn": {
+      "type": "text"
+    },
     "medunderskriverident": {
       "type": "keyword"
     },

@@ -39,7 +39,7 @@ class SaksbehandlerService(
     private fun getNameForIdent(it: String) =
         saksbehandlerRepository.getNamesForSaksbehandlere(setOf(it)).getOrDefault(it, "Ukjent navn")
 
-    fun getNamesForSaksbehandlere(idents: Set<String>) =
+    fun getNamesForSaksbehandlere(idents: Set<String>): Map<String, String> =
         saksbehandlerRepository.getNamesForSaksbehandlere(idents)
 
     @Transactional

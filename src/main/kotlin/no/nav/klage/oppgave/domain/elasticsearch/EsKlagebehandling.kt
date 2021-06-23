@@ -100,6 +100,8 @@ data class EsKlagebehandling(
 
     @Field(type = FieldType.Keyword)
     val tildeltSaksbehandlerident: String? = null,
+    @Field(type = FieldType.Text)
+    val tildeltSaksbehandlernavn: String? = null,
     @Field(type = FieldType.Keyword)
     val medunderskriverident: String? = null,
 
