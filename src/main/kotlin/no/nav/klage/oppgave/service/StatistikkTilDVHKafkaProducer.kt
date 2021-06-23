@@ -27,7 +27,7 @@ class StatistikkTilDVHKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nKlageStatistikkTilDVH: {}", topic, statistikk)
         runCatching {
-            aivenKafkaTemplate.send(topic, statistikk.toJson()).get()
+            aivenKafkaTemplate.send(topic, statistikk.behandlingIdKabal, statistikk.toJson()).get()
             logger.debug("KlageStatistikkTilDVH sent to Kafka.")
         }.onFailure {
             val errorMessage = "Could not send KlageStatistikkTilDVH to Kafka. Check secure logs for more information."

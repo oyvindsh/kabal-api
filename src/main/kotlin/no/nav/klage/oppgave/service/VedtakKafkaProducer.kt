@@ -27,7 +27,7 @@ class VedtakKafkaProducer(
         logger.debug("Sending to Kafka topic: {}", topic)
         secureLogger.debug("Sending to Kafka topic: {}\nVedtak: {}", topic, vedtak)
         runCatching {
-            val result = aivenKafkaTemplate.send(topic, vedtak.toJson()).get()
+            val result = aivenKafkaTemplate.send(topic, vedtak.kabalReferanse, vedtak.toJson()).get()
             logger.info("Vedtak sent to Kafka.")
             secureLogger.debug("Vedtak $vedtak sent to kafka ($result)")
         }.onFailure {
