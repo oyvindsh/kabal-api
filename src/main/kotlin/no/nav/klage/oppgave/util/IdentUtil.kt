@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.util
 
-fun isValidFnr(fnr: String): Boolean {
+fun isValidFnrOrDnr(fnr: String): Boolean {
     if (fnr.length != 11) {
         return false
     }

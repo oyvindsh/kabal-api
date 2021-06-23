@@ -15,7 +15,7 @@ import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
 import no.nav.klage.oppgave.repositories.EnhetRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.isValidFnr
+import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -75,8 +75,8 @@ class MottakService(
 
     fun OversendtKlage.validate() {
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-        validateKlager(klager.id)
-        sakenGjelder?.run { validateKlager(sakenGjelder.id) }
+        validatePartId(klager.id)
+        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
         validateTema(tema)
         validateType(type)
         validateEnhet(avsenderEnhet)
@@ -117,12 +117,12 @@ class MottakService(
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
 
-    private fun validateKlager(klager: OversendtPartId) {
+    private fun validatePartId(klager: OversendtPartId) {
         if (klager.type == OversendtPartIdType.VIRKSOMHET) {
             return
         }
 
-        if (!isValidFnr(klager.verdi)) {
+        if (!isValidFnrOrDnr(klager.verdi)) {
             throw OversendtKlageNotValidException("Ugyldig fødselsnummer")
         }
     }
