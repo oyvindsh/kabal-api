@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.domain.elasticsearch.EsVedtak
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
+import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service
 class EsKlagebehandlingMapper(
     private val pdlFacade: PdlFacade,
     private val egenAnsattService: EgenAnsattService,
+    private val saksbehandlerService: SaksbehandlerService,
     private val eregClient: EregClient
 ) {
 
@@ -39,7 +41,7 @@ class EsKlagebehandlingMapper(
 
         val sakenGjelderOrgnr = virksomhetsnummer(klagebehandling.sakenGjelder.partId)
         val sakenGjelderOrgnavn = sakenGjelderOrgnr?.let { eregClient.hentOrganisasjon(it)?.navn?.sammensattNavn() }
-        
+
         val erFortrolig = sakenGjelderPersonInfo?.harBeskyttelsesbehovFortrolig() ?: false
         val erStrengtFortrolig = sakenGjelderPersonInfo?.harBeskyttelsesbehovStrengtFortrolig() ?: false
         val erEgenAnsatt = sakenGjelderFnr?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
@@ -78,6 +80,7 @@ class EsKlagebehandlingMapper(
             avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
+            tildeltSaksbehandlernavn = getTildeltSaksbehandlernavn(klagebehandling),
             medunderskriverident = klagebehandling.medunderskriver?.saksbehandlerident,
             sendtMedunderskriver = klagebehandling.medunderskriver?.tidspunkt,
             tildeltEnhet = klagebehandling.tildeling?.enhet,
@@ -129,6 +132,15 @@ class EsKlagebehandlingMapper(
             sakFagsystemNavn = klagebehandling.sakFagsystem?.name,
             status = EsKlagebehandling.Status.valueOf(klagebehandling.getStatus().name)
         )
+    }
+
+    private fun getTildeltSaksbehandlernavn(klagebehandling: Klagebehandling): String? {
+        return klagebehandling.tildeling?.saksbehandlerident?.let {
+            val names = saksbehandlerService.getNamesForSaksbehandlere(
+                setOf(it)
+            )
+            names[it]
+        }
     }
 
     private fun foedselsnummer(partId: PartId) =

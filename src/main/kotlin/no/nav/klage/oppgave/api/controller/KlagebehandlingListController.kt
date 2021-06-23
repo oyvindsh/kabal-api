@@ -83,10 +83,7 @@ class KlagebehandlingListController(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.saksbehandler,
-                valgtEnhet.temaer,
-                saksbehandlerService.getNamesForSaksbehandlere(esResponse.searchHits.mapNotNull {
-                    it.content.tildeltSaksbehandlerident
-                }.toSet())
+                valgtEnhet.temaer
             )
         )
     }
