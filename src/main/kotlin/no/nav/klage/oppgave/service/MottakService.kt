@@ -2,8 +2,7 @@ package no.nav.klage.oppgave.service
 
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
-import no.nav.klage.oppgave.api.view.OversendtKlage
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
@@ -75,7 +74,7 @@ class MottakService(
 
     fun OversendtKlage.validate() {
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-
+        validateKlager(klager.id)
         validateTema(tema)
         validateType(type)
         validateEnhet(avsenderEnhet)
@@ -115,5 +114,35 @@ class MottakService(
             logger.warn("Unable to validate journalpost from oversendt klage: {}", journalpostId, e)
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
+
+    private fun validateKlager(klager: OversendtPartId) {
+        if (klager.type == OversendtPartIdType.VIRKSOMHET) {
+            return
+        }
+
+        if (!isValidFnr(klager.verdi)) {
+            throw OversendtKlageNotValidException("Ugyldig fødselsnummer")
+        }
+    }
+
+    private fun isValidFnr(fnr: String): Boolean {
+        if (fnr.length != 11) {
+            return false
+        }
+        val d1 = fnr.substring(0, 1).toInt()
+        val d2 = fnr.substring(1, 2).toInt()
+        val m1 = fnr.substring(2, 3).toInt()
+        val m2 = fnr.substring(3, 4).toInt()
+        val y1 = fnr.substring(4, 5).toInt()
+        val y2 = fnr.substring(5, 6).toInt()
+        val i1 = fnr.substring(6, 7).toInt()
+        val i2 = fnr.substring(7, 8).toInt()
+        val i3 = fnr.substring(8, 9).toInt()
+
+        val k1 = 11 - ((3 * d1 + 7 * d2 + 6 * m1 + 1 * m2 + 8 * y1 + 9 * y2 + 4 * i1 + 5 * i2 + 2 * i3) % 11)
+        val k2 = 11 - ((5 * d1 + 4 * d2 + 3 * m1 + 2 * m2 + 7 * y1 + 6 * y2 + 5 * i1 + 4 * i2 + 3 * i3 + 2 * k1) % 11)
+
+        return k1 == fnr.substring(9, 10).toInt() && k2 == fnr.substring(10, 11).toInt()
+    }
 
 }
