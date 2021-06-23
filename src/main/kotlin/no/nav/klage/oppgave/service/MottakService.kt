@@ -75,6 +75,7 @@ class MottakService(
     fun OversendtKlage.validate() {
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
         validateKlager(klager.id)
+        sakenGjelder?.run { validateKlager(sakenGjelder.id) }
         validateTema(tema)
         validateType(type)
         validateEnhet(avsenderEnhet)
