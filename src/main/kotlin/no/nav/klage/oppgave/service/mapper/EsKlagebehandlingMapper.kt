@@ -135,13 +135,11 @@ class EsKlagebehandlingMapper(
     }
 
     private fun getTildeltSaksbehandlernavn(klagebehandling: Klagebehandling): String? {
-        return if (klagebehandling.tildeling?.saksbehandlerident != null) {
+        return klagebehandling.tildeling?.saksbehandlerident?.let {
             val names = saksbehandlerService.getNamesForSaksbehandlere(
-                setOf(requireNotNull(klagebehandling.tildeling?.saksbehandlerident))
+                setOf(it)
             )
-            names[klagebehandling.tildeling?.saksbehandlerident]
-        } else {
-            null
+            names[it]
         }
     }
 
