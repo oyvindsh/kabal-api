@@ -35,14 +35,14 @@ class IndexService(
             PageRequest.of(0, 50, Sort.by("created").descending())
         do {
             val page = klagebehandlingRepository.findAll(pageable)
-            page.content.map { esKlagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(it) }
-                .let {
-                    try {
-                        elasticsearchService.save(it)
-                    } catch (e: Exception) {
-                        logger.warn("Exception during indexing", e)
-                    }
+            page.content.map { klagebehandling ->
+                try {
+                    esKlagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
+                        .let { elasticsearchService.save(it) }
+                } catch (e: Exception) {
+                    logger.warn("Exception during indexing", e)
                 }
+            }
             pageable = page.nextPageable();
         } while (pageable.isPaged)
     }
