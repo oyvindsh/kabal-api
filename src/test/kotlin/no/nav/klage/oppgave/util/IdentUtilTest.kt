@@ -11,8 +11,8 @@ class IdentUtilTest {
     }
 
     @Test
-    fun `gyldig fødselsnummer gir rett svar`() {
+    fun `gyldig d-nummer gir rett svar`() {
         assertThat(isValidFnrOrDnr("02446701749")).isTrue
     }
-
+    
 }

@@ -117,12 +117,12 @@ class MottakService(
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
 
-    private fun validatePartId(klager: OversendtPartId) {
-        if (klager.type == OversendtPartIdType.VIRKSOMHET) {
+    private fun validatePartId(partId: OversendtPartId) {
+        if (partId.type == OversendtPartIdType.VIRKSOMHET) {
             return
         }
 
-        if (!isValidFnrOrDnr(klager.verdi)) {
+        if (!isValidFnrOrDnr(partId.verdi)) {
             throw OversendtKlageNotValidException("Ugyldig fødselsnummer")
         }
     }
