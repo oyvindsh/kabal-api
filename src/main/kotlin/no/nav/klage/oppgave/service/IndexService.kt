@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Service
 class IndexService(
@@ -58,14 +59,19 @@ class IndexService(
             "Klagebehandlinger in DB that are not in ES: {}",
             dbData.keys.minus(esData.keys)
         )
-        dbData.keys.forEach {
-            if (!dbData.getValue(it).isEqual(esData[it])) {
-                logger.info(
-                    "Klagebehandling {} is not up-to-date in ES, modified is {} in DB and {} in ES",
-                    it,
-                    dbData.getValue(it),
-                    esData[it]
-                )
+        dbData.keys.forEach { id ->
+            val dbValue = dbData.getValue(id)
+            val esValue = esData[id]
+            if (esValue != null) {
+                //If esValue == null it will already have been logged as "Klagebehandlinger in DB that are not in ES"
+                if (!dbValue.truncatedTo(ChronoUnit.MILLIS).isEqual(esValue.truncatedTo(ChronoUnit.MILLIS))) {
+                    logger.info(
+                        "Klagebehandling {} is not up-to-date in ES, modified is {} in DB and {} in ES",
+                        id,
+                        dbValue,
+                        esValue
+                    )
+                }
             }
         }
     }
