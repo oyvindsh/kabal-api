@@ -119,7 +119,7 @@ class SafGraphQlClient(
             return block.invoke().let { secureLogger.debug("Received response: $it"); it }
         } finally {
             val end = System.currentTimeMillis()
-            logger.info("Time it took to call saf: ${end - start} millis")
+            logger.debug("Time it took to call saf: ${end - start} millis")
         }
     }
 }

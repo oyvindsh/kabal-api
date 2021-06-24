@@ -42,7 +42,7 @@ class PdlClient(
             return block.invoke()
         } finally {
             val end = currentTimeMillis()
-            logger.info("Time it took to call pdl: ${end - start} millis")
+            logger.debug("Time it took to call pdl: ${end - start} millis")
         }
     }
 
