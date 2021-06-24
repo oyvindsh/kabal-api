@@ -1,6 +1,6 @@
 pool: nav-prod
 config:
-  cleanupPolicy: compact
+  cleanupPolicy: delete
   minimumInSyncReplicas: 1
   partitions: 1
   replication: 3
