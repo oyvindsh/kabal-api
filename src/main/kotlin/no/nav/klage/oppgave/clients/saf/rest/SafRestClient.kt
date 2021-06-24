@@ -75,7 +75,7 @@ class SafRestClient(
             return block.invoke()
         } finally {
             val end = System.currentTimeMillis()
-            logger.info("Time it took to call saf: ${end - start} millis")
+            logger.debug("Time it took to call saf: ${end - start} millis")
         }
     }
 }

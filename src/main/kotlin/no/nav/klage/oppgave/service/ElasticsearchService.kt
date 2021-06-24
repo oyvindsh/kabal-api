@@ -268,7 +268,7 @@ open class ElasticsearchService(
             }
         }
 
-        logger.info("Making search request with query {}", baseQuery.toString())
+        logger.debug("Making search request with query {}", baseQuery.toString())
         return baseQuery
     }
 
