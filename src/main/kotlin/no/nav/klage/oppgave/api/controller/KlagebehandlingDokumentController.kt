@@ -44,7 +44,12 @@ class KlagebehandlingDokumentController(
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null
     ): DokumenterResponse {
         val klagebehandlingId = parseAndValidate(behandlingsid)
-        return klagebehandlingService.fetchDokumentlisteForKlagebehandling(klagebehandlingId, pageSize, previousPageRef)
+        return klagebehandlingService.fetchDokumentlisteForKlagebehandling(
+            klagebehandlingId,
+            null,
+            pageSize,
+            previousPageRef
+        )
     }
 
     //TODO: Blir denne brukt?

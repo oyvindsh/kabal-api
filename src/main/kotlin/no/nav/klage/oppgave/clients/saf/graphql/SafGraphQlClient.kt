@@ -26,6 +26,7 @@ class SafGraphQlClient(
     @Retryable
     fun getDokumentoversiktBruker(
         fnr: String,
+        tema: List<Tema>?,
         pageSize: Int,
         previousPageRef: String? = null
     ): DokumentoversiktBruker {
@@ -38,7 +39,7 @@ class SafGraphQlClient(
                 )
                 .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
 
-                .bodyValue(hentDokumentoversiktBrukerQuery(fnr, pageSize, previousPageRef))
+                .bodyValue(hentDokumentoversiktBrukerQuery(fnr, tema, pageSize, previousPageRef))
                 .retrieve()
                 .bodyToMono<DokumentoversiktBrukerResponse>()
                 .block()
