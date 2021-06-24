@@ -55,7 +55,7 @@ internal class SafDokumentoversiktBrukerTest {
             tracerMock
         )
 
-        return safClient.getDokumentoversiktBruker("fnr", 1, null)
+        return safClient.getDokumentoversiktBruker("fnr", emptyList(), 1, null)
     }
 
     @Language("json")

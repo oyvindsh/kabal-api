@@ -500,11 +500,12 @@ class KlagebehandlingService(
 
     fun fetchDokumentlisteForKlagebehandling(
         klagebehandlingId: UUID,
+        temaer: List<Tema>,
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
-        return dokumentService.fetchDokumentlisteForKlagebehandling(klagebehandling, pageSize, previousPageRef)
+        return dokumentService.fetchDokumentlisteForKlagebehandling(klagebehandling, temaer, pageSize, previousPageRef)
     }
 
     fun fetchJournalpostIderConnectedToKlagebehandling(klagebehandlingId: UUID): List<String> =

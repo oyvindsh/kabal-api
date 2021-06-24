@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.ArkivertDokumentWithTitle
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
@@ -27,6 +28,7 @@ class DokumentService(
 
     fun fetchDokumentlisteForKlagebehandling(
         klagebehandling: Klagebehandling,
+        temaer: List<Tema>,
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
@@ -34,6 +36,7 @@ class DokumentService(
             val dokumentoversiktBruker: DokumentoversiktBruker =
                 safGraphQlClient.getDokumentoversiktBruker(
                     klagebehandling.sakenGjelder.partId.value,
+                    mapTema(temaer),
                     pageSize,
                     previousPageRef
                 )
@@ -53,6 +56,10 @@ class DokumentService(
             return DokumenterResponse(dokumenter = emptyList(), pageReference = null, antall = 0, totaltAntall = 0)
         }
     }
+
+    private fun mapTema(temaer: List<Tema>): List<no.nav.klage.oppgave.clients.saf.graphql.Tema> =
+        temaer.map { tema -> no.nav.klage.oppgave.clients.saf.graphql.Tema.valueOf(tema.name) }
+    
 
     fun fetchJournalposterConnectedToKlagebehandling(klagebehandling: Klagebehandling): DokumenterResponse {
         val dokumentReferanser = klagebehandling.saksdokumenter
