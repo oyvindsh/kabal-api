@@ -26,7 +26,7 @@ class SafGraphQlClient(
     @Retryable
     fun getDokumentoversiktBruker(
         fnr: String,
-        tema: List<Tema>?,
+        tema: List<Tema>,
         pageSize: Int,
         previousPageRef: String? = null
     ): DokumentoversiktBruker {

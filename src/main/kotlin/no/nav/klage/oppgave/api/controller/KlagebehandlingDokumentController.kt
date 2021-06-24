@@ -45,10 +45,10 @@ class KlagebehandlingDokumentController(
     ): DokumenterResponse {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         return klagebehandlingService.fetchDokumentlisteForKlagebehandling(
-            klagebehandlingId,
-            null,
-            pageSize,
-            previousPageRef
+            klagebehandlingId = klagebehandlingId,
+            temaer = emptyList(),
+            pageSize = pageSize,
+            previousPageRef = previousPageRef
         )
     }
 

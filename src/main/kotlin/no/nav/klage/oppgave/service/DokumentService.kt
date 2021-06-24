@@ -28,7 +28,7 @@ class DokumentService(
 
     fun fetchDokumentlisteForKlagebehandling(
         klagebehandling: Klagebehandling,
-        temaer: List<Tema>?,
+        temaer: List<Tema>,
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
@@ -57,9 +57,9 @@ class DokumentService(
         }
     }
 
-    private fun mapTema(temaer: List<Tema>?): List<no.nav.klage.oppgave.clients.saf.graphql.Tema>? {
-        return temaer?.let { temaer -> temaer.map { tema -> no.nav.klage.oppgave.clients.saf.graphql.Tema.valueOf(tema.name) } }
-    }
+    private fun mapTema(temaer: List<Tema>): List<no.nav.klage.oppgave.clients.saf.graphql.Tema> =
+        temaer.map { tema -> no.nav.klage.oppgave.clients.saf.graphql.Tema.valueOf(tema.name) }
+    
 
     fun fetchJournalposterConnectedToKlagebehandling(klagebehandling: Klagebehandling): DokumenterResponse {
         val dokumentReferanser = klagebehandling.saksdokumenter

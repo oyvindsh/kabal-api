@@ -26,6 +26,11 @@ fun hentDokumentoversiktBrukerQuery(
             .readText().replace("[\n\r]", "")
     return HentDokumentoversiktBrukerGraphqlQuery(
         query,
-        DokumentoversiktBrukerVariables(BrukerId(fnr), tema, pageSize, previousPageRef)
+        DokumentoversiktBrukerVariables(
+            BrukerId(fnr),
+            if (tema.isNullOrEmpty()) null else tema,
+            pageSize,
+            previousPageRef
+        )
     )
 }

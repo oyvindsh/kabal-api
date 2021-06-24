@@ -500,7 +500,7 @@ class KlagebehandlingService(
 
     fun fetchDokumentlisteForKlagebehandling(
         klagebehandlingId: UUID,
-        temaer: List<Tema>?,
+        temaer: List<Tema>,
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
