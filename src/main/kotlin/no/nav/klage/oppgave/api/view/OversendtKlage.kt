@@ -75,6 +75,11 @@ data class OversendtKlage(
     )
     val frist: LocalDate? = null,
     @ApiModelProperty(
+        notes = "Kan settes dersom denne saken har blitt sendt til Gosys og derfor har fristen begynt å løpe",
+        required = false
+    )
+    val oversendtKaDato: LocalDateTime? = null,
+    @ApiModelProperty(
         notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
         required = true,
         example = "FS39"
@@ -102,7 +107,7 @@ data class OversendtKlage(
         mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),
         innsendtDato = innsendtTilNav,
         mottattNavDato = mottattFoersteinstans,
-        oversendtKaDato = LocalDateTime.now(),
+        oversendtKaDato = oversendtKaDato ?: LocalDateTime.now(),
         fristFraFoersteinstans = frist,
         kildesystem = kilde.mapFagsystem()
     )
