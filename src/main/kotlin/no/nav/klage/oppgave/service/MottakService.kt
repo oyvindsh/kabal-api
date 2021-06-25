@@ -2,8 +2,7 @@ package no.nav.klage.oppgave.service
 
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
-import no.nav.klage.oppgave.api.view.OversendtKlage
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
@@ -16,6 +15,7 @@ import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
 import no.nav.klage.oppgave.repositories.EnhetRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -75,7 +75,8 @@ class MottakService(
 
     fun OversendtKlage.validate() {
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-
+        validatePartId(klager.id)
+        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
         validateTema(tema)
         validateType(type)
         validateEnhet(avsenderEnhet)
@@ -116,4 +117,13 @@ class MottakService(
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
 
+    private fun validatePartId(partId: OversendtPartId) {
+        if (partId.type == OversendtPartIdType.VIRKSOMHET) {
+            return
+        }
+
+        if (!isValidFnrOrDnr(partId.verdi)) {
+            throw OversendtKlageNotValidException("Ugyldig fødselsnummer")
+        }
+    }
 }
