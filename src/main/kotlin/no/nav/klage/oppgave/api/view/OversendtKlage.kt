@@ -76,7 +76,8 @@ data class OversendtKlage(
     val frist: LocalDate? = null,
     @ApiModelProperty(
         notes = "Kan settes dersom denne saken har blitt sendt til Gosys og derfor har fristen begynt å løpe",
-        required = false
+        required = false,
+        example = "2020-12-20T00:00"
     )
     val oversendtKaDato: LocalDateTime? = null,
     @ApiModelProperty(
