@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.DokumentReferanserResponse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
@@ -41,12 +42,13 @@ class KlagebehandlingDokumentController(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable behandlingsid: String,
         @RequestParam(required = false, name = "antall", defaultValue = "10") pageSize: Int,
-        @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null
+        @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
+        @RequestParam(required = false, name = "tema") tema: List<String>? = emptyList()
     ): DokumenterResponse {
         val klagebehandlingId = parseAndValidate(behandlingsid)
         return klagebehandlingService.fetchDokumentlisteForKlagebehandling(
             klagebehandlingId = klagebehandlingId,
-            temaer = emptyList(),
+            temaer = tema?.map { Tema.of(it) } ?: emptyList(),
             pageSize = pageSize,
             previousPageRef = previousPageRef
         )
