@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.api.view.ValgtEnhetInput
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @Api(tags = ["kabal-api"])
 class SaksbehandlerController(
-    private val saksbehandlerService: SaksbehandlerService, private val environment: Environment,
+    private val saksbehandlerService: SaksbehandlerService,
+    private val environment: Environment,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 ) {
 
@@ -85,7 +87,7 @@ class SaksbehandlerController(
     ): Medunderskrivere {
         logger.debug("getMedunderskrivere is requested by $navIdent")
         return if (environment.activeProfiles.contains("prod-gcp")) {
-            saksbehandlerService.getMedunderskrivere(navIdent, tema)
+            saksbehandlerService.getMedunderskrivere(navIdent, Tema.of(tema))
         } else Medunderskrivere(
             tema,
             listOf(
