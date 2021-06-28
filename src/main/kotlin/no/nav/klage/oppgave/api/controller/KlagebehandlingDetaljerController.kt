@@ -39,7 +39,7 @@ class KlagebehandlingDetaljerController(
     ): Medunderskrivere {
         val navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         logger.debug("getPossibleMedunderskrivere is requested by $navIdent")
-        val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId.toUUIDOrException())
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId.toUUIDOrException())
         val tema = klagebehandling.tema
         return if (environment.activeProfiles.contains("prod-gcp")) {
             saksbehandlerService.getMedunderskrivere(navIdent, klagebehandling)

@@ -28,7 +28,8 @@ class SaksbehandlerService(
     fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
         innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
 
-    fun getMedunderskrivere(ident: String, klagebehandling: Klagebehandling): Medunderskrivere {
+    fun getMedunderskrivere(innloggetSaksbehandlerident: String, klagebehandling: Klagebehandling): Medunderskrivere {
+        val ident = klagebehandling.tildeling?.saksbehandlerident ?: innloggetSaksbehandlerident
         val medunderskrivere = saksbehandlerRepository.getAlleSaksbehandlerIdenter()
             .filter { it != ident }
             .filter { saksbehandlerHarTilgangTilTema(it, klagebehandling.tema) }
