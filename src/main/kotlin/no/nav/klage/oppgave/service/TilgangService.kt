@@ -100,4 +100,36 @@ class TilgangService(
         }
         return true
     }
+
+    fun harSaksbehandlerTilgangTil(ident: String, fnr: String): Boolean {
+        val personInfo = pdlFacade.getPersonInfo(fnr)
+        if (personInfo.harBeskyttelsesbehovFortrolig()) {
+            securelogger.info("erFortrolig")
+            if (saksbehandlerRepository.kanBehandleFortrolig(ident)) {
+                securelogger.info("Access granted to fortrolig for $ident")
+            } else {
+                securelogger.info("Access denied to fortrolig for $ident")
+                return false
+            }
+        }
+        if (personInfo.harBeskyttelsesbehovStrengtFortrolig()) {
+            securelogger.info("erStrengtFortrolig")
+            if (saksbehandlerRepository.kanBehandleStrengtFortrolig(ident)) {
+                securelogger.info("Access granted to strengt fortrolig for $ident")
+            } else {
+                securelogger.info("Access denied to strengt fortrolig for $ident")
+                return false
+            }
+        }
+        if (egenAnsattService.erEgenAnsatt(fnr)) {
+            securelogger.info("erEgenAnsatt")
+            if (saksbehandlerRepository.kanBehandleEgenAnsatt(ident)) {
+                securelogger.info("Access granted to egen ansatt for $ident")
+            } else {
+                securelogger.info("Access denied to egen ansatt for $ident")
+                return false
+            }
+        }
+        return true
+    }
 }
