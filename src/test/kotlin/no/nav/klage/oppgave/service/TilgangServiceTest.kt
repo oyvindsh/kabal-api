@@ -185,7 +185,8 @@ class TilgangServiceTest {
                 etternavn = "",
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
-                kjoenn = ""
+                kjoenn = "",
+                sivilstand = null
             )
         )
 
@@ -204,7 +205,8 @@ class TilgangServiceTest {
                 etternavn = "",
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.STRENGT_FORTROLIG,
-                kjoenn = ""
+                kjoenn = "",
+                sivilstand = null
             )
         )
 
@@ -223,7 +225,8 @@ class TilgangServiceTest {
                 etternavn = "",
                 sammensattNavn = "",
                 beskyttelsesbehov = null,
-                kjoenn = ""
+                kjoenn = "",
+                sivilstand = null
             )
         )
 

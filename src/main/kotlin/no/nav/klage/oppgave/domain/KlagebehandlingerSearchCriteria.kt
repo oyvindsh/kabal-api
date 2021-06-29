@@ -18,7 +18,7 @@ data class KlagebehandlingerSearchCriteria(
     val ferdigstiltTom: LocalDate? = null,
     val fristFom: LocalDate? = null,
     val fristTom: LocalDate? = null,
-    val foedselsnr: String? = null,
+    val foedselsnr: List<String> = emptyList(),
 
     val order: Order? = null,
     val offset: Int,
