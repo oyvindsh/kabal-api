@@ -4,7 +4,10 @@ import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
 import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.klage.ValgtEnhet
+import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -19,22 +22,40 @@ import java.time.LocalDateTime
 class SaksbehandlerService(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val saksbehandlerRepository: SaksbehandlerRepository,
-    private val valgtEnhetRepository: ValgtEnhetRepository
+    private val valgtEnhetRepository: ValgtEnhetRepository,
+    private val tilgangService: TilgangService
 ) {
     fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
         innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
 
-    fun getMedunderskrivere(ident: String, tema: String): Medunderskrivere {
+    fun getMedunderskrivere(innloggetSaksbehandlerident: String, klagebehandling: Klagebehandling): Medunderskrivere {
+        val ident = klagebehandling.tildeling?.saksbehandlerident ?: innloggetSaksbehandlerident
+        val medunderskrivere = saksbehandlerRepository.getAlleSaksbehandlerIdenter()
+            .filter { it != ident }
+            .filter { saksbehandlerHarTilgangTilTema(it, klagebehandling.tema) }
+            .filter { saksbehandlerHarTilgangTilPerson(it, klagebehandling.sakenGjelder.partId) }
+            .map { Medunderskriver(it, getNameForIdent(it)) }
+        return Medunderskrivere(klagebehandling.tema.id, medunderskrivere)
+    }
+
+    fun getMedunderskrivere(ident: String, tema: Tema): Medunderskrivere {
         val medunderskrivere = saksbehandlerRepository.getAlleSaksbehandlerIdenter()
             .filter { it != ident }
             .filter { saksbehandlerHarTilgangTilTema(it, tema) }
             .map { Medunderskriver(it, getNameForIdent(it)) }
-        return Medunderskrivere(tema, medunderskrivere)
+        return Medunderskrivere(tema.id, medunderskrivere)
     }
 
-    private fun saksbehandlerHarTilgangTilTema(ident: String, tema: String) =
+    private fun saksbehandlerHarTilgangTilPerson(ident: String, partId: PartId): Boolean =
+        if (partId.type == PartIdType.VIRKSOMHET) {
+            true
+        } else {
+            tilgangService.harSaksbehandlerTilgangTil(ident, partId.value)
+        }
+
+    private fun saksbehandlerHarTilgangTilTema(ident: String, tema: Tema) =
         saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(ident).enheter.flatMap { it.temaer }
-            .contains(Tema.of(tema))
+            .contains(tema)
 
     private fun getNameForIdent(it: String) =
         saksbehandlerRepository.getNamesForSaksbehandlere(setOf(it)).getOrDefault(it, "Ukjent navn")

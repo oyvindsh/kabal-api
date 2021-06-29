@@ -50,9 +50,17 @@ class KlagebehandlingListController(
     ): KlagebehandlingerListRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams)
+        val lovligeTemaer =
+            saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).temaer
+        val searchCriteria = if (queryParams.temaer.isNullOrEmpty()) {
+            klagebehandlingerSearchCriteriaMapper.toSearchCriteria(
+                navIdent,
+                queryParams.copy(temaer = lovligeTemaer.map { it.id })
+            )
+        } else {
+            klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams)
+        }
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
-        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
@@ -60,7 +68,7 @@ class KlagebehandlingListController(
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
                 searchCriteria.saksbehandler,
-                valgtEnhet.temaer
+                lovligeTemaer
             )
         )
     }
