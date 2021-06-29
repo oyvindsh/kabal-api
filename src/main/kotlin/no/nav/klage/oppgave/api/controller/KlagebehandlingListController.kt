@@ -13,6 +13,7 @@ import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.PersonsoekService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -28,7 +29,8 @@ class KlagebehandlingListController(
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    private val saksbehandlerService: SaksbehandlerService
+    private val saksbehandlerService: SaksbehandlerService,
+    private val personsoekService: PersonsoekService
 ) {
 
     companion object {
@@ -74,16 +76,17 @@ class KlagebehandlingListController(
         @RequestBody input: PersonSoekInput
     ): KlagebehandlingerPersonSoekListRespons {
         validateNavIdent(navIdent)
-        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
-        val esResponse = elasticsearchService.findByCriteria(searchCriteria)
-        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
+
+        val personsoekResponse = personsoekService.personsoek(navIdent, input)
+        val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
         return KlagebehandlingerPersonSoekListRespons(
-            antallTreffTotalt = esResponse.totalHits.toInt(),
-            personer = klagebehandlingMapper.mapEsKlagebehandlingerToPersonListView(
-                esResponse.searchHits.map { it.content },
-                searchCriteria.isProjectionUtvidet(),
-                searchCriteria.saksbehandler,
-                valgtEnhet.temaer
+            antallTreffTotalt = personsoekResponse.antallTreffTotalt,
+            personer = klagebehandlingMapper.mapPersonSoekResponseToPersonSoekListView(
+                personSoekResponse = personsoekResponse,
+                viseUtvidet = input.projeksjon == PersonSoekInput.Projeksjon.UTVIDET,
+                saksbehandler = saksbehandler,
+                tilgangTilTemaer = valgtEnhet.temaer
             )
         )
     }
