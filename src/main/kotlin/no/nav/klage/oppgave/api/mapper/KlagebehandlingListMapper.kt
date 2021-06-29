@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.PersonSoekPersonView
+import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
@@ -48,7 +49,8 @@ class KlagebehandlingListMapper() {
         viseUtvidet: Boolean,
         viseFullfoerte: Boolean,
         saksbehandler: String?,
-        tilgangTilTemaer: List<Tema>
+        tilgangTilTemaer: List<Tema>,
+        sivilstand: Sivilstand? = null
     ): List<KlagebehandlingListView> {
         return esKlagebehandlinger.map { esKlagebehandling ->
             KlagebehandlingListView(
@@ -56,7 +58,8 @@ class KlagebehandlingListMapper() {
                 person = if (viseUtvidet) {
                     KlagebehandlingListView.Person(
                         esKlagebehandling.sakenGjelderFnr,
-                        esKlagebehandling.sakenGjelderNavn
+                        esKlagebehandling.sakenGjelderNavn,
+                        if (esKlagebehandling.sakenGjelderFnr == sivilstand?.foedselsnr) sivilstand?.type?.id else null
                     )
                 } else {
                     null

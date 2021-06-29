@@ -1,8 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
-import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria.Statuskategori.AAPEN
-import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria.Statuskategori.AVSLUTTET
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria.Statuskategori.*
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.*
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
@@ -195,6 +194,7 @@ open class ElasticsearchService(
         when (statuskategori) {
             AAPEN -> baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
             AVSLUTTET -> baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
+            ALLE -> noop()
         }
 
         enhetId?.let {
@@ -272,6 +272,10 @@ open class ElasticsearchService(
 
         logger.debug("Making search request with query {}", baseQuery.toString())
         return baseQuery
+    }
+
+    private fun noop() {
+        //DO NOTHING
     }
 
     private fun addSecurityFilters(baseQuery: BoolQueryBuilder) {

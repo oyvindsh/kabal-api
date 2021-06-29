@@ -25,11 +25,12 @@ data class KlagebehandlingListView(
     val erTildelt: Boolean,
     val tildeltSaksbehandlerident: String?,
     val tildeltSaksbehandlerNavn: String?,
-    val saksbehandlerHarTilgang: Boolean
+    val saksbehandlerHarTilgang: Boolean,
 ) {
     data class Person(
         val fnr: String?,
-        val navn: String?
+        val navn: String?,
+        val sivilstand: String? = null
     )
 }
 
