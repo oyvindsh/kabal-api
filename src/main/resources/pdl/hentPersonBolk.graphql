@@ -10,6 +10,12 @@ query($identer: [ID!]!){
             },
             kjoenn {
                 kjoenn
+            },
+            sivilstand {
+                type
+                gyldigFraOgMed
+                relatertVedSivilstand
+                bekreftelsesdato
             }
         },
         ident

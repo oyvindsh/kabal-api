@@ -7,7 +7,8 @@ data class Person(
     val etternavn: String?,
     val sammensattNavn: String?,
     val beskyttelsesbehov: Beskyttelsesbehov?,
-    val kjoenn: String?
+    val kjoenn: String?,
+    val sivilstand: Sivilstand?
 ) {
     fun harBeskyttelsesbehovFortrolig() = beskyttelsesbehov == Beskyttelsesbehov.FORTROLIG
 
@@ -23,6 +24,13 @@ data class Person(
     }
 }
 
+data class Sivilstand(val type: SivilstandType, val foedselsnr: String)
+
 enum class Beskyttelsesbehov {
     STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG
+}
+
+enum class SivilstandType {
+    GIFT,
+    REGISTRERT_PARTNER
 }

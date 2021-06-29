@@ -56,7 +56,8 @@ internal class PdlClientTest {
                   "kjoenn": "MANN"
                 }
               ],
-              "adressebeskyttelse": []
+              "adressebeskyttelse": [],
+              "sivilstand": []
             }
           }
         }
