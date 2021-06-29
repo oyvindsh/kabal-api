@@ -186,8 +186,10 @@ open class ElasticsearchService(
 
         addSecurityFilters(baseQuery)
 
-        foedselsnr?.let {
-            baseQuery.must(QueryBuilders.termQuery("sakenGjelderFnr", it))
+        val innerQueryFnr = QueryBuilders.boolQuery()
+        baseQuery.must(innerQueryFnr)
+        foedselsnr.forEach {
+            innerQueryFnr.should(QueryBuilders.termQuery("sakenGjelderFnr", it))
         }
 
         when (statuskategori) {
