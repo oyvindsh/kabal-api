@@ -54,7 +54,7 @@ class MottakService(
         oversendtKlage.validate()
         val mottak: Mottak
         try {
-            mottak = mottakRepository.save(oversendtKlage.toMottak())
+            mottak = mottakRepository.saveAndFlush(oversendtKlage.toMottak())
             secureLogger.debug("Har lagret mottak basert på oversendtKlage {}", oversendtKlage)
         } catch (dive: DataIntegrityViolationException) {
             val message =
