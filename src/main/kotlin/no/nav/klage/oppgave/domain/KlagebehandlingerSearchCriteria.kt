@@ -20,6 +20,7 @@ data class KlagebehandlingerSearchCriteria(
     val fristTom: LocalDate? = null,
     val foedselsnr: List<String> = emptyList(),
     val extraPersonAndTema: ExtraPersonAndTema? = null,
+    val raw: String = "",
 
     val order: Order? = null,
     val offset: Int,
@@ -52,4 +53,8 @@ data class KlagebehandlingerSearchCriteria(
 
     fun isProjectionUtvidet(): Boolean = Projection.UTVIDET == projection
 
+
+    fun isFnrSoek() = raw.isNumeric()
+
+    private fun String.isNumeric() = toIntOrNull() != null
 }

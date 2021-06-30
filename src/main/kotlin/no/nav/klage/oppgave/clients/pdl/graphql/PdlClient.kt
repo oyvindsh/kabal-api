@@ -59,4 +59,18 @@ class PdlClient(
                 .block() ?: throw RuntimeException("Person not found")
         }
     }
+
+    @Retryable
+    fun personsok(inputString: String): SoekPersonResponse {
+        return runWithTiming {
+            val userToken = tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()
+            pdlWebClient.post()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
+                .header("Nav-Consumer-Token", "Bearer $userToken")
+                .bodyValue(soekPersonNavnContainsQuery(inputString))
+                .retrieve()
+                .bodyToMono<SoekPersonResponse>()
+                .block() ?: throw RuntimeException("Personsøk failed")
+        }
+    }
 }
