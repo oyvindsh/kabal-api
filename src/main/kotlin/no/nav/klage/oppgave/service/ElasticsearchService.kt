@@ -185,12 +185,37 @@ open class ElasticsearchService(
 
         addSecurityFilters(baseQuery)
 
+        val combinedInnerFnrAndTemaQuery = QueryBuilders.boolQuery()
+        baseQuery.must(combinedInnerFnrAndTemaQuery)
+
+        val innerFnrAndTemaQuery = QueryBuilders.boolQuery()
+        combinedInnerFnrAndTemaQuery.should(innerFnrAndTemaQuery)
+
         val innerQueryFnr = QueryBuilders.boolQuery()
-        baseQuery.must(innerQueryFnr)
+        innerFnrAndTemaQuery.must(innerQueryFnr)
         foedselsnr.forEach {
             innerQueryFnr.should(QueryBuilders.termQuery("sakenGjelderFnr", it))
         }
 
+        val innerQueryTema = QueryBuilders.boolQuery()
+        innerFnrAndTemaQuery.must(innerQueryTema)
+        temaer.forEach {
+            innerQueryTema.should(QueryBuilders.termQuery("tema", it.id))
+        }
+
+        extraPersonAndTema?.let { extraPerson ->
+            val innerFnrAndTemaEktefelleQuery = QueryBuilders.boolQuery()
+            combinedInnerFnrAndTemaQuery.should(innerFnrAndTemaEktefelleQuery)
+
+            innerFnrAndTemaEktefelleQuery.must(QueryBuilders.termQuery("sakenGjelderFnr", extraPerson.foedselsnr))
+
+            val innerTemaEktefelleQuery = QueryBuilders.boolQuery()
+            innerFnrAndTemaEktefelleQuery.must(innerTemaEktefelleQuery)
+            extraPerson.temaer.forEach { tema ->
+                innerTemaEktefelleQuery.should(QueryBuilders.termQuery("tema", tema.id))
+            }
+        }
+        
         when (statuskategori) {
             AAPEN -> baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
             AVSLUTTET -> baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
@@ -209,12 +234,6 @@ open class ElasticsearchService(
             }
         } else {
             innerQueryBehandlingtype.should(QueryBuilders.termQuery("type", Type.KLAGE.id))
-        }
-
-        val innerQueryTema = QueryBuilders.boolQuery()
-        baseQuery.must(innerQueryTema)
-        temaer.forEach {
-            innerQueryTema.should(QueryBuilders.termQuery("tema", it.id))
         }
 
         erTildeltSaksbehandler?.let {
