@@ -70,7 +70,7 @@ data class OversendtKlage(
     val mottattFoersteinstans: LocalDate,
     val innsendtTilNav: LocalDate,
     @ApiModelProperty(
-        notes = "NB! Ikke implementert. Kan settes dersom førsteinstans ønsker å overstyre frist.",
+        notes = "Kan settes dersom førsteinstans ønsker å overstyre frist.",
         required = false
     )
     val frist: LocalDate? = null,
