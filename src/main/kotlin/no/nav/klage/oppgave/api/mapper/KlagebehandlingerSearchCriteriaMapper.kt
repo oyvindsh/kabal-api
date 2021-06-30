@@ -19,7 +19,8 @@ class KlagebehandlingerSearchCriteriaMapper {
     }
 
     fun toSearchCriteria(navIdent: String, input: PersonSoekInput) = KlagebehandlingerSearchCriteria(
-        foedselsnr = listOf(input.soekString),
+        foedselsnr = listOf(input.soekString ?: input.fnr),
+        raw = input.soekString ?: input.fnr,
         order = if (input.rekkefoelge == PersonSoekInput.Rekkefoelge.SYNKENDE) {
             KlagebehandlingerSearchCriteria.Order.DESC
         } else {

@@ -85,14 +85,15 @@ class KlagebehandlingListController(
     ): KlagebehandlingerPersonSoekListRespons {
         validateNavIdent(navIdent)
 
-        val personsoekResponse = personsoekService.personsoek(navIdent, input)
+        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
+        val personsoekResponse = personsoekService.personsoek(searchCriteria)
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
         val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = personsoekResponse.antallTreffTotalt,
             personer = klagebehandlingMapper.mapPersonSoekResponseToPersonSoekListView(
                 personSoekResponse = personsoekResponse,
-                viseUtvidet = input.projeksjon == PersonSoekInput.Projeksjon.UTVIDET,
+                viseUtvidet = searchCriteria.isProjectionUtvidet(),
                 saksbehandler = saksbehandler,
                 tilgangTilTemaer = valgtEnhet.temaer
             )

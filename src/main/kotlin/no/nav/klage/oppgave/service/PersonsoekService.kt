@@ -1,9 +1,8 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingerSearchCriteriaMapper
-import no.nav.klage.oppgave.api.view.PersonSoekInput
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlClient
 import no.nav.klage.oppgave.clients.pdl.graphql.SoekPersonResponse
+import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponse
 import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponseList
@@ -16,8 +15,7 @@ import java.time.LocalDate
 @Service
 class PersonsoekService(
     private val pdlClient: PdlClient,
-    private val elasticsearchService: ElasticsearchService,
-    private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper
+    private val elasticsearchService: ElasticsearchService
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -25,16 +23,16 @@ class PersonsoekService(
         private val secureLogger = getSecureLogger()
     }
 
-    fun personsoek(navIdent: String, input: PersonSoekInput): PersonSoekResponseList {
+    fun personsoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         return if(input.isFnrSoek()) {
-            fnrSoek(navIdent, input)
+            fnrSoek(input)
         } else {
-            navnSoek(navIdent, input)
+            navnSoek(input)
         }
     }
 
-    private fun fnrSoek(navIdent: String, input: PersonSoekInput): PersonSoekResponseList {
-        val liste = esSoek(navIdent, input)
+    private fun fnrSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
+        val liste = esSoek(input)
         val mapped = liste.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
             PersonSoekResponse(
                 fnr = key!!,
@@ -46,25 +44,26 @@ class PersonsoekService(
         return PersonSoekResponseList(liste.size, mapped)
     }
 
-    private fun navnSoek(navIdent: String, input: PersonSoekInput): PersonSoekResponseList {
-        val pdlResponse = pdlClient.personsok(input.soekString)
+    private fun navnSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
+        val pdlResponse = pdlClient.personsok(input.raw)
         verifyPdlResponse(pdlResponse)
-        val mapped = pdlResponse.data?.soekPerson?.hits?.map {
-            val fnr = it.person.folkeregisteridentifikator.identifikasjonsnummer
-            val klagebehandlinger = esSoek(navIdent, input.copy(soekString = fnr))
+        val fnrList = pdlResponse.collectFnr()
+        val allKlagebehandlinger = esSoek(input.copy(foedselsnr = fnrList))
+        val mapped = pdlResponse.data?.soekPerson?.hits?.map { personHit ->
+            val fnr = personHit.person.folkeregisteridentifikator.identifikasjonsnummer
+            val klagebehandlinger = allKlagebehandlinger.filter { it.klagerFnr == fnr }
             PersonSoekResponse(
                 fnr = fnr,
-                navn = it.person.navn.toString(),
-                foedselsdato = LocalDate.parse(it.person.foedsel.foedselsdato),
+                navn = personHit.person.navn.toString(),
+                foedselsdato = LocalDate.parse(personHit.person.foedsel.foedselsdato),
                 klagebehandlinger = klagebehandlinger
             )
         }
         return PersonSoekResponseList(mapped?.size ?: 0, mapped ?: listOf())
     }
 
-    private fun esSoek(navIdent: String, input: PersonSoekInput): List<EsKlagebehandling> {
-        val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
-        val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+    private fun esSoek(input: KlagebehandlingerSearchCriteria): List<EsKlagebehandling> {
+        val esResponse = elasticsearchService.findByCriteria(input)
         return esResponse.searchHits.map { it.content }
     }
 
@@ -75,4 +74,7 @@ class PersonsoekService(
             throw RuntimeException("Søkefeil i PDL")
         }
     }
+
+    private fun SoekPersonResponse.collectFnr(): List<String> =
+        this.data?.soekPerson?.hits?.map { it.person.folkeregisteridentifikator.identifikasjonsnummer } ?: listOf()
 }
