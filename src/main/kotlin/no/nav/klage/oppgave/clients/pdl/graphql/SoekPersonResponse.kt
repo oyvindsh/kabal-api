@@ -6,7 +6,7 @@ data class SoekPersonResponse(
 )
 
 data class SoekPersonData(
-    val soekPerson: SoekPersonResult
+    val soekPerson: SoekPersonResult?
 )
 
 data class SoekPersonResult(
