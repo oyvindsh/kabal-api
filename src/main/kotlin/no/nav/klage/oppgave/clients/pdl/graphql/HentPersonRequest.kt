@@ -20,12 +20,12 @@ data class FnrVariables(
 
 fun hentPersonerQuery(fnrList: List<String>): PersonerGraphqlQuery {
     val query =
-        PersonGraphqlQuery::class.java.getResource("/pdl/hentPersonBolk.graphql").readText().replace("[\n\r]", "")
+        PersonGraphqlQuery::class.java.getResource("/pdl/hentPersonBolk.graphql").cleanForGraphql()
     return PersonerGraphqlQuery(query, FnrListeVariables(fnrList))
 }
 
 fun hentPersonQuery(fnr: String): PersonGraphqlQuery {
     val query =
-        PersonGraphqlQuery::class.java.getResource("/pdl/hentPerson.graphql").readText().replace("[\n\r]", "")
+        PersonGraphqlQuery::class.java.getResource("/pdl/hentPerson.graphql").cleanForGraphql()
     return PersonGraphqlQuery(query, FnrVariables(fnr))
 }

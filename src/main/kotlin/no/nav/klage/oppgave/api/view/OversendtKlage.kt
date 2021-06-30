@@ -83,7 +83,7 @@ data class OversendtKlage(
     @ApiModelProperty(
         notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
         required = true,
-        example = "FS39"
+        example = "K9"
     )
     val kilde: KildeFagsystem,
     @ApiModelProperty(
@@ -118,7 +118,6 @@ private fun KildeFagsystem.mapFagsystem(): Fagsystem =
     when (this) {
         KildeFagsystem.AO01 -> Fagsystem.AO01
         KildeFagsystem.FS36 -> Fagsystem.FS36
-        KildeFagsystem.FS39 -> Fagsystem.FS39
         KildeFagsystem.AO11 -> Fagsystem.AO11
         KildeFagsystem.BISYS -> Fagsystem.BISYS
         KildeFagsystem.FS38 -> Fagsystem.FS38
@@ -284,7 +283,7 @@ data class OversendtSak(
     val fagsakId: String,
     @ApiModelProperty(
         required = true,
-        example = "FS39"
+        example = "K9"
     )
     val fagsystem: KildeFagsystem
 )
@@ -292,7 +291,6 @@ data class OversendtSak(
 @ApiModel
 enum class KildeFagsystem {
     FS36,
-    FS39,
     AO01,
     AO11,
     BISYS,

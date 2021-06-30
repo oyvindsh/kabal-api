@@ -5,37 +5,30 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.PersonSoekPersonView
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.getSecureLogger
+import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponseList
 import org.springframework.stereotype.Service
 
 @Service
-class KlagebehandlingListMapper() {
+class KlagebehandlingListMapper {
 
-    companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
-    }
-
-    fun mapEsKlagebehandlingerToPersonListView(
-        esKlagebehandlinger: List<EsKlagebehandling>,
+    fun mapPersonSoekResponseToPersonSoekListView(
+        personSoekResponse: PersonSoekResponseList,
         viseUtvidet: Boolean,
         saksbehandler: String?,
         tilgangTilTemaer: List<Tema>
     ): List<PersonSoekPersonView> {
-        return esKlagebehandlinger.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
+        return personSoekResponse.liste.map { person ->
             val klagebehandlinger =
                 mapEsKlagebehandlingerToListView(
-                    value,
+                    person.klagebehandlinger,
                     viseUtvidet,
                     true,
                     saksbehandler,
                     tilgangTilTemaer
                 )
             PersonSoekPersonView(
-                fnr = key!!,
-                navn = value.first().sakenGjelderNavn,
+                fnr = person.fnr,
+                navn = person.navn,
                 klagebehandlinger = klagebehandlinger,
                 aapneKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler == null },
                 avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler != null }

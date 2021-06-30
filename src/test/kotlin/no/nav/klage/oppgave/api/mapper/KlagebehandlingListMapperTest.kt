@@ -75,18 +75,4 @@ internal class KlagebehandlingListMapperTest {
             typeNavn = Type.KLAGE.name,
             status = EsKlagebehandling.Status.IKKE_TILDELT
         )
-
-    @Test
-    fun mapEsKlagebehandlingerToPersonListView() {
-
-        val mapper = KlagebehandlingListMapper()
-        val mappedValue: List<PersonSoekPersonView> = mapper.mapEsKlagebehandlingerToPersonListView(
-            viseUtvidet = false, saksbehandler = "AB12345", esKlagebehandlinger = listOf(
-                klagebehandling1, klagebehandling2, klagebehandling3
-            ), tilgangTilTemaer = emptyList()
-        )
-        assertThat(mappedValue.size).isEqualTo(2)
-        assertThat(mappedValue.find { it.fnr == fnr1 }!!.klagebehandlinger.size).isEqualTo(2)
-        assertThat(mappedValue.find { it.fnr == fnr2 }!!.klagebehandlinger.size).isEqualTo(1)
-    }
 }

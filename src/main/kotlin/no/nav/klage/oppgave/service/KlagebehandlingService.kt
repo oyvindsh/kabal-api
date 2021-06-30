@@ -24,6 +24,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTil
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
+import no.nav.klage.oppgave.exceptions.ValidationException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
@@ -240,6 +241,7 @@ class KlagebehandlingService(
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        validateBeforeMedunderskriver(klagebehandling)
         val event =
             klagebehandling.setMedunderskriverident(
                 medunderskriverIdent,
@@ -247,6 +249,23 @@ class KlagebehandlingService(
             )
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
+    }
+
+    private fun validateBeforeMedunderskriver(klagebehandling: Klagebehandling) {
+        if (klagebehandling.vedtak.isEmpty()) {
+            throw ValidationException("Klagebehandling har ikke vedtak")
+        }
+        if (klagebehandling.vedtak.first().utfall == null) {
+            throw ValidationException("Utfall er ikke satt på vedtak")
+        }
+        if (klagebehandling.vedtak.first().utfall in listOf(Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD)) {
+            if (klagebehandling.vedtak.first().grunn == null) {
+                throw ValidationException("Omgjøringsgrunn er ikke satt på vedtak")
+            }
+        }
+        if (klagebehandling.vedtak.first().hjemler.isNullOrEmpty()) {
+            throw ValidationException("Hjemmel er ikke satt på vedtak")
+        }
     }
 
     fun setKvalitetsvurderingEoes(
