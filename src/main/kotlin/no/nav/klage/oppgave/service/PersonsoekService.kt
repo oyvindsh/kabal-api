@@ -48,15 +48,14 @@ class PersonsoekService(
         val pdlResponse = pdlClient.personsok(input.raw)
         verifyPdlResponse(pdlResponse)
         val fnrList = pdlResponse.collectFnr()
-        val allKlagebehandlinger = esSoek(input.copy(foedselsnr = fnrList))
+        val klagebehandlinger = esSoek(input.copy(foedselsnr = fnrList)).groupBy { it.klagerFnr }
         val mapped = pdlResponse.data?.soekPerson?.hits?.map { personHit ->
             val fnr = personHit.person.folkeregisteridentifikator.identifikasjonsnummer
-            val klagebehandlinger = allKlagebehandlinger.filter { it.klagerFnr == fnr }
             PersonSoekResponse(
                 fnr = fnr,
                 navn = personHit.person.navn.toString(),
                 foedselsdato = LocalDate.parse(personHit.person.foedsel.foedselsdato),
-                klagebehandlinger = klagebehandlinger
+                klagebehandlinger = klagebehandlinger[fnr] ?: listOf()
             )
         }
         return PersonSoekResponseList(mapped?.size ?: 0, mapped ?: listOf())
