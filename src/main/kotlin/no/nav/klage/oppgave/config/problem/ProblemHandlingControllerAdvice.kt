@@ -93,6 +93,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     ): ResponseEntity<Problem> =
         create(ex, createProblem(ex), request)
 
+    @ExceptionHandler
+    fun handleDuplicateOversendelse(ex: DuplicateOversendelseException, request: NativeWebRequest): ResponseEntity<Problem> =
+        create(Status.CONFLICT, ex, request)
+
     private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
         return Problem.builder()
             .withStatus(mapStatus(ex.statusCode))

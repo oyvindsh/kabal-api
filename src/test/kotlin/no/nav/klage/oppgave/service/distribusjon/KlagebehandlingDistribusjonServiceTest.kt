@@ -111,7 +111,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
         tema = Tema.OMS,
         type = Type.KLAGE,
         kildesystem = Fagsystem.K9,
-        kildeReferanse = "1234234",
+        kildeReferanse = UUID.randomUUID().toString(),
         klager = Klager(partId = PartId(type = PartIdType.PERSON, value = fnr)),
         oversendtKaDato = LocalDateTime.now()
     )

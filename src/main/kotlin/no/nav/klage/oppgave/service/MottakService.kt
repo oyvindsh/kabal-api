@@ -2,7 +2,10 @@ package no.nav.klage.oppgave.service
 
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
+import no.nav.klage.oppgave.api.view.OversendtKlage
+import no.nav.klage.oppgave.api.view.OversendtPartId
+import no.nav.klage.oppgave.api.view.OversendtPartIdType
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
@@ -10,14 +13,17 @@ import no.nav.klage.oppgave.domain.klage.Klager
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
 import no.nav.klage.oppgave.repositories.EnhetRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -40,12 +46,29 @@ class MottakService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @Transactional
     fun createMottakForKlage(oversendtKlage: OversendtKlage) {
         oversendtKlage.validate()
-        val mottak = mottakRepository.save(oversendtKlage.toMottak())
+        val mottak: Mottak
+        try {
+            mottak = mottakRepository.save(oversendtKlage.toMottak())
+            secureLogger.debug("Har lagret mottak basert på oversendtKlage {}", oversendtKlage)
+        } catch (dive: DataIntegrityViolationException) {
+            val message =
+                "Kunne ikke lagre oversendelse grunnet duplikat: kilde ${oversendtKlage.kilde.name} og kildereferanse: ${oversendtKlage.kildeReferanse}"
+            logger.warn(message, dive)
+            secureLogger.warn("Kunne ikke lagre oversendelse grunnet duplikat: $oversendtKlage", dive)
+            throw DuplicateOversendelseException(message)
+        } catch (e: Exception) {
+            logger.error("Kunne ikke lagre oversendelse. Se mer i secure logs", e)
+            secureLogger.error("Kunne ikke lagre oversendelse: $oversendtKlage", e)
+            throw RuntimeException(
+                "Kunne ikke lagre oversendelse", e)
+        }
+
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
         meterRegistry.incrementMottattKlage(mottak.kildesystem, mottak.tema)

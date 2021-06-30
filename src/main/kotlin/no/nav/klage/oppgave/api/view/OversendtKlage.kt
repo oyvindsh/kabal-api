@@ -38,7 +38,7 @@ data class OversendtKlage(
     )
     val fagsak: OversendtSak? = null,
     @ApiModelProperty(
-        notes = "Id som er intern for kildesystemet så vedtak fra oss knyttes riktig i kilde",
+        notes = "Id som er intern for kildesystemet (f.eks. K9) så vedtak fra oss knyttes riktig i kilde",
         required = true
     )
     val kildeReferanse: String,
