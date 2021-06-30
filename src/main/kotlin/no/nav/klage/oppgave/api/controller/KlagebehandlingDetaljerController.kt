@@ -5,10 +5,12 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
+import no.nav.klage.oppgave.domain.kodeverk.TemaTilgjengeligeForEktefelle.temaerTilgjengeligForEktefelle
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
@@ -93,31 +95,38 @@ class KlagebehandlingDetaljerController(
             saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).temaer
         if (klagebehandling.sakenGjelder.partId.type == PartIdType.VIRKSOMHET) {
             return KlagebehandlingerListRespons(0, listOf()) //TODO: Må legge til søk mot ES på virksomhetsnummer
-        } else {
-            val sivilstand = pdlFacade.getPersonInfo(klagebehandling.sakenGjelder.partId.value).sivilstand
-
-            val searchCriteria = KlagebehandlingerSearchCriteria(
-                statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE,
-                ferdigstiltFom = LocalDate.now().minusDays(30),
-                foedselsnr = listOfNotNull(klagebehandling.sakenGjelder.partId.value, sivilstand?.foedselsnr),
-                offset = 0,
-                limit = 100,
-                projection = KlagebehandlingerSearchCriteria.Projection.UTVIDET,
-            )
-
-            val esResponse = elasticsearchService.findByCriteria(searchCriteria)
-            return KlagebehandlingerListRespons(
-                antallTreffTotalt = esResponse.totalHits.toInt(),
-                klagebehandlinger = klagebehandlingListMapper.mapEsKlagebehandlingerToListView(
-                    esResponse.searchHits.map { it.content },
-                    true,
-                    true,
-                    searchCriteria.saksbehandler,
-                    lovligeTemaer,
-                    sivilstand
-                )
-            )
         }
+
+        val sivilstand: Sivilstand? = pdlFacade.getPersonInfo(klagebehandling.sakenGjelder.partId.value).sivilstand
+        
+        val searchCriteria = KlagebehandlingerSearchCriteria(
+            statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE,
+            ferdigstiltFom = LocalDate.now().minusDays(30),
+            foedselsnr = listOf(klagebehandling.sakenGjelder.partId.value),
+            extraPersonAndTema = sivilstand?.let {
+                KlagebehandlingerSearchCriteria.ExtraPersonAndTema(
+                    foedselsnr = it.foedselsnr,
+                    temaer = temaerTilgjengeligForEktefelle(environment).toList()
+                )
+            },
+            offset = 0,
+            limit = 100,
+            projection = KlagebehandlingerSearchCriteria.Projection.UTVIDET,
+        )
+
+        val esResponse = elasticsearchService.findByCriteria(searchCriteria)
+        return KlagebehandlingerListRespons(
+            antallTreffTotalt = esResponse.totalHits.toInt(),
+            klagebehandlinger = klagebehandlingListMapper.mapEsKlagebehandlingerToListView(
+                esResponse.searchHits.map { it.content },
+                true,
+                true,
+                searchCriteria.saksbehandler,
+                lovligeTemaer,
+                sivilstand
+            )
+        )
+
     }
 
     @PutMapping("/klagebehandlinger/{id}/detaljer/medunderskriverident")
