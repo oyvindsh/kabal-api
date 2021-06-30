@@ -98,10 +98,10 @@ class KlagebehandlingDetaljerController(
         }
 
         val sivilstand: Sivilstand? = pdlFacade.getPersonInfo(klagebehandling.sakenGjelder.partId.value).sivilstand
-        
+
         val searchCriteria = KlagebehandlingerSearchCriteria(
             statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE,
-            ferdigstiltFom = LocalDate.now().minusDays(30),
+            ferdigstiltFom = LocalDate.now().minusMonths(12),
             foedselsnr = listOf(klagebehandling.sakenGjelder.partId.value),
             extraPersonAndTema = sivilstand?.let {
                 KlagebehandlingerSearchCriteria.ExtraPersonAndTema(
