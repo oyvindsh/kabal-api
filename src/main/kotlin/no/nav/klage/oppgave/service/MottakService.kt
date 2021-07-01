@@ -2,10 +2,7 @@ package no.nav.klage.oppgave.service
 
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
-import no.nav.klage.oppgave.api.view.OversendtKlage
-import no.nav.klage.oppgave.api.view.OversendtPartId
-import no.nav.klage.oppgave.api.view.OversendtPartIdType
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
@@ -23,7 +20,6 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -52,26 +48,16 @@ class MottakService(
     @Transactional
     fun createMottakForKlage(oversendtKlage: OversendtKlage) {
         oversendtKlage.validate()
-        val mottak: Mottak
-        try {
-            mottak = mottakRepository.saveAndFlush(oversendtKlage.toMottak())
-            secureLogger.debug("Har lagret mottak basert på oversendtKlage {}", oversendtKlage)
-        } catch (dive: DataIntegrityViolationException) {
-            val message =
-                "Kunne ikke lagre oversendelse grunnet duplikat: kilde ${oversendtKlage.kilde.name} og kildereferanse: ${oversendtKlage.kildeReferanse}"
-            logger.warn(message, dive)
-            secureLogger.warn("Kunne ikke lagre oversendelse grunnet duplikat: $oversendtKlage", dive)
-            throw DuplicateOversendelseException(message)
-        } catch (e: Exception) {
-            logger.error("Kunne ikke lagre oversendelse. Se mer i secure logs", e)
-            secureLogger.error("Kunne ikke lagre oversendelse: $oversendtKlage", e)
-            throw RuntimeException(
-                "Kunne ikke lagre oversendelse", e)
-        }
 
+        val mottak = mottakRepository.save(oversendtKlage.toMottak())
+
+        secureLogger.debug("Har lagret mottak basert på oversendtKlage {}", oversendtKlage)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
-        meterRegistry.incrementMottattKlage(mottak.kildesystem, mottak.tema)
+
+        //TODO: Move to outside of transaction to make sure it went well
+        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.tema.navn)
     }
 
     fun createMottakFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
@@ -97,6 +83,7 @@ class MottakService(
     }
 
     fun OversendtKlage.validate() {
+        validateDuplicate(kilde, kildeReferanse)
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
         validatePartId(klager.id)
         sakenGjelder?.run { validatePartId(sakenGjelder.id) }
@@ -104,6 +91,15 @@ class MottakService(
         validateType(type)
         validateEnhet(avsenderEnhet)
         validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
+    }
+
+    private fun validateDuplicate(kildeFagsystem: KildeFagsystem, kildeReferanse: String) {
+        if (mottakRepository.existsByKildesystemAndKildeReferanse(kildeFagsystem.mapFagsystem(), kildeReferanse)) {
+            val message =
+                "Kunne ikke lagre oversendelse grunnet duplikat: kilde ${kildeFagsystem.name} og kildereferanse: $kildeReferanse"
+            logger.warn(message)
+            throw DuplicateOversendelseException(message)
+        }
     }
 
     private fun validateType(type: Type) {

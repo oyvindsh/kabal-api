@@ -4,8 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.config.MeterFilter
 import io.micrometer.influx.InfluxMeterRegistry
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import no.nav.klage.oppgave.domain.kodeverk.Fagsystem
-import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer
 import org.springframework.context.annotation.Bean
@@ -40,6 +38,6 @@ class MetricsConfiguration {
     }
 }
 
-fun MeterRegistry.incrementMottattKlage(kildesystem: Fagsystem, tema: Tema) {
-    counter(MetricsConfiguration.MOTTATT_KLAGE, "kildesystem", kildesystem.navn, "tema", tema.navn).increment()
+fun MeterRegistry.incrementMottattKlage(kildesystem: String, tema: String) {
+    counter(MetricsConfiguration.MOTTATT_KLAGE, "kildesystem", kildesystem, "tema", tema).increment()
 }

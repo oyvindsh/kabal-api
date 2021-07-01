@@ -114,7 +114,7 @@ data class OversendtKlage(
     )
 }
 
-private fun KildeFagsystem.mapFagsystem(): Fagsystem =
+fun KildeFagsystem.mapFagsystem(): Fagsystem =
     when (this) {
         KildeFagsystem.AO01 -> Fagsystem.AO01
         KildeFagsystem.FS36 -> Fagsystem.FS36
