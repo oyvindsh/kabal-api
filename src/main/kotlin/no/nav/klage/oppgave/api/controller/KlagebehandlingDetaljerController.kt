@@ -118,12 +118,12 @@ class KlagebehandlingDetaljerController(
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
             klagebehandlinger = klagebehandlingListMapper.mapEsKlagebehandlingerToListView(
-                esResponse.searchHits.map { it.content },
-                true,
-                true,
-                searchCriteria.saksbehandler,
-                lovligeTemaer,
-                sivilstand
+                esKlagebehandlinger = esResponse.searchHits.map { it.content },
+                viseUtvidet = true,
+                viseFullfoerte = true,
+                saksbehandler = searchCriteria.saksbehandler,
+                tilgangTilTemaer = lovligeTemaer,
+                sivilstand = sivilstand
             )
         )
 

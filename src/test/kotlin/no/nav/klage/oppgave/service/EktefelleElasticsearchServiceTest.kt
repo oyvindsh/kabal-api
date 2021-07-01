@@ -77,7 +77,7 @@ class EktefelleElasticsearchServiceTest {
 
     @Test
     @Order(3)
-    fun `lagrer to oppgaver for senere tester`() {
+    fun `lagrer fire oppgaver for senere tester`() {
 
         val klagebehandling1 = EsKlagebehandling(
             id = "1001L",
@@ -189,7 +189,7 @@ class EktefelleElasticsearchServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun `Klagebehandling can be searched for by fnr and tema`() {
         val klagebehandlinger: List<EsKlagebehandling> =
             service.findByCriteria(
@@ -205,7 +205,7 @@ class EktefelleElasticsearchServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     fun `Klagebehandling can be searched for by ektefelle`() {
         val klagebehandlinger: List<EsKlagebehandling> =
             service.findByCriteria(
@@ -225,7 +225,7 @@ class EktefelleElasticsearchServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(7)
     fun `Klagebehandling can be searched for by fnr and ektefelle`() {
         val klagebehandlinger: List<EsKlagebehandling> =
             service.findByCriteria(

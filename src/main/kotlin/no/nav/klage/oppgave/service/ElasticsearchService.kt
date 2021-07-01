@@ -215,11 +215,11 @@ open class ElasticsearchService(
                 innerTemaEktefelleQuery.should(QueryBuilders.termQuery("tema", tema.id))
             }
         }
-        
+
         when (statuskategori) {
             AAPEN -> baseQuery.mustNot(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
             AVSLUTTET -> baseQuery.must(QueryBuilders.existsQuery("avsluttetAvSaksbehandler"))
-            ALLE -> noop()
+            ALLE -> Unit
         }
 
         enhetId?.let {
