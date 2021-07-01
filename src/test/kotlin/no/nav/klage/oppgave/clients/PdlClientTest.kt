@@ -33,6 +33,7 @@ internal class PdlClientTest {
     fun getHentPersonResponse(jsonResponse: String): HentPersonResponse {
         val pdlClient = PdlClient(
             createShortCircuitWebClient(jsonResponse),
+            createShortCircuitWebClient(jsonResponse),
             tokenUtilMock
         )
 
