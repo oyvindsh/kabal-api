@@ -188,17 +188,41 @@ class FortroligElasticsearchServiceTest {
                 egenAnsatt = true,
                 fortrolig = true
             )
+        val klagebehandling6 =
+            EsKlagebehandling(
+                id = "1006L",
+                versjon = 1L,
+                tildeltEnhet = "4219",
+                tema = Tema.OMS.id,
+                type = Type.KLAGE.id,
+                tildeltSaksbehandlerident = null,
+                innsendt = LocalDate.of(2018, 10, 1),
+                mottattFoersteinstans = LocalDate.of(2018, 11, 1),
+                mottattKlageinstans = LocalDateTime.of(2018, 12, 1, 0, 0),
+                frist = LocalDate.of(2019, 12, 1),
+                hjemler = listOf(),
+                created = LocalDateTime.now(),
+                modified = LocalDateTime.now(),
+                kilde = "K9",
+                temaNavn = Tema.OMS.name,
+                typeNavn = Type.KLAGE.name,
+                status = IKKE_TILDELT,
+                sakenGjelderFnr = "123",
+                egenAnsatt = true,
+                strengtFortrolig = true
+            )
         repo.save(klagebehandling1)
         repo.save(klagebehandling2)
         repo.save(klagebehandling3)
         repo.save(klagebehandling4)
         repo.save(klagebehandling5)
+        repo.save(klagebehandling6)
 
         val query: Query = NativeSearchQueryBuilder()
             .withQuery(QueryBuilders.matchAllQuery())
             .build()
         val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
-        assertThat(searchHits.totalHits).isEqualTo(5L)
+        assertThat(searchHits.totalHits).isEqualTo(6L)
     }
 
     @Test
@@ -220,8 +244,8 @@ class FortroligElasticsearchServiceTest {
     }
 
     @Test
-    @Order(4)
-    fun `Saksbehandler with egen ansatt rights will only see normal klagebehandlinger and those for egen ansatte, but not egen ansatte that are fortrolig`() {
+    @Order(5)
+    fun `Saksbehandler with egen ansatt rights will only see normal klagebehandlinger and those for egen ansatte, but not egen ansatte that are fortrolig or strengt fortrolig`() {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() } returns true
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() } returns false
         every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() } returns false
@@ -238,8 +262,8 @@ class FortroligElasticsearchServiceTest {
     }
 
     @Test
-    @Order(4)
-    fun `Saksbehandler with fortrolig rights will only see fortrolige klagebehandlinger and those that are fortrolige and egen ansatte`() {
+    @Order(6)
+    fun `Saksbehandler with fortrolig rights will see normal klagebehandlinger and fortrolige klagebehandlinger, including the combo fortrolig and egen ansatt`() {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() } returns false
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() } returns true
         every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() } returns false
@@ -251,13 +275,13 @@ class FortroligElasticsearchServiceTest {
                     limit = 10
                 )
             ).searchHits.map { it.content }
-        assertThat(klagebehandlinger.size).isEqualTo(2L)
-        assertThat(klagebehandlinger.map { it.id }).containsExactlyInAnyOrder("1002L", "1005L")
+        assertThat(klagebehandlinger.size).isEqualTo(3L)
+        assertThat(klagebehandlinger.map { it.id }).containsExactlyInAnyOrder("1001L", "1002L", "1005L")
     }
 
     @Test
-    @Order(4)
-    fun `Saksbehandler with strengt fortrolig rights will only see fortrolige and strengt fortrolige klagebehandlinger, and those that are fortrolige and egen ansatte`() {
+    @Order(7)
+    fun `Saksbehandler with strengt fortrolig rights will only see strengt fortrolige klagebehandlinger, and those that are strengt fortrolige and egen ansatte`() {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() } returns false
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() } returns false
         every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() } returns true
@@ -269,8 +293,8 @@ class FortroligElasticsearchServiceTest {
                     limit = 10
                 )
             ).searchHits.map { it.content }
-        assertThat(klagebehandlinger.size).isEqualTo(3L)
-        assertThat(klagebehandlinger.map { it.id }).containsExactlyInAnyOrder("1002L", "1003L", "1005L")
+        assertThat(klagebehandlinger.size).isEqualTo(2L)
+        assertThat(klagebehandlinger.map { it.id }).containsExactlyInAnyOrder("1003L", "1006L")
     }
 
 }

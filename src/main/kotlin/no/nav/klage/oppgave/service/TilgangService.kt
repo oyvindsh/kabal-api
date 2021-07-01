@@ -73,8 +73,8 @@ class TilgangService(
         val personInfo = pdlFacade.getPersonInfo(fnr)
         if (personInfo.harBeskyttelsesbehovFortrolig()) {
             securelogger.info("erFortrolig")
-            //Merk at vi ikke sjekker egenAnsatt her, strengt fortrolig trumfer det
-            if (innloggetSaksbehandlerRepository.kanBehandleFortrolig() || innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
+            //Merk at vi ikke sjekker egenAnsatt her, fortrolig trumfer det
+            if (innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
                 securelogger.info("Access granted to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
             } else {
                 securelogger.info("Access denied to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
@@ -83,7 +83,7 @@ class TilgangService(
         }
         if (personInfo.harBeskyttelsesbehovStrengtFortrolig()) {
             securelogger.info("erStrengtFortrolig")
-            //Merk at vi ikke sjekker egenAnsatt her, fortrolig trumfer det
+            //Merk at vi ikke sjekker egenAnsatt her, strengt fortrolig trumfer det
             if (innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
                 securelogger.info("Access granted to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
             } else {
