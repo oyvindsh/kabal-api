@@ -10,11 +10,13 @@ import no.nav.klage.oppgave.domain.klage.Klager
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
 import no.nav.klage.oppgave.repositories.EnhetRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
@@ -40,15 +42,22 @@ class MottakService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @Transactional
     fun createMottakForKlage(oversendtKlage: OversendtKlage) {
         oversendtKlage.validate()
+
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
+
+        secureLogger.debug("Har lagret mottak basert på oversendtKlage {}", oversendtKlage)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
-        meterRegistry.incrementMottattKlage(mottak.kildesystem, mottak.tema)
+
+        //TODO: Move to outside of transaction to make sure it went well
+        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.tema.navn)
     }
 
     fun createMottakFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
@@ -74,6 +83,7 @@ class MottakService(
     }
 
     fun OversendtKlage.validate() {
+        validateDuplicate(kilde, kildeReferanse)
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
         validatePartId(klager.id)
         sakenGjelder?.run { validatePartId(sakenGjelder.id) }
@@ -81,6 +91,15 @@ class MottakService(
         validateType(type)
         validateEnhet(avsenderEnhet)
         validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
+    }
+
+    private fun validateDuplicate(kildeFagsystem: KildeFagsystem, kildeReferanse: String) {
+        if (mottakRepository.existsByKildesystemAndKildeReferanse(kildeFagsystem.mapFagsystem(), kildeReferanse)) {
+            val message =
+                "Kunne ikke lagre oversendelse grunnet duplikat: kilde ${kildeFagsystem.name} og kildereferanse: $kildeReferanse"
+            logger.warn(message)
+            throw DuplicateOversendelseException(message)
+        }
     }
 
     private fun validateType(type: Type) {
