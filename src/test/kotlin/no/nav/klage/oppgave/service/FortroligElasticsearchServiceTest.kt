@@ -78,7 +78,7 @@ class FortroligElasticsearchServiceTest {
 
     @Test
     @Order(3)
-    fun `lagrer fem oppgaver for senere tester`() {
+    fun `lagrer oppgaver for senere tester`() {
 
         val klagebehandling1 = EsKlagebehandling(
             id = "1001L",
