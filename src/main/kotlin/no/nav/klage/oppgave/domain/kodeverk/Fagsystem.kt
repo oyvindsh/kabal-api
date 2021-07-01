@@ -5,6 +5,7 @@ import javax.persistence.Converter
 
 enum class Fagsystem(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
     FS36("1", "FS36", "Vedtaksløsning Foreldrepenger"),
+    //MERK: FS39 er ikke lenger i bruk, og kan anses som utgått.
     FS39("2", "FS39", "Saksbehandling for Folketrygdloven kapittel 9"),
     AO01("3", "AO01", "Arena"),
     AO11("4", "AO11", "Grisen"),
