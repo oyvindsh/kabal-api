@@ -300,14 +300,28 @@ open class ElasticsearchService(
     private fun addSecurityFilters(baseQuery: BoolQueryBuilder) {
         val filterQuery = QueryBuilders.boolQuery()
         baseQuery.filter(filterQuery)
-        if (!innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
+
+        val kanBehandleEgenAnsatt = innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()
+        val kanBehandleFortrolig = innloggetSaksbehandlerRepository.kanBehandleFortrolig()
+        val kanBehandleStrengtFortrolig = innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()
+        if (!kanBehandleEgenAnsatt && !kanBehandleFortrolig && !kanBehandleStrengtFortrolig) {
+            //Antar her at de som kan behandle fortrolig og/eller strengt fortrolig også kan behandle eventuelle personer som er egen ansatt og fortrolig
             filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))
         }
-        if (!innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
+        if (!kanBehandleFortrolig && !kanBehandleStrengtFortrolig) {
             filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
         }
-        if (!innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
+        if (!kanBehandleStrengtFortrolig) {
             filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+        }
+        if (kanBehandleFortrolig || kanBehandleStrengtFortrolig) {
+            if (kanBehandleStrengtFortrolig) {
+                //Not using a innerQuery here, ref https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl-bool-query.html
+                filterQuery.should(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.should(QueryBuilders.termQuery("fortrolig", true))
+            } else {
+                filterQuery.must(QueryBuilders.termQuery("fortrolig", true))
+            }
         }
     }
 
