@@ -85,6 +85,18 @@ enum class Tema(override val id: String, override val navn: String, override val
     }
 }
 
+object TemaTilgjengeligeForEktefelle {
+    private val ektefelleTemaerIProdGcp = EnumSet.of(Tema.OMS)
+    private val ektefelleTemaerIDevGcp = EnumSet.of(Tema.OMS)
+
+    fun temaerTilgjengeligForEktefelle(environment: Environment): EnumSet<Tema> =
+        if (environment.activeProfiles.contains("prod-gcp")) {
+            ektefelleTemaerIProdGcp
+        } else {
+            ektefelleTemaerIDevGcp
+        }
+}
+
 object LovligeTemaer {
     private val lovligeTemaerIProdGcp = EnumSet.of(Tema.OMS)
     private val lovligeTemaerIDevGcp = EnumSet.of(Tema.OMS, Tema.SYK)

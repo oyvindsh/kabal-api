@@ -29,7 +29,8 @@ data class KlagebehandlingListView(
 ) {
     data class Person(
         val fnr: String?,
-        val navn: String?
+        val navn: String?,
+        val sivilstand: String? = null
     )
 }
 

@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.clients.pdl
 
+import no.nav.klage.oppgave.domain.kodeverk.SivilstandType
+
 data class Person(
     val foedselsnr: String,
     val fornavn: String?,
@@ -28,9 +30,4 @@ data class Sivilstand(val type: SivilstandType, val foedselsnr: String)
 
 enum class Beskyttelsesbehov {
     STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG
-}
-
-enum class SivilstandType {
-    GIFT,
-    REGISTRERT_PARTNER
 }

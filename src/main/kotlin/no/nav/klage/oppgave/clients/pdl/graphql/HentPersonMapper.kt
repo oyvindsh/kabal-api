@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.clients.pdl.graphql
 import no.nav.klage.oppgave.clients.pdl.Beskyttelsesbehov
 import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.clients.pdl.Sivilstand
-import no.nav.klage.oppgave.clients.pdl.SivilstandType
+import no.nav.klage.oppgave.domain.kodeverk.SivilstandType
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
