@@ -47,6 +47,7 @@ class MottakService(
 
     @Transactional
     fun createMottakForKlage(oversendtKlage: OversendtKlage) {
+        secureLogger.debug("Prøver å lagre oversendtKlage: {}", oversendtKlage)
         oversendtKlage.validate()
 
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
