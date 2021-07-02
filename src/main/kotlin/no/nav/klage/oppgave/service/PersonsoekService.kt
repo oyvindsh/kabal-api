@@ -47,6 +47,7 @@ class PersonsoekService(
 
     private fun navnSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         val pdlResponse = pdlClient.personsok(input.raw)
+        secureLogger.debug("Fetched data from PDL søk: ${pdlResponse}")
         verifyPdlResponse(pdlResponse)
         val fnrList = pdlResponse.collectFnr()
         val klagebehandlinger = esSoek(input.copy(foedselsnr = fnrList)).groupBy { it.klagerFnr }
