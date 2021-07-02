@@ -331,7 +331,7 @@ class FortroligElasticsearchServiceTest {
     }
 
     @Test
-    @Order(7)
+    @Order(9)
     fun `Saksbehandler with strengt fortrolig rights without egen ansatt rights will only see strengt fortrolige klagebehandlinger, including the combo strengt fortrolig and egen ansatt`() {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() } returns false
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() } returns false
@@ -351,7 +351,7 @@ class FortroligElasticsearchServiceTest {
     }
 
     @Test
-    @Order(7)
+    @Order(10)
     fun `Saksbehandler with fortrolig and strengt fortrolig rights will only see strengt fortrolige and fortrolige klagebehandlinger, including those that also are egen ansatte`() {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() } returns false
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() } returns true
@@ -373,7 +373,7 @@ class FortroligElasticsearchServiceTest {
     }
 
     @Test
-    @Order(7)
+    @Order(11)
     fun `Saksbehandler with fortrolig and strengt fortrolig and egen ansatt rights will only see strengt fortrolige and fortrolige klagebehandlinger, including those that also are egen ansatte`() {
         every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() } returns true
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() } returns true
