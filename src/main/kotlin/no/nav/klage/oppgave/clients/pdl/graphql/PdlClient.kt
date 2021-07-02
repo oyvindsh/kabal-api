@@ -13,6 +13,7 @@ import java.lang.System.currentTimeMillis
 @Component
 class PdlClient(
     private val pdlWebClient: WebClient,
+    private val pdlNoproxyWebClient: WebClient,
     private val tokenUtil: TokenUtil
 ) {
 
@@ -63,10 +64,9 @@ class PdlClient(
     @Retryable
     fun personsok(inputString: String): SoekPersonResponse {
         return runWithTiming {
-            val userToken = tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()
-            pdlWebClient.post()
+            val userToken = tokenUtil.getSaksbehandlerAccessTokenWithPdlScope()
+            pdlNoproxyWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
-                .header("Nav-Consumer-Token", "Bearer $userToken")
                 .bodyValue(soekPersonNavnContainsQuery(inputString))
                 .retrieve()
                 .bodyToMono<SoekPersonResponse>()

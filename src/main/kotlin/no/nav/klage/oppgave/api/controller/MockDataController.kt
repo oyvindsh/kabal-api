@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.util.*
 
 @Profile("dev-gcp")
 @RestController
@@ -60,7 +61,7 @@ class MockDataController(
                         fagsystem = KildeFagsystem.AO01
                     )
                 },
-                kildeReferanse = "REF_$fnr",
+                kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
@@ -106,7 +107,7 @@ class MockDataController(
                         fagsystem = KildeFagsystem.AO01
                     )
                 },
-                kildeReferanse = "REF_$fnr",
+                kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
@@ -152,7 +153,7 @@ class MockDataController(
                         fagsystem = KildeFagsystem.AO01
                     )
                 },
-                kildeReferanse = "REF_$fnr",
+                kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
@@ -202,7 +203,7 @@ class MockDataController(
                         fagsystem = KildeFagsystem.AO01
                     )
                 },
-                kildeReferanse = "REF_$fnr",
+                kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(

@@ -38,7 +38,7 @@ data class OversendtKlage(
     )
     val fagsak: OversendtSak? = null,
     @ApiModelProperty(
-        notes = "Id som er intern for kildesystemet så vedtak fra oss knyttes riktig i kilde",
+        notes = "Id som er intern for kildesystemet (f.eks. K9) så vedtak fra oss knyttes riktig i kilde",
         required = true
     )
     val kildeReferanse: String,
@@ -52,19 +52,19 @@ data class OversendtKlage(
         required = false,
         example = "https://k9-sak.adeo.no/behandling/12345678"
     )
-    val innsynUrl: String?,
+    val innsynUrl: String? = null,
     @ApiModelProperty(
         notes = "Hjemler knyttet til klagen",
         required = false
     )
-    val hjemler: List<HjemmelFraFoersteInstans>?,
+    val hjemler: List<HjemmelFraFoersteInstans>? = emptyList(),
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     @ApiModelProperty(
         notes = "Liste med relevante journalposter til klagen. Liste kan være tom.",
         required = true
     )
-    val tilknyttedeJournalposter: List<OversendtDokumentReferanse>,
+    val tilknyttedeJournalposter: List<OversendtDokumentReferanse> = emptyList(),
     @field:PastOrPresent(message = "Dato for mottatt førsteinstans må være i fortiden eller i dag")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val mottattFoersteinstans: LocalDate,
@@ -114,7 +114,7 @@ data class OversendtKlage(
     )
 }
 
-private fun KildeFagsystem.mapFagsystem(): Fagsystem =
+fun KildeFagsystem.mapFagsystem(): Fagsystem =
     when (this) {
         KildeFagsystem.AO01 -> Fagsystem.AO01
         KildeFagsystem.FS36 -> Fagsystem.FS36

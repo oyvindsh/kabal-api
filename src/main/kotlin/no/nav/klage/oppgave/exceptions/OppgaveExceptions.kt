@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.exceptions
 
+class DuplicateOversendelseException(msg: String) : RuntimeException(msg)
+
 class OppgaveNotFoundException(msg: String) : RuntimeException(msg)
 
 class JournalpostNotFoundException(msg: String) : ValidationException(msg)

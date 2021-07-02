@@ -33,6 +33,12 @@ class TokenUtil(
         return response.accessToken
     }
 
+    fun getSaksbehandlerAccessTokenWithPdlScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["pdl-onbehalfof"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getSaksbehandlerAccessTokenWithAxsysScope(): String {
         val clientProperties = clientConfigurationProperties.registration["axsys-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)

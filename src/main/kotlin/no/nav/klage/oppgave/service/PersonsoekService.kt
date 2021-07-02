@@ -33,6 +33,7 @@ class PersonsoekService(
 
     private fun fnrSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         val liste = esSoek(input)
+        logger.debug("Personsøk: Got ${liste.size} hits from ES")
         val mapped = liste.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
             PersonSoekResponse(
                 fnr = key!!,
@@ -46,15 +47,16 @@ class PersonsoekService(
 
     private fun navnSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         val pdlResponse = pdlClient.personsok(input.raw)
+        secureLogger.debug("Fetched data from PDL søk: ${pdlResponse}")
         verifyPdlResponse(pdlResponse)
         val fnrList = pdlResponse.collectFnr()
         val klagebehandlinger = esSoek(input.copy(foedselsnr = fnrList)).groupBy { it.klagerFnr }
-        val mapped = pdlResponse.data?.soekPerson?.hits?.map { personHit ->
-            val fnr = personHit.person.folkeregisteridentifikator.identifikasjonsnummer
+        val mapped = pdlResponse.data?.sokPerson?.hits?.map { personHit ->
+            val fnr = personHit.person.folkeregisteridentifikator.first().identifikasjonsnummer
             PersonSoekResponse(
                 fnr = fnr,
                 navn = personHit.person.navn.toString(),
-                foedselsdato = LocalDate.parse(personHit.person.foedsel.foedselsdato),
+                foedselsdato = LocalDate.parse(personHit.person.foedsel.first().foedselsdato),
                 klagebehandlinger = klagebehandlinger[fnr] ?: listOf()
             )
         }
@@ -75,5 +77,7 @@ class PersonsoekService(
     }
 
     private fun SoekPersonResponse.collectFnr(): List<String> =
-        this.data?.soekPerson?.hits?.map { it.person.folkeregisteridentifikator.identifikasjonsnummer } ?: listOf()
+        this.data?.sokPerson?.hits?.map {
+            it.person.folkeregisteridentifikator.first().identifikasjonsnummer
+        } ?: listOf()
 }
