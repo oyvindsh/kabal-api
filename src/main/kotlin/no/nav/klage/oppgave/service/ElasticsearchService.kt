@@ -300,14 +300,71 @@ open class ElasticsearchService(
     private fun addSecurityFilters(baseQuery: BoolQueryBuilder) {
         val filterQuery = QueryBuilders.boolQuery()
         baseQuery.filter(filterQuery)
-        if (!innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
-            filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))
-        }
-        if (!innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
-            filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
-        }
-        if (!innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
-            filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+
+        val kanBehandleEgenAnsatt = innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()
+        val kanBehandleFortrolig = innloggetSaksbehandlerRepository.kanBehandleFortrolig()
+        val kanBehandleStrengtFortrolig = innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()
+
+        when {
+            kanBehandleEgenAnsatt && kanBehandleFortrolig && kanBehandleStrengtFortrolig -> {
+                //Case 1
+                //Skipper de normale, altså de som ikke har noe.
+                //fortrolig og strengt fortrolig trumfer egen ansatt
+                //tolker dette som kun egen ansatt som også er strengt fortrolig eller fortrolig
+                filterQuery.should(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.should(QueryBuilders.termQuery("fortrolig", true))
+            }
+            !kanBehandleEgenAnsatt && kanBehandleFortrolig && kanBehandleStrengtFortrolig -> {
+                //Case 2
+                //Er i praksis det samme som case 1
+                filterQuery.should(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.should(QueryBuilders.termQuery("fortrolig", true))
+            }
+            kanBehandleEgenAnsatt && !kanBehandleFortrolig && kanBehandleStrengtFortrolig -> {
+                //Case 3
+                //tolker dette som kun egen ansatt som også er strengt fortrolig
+                //Skipper de normale, altså de som ikke har noe.
+                filterQuery.must(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
+            }
+            kanBehandleEgenAnsatt && kanBehandleFortrolig && !kanBehandleStrengtFortrolig -> {
+                //Case 4
+                //Skal inkludere de normale
+                //Skal inkludere egen ansatt
+                //Skal inkludere fortrolig
+                filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+            }
+            !kanBehandleEgenAnsatt && !kanBehandleFortrolig && kanBehandleStrengtFortrolig -> {
+                //Case 5.
+                //Er i praksis det samme som case 3. Inkluderer egen ansatte som også har strengt fortrolig, strengt fortrolig trumfer egen ansatt
+                filterQuery.must(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
+            }
+            !kanBehandleEgenAnsatt && kanBehandleFortrolig && !kanBehandleStrengtFortrolig -> {
+                //Case 6
+                //Skal inkludere de normale
+                //Skal inkludere fortrolig
+                //Skal inkludere fortrolige som også er egen ansatt, men ikke egen ansatte som ikke er fortrolige
+                val egenAnsattAndNotFortrolig = QueryBuilders.boolQuery()
+                egenAnsattAndNotFortrolig.must(QueryBuilders.termQuery("egenAnsatt", true))
+                egenAnsattAndNotFortrolig.mustNot(QueryBuilders.termQuery("fortrolig", true))
+
+                filterQuery.mustNot(egenAnsattAndNotFortrolig)
+                filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+            }
+            kanBehandleEgenAnsatt && !kanBehandleFortrolig && !kanBehandleStrengtFortrolig -> {
+                //Case 7
+                //Skal inkludere de normale
+                //Skal inkludere egen ansatt
+                filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
+            }
+            !kanBehandleEgenAnsatt && !kanBehandleFortrolig && !kanBehandleStrengtFortrolig -> {
+                //Case 8
+                filterQuery.mustNot(QueryBuilders.termQuery("strengtFortrolig", true))
+                filterQuery.mustNot(QueryBuilders.termQuery("fortrolig", true))
+                filterQuery.mustNot(QueryBuilders.termQuery("egenAnsatt", true))
+            }
         }
     }
 
