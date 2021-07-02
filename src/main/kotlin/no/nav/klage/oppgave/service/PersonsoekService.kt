@@ -33,6 +33,7 @@ class PersonsoekService(
 
     private fun fnrSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         val liste = esSoek(input)
+        logger.debug("Personsøk: Got ${liste.size} hits from ES")
         val mapped = liste.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
             PersonSoekResponse(
                 fnr = key!!,

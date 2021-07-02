@@ -53,5 +53,5 @@ data class KlagebehandlingerSearchCriteria(
 
     fun isFnrSoek() = raw.isNumeric()
 
-    private fun String.isNumeric() = toIntOrNull() != null
+    private fun String.isNumeric() = toLongOrNull() != null
 }
