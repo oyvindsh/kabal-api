@@ -6,7 +6,7 @@ data class SoekPersonResponse(
 )
 
 data class SoekPersonData(
-    val soekPerson: SoekPersonResult?
+    val sokPerson: SoekPersonResult?
 )
 
 data class SoekPersonResult(
@@ -21,10 +21,10 @@ data class SoekPersonHit(
 )
 
 data class PdlSoekPerson(
-    val folkeregisteridentifikator: Folkeregisteridentifikator,
-    val navn: Navn,
+    val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
+    val navn: List<Navn>,
     val adressebeskyttelse: List<PdlPerson.Adressebeskyttelse>,
-    val foedsel: Foedsel
+    val foedsel: List<Foedsel>
 ) {
     data class Folkeregisteridentifikator(
         val identifikasjonsnummer: String

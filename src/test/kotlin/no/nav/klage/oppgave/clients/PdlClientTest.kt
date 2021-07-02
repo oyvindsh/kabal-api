@@ -5,6 +5,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonResponse
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlClient
+import no.nav.klage.oppgave.clients.pdl.graphql.SoekPersonResponse
 import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
@@ -21,6 +22,7 @@ internal class PdlClientTest {
     @BeforeEach
     fun before() {
         every { tokenUtilMock.getStsSystembrukerToken() } returns "abc"
+        every { tokenUtilMock.getSaksbehandlerAccessTokenWithPdlScope() } returns "abc"
     }
 
     @Test
@@ -30,13 +32,30 @@ internal class PdlClientTest {
         assertThat(hentPersonResponse.data!!.hentPerson!!.navn.first().fornavn).isEqualTo("AREMARK")
     }
 
+    @Test
+    fun `personsøk ok`() {
+        val personsoekResponse = getSoekPersonResponse(pdlSoekResponse())
+        assertThat(personsoekResponse.data).isNotNull
+    }
+
     fun getHentPersonResponse(jsonResponse: String): HentPersonResponse {
         val pdlClient = PdlClient(
+            createShortCircuitWebClient(jsonResponse),
             createShortCircuitWebClient(jsonResponse),
             tokenUtilMock
         )
 
         return pdlClient.getPersonInfo("fnr")
+    }
+
+    fun getSoekPersonResponse(jsonResponse: String): SoekPersonResponse {
+        val pdlClient = PdlClient(
+            createShortCircuitWebClient(jsonResponse),
+            createShortCircuitWebClient(jsonResponse),
+            tokenUtilMock
+        )
+
+        return pdlClient.personsok("fnr")
     }
 
     @Language("json")
@@ -58,6 +77,44 @@ internal class PdlClientTest {
               ],
               "adressebeskyttelse": [],
               "sivilstand": []
+            }
+          }
+        }
+    """
+
+    @Language("json")
+    fun pdlSoekResponse() = """
+        {
+          "data": {
+            "sokPerson": {
+              "pageNumber": 1,
+              "totalHits": 38,
+              "totalPages": 2,
+              "hits": [
+                {
+                  "score": 37.505756,
+                  "person": {
+                    "folkeregisteridentifikator": [
+                      {
+                        "identifikasjonsnummer": "23051668235"
+                      }
+                    ],
+                    "navn": [
+                      {
+                        "fornavn": "LITEN",
+                        "etternavn": "SAKS",
+                        "mellomnavn": null
+                      }
+                    ],
+                    "adressebeskyttelse": [],
+                    "foedsel": [
+                      {
+                        "foedselsdato": "2016-05-23"
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           }
         }

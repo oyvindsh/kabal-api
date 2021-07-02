@@ -30,6 +30,7 @@ class KlagebehandlingListMapper {
             PersonSoekPersonView(
                 fnr = person.fnr,
                 navn = person.navn,
+                foedselsdato = person.foedselsdato,
                 klagebehandlinger = klagebehandlinger,
                 aapneKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler == null },
                 avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler != null }
