@@ -41,6 +41,7 @@ data class KlagebehandlingerPersonSoekListRespons(
 data class PersonSoekPersonView(
     val fnr: String,
     val navn: String?,
+    val foedselsdato: LocalDate?,
     val klagebehandlinger: List<KlagebehandlingListView>,
     val aapneKlagebehandlinger: List<KlagebehandlingListView>,
     val avsluttedeKlagebehandlinger: List<KlagebehandlingListView>
