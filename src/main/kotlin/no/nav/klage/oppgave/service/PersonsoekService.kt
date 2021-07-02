@@ -52,11 +52,11 @@ class PersonsoekService(
         val fnrList = pdlResponse.collectFnr()
         val klagebehandlinger = esSoek(input.copy(foedselsnr = fnrList)).groupBy { it.klagerFnr }
         val mapped = pdlResponse.data?.sokPerson?.hits?.map { personHit ->
-            val fnr = personHit.person.folkeregisteridentifikator.identifikasjonsnummer
+            val fnr = personHit.person.folkeregisteridentifikator.first().identifikasjonsnummer
             PersonSoekResponse(
                 fnr = fnr,
                 navn = personHit.person.navn.toString(),
-                foedselsdato = LocalDate.parse(personHit.person.foedsel.foedselsdato),
+                foedselsdato = LocalDate.parse(personHit.person.foedsel.first().foedselsdato),
                 klagebehandlinger = klagebehandlinger[fnr] ?: listOf()
             )
         }
@@ -77,5 +77,7 @@ class PersonsoekService(
     }
 
     private fun SoekPersonResponse.collectFnr(): List<String> =
-        this.data?.sokPerson?.hits?.map { it.person.folkeregisteridentifikator.identifikasjonsnummer } ?: listOf()
+        this.data?.sokPerson?.hits?.map {
+            it.person.folkeregisteridentifikator.first().identifikasjonsnummer
+        } ?: listOf()
 }
