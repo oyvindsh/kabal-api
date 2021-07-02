@@ -193,6 +193,7 @@ class TilgangServiceTest {
         every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() }.returns(false)
         every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { egenAnsattService.erEgenAnsatt(any()) }.returns(false)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
 
@@ -213,6 +214,7 @@ class TilgangServiceTest {
 
         every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { egenAnsattService.erEgenAnsatt(any()) }.returns(false)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
 

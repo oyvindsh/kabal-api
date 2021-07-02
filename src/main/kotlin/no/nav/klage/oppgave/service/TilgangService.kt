@@ -70,63 +70,62 @@ class TilgangService(
     }
 
     fun harInnloggetSaksbehandlerTilgangTil(fnr: String): Boolean {
-        val personInfo = pdlFacade.getPersonInfo(fnr)
-        if (personInfo.harBeskyttelsesbehovFortrolig()) {
-            securelogger.info("erFortrolig")
-            //Merk at vi ikke sjekker egenAnsatt her, fortrolig trumfer det
-            if (innloggetSaksbehandlerRepository.kanBehandleFortrolig()) {
-                securelogger.info("Access granted to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-            } else {
-                securelogger.info("Access denied to fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                return false
-            }
-        }
-        if (personInfo.harBeskyttelsesbehovStrengtFortrolig()) {
-            securelogger.info("erStrengtFortrolig")
-            //Merk at vi ikke sjekker egenAnsatt her, strengt fortrolig trumfer det
-            if (innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig()) {
-                securelogger.info("Access granted to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-            } else {
-                securelogger.info("Access denied to strengt fortrolig for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                return false
-            }
-        }
-        if (egenAnsattService.erEgenAnsatt(fnr) && !(personInfo.harBeskyttelsesbehovFortrolig() || personInfo.harBeskyttelsesbehovStrengtFortrolig())) {
-            securelogger.info("erEgenAnsatt")
-            //Er kun egenAnsatt, har ikke et beskyttelsesbehov i tillegg
-            if (innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt()) {
-                securelogger.info("Access granted to egen ansatt for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-            } else {
-                securelogger.info("Access denied to egen ansatt for ${innloggetSaksbehandlerRepository.getInnloggetIdent()}")
-                return false
-            }
-        }
-        return true
+        val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return verifiserTilgangTilPersonForSaksbehandler(
+            fnr = fnr,
+            ident = ident,
+            kanBehandleStrengtFortrolig = { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() },
+            kanBehandleFortrolig = { innloggetSaksbehandlerRepository.kanBehandleFortrolig() },
+            kanBehandleEgenAnsatt = { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() },
+        )
     }
 
     fun harSaksbehandlerTilgangTil(ident: String, fnr: String): Boolean {
+        return verifiserTilgangTilPersonForSaksbehandler(
+            fnr = fnr,
+            ident = ident,
+            kanBehandleStrengtFortrolig = { saksbehandlerRepository.kanBehandleStrengtFortrolig(ident) },
+            kanBehandleFortrolig = { saksbehandlerRepository.kanBehandleFortrolig(ident) },
+            kanBehandleEgenAnsatt = { saksbehandlerRepository.kanBehandleEgenAnsatt(ident) },
+        )
+    }
+
+    private fun verifiserTilgangTilPersonForSaksbehandler(
+        fnr: String,
+        ident: String,
+        kanBehandleStrengtFortrolig: () -> Boolean,
+        kanBehandleFortrolig: () -> Boolean,
+        kanBehandleEgenAnsatt: () -> Boolean
+    ): Boolean {
         val personInfo = pdlFacade.getPersonInfo(fnr)
-        if (personInfo.harBeskyttelsesbehovFortrolig()) {
-            securelogger.info("erFortrolig")
-            if (saksbehandlerRepository.kanBehandleFortrolig(ident)) {
-                securelogger.info("Access granted to fortrolig for $ident")
-            } else {
-                securelogger.info("Access denied to fortrolig for $ident")
-                return false
-            }
-        }
-        if (personInfo.harBeskyttelsesbehovStrengtFortrolig()) {
+        val harBeskyttelsesbehovFortrolig = personInfo.harBeskyttelsesbehovFortrolig()
+        val harBeskyttelsesbehovStrengtFortrolig = personInfo.harBeskyttelsesbehovStrengtFortrolig()
+        val erEgenAnsatt = egenAnsattService.erEgenAnsatt(fnr)
+
+        if (harBeskyttelsesbehovStrengtFortrolig) {
             securelogger.info("erStrengtFortrolig")
-            if (saksbehandlerRepository.kanBehandleStrengtFortrolig(ident)) {
+            //Merk at vi ikke sjekker egenAnsatt her, strengt fortrolig trumfer det
+            if (kanBehandleStrengtFortrolig.invoke()) {
                 securelogger.info("Access granted to strengt fortrolig for $ident")
             } else {
                 securelogger.info("Access denied to strengt fortrolig for $ident")
                 return false
             }
         }
-        if (egenAnsattService.erEgenAnsatt(fnr)) {
+        if (harBeskyttelsesbehovFortrolig) {
+            securelogger.info("erFortrolig")
+            //Merk at vi ikke sjekker egenAnsatt her, fortrolig trumfer det
+            if (kanBehandleFortrolig.invoke()) {
+                securelogger.info("Access granted to fortrolig for $ident")
+            } else {
+                securelogger.info("Access denied to fortrolig for $ident")
+                return false
+            }
+        }
+        if (erEgenAnsatt && !(harBeskyttelsesbehovFortrolig || harBeskyttelsesbehovStrengtFortrolig)) {
             securelogger.info("erEgenAnsatt")
-            if (saksbehandlerRepository.kanBehandleEgenAnsatt(ident)) {
+            //Er kun egenAnsatt, har ikke et beskyttelsesbehov i tillegg
+            if (kanBehandleEgenAnsatt.invoke()) {
                 securelogger.info("Access granted to egen ansatt for $ident")
             } else {
                 securelogger.info("Access denied to egen ansatt for $ident")
