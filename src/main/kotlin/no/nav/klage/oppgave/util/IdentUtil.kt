@@ -14,8 +14,11 @@ fun isValidFnrOrDnr(fnr: String): Boolean {
     val i2 = fnr.substring(7, 8).toInt()
     val i3 = fnr.substring(8, 9).toInt()
 
-    val k1 = 11 - ((3 * d1 + 7 * d2 + 6 * m1 + 1 * m2 + 8 * y1 + 9 * y2 + 4 * i1 + 5 * i2 + 2 * i3) % 11)
-    val k2 = 11 - ((5 * d1 + 4 * d2 + 3 * m1 + 2 * m2 + 7 * y1 + 6 * y2 + 5 * i1 + 4 * i2 + 3 * i3 + 2 * k1) % 11)
+    var k1 = 11 - ((3 * d1 + 7 * d2 + 6 * m1 + 1 * m2 + 8 * y1 + 9 * y2 + 4 * i1 + 5 * i2 + 2 * i3) % 11)
+    var k2 = 11 - ((5 * d1 + 4 * d2 + 3 * m1 + 2 * m2 + 7 * y1 + 6 * y2 + 5 * i1 + 4 * i2 + 3 * i3 + 2 * k1) % 11)
 
-    return k1 == fnr.substring(9, 10).toInt() && k2 == fnr.substring(10, 11).toInt()
+    if (k1 == 11) k1 = 0
+    if (k2 == 11) k2 = 0
+
+    return k1 < 10 && k2 < 10 && k1 == fnr.substring(9, 10).toInt() && k2 == fnr.substring(10, 11).toInt()
 }
