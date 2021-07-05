@@ -21,7 +21,7 @@ internal class PdlClientTest {
 
     @BeforeEach
     fun before() {
-        every { tokenUtilMock.getStsSystembrukerToken() } returns "abc"
+        every { tokenUtilMock.getAppAccessTokenWithPdlScope() } returns "abc"
         every { tokenUtilMock.getSaksbehandlerAccessTokenWithPdlScope() } returns "abc"
     }
 
@@ -41,7 +41,6 @@ internal class PdlClientTest {
     fun getHentPersonResponse(jsonResponse: String): HentPersonResponse {
         val pdlClient = PdlClient(
             createShortCircuitWebClient(jsonResponse),
-            createShortCircuitWebClient(jsonResponse),
             tokenUtilMock
         )
 
@@ -50,7 +49,6 @@ internal class PdlClientTest {
 
     fun getSoekPersonResponse(jsonResponse: String): SoekPersonResponse {
         val pdlClient = PdlClient(
-            createShortCircuitWebClient(jsonResponse),
             createShortCircuitWebClient(jsonResponse),
             tokenUtilMock
         )
