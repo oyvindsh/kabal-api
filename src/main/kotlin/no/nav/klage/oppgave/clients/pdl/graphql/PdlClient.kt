@@ -13,7 +13,6 @@ import java.lang.System.currentTimeMillis
 @Component
 class PdlClient(
     private val pdlWebClient: WebClient,
-    private val pdlNoproxyWebClient: WebClient,
     private val tokenUtil: TokenUtil
 ) {
 
@@ -26,10 +25,9 @@ class PdlClient(
     @Retryable
     fun getPersonerInfo(fnrList: List<String>): HentPersonerResponse {
         return runWithTiming {
-            val stsSystembrukerToken = tokenUtil.getStsSystembrukerToken()
+            val stsSystembrukerToken = tokenUtil.getAppAccessTokenWithPdlScope()
             pdlWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $stsSystembrukerToken")
-                .header("Nav-Consumer-Token", "Bearer $stsSystembrukerToken")
                 .bodyValue(hentPersonerQuery(fnrList))
                 .retrieve()
                 .bodyToMono<HentPersonerResponse>()
@@ -50,10 +48,9 @@ class PdlClient(
     @Retryable
     fun getPersonInfo(fnr: String): HentPersonResponse {
         return runWithTiming {
-            val stsSystembrukerToken = tokenUtil.getStsSystembrukerToken()
+            val stsSystembrukerToken = tokenUtil.getAppAccessTokenWithPdlScope()
             pdlWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $stsSystembrukerToken")
-                .header("Nav-Consumer-Token", "Bearer $stsSystembrukerToken")
                 .bodyValue(hentPersonQuery(fnr))
                 .retrieve()
                 .bodyToMono<HentPersonResponse>()
@@ -65,7 +62,7 @@ class PdlClient(
     fun personsok(inputString: String): SoekPersonResponse {
         return runWithTiming {
             val userToken = tokenUtil.getSaksbehandlerAccessTokenWithPdlScope()
-            pdlNoproxyWebClient.post()
+            pdlWebClient.post()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $userToken")
                 .bodyValue(soekPersonNavnContainsQuery(inputString))
                 .retrieve()
