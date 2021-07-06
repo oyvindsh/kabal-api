@@ -52,7 +52,7 @@ class MottakService(
 
         val mottak = mottakRepository.save(oversendtKlage.toMottak())
 
-        secureLogger.debug("Har lagret mottak basert på oversendtKlage {}", oversendtKlage)
+        secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
 
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
