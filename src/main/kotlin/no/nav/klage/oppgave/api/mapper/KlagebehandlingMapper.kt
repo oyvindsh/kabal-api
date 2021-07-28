@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.mapper
 
 
 import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -22,6 +23,7 @@ import java.util.*
 @Service
 class KlagebehandlingMapper(
     private val pdlFacade: PdlFacade,
+    private val egenAnsattService: EgenAnsattService,
     private val norg2Client: Norg2Client,
     private val eregClient: EregClient,
     private val dokumentService: DokumentService
@@ -43,6 +45,10 @@ class KlagebehandlingMapper(
         val klager = klagerFoedselsnummer?.let { pdlFacade.getPersonInfo(it) }
         val klagerVirksomhetsnummer = virksomhetsnummer(klagebehandling.klager.partId)
         val klagerVirksomhet = klagerVirksomhetsnummer?.let { eregClient.hentOrganisasjon(it) }
+
+        val erFortrolig = sakenGjelder?.harBeskyttelsesbehovFortrolig() ?: false
+        val erStrengtFortrolig = sakenGjelder?.harBeskyttelsesbehovStrengtFortrolig() ?: false
+        val erEgenAnsatt = sakenGjelderFoedselsnummer?.let { egenAnsattService.erEgenAnsatt(it) } ?: false
 
         return KlagebehandlingDetaljerView(
             id = klagebehandling.id,
@@ -87,7 +93,10 @@ class KlagebehandlingMapper(
                     journalpostId = it.journalpostId,
                     dokumentInfoId = it.dokumentInfoId
                 )
-            }.toSet()
+            }.toSet(),
+            egenAnsatt = erEgenAnsatt,
+            fortrolig = erFortrolig,
+            strengtFortrolig = erStrengtFortrolig
         )
     }
 
