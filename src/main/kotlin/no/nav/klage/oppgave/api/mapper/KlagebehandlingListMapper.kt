@@ -81,7 +81,10 @@ class KlagebehandlingListMapper {
                 } else {
                     null
                 },
-                saksbehandlerHarTilgang = tilgangTilTemaer.contains(Tema.of(esKlagebehandling.tema))
+                saksbehandlerHarTilgang = tilgangTilTemaer.contains(Tema.of(esKlagebehandling.tema)),
+                egenAnsatt = esKlagebehandling.egenAnsatt,
+                fortrolig = esKlagebehandling.fortrolig,
+                strengtFortrolig = esKlagebehandling.strengtFortrolig
             )
         }
     }

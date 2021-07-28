@@ -25,7 +25,10 @@ data class KlagebehandlingListView(
     val erTildelt: Boolean,
     val tildeltSaksbehandlerident: String?,
     val tildeltSaksbehandlerNavn: String?,
-    val saksbehandlerHarTilgang: Boolean
+    val saksbehandlerHarTilgang: Boolean,
+    val egenAnsatt: Boolean,
+    val fortrolig: Boolean,
+    val strengtFortrolig: Boolean
 ) {
     data class Person(
         val fnr: String?,
