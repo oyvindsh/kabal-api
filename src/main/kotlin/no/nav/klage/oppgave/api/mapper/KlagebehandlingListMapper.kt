@@ -18,23 +18,33 @@ class KlagebehandlingListMapper {
         saksbehandler: String?,
         tilgangTilTemaer: List<Tema>
     ): List<PersonSoekPersonView> {
-        return personSoekResponse.liste.map { person ->
-            val klagebehandlinger =
-                mapEsKlagebehandlingerToListView(
-                    person.klagebehandlinger,
-                    viseUtvidet,
-                    true,
-                    saksbehandler,
-                    tilgangTilTemaer
+        return if (personSoekResponse.antallTreffTotalt == 1) {
+            personSoekResponse.liste.map { person ->
+                val klagebehandlinger =
+                    mapEsKlagebehandlingerToListView(
+                        esKlagebehandlinger = person.klagebehandlinger,
+                        viseUtvidet = viseUtvidet,
+                        viseFullfoerte = true,
+                        saksbehandler = saksbehandler,
+                        tilgangTilTemaer = tilgangTilTemaer
+                    )
+                PersonSoekPersonView(
+                    fnr = person.fnr,
+                    navn = person.navn,
+                    foedselsdato = person.foedselsdato,
+                    klagebehandlinger = klagebehandlinger,
+                    aapneKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler == null },
+                    avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler != null }
                 )
-            PersonSoekPersonView(
-                fnr = person.fnr,
-                navn = person.navn,
-                foedselsdato = person.foedselsdato,
-                klagebehandlinger = klagebehandlinger,
-                aapneKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler == null },
-                avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler != null }
-            )
+            }
+        } else {
+            personSoekResponse.liste.map { person ->
+                PersonSoekPersonView(
+                    fnr = person.fnr,
+                    navn = person.navn,
+                    foedselsdato = person.foedselsdato
+                )
+            }
         }
     }
 
