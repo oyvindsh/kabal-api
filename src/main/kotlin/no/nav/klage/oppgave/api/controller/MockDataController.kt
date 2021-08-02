@@ -28,18 +28,17 @@ class MockDataController(
     @PostMapping("/randomklage")
     fun sendInnRandomKlage() {
         val dollyDoc = listOf(
-            SyntheticWithDoc("02446701749", "493357061"),
-            SyntheticWithDoc("29437117843", "493357060"),
-            SyntheticWithDoc("25438301286", "493357059"),
-            SyntheticWithDoc("18496900509", "493357058"),
-            SyntheticWithDoc("28416904490", "493357056"),
-            SyntheticWithDoc("17457337760", "493357054"),
-            SyntheticWithDoc("09418242458", "493357053"),
-            SyntheticWithDoc("16498818653", "493357052"),
-            SyntheticWithDoc("20467938577", "493357051"),
-            SyntheticWithDoc("14437830275", "493357050"),
-            SyntheticWithDoc("18418507701", "493357049"),
-            SyntheticWithDoc("12518603068", "493357045")
+            SyntheticWithDoc("02446701749", "510534792"),
+            SyntheticWithDoc("29437117843", "510534815"),
+            SyntheticWithDoc("25438301286", "510534816"),
+            SyntheticWithDoc("18496900509", "510534817"),
+            SyntheticWithDoc("28416904490", "510534818"),
+            SyntheticWithDoc("17457337760", "510534819"),
+            SyntheticWithDoc("16498818653", "510534820"),
+            SyntheticWithDoc("20467938577", "510534821"),
+            SyntheticWithDoc("14437830275", "510534823"),
+            SyntheticWithDoc("18418507701", "510534797"),
+            SyntheticWithDoc("12518603068", "510534824")
         ).shuffled().first()
 
         val fnr = dollyDoc.fnr
@@ -90,7 +89,7 @@ class MockDataController(
     @PostMapping("/kode6")
     fun createKode6Person() {
         val fnr = "15436621822" // ÅPENHJERTIG SAKS
-        val journalpostId = "493357084"
+        val journalpostId = "510534811"
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
@@ -136,7 +135,7 @@ class MockDataController(
     @PostMapping("/kode7")
     fun createKode7Person() {
         val fnr = "28107122119" // GOD STAFFELI
-        val journalpostId = "493357085"
+        val journalpostId = "510534809"
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
@@ -182,7 +181,7 @@ class MockDataController(
     @PostMapping("/fullmakt")
     fun createPersonWithFullmakt() {
         val fnr = "17117323862" // SNILL VEPS
-        val journalpostId = "493357182"
+        val journalpostId = "510534808"
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
