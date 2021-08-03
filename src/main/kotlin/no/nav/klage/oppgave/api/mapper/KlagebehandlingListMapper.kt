@@ -18,7 +18,7 @@ class KlagebehandlingListMapper {
         saksbehandler: String?,
         tilgangTilTemaer: List<Tema>
     ): List<PersonSoekPersonView> {
-        return if (personSoekResponse.antallTreffTotalt == 1) {
+        return if (personSoekResponse.liste.size == 1) {
             personSoekResponse.liste.map { person ->
                 val klagebehandlinger =
                     mapEsKlagebehandlingerToListView(
