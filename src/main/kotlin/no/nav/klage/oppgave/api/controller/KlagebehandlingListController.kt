@@ -90,7 +90,7 @@ class KlagebehandlingListController(
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
         val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
         return KlagebehandlingerPersonSoekListRespons(
-            antallTreffTotalt = personsoekResponse.antallTreffTotalt,
+            antallTreffTotalt = personsoekResponse.liste.size,
             personer = klagebehandlingMapper.mapPersonSoekResponseToPersonSoekListView(
                 personSoekResponse = personsoekResponse,
                 viseUtvidet = searchCriteria.isProjectionUtvidet(),
