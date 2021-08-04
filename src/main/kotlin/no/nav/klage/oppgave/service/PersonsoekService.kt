@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponseList
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
 import java.time.LocalDate
 
 @Service
@@ -24,7 +23,7 @@ class PersonsoekService(
     }
 
     fun personsoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
-        return if(input.isFnrSoek()) {
+        return if (input.isFnrSoek()) {
             fnrSoek(input)
         } else {
             navnSoek(input)
@@ -33,7 +32,7 @@ class PersonsoekService(
 
     private fun fnrSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         val liste = esSoek(input)
-        logger.debug("Personsøk: Got ${liste.size} hits from ES")
+        logger.debug("Personsøk with fnr: Got ${liste.size} hits from ES")
         val mapped = liste.groupBy { it.sakenGjelderFnr }.map { (key, value) ->
             PersonSoekResponse(
                 fnr = key!!,
@@ -47,16 +46,23 @@ class PersonsoekService(
 
     private fun navnSoek(input: KlagebehandlingerSearchCriteria): PersonSoekResponseList {
         val pdlResponse = pdlClient.personsok(input.raw)
-        secureLogger.debug("Fetched data from PDL søk: ${pdlResponse}")
+        secureLogger.debug("Fetched data from PDL søk: $pdlResponse")
         verifyPdlResponse(pdlResponse)
         val fnrList = pdlResponse.collectFnr()
-        val klagebehandlinger = esSoek(input.copy(foedselsnr = fnrList)).groupBy { it.klagerFnr }
+
+        var klagebehandlinger: Map<String?, List<EsKlagebehandling>> = emptyMap()
+        //Only fetch klagebehandlinger when there is only one hit
+        if (fnrList.size == 1) {
+            klagebehandlinger = esSoek(input.copy(foedselsnr = fnrList)).groupBy { it.klagerFnr }
+        }
         val mapped = pdlResponse.data?.sokPerson?.hits?.map { personHit ->
             val fnr = personHit.person.folkeregisteridentifikator.first().identifikasjonsnummer
             PersonSoekResponse(
                 fnr = fnr,
-                navn = personHit.person.navn.toString(),
-                foedselsdato = LocalDate.parse(personHit.person.foedsel.first().foedselsdato),
+                navn = personHit.person.navn.first().toString(),
+                foedselsdato = if (personHit.person.foedsel.isNotEmpty()) {
+                    LocalDate.parse(personHit.person.foedsel.first().foedselsdato)
+                } else null,
                 klagebehandlinger = klagebehandlinger[fnr] ?: listOf()
             )
         }
