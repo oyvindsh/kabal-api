@@ -119,7 +119,7 @@ class MottakService(
         if
         if (enhetRepository.getAnsatteIEnhet(enhet).none { it.equals(saksbehandlerident, ignoreCase = true) }) {
             //throw OversendtKlageNotValidException("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
-            logger.warn("$saksbehandlerident er ikke oppført i Axsys som medlem av enhet $enhet")
+            logger.warn("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
         }
     }
 
