@@ -20,14 +20,14 @@ class MuligAnkeController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @GetMapping("muliganke/{fnr}")
+    @GetMapping("/muliganke/{fnr}")
     fun getMuligeAnkerByFnr(
         @PathVariable("fnr") fnr: String
     ): List<MuligAnke> {
         return klagebehandlingService.findMuligAnkeByPartId(fnr)
     }
 
-    @GetMapping("muliganke/{fnr}/{uuid}")
+    @GetMapping("/muliganke/{fnr}/{uuid}")
     fun getMuligAnkeByFnrAndUUID(
         @PathVariable("fnr") fnr: String,
         @PathVariable("uuid") uuid: UUID
