@@ -113,7 +113,7 @@ enum class KvalitetsavvikVedtak(
         "Begrunnelsen er ikke tilstrekkelig konkret og individuell",
         "Begrunnelsen er ikke tilstrekkelig konkret og individuell"
     ),
-    MANGLER_KONKLUSJON("5", "Formidlingen er ikke tydelig", "Formidlingen er ikke tydelig");
+    FORMIDLING_IKKE_TYDELIG("5", "Formidlingen er ikke tydelig", "Formidlingen er ikke tydelig");
 
     override fun toString(): String {
         return "KvalitetsavvikVedtak(id=$id, " +
