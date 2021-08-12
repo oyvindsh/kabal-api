@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
@@ -19,7 +18,8 @@ class KvalitetsvurderingController(
     val klagebehandlingService: KlagebehandlingService
 ) {
 
-    @PostMapping("/kvalitetsvurdering/manuell")
+    //TODO Needs new implementation
+//    @PostMapping("/kvalitetsvurdering/manuell")
     fun createKvalitetsvurderingFromScratch(
         @RequestBody input: KvalitetsvurderingManuellInput
     ): KvalitetsvurderingResponse {
