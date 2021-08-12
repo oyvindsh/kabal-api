@@ -16,7 +16,10 @@ data class KodeverkResponse(
     val rolle: List<Kode> = Rolle.values().asList().toDto(),
     val fagsystem: List<Kode> = Fagsystem.values().asList().toDto(),
     val utsendingStatus: List<Kode> = UtsendingStatus.values().asList().toDto(),
-    val sivilstandType: List<Kode> = SivilstandType.values().asList().toDto()
+    val sivilstandType: List<Kode> = SivilstandType.values().asList().toDto(),
+    val kvalitetsavvikOversendelsesbrev: List<Kode> = KvalitetsavvikOversendelsesbrev.values().asList().toDto(),
+    val kvalitetsavvikUtredning: List<Kode> = KvalitetsavvikUtredning.values().asList().toDto(),
+    val kvalitetsavvikVedtak: List<Kode> = KvalitetsavvikVedtak.values().asList().toDto()
 
 )
 
