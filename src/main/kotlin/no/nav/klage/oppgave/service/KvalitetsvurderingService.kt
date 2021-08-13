@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setBrukSomEksempelIOpplaering
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingAvvikStorKonsekvens
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInkluderteDatoForKlage
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInkluderteDatoForVedtak
@@ -155,6 +156,16 @@ class KvalitetsvurderingService(
         saksbehandlerIdent: String
     ): Klagebehandling {
         val event = klagebehandling.setKvalitetsvurderingAvvikStorKonsekvens(avvikStorKonsekvens, saksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun setBrukSomEksempelIOpplaering(
+        klagebehandling: Klagebehandling,
+        brukSomEksempelIOpplaering: Boolean?,
+        saksbehandlerIdent: String
+    ): Klagebehandling {
+        val event = klagebehandling.setBrukSomEksempelIOpplaering(brukSomEksempelIOpplaering, saksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

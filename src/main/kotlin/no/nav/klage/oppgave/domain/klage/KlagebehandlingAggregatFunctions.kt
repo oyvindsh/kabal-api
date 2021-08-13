@@ -542,6 +542,29 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
+    fun Klagebehandling.setBrukSomEksempelIOpplaering(
+        nyVerdi: Boolean?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.brukSomEksempelIOpplaering
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.brukSomEksempelIOpplaering = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.BRUK_SOM_EKSEMPEL_I_OPPLAERING,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
     fun Klagebehandling.setUtfallInVedtak(
         vedtakId: UUID,
         nyVerdi: Utfall?,

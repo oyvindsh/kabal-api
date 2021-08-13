@@ -40,6 +40,7 @@ class KvalitetsvurderingEditableFieldsFacade(
         dirtyCheckAndUpdateKommentarVedtak(input, klagebehandlingForUpdate, innloggetIdent)
 
         dirtyCheckAndUpdateAvvikStorKonsekvens(input, klagebehandlingForUpdate, innloggetIdent)
+        dirtyCheckAndUpdateBrukSomEksempelIOpplaering(input, klagebehandlingForUpdate, innloggetIdent)
         return klagebehandlingForUpdate
     }
 
@@ -235,6 +236,21 @@ class KvalitetsvurderingEditableFieldsFacade(
         }
     }
 
+    private fun dirtyCheckAndUpdateBrukSomEksempelIOpplaering(
+        input: KvalitetsvurderingEditableFieldsInput,
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        val nyVerdi = input.brukSomEksempelIOpplaering
+        val gammelVerdi = klagebehandling.kvalitetsvurdering?.brukSomEksempelIOpplaering
+        if (isDirty(gammelVerdi, nyVerdi)) {
+            kvalitetsvurderingService.setBrukSomEksempelIOpplaering(
+                klagebehandling,
+                nyVerdi,
+                innloggetIdent
+            )
+        }
+    }
 
     fun isDirty(gammelVerdi: Any?, nyVerdi: Any?): Boolean {
         return gammelVerdi != nyVerdi

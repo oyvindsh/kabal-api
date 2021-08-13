@@ -16,5 +16,6 @@ data class KlagebehandlingKvalitetsvurderingView(
     val kvalitetVedtaketBra: Boolean?,
     val kvalitetsAvvikVedtak: Set<String> = emptySet(),
     val kommentarVedtak: String?,
-    val avvikStorKonsekvens: Boolean?
+    val avvikStorKonsekvens: Boolean?,
+    val brukSomEksempelIOpplaering: Boolean?
 )

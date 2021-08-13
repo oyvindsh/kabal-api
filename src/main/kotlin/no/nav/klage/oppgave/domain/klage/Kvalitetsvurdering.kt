@@ -61,6 +61,9 @@ class Kvalitetsvurdering(
     @Column(name = "avvik_stor_konsekvens")
     var avvikStorKonsekvens: Boolean? = null,
 
+    @Column(name = "bruk_som_eksempel_i_opplaering")
+    var brukSomEksempelIOpplaering: Boolean? = null,
+
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")

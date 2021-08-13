@@ -37,7 +37,8 @@ class KvalitetsvurderingMapper {
                 it.id
             }?.toSet() ?: emptySet(),
             kommentarVedtak = klagebehandling.kvalitetsvurdering?.kommentarVedtak,
-            avvikStorKonsekvens = klagebehandling.kvalitetsvurdering?.avvikStorKonsekvens
+            avvikStorKonsekvens = klagebehandling.kvalitetsvurdering?.avvikStorKonsekvens,
+            brukSomEksempelIOpplaering = klagebehandling.kvalitetsvurdering?.brukSomEksempelIOpplaering
         )
     }
 }
