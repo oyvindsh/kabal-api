@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.oppgave.domain.kodeverk.Eoes
-import no.nav.klage.oppgave.domain.kodeverk.EoesConverter
-import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLege
-import no.nav.klage.oppgave.domain.kodeverk.RaadfoertMedLegeConverter
+import no.nav.klage.oppgave.domain.kodeverk.*
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -13,31 +10,79 @@ import javax.persistence.*
 class Kvalitetsvurdering(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "eoes_id")
-    @Convert(converter = EoesConverter::class)
-    var eoes: Eoes? = null,
-    @Column(name = "raadfoert_med_lege_id")
-    @Convert(converter = RaadfoertMedLegeConverter::class)
-    var raadfoertMedLege: RaadfoertMedLege? = null,
-    @Column(name = "intern_vurdering")
-    var internVurdering: String? = null,
-    @Column(name = "send_tilbakemelding")
-    var sendTilbakemelding: Boolean? = null,
-    @Column(name = "tilbakemelding")
-    var tilbakemelding: String? = null,
-    @Column(name = "mottaker_saksbehandlerident")
-    val mottakerSaksbehandlerident: String? = null,
-    @Column(name = "mottaker_enhet")
-    val mottakerEnhet: String? = null,
+
+    @Column(name = "inkluderte_dato_for_klage")
+    var inkluderteDatoForKlage: Boolean? = null,
+    @Column(name = "inkluderte_dato_for_vedtak")
+    var inkluderteDatoForVedtak: Boolean? = null,
+
+    @Column(name = "oversendelsesbrev_bra")
+    var oversendelsesbrevBra: Boolean? = null,
+    @ElementCollection(targetClass = KvalitetsavvikOversendelsesbrev::class, fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "kvalitetsvurdering_avvik_oversendelsesbrev",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "kvalitetsvurdering_id", referencedColumnName = "id", nullable = false)]
+    )
+    @Convert(converter = KvalitetsavvikOversendelsesbrevConverter::class)
+    @Column(name = "id")
+    var kvalitetsavvikOversendelsesbrev: MutableSet<KvalitetsavvikOversendelsesbrev> = mutableSetOf(),
+    @Column(name = "kommentar_oversendelsesbrev")
+    var kommentarOversendelsesbrev: String? = null,
+
+    @Column(name = "utredning_bra")
+    var utredningBra: Boolean? = null,
+    @ElementCollection(targetClass = KvalitetsavvikUtredning::class, fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "kvalitetsvurdering_avvik_utredning",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "kvalitetsvurdering_id", referencedColumnName = "id", nullable = false)]
+    )
+    @Convert(converter = KvalitetsavvikUtredningConverter::class)
+    @Column(name = "id")
+    var kvalitetsavvikUtredning: MutableSet<KvalitetsavvikUtredning> = mutableSetOf(),
+    @Column(name = "kommentar_utredning")
+    var kommentarUtredning: String? = null,
+
+    @Column(name = "vedtak_bra")
+    var vedtakBra: Boolean? = null,
+    @ElementCollection(targetClass = KvalitetsavvikVedtak::class, fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "kvalitetsvurdering_avvik_vedtak",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "kvalitetsvurdering_id", referencedColumnName = "id", nullable = false)]
+    )
+    @Convert(converter = KvalitetsavvikVedtakConverter::class)
+    @Column(name = "id")
+    var kvalitetsavvikVedtak: MutableSet<KvalitetsavvikVedtak> = mutableSetOf(),
+    @Column(name = "kommentar_vedtak")
+    var kommentarVedtak: String? = null,
+
+    @Column(name = "avvik_stor_konsekvens")
+    var avvikStorKonsekvens: Boolean? = null,
+
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now()
 ) {
+
     override fun toString(): String {
-        return "Tilbakemelding(id=$id, " +
-                "modified=$modified, " +
-                "created=$created)"
+        return "Kvalitetsvurdering(id=$id, " +
+                "inkluderteDatoForKlage=$inkluderteDatoForKlage, " +
+                "inkluderteDatoForVedtak=$inkluderteDatoForVedtak, " +
+                "oversendelsesbrevBra=$oversendelsesbrevBra, " +
+                "kvalitetsavvikOversendelsesbrev=$kvalitetsavvikOversendelsesbrev, " +
+                "kommentarOversendingsbrev=$kommentarOversendelsesbrev, " +
+                "utredningBra=$utredningBra, " +
+                "kvalitetsavvikUtredning=$kvalitetsavvikUtredning, " +
+                "kommentarUtredning=$kommentarUtredning, " +
+                "vedtakBra=$vedtakBra, " +
+                "kvalitetsavvikVedtak=$kvalitetsavvikVedtak, " +
+                "kommentarVedtak=$kommentarVedtak, " +
+                "avvikStorKonsekvens=$avvikStorKonsekvens, " +
+                "created=$created, " +
+                "modified=$modified)"
     }
 
     override fun equals(other: Any?): Boolean {

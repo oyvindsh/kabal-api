@@ -259,113 +259,286 @@ object KlagebehandlingAggregatFunctions {
             endringslogg(
                 saksbehandlerident,
                 Felt.HJEMLER_I_VEDTAK,
-                gammelVerdi.map { it.id }.joinToString(),
-                nyVerdi.map { it.id }.joinToString(),
+                gammelVerdi.joinToString { it.id },
+                nyVerdi.joinToString { it.id },
                 tidspunkt
             )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setKvalitetsvurderingEoes(
-        nyVerdi: Eoes?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering()
-        }
-        val gammelVerdi = kvalitetsvurdering!!.eoes
-        val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.eoes = nyVerdi
-        kvalitetsvurdering!!.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.EOES,
-                gammelVerdi?.id.toString(),
-                nyVerdi?.id.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.setKvalitetsvurderingRaadfoertMedLege(
-        nyVerdi: RaadfoertMedLege?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering()
-        }
-        val gammelVerdi = kvalitetsvurdering!!.raadfoertMedLege
-        val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.raadfoertMedLege = nyVerdi
-        kvalitetsvurdering!!.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.RAADGIVENDE_OVERLEGE,
-                gammelVerdi?.id.toString(),
-                nyVerdi?.id.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.setKvalitetsvurderingInternvurdering(
-        nyVerdi: String?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering()
-        }
-        val gammelVerdi = kvalitetsvurdering!!.internVurdering
-        val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.internVurdering = nyVerdi
-        kvalitetsvurdering!!.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(saksbehandlerident, Felt.KVALITETSVURDERING, gammelVerdi, nyVerdi, tidspunkt)
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.setKvalitetsvurderingSendTilbakemelding(
+    fun Klagebehandling.setKvalitetsvurderingInkluderteDatoForKlage(
         nyVerdi: Boolean?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         if (kvalitetsvurdering == null) {
             kvalitetsvurdering = Kvalitetsvurdering()
         }
-        val gammelVerdi = kvalitetsvurdering!!.sendTilbakemelding
+        val gammelVerdi = kvalitetsvurdering!!.inkluderteDatoForKlage
         val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.sendTilbakemelding = nyVerdi
+        kvalitetsvurdering!!.inkluderteDatoForKlage = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.SEND_TILBAKEMELDING,
-                gammelVerdi?.toString(),
-                nyVerdi?.toString(),
+                Felt.INKLUDERTE_DATO_FOR_KLAGE,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
                 tidspunkt
             )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setKvalitetsvurderingTilbakemelding(
+    fun Klagebehandling.setKvalitetsvurderingInkluderteDatoForVedtak(
+        nyVerdi: Boolean?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.inkluderteDatoForVedtak
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.inkluderteDatoForVedtak = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.INKLUDERTE_DATO_FOR_VEDTAK,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingOversendelsesbrevBra(
+        nyVerdi: Boolean?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.oversendelsesbrevBra
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.oversendelsesbrevBra = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.OVERSENDELSESBREV_BRA,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingKvalitetsavvikOversendelsesbrev(
+        nyVerdi: Set<KvalitetsavvikOversendelsesbrev>,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.kvalitetsavvikOversendelsesbrev
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.kvalitetsavvikOversendelsesbrev = nyVerdi.toMutableSet()
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.KVALITETSAVVIK_OVERSENDELSESBREV,
+                gammelVerdi.joinToString { it.id },
+                nyVerdi.joinToString { it.id },
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingKommentarOversendelsesbrev(
         nyVerdi: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         if (kvalitetsvurdering == null) {
             kvalitetsvurdering = Kvalitetsvurdering()
         }
-        val gammelVerdi = kvalitetsvurdering!!.tilbakemelding
+        val gammelVerdi = kvalitetsvurdering!!.kommentarOversendelsesbrev
         val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.tilbakemelding = nyVerdi
+        kvalitetsvurdering!!.kommentarOversendelsesbrev = nyVerdi
         kvalitetsvurdering!!.modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TILBAKEMELDING, gammelVerdi, nyVerdi, tidspunkt)
+            endringslogg(
+                saksbehandlerident,
+                Felt.KOMMENTAR_OVERSENDELSESBREV,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingUtredningBra(
+        nyVerdi: Boolean?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.utredningBra
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.utredningBra = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.UTREDNING_BRA,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingKvalitetsavvikUtredning(
+        nyVerdi: Set<KvalitetsavvikUtredning>,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.kvalitetsavvikUtredning
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.kvalitetsavvikUtredning = nyVerdi.toMutableSet()
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.KVALITETSAVVIK_UTREDNING,
+                gammelVerdi.joinToString { it.id },
+                nyVerdi.joinToString { it.id },
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingKommentarUtredning(
+        nyVerdi: String?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.kommentarUtredning
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.kommentarUtredning = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.KOMMENTAR_UTREDNING,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingVedtakBra(
+        nyVerdi: Boolean?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.vedtakBra
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.vedtakBra = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.VEDTAK_BRA,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingKvalitetsavvikVedtak(
+        nyVerdi: Set<KvalitetsavvikVedtak>,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.kvalitetsavvikVedtak
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.kvalitetsavvikVedtak = nyVerdi.toMutableSet()
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.KVALITETSAVVIK_VEDTAK,
+                gammelVerdi.joinToString { it.id },
+                nyVerdi.joinToString { it.id },
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingKommentarVedtak(
+        nyVerdi: String?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.kommentarVedtak
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.kommentarVedtak = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.KOMMENTAR_VEDTAK,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Klagebehandling.setKvalitetsvurderingAvvikStorKonsekvens(
+        nyVerdi: Boolean?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        if (kvalitetsvurdering == null) {
+            kvalitetsvurdering = Kvalitetsvurdering()
+        }
+        val gammelVerdi = kvalitetsvurdering!!.avvikStorKonsekvens
+        val tidspunkt = LocalDateTime.now()
+        kvalitetsvurdering!!.avvikStorKonsekvens = nyVerdi
+        kvalitetsvurdering!!.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.AVVIK_STOR_KONSEKVENS,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 

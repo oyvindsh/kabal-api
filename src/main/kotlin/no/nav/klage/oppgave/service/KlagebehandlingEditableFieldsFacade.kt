@@ -25,9 +25,6 @@ class KlagebehandlingEditableFieldsFacade(
         val klagebehandling =
             klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, input.klagebehandlingVersjon)
 
-        dirtyCheckAndUpdateInternVurdering(input, klagebehandling, innloggetIdent)
-        //dirtyCheckAndUpdateSendTilbakemelding(input, klagebehandling, innloggetIdent)
-        //dirtyCheckAndUpdateTilbakemelding(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateUtfall(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateGrunn(input, klagebehandling, innloggetIdent)
         dirtyCheckAndUpdateHjemlerInVedtak(input, klagebehandling, innloggetIdent)
@@ -77,56 +74,6 @@ class KlagebehandlingEditableFieldsFacade(
             vedtakService.setHjemler(
                 klagebehandling,
                 klagebehandling.vedtak.first().id,
-                nyVerdi,
-                innloggetIdent
-            )
-        }
-    }
-
-    /*
-    private fun dirtyCheckAndUpdateTilbakemelding(
-        input: KlagebehandlingEditableFieldsInput,
-        klagebehandling: Klagebehandling,
-        innloggetIdent: String
-    ) {
-        val nyVerdi = input.tilbakemelding
-        val gammelVerdi = klagebehandling.kvalitetsvurdering?.tilbakemelding
-        if (isDirty(gammelVerdi, nyVerdi)) {
-            klagebehandlingService.setKvalitetsvurderingTilbakemelding(
-                klagebehandling,
-                nyVerdi,
-                innloggetIdent
-            )
-        }
-    }
-
-    private fun dirtyCheckAndUpdateSendTilbakemelding(
-        input: KlagebehandlingEditableFieldsInput,
-        klagebehandling: Klagebehandling,
-        innloggetIdent: String
-    ) {
-        val nyVerdi = input.sendTilbakemelding
-        val gammelVerdi = klagebehandling.kvalitetsvurdering?.sendTilbakemelding
-        if (isDirty(gammelVerdi, nyVerdi)) {
-            klagebehandlingService.setKvalitetsvurderingSendTilbakemelding(
-                klagebehandling,
-                nyVerdi,
-                innloggetIdent
-            )
-        }
-    }
-     */
-
-    private fun dirtyCheckAndUpdateInternVurdering(
-        input: KlagebehandlingEditableFieldsInput,
-        klagebehandling: Klagebehandling,
-        innloggetIdent: String
-    ) {
-        val nyVerdi = input.internVurdering.ifBlank { null }
-        val gammelVerdi = klagebehandling.kvalitetsvurdering?.internVurdering
-        if (isDirty(gammelVerdi, nyVerdi)) {
-            klagebehandlingService.setKvalitetsvurderingInternVurdering(
-                klagebehandling,
                 nyVerdi,
                 innloggetIdent
             )

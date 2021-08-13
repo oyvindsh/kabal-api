@@ -11,11 +11,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvs
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingEoes
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInternvurdering
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingRaadfoertMedLege
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingSendTilbakemelding
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingTilbakemelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverident
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
@@ -300,60 +295,6 @@ class KlagebehandlingService(
         }
     }
 
-    fun setKvalitetsvurderingEoes(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
-        eoes: Eoes?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        val event = klagebehandling.setKvalitetsvurderingEoes(eoes, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setKvalitetsvurderingRaadfoertMedLege(
-        klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
-        raadfoertMedLege: RaadfoertMedLege?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        val event = klagebehandling.setKvalitetsvurderingRaadfoertMedLege(raadfoertMedLege, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setKvalitetsvurderingInternVurdering(
-        klagebehandling: Klagebehandling,
-        internVurdering: String?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val event = klagebehandling.setKvalitetsvurderingInternvurdering(internVurdering, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setKvalitetsvurderingSendTilbakemelding(
-        klagebehandling: Klagebehandling,
-        sendTilbakemelding: Boolean?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val event = klagebehandling.setKvalitetsvurderingSendTilbakemelding(sendTilbakemelding, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setKvalitetsvurderingTilbakemelding(
-        klagebehandling: Klagebehandling,
-        tilbakemelding: String?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val event = klagebehandling.setKvalitetsvurderingTilbakemelding(tilbakemelding, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
     fun createKlagebehandlingFromMottak(mottak: Mottak) {
         if (klagebehandlingRepository.findByMottakId(mottak.id) != null) {
             logger.error("We already have a klagebehandling for mottak ${mottak.id}. This is not supposed to happen.")
@@ -423,15 +364,16 @@ class KlagebehandlingService(
                     kvalitetsvurdering.datoMottattKlageinstans
                 ),
                 hjemler = hjemler,
-                kvalitetsvurdering = Kvalitetsvurdering(
-                    eoes = kvalitetsvurdering.eoes,
-                    raadfoertMedLege = kvalitetsvurdering.raadfoertMedLege,
-                    internVurdering = kvalitetsvurdering.internVurdering,
-                    sendTilbakemelding = kvalitetsvurdering.sendTilbakemelding,
-                    tilbakemelding = kvalitetsvurdering.tilbakemelding,
-                    mottakerSaksbehandlerident = kvalitetsvurdering.foersteinstansSaksbehandler,
-                    mottakerEnhet = kvalitetsvurdering.foersteinstansEnhet
-                ),
+                //TODO New model
+//                kvalitetsvurdering = Kvalitetsvurdering(
+//                    eoes = kvalitetsvurdering.eoes,
+//                    raadfoertMedLege = kvalitetsvurdering.raadfoertMedLege,
+//                    internVurdering = kvalitetsvurdering.internVurdering,
+//                    sendTilbakemelding = kvalitetsvurdering.sendTilbakemelding,
+//                    tilbakemelding = kvalitetsvurdering.tilbakemelding,
+//                    mottakerSaksbehandlerident = kvalitetsvurdering.foersteinstansSaksbehandler,
+//                    mottakerEnhet = kvalitetsvurdering.foersteinstansEnhet
+//                ),
                 vedtak = mutableSetOf(
                     Vedtak(
                         utfall = kvalitetsvurdering.utfall,

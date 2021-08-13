@@ -89,7 +89,6 @@ class EsKlagebehandlingMapper(
             modified = klagebehandling.modified,
             kilde = klagebehandling.kildesystem.id,
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
-            internVurdering = klagebehandling.kvalitetsvurdering?.internVurdering,
             vedtak = klagebehandling.vedtak.map { vedtak ->
                 EsVedtak(
                     utfall = vedtak.utfall?.id,
