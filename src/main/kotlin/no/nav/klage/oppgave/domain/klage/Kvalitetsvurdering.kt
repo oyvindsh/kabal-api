@@ -84,6 +84,7 @@ class Kvalitetsvurdering(
                 "kvalitetsavvikVedtak=$kvalitetsavvikVedtak, " +
                 "kommentarVedtak=$kommentarVedtak, " +
                 "avvikStorKonsekvens=$avvikStorKonsekvens, " +
+                "brukSomEksempelIOpplaering=$brukSomEksempelIOpplaering, " +
                 "created=$created, " +
                 "modified=$modified)"
     }

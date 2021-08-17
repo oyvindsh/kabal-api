@@ -123,7 +123,10 @@ data class KlageStatistikkTilDVH(
 
     //TODO Fyll ut når kabal-api får tilgang til det
     @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH. TODO.")
-    val ytelseType: String
+    val ytelseType: String,
+
+    @JsonSchemaDescription("Kvalitetsvurdering av arbeid gjort i 1. instans.")
+    val kvalitetsvurdering: Kvalitetsvurdering? = null
 ) {
     data class Part(
         val verdi: String,
@@ -132,6 +135,135 @@ data class KlageStatistikkTilDVH(
 
     enum class PartIdType {
         PERSON, VIRKSOMHET
+    }
+
+    data class Kvalitetsvurdering(
+        @JsonSchemaDescription("Er dato for klage inkludert?")
+        val inkluderteDatoForKlage: Boolean?,
+        @JsonSchemaDescription("Er dato for vedtak inkludert?")
+        val inkluderteDatoForVedtak: Boolean?,
+        @JsonSchemaDescription("Er kvaliteten på oversendelsebrevet bra?")
+        val kvalitetOversendelsesbrevBra: Boolean?,
+        @JsonSchemaDescription("Mulige kvalitetsavvik i forsendelsesbrevet.")
+        val kvalitetsavvikOversendelsesbrev: Set<KvalitetsavvikOversendelsesbrev>? = emptySet(),
+        @JsonSchemaDescription("Er kvaliteten på utredning bra?")
+        val kvalitetUtredningBra: Boolean?,
+        @JsonSchemaDescription("Mulige kvalitetsavvik i utredningen.")
+        val kvalitetsavvikUtredning: Set<KvalitetsavvikUtredning>? = emptySet(),
+        @JsonSchemaDescription("Er kvaliteten på vedtaket bra?")
+        val kvalitetVedtaketBra: Boolean?,
+        @JsonSchemaDescription("Mulige kvalitetsavvik i vedtaket.")
+        val kvalitetsAvvikVedtak: Set<KvalitetsavvikVedtak>? = emptySet(),
+        @JsonSchemaDescription("Har avviket stor konsekvens for bruker?")
+        val avvikStorKonsekvens: Boolean?,
+    ) {
+        enum class KvalitetsavvikOversendelsesbrev(
+            val id: Int,
+            val beskrivelse: String
+        ) {
+            OVERSITTET_KLAGEFRIST_IKKE_KOMMENTERT(
+                1,
+                "Oversittet klagefrist er ikke kommentert"
+            ),
+            HOVEDINNHOLDET_IKKE_GJENGITT(
+                2,
+                "Hovedinnholdet i klagen er ikke gjengitt"
+            ),
+            MANGLER_BEGRUNNELSE(
+                3,
+                "Mangler begrunnelse for hvorfor vedtaket opprettholdes/hvorfor klager ikke oppfyller villkår"
+            ),
+            KLAGERS_ANFOERSLER_IKKE_TILSTREKKELIG_KOMMENTERT(
+                4,
+                "Klagers anførsler er ikke tilstrekkelig kommentert/imøtegått"
+            ),
+            MANGLER_KONKLUSJON(5, "Mangler konklusjon");
+
+            override fun toString(): String {
+                return "KvalitetsavvikOversendelsesbrev(id=$id, " +
+                        "beskrivelse=$beskrivelse)"
+            }
+
+            companion object {
+                fun of(id: Int): KvalitetsavvikOversendelsesbrev {
+                    return values().firstOrNull { it.id == id }
+                        ?: throw IllegalArgumentException("No KvalitetsavvikOversendelsesbrev with $id exists")
+                }
+            }
+        }
+
+        enum class KvalitetsavvikUtredning(
+            val id: Int,
+            val beskrivelse: String
+        ) {
+            MANGELFULL_UTREDNING_AV_MEDISINSKE_FORHOLD(
+                1,
+                "Mangelfull utredning av medisinske forhold "
+            ),
+            MANGELFULL_UTREDNING_AV_ARBEIDSFORHOLD(
+                2,
+                "Mangelfull utredning av arbeids- og inntektsforhold"
+            ),
+            MANGELFULL_UTREDNING_AV_UTENLANDSPROBLEMATIKK(
+                3,
+                "Mangelfull utredning av EØS/utlandsproblematikk"
+            ),
+            MANGELFULL_BRUK_AV_ROL(
+                4,
+                "Mangelfull bruk av rådgivende lege"
+            ),
+            MANGELFULL_UTREDNING_ANDRE_FORHOLD(
+                5,
+                "Mangelfull utredning av andre aktuelle forhold i saken"
+            );
+
+            override fun toString(): String {
+                return "KvalitetsavvikUtredning(id=$id, " +
+                        "beskrivelse=$beskrivelse)"
+            }
+
+            companion object {
+                fun of(id: Int): KvalitetsavvikUtredning {
+                    return values().firstOrNull { it.id == id }
+                        ?: throw IllegalArgumentException("No KvalitetsavvikUtredning with $id exists")
+                }
+            }
+        }
+
+        enum class KvalitetsavvikVedtak(
+            val id: Int,
+            val beskrivelse: String
+        ) {
+            IKKE_BRUKT_RIKTIGE_HJEMLER(
+                1,
+                "Det er ikke brukt riktig hjemmel/er"
+            ),
+            INNHOLDET_I_RETTSREGLENE_IKKE_TILSTREKKELIG_BESKREVET(
+                2,
+                "Innholdet i rettsreglene er ikke tilstrekkelig beskrevet"
+            ),
+            VURDERING_AV_BEVIS_ER_MANGELFULL(
+                3,
+                "Vurderingen av faktum/bevisvurderingen er mangelfull"
+            ),
+            BEGRUNNELSE_IKKE_TILSTREKKELIG_KONKRET_OG_INDVIDUELL(
+                4,
+                "Begrunnelsen er ikke tilstrekkelig konkret og individuell"
+            ),
+            FORMIDLING_IKKE_TYDELIG(5, "Formidlingen er ikke tydelig");
+
+            override fun toString(): String {
+                return "KvalitetsavvikVedtak(id=$id, " +
+                        "beskrivelse=$beskrivelse)"
+            }
+
+            companion object {
+                fun of(id: Int): KvalitetsavvikVedtak {
+                    return values().firstOrNull { it.id == id }
+                        ?: throw IllegalArgumentException("No KvalitetsavvikVedtak with $id exists")
+                }
+            }
+        }
     }
 }
 
