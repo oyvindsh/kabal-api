@@ -178,18 +178,6 @@ data class KlageStatistikkTilDVH(
                 "Klagers anførsler er ikke tilstrekkelig kommentert/imøtegått"
             ),
             MANGLER_KONKLUSJON(5, "Mangler konklusjon");
-
-            override fun toString(): String {
-                return "KvalitetsavvikOversendelsesbrev(id=$id, " +
-                        "beskrivelse=$beskrivelse)"
-            }
-
-            companion object {
-                fun of(id: Int): KvalitetsavvikOversendelsesbrev {
-                    return values().firstOrNull { it.id == id }
-                        ?: throw IllegalArgumentException("No KvalitetsavvikOversendelsesbrev with $id exists")
-                }
-            }
         }
 
         enum class KvalitetsavvikUtredning(
@@ -216,18 +204,6 @@ data class KlageStatistikkTilDVH(
                 5,
                 "Mangelfull utredning av andre aktuelle forhold i saken"
             );
-
-            override fun toString(): String {
-                return "KvalitetsavvikUtredning(id=$id, " +
-                        "beskrivelse=$beskrivelse)"
-            }
-
-            companion object {
-                fun of(id: Int): KvalitetsavvikUtredning {
-                    return values().firstOrNull { it.id == id }
-                        ?: throw IllegalArgumentException("No KvalitetsavvikUtredning with $id exists")
-                }
-            }
         }
 
         enum class KvalitetsavvikVedtak(
@@ -251,18 +227,6 @@ data class KlageStatistikkTilDVH(
                 "Begrunnelsen er ikke tilstrekkelig konkret og individuell"
             ),
             FORMIDLING_IKKE_TYDELIG(5, "Formidlingen er ikke tydelig");
-
-            override fun toString(): String {
-                return "KvalitetsavvikVedtak(id=$id, " +
-                        "beskrivelse=$beskrivelse)"
-            }
-
-            companion object {
-                fun of(id: Int): KvalitetsavvikVedtak {
-                    return values().firstOrNull { it.id == id }
-                        ?: throw IllegalArgumentException("No KvalitetsavvikVedtak with $id exists")
-                }
-            }
         }
     }
 }
