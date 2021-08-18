@@ -65,7 +65,8 @@ class StatistikkTilDVHService(
         //Only works as long as we only have one
         val vedtak = klagebehandling.vedtak.firstOrNull()
 
-        val funksjoneltEndringstidspunkt = getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState, vedtak)
+        val funksjoneltEndringstidspunkt =
+            getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState, vedtak)
 
         return KlageStatistikkTilDVH(
             behandlingId = mottak.dvhReferanse,
@@ -87,7 +88,8 @@ class StatistikkTilDVHService(
             tekniskTid = klagebehandling.modified,
             vedtakId = vedtak?.id.toString(),
             vedtaksdato = vedtak?.ferdigstiltIJoark?.toLocalDate(),
-            ytelseType = "TODO"
+            ytelseType = "TODO",
+            kvalitetsvurdering = klagebehandling.toKvalitetsvurdering()
         )
     }
 
@@ -100,7 +102,8 @@ class StatistikkTilDVHService(
             KlagebehandlingState.MOTTATT -> klagebehandling.mottattKlageinstans
             KlagebehandlingState.TILDELT_SAKSBEHANDLER -> klagebehandling.tildeling?.tidspunkt
                 ?: throw RuntimeException("tildelt mangler")
-            KlagebehandlingState.AVSLUTTET -> vedtak?.ferdigstiltIJoark ?: throw RuntimeException("ferdigstiltIJoark mangler")
+            KlagebehandlingState.AVSLUTTET -> vedtak?.ferdigstiltIJoark
+                ?: throw RuntimeException("ferdigstiltIJoark mangler")
             KlagebehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")
                 LocalDateTime.now()
@@ -123,4 +126,29 @@ class StatistikkTilDVHService(
                 )
             }
         }
+
+    private fun Klagebehandling.toKvalitetsvurdering(): KlageStatistikkTilDVH.Kvalitetsvurdering? {
+        when {
+            kvalitetsvurdering != null -> {
+                return KlageStatistikkTilDVH.Kvalitetsvurdering(
+                    inkluderteDatoForKlage = kvalitetsvurdering!!.inkluderteDatoForKlage,
+                    inkluderteDatoForVedtak = kvalitetsvurdering!!.inkluderteDatoForVedtak,
+                    kvalitetOversendelsesbrevBra = kvalitetsvurdering!!.oversendelsesbrevBra,
+                    kvalitetsavvikOversendelsesbrev = kvalitetsvurdering!!.kvalitetsavvikOversendelsesbrev.map { it.name }
+                        .map { KlageStatistikkTilDVH.Kvalitetsvurdering.KvalitetsavvikOversendelsesbrev.valueOf(it) }
+                        .toSet(),
+                    kvalitetUtredningBra = kvalitetsvurdering!!.utredningBra,
+                    kvalitetsavvikUtredning = kvalitetsvurdering!!.kvalitetsavvikUtredning.map { it.name }
+                        .map { KlageStatistikkTilDVH.Kvalitetsvurdering.KvalitetsavvikUtredning.valueOf(it) }.toSet(),
+                    kvalitetVedtaketBra = kvalitetsvurdering!!.vedtakBra,
+                    kvalitetsAvvikVedtak = kvalitetsvurdering!!.kvalitetsavvikVedtak.map { it.name }
+                        .map { KlageStatistikkTilDVH.Kvalitetsvurdering.KvalitetsavvikVedtak.valueOf(it) }.toSet(),
+                    avvikStorKonsekvens = kvalitetsvurdering!!.avvikStorKonsekvens
+                )
+            }
+            else -> {
+                return null
+            }
+        }
+    }
 }
