@@ -33,7 +33,7 @@ class KvalitetsvurderingMapper {
             }?.toSet() ?: emptySet(),
             kommentarUtredning = klagebehandling.kvalitetsvurdering?.kommentarUtredning,
             kvalitetVedtakBra = klagebehandling.kvalitetsvurdering?.vedtakBra,
-            kvalitetsAvvikVedtak = klagebehandling.kvalitetsvurdering?.kvalitetsavvikVedtak?.map {
+            kvalitetsavvikVedtak = klagebehandling.kvalitetsvurdering?.kvalitetsavvikVedtak?.map {
                 it.id
             }?.toSet() ?: emptySet(),
             kommentarVedtak = klagebehandling.kvalitetsvurdering?.kommentarVedtak,

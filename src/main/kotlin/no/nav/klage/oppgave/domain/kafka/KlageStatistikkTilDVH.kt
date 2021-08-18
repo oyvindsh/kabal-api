@@ -153,7 +153,7 @@ data class KlageStatistikkTilDVH(
         @JsonSchemaDescription("Er kvaliteten på vedtaket bra?")
         val kvalitetVedtaketBra: Boolean?,
         @JsonSchemaDescription("Mulige kvalitetsavvik i vedtaket.")
-        val kvalitetsAvvikVedtak: Set<KvalitetsavvikVedtak>? = emptySet(),
+        val kvalitetsavvikVedtak: Set<KvalitetsavvikVedtak>? = emptySet(),
         @JsonSchemaDescription("Har avviket stor konsekvens for bruker?")
         val avvikStorKonsekvens: Boolean?,
     ) {

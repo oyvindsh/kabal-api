@@ -141,7 +141,7 @@ class StatistikkTilDVHService(
                     kvalitetsavvikUtredning = kvalitetsvurdering!!.kvalitetsavvikUtredning.map { it.name }
                         .map { KlageStatistikkTilDVH.Kvalitetsvurdering.KvalitetsavvikUtredning.valueOf(it) }.toSet(),
                     kvalitetVedtaketBra = kvalitetsvurdering!!.vedtakBra,
-                    kvalitetsAvvikVedtak = kvalitetsvurdering!!.kvalitetsavvikVedtak.map { it.name }
+                    kvalitetsavvikVedtak = kvalitetsvurdering!!.kvalitetsavvikVedtak.map { it.name }
                         .map { KlageStatistikkTilDVH.Kvalitetsvurdering.KvalitetsavvikVedtak.valueOf(it) }.toSet(),
                     avvikStorKonsekvens = kvalitetsvurdering!!.avvikStorKonsekvens
                 )

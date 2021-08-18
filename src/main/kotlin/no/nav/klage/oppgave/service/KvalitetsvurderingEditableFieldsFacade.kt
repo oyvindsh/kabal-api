@@ -193,7 +193,7 @@ class KvalitetsvurderingEditableFieldsFacade(
         klagebehandling: Klagebehandling,
         innloggetIdent: String
     ) {
-        val nyVerdi = input.kvalitetsAvvikVedtak.map { KvalitetsavvikVedtak.of(it) }.toSet()
+        val nyVerdi = input.kvalitetsavvikVedtak.map { KvalitetsavvikVedtak.of(it) }.toSet()
         val gammelVerdi = klagebehandling.kvalitetsvurdering?.kvalitetsavvikVedtak
         if (isDirty(gammelVerdi, nyVerdi)) {
             kvalitetsvurderingService.setKvalitetsavvikVedtak(
