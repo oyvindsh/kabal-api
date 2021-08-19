@@ -138,10 +138,6 @@ data class KlageStatistikkTilDVH(
     }
 
     data class Kvalitetsvurdering(
-        @JsonSchemaDescription("Er dato for klage inkludert?")
-        val inkluderteDatoForKlage: Boolean?,
-        @JsonSchemaDescription("Er dato for vedtak inkludert?")
-        val inkluderteDatoForVedtak: Boolean?,
         @JsonSchemaDescription("Er kvaliteten på oversendelsebrevet bra?")
         val kvalitetOversendelsesbrevBra: Boolean?,
         @JsonSchemaDescription("Mulige kvalitetsavvik i forsendelsesbrevet.")

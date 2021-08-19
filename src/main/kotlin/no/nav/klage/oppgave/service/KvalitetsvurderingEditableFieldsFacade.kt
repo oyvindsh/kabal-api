@@ -24,9 +24,6 @@ class KvalitetsvurderingEditableFieldsFacade(
         val klagebehandlingForUpdate =
             klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, input.klagebehandlingVersjon)
 
-        dirtyCheckAndUpdateInkluderteDatoForKlage(input, klagebehandlingForUpdate, innloggetIdent)
-        dirtyCheckAndUpdateInkluderteDatoForVedtak(input, klagebehandlingForUpdate, innloggetIdent)
-
         dirtyCheckAndUpdateOversendelsesbrevBra(input, klagebehandlingForUpdate, innloggetIdent)
         dirtyCheckAndUpdateAvvikOversendelsesbrev(input, klagebehandlingForUpdate, innloggetIdent)
         dirtyCheckAndUpdateKommentarOversendelsesbrev(input, klagebehandlingForUpdate, innloggetIdent)
@@ -42,38 +39,6 @@ class KvalitetsvurderingEditableFieldsFacade(
         dirtyCheckAndUpdateAvvikStorKonsekvens(input, klagebehandlingForUpdate, innloggetIdent)
         dirtyCheckAndUpdateBrukSomEksempelIOpplaering(input, klagebehandlingForUpdate, innloggetIdent)
         return klagebehandlingForUpdate
-    }
-
-    private fun dirtyCheckAndUpdateInkluderteDatoForKlage(
-        input: KvalitetsvurderingEditableFieldsInput,
-        klagebehandlingForUpdate: Klagebehandling,
-        innloggetIdent: String
-    ) {
-        val nyVerdi = input.inkluderteDatoForKlage
-        val gammelVerdi = klagebehandlingForUpdate.kvalitetsvurdering?.inkluderteDatoForKlage
-        if (isDirty(gammelVerdi, nyVerdi)) {
-            kvalitetsvurderingService.setInkluderteDatoForKlage(
-                klagebehandlingForUpdate,
-                nyVerdi,
-                innloggetIdent
-            )
-        }
-    }
-
-    private fun dirtyCheckAndUpdateInkluderteDatoForVedtak(
-        input: KvalitetsvurderingEditableFieldsInput,
-        klagebehandling: Klagebehandling,
-        innloggetIdent: String
-    ) {
-        val nyVerdi = input.inkluderteDatoForVedtak
-        val gammelVerdi = klagebehandling.kvalitetsvurdering?.inkluderteDatoForVedtak
-        if (isDirty(gammelVerdi, nyVerdi)) {
-            kvalitetsvurderingService.setInkluderteDatoForVedtak(
-                klagebehandling,
-                nyVerdi,
-                innloggetIdent
-            )
-        }
     }
 
     private fun dirtyCheckAndUpdateOversendelsesbrevBra(

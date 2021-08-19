@@ -5,8 +5,6 @@ import java.util.*
 data class KlagebehandlingKvalitetsvurderingView(
     val klagebehandlingId: UUID,
     val klagebehandlingVersjon: Long,
-    val inkluderteDatoForKlage: Boolean?,
-    val inkluderteDatoForVedtak: Boolean?,
     val kvalitetOversendelsesbrevBra: Boolean?,
     val kvalitetsavvikOversendelsesbrev: Set<String> = emptySet(),
     val kommentarOversendelsesbrev: String?,

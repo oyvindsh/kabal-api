@@ -20,8 +20,6 @@ class KvalitetsvurderingMapper {
         return KlagebehandlingKvalitetsvurderingView(
             klagebehandlingId = klagebehandling.id,
             klagebehandlingVersjon = klagebehandling.versjon,
-            inkluderteDatoForKlage = klagebehandling.kvalitetsvurdering?.inkluderteDatoForKlage,
-            inkluderteDatoForVedtak = klagebehandling.kvalitetsvurdering?.inkluderteDatoForVedtak,
             kvalitetOversendelsesbrevBra = klagebehandling.kvalitetsvurdering?.oversendelsesbrevBra,
             kvalitetsavvikOversendelsesbrev = klagebehandling.kvalitetsvurdering?.kvalitetsavvikOversendelsesbrev?.map {
                 it.id
