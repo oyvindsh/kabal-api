@@ -131,8 +131,6 @@ class StatistikkTilDVHService(
         when {
             kvalitetsvurdering != null -> {
                 return KlageStatistikkTilDVH.Kvalitetsvurdering(
-                    inkluderteDatoForKlage = kvalitetsvurdering!!.inkluderteDatoForKlage,
-                    inkluderteDatoForVedtak = kvalitetsvurdering!!.inkluderteDatoForVedtak,
                     kvalitetOversendelsesbrevBra = kvalitetsvurdering!!.oversendelsesbrevBra,
                     kvalitetsavvikOversendelsesbrev = kvalitetsvurdering!!.kvalitetsavvikOversendelsesbrev.map { it.name }
                         .map { KlageStatistikkTilDVH.Kvalitetsvurdering.KvalitetsavvikOversendelsesbrev.valueOf(it) }

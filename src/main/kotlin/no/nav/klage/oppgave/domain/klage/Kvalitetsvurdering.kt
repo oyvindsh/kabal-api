@@ -11,11 +11,6 @@ class Kvalitetsvurdering(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "inkluderte_dato_for_klage")
-    var inkluderteDatoForKlage: Boolean? = null,
-    @Column(name = "inkluderte_dato_for_vedtak")
-    var inkluderteDatoForVedtak: Boolean? = null,
-
     @Column(name = "oversendelsesbrev_bra")
     var oversendelsesbrevBra: Boolean? = null,
     @ElementCollection(targetClass = KvalitetsavvikOversendelsesbrev::class, fetch = FetchType.EAGER)
@@ -72,8 +67,6 @@ class Kvalitetsvurdering(
 
     override fun toString(): String {
         return "Kvalitetsvurdering(id=$id, " +
-                "inkluderteDatoForKlage=$inkluderteDatoForKlage, " +
-                "inkluderteDatoForVedtak=$inkluderteDatoForVedtak, " +
                 "oversendelsesbrevBra=$oversendelsesbrevBra, " +
                 "kvalitetsavvikOversendelsesbrev=$kvalitetsavvikOversendelsesbrev, " +
                 "kommentarOversendingsbrev=$kommentarOversendelsesbrev, " +

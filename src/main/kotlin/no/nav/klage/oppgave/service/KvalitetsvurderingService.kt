@@ -3,8 +3,6 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setBrukSomEksempelIOpplaering
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingAvvikStorKonsekvens
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInkluderteDatoForKlage
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingInkluderteDatoForVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingKommentarOversendelsesbrev
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingKommentarUtredning
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setKvalitetsvurderingKommentarVedtak
@@ -26,31 +24,6 @@ import org.springframework.transaction.annotation.Transactional
 class KvalitetsvurderingService(
     private val applicationEventPublisher: ApplicationEventPublisher
 ) {
-
-    fun setInkluderteDatoForKlage(
-        klagebehandlingForUpdate: Klagebehandling,
-        inkluderteDatoForKlage: Boolean?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val event = klagebehandlingForUpdate.setKvalitetsvurderingInkluderteDatoForKlage(
-            inkluderteDatoForKlage,
-            saksbehandlerIdent
-        )
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandlingForUpdate
-    }
-
-    fun setInkluderteDatoForVedtak(
-        klagebehandling: Klagebehandling,
-        inkluderteDatoForVedtak: Boolean?,
-        saksbehandlerIdent: String
-    ): Klagebehandling {
-        val event =
-            klagebehandling.setKvalitetsvurderingInkluderteDatoForVedtak(inkluderteDatoForVedtak, saksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
     fun setOversendelsesbrevBra(
         klagebehandling: Klagebehandling,
         oversendelsesbrevBra: Boolean?,

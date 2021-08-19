@@ -266,52 +266,6 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setKvalitetsvurderingInkluderteDatoForKlage(
-        nyVerdi: Boolean?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering()
-        }
-        val gammelVerdi = kvalitetsvurdering!!.inkluderteDatoForKlage
-        val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.inkluderteDatoForKlage = nyVerdi
-        kvalitetsvurdering!!.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.INKLUDERTE_DATO_FOR_KLAGE,
-                gammelVerdi.toString(),
-                nyVerdi.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.setKvalitetsvurderingInkluderteDatoForVedtak(
-        nyVerdi: Boolean?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        if (kvalitetsvurdering == null) {
-            kvalitetsvurdering = Kvalitetsvurdering()
-        }
-        val gammelVerdi = kvalitetsvurdering!!.inkluderteDatoForVedtak
-        val tidspunkt = LocalDateTime.now()
-        kvalitetsvurdering!!.inkluderteDatoForVedtak = nyVerdi
-        kvalitetsvurdering!!.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.INKLUDERTE_DATO_FOR_VEDTAK,
-                gammelVerdi.toString(),
-                nyVerdi.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
     fun Klagebehandling.setKvalitetsvurderingOversendelsesbrevBra(
         nyVerdi: Boolean?,
         saksbehandlerident: String
