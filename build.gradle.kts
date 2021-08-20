@@ -41,6 +41,7 @@ plugins {
     id("org.springframework.boot") version "2.4.2"
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.21"
     id("org.jetbrains.kotlin.plugin.jpa") version "1.4.21"
+    id("com.github.gradlecommunity.jaxb2") version "0.1.0"
     idea
 }
 
@@ -115,6 +116,15 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5:$archunitVersion")
 }
 
+jaxb2 {
+    xjc {
+        create("request-classes") {
+            basePackage = "no.nav.klage.xsdgen"
+            schema = "src/main/resources/xsd/arkivmelding.xsd"
+        }
+    }
+}
+
 idea {
     module {
         isDownloadJavadoc = true
@@ -135,6 +145,8 @@ tasks.withType<Test> {
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
 }
+
+
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src/main/kotlin")
 kotlin.sourceSets["test"].kotlin.srcDirs("src/test/kotlin")
