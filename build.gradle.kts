@@ -90,6 +90,11 @@ dependencies {
     implementation("com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39")
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
+    implementation("com.sun.xml.bind:jaxb-core:2.3.0")
+    implementation("javax.xml.bind:jaxb-api:2.3.0")
+    implementation("com.sun.xml.bind:jaxb-xjc:2.3.0")
+    implementation("com.sun.xml.bind:jaxb-impl:2.3.0")
+
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
 
