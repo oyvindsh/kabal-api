@@ -95,6 +95,8 @@ dependencies {
     implementation("com.sun.xml.bind:jaxb-xjc:2.3.0")
     implementation("com.sun.xml.bind:jaxb-impl:2.3.0")
 
+    implementation("org.redundent:kotlin-xml-builder:1.7.3")
+
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
 
