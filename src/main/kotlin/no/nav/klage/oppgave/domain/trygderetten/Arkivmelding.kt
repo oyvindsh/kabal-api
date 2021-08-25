@@ -1,10 +1,13 @@
 package no.nav.klage.oppgave.domain.trygderetten
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 
 class Arkivmelding(
     val system: String,
     val meldingId: String,
-    val tidspunkt: String,
+    val tidspunkt: LocalDateTime,
     val antallFiler: Int,
     val mappe: Mappe
 ) {
@@ -30,11 +33,11 @@ class Arkivmelding(
 
     data class Mappe(
         val tittel: String,
-        val opprettetDato: String,
+        val opprettetDato: LocalDateTime,
         val virksomhetsspesifikkeMetadata: String,
         val part: Part,
         val registrering: Registrering,
-        val saksdato: String,
+        val saksdato: LocalDate,
         val administrativEnhet: String,
         val saksansvarlig: String,
         val journalenhet: String,
@@ -55,25 +58,25 @@ class Arkivmelding(
         }
 
         data class Registrering(
-            val opprettetDato: String,
+            val opprettetDato: LocalDateTime,
             val opprettetAv: String,
             val dokumentbeskrivelse: Dokumentbeskrivelse,
             val tittel: String,
             val korrespondansepart: Korrespondansepart,
             val journalposttype: String,
             val journalstatus: String,
-            val journaldato: String
+            val journaldato: LocalDate
 
         ) {
             data class Dokumentbeskrivelse(
                 val dokumenttype: String,
                 val dokumentstatus: String,
                 val tittel: String,
-                val opprettetDato: String,
+                val opprettetDato: LocalDateTime,
                 val opprettetAv: String,
                 val tilknyttetRegistreringSom: String,
                 val dokumentnummer: String,
-                val tilknyttetDato: String,
+                val tilknyttetDato: LocalDateTime,
                 val tilknyttetAv: String,
                 val dokumentobjekt: Dokumentobjekt
 
@@ -81,7 +84,7 @@ class Arkivmelding(
                 data class Dokumentobjekt(
                     val versjonsnummer: String,
                     val variantformat: String,
-                    val opprettetDato: String,
+                    val opprettetDato: LocalDateTime,
                     val opprettetAv: String,
                     val referanseDokumentfil: String
                 )
