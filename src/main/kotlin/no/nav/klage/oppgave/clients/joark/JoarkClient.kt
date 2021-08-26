@@ -7,7 +7,7 @@ import no.nav.klage.oppgave.domain.ArkivertDokumentWithTitle
 import no.nav.klage.oppgave.domain.joark.*
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
-import no.nav.klage.oppgave.service.PdfService
+import no.nav.klage.oppgave.util.PdfUtils
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -24,7 +24,7 @@ class JoarkClient(
     private val tracer: Tracer,
     private val pdlFacade: PdlFacade,
     private val eregClient: EregClient,
-    private val pdfService: PdfService
+    private val pdfUtils: PdfUtils
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -168,7 +168,7 @@ class JoarkClient(
             dokumentVarianter = listOf(
                 DokumentVariant(
                     filnavn = document.title,
-                    filtype = if (pdfService.pdfByteArrayIsPdfa(document.content)) "PDFA" else "PDF",
+                    filtype = if (pdfUtils.pdfByteArrayIsPdfa(document.content)) "PDFA" else "PDF",
                     variantformat = "ARKIV",
                     fysiskDokument = Base64.getEncoder().encodeToString(document.content)
                 )

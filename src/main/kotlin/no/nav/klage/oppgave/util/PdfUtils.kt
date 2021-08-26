@@ -1,12 +1,12 @@
-package no.nav.klage.oppgave.service
+package no.nav.klage.oppgave.util
 
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.verapdf.pdfa.Foundries
 import org.verapdf.pdfa.VeraGreenfieldFoundryProvider
 import java.io.ByteArrayInputStream
 
-@Service
-class PdfService {
+@Component
+class PdfUtils {
     init {
         VeraGreenfieldFoundryProvider.initialise()
     }
