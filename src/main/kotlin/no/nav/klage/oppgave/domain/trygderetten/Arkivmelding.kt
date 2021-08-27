@@ -4,6 +4,7 @@ import org.redundent.kotlin.xml.PrintOptions
 import org.redundent.kotlin.xml.xml
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 fun toXml(arkivmelding: Arkivmelding): String {
     return xml("avtalemelding") {
@@ -12,12 +13,12 @@ fun toXml(arkivmelding: Arkivmelding): String {
         namespace("xsi:schemaLocation", "http://www.arkivverket.no/standarder/noark5/arkivmelding arkivmelding.xsd")
         "system" { -arkivmelding.system }
         "meldingsId" { -arkivmelding.meldingId }
-        "tidspunkt" { -arkivmelding.tidspunkt.toString() }
+        "tidspunkt" { -arkivmelding.tidspunkt.truncatedToSeconds() }
         "antallFiler" { -arkivmelding.antallFiler.toString() }
         "mappe" {
             attribute("xsi:type", "saksmappe")
             "tittel" { -arkivmelding.mappe.tittel }
-            "opprettetDato" { -arkivmelding.mappe.opprettetDato.toString() }
+            "opprettetDato" { -arkivmelding.mappe.opprettetDato.truncatedToSeconds() }
             "virksomhetsspesifikkeMetadata" { -arkivmelding.mappe.virksomhetsspesifikkeMetadata }
             "part" {
                 "partNavn" { -arkivmelding.mappe.part.partNavn }
@@ -32,22 +33,22 @@ fun toXml(arkivmelding: Arkivmelding): String {
             }
             "registrering" {
                 attribute("xsi:type", "journalpost")
-                "opprettetDato" { -arkivmelding.mappe.registrering.opprettetDato.toString() }
+                "opprettetDato" { -arkivmelding.mappe.registrering.opprettetDato.truncatedToSeconds() }
                 "opprettetAv" { -arkivmelding.mappe.registrering.opprettetAv }
                 "dokumentbeskrivelse" {
                     "dokumenttype" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumenttype }
                     "dokumentstatus" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentstatus }
                     "tittel" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tittel }
-                    "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetDato.toString() }
+                    "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetDato.truncatedToSeconds() }
                     "opprettetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetAv }
                     "tilknyttetRegistreringSom" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetRegistreringSom }
                     "dokumentnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentnummer }
-                    "tilknyttetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetDato.toString() }
+                    "tilknyttetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetDato.truncatedToSeconds() }
                     "tilknyttetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetAv }
                     "dokumentobjekt" {
                         "versjonsnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.versjonsnummer }
                         "variantformat" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.variantformat }
-                        "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetDato.toString() }
+                        "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetDato.truncatedToSeconds() }
                         "opprettetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetAv }
                         "referanseDokumentfil" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.referanseDokumentfil }
                     }
@@ -72,6 +73,8 @@ fun toXml(arkivmelding: Arkivmelding): String {
         }
     }.toString(PrintOptions(singleLineTextElements = true))
 }
+
+private fun LocalDateTime.truncatedToSeconds() = this.truncatedTo(ChronoUnit.SECONDS).toString()
 
 class Arkivmelding(
     val system: String,
