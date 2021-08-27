@@ -18,6 +18,7 @@ val nimbusVersion = "8.20.1"
 val threeTenExtraVersion = "1.6.0"
 val shedlockVersion = "4.23.0"
 val archunitVersion = "0.19.0"
+val verapdfVersion = "1.18.8"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -105,6 +106,7 @@ dependencies {
     implementation("no.finn.unleash:unleash-client-java:$unleashVersion")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
 
+    implementation("org.verapdf:validation-model:$verapdfVersion")
     implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
     implementation("org.apache.tika:tika-core:$tikaVersion")
 

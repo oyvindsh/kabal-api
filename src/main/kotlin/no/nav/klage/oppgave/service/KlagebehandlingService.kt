@@ -285,12 +285,13 @@ class KlagebehandlingService(
         if (klagebehandling.vedtak.first().utfall == null) {
             throw ValidationException("Utfall er ikke satt på vedtak")
         }
-        if (klagebehandling.vedtak.first().utfall in listOf(Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD)) {
-            if (klagebehandling.vedtak.first().grunn == null) {
-                throw ValidationException("Omgjøringsgrunn er ikke satt på vedtak")
-            }
-        }
-        if (klagebehandling.vedtak.first().hjemler.isNullOrEmpty()) {
+        //TODO validate based on kvalitetsvurdering when that feature is done
+//        if (klagebehandling.vedtak.first().utfall in listOf(Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD)) {
+//            if (klagebehandling.vedtak.first().grunn == null) {
+//                throw ValidationException("Omgjøringsgrunn er ikke satt på vedtak")
+//            }
+//        }
+        if (klagebehandling.vedtak.first().hjemler.isEmpty()) {
             throw ValidationException("Hjemmel er ikke satt på vedtak")
         }
     }

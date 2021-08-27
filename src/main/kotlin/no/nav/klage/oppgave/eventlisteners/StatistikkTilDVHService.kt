@@ -69,7 +69,7 @@ class StatistikkTilDVHService(
             getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState, vedtak)
 
         return KlageStatistikkTilDVH(
-            behandlingId = mottak.dvhReferanse,
+            behandlingId = mottak.dvhReferanse ?: mottak.kildeReferanse,
             behandlingIdKabal = klagebehandling.id.toString(),
             behandlingStartetKA = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
             behandlingStatus = klagebehandlingState,

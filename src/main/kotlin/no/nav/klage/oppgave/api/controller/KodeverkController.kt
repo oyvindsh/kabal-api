@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.api.view.KodeverkResponse
 import no.nav.klage.oppgave.api.view.toDto
-import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 @Unprotected
 class KodeverkController(private val environment: Environment) {
 
-    private val lovligeTemaerIKabal = LovligeTemaer.lovligeTemaer(environment)
     private val lovligeTyperIKabal = LovligeTyper.lovligeTyper(environment)
 
     companion object {
@@ -28,7 +26,7 @@ class KodeverkController(private val environment: Environment) {
     fun getKodeverk(): KodeverkResponse {
 
         return KodeverkResponse(
-            tema = Tema.values().asList().filter { lovligeTemaerIKabal.contains(it) }.toDto(),
+            tema = Tema.values().asList().toDto(),
             type = Type.values().asList().filter { lovligeTyperIKabal.contains(it) }.toDto()
         )
     }
