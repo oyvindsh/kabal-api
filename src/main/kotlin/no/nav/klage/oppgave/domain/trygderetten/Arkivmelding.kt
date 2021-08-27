@@ -1,8 +1,77 @@
 package no.nav.klage.oppgave.domain.trygderetten
 
+import org.redundent.kotlin.xml.PrintOptions
+import org.redundent.kotlin.xml.xml
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+fun toXml(arkivmelding: Arkivmelding): String {
+    return xml("avtalemelding") {
+        xmlns = "http://www.arkivverket.no/standarder/noark5/arkivmelding"
+        namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
+        namespace("xsi:schemaLocation", "http://www.arkivverket.no/standarder/noark5/arkivmelding arkivmelding.xsd")
+        "system" { -arkivmelding.system }
+        "meldingsId" { -arkivmelding.meldingId }
+        "tidspunkt" { -arkivmelding.tidspunkt.toString() }
+        "antallFiler" { -arkivmelding.antallFiler.toString() }
+        "mappe" {
+            attribute("xsi:type", "saksmappe")
+            "tittel" { -arkivmelding.mappe.tittel }
+            "opprettetDato" { -arkivmelding.mappe.opprettetDato.toString() }
+            "virksomhetsspesifikkeMetadata" { -arkivmelding.mappe.virksomhetsspesifikkeMetadata }
+            "part" {
+                "partNavn" { -arkivmelding.mappe.part.partNavn }
+                "partRolle" { -arkivmelding.mappe.part.partRolle }
+                "organisasjonsnummer" {
+                    "organisasjonsnummer" { -arkivmelding.mappe.part.organisasjonsnummer.organisasjonsnummer }
+                }
+                "foedselsnummer" {
+                    "foedselsnummer" { -arkivmelding.mappe.part.foedselsnummer.foedselsnummer }
+                }
+                "kontaktperson" { -arkivmelding.mappe.part.kontaktperson }
+            }
+            "registrering" {
+                attribute("xsi:type", "journalpost")
+                "opprettetDato" { -arkivmelding.mappe.registrering.opprettetDato.toString() }
+                "opprettetAv" { -arkivmelding.mappe.registrering.opprettetAv }
+                "dokumentbeskrivelse" {
+                    "dokumenttype" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumenttype }
+                    "dokumentstatus" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentstatus }
+                    "tittel" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tittel }
+                    "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetDato.toString() }
+                    "opprettetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetAv }
+                    "tilknyttetRegistreringSom" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetRegistreringSom }
+                    "dokumentnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentnummer }
+                    "tilknyttetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetDato.toString() }
+                    "tilknyttetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetAv }
+                    "dokumentobjekt" {
+                        "versjonsnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.versjonsnummer }
+                        "variantformat" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.variantformat }
+                        "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetDato.toString() }
+                        "opprettetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetAv }
+                        "referanseDokumentfil" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.referanseDokumentfil }
+                    }
+                }
+                "tittel" { -arkivmelding.mappe.registrering.tittel }
+                "korrespondansepart" {
+                    "korrespondanseparttype" { -arkivmelding.mappe.registrering.korrespondansepart.korrespondanseparttype }
+                    "korrespondansepartNavn" { -arkivmelding.mappe.registrering.korrespondansepart.korrespondansepartNavn }
+                    "organisasjonsummer" {
+                        "organisasjonsummer" { -arkivmelding.mappe.registrering.korrespondansepart.organisasjonsnummer.organisasjonsnummer }
+                    }
+                }
+                "journalposttype" { -arkivmelding.mappe.registrering.journalposttype }
+                "journalstatus" { -arkivmelding.mappe.registrering.journalstatus }
+                "journaldato" { -arkivmelding.mappe.registrering.journaldato.toString() }
+            }
+            "saksdato" { -arkivmelding.mappe.saksdato.toString() }
+            "administrativEnhet" { -arkivmelding.mappe.administrativEnhet }
+            "saksansvarlig" { -arkivmelding.mappe.saksansvarlig }
+            "journalenhet" { -arkivmelding.mappe.journalenhet }
+            "saksstatus" { -arkivmelding.mappe.saksstatus }
+        }
+    }.toString(PrintOptions(singleLineTextElements = true))
+}
 
 class Arkivmelding(
     val system: String,
@@ -11,25 +80,6 @@ class Arkivmelding(
     val antallFiler: Int,
     val mappe: Mappe
 ) {
-
-    fun toXml(): String {
-        return ""
-//        return xml("people") {
-//            xmlns = "http://example.com/people"
-//            "person" {
-//                attribute("id", id)
-//                "firstName" {
-//                    -firstName
-//                }
-//                "lastName" {
-//                    -lastName
-//                }
-//                "phone" {
-//                    -phone
-//                }
-//            }
-//        }.toString()
-    }
 
     data class Mappe(
         val tittel: String,

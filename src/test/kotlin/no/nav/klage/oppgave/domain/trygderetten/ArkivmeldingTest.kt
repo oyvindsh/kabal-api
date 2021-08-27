@@ -68,7 +68,7 @@ internal class ArkivmeldingTest {
                 saksstatus = "saksstatus"
             )
         )
-        println(arkivmelding.toXml())
+        println(toXml(arkivmelding))
     }
 
 }
