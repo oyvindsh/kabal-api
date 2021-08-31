@@ -246,11 +246,7 @@ open class ElasticsearchService(
         saksbehandler?.let {
             val innerQuerySaksbehandler = QueryBuilders.boolQuery()
             innerQuerySaksbehandler.should(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
-
-            if (statuskategori == AAPEN) {
-                innerQuerySaksbehandler.should(QueryBuilders.termQuery("medunderskriverident", saksbehandler))
-            }
-
+            innerQuerySaksbehandler.should(QueryBuilders.termQuery("medunderskriverident", saksbehandler))
             baseQuery.must(innerQuerySaksbehandler)
         }
 
