@@ -23,13 +23,19 @@ fun toXml(arkivmelding: Arkivmelding): String {
             "part" {
                 "partNavn" { -arkivmelding.mappe.part.partNavn }
                 "partRolle" { -arkivmelding.mappe.part.partRolle }
-                "organisasjonsnummer" {
-                    "organisasjonsnummer" { -arkivmelding.mappe.part.organisasjonsnummer.organisasjonsnummer }
+                arkivmelding.mappe.part.organisasjonsnummer?.organisasjonsnummer?.let {
+                    "organisasjonsnummer" {
+                        "organisasjonsnummer" { -arkivmelding.mappe.part.organisasjonsnummer.organisasjonsnummer }
+                    }
                 }
-                "foedselsnummer" {
-                    "foedselsnummer" { -arkivmelding.mappe.part.foedselsnummer.foedselsnummer }
+                arkivmelding.mappe.part.foedselsnummer?.foedselsnummer?.let {
+                    "foedselsnummer" {
+                        "foedselsnummer" { -arkivmelding.mappe.part.foedselsnummer.foedselsnummer }
+                    }
                 }
-                "kontaktperson" { -arkivmelding.mappe.part.kontaktperson }
+                arkivmelding.mappe.part.kontaktperson?.let {
+                    "kontaktperson" { -arkivmelding.mappe.part.kontaktperson }
+                }
             }
             "registrering" {
                 attribute("xsi:type", "journalpost")
@@ -100,9 +106,9 @@ class Arkivmelding(
         data class Part(
             val partNavn: String,
             val partRolle: String,
-            val organisasjonsnummer: Organisasjonsnummer,
-            val foedselsnummer: Foedselsnummer,
-            val kontaktperson: String
+            val organisasjonsnummer: Organisasjonsnummer?,
+            val foedselsnummer: Foedselsnummer?,
+            val kontaktperson: String?
         ) {
 
             data class Foedselsnummer(
