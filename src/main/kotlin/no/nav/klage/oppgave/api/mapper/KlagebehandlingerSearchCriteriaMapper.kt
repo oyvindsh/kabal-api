@@ -38,8 +38,12 @@ class KlagebehandlingerSearchCriteriaMapper {
         statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE
     )
 
-    fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams, enhet: EnhetMedLovligeTemaer? = null) = KlagebehandlingerSearchCriteria(
-        enhetId = if (queryParams.tildeltSaksbehandler == null) enhet?.enhetId else null,
+    fun toSearchCriteria(
+        navIdent: String,
+        queryParams: KlagebehandlingerQueryParams,
+        enhet: EnhetMedLovligeTemaer? = null
+    ) = KlagebehandlingerSearchCriteria(
+        enhetId = if (queryParams.erTildeltSaksbehandler == true && queryParams.tildeltSaksbehandler == null) enhet?.enhetId else null,
         typer = queryParams.typer.map { Type.of(it) },
         temaer = queryParams.temaer.map { Tema.of(it) },
         hjemler = queryParams.hjemler.map { Hjemmel.of(it) },
