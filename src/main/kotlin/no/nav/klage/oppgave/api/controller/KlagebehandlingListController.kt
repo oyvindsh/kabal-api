@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingerSearchCriteriaMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.BehandlingsidWrongFormatException
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.exceptions.OppgaveVersjonWrongFormatException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -50,16 +51,21 @@ class KlagebehandlingListController(
     ): KlagebehandlingerListRespons {
         logger.debug("Params: {}", queryParams)
         validateNavIdent(navIdent)
-        val lovligeTemaer =
-            saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).temaer
-        val searchCriteria = if (queryParams.temaer.isNullOrEmpty()) {
+
+        validateRettigheter(queryParams, navIdent)
+
+        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
+        val searchCriteria = if (queryParams.temaer.isEmpty()) {
             klagebehandlingerSearchCriteriaMapper.toSearchCriteria(
                 navIdent,
-                queryParams.copy(temaer = lovligeTemaer.map { it.id })
+                queryParams.copy(temaer = valgtEnhet.temaer.map { it.id }),
+                valgtEnhet
             )
         } else {
-            klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams)
+            klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams, valgtEnhet)
         }
+
+
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
@@ -68,10 +74,29 @@ class KlagebehandlingListController(
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
                 searchCriteria.saksbehandler,
-                lovligeTemaer
+                valgtEnhet.temaer
             )
         )
     }
+
+    /*
+        Does user have the rights to get all tildelte oppgaver?
+     */
+    private fun validateRettigheter(
+        queryParams: KlagebehandlingerQueryParams,
+        navIdent: String
+    ) {
+        if (queryParams.erTildeltSaksbehandler == true && queryParams.tildeltSaksbehandler == null) {
+            if (!canSeeTildelteOppgaver()) {
+                val message = "$navIdent har ikke tilgang til å se alle tildelte oppgaver."
+                logger.warn(message)
+                throw MissingTilgangException(message)
+            }
+        }
+    }
+
+    private fun canSeeTildelteOppgaver() = innloggetSaksbehandlerRepository.erLeder() ||
+            innloggetSaksbehandlerRepository.erFagansvarlig()
 
     @ApiOperation(
         value = "Hent oppgaver som gjelder en gitt person",
