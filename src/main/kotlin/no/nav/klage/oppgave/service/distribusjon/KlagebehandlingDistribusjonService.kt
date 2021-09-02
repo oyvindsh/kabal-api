@@ -28,10 +28,11 @@ class KlagebehandlingDistribusjonService(
     @Transactional(propagation = Propagation.NEVER)
     fun distribuerKlagebehandling(klagebehandlingId: UUID) {
         try {
-            var klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+            var klagebehandling =
+                klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
             klagebehandling.vedtak
                 .filter { vedtak -> vedtak.erIkkeFerdigDistribuert() }
-                .forEach { vedtak -> 
+                .forEach { vedtak ->
                     logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert")
 
                     klagebehandling = lagBrevmottakere(klagebehandling, vedtak.id)

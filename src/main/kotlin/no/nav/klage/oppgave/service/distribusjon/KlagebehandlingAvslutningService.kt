@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.VedtakKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -19,7 +20,8 @@ import java.util.*
 class KlagebehandlingAvslutningService(
     private val kafkaVedtakEventRepository: KafkaVedtakEventRepository,
     private val vedtakKafkaProducer: VedtakKafkaProducer,
-    private val klagebehandlingService: KlagebehandlingService
+    private val klagebehandlingService: KlagebehandlingService,
+    private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
     companion object {
@@ -43,7 +45,9 @@ class KlagebehandlingAvslutningService(
             )
         )
 
-        klagebehandling.setAvsluttet(VedtakDistribusjonService.SYSTEMBRUKER)
+        val event = klagebehandling.setAvsluttet(VedtakDistribusjonService.SYSTEMBRUKER)
+        applicationEventPublisher.publishEvent(event)
+
         return klagebehandling
     }
 
