@@ -43,10 +43,11 @@ class KlagebehandlingRepositoryTest {
         val mottak = Mottak(
             tema = Tema.OMS,
             type = Type.KLAGE,
-            kildesystem = Fagsystem.K9,
-            kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            oversendtKaDato = LocalDateTime.now()
+            kildeReferanse = "1234234",
+            oversendtKaDato = LocalDateTime.now(),
+            kildesystem = Fagsystem.K9,
+            ytelse = "ABC"
         )
 
         mottakRepository.save(mottak)
@@ -84,10 +85,11 @@ class KlagebehandlingRepositoryTest {
         val mottak = Mottak(
             tema = Tema.OMS,
             type = Type.KLAGE,
-            kildesystem = Fagsystem.K9,
-            kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            oversendtKaDato = LocalDateTime.now()
+            kildeReferanse = "1234234",
+            oversendtKaDato = LocalDateTime.now(),
+            kildesystem = Fagsystem.K9,
+            ytelse = "ABC"
         )
 
         mottakRepository.save(mottak)
@@ -132,10 +134,11 @@ class KlagebehandlingRepositoryTest {
         val mottak = Mottak(
             tema = Tema.OMS,
             type = Type.KLAGE,
-            kildesystem = Fagsystem.K9,
-            kildeReferanse = "1234234",
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            oversendtKaDato = LocalDateTime.now()
+            kildeReferanse = "1234234",
+            oversendtKaDato = LocalDateTime.now(),
+            kildesystem = Fagsystem.K9,
+            ytelse = "ABC"
         )
 
         mottakRepository.save(mottak)

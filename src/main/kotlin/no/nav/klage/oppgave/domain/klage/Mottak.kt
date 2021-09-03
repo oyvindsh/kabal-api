@@ -60,8 +60,10 @@ class Mottak(
     @Column(name = "kildesystem")
     @Convert(converter = FagsystemConverter::class)
     val kildesystem: Fagsystem,
+    @Column(name = "ytelse")
+    val ytelse: String?,
     @Column(name = "kommentar")
-    val kommentar: String? = null,
+    val kommentar: String? = null
 ) {
 
     override fun toString(): String {

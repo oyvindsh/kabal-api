@@ -115,7 +115,8 @@ data class OversendtKlage(
         mottattNavDato = mottattFoersteinstans,
         oversendtKaDato = oversendtKaDato ?: LocalDateTime.now(),
         fristFraFoersteinstans = frist,
-        kildesystem = kilde.mapFagsystem()
+        kildesystem = kilde.mapFagsystem(),
+        ytelse = ytelse
     )
 }
 
