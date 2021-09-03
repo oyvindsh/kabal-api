@@ -87,6 +87,11 @@ data class OversendtKlage(
     )
     val kilde: KildeFagsystem,
     @ApiModelProperty(
+        notes = "Ytelse. Kode fra et kodeverk.",
+        required = false
+    )
+    val ytelse: String? = null,
+    @ApiModelProperty(
         notes = "Kommentarer fra saksbehandler i førsteinstans som ikke er med i oversendelsesbrevet klager mottar",
         required = false
     )
