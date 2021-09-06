@@ -96,7 +96,6 @@ spec:
           cluster: {{k9_cluster}}
     outbound:
       rules:
-        - application: klage-redis
         - application: kabal-file-api
         - application: clamav
           namespace: clamav
