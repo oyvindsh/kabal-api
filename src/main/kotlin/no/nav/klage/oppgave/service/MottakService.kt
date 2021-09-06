@@ -72,11 +72,12 @@ class MottakService(
         val mottak = mottakRepository.save(
             Mottak(
                 tema = kvalitetsvurdering.tema,
+                type = Type.KLAGE,
                 klager = klager,
                 kildeReferanse = "N/A",
-                kildesystem = Fagsystem.MANUELL,
                 oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
-                type = Type.KLAGE
+                kildesystem = Fagsystem.MANUELL,
+                ytelse = null
             )
         )
 

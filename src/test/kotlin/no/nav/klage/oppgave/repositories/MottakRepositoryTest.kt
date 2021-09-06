@@ -38,8 +38,8 @@ class MottakRepositoryTest {
             tema = Tema.OMS,
             type = Type.KLAGE,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "123454")),
-            sakFagsakId = "12345",
             sakFagsystem = Fagsystem.AO01,
+            sakFagsakId = "12345",
             kildeReferanse = "54321",
             dvhReferanse = "5342523",
             hjemmelListe = mutableSetOf(MottakHjemmel(lov = LovKilde.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
@@ -52,7 +52,8 @@ class MottakRepositoryTest {
                 )
             ),
             oversendtKaDato = LocalDateTime.now(),
-            kildesystem = Fagsystem.AO01
+            kildesystem = Fagsystem.AO01,
+            ytelse = "ABC"
         )
 
         mottakRepository.save(mottak)

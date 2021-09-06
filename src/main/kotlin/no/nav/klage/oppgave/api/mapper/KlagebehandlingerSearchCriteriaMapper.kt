@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingerQueryParams
 import no.nav.klage.oppgave.api.view.PersonSoekInput
+import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -37,7 +38,12 @@ class KlagebehandlingerSearchCriteriaMapper {
         statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE
     )
 
-    fun toSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) = KlagebehandlingerSearchCriteria(
+    fun toSearchCriteria(
+        navIdent: String,
+        queryParams: KlagebehandlingerQueryParams,
+        enhet: EnhetMedLovligeTemaer? = null
+    ) = KlagebehandlingerSearchCriteria(
+        enhetId = if (queryParams.erTildeltSaksbehandler == true && queryParams.tildeltSaksbehandler == null) enhet?.enhetId else null,
         typer = queryParams.typer.map { Type.of(it) },
         temaer = queryParams.temaer.map { Tema.of(it) },
         hjemler = queryParams.hjemler.map { Hjemmel.of(it) },

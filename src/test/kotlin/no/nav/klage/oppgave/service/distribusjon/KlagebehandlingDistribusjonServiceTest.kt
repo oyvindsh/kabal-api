@@ -110,10 +110,11 @@ internal class KlagebehandlingDistribusjonServiceTest {
     private val mottak = Mottak(
         tema = Tema.OMS,
         type = Type.KLAGE,
-        kildesystem = Fagsystem.K9,
-        kildeReferanse = UUID.randomUUID().toString(),
         klager = Klager(partId = PartId(type = PartIdType.PERSON, value = fnr)),
-        oversendtKaDato = LocalDateTime.now()
+        kildeReferanse = UUID.randomUUID().toString(),
+        oversendtKaDato = LocalDateTime.now(),
+        kildesystem = Fagsystem.K9,
+        ytelse = "ABC"
     )
 
     private val klage = Klagebehandling(
