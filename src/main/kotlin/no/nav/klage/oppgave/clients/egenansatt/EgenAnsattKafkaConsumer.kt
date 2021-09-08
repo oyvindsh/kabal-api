@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.config.PartitionFinder
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.PartitionOffset
 import org.springframework.kafka.annotation.TopicPartition
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component
 @Component
 class EgenAnsattKafkaConsumer(
     private val egenAnsattService: EgenAnsattService,
-    @Qualifier("egenAnsattFinder") private val egenAnsattFinder: PartitionFinder<String, String>
+    private val egenAnsattFinder: PartitionFinder<String, String>
 ) {
 
     companion object {

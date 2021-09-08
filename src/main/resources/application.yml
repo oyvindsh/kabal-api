@@ -197,10 +197,7 @@ allowed.origins:
 MICROSOFT_GRAPH_URL: https://graph.microsoft.com/v1.0
 UNLEASH_URL: https://unleash.nais.io/api/
 
-KAFKA_BOOTSTRAP_SERVERS: localhost:9092
-KAFKA_SCHEMA_REGISTRY_URL: http://localhost:9093
-KAFKA_GROUP_ID: kabal-api
-EGENANSATT_KAFKA_TOPIC: aapen-skjermede-personer-v1
+EGENANSATT_KAFKA_TOPIC: nom.skjermede-personer-v1
 PDL_PERSON_KAFKA_TOPIC: aapen-person-pdl-dokument-v1
 
 SERVICE_USER_PASSWORD: itest
