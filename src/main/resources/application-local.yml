@@ -17,9 +17,6 @@ SAF_APP_CLIENT_ID: uu-id
 nais:
   cluster:
     name: local
-spring:
-  redis:
-    host: localhost
 AIVEN_ES_SCHEME: http
 AIVEN_ES_HOST: localhost
 AIVEN_ES_PORT: 9200
