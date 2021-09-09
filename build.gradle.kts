@@ -90,6 +90,8 @@ dependencies {
     implementation("com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39")
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
 
+    implementation("org.redundent:kotlin-xml-builder:1.7.3")
+
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
 
@@ -137,6 +139,8 @@ tasks.withType<Test> {
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     this.archiveFileName.set("app.jar")
 }
+
+
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src/main/kotlin")
 kotlin.sourceSets["test"].kotlin.srcDirs("src/test/kotlin")
