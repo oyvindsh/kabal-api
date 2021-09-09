@@ -42,7 +42,6 @@ plugins {
     id("org.springframework.boot") version "2.4.2"
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.21"
     id("org.jetbrains.kotlin.plugin.jpa") version "1.4.21"
-    id("org.unbroken-dome.xjc") version "2.0.0"
     idea
 }
 
@@ -90,11 +89,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.kjetland:mbknor-jackson-jsonschema_2.13:1.0.39")
     implementation("com.papertrailapp:logback-syslog4j:1.0.0")
-
-    implementation("com.sun.xml.bind:jaxb-core:2.3.0")
-    implementation("javax.xml.bind:jaxb-api:2.3.0")
-    implementation("com.sun.xml.bind:jaxb-xjc:2.3.0")
-    implementation("com.sun.xml.bind:jaxb-impl:2.3.0")
 
     implementation("org.redundent:kotlin-xml-builder:1.7.3")
 

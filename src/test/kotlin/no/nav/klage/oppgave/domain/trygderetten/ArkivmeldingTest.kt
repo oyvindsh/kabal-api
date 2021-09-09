@@ -20,9 +20,10 @@ internal class ArkivmeldingTest {
                 part = Arkivmelding.Mappe.Part(
                     partNavn = "partNavn",
                     partRolle = "partRolle",
-                    organisasjonsnummer = Arkivmelding.Organisasjonsnummer(
-                        organisasjonsnummer = "organisasjonsnummer"
-                    ),
+                    organisasjonsnummer = null,
+//                            Arkivmelding.Organisasjonsnummer(
+//                        organisasjonsnummer = "organisasjonsnummer"
+//                    ),
                     foedselsnummer = Arkivmelding.Mappe.Part.Foedselsnummer(
                         foedselsnummer = "foedselsnummer"
                     ),
@@ -38,11 +39,12 @@ internal class ArkivmeldingTest {
                         opprettetDato = LocalDateTime.now(),
                         opprettetAv = "oppretteAv",
                         tilknyttetRegistreringSom = "tilknyttetRegistreringSom",
-                        dokumentnummer = "dokumentnummer",
+                        dokumentnummer = 1,
                         tilknyttetDato = LocalDateTime.now(),
                         tilknyttetAv = "tilknyttetAv",
                         dokumentobjekt = Arkivmelding.Mappe.Registrering.Dokumentbeskrivelse.Dokumentobjekt(
-                            versjonsnummer = "versjonsnummer",
+                            versjonsnummer = 1,
+                            format = "format",
                             variantformat = "variantformat",
                             opprettetDato = LocalDateTime.now(),
                             opprettetAv = "opprettetAv",
@@ -68,7 +70,9 @@ internal class ArkivmeldingTest {
                 saksstatus = "saksstatus"
             )
         )
-        println(toXml(arkivmelding))
+        val xml = toXml(arkivmelding)
+//        println(xml)
+        validateXmlAgainstXsd(xml)
     }
 
 }

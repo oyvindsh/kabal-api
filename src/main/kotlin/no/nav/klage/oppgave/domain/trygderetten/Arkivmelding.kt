@@ -2,17 +2,21 @@ package no.nav.klage.oppgave.domain.trygderetten
 
 import org.redundent.kotlin.xml.PrintOptions
 import org.redundent.kotlin.xml.xml
+import org.springframework.core.io.ClassPathResource
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
+
 
 fun toXml(arkivmelding: Arkivmelding): String {
-    return xml("avtalemelding") {
+    return xml("arkivmelding") {
         xmlns = "http://www.arkivverket.no/standarder/noark5/arkivmelding"
         namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        namespace("xsi:schemaLocation", "http://www.arkivverket.no/standarder/noark5/arkivmelding arkivmelding.xsd")
+        attribute("xsi:schemaLocation", "http://www.arkivverket.no/standarder/noark5/arkivmelding arkivmelding.xsd")
         "system" { -arkivmelding.system }
-        "meldingsId" { -arkivmelding.meldingId }
+        "meldingId" { -arkivmelding.meldingId }
         "tidspunkt" { -arkivmelding.tidspunkt.truncatedToSeconds() }
         "antallFiler" { -arkivmelding.antallFiler.toString() }
         "mappe" {
@@ -48,12 +52,13 @@ fun toXml(arkivmelding: Arkivmelding): String {
                     "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetDato.truncatedToSeconds() }
                     "opprettetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.opprettetAv }
                     "tilknyttetRegistreringSom" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetRegistreringSom }
-                    "dokumentnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentnummer }
+                    "dokumentnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentnummer.toString() }
                     "tilknyttetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetDato.truncatedToSeconds() }
                     "tilknyttetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.tilknyttetAv }
                     "dokumentobjekt" {
-                        "versjonsnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.versjonsnummer }
+                        "versjonsnummer" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.versjonsnummer.toString() }
                         "variantformat" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.variantformat }
+                        "format" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.format }
                         "opprettetDato" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetDato.truncatedToSeconds() }
                         "opprettetAv" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.opprettetAv }
                         "referanseDokumentfil" { -arkivmelding.mappe.registrering.dokumentbeskrivelse.dokumentobjekt.referanseDokumentfil }
@@ -63,8 +68,8 @@ fun toXml(arkivmelding: Arkivmelding): String {
                 "korrespondansepart" {
                     "korrespondanseparttype" { -arkivmelding.mappe.registrering.korrespondansepart.korrespondanseparttype }
                     "korrespondansepartNavn" { -arkivmelding.mappe.registrering.korrespondansepart.korrespondansepartNavn }
-                    "organisasjonsummer" {
-                        "organisasjonsummer" { -arkivmelding.mappe.registrering.korrespondansepart.organisasjonsnummer.organisasjonsnummer }
+                    "organisasjonsnummer" {
+                        "organisasjonsnummer" { -arkivmelding.mappe.registrering.korrespondansepart.organisasjonsnummer.organisasjonsnummer }
                     }
                 }
                 "journalposttype" { -arkivmelding.mappe.registrering.journalposttype }
@@ -134,14 +139,15 @@ class Arkivmelding(
                 val opprettetDato: LocalDateTime,
                 val opprettetAv: String,
                 val tilknyttetRegistreringSom: String,
-                val dokumentnummer: String,
+                val dokumentnummer: Int,
                 val tilknyttetDato: LocalDateTime,
                 val tilknyttetAv: String,
                 val dokumentobjekt: Dokumentobjekt
 
             ) {
                 data class Dokumentobjekt(
-                    val versjonsnummer: String,
+                    val versjonsnummer: Int,
+                    val format: String,
                     val variantformat: String,
                     val opprettetDato: LocalDateTime,
                     val opprettetAv: String,
@@ -163,3 +169,15 @@ class Arkivmelding(
     )
 }
 
+fun validateXmlAgainstXsd(xml: String) {
+    val factory: SchemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema")
+
+    val schema = factory.newSchema(ClassPathResource("schema/arkivmelding.xsd").file)
+    val validator = schema.newValidator()
+
+    val source = StreamSource(xml.byteInputStream())
+
+    println("Validation Starts now!")
+
+    validator.validate(source)
+}
