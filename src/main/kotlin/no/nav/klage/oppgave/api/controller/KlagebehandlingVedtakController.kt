@@ -45,7 +45,7 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String
     ): VedtakView {
-        logMethodDetails("getVedtak", klagebehandlingId, vedtakId)
+        logMethodDetails("getVedtak", klagebehandlingId)
         val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId.toUUIDOrException())
             .also {
                 auditLogger.log(
@@ -55,7 +55,7 @@ class KlagebehandlingVedtakController(
                     )
                 )
             }
-        return klagebehandlingMapper.mapVedtakToVedtakView(klagebehandling.getVedtak(vedtakId.toUUIDOrException()))
+        return klagebehandlingMapper.mapVedtakToVedtakView(klagebehandling.getVedtakOrException())
     }
 
     @PostMapping("/klagebehandlinger/{klagebehandlingid}/vedtak/{vedtakid}/vedlegg")
@@ -64,15 +64,14 @@ class KlagebehandlingVedtakController(
         @PathVariable("vedtakid") vedtakId: String,
         @ModelAttribute input: VedtakVedleggInput
     ): VedleggEditedView? {
-        logMethodDetails("postVedlegg", klagebehandlingId, vedtakId)
+        logMethodDetails("postVedlegg", klagebehandlingId)
 
         return klagebehandlingMapper.mapToVedleggEditedView(
             vedtakService.knyttVedtaksFilTilVedtak(
                 klagebehandlingId.toUUIDOrException(),
-                vedtakId.toUUIDOrException(),
                 input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
-            ), vedtakId.toUUIDOrException()
+            )
         )
     }
 
@@ -82,15 +81,14 @@ class KlagebehandlingVedtakController(
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakSlettVedleggInput
     ): VedleggEditedView {
-        logMethodDetails("deleteVedlegg", klagebehandlingId, vedtakId)
+        logMethodDetails("deleteVedlegg", klagebehandlingId)
 
         return klagebehandlingMapper.mapToVedleggEditedView(
             vedtakService.slettFilTilknyttetVedtak(
                 klagebehandlingId.toUUIDOrException(),
-                vedtakId.toUUIDOrException(),
                 input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
-            ), vedtakId.toUUIDOrException()
+            )
         )
     }
 
@@ -100,14 +98,13 @@ class KlagebehandlingVedtakController(
         @PathVariable("vedtakid") vedtakId: String,
         @RequestBody input: VedtakFullfoerInput
     ): VedtakFullfoertView {
-        logMethodDetails("fullfoerVedtak", klagebehandlingId, vedtakId)
+        logMethodDetails("fullfoerVedtak", klagebehandlingId)
         val klagebehandling = vedtakService.ferdigstillVedtak(
             klagebehandlingId.toUUIDOrException(),
-            vedtakId.toUUIDOrException(),
             input,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return klagebehandlingMapper.mapToVedtakFullfoertView(klagebehandling, vedtakId.toUUIDOrException())
+        return klagebehandlingMapper.mapToVedtakFullfoertView(klagebehandling)
     }
 
     @ResponseBody
@@ -116,9 +113,9 @@ class KlagebehandlingVedtakController(
         @PathVariable("klagebehandlingid") klagebehandlingId: String,
         @PathVariable("vedtakid") vedtakId: String,
     ): ResponseEntity<ByteArray> {
-        logMethodDetails("getVedlegg", klagebehandlingId, vedtakId)
+        logMethodDetails("getVedlegg", klagebehandlingId)
         val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId.toUUIDOrException())
-        val vedtak = vedtakService.getVedtak(klagebehandling, vedtakId.toUUIDOrException())
+        val vedtak = vedtakService.getVedtak(klagebehandling)
 
         val arkivertDokumentWithTitle =
             when {
@@ -151,13 +148,12 @@ class KlagebehandlingVedtakController(
             throw BehandlingsidWrongFormatException("Input could not be parsed as an UUID")
         }
 
-    private fun logMethodDetails(methodName: String, klagebehandlingId: String, vedtakId: String) {
+    private fun logMethodDetails(methodName: String, klagebehandlingId: String) {
         logger.debug(
-            "{} is requested by ident {} for klagebehandlingId {} and vedtakId {}",
+            "{} is requested by ident {} for klagebehandlingId {}",
             methodName,
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            klagebehandlingId,
-            vedtakId
+            klagebehandlingId
         )
     }
 }

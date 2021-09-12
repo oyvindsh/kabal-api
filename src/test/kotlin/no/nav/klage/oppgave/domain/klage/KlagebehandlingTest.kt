@@ -28,11 +28,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -44,8 +42,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -59,11 +57,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -75,8 +71,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -90,11 +86,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -112,8 +106,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -136,11 +130,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -152,8 +144,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -176,11 +168,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -197,8 +187,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -221,11 +211,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -242,8 +230,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -266,12 +254,11 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
+
             )
 
             val fasitMottakere = setOf(
@@ -292,8 +279,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -316,11 +303,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -332,8 +317,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
 
@@ -356,11 +341,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        id = vedtakId,
-                        journalpostId = journalpostId
-                    )
+                vedtak = Vedtak(
+                    id = vedtakId,
+                    journalpostId = journalpostId
                 )
             )
 
@@ -377,8 +360,8 @@ internal class KlagebehandlingTest {
                 )
             )
 
-            klagebehandling.lagBrevmottakereForVedtak(vedtakId)
-            val brevMottakere = klagebehandling.getVedtak(vedtakId).brevmottakere
+            klagebehandling.lagBrevmottakereForVedtak()
+            val brevMottakere = klagebehandling.getVedtakOrException().brevmottakere
             assert(brevMottakerSetsAreEqual(fasitMottakere, brevMottakere))
         }
     }

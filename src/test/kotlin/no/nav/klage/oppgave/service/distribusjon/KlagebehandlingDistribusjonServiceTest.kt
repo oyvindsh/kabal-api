@@ -135,12 +135,10 @@ internal class KlagebehandlingDistribusjonServiceTest {
         mottattKlageinstans = LocalDateTime.now(),
         kildesystem = Fagsystem.K9,
         mottakId = mottak.id,
-        vedtak = mutableSetOf(
-            Vedtak(
-                id = vedtakId,
-                journalpostId = "1",
-                utfall = Utfall.MEDHOLD
-            )
+        vedtak = Vedtak(
+            id = vedtakId,
+            journalpostId = "1",
+            utfall = Utfall.MEDHOLD
         )
     )
 
@@ -161,7 +159,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
     fun `distribusjon av klagebehandling fører til dokdistReferanse, ferdig distribuert vedtak og avsluttet klagebehandling`() {
         val dokdistResponse = DistribuerJournalpostResponse(UUID.randomUUID())
 
-        every { dokDistFordelingClient.distribuerJournalpost(any())  } returns dokdistResponse
+        every { dokDistFordelingClient.distribuerJournalpost(any()) } returns dokdistResponse
 
         every { kafkaVedtakEventRepository.save(any()) } returns null
 
@@ -172,7 +170,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
         klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getOne(klagebehandlingId)
-        val resultingVedtak = result.getVedtak(vedtakId)
+        val resultingVedtak = result.getVedtakOrException()
         val brevMottakere = resultingVedtak.brevmottakere
 
         assertThat(brevMottakere.first().dokdistReferanse).isNotNull

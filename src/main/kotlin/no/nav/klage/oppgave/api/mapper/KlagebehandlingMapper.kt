@@ -19,7 +19,6 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
 
 @Service
 class KlagebehandlingMapper(
@@ -83,7 +82,7 @@ class KlagebehandlingMapper(
             modified = klagebehandling.modified,
             created = klagebehandling.created,
             klagebehandlingVersjon = klagebehandling.versjon,
-            vedtak = klagebehandling.vedtak.map { mapVedtakToVedtakView(it) },
+            vedtak = if (klagebehandling.vedtak != null) listOf(mapVedtakToVedtakView(klagebehandling.vedtak)) else emptyList(),
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
                 TilknyttetDokument(
@@ -175,8 +174,8 @@ class KlagebehandlingMapper(
         return KlagebehandlingEditedView(klagebehandling.versjon, klagebehandling.modified)
     }
 
-    fun mapToVedleggEditedView(klagebehandling: Klagebehandling, vedtakId: UUID): VedleggEditedView {
-        val vedtak = klagebehandling.getVedtak(vedtakId)
+    fun mapToVedleggEditedView(klagebehandling: Klagebehandling): VedleggEditedView {
+        val vedtak = klagebehandling.getVedtakOrException()
         return VedleggEditedView(
             klagebehandling.versjon,
             klagebehandling.modified,
@@ -184,11 +183,12 @@ class KlagebehandlingMapper(
         )
     }
 
-    fun mapToVedtakFullfoertView(klagebehandling: Klagebehandling, vedtakId: UUID): VedtakFullfoertView {
+    fun mapToVedtakFullfoertView(klagebehandling: Klagebehandling): VedtakFullfoertView {
+        val vedtak = klagebehandling.getVedtakOrException()
         return VedtakFullfoertView(
             klagebehandling.versjon,
             klagebehandling.modified,
-            klagebehandling.getVedtak(vedtakId).ferdigstiltIJoark!!,
+            vedtak.ferdigstiltIJoark!!,
             klagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
         )
     }

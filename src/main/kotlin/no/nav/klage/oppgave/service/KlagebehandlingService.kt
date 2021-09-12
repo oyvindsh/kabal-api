@@ -111,7 +111,7 @@ class KlagebehandlingService(
         klagebehandlingRepository.findByAvsluttetIsNotNull()
             .filter {
                 it.klager.partId.value == partId &&
-                muligAnkeUtfall.contains(it.vedtak.first().utfall)
+                        muligAnkeUtfall.contains(it.vedtak?.utfall)
             }
             .map { it.toMuligAnke() }
 
@@ -121,7 +121,7 @@ class KlagebehandlingService(
     ): MuligAnke? {
         val klagebehandling = klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
-            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.vedtak.first().utfall)
+            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.vedtak?.utfall)
         ) {
             klagebehandling.toMuligAnke()
         } else {
@@ -279,10 +279,10 @@ class KlagebehandlingService(
     }
 
     private fun validateBeforeMedunderskriver(klagebehandling: Klagebehandling) {
-        if (klagebehandling.vedtak.isEmpty()) {
+        if (klagebehandling.vedtak == null) {
             throw ValidationException("Klagebehandling har ikke vedtak")
         }
-        if (klagebehandling.vedtak.first().utfall == null) {
+        if (klagebehandling.vedtak.utfall == null) {
             throw ValidationException("Utfall er ikke satt på vedtak")
         }
         //TODO validate based on kvalitetsvurdering when that feature is done
@@ -291,7 +291,7 @@ class KlagebehandlingService(
 //                throw ValidationException("Omgjøringsgrunn er ikke satt på vedtak")
 //            }
 //        }
-        if (klagebehandling.vedtak.first().hjemler.isEmpty()) {
+        if (klagebehandling.vedtak.hjemler.isEmpty()) {
             throw ValidationException("Hjemmel er ikke satt på vedtak")
         }
     }
@@ -320,7 +320,7 @@ class KlagebehandlingService(
                 avsluttet = null,
                 frist = mottak.generateFrist(),
                 mottakId = mottak.id,
-                vedtak = mutableSetOf(Vedtak()),
+                vedtak = Vedtak(),
                 kvalitetsvurdering = null,
                 hjemler = createHjemmelSetFromMottak(mottak.hjemmelListe),
                 saksdokumenter = createSaksdokumenter(mottak),
@@ -375,13 +375,11 @@ class KlagebehandlingService(
 //                    mottakerSaksbehandlerident = kvalitetsvurdering.foersteinstansSaksbehandler,
 //                    mottakerEnhet = kvalitetsvurdering.foersteinstansEnhet
 //                ),
-                vedtak = mutableSetOf(
-                    Vedtak(
-                        utfall = kvalitetsvurdering.utfall,
-                        grunn = kvalitetsvurdering.grunn,
-                        journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
-                        hjemler = hjemler
-                    )
+                vedtak = Vedtak(
+                    utfall = kvalitetsvurdering.utfall,
+                    grunn = kvalitetsvurdering.grunn,
+                    journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
+                    hjemler = hjemler
                 )
             )
         )
@@ -583,7 +581,7 @@ class KlagebehandlingService(
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,
         this.tema,
-        this.vedtak.first().utfall!!,
+        this.vedtak?.utfall!!,
         this.innsendt!!,
         this.avsluttetAvSaksbehandler!!,
         this.klager.partId.value

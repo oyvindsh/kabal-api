@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
 import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
+import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.service.StatistikkTilDVHKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
@@ -62,8 +63,7 @@ class StatistikkTilDVHService(
         mottak: Mottak,
         klagebehandlingState: KlagebehandlingState
     ): KlageStatistikkTilDVH {
-        //Only works as long as we only have one
-        val vedtak = klagebehandling.vedtak.firstOrNull()
+        val vedtak = klagebehandling.vedtak ?: throw VedtakNotFoundException("Fant ikke vedtak for klagebehandling ${klagebehandling.id}")
 
         val funksjoneltEndringstidspunkt =
             getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState, vedtak)

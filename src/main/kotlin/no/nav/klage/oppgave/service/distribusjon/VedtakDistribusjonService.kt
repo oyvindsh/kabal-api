@@ -40,7 +40,7 @@ class VedtakDistribusjonService(
                 klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
             val dokdistReferanse: UUID =
                 dokDistFordelingClient.distribuerJournalpost(vedtak.journalpostId!!).bestillingsId
-            setDokdistReferanse(klagebehandling, vedtak.id, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
+            setDokdistReferanse(klagebehandling, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
             return klagebehandling
         } catch (e: Exception) {
             logger.warn("Kunne ikke distribuere journalpost ${vedtak.journalpostId}")
@@ -50,26 +50,24 @@ class VedtakDistribusjonService(
 
     private fun setDokdistReferanse(
         klagebehandling: Klagebehandling,
-        vedtakId: UUID,
         mottakerId: UUID,
         dokdistReferanse: UUID,
         utfoerendeSaksbehandlerIdent: String
     ): Vedtak {
         val event = klagebehandling.setDokdistReferanseInVedtaksmottaker(
-            vedtakId,
             mottakerId,
             dokdistReferanse,
             utfoerendeSaksbehandlerIdent
         )
         applicationEventPublisher.publishEvent(event)
-        return klagebehandling.getVedtak(vedtakId)
+        return klagebehandling.getVedtakOrException()
     }
 
     @Transactional
     fun lagBrevmottakere(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
         logger.debug("Lager brevmottakere for vedtak $vedtakId i klagebehandling ${klagebehandling.id}")
-        klagebehandling.lagBrevmottakereForVedtak(vedtakId)
+        klagebehandling.lagBrevmottakereForVedtak()
         return klagebehandling
     }
 
@@ -86,7 +84,7 @@ class VedtakDistribusjonService(
     @Transactional
     fun markerVedtakSomFerdigDistribuert(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-        val event = klagebehandling.setVedtakFerdigDistribuert(vedtakId, SYSTEMBRUKER)
+        val event = klagebehandling.setVedtakFerdigDistribuert(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
