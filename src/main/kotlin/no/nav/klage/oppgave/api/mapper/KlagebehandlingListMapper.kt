@@ -8,6 +8,9 @@ import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponseList
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Service
 class KlagebehandlingListMapper {
@@ -72,7 +75,7 @@ class KlagebehandlingListMapper {
                 tema = esKlagebehandling.tema,
                 hjemmel = esKlagebehandling.hjemler.firstOrNull(),
                 frist = esKlagebehandling.frist,
-                mottatt = esKlagebehandling.mottattKlageinstans?.toLocalDate(),
+                mottatt = esKlagebehandling.mottattKlageinstans.toLocalDate(),
                 versjon = esKlagebehandling.versjon!!.toInt(),
                 klagebehandlingVersjon = esKlagebehandling.versjon,
                 harMedunderskriver = esKlagebehandling.medunderskriverident != null,
@@ -94,9 +97,11 @@ class KlagebehandlingListMapper {
                 saksbehandlerHarTilgang = tilgangTilTemaer.contains(Tema.of(esKlagebehandling.tema)),
                 egenAnsatt = esKlagebehandling.egenAnsatt,
                 fortrolig = esKlagebehandling.fortrolig,
-                strengtFortrolig = esKlagebehandling.strengtFortrolig
+                strengtFortrolig = esKlagebehandling.strengtFortrolig,
+                ageKA = esKlagebehandling.mottattKlageinstans.toAgeInDays()
             )
         }
     }
-}
 
+    private fun LocalDateTime.toAgeInDays() = ChronoUnit.DAYS.between(this.toLocalDate(), LocalDate.now()).toInt()
+}
