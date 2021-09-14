@@ -82,7 +82,7 @@ data class EsKlagebehandling(
     val avsenderEnhetFoersteinstans: String? = null,
 
     @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val mottattKlageinstans: LocalDateTime?,
+    val mottattKlageinstans: LocalDateTime,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val tildelt: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)

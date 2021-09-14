@@ -3,22 +3,22 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
 import no.nav.klage.oppgave.api.view.VedtakSlettVedleggInput
 import no.nav.klage.oppgave.api.view.VedtakVedleggInput
-import no.nav.klage.oppgave.clients.joark.JoarkClient
-import no.nav.klage.oppgave.clients.saf.graphql.Journalstatus.FERDIGSTILT
-import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setGrunnInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdOgOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdOgOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigstiltIJoark
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakAvsluttetAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Grunn
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
-import no.nav.klage.oppgave.exceptions.*
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
+import no.nav.klage.oppgave.exceptions.UtfallNotSetException
+import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
+import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
+import no.nav.klage.oppgave.gateway.JournalpostGateway
 import no.nav.klage.oppgave.util.AttachmentValidator
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -33,10 +33,9 @@ class VedtakService(
     private val klagebehandlingService: KlagebehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val attachmentValidator: AttachmentValidator,
-    private val joarkClient: JoarkClient,
-    private val safClient: SafGraphQlClient,
     private val tilgangService: TilgangService,
-    private val fileApiService: FileApiService
+    private val fileApiService: FileApiService,
+    private val journalpostGateway: JournalpostGateway
 ) {
 
     companion object {
@@ -46,89 +45,84 @@ class VedtakService(
     }
 
     @Transactional(readOnly = true)
-    fun getVedtak(klagebehandling: Klagebehandling): Vedtak {
-        return klagebehandling.vedtak
-            ?: throw VedtakNotFoundException("Fant ikke vedtak for klagebehandling ${klagebehandling.id}")
+    fun getVedtak(klagebehandling: Klagebehandling, vedtakId: UUID): Vedtak {
+        return klagebehandling.getVedtak(vedtakId)
     }
 
     fun setUtfall(
         klagebehandling: Klagebehandling,
+        vedtakId: UUID,
         utfall: Utfall?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setUtfallInVedtak(utfall, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setUtfallInVedtak(vedtakId, utfall, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun setGrunn(
         klagebehandling: Klagebehandling,
+        vedtakId: UUID,
         grunn: Grunn?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setGrunnInVedtak(grunn, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setGrunnInVedtak(vedtakId, grunn, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun setHjemler(
         klagebehandling: Klagebehandling,
+        vedtakId: UUID,
         hjemler: Set<Hjemmel>,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setHjemlerInVedtak(hjemler, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setHjemlerInVedtak(vedtakId, hjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun setJournalpostIdOgOpplastet(
         klagebehandling: Klagebehandling,
+        vedtakId: UUID,
         journalpostId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setJournalpostIdOgOpplastetInVedtak(journalpostId, utfoerendeSaksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    fun setJournalpostId(
-        klagebehandling: Klagebehandling,
-        journalpostId: String?,
-        utfoerendeSaksbehandlerIdent: String
-    ): Klagebehandling {
-        val event =
-            klagebehandling.setJournalpostIdInVedtak(journalpostId, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setJournalpostIdOgOpplastetInVedtak(vedtakId, journalpostId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun setMellomlagerIdOgOpplastet(
         klagebehandling: Klagebehandling,
+        vedtakId: UUID,
         mellomlagerId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setMellomlagerIdOgOpplastetInVedtak(mellomlagerId, utfoerendeSaksbehandlerIdent)
+            klagebehandling.setMellomlagerIdOgOpplastetInVedtak(vedtakId, mellomlagerId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
-    fun markerVedtakSomFerdigstilt(
+    fun markerVedtakSomAvsluttetAvSaksbehandler(
         klagebehandling: Klagebehandling,
+        vedtakId: UUID,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setVedtakFerdigstiltIJoark(utfoerendeSaksbehandlerIdent)
+            klagebehandling.setVedtakAvsluttetAvSaksbehandler(vedtakId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
     fun slettFilTilknyttetVedtak(
         klagebehandlingId: UUID,
+        vedtakId: UUID,
         input: VedtakSlettVedleggInput,
         innloggetIdent: String
     ): Klagebehandling {
@@ -140,7 +134,7 @@ class VedtakService(
         //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
-        val vedtak = klagebehandling.getVedtakOrException()
+        val vedtak = klagebehandling.getVedtak(vedtakId)
 
         if (vedtak.mellomlagerId == null && vedtak.journalpostId == null) {
             return klagebehandling
@@ -167,6 +161,7 @@ class VedtakService(
 
     fun knyttVedtaksFilTilVedtak(
         klagebehandlingId: UUID,
+        vedtakId: UUID,
         input: VedtakVedleggInput,
         innloggetIdent: String
     ): Klagebehandling {
@@ -178,9 +173,9 @@ class VedtakService(
         //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
-        val vedtak = klagebehandling.getVedtakOrException()
+        val vedtak = klagebehandling.getVedtak(vedtakId)
 
-        if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id ${klagebehandling.vedtak?.id} er ferdigstilt")
+        if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er ferdigstilt")
 
         if (vedtak.journalpostId != null) {
             kansellerJournalpost(
@@ -204,6 +199,7 @@ class VedtakService(
 
         return setMellomlagerIdOgOpplastet(
             klagebehandling,
+            vedtak.id,
             mellomlagerId,
             innloggetIdent
         )
@@ -211,6 +207,7 @@ class VedtakService(
 
     fun ferdigstillVedtak(
         klagebehandlingId: UUID,
+        vedtakId: UUID,
         input: VedtakFullfoerInput,
         innloggetIdent: String
     ): Klagebehandling {
@@ -229,62 +226,22 @@ class VedtakService(
             throw MissingTilgangException("Vedtak kan kun ferdigstilles av medunderskriver")
         }
 
-        val vedtak = klagebehandling.getVedtakOrException()
-        if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id ${vedtak.id} er allerede ferdigstilt")
+        val vedtak = klagebehandling.getVedtak(vedtakId)
+        if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id $vedtakId er allerede ferdigstilt")
 
-        if (vedtak.journalpostId == null) {
-            if (vedtak.mellomlagerId == null) throw DocumentNotFoundInStorageException("Vedtak med id ${vedtak.id} er ikke lastet opp")
-            opprettVedtakJournalpost(klagebehandling, vedtak, innloggetIdent)
-            slettMellomlagretDokument(klagebehandling, vedtak, innloggetIdent)
+        if (vedtak.mellomlagerId == null && vedtak.journalpostId != null) {
+            //Dette gjelder edge-case der noen har påbegynt en klagebehandling før vi innførte mellomlager.
+            throw VedtakNotFoundException("Vennligst last opp vedtak på nytt")
         }
 
-        if (vedtak.utfall == null) throw UtfallNotSetException("Utfall på vedtak ${vedtak.id} er ikke satt")
+        if (vedtak.utfall == null) throw UtfallNotSetException("Utfall på vedtak $vedtakId er ikke satt")
 
-        ferdigstillJournalpost(
-            klagebehandling,
-            vedtak,
-            innloggetIdent,
-            klagebehandling.tildeling!!.enhet!!
-        )
-        if (klagebehandling.vedtak?.ferdigstiltIJoark != null) {
+        markerVedtakSomAvsluttetAvSaksbehandler(klagebehandling, vedtakId, innloggetIdent)
+
+        if (klagebehandling.vedtak.all { it.avsluttetAvSaksbehandler != null }) {
             klagebehandlingService.markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
         }
         return klagebehandling
-    }
-
-    private fun opprettVedtakJournalpost(
-        klagebehandling: Klagebehandling,
-        vedtak: Vedtak,
-        utfoerendeSaksbehandlerIdent: String
-    ): Klagebehandling {
-        val documentInStorage = fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
-        val journalpostId =
-            joarkClient.createJournalpost(klagebehandling, klagebehandling.tildeling!!.enhet!!, documentInStorage)
-        return setJournalpostId(
-            klagebehandling,
-            journalpostId,
-            utfoerendeSaksbehandlerIdent
-        )
-    }
-
-    private fun ferdigstillJournalpost(
-        klagebehandling: Klagebehandling,
-        vedtak: Vedtak,
-        utfoerendeSaksbehandlerIdent: String,
-        journalfoerendeEnhet: String
-    ): Klagebehandling {
-        return try {
-            val journalpost = safClient.getJournalpostAsSaksbehandler(vedtak.journalpostId!!)
-                ?: throw JournalpostNotFoundException("Journalpost med id ${vedtak.journalpostId} finnes ikke")
-            if (journalpost.journalstatus != FERDIGSTILT) {
-                joarkClient.finalizeJournalpost(vedtak.journalpostId!!, journalfoerendeEnhet)
-            }
-            markerVedtakSomFerdigstilt(klagebehandling, utfoerendeSaksbehandlerIdent)
-
-        } catch (e: Exception) {
-            logger.warn("Kunne ikke ferdigstille journalpost ${vedtak.journalpostId}")
-            throw JournalpostFinalizationException("Klarte ikke å journalføre vedtak")
-        }
     }
 
     private fun kansellerJournalpost(
@@ -293,16 +250,17 @@ class VedtakService(
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         if (vedtak.journalpostId != null) {
-            joarkClient.cancelJournalpost(vedtak.journalpostId!!)
+            journalpostGateway.cancelJournalpost(vedtak.journalpostId!!)
         }
         return setJournalpostIdOgOpplastet(
             klagebehandling,
+            vedtak.id,
             null,
             utfoerendeSaksbehandlerIdent
         )
     }
 
-    private fun slettMellomlagretDokument(
+    fun slettMellomlagretDokument(
         klagebehandling: Klagebehandling,
         vedtak: Vedtak,
         utfoerendeSaksbehandlerIdent: String
@@ -312,6 +270,7 @@ class VedtakService(
         }
         return setMellomlagerIdOgOpplastet(
             klagebehandling,
+            vedtak.id,
             null,
             utfoerendeSaksbehandlerIdent
         )

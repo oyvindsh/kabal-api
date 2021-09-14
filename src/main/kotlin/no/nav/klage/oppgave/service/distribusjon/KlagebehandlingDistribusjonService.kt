@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.service.distribusjon
 
-import no.nav.klage.oppgave.domain.klage.BrevMottaker
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -16,13 +14,16 @@ import java.util.*
 class KlagebehandlingDistribusjonService(
     private val klagebehandlingService: KlagebehandlingService,
     private val vedtakDistribusjonService: VedtakDistribusjonService,
-    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService
+    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService,
+    private val vedtakJournalfoeringService: VedtakJournalfoeringService
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+        const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
+        const val SYSTEM_JOURNALFOERENDE_ENHET = "9999"
     }
 
     @Transactional(propagation = Propagation.NEVER)
@@ -30,28 +31,29 @@ class KlagebehandlingDistribusjonService(
         try {
             var klagebehandling =
                 klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-            val vedtak = klagebehandling.vedtak
-            if (vedtak?.erIkkeFerdigDistribuert() == true) {
+            klagebehandling.vedtak
+                .filter { vedtak -> vedtak.erIkkeFerdigDistribuert() }
+                .forEach { vedtak ->
+                    logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert")
 
-                logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert")
+                    klagebehandling = lagBrevmottakere(klagebehandling, vedtak.id)
+                    val brevmottakere = klagebehandling.getVedtak(vedtak.id).brevmottakere
+                    brevmottakere
+                        .filter { brevMottaker -> brevMottaker.erIkkeDistribuertTil() }
+                        .forEach { brevMottaker ->
+                            logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert til brevmottaker ${brevMottaker.id}")
 
-                klagebehandling = lagBrevmottakere(klagebehandling, vedtak.id)
-                val brevmottakere = klagebehandling.getVedtakOrException().brevmottakere
-                brevmottakere
-                    .filter { brevMottaker -> brevMottaker.erIkkeDistribuertTil() }
-                    .forEach { brevMottaker ->
-                        logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert til brevmottaker ${brevMottaker.id}")
+                            opprettJournalpostForBrevMottaker(klagebehandling.id, vedtak.id, brevMottaker.id)
+                            ferdigstillJournalpostForBrevMottaker(klagebehandling.id, vedtak.id, brevMottaker.id)
+                            distribuerVedtakTilBrevmottaker(klagebehandling.id, vedtak.id, brevMottaker.id)
+                        }
 
-                        klagebehandling =
-                            lagJournalpostKopierForSekundaereMottakere(klagebehandling, brevMottaker)
+                    slettMellomlagretDokument(klagebehandling.id, vedtak.id)
 
-                        klagebehandling = distribuerVedtakTilBrevmottaker(klagebehandling, vedtak.id, brevMottaker)
-                    }
+                    markerVedtakSomFerdigDistribuert(klagebehandling.id, vedtak.id)
+                }
 
-                klagebehandling = markerVedtakSomFerdigDistribuert(klagebehandling, vedtak.id)
-            }
-
-            avsluttKlagebehandling(klagebehandling)
+            avsluttKlagebehandling(klagebehandling.id)
         } catch (e: Exception) {
             logger.error("Feilet under distribuering av klagebehandling $klagebehandlingId", e)
         }
@@ -61,7 +63,7 @@ class KlagebehandlingDistribusjonService(
         klagebehandling: Klagebehandling,
         vedtakId: UUID
     ): Klagebehandling {
-        val vedtak = klagebehandling.getVedtakOrException()
+        val vedtak = klagebehandling.getVedtak(vedtakId)
         if (vedtak.harIngenBrevMottakere()) {
             logger.debug("Vedtak $vedtakId i klagebehandling ${klagebehandling.id} har ingen brevmottakere, vi oppretter det")
             return vedtakDistribusjonService.lagBrevmottakere(klagebehandling.id, vedtakId)
@@ -69,53 +71,64 @@ class KlagebehandlingDistribusjonService(
         return klagebehandling
     }
 
-    private fun lagJournalpostKopierForSekundaereMottakere(
-        klagebehandling: Klagebehandling,
-        brevMottaker: BrevMottaker
+    private fun opprettJournalpostForBrevMottaker(
+        klagebehandlingId: UUID,
+        vedtakId: UUID,
+        brevMottakerId: UUID
     ): Klagebehandling {
-        val vedtak = klagebehandling.getVedtakOrException()
-        logger.debug("Starter distribusjon av vedtak ${vedtak.id} i klagebehandling ${klagebehandling.id} til brevmottaker ${brevMottaker.id}")
-        if (brevMottaker.erIkkeHovedMottakerAv(vedtak)) {
-            logger.debug("Brevmottaker ${brevMottaker.id} i vedtak ${vedtak.id} i klagebehandling ${klagebehandling.id} er ikke hovedmottaker, så vi må opprette en ny journalpost")
-            return vedtakDistribusjonService.lagKopiAvJournalpostForMottaker(klagebehandling, vedtak, brevMottaker)
-        }
-        return klagebehandling
+        return vedtakJournalfoeringService.opprettJournalpostForBrevMottaker(
+            klagebehandlingId,
+            vedtakId,
+            brevMottakerId
+        )
+    }
+
+    private fun ferdigstillJournalpostForBrevMottaker(
+        klagebehandlingId: UUID,
+        vedtakId: UUID,
+        brevMottakerId: UUID
+    ): Klagebehandling {
+        return vedtakJournalfoeringService.ferdigstillJournalpostForBrevMottaker(
+            klagebehandlingId,
+            vedtakId,
+            brevMottakerId
+        )
     }
 
     private fun distribuerVedtakTilBrevmottaker(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         vedtakId: UUID,
-        brevMottaker: BrevMottaker
+        brevMottakerId: UUID
     ): Klagebehandling {
-        val vedtak = klagebehandling.getVedtakOrException()
-        logger.debug("Distribuerer vedtak ${vedtakId} i klagebehandling ${klagebehandling.id} til brevmottaker ${brevMottaker.id}")
+        logger.debug("Distribuerer vedtak ${vedtakId} i klagebehandling ${klagebehandlingId} til brevmottaker ${brevMottakerId}")
         return vedtakDistribusjonService.distribuerJournalpostTilMottaker(
-            klagebehandling.id, vedtak, brevMottaker
+            klagebehandlingId, vedtakId, brevMottakerId
+        )
+    }
+
+    fun slettMellomlagretDokument(
+        klagebehandlingId: UUID,
+        vedtakId: UUID,
+    ): Klagebehandling {
+        logger.debug("Sletter mellomlagret fil i vedtak ${vedtakId} i klagebehandling${klagebehandlingId}")
+        return vedtakDistribusjonService.slettMellomlagretDokument(
+            klagebehandlingId,
+            vedtakId
         )
     }
 
     private fun markerVedtakSomFerdigDistribuert(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         vedtakId: UUID
     ): Klagebehandling {
-        val vedtak = klagebehandling.getVedtakOrException()
-        logger.debug("Markerer vedtak ${vedtak.id} i klagebehandling ${klagebehandling.id} som ferdig distribuert")
-        return vedtakDistribusjonService.markerVedtakSomFerdigDistribuert(klagebehandling.id, vedtak.id)
+        logger.debug("Markerer vedtak ${vedtakId} i klagebehandling ${klagebehandlingId} som ferdig distribuert")
+        return vedtakDistribusjonService.markerVedtakSomFerdigDistribuert(klagebehandlingId, vedtakId)
     }
 
-    private fun avsluttKlagebehandling(klagebehandling: Klagebehandling) {
-        logger.debug("Alle vedtak i klagebehandling ${klagebehandling.id} er ferdig distribuert, så vi markerer klagebehandlingen som avsluttet")
-        klagebehandlingAvslutningService.avsluttKlagebehandling(klagebehandling.id)
+    private fun avsluttKlagebehandling(klagebehandlingId: UUID) {
+        logger.debug("Alle vedtak i klagebehandling ${klagebehandlingId} er ferdig distribuert, så vi markerer klagebehandlingen som avsluttet")
+        klagebehandlingAvslutningService.avsluttKlagebehandling(klagebehandlingId)
     }
-
-    private fun BrevMottaker.erIkkeDistribuertTil() = this.dokdistReferanse == null
-
-    private fun BrevMottaker.erIkkeHovedMottakerAv(vedtak: Vedtak) = this.journalpostId != vedtak.journalpostId
-
-    private fun Vedtak.erIkkeFerdigDistribuert() = ferdigDistribuert == null
-
-    private fun Vedtak.harIngenBrevMottakere(): Boolean =
-        brevmottakere.isEmpty()
 }
 
 
