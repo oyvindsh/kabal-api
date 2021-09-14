@@ -182,12 +182,10 @@ internal class KlagebehandlingDistribusjonServiceTest {
         mottattKlageinstans = LocalDateTime.now(),
         kildesystem = Fagsystem.K9,
         mottakId = mottak.id,
-        vedtak = mutableSetOf(
-            Vedtak(
-                id = vedtakId,
-                utfall = Utfall.MEDHOLD,
-                mellomlagerId = "123"
-            )
+        vedtak = Vedtak(
+            id = vedtakId,
+            utfall = Utfall.MEDHOLD,
+            mellomlagerId = "123"
         )
     )
 
@@ -216,7 +214,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         every { journalpostGateway.createJournalpostAsSystemUser(any(), any(), any()) } returns dokarkivResponse
 
-        every { dokDistFordelingClient.distribuerJournalpost(any())  } returns dokdistResponse
+        every { dokDistFordelingClient.distribuerJournalpost(any()) } returns dokdistResponse
 
         every { kafkaVedtakEventRepository.save(any()) } returns null
 
@@ -231,7 +229,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
         klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getOne(klagebehandlingId)
-        val resultingVedtak = result.getVedtak(vedtakId)
+        val resultingVedtak = result.getVedtakOrException()
         val brevMottaker = resultingVedtak.brevmottakere.first()
 
         assertThat(brevMottaker.dokdistReferanse).isNotNull

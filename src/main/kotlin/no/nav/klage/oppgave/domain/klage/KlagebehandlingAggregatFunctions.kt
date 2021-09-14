@@ -223,11 +223,10 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setGrunnInVedtak(
-        vedtakId: UUID,
         nyVerdi: Grunn?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.grunn
         val tidspunkt = LocalDateTime.now()
         vedtak.grunn = nyVerdi
@@ -245,11 +244,10 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setHjemlerInVedtak(
-        vedtakId: UUID,
         nyVerdi: Set<Hjemmel>,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.hjemler
         val tidspunkt = LocalDateTime.now()
         vedtak.hjemler = nyVerdi.toMutableSet()
@@ -520,11 +518,10 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setUtfallInVedtak(
-        vedtakId: UUID,
         nyVerdi: Utfall?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.utfall
         val tidspunkt = LocalDateTime.now()
         vedtak.utfall = nyVerdi
@@ -542,12 +539,11 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setJournalpostIdInBrevmottaker(
-        vedtakId: UUID,
         mottakerId: UUID,
         nyVerdi: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val mottaker = vedtak.getMottaker(mottakerId)
         val gammelVerdi = mottaker.journalpostId
         val tidspunkt = LocalDateTime.now()
@@ -568,11 +564,10 @@ object KlagebehandlingAggregatFunctions {
 
     //Brukes bare for å slette gamle journalposter på vedtak
     fun Klagebehandling.setJournalpostIdOgOpplastetInVedtak(
-        vedtakId: UUID,
         nyVerdi: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.journalpostId
         val tidspunkt = LocalDateTime.now()
         val gammelVerdiOpplastet = vedtak.opplastet
@@ -600,11 +595,10 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setMellomlagerIdInVedtak(
-        vedtakId: UUID,
         nyVerdi: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.mellomlagerId
         val tidspunkt = LocalDateTime.now()
         vedtak.mellomlagerId = nyVerdi
@@ -623,11 +617,10 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setMellomlagerIdOgOpplastetInVedtak(
-        vedtakId: UUID,
         nyVerdi: String?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.mellomlagerId
         val tidspunkt = LocalDateTime.now()
         val gammelVerdiOpplastet = vedtak.opplastet
@@ -655,10 +648,9 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setVedtakFerdigDistribuert(
-        vedtakId: UUID,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.ferdigDistribuert
         val tidspunkt = LocalDateTime.now()
         val nyVerdi = tidspunkt
@@ -677,11 +669,10 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setBrevMottakerFerdigstiltIJoark(
-        vedtakId: UUID,
         brevMottakerId: UUID,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val brevMottaker = vedtak.getMottaker(brevMottakerId)
         val gammelVerdi = brevMottaker.ferdigstiltIJoark
         val tidspunkt = LocalDateTime.now()
@@ -701,10 +692,9 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setVedtakAvsluttetAvSaksbehandler(
-        vedtakId: UUID,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.avsluttetAvSaksbehandler
         val tidspunkt = LocalDateTime.now()
         val nyVerdi = tidspunkt
@@ -761,12 +751,11 @@ object KlagebehandlingAggregatFunctions {
     }
 
     fun Klagebehandling.setDokdistReferanseInVedtaksmottaker(
-        vedtakId: UUID,
         mottakerId: UUID,
         nyVerdi: UUID,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtak(vedtakId)
+        val vedtak = this.getVedtakOrException()
         val mottaker = vedtak.getMottaker(mottakerId)
         val gammelVerdi = mottaker.dokdistReferanse
         val tidspunkt = LocalDateTime.now()

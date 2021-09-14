@@ -31,21 +31,20 @@ class KlagebehandlingDistribusjonService(
         try {
             var klagebehandling =
                 klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-            klagebehandling.vedtak
-                .filter { vedtak -> vedtak.erIkkeFerdigDistribuert() }
-                .forEach { vedtak ->
+            if (klagebehandling.vedtak?.erIkkeFerdigDistribuert() == true) {
+                klagebehandling.vedtak?.let { vedtak ->
                     logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert")
 
                     klagebehandling = lagBrevmottakere(klagebehandling, vedtak.id)
-                    val brevmottakere = klagebehandling.getVedtak(vedtak.id).brevmottakere
+                    val brevmottakere = klagebehandling.getVedtakOrException().brevmottakere
                     brevmottakere
                         .filter { brevMottaker -> brevMottaker.erIkkeDistribuertTil() }
                         .forEach { brevMottaker ->
                             logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert til brevmottaker ${brevMottaker.id}")
 
-                            opprettJournalpostForBrevMottaker(klagebehandling.id, vedtak.id, brevMottaker.id)
-                            ferdigstillJournalpostForBrevMottaker(klagebehandling.id, vedtak.id, brevMottaker.id)
-                            distribuerVedtakTilBrevmottaker(klagebehandling.id, vedtak.id, brevMottaker.id)
+                            opprettJournalpostForBrevMottaker(klagebehandling.id, brevMottaker.id)
+                            ferdigstillJournalpostForBrevMottaker(klagebehandling.id, brevMottaker.id)
+                            distribuerVedtakTilBrevmottaker(klagebehandling.id, brevMottaker.id)
                         }
 
                     slettMellomlagretDokument(klagebehandling.id, vedtak.id)
@@ -53,7 +52,8 @@ class KlagebehandlingDistribusjonService(
                     markerVedtakSomFerdigDistribuert(klagebehandling.id, vedtak.id)
                 }
 
-            avsluttKlagebehandling(klagebehandling.id)
+                avsluttKlagebehandling(klagebehandling.id)
+            }
         } catch (e: Exception) {
             logger.error("Feilet under distribuering av klagebehandling $klagebehandlingId", e)
         }
@@ -63,7 +63,7 @@ class KlagebehandlingDistribusjonService(
         klagebehandling: Klagebehandling,
         vedtakId: UUID
     ): Klagebehandling {
-        val vedtak = klagebehandling.getVedtak(vedtakId)
+        val vedtak = klagebehandling.getVedtakOrException()
         if (vedtak.harIngenBrevMottakere()) {
             logger.debug("Vedtak $vedtakId i klagebehandling ${klagebehandling.id} har ingen brevmottakere, vi oppretter det")
             return vedtakDistribusjonService.lagBrevmottakere(klagebehandling.id, vedtakId)
@@ -73,36 +73,31 @@ class KlagebehandlingDistribusjonService(
 
     private fun opprettJournalpostForBrevMottaker(
         klagebehandlingId: UUID,
-        vedtakId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
         return vedtakJournalfoeringService.opprettJournalpostForBrevMottaker(
             klagebehandlingId,
-            vedtakId,
             brevMottakerId
         )
     }
 
     private fun ferdigstillJournalpostForBrevMottaker(
         klagebehandlingId: UUID,
-        vedtakId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
         return vedtakJournalfoeringService.ferdigstillJournalpostForBrevMottaker(
             klagebehandlingId,
-            vedtakId,
             brevMottakerId
         )
     }
 
     private fun distribuerVedtakTilBrevmottaker(
         klagebehandlingId: UUID,
-        vedtakId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
-        logger.debug("Distribuerer vedtak ${vedtakId} i klagebehandling ${klagebehandlingId} til brevmottaker ${brevMottakerId}")
+        logger.debug("Distribuerer vedtak i klagebehandling ${klagebehandlingId} til brevmottaker ${brevMottakerId}")
         return vedtakDistribusjonService.distribuerJournalpostTilMottaker(
-            klagebehandlingId, vedtakId, brevMottakerId
+            klagebehandlingId, brevMottakerId
         )
     }
 
