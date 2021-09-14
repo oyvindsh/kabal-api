@@ -89,23 +89,21 @@ class EsKlagebehandlingMapper(
             modified = klagebehandling.modified,
             kilde = klagebehandling.kildesystem.id,
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
-            vedtak = if (klagebehandling.vedtak != null) {
-                listOf(klagebehandling.vedtak.let { vedtak ->
-                    EsVedtak(
-                        utfall = vedtak.utfall?.id,
-                        grunn = vedtak.grunn?.id,
-                        hjemler = vedtak.hjemler.map { hjemmel -> hjemmel.id },
-                        brevmottakerFnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.PERSON }
-                            .map { it.partId.value },
-                        brevmottakerOrgnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.VIRKSOMHET }
-                            .map { it.partId.value },
-                        journalpostId = vedtak.journalpostId,
-                        created = vedtak.created,
-                        modified = vedtak.modified,
-                        ferdigstiltIJoark = vedtak.ferdigstiltIJoark
-                    )
-                })
-            } else emptyList(),
+            vedtak = klagebehandling.vedtak?.let { vedtak ->
+                EsVedtak(
+                    utfall = vedtak.utfall?.id,
+                    grunn = vedtak.grunn?.id,
+                    hjemler = vedtak.hjemler.map { hjemmel -> hjemmel.id },
+                    brevmottakerFnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.PERSON }
+                        .map { it.partId.value },
+                    brevmottakerOrgnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.VIRKSOMHET }
+                        .map { it.partId.value },
+                    journalpostId = vedtak.journalpostId,
+                    created = vedtak.created,
+                    modified = vedtak.modified,
+                    ferdigstiltIJoark = vedtak.ferdigstiltIJoark
+                )
+            },
             saksdokumenter = klagebehandling.saksdokumenter.map { EsSaksdokument(it.journalpostId, it.dokumentInfoId) },
             saksdokumenterJournalpostId = klagebehandling.saksdokumenter.map { it.journalpostId },
             saksdokumenterJournalpostIdOgDokumentInfoId = klagebehandling.saksdokumenter.map {
