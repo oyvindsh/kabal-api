@@ -4,6 +4,5 @@ ALTER TABLE klage.klagebehandling
 UPDATE klage.klagebehandling k
 SET vedtak_id = (SELECT v.id FROM klage.vedtak v WHERE v.klagebehandling_id = k.id);
 
--- TODO Wait until we know everything works as expected
--- ALTER TABLE klage.vedtak
---     DROP COLUMN klagebehandling_id;
+ALTER TABLE klage.vedtak
+    DROP COLUMN klagebehandling_id;
