@@ -37,12 +37,11 @@ class VedtakJournalfoeringService(
 
     fun opprettJournalpostForBrevMottaker(
         klagebehandlingId: UUID,
-        vedtakId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
 
-        val vedtak = klagebehandling.getVedtak(vedtakId)
+        val vedtak = klagebehandling.getVedtakOrException()
         val brevMottaker = vedtak.getMottaker(brevMottakerId)
         val documentInStorage = fileApiService.getUploadedDocumentAsSystemUser(vedtak.mellomlagerId!!)
         if (brevMottaker.journalpostId == null) {
@@ -54,7 +53,6 @@ class VedtakJournalfoeringService(
 
             val event =
                 klagebehandling.setJournalpostIdInBrevmottaker(
-                    vedtakId,
                     brevMottakerId,
                     journalpostId,
                     SYSTEMBRUKER
@@ -66,11 +64,10 @@ class VedtakJournalfoeringService(
 
     fun ferdigstillJournalpostForBrevMottaker(
         klagebehandlingId: UUID,
-        vedtakId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-        val vedtak = klagebehandling.getVedtak(vedtakId)
+        val vedtak = klagebehandling.getVedtakOrException()
         val brevMottaker = vedtak.getMottaker(brevMottakerId)
 
         try {
@@ -86,7 +83,6 @@ class VedtakJournalfoeringService(
 
         val event =
             klagebehandling.setBrevMottakerFerdigstiltIJoark(
-                vedtakId,
                 brevMottakerId,
                 SYSTEMBRUKER
             )

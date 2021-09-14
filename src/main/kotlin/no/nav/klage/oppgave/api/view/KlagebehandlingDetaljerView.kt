@@ -35,6 +35,7 @@ data class KlagebehandlingDetaljerView(
     val created: LocalDateTime,
     val fraSaksbehandlerident: String? = null,
     val klagebehandlingVersjon: Long,
+    //TODO remove list when frontend is ready, and replace with only one vedtak
     val vedtak: List<VedtakView>,
     val kommentarFraFoersteinstans: String?,
     val tilknyttedeDokumenter: Set<TilknyttetDokument>,

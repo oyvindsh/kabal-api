@@ -91,9 +91,9 @@ class Klagebehandling(
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val vedtak: MutableSet<Vedtak> = mutableSetOf(),
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "vedtak_id", referencedColumnName = "id")
+    val vedtak: Vedtak? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
@@ -135,13 +135,12 @@ class Klagebehandling(
         }
     }
 
-    fun getVedtak(vedtakId: UUID): Vedtak {
-        return vedtak.firstOrNull { it.id == vedtakId }
-            ?: throw VedtakNotFoundException("Vedtak med id $vedtakId ikke funnet")
+    fun getVedtakOrException(): Vedtak {
+        return vedtak ?: throw VedtakNotFoundException("Vedtak ikke funnet for klagebehandling $id")
     }
 
-    fun lagBrevmottakereForVedtak(vedtakId: UUID) {
-        val vedtak = getVedtak(vedtakId)
+    fun lagBrevmottakereForVedtak() {
+        val vedtak = getVedtakOrException()
         val klager = klager
         if (klager.prosessfullmektig != null) {
             vedtak.leggTilProsessfullmektigSomBrevmottaker(klager.prosessfullmektig)

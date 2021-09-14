@@ -159,8 +159,11 @@
     "kommentarFraFoersteinstans": {
       "type": "text"
     },
+    "internVurdering": {
+      "type": "text"
+    },
     "vedtak": {
-      "type": "nested",
+      "type": "object",
       "properties": {
         "utfall": {
           "type": "keyword"

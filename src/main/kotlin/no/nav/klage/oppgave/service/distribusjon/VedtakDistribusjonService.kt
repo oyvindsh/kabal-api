@@ -1,18 +1,10 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import no.nav.klage.oppgave.clients.dokdistfordeling.DokDistFordelingClient
-import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
-import no.nav.klage.oppgave.domain.joark.DokumentStatus
-import no.nav.klage.oppgave.domain.klage.BrevMottaker
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokdistReferanseInVedtaksmottaker
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setJournalpostIdInBrevmottaker
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdOgOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigDistribuert
-import no.nav.klage.oppgave.domain.klage.Vedtak
-import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
-import no.nav.klage.oppgave.gateway.JournalpostGateway
 import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
@@ -41,17 +33,16 @@ class VedtakDistribusjonService(
 
     fun distribuerJournalpostTilMottaker(
         klagebehandlingId: UUID,
-        vedtakId: UUID,
         mottakerId: UUID
     ): Klagebehandling {
         val klagebehandling =
             klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-        val vedtak = klagebehandling.getVedtak(vedtakId)
+        val vedtak = klagebehandling.getVedtakOrException()
         val mottaker = vedtak.getMottaker(mottakerId)
         try {
             val dokdistReferanse: UUID =
                 dokDistFordelingClient.distribuerJournalpost(mottaker.journalpostId!!).bestillingsId
-            return setDokdistReferanse(klagebehandling, vedtak.id, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
+            return setDokdistReferanse(klagebehandling, mottaker.id, dokdistReferanse, SYSTEMBRUKER)
         } catch (e: Exception) {
             logger.warn("Kunne ikke distribuere journalpost ${mottaker.journalpostId}")
             throw e
@@ -60,13 +51,11 @@ class VedtakDistribusjonService(
 
     private fun setDokdistReferanse(
         klagebehandling: Klagebehandling,
-        vedtakId: UUID,
         mottakerId: UUID,
         dokdistReferanse: UUID,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event = klagebehandling.setDokdistReferanseInVedtaksmottaker(
-            vedtakId,
             mottakerId,
             dokdistReferanse,
             utfoerendeSaksbehandlerIdent
@@ -79,13 +68,13 @@ class VedtakDistribusjonService(
     fun lagBrevmottakere(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
         logger.debug("Lager brevmottakere for vedtak $vedtakId i klagebehandling ${klagebehandling.id}")
-        klagebehandling.lagBrevmottakereForVedtak(vedtakId)
+        klagebehandling.lagBrevmottakereForVedtak()
         return klagebehandling
     }
 
     fun markerVedtakSomFerdigDistribuert(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-        val event = klagebehandling.setVedtakFerdigDistribuert(vedtakId, SYSTEMBRUKER)
+        val event = klagebehandling.setVedtakFerdigDistribuert(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -95,9 +84,9 @@ class VedtakDistribusjonService(
         vedtakId: UUID
     ): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
-        val vedtak = klagebehandling.getVedtak(vedtakId)
+        val vedtak = klagebehandling.getVedtakOrException()
         fileApiService.deleteDocumentAsSystemUser(vedtak.mellomlagerId!!)
-        val event = klagebehandling.setMellomlagerIdInVedtak(vedtakId, null, SYSTEMBRUKER)
+        val event = klagebehandling.setMellomlagerIdInVedtak(null, SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

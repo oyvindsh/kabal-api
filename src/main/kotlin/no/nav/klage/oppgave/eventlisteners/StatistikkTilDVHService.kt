@@ -62,8 +62,7 @@ class StatistikkTilDVHService(
         mottak: Mottak,
         klagebehandlingState: KlagebehandlingState
     ): KlageStatistikkTilDVH {
-        //Only works as long as we only have one
-        val vedtak = klagebehandling.vedtak.firstOrNull()
+        val vedtak = klagebehandling.getVedtakOrException()
 
         val funksjoneltEndringstidspunkt =
             getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState, vedtak)

@@ -67,11 +67,10 @@ class KlagebehandlingEditableFieldsFacade(
         innloggetIdent: String
     ) {
         val nyVerdi = input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet()
-        val gammelVerdi = klagebehandling.vedtak.first().hjemler
+        val gammelVerdi = klagebehandling.vedtak?.hjemler
         if (isDirty(gammelVerdi, nyVerdi)) {
             vedtakService.setHjemler(
                 klagebehandling,
-                klagebehandling.vedtak.first().id,
                 nyVerdi,
                 innloggetIdent
             )
@@ -84,11 +83,10 @@ class KlagebehandlingEditableFieldsFacade(
         innloggetIdent: String
     ) {
         val nyVerdi = input.utfall?.let { Utfall.of(it) }
-        val gammelVerdi = klagebehandling.vedtak.first().utfall
+        val gammelVerdi = klagebehandling.vedtak?.utfall
         if (isDirty(gammelVerdi, nyVerdi)) {
             vedtakService.setUtfall(
                 klagebehandling,
-                klagebehandling.vedtak.first().id,
                 nyVerdi,
                 innloggetIdent
             )

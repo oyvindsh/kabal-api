@@ -89,7 +89,7 @@ class EsKlagebehandlingMapper(
             modified = klagebehandling.modified,
             kilde = klagebehandling.kildesystem.id,
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
-            vedtak = klagebehandling.vedtak.map { vedtak ->
+            vedtak = klagebehandling.vedtak?.let { vedtak ->
                 EsVedtak(
                     utfall = vedtak.utfall?.id,
                     grunn = vedtak.grunn?.id,
@@ -112,22 +112,22 @@ class EsKlagebehandlingMapper(
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
-            vedtakUtfall = klagebehandling.vedtak.firstOrNull()?.utfall?.id,
-            vedtakGrunn = klagebehandling.vedtak.firstOrNull()?.grunn?.id,
-            vedtakHjemler = klagebehandling.vedtak.firstOrNull()?.hjemler?.map { hjemmel -> hjemmel.id } ?: emptyList(),
-            vedtakBrevmottakerFnr = klagebehandling.vedtak.firstOrNull()?.brevmottakere?.filter { it.partId.type == PartIdType.PERSON }
+            vedtakUtfall = klagebehandling.vedtak?.utfall?.id,
+            vedtakGrunn = klagebehandling.vedtak?.grunn?.id,
+            vedtakHjemler = klagebehandling.vedtak?.hjemler?.map { hjemmel -> hjemmel.id } ?: emptyList(),
+            vedtakBrevmottakerFnr = klagebehandling.vedtak?.brevmottakere?.filter { it.partId.type == PartIdType.PERSON }
                 ?.map { it.partId.value } ?: emptyList(),
-            vedtakBrevmottakerOrgnr = klagebehandling.vedtak.firstOrNull()?.brevmottakere?.filter { it.partId.type == PartIdType.VIRKSOMHET }
+            vedtakBrevmottakerOrgnr = klagebehandling.vedtak?.brevmottakere?.filter { it.partId.type == PartIdType.VIRKSOMHET }
                 ?.map { it.partId.value } ?: emptyList(),
-            vedtakJournalpostId = klagebehandling.vedtak.firstOrNull()?.journalpostId,
-            vedtakCreated = klagebehandling.vedtak.firstOrNull()?.created,
-            vedtakModified = klagebehandling.vedtak.firstOrNull()?.modified,
-            vedtakFerdigstiltIJoark = klagebehandling.vedtak.firstOrNull()?.ferdigstiltIJoark,
+            vedtakJournalpostId = klagebehandling.vedtak?.journalpostId,
+            vedtakCreated = klagebehandling.vedtak?.created,
+            vedtakModified = klagebehandling.vedtak?.modified,
+            vedtakFerdigstiltIJoark = klagebehandling.vedtak?.ferdigstiltIJoark,
             temaNavn = klagebehandling.tema.name,
             typeNavn = klagebehandling.type.name,
             hjemlerNavn = klagebehandling.hjemler.map { it.name },
-            vedtakUtfallNavn = klagebehandling.vedtak.firstOrNull()?.utfall?.name,
-            vedtakGrunnNavn = klagebehandling.vedtak.firstOrNull()?.grunn?.name,
+            vedtakUtfallNavn = klagebehandling.vedtak?.utfall?.name,
+            vedtakGrunnNavn = klagebehandling.vedtak?.grunn?.name,
             sakFagsystemNavn = klagebehandling.sakFagsystem?.name,
             status = EsKlagebehandling.Status.valueOf(klagebehandling.getStatus().name)
         )

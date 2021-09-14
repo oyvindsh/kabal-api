@@ -134,8 +134,8 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Text)
     val internVurdering: String? = null,
 
-    @Field(type = FieldType.Nested)
-    val vedtak: List<EsVedtak> = emptyList(),
+    @Field(type = FieldType.Object)
+    val vedtak: EsVedtak? = null,
 
     @Field(type = FieldType.Nested)
     val saksdokumenter: List<EsSaksdokument> = emptyList(),

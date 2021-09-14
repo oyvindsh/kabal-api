@@ -175,12 +175,10 @@ class KlagebehandlingServiceTest {
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
             mottakId = mottak.id,
-            vedtak = mutableSetOf(
-                Vedtak(
-                    utfall = Utfall.AVVIST,
-                    hjemler = mutableSetOf(
-                        Hjemmel.FTL
-                    )
+            vedtak = Vedtak(
+                utfall = Utfall.AVVIST,
+                hjemler = mutableSetOf(
+                    Hjemmel.FTL
                 )
             )
         )
