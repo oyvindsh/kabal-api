@@ -14,7 +14,6 @@ data class KlagebehandlingerQueryParams(
     val projeksjon: Projeksjon? = null,
     val erTildeltSaksbehandler: Boolean? = null,
     val tildeltSaksbehandler: String? = null,
-    val enhetId: String,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val ferdigstiltFom: LocalDate? = null
 ) {
