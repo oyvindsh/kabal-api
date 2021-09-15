@@ -138,7 +138,6 @@ class KlagebehandlingListController(
             klagebehandlingId.toUUIDOrException(),
             saksbehandlertildeling.klagebehandlingVersjon,
             saksbehandlertildeling.navIdent,
-            //TODO: Må sørge for at denne faktisk angis!
             saksbehandlertildeling.angittEnhetOrDefault(),
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
@@ -217,6 +216,7 @@ class KlagebehandlingListController(
         }
     }
 
+    // Vi har bestemt at det er greit å hente dette fra db, men jeg beholder muligheten her til å sende det inn fra frontend "just in case".. :)
     private fun Saksbehandlertildeling.angittEnhetOrDefault(): String =
         enhetId ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).enhetId
 
