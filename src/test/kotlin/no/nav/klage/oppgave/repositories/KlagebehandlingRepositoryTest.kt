@@ -182,4 +182,78 @@ class KlagebehandlingRepositoryTest {
         assertThat(foundModifiedKlage.saksdokumenter.first().journalpostId).isEqualTo("REF2")
     }
 
+    @Test
+    fun `add kommentarer to klage works`() {
+
+        val mottak = Mottak(
+            tema = Tema.OMS,
+            type = Type.KLAGE,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            kildeReferanse = "1234234",
+            oversendtKaDato = LocalDateTime.now(),
+            kildesystem = Fagsystem.K9,
+            ytelse = "ABC"
+        )
+
+        mottakRepository.save(mottak)
+
+        var klage = Klagebehandling(
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            tema = Tema.OMS,
+            type = Type.KLAGE,
+            frist = LocalDate.now(),
+            hjemler = mutableSetOf(
+                Hjemmel.FTL_8_7
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDateTime.now(),
+            kildesystem = Fagsystem.K9,
+            mottakId = mottak.id
+        )
+
+        klagebehandlingRepository.save(klage)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        var foundKlagebehandling = klagebehandlingRepository.findById(klage.id).get()
+        assertThat(foundKlagebehandling).isEqualTo(klage)
+
+        klage = foundKlagebehandling
+
+        val kommentarTil1 = "min kommentar 1"
+
+        val kommentar1 = Kommentar(
+            kommentar = kommentarTil1,
+            saksbehandlerident = "abc123",
+            tidspunkt = LocalDateTime.now()
+        )
+        val kommentar2 = Kommentar(
+            kommentar = "min kommentar 2",
+            saksbehandlerident = "abc456",
+            tidspunkt = LocalDateTime.now()
+        )
+
+        //Adding in reverse order
+        klage.kommentarer.add(kommentar2)
+        klage.kommentarer.add(kommentar1)
+
+        klagebehandlingRepository.save(klage)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        foundKlagebehandling = klagebehandlingRepository.findById(klage.id).get()
+        assertThat(foundKlagebehandling.kommentarer).hasSize(2)
+
+        //Sorted by tidspunkt
+        val kommentarer = foundKlagebehandling.kommentarer.sorted()
+        assertThat(kommentarer.first().kommentar).isEqualTo(kommentarTil1)
+    }
+
 }
