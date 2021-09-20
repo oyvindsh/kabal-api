@@ -8,22 +8,24 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "kommentar", schema = "klage")
-class Kommentar(
+@Table(name = "melding", schema = "klage")
+class Melding(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "kommentar")
-    val kommentar: String,
+    @Column(name = "text")
+    var text: String,
     @Column(name = "saksbehandlerident")
-    val saksbehandlerident: String? = null,
-    @Column(name = "tidspunkt")
-    val tidspunkt: LocalDateTime
-) : Comparable<Kommentar> {
+    val saksbehandlerident: String,
+    @Column(name = "created")
+    val created: LocalDateTime,
+    @Column(name = "modified")
+    var modified: LocalDateTime? = null,
+) : Comparable<Melding> {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Kommentar
+        other as Melding
 
         if (id != other.id) return false
 
@@ -35,10 +37,10 @@ class Kommentar(
     }
 
     override fun toString(): String {
-        return "Kommentar(id=$id, kommentar=$kommentar, tidspunkt=$tidspunkt)"
+        return "Melding(id=$id, text=$text, created=$created, modified=$modified)"
     }
 
-    override fun compareTo(other: Kommentar): Int {
-        return this.tidspunkt.compareTo(other.tidspunkt)
+    override fun compareTo(other: Melding): Int {
+        return this.created.compareTo(other.created)
     }
 }

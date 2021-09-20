@@ -108,7 +108,7 @@ class Klagebehandling(
     val kommentarFraFoersteinstans: String? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val kommentarer: MutableSet<Kommentar> = mutableSetOf()
+    val meldinger: MutableSet<Melding> = mutableSetOf()
 ) {
 
     override fun toString(): String {

@@ -183,7 +183,7 @@ class KlagebehandlingRepositoryTest {
     }
 
     @Test
-    fun `add kommentarer to klage works`() {
+    fun `add meldinger to klage works`() {
 
         val mottak = Mottak(
             tema = Tema.OMS,
@@ -226,22 +226,22 @@ class KlagebehandlingRepositoryTest {
 
         klage = foundKlagebehandling
 
-        val kommentarTil1 = "min kommentar 1"
+        val meldingTil1 = "min melding 1"
 
-        val kommentar1 = Kommentar(
-            kommentar = kommentarTil1,
+        val melding1 = Melding(
+            text = meldingTil1,
             saksbehandlerident = "abc123",
-            tidspunkt = LocalDateTime.now()
+            created = LocalDateTime.now()
         )
-        val kommentar2 = Kommentar(
-            kommentar = "min kommentar 2",
+        val melding2 = Melding(
+            text = "min melding 2",
             saksbehandlerident = "abc456",
-            tidspunkt = LocalDateTime.now()
+            created = LocalDateTime.now()
         )
 
         //Adding in reverse order
-        klage.kommentarer.add(kommentar2)
-        klage.kommentarer.add(kommentar1)
+        klage.meldinger.add(melding2)
+        klage.meldinger.add(melding1)
 
         klagebehandlingRepository.save(klage)
 
@@ -249,11 +249,11 @@ class KlagebehandlingRepositoryTest {
         testEntityManager.clear()
 
         foundKlagebehandling = klagebehandlingRepository.findById(klage.id).get()
-        assertThat(foundKlagebehandling.kommentarer).hasSize(2)
+        assertThat(foundKlagebehandling.meldinger).hasSize(2)
 
         //Sorted by tidspunkt
-        val kommentarer = foundKlagebehandling.kommentarer.sorted()
-        assertThat(kommentarer.first().kommentar).isEqualTo(kommentarTil1)
+        val meldinger = foundKlagebehandling.meldinger.sorted()
+        assertThat(meldinger.first().text).isEqualTo(meldingTil1)
     }
 
 }
