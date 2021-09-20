@@ -57,6 +57,20 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
+    fun handleVedtakNotFound(
+        ex: VedtakNotFoundException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.NOT_FOUND, ex, request)
+
+    @ExceptionHandler
+    fun handleMeldingNotFound(
+        ex: MeldingNotFoundException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.NOT_FOUND, ex, request)
+
+    @ExceptionHandler
     fun handleValidationException(
         ex: ValidationException,
         request: NativeWebRequest
