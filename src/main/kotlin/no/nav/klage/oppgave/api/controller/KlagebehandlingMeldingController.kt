@@ -16,6 +16,7 @@ import java.util.*
 @RestController
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
+@RequestMapping("/klagebehandlinger")
 class KlagebehandlingMeldingController(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val klagebehandlingService: KlagebehandlingService,
@@ -27,7 +28,7 @@ class KlagebehandlingMeldingController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/klagebehandlinger/{id}/meldinger")
+    @PostMapping("/{id}/meldinger")
     @ResponseStatus(HttpStatus.CREATED)
     fun addMelding(
         @PathVariable("id") klagebehandlingId: UUID,
@@ -46,7 +47,7 @@ class KlagebehandlingMeldingController(
         return MeldingCreated(version, created)
     }
 
-    @GetMapping("/klagebehandlinger/{id}/meldinger")
+    @GetMapping("/{id}/meldinger")
     fun getMeldinger(
         @PathVariable("id") klagebehandlingId: UUID,
         @RequestBody input: MeldingInput
@@ -74,7 +75,7 @@ class KlagebehandlingMeldingController(
         }
     }
 
-    @DeleteMapping("/klagebehandlinger/{klagebehandlingId}/meldinger/{meldingId}")
+    @DeleteMapping("/{klagebehandlingId}/meldinger/{meldingId}")
     fun deleteMelding(
         @PathVariable("klagebehandlingId") klagebehandlingId: UUID,
         @PathVariable("meldingId") meldingId: UUID,
@@ -93,7 +94,7 @@ class KlagebehandlingMeldingController(
         return MeldingDeleted(version)
     }
 
-    @PutMapping("/klagebehandlinger/{klagebehandlingId}/meldinger/{meldingId}")
+    @PutMapping("/{klagebehandlingId}/meldinger/{meldingId}")
     fun modifyMelding(
         @PathVariable("klagebehandlingId") klagebehandlingId: UUID,
         @PathVariable("meldingId") meldingId: UUID,
