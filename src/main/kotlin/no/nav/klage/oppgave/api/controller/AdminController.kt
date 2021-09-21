@@ -58,11 +58,11 @@ class AdminController(
     @Unprotected
     @GetMapping("/internal/testazure", produces = ["application/json"])
     fun testAzure(): String {
-        azureGateway.getPersonligDataOmSaksbehandlerMedIdent("Z994488")
-        azureGateway.getAllDisplayNames(listOf(listOf("Z994488")))
-        azureGateway.getRollerForSaksbehandlerMedIdent("Z994488")
-        azureGateway.getRolleIder("Z994488")
-        azureGateway.getGroupMembersNavIdents("07add1e7-7195-4c37-828d-fdf23ec6bef1")
+        logger.debug("" + azureGateway.getPersonligDataOmSaksbehandlerMedIdent("Z994488"))
+        logger.debug("" + azureGateway.getAllDisplayNames(listOf(listOf("Z994488"))))
+        logger.debug("" + azureGateway.getRollerForSaksbehandlerMedIdent("Z994488"))
+        logger.debug("" + azureGateway.getRolleIder("Z994488"))
+        logger.debug("" + azureGateway.getGroupMembersNavIdents("07add1e7-7195-4c37-828d-fdf23ec6bef1"))
         return "ok"
     }
 

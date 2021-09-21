@@ -8,12 +8,12 @@ data class SaksbehandlerView(
     val innstillinger: InnstillingerView
 ) {
     data class PersonligInfoView(
-        private val navIdent: String,
-        private val azureId: String,
-        private val fornavn: String,
-        private val etternavn: String,
-        private val sammensattNavn: String,
-        private val epost: String
+        val navIdent: String,
+        val azureId: String,
+        val fornavn: String,
+        val etternavn: String,
+        val sammensattNavn: String,
+        val epost: String
     )
 
     data class InnstillingerView(
