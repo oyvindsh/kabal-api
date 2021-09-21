@@ -152,8 +152,6 @@ class MicrosoftGraphClient(
             uriBuilder
                 .path("/users")
                 .queryParam("\$filter", "mailnickname eq '$navIdent'")
-                .queryParam("\$orderby", "mailnickname")
-                .queryParam("\$top", "1")
                 .queryParam("\$select", userSelect)
                 .build()
         }
