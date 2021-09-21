@@ -2,38 +2,51 @@ package no.nav.klage.oppgave.clients.azure
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-data class MicrosoftGraphIdentResponse(val onPremisesSamAccountName: String)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class AzureUser(
+    val onPremisesSamAccountName: String,
+    val displayName: String,
+    val givenName: String,
+    val surname: String,
+    val mail: String,
+    val officeLocation: String?,
+    val userPrincipalName: String,
+    val id: String,
+    val jobTitle: String?
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MicrosoftGraphNameResponse(val value: List<Value>?) {
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    data class Value(val onPremisesSamAccountName: String?, val displayName: String?)
-}
+data class AzureSlimUser(
+    val userPrincipalName: String,
+    val onPremisesSamAccountName: String?,
+    val displayName: String?
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MicrosoftGraphUsersResponse(val value: List<Value>?) {
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    data class Value(val userPrincipalName: String)
-}
+data class AzureGroupMember(
+    val id: String?,
+    val mail: String?,
+    val mailnickname: String?,
+    val onPremisesSamAccountName: String?,
+    val displayName: String?
+)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MicrosoftGraphGroupMembersResponse(val value: List<Value>?) {
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    data class Value(
-        val id: String?,
-        val mail: String?,
-        val mailnickname: String?,
-        val onPremisesSamAccountName: String?,
-        val displayName: String?
-    )
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class MicrosoftGraphMemberOfResponse(val value: List<Group>)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Group(
+data class AzureGroup(
     val id: String,
     val displayName: String? = null,
     val mailNickname: String? = null,
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class AzureUserList(val value: List<AzureUser>?)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class AzureSlimUserList(val value: List<AzureSlimUser>?)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class AzureGroupMemberList(val azureGroupMember: List<AzureGroupMember>?)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class AzureGroupList(val value: List<AzureGroup>)
+

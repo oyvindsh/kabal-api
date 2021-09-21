@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

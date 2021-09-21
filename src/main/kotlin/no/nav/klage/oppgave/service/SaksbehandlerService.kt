@@ -2,15 +2,15 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
-import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
-import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
-import no.nav.klage.oppgave.domain.klage.ValgtEnhet
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.saksbehandler.*
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
+import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.repositories.InnstillingerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.ValgtEnhetRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -23,7 +23,9 @@ class SaksbehandlerService(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val valgtEnhetRepository: ValgtEnhetRepository,
-    private val tilgangService: TilgangService
+    private val innstillingerRepository: InnstillingerRepository,
+    private val tilgangService: TilgangService,
+    private val azureGateway: AzureGateway
 ) {
     fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
         innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
@@ -88,5 +90,39 @@ class SaksbehandlerService(
         return valgtEnhetRepository.findByIdOrNull(ident)
             ?.let { valgtEnhet -> getEnheterMedTemaerForSaksbehandler().enheter.find { it.enhetId == valgtEnhet.enhetId } }
             ?: storeValgtEnhetId(ident, getEnheterMedTemaerForSaksbehandler().enheter.first().enhetId)
+    }
+
+    @Transactional
+    fun findInnstillinger(ident: String): SaksbehandlerInnstillinger {
+        return innstillingerRepository.findByIdOrNull(ident)?.toSaksbehandlerInnstillinger()
+            ?: SaksbehandlerInnstillinger()
+    }
+
+    @Transactional
+    fun storeInnstillinger(
+        navIdent: String,
+        saksbehandlerInnstillinger: SaksbehandlerInnstillinger
+    ): SaksbehandlerInnstillinger {
+        return innstillingerRepository.save(
+            Innstillinger.fromSaksbehandlersInnstillinger(
+                navIdent,
+                saksbehandlerInnstillinger
+            )
+        ).toSaksbehandlerInnstillinger()
+    }
+
+    fun getDataOmSaksbehandler(navIdent: String): SaksbehandlerInfo {
+        val dataOmInnloggetSaksbehandler = azureGateway.getDataOmInnloggetSaksbehandler()
+        val rollerForInnloggetSaksbehandler = azureGateway.getRollerForInnloggetSaksbehandler()
+        val enheterForInnloggetSaksbehandler = innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
+        val valgtEnhet = findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
+        val innstillinger = findInnstillinger(innloggetSaksbehandlerRepository.getInnloggetIdent())
+        return SaksbehandlerInfo(
+            dataOmInnloggetSaksbehandler,
+            rollerForInnloggetSaksbehandler,
+            enheterForInnloggetSaksbehandler,
+            valgtEnhet,
+            innstillinger
+        )
     }
 }

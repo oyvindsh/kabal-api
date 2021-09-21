@@ -4,18 +4,18 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.oppgave.clients.axsys.AxsysClient
 import no.nav.klage.oppgave.clients.axsys.Tilganger
-import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
-import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
-import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
+import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.gateway.AzureGateway
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.Test
 
-internal class SaksbehandlerRepositoryTest {
+internal class SaksbehandlerInfoRepositoryTest {
 
     private val mapper: SaksbehandlerMapper = mockk()
     private val axsysClient: AxsysClient = mockk()
-    private val msClient: MicrosoftGraphClient = mockk()
+    private val msClient: AzureGateway = mockk()
     private val tilganger = Tilganger(emptyList())
 
     private val repo: SaksbehandlerRepository =

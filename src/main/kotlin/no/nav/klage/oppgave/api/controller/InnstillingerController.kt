@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.util.getLogger
@@ -18,11 +17,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
-class AdminController(
+class InnstillingerController(
     private val adminService: AdminService,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    private val eregClient: EregClient,
-    private val azureGateway: AzureGateway
+    private val eregClient: EregClient
 ) {
 
     companion object {
@@ -30,14 +28,9 @@ class AdminController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/internal/elasticadmin/rebuild", produces = ["application/json"])
+    @PostMapping("/ansatte/elasticadmin/rebuild", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
     fun resetElasticIndexWithPost() {
-
-
-        azureGateway.getDataOmInnloggetSaksbehandler()
-        azureGateway.getRollerForInnloggetSaksbehandler()
-
         krevAdminTilgang()
         try {
             adminService.recreateEsIndex()
@@ -53,17 +46,6 @@ class AdminController(
         if (!innloggetSaksbehandlerRepository.erAdmin()) {
             throw MissingTilgangException("Not an admin")
         }
-    }
-
-    @Unprotected
-    @GetMapping("/internal/testazure", produces = ["application/json"])
-    fun testAzure(): String {
-        azureGateway.getPersonligDataOmSaksbehandlerMedIdent("Z994488")
-        azureGateway.getAllDisplayNames(listOf(listOf("Z994488")))
-        azureGateway.getRollerForSaksbehandlerMedIdent("Z994488")
-        azureGateway.getRolleIder("Z994488")
-        azureGateway.getGroupMembersNavIdents("07add1e7-7195-4c37-828d-fdf23ec6bef1")
-        return "ok"
     }
 
     @Unprotected

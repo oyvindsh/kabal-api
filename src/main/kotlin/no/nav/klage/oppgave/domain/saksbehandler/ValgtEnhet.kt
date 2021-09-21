@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.domain.klage
+package no.nav.klage.oppgave.domain.saksbehandler
 
 import java.time.LocalDateTime
 import javax.persistence.Column

@@ -1,10 +1,10 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.clients.axsys.Tilganger
-import no.nav.klage.oppgave.domain.EnhetMedLovligeTemaer
-import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
+import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component

@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.clients.axsys.AxsysClient
-import no.nav.klage.oppgave.clients.azure.MicrosoftGraphClient
-import no.nav.klage.oppgave.domain.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -11,7 +11,7 @@ import kotlin.system.measureTimeMillis
 
 @Service
 class SaksbehandlerRepository(
-    private val client: MicrosoftGraphClient,
+    private val azureGateway: AzureGateway,
     private val axsysClient: AxsysClient,
     private val saksbehandlerMapper: SaksbehandlerMapper,
     @Value("\${ROLE_GOSYS_OPPGAVE_BEHANDLER}") private val gosysSaksbehandlerRole: String,
@@ -51,7 +51,7 @@ class SaksbehandlerRepository(
         saksbehandlerMapper.mapTilgangerToEnheterMedLovligeTemaer(axsysClient.getTilgangerForSaksbehandler(ident))
 
     fun getAlleSaksbehandlerIdenter(): List<String> {
-        return client.getGroupMembers(saksbehandlerRole)
+        return azureGateway.getGroupMembersNavIdents(saksbehandlerRole)
     }
 
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
@@ -64,7 +64,7 @@ class SaksbehandlerRepository(
         val chunkedList = identerNotInCache.chunked(MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY)
 
         val measuredTimeMillis = measureTimeMillis {
-            saksbehandlerNameCache += client.getAllDisplayNames(chunkedList)
+            saksbehandlerNameCache += azureGateway.getAllDisplayNames(chunkedList)
         }
         logger.debug("It took {} millis to fetch all names", measuredTimeMillis)
 
@@ -86,7 +86,7 @@ class SaksbehandlerRepository(
 
     fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleEgenAnsattRole)
 
-    private fun getRoller(ident: String): List<String> = client.getRoller(ident)
+    private fun getRoller(ident: String): List<String> = azureGateway.getRolleIder(ident)
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 }

@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
-import no.nav.klage.oppgave.domain.klage.ValgtEnhet
+import no.nav.klage.oppgave.domain.saksbehandler.ValgtEnhet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
