@@ -26,6 +26,8 @@ class MicrosoftGraphClient(
             "onPremisesSamAccountName,displayName,givenName,surname,mail,officeLocation,userPrincipalName,id,jobTitle"
 
         private const val slimUserSelect = "userPrincipalName,onPremisesSamAccountName,displayName"
+
+        private const val groupMemberSelect = "id,mail,mailnickname,onPremisesSamAccountName,displayName"
     }
 
     @Retryable
@@ -124,7 +126,7 @@ class MicrosoftGraphClient(
             .uri { uriBuilder ->
                 uriBuilder
                     .path("/groups/{groupid}/members")
-                    .queryParam("\$select", slimUserSelect)
+                    .queryParam("\$select", groupMemberSelect)
                     .build(groupid)
             }
             .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
