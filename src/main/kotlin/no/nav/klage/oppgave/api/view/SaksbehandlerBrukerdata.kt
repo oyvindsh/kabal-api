@@ -21,5 +21,4 @@ data class SaksbehandlerView(
         val temaer: List<String>,
         val typer: List<String>
     )
-
 }

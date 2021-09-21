@@ -42,12 +42,12 @@ class MicrosoftGraphClient(
 
             .retrieve()
             .bodyToMono<AzureUser>()
-            .block() ?: throw RuntimeException("AzureAD data could not be fetched")
+            .block() ?: throw RuntimeException("AzureAD data about authenticated user could not be fetched")
     }
 
     @Retryable
     fun getSaksbehandler(navIdent: String): AzureUser {
-        logger.debug("Fetching data about user from Microsoft Graph")
+        logger.debug("Fetching data about authenticated user from Microsoft Graph")
         return findUserByNavIdent(navIdent)
     }
 
@@ -63,7 +63,8 @@ class MicrosoftGraphClient(
             }.header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()}")
             .retrieve()
             .bodyToMono<AzureGroupList>()
-            .block()?.value ?: throw RuntimeException("AzureAD data could not be fetched")
+            .block()?.value
+            ?: throw RuntimeException("AzureAD data about authenticated users groups could not be fetched")
     }
 
     @Retryable
@@ -129,7 +130,7 @@ class MicrosoftGraphClient(
             .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
             .retrieve()
             .bodyToMono<AzureGroupMemberList>().block()?.azureGroupMember
-            ?: throw RuntimeException("AzureAD data could not be fetched")
+            ?: throw RuntimeException("AzureAD data about group members nav idents could not be fetched")
         return azureGroupMember.map { logger.debug("Har funnet $it"); it }.mapNotNull { it.onPremisesSamAccountName }
     }
 
@@ -143,7 +144,7 @@ class MicrosoftGraphClient(
             .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
             .retrieve()
             .bodyToMono<AzureGroupList>().block()?.value
-            ?: throw RuntimeException("AzureAD data could not be fetched")
+            ?: throw RuntimeException("AzureAD data about groups by user principal name could not be fetched")
         return aadAzureGroups
     }
 
@@ -158,5 +159,5 @@ class MicrosoftGraphClient(
         .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
         .retrieve()
         .bodyToMono<AzureUserList>().block()?.value?.firstOrNull()
-        ?: throw RuntimeException("AzureAD data could not be fetched")
+        ?: throw RuntimeException("AzureAD data about user by nav ident could not be fetched")
 }
