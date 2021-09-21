@@ -45,7 +45,7 @@ data class AzureUserList(val value: List<AzureUser>?)
 data class AzureSlimUserList(val value: List<AzureSlimUser>?)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class AzureGroupMemberList(val azureGroupMember: List<AzureGroupMember>?)
+data class AzureGroupMemberList(val value: List<AzureGroupMember>?)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AzureGroupList(val value: List<AzureGroup>)

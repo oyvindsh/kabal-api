@@ -129,7 +129,7 @@ class MicrosoftGraphClient(
             }
             .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
             .retrieve()
-            .bodyToMono<AzureGroupMemberList>().block()?.azureGroupMember
+            .bodyToMono<AzureGroupMemberList>().block()?.value
             ?: throw RuntimeException("AzureAD data about group members nav idents could not be fetched")
         return azureGroupMember.map { logger.debug("Har funnet $it"); it }.mapNotNull { it.onPremisesSamAccountName }
     }
