@@ -184,7 +184,6 @@ class KlagebehandlingMapper(
     }
 
     fun mapToVedtakFullfoertView(klagebehandling: Klagebehandling): VedtakFullfoertView {
-        val vedtak = klagebehandling.getVedtakOrException()
         return VedtakFullfoertView(
             klagebehandling.versjon,
             klagebehandling.modified,
