@@ -815,66 +815,6 @@ object KlagebehandlingAggregatFunctions {
         return null
     }
 
-    fun Klagebehandling.addMelding(
-        melding: Melding,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val tidspunkt = LocalDateTime.now()
-        meldinger.add(melding)
-        modified = tidspunkt
-        val endringslogg = Endringslogginnslag.endringslogg(
-            saksbehandlerident,
-            Felt.MELDING_KLAGEBEHANDLING,
-            null,
-            melding.text,
-            id,
-            tidspunkt
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.deleteMelding(
-        meldingId: UUID,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val tidspunkt = LocalDateTime.now()
-        meldinger.removeIf { it.id == meldingId }
-        modified = tidspunkt
-        val endringslogg = Endringslogginnslag.endringslogg(
-            saksbehandlerident,
-            Felt.MELDING_KLAGEBEHANDLING,
-            meldingId.toString(),
-            null,
-            id,
-            tidspunkt
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.modifyMelding(
-        meldingId: UUID,
-        text: String,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val tidspunkt = LocalDateTime.now()
-        val oldMelding = meldinger.find { it.id == meldingId }
-        val oldMeldingText = oldMelding?.text
-        oldMelding?.apply {
-            this.text = text
-            this.modified = tidspunkt
-        }
-        modified = tidspunkt
-        val endringslogg = Endringslogginnslag.endringslogg(
-            saksbehandlerident,
-            Felt.MELDING_KLAGEBEHANDLING,
-            oldMeldingText,
-            text,
-            id,
-            tidspunkt
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
     private fun Klagebehandling.endringslogg(
         saksbehandlerident: String,
         felt: Felt,

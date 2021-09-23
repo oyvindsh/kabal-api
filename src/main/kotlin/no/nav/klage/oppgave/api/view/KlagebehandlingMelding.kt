@@ -4,25 +4,14 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class MeldingInput(
-    val text: String,
-    val klagebehandlingVersion: Long
-)
-
-data class MeldingDeleteInput(
-    val klagebehandlingVersion: Long
+    val text: String
 )
 
 data class MeldingCreated(
-    val klagebehandlingVersion: Long,
     val created: LocalDateTime
 )
 
-data class MeldingDeleted(
-    val klagebehandlingVersion: Long
-)
-
 data class MeldingModified(
-    val klagebehandlingVersion: Long,
     val modified: LocalDateTime
 )
 

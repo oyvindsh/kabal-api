@@ -105,10 +105,7 @@ class Klagebehandling(
     @Convert(converter = FagsystemConverter::class)
     val kildesystem: Fagsystem,
     @Column(name = "kommentar_fra_foersteinstans")
-    val kommentarFraFoersteinstans: String? = null,
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
-    val meldinger: MutableSet<Melding> = mutableSetOf()
+    val kommentarFraFoersteinstans: String? = null
 ) {
 
     override fun toString(): String {
