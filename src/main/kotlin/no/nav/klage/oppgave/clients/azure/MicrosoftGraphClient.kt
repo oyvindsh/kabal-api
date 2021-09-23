@@ -27,7 +27,7 @@ class MicrosoftGraphClient(
 
         private const val slimUserSelect = "userPrincipalName,onPremisesSamAccountName,displayName"
 
-        private const val groupMemberSelect = "id,mail,mailnickname,onPremisesSamAccountName,displayName"
+        private const val groupMemberSelect = "id,mail,onPremisesSamAccountName,displayName"
     }
 
     @Retryable

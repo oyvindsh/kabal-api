@@ -18,24 +18,22 @@ data class AzureUser(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AzureSlimUser(
     val userPrincipalName: String,
-    val onPremisesSamAccountName: String?,
-    val displayName: String?
+    val onPremisesSamAccountName: String,
+    val displayName: String
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AzureGroupMember(
-    val id: String?,
-    val mail: String?,
-    val mailnickname: String?,
-    val onPremisesSamAccountName: String?,
-    val displayName: String?
+    val id: String,
+    val mail: String,
+    val onPremisesSamAccountName: String,
+    val displayName: String
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AzureGroup(
     val id: String,
-    val displayName: String? = null,
-    val mailNickname: String? = null,
+    val displayName: String
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
