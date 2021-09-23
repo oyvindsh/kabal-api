@@ -4,10 +4,7 @@ import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addMelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.deleteMelding
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.modifyMelding
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderEnhetFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsenderSaksbehandleridentFoersteinstans
@@ -22,7 +19,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTil
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
-import no.nav.klage.oppgave.exceptions.MeldingNotFoundException
 import no.nav.klage.oppgave.exceptions.ValidationException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.TokenUtil
@@ -562,54 +558,5 @@ class KlagebehandlingService(
         this.avsluttetAvSaksbehandler!!,
         this.klager.partId.value
     )
-
-    fun addMelding(
-        klagebehandlingId: UUID,
-        innloggetIdent: String,
-        text: String,
-        klagebehandlingVersion: Long
-    ): Pair<Long, LocalDateTime> {
-        val melding = Melding(
-            text = text,
-            saksbehandlerident = innloggetIdent,
-            created = LocalDateTime.now()
-        )
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersion)
-
-        val event = klagebehandling.addMelding(melding, innloggetIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling.versjon to melding.created
-    }
-
-    fun deleteMelding(
-        klagebehandlingId: UUID,
-        innloggetIdent: String,
-        meldingId: UUID,
-        klagebehandlingVersion: Long
-    ): Long {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersion)
-
-        val event = klagebehandling.deleteMelding(meldingId, innloggetIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling.versjon
-    }
-
-    fun modifyMelding(
-        klagebehandlingId: UUID,
-        innloggetIdent: String,
-        meldingId: UUID,
-        text: String,
-        klagebehandlingVersion: Long
-    ): Pair<Long, LocalDateTime> {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersion)
-
-        val melding = klagebehandling.meldinger.find { it.id == meldingId }
-            ?: throw MeldingNotFoundException("melding with id $meldingId not found")
-
-        val event = klagebehandling.modifyMelding(meldingId, text, innloggetIdent)
-        applicationEventPublisher.publishEvent(event)
-
-        return klagebehandling.versjon to (melding.modified ?: throw RuntimeException("modified date was not set"))
-    }
 
 }
