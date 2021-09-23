@@ -69,6 +69,13 @@ enum class Hjemmel(
         "FTL 22-13",
         "Folketrygdloven §22-13"
     ),
+    FTL_22_15(
+        "1000.022.015",
+        LovKilde.FOLKETRYGDLOVEN,
+        KapittelOgParagraf(22, 15),
+        "FTL 22-15",
+        "Folketrygdloven §22-15"
+    ),
     FTL_9("1000.009", LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9), "FTL 9", "Folketrygdloven kapittel 9"),
     FTL_9_2("1000.009.002", LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 2), "FTL 9-2", "Folketrygdloven §9-2"),
     FTL_9_3("1000.009.003", LovKilde.FOLKETRYGDLOVEN, KapittelOgParagraf(9, 3), "FTL 9-3", "Folketrygdloven §9-3"),
