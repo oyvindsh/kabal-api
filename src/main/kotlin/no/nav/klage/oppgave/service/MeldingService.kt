@@ -44,18 +44,14 @@ class MeldingService(
     ) {
         try {
             val melding = meldingRepository.getOne(meldingId)
-            if (melding.saksbehandlerident == innloggetIdent) {
-                meldingRepository.delete(melding)
-                logger.debug("melding ($meldingId) deleted by $innloggetIdent")
-            } else {
-                throw RuntimeException(
-                    "saksbehandler ($innloggetIdent) is not the author of melding ($meldingId), and is not allowed to delete it."
-                )
-            }
+            validateRightsToModifyMelding(melding, innloggetIdent)
+
+            meldingRepository.delete(melding)
+
+            logger.debug("melding ($meldingId) deleted by $innloggetIdent")
         } catch (enfe: EntityNotFoundException) {
             throw MeldingNotFoundException("couldn't find melding with id $meldingId")
         }
-
     }
 
     fun modifyMelding(
@@ -66,19 +62,15 @@ class MeldingService(
     ): Melding {
         try {
             val melding = meldingRepository.getOne(meldingId)
-            if (melding.saksbehandlerident == innloggetIdent) {
-                melding.text = text
-                melding.modified = LocalDateTime.now()
+            validateRightsToModifyMelding(melding, innloggetIdent)
 
-                meldingRepository.save(melding)
-                logger.debug("melding ($meldingId) modified by $innloggetIdent")
+            melding.text = text
+            melding.modified = LocalDateTime.now()
 
-                return melding
-            } else {
-                throw RuntimeException(
-                    "saksbehandler ($innloggetIdent) is not the author of melding ($meldingId), and is not allowed to modify it."
-                )
-            }
+            meldingRepository.save(melding)
+            logger.debug("melding ($meldingId) modified by $innloggetIdent")
+
+            return melding
         } catch (enfe: EntityNotFoundException) {
             throw MeldingNotFoundException("couldn't find melding with id $meldingId")
         }
@@ -87,4 +79,11 @@ class MeldingService(
     fun getMeldingerForKlagebehandling(klagebehandlingId: UUID) =
         meldingRepository.findByKlagebehandlingIdOrderByCreatedDesc(klagebehandlingId)
 
+    private fun validateRightsToModifyMelding(melding: Melding, innloggetIdent: String) {
+        if (melding.saksbehandlerident != innloggetIdent) {
+            throw RuntimeException(
+                "saksbehandler ($innloggetIdent) is not the author of melding (${melding.id}), and is not allowed to delete it."
+            )
+        }
+    }
 }
