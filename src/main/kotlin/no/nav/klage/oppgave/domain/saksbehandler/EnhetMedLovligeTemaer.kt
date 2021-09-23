@@ -1,7 +1,5 @@
-package no.nav.klage.oppgave.domain
+package no.nav.klage.oppgave.domain.saksbehandler
 
 import no.nav.klage.oppgave.domain.kodeverk.Tema
-
-data class EnheterMedLovligeTemaer(val enheter: List<EnhetMedLovligeTemaer>)
 
 data class EnhetMedLovligeTemaer(val enhetId: String, val navn: String, val temaer: List<Tema>)

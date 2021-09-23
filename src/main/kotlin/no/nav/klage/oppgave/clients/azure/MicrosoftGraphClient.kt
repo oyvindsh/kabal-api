@@ -21,23 +21,59 @@ class MicrosoftGraphClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        private const val userSelect =
+            "onPremisesSamAccountName,displayName,givenName,surname,mail,officeLocation,userPrincipalName,id,jobTitle"
+
+        private const val slimUserSelect = "userPrincipalName,onPremisesSamAccountName,displayName"
+
+        private const val groupMemberSelect = "id,mail,mailnickname,onPremisesSamAccountName,displayName"
     }
 
     @Retryable
-    fun getNavIdentForAuthenticatedUser(): String {
-        logger.debug("Fetching navIdent from Microsoft Graph")
+    fun getInnloggetSaksbehandler(): AzureUser {
+        logger.debug("Fetching data about authenticated user from Microsoft Graph")
 
         return microsoftGraphWebClient.get()
             .uri { uriBuilder ->
                 uriBuilder
                     .path("/me")
-                    .queryParam("\$select", "onPremisesSamAccountName")
+                    .queryParam("\$select", userSelect)
                     .build()
             }.header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()}")
 
             .retrieve()
-            .bodyToMono<MicrosoftGraphIdentResponse>()
-            .block()?.onPremisesSamAccountName ?: throw RuntimeException("NavIdent could not be fetched")
+            .bodyToMono<AzureUser>()
+            .block() ?: throw RuntimeException("AzureAD data about authenticated user could not be fetched")
+    }
+
+    @Retryable
+    fun getSaksbehandler(navIdent: String): AzureUser {
+        logger.debug("Fetching data about authenticated user from Microsoft Graph")
+        return findUserByNavIdent(navIdent)
+    }
+
+    @Retryable
+    fun getInnloggetSaksbehandlersGroups(): List<AzureGroup> {
+        logger.debug("Fetching data about authenticated users groups from Microsoft Graph")
+
+        return microsoftGraphWebClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/me/memberOf")
+                    .build()
+            }.header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()}")
+            .retrieve()
+            .bodyToMono<AzureGroupList>()
+            .block()?.value
+            ?: throw RuntimeException("AzureAD data about authenticated users groups could not be fetched")
+    }
+
+    @Retryable
+    fun getSaksbehandlersGroups(navIdent: String): List<AzureGroup> {
+        logger.debug("Fetching data about users groups from Microsoft Graph")
+        val user = findUserByNavIdent(navIdent)
+        return getGroupsByUserPrincipalName(user.userPrincipalName)
     }
 
     @Retryable
@@ -52,7 +88,7 @@ class MicrosoftGraphClient(
             .flatMap {
                 getDisplayNames(it)
             }
-            .ordered { _: MicrosoftGraphNameResponse, _: MicrosoftGraphNameResponse -> 1 }.toIterable()
+            .ordered { _: AzureSlimUserList, _: AzureSlimUserList -> 1 }.toIterable()
 
         return data.flatMap {
             it.value ?: emptyList()
@@ -65,73 +101,65 @@ class MicrosoftGraphClient(
         }.toMap()
     }
 
-    private fun getDisplayNames(idents: String): Mono<MicrosoftGraphNameResponse> {
+    private fun getDisplayNames(navIdents: String): Mono<AzureSlimUserList> {
         return try {
             microsoftGraphWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder
                         .path("/users")
-                        .queryParam("\$filter", "mailnickname in $idents")
-                        .queryParam("\$select", "onPremisesSamAccountName,displayName")
+                        .queryParam("\$filter", "mailnickname in $navIdents")
+                        .queryParam("\$select", slimUserSelect)
                         .build()
                 }.header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
                 .retrieve()
                 .bodyToMono()
         } catch (e: Exception) {
-            logger.warn("Could not fetch displayname for idents: $idents", e)
+            logger.warn("Could not fetch displayname for idents: $navIdents", e)
             Mono.empty()
         }
     }
 
     @Retryable
     @Cacheable(CacheWithJCacheConfiguration.GROUPMEMBERS_CACHE)
-    fun getGroupMembers(groupid: String): List<String> {
-        return microsoftGraphWebClient.get()
+    fun getGroupMembersNavIdents(groupid: String): List<String> {
+        val azureGroupMember: List<AzureGroupMember> = microsoftGraphWebClient.get()
             .uri { uriBuilder ->
                 uriBuilder
                     .path("/groups/{groupid}/members")
-                    .queryParam("\$select", "mailnickname,onPremisesSamAccountName,displayName")
+                    .queryParam("\$select", groupMemberSelect)
                     .build(groupid)
             }
             .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
             .retrieve()
-            .bodyToMono<MicrosoftGraphGroupMembersResponse>().block().value!!
-            .map { logger.debug("Har funnet $it"); it }
-            .map { it.onPremisesSamAccountName }
-            .filterNotNull()
+            .bodyToMono<AzureGroupMemberList>().block()?.value
+            ?: throw RuntimeException("AzureAD data about group members nav idents could not be fetched")
+        return azureGroupMember.map { logger.debug("Har funnet $it"); it }.mapNotNull { it.onPremisesSamAccountName }
     }
 
-    @Retryable
-    fun getRoller(ident: String): List<String> {
-        return try {
-            val idents = listOf(ident).joinToString(separator = "','", prefix = "('", postfix = "')")
-            val user =
-                microsoftGraphWebClient.get()
-                    .uri { uriBuilder ->
-                        uriBuilder
-                            .path("/users")
-                            .queryParam("\$filter", "mailnickname in $idents")
-                            .queryParam("\$select", "userPrincipalName")
-                            .build()
-                    }
-                    .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
-                    .retrieve()
-                    .bodyToMono<MicrosoftGraphUsersResponse>().block().value!!.first()
+    private fun getGroupsByUserPrincipalName(userPrincipalName: String): List<AzureGroup> {
+        val aadAzureGroups: List<AzureGroup> = microsoftGraphWebClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/users/{userPrincipalName}/memberOf")
+                    .build(userPrincipalName)
+            }
+            .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
+            .retrieve()
+            .bodyToMono<AzureGroupList>().block()?.value
+            ?: throw RuntimeException("AzureAD data about groups by user principal name could not be fetched")
+        return aadAzureGroups
+    }
 
-            val userPrincipalName = user.userPrincipalName
-            val aadGroups: List<Group> = microsoftGraphWebClient.get()
-                .uri { uriBuilder ->
-                    uriBuilder
-                        .path("/users/{userPrincipalName}/memberOf")
-                        .build(userPrincipalName)
-                }
-                .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
-                .retrieve()
-                .bodyToMono<MicrosoftGraphMemberOfResponse>().block().value
-            aadGroups.map { it.id }
-        } catch (e: Exception) {
-            logger.error("Failed to retrieve AAD groups for $ident", e)
-            emptyList()
+    private fun findUserByNavIdent(navIdent: String): AzureUser = microsoftGraphWebClient.get()
+        .uri { uriBuilder ->
+            uriBuilder
+                .path("/users")
+                .queryParam("\$filter", "mailnickname eq '$navIdent'")
+                .queryParam("\$select", userSelect)
+                .build()
         }
-    }
+        .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
+        .retrieve()
+        .bodyToMono<AzureUserList>().block()?.value?.firstOrNull()
+        ?: throw RuntimeException("AzureAD data about user by nav ident could not be fetched")
 }

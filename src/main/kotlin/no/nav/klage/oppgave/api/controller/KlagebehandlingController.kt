@@ -3,8 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
-import no.nav.klage.oppgave.api.view.Medunderskriver
-import no.nav.klage.oppgave.api.view.Medunderskrivere
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -45,34 +43,16 @@ class KlagebehandlingController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @GetMapping("/{id}/muligemedunderskrivere")
-    fun getPossibleMedunderskrivere(
-        @PathVariable("id") klagebehandlingId: UUID
-    ): Medunderskrivere {
-        val navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        logger.debug("getPossibleMedunderskrivere is requested by $navIdent")
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId)
-        val tema = klagebehandling.tema
-        return if (environment.activeProfiles.contains("prod-gcp")) {
-            saksbehandlerService.getMedunderskrivere(navIdent, klagebehandling)
-        } else Medunderskrivere(
-            tema.id,
-            listOf(
-                Medunderskriver("Z994488", "F_Z994488, E_Z994488"),
-                Medunderskriver("Z994330", "F_Z994330 E_Z994330"),
-                Medunderskriver("Z994861", "F_Z994861 E_Z994861"),
-                Medunderskriver("Z994864", "F_Z994864 E_Z994864"),
-                Medunderskriver("Z994863", "F_Z994863 E_Z994863"),
-                Medunderskriver("Z994862", "F_Z994862 E_Z994862"),
-            ).filter { it.ident != navIdent }
-        )
-    }
-
     @GetMapping("/{id}/relaterte")
     fun getRelaterteKlagebehandlinger(
         @PathVariable("id") klagebehandlingId: UUID
     ): KlagebehandlingerListRespons {
-        logKlagebehandlingMethodDetails("getRelaterteKlagebehandlinger", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId, logger)
+        logKlagebehandlingMethodDetails(
+            "getRelaterteKlagebehandlinger",
+            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            klagebehandlingId,
+            logger
+        )
         //TODO: Flytt masse av dette inn i en egen service/facade, kanskje den Richard lager?
         val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId)
         val lovligeTemaer =
