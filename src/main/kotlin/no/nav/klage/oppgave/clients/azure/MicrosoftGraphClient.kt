@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.clients.azure
 import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
@@ -21,6 +22,7 @@ class MicrosoftGraphClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
 
         private const val userSelect =
             "onPremisesSamAccountName,displayName,givenName,surname,mail,officeLocation,userPrincipalName,id,jobTitle"
@@ -44,7 +46,7 @@ class MicrosoftGraphClient(
 
             .retrieve()
             .bodyToMono<AzureUser>()
-            .block().let { logger.debug("me: $it"); it }
+            .block().let { secureLogger.debug("me: $it"); it }
             ?: throw RuntimeException("AzureAD data about authenticated user could not be fetched")
     }
 
@@ -66,7 +68,7 @@ class MicrosoftGraphClient(
             }.header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()}")
             .retrieve()
             .bodyToMono<AzureGroupList>()
-            .block()?.value?.map { logger.debug("AD Gruppe: $it"); it }
+            .block()?.value?.map { secureLogger.debug("AD Gruppe: $it"); it }
             ?: throw RuntimeException("AzureAD data about authenticated users groups could not be fetched")
     }
 
@@ -94,7 +96,7 @@ class MicrosoftGraphClient(
         return data.flatMap {
             it.value ?: emptyList()
         }.mapNotNull {
-            logger.debug("Display name: $it")
+            secureLogger.debug("Display name: $it")
             if (it.onPremisesSamAccountName == null || it.displayName == null) {
                 null
             } else {
@@ -135,7 +137,8 @@ class MicrosoftGraphClient(
             .retrieve()
             .bodyToMono<AzureGroupMemberList>().block()?.value
             ?: throw RuntimeException("AzureAD data about group members nav idents could not be fetched")
-        return azureGroupMember.map { logger.debug("Group member $it"); it }.mapNotNull { it.onPremisesSamAccountName }
+        return azureGroupMember.map { secureLogger.debug("Group member $it"); it }
+            .mapNotNull { it.onPremisesSamAccountName }
     }
 
     private fun getGroupsByUserPrincipalName(userPrincipalName: String): List<AzureGroup> {
@@ -147,7 +150,7 @@ class MicrosoftGraphClient(
             }
             .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
             .retrieve()
-            .bodyToMono<AzureGroupList>().block()?.value?.map { logger.debug("AD Gruppe by navident: $it"); it }
+            .bodyToMono<AzureGroupList>().block()?.value?.map { secureLogger.debug("AD Gruppe by navident: $it"); it }
             ?: throw RuntimeException("AzureAD data about groups by user principal name could not be fetched")
         return aadAzureGroups
     }
@@ -162,6 +165,6 @@ class MicrosoftGraphClient(
         }
         .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
         .retrieve()
-        .bodyToMono<AzureUserList>().block()?.value?.firstOrNull()?.let { logger.debug("Saksbehandler: $it"); it }
+        .bodyToMono<AzureUserList>().block()?.value?.firstOrNull()?.let { secureLogger.debug("Saksbehandler: $it"); it }
         ?: throw RuntimeException("AzureAD data about user by nav ident could not be fetched")
 }
