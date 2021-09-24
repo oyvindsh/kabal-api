@@ -31,6 +31,17 @@ class SaksbehandlerController(
     }
 
     @ApiOperation(
+        value = "Hent brukerdata for innlogget anaatt",
+        notes = "Henter alle brukerdata om en saksbehandler, inklusive innstillingene hen har gjort."
+    )
+    @GetMapping("/me/brukerdata", produces = ["application/json"])
+    fun getBrukerdata(): SaksbehandlerView {
+        val navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        logger.debug("getBrukerdata is requested by $navIdent")
+        return saksbehandlerService.getDataOmSaksbehandler(navIdent).mapToView()
+    }
+
+    @ApiOperation(
         value = "Hent brukerdata for en ansatt",
         notes = "Henter alle brukerdata om en saksbehandler, inklusive innstillingene hen har gjort."
     )
