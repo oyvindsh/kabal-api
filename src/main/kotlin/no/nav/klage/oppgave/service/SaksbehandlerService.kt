@@ -113,7 +113,9 @@ class SaksbehandlerService(
 
     fun getDataOmSaksbehandler(navIdent: String): SaksbehandlerInfo {
         val dataOmInnloggetSaksbehandler = azureGateway.getDataOmInnloggetSaksbehandler()
-        val rollerForInnloggetSaksbehandler = azureGateway.getRollerForInnloggetSaksbehandler()
+        azureGateway.getRollerForInnloggetSaksbehandler()
+        val rollerForInnloggetSaksbehandler =
+            azureGateway.getRollerForSaksbehandlerMedIdent(innloggetSaksbehandlerRepository.getInnloggetIdent())
         val enheterForInnloggetSaksbehandler = innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
         val valgtEnhet = findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
         val innstillinger = findInnstillinger(innloggetSaksbehandlerRepository.getInnloggetIdent())
