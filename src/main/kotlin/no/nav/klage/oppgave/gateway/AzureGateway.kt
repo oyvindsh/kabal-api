@@ -73,7 +73,7 @@ class AzureGateway(private val microsoftGraphClient: MicrosoftGraphClient) {
     fun getRollerForSaksbehandlerMedIdent(navIdent: String): List<SaksbehandlerRolle> =
         try {
             microsoftGraphClient.getSaksbehandlersGroups(navIdent)
-                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.id) }
+                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.mailNickname ?: it.id) }
         } catch (e: Exception) {
             logger.error("Failed to call getSaksbehandlersGroups", e)
             throw e
@@ -82,7 +82,7 @@ class AzureGateway(private val microsoftGraphClient: MicrosoftGraphClient) {
     fun getRollerForInnloggetSaksbehandler(): List<SaksbehandlerRolle> =
         try {
             microsoftGraphClient.getInnloggetSaksbehandlersGroups()
-                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.id) }
+                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.mailNickname ?: it.id) }
         } catch (e: Exception) {
             logger.error("Failed to call getInnloggetSaksbehandlersGroups", e)
             throw e

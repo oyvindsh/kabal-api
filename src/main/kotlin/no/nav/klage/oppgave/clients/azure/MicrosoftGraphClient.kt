@@ -65,7 +65,7 @@ class MicrosoftGraphClient(
             }.header("Authorization", "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithGraphScope()}")
             .retrieve()
             .bodyToMono<AzureGroupList>()
-            .block()?.value
+            .block()?.value?.map { logger.debug("AD Gruppe: $it"); it }
             ?: throw RuntimeException("AzureAD data about authenticated users groups could not be fetched")
     }
 

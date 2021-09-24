@@ -33,7 +33,8 @@ data class AzureGroupMember(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AzureGroup(
     val id: String,
-    val displayName: String
+    val displayName: String?,
+    val mailNickname: String?
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
