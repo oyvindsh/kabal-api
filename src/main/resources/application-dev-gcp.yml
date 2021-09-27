@@ -48,8 +48,3 @@ CLAM_AV_URL: http://clamav.clamav/scan
 
 INFLUX_HOST: influx-klage-nav-dev.aivencloud.com
 INFLUX_PORT: 26482
-
-allowed.origins:
-  https://kabal.nav.no,
-  https://kabal.dev.nav.no,
-  http://localhost
