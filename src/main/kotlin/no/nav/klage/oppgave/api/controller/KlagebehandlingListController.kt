@@ -96,7 +96,7 @@ class KlagebehandlingListController(
     }
 
     private fun canSeeTildelteOppgaver() = innloggetSaksbehandlerRepository.erLeder() ||
-            innloggetSaksbehandlerRepository.erFagansvarlig()
+            innloggetSaksbehandlerRepository.erFagansvarlig() || true
 
     @ApiOperation(
         value = "Hent oppgaver som gjelder en gitt person",
