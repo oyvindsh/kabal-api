@@ -117,14 +117,23 @@ class KlagebehandlingMapper(
     }
 
     private fun Klager.mapToView(): KlagebehandlingDetaljerView.KlagerView {
-        val person = pdlFacade.getPersonInfo(partId.value)
-        return KlagebehandlingDetaljerView.KlagerView(
-            person = KlagebehandlingDetaljerView.PersonView(
-                foedselsnummer = person.foedselsnr,
-                navn = person.mapNavnToView(),
-                kjoenn = person.kjoenn
+        if (erPerson()) {
+            val person = pdlFacade.getPersonInfo(partId.value)
+            return KlagebehandlingDetaljerView.KlagerView(
+                person = KlagebehandlingDetaljerView.PersonView(
+                    foedselsnummer = person.foedselsnr,
+                    navn = person.mapNavnToView(),
+                    kjoenn = person.kjoenn
+                ), virksomhet = null
             )
-        )
+        } else {
+            return KlagebehandlingDetaljerView.KlagerView(
+                person = null, virksomhet = KlagebehandlingDetaljerView.VirksomhetView(
+                    virksomhetsnummer = partId.value,
+                    navn = eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
+                )
+            )
+        }
     }
 
     fun Vedtak.mapToVedtakView(): VedtakView {

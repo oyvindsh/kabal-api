@@ -54,6 +54,7 @@ data class KlagebehandlingDetaljerView(
 
     data class KlagerView(
         val person: PersonView?,
+        val virksomhet: VirksomhetView?
     )
 
     data class SakenGjelderView(
