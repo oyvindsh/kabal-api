@@ -97,11 +97,7 @@ class MicrosoftGraphClient(
             it.value ?: emptyList()
         }.mapNotNull {
             secureLogger.debug("Display name: $it")
-            if (it.onPremisesSamAccountName == null || it.displayName == null) {
-                null
-            } else {
-                it.onPremisesSamAccountName to it.displayName
-            }
+            it.onPremisesSamAccountName to it.displayName
         }.toMap()
     }
 

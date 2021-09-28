@@ -10,15 +10,17 @@ data class KlagebehandlingDetaljerView(
     val fraNAVEnhet: String?,
     val fraNAVEnhetNavn: String?,
     val mottattFoersteinstans: LocalDate? = null,
+    val sakenGjelder: SakenGjelderView,
+    val klager: KlagerView?,
     val sakenGjelderFoedselsnummer: String?,
-    val sakenGjelderNavn: Navn?,
+    val sakenGjelderNavn: NavnView?,
     val sakenGjelderKjoenn: String?,
     val sakenGjelderVirksomhetsnummer: String?,
     val sakenGjelderVirksomhetsnavn: String?,
     val klagerFoedselsnummer: String?,
     val klagerVirksomhetsnummer: String?,
     val klagerVirksomhetsnavn: String?,
-    val klagerNavn: Navn?,
+    val klagerNavn: NavnView?,
     val klagerKjoenn: String?,
     val tema: String,
     val type: String,
@@ -37,15 +39,36 @@ data class KlagebehandlingDetaljerView(
     val klagebehandlingVersjon: Long,
     //TODO remove list when frontend is ready, and replace with only one vedtak
     val vedtak: List<VedtakView>,
+    val vedtaket: VedtakView?,
     val kommentarFraFoersteinstans: String?,
     val tilknyttedeDokumenter: Set<TilknyttetDokument>,
     val egenAnsatt: Boolean,
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean
 ) {
-    data class Navn(
+    data class NavnView(
         val fornavn: String?,
         val mellomnavn: String?,
         val etternavn: String?,
+    )
+
+    data class KlagerView(
+        val person: PersonView?,
+    )
+
+    data class SakenGjelderView(
+        val person: PersonView?,
+        val virksomhet: VirksomhetView?
+    )
+
+    data class VirksomhetView(
+        val virksomhetsnummer: String?,
+        val navn: String?,
+    )
+
+    data class PersonView(
+        val foedselsnummer: String?,
+        val navn: NavnView?,
+        val kjoenn: String?,
     )
 }
