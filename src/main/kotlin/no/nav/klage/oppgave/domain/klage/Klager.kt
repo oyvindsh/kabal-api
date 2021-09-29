@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
+import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import javax.persistence.*
 
 @Embeddable
@@ -22,4 +23,8 @@ data class Klager(
         ]
     )
     val prosessfullmektig: Prosessfullmektig? = null
-)
+) {
+    fun erPerson() = partId.type == PartIdType.PERSON
+
+    fun erVirksomhet() = partId.type == PartIdType.VIRKSOMHET
+}

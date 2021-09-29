@@ -8,10 +8,7 @@ import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.ArkivertDokumentWithTitle
-import no.nav.klage.oppgave.domain.klage.BrevMottaker
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.PartId
-import no.nav.klage.oppgave.domain.klage.Vedtak
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.FileApiService
@@ -58,15 +55,17 @@ class KlagebehandlingMapper(
             fraNAVEnhetNavn = enhetNavn,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
             mottattFoersteinstans = klagebehandling.mottattFoersteinstans,
+            sakenGjelder = klagebehandling.sakenGjelder.mapToView(),
+            klager = klagebehandling.klager.mapToView(),
             sakenGjelderFoedselsnummer = sakenGjelderFoedselsnummer,
-            sakenGjelderNavn = sakenGjelder.getNavn(),
+            sakenGjelderNavn = sakenGjelder.mapNavnToView(),
             sakenGjelderKjoenn = sakenGjelder?.kjoenn,
             sakenGjelderVirksomhetsnummer = sakenGjelderVirksomhetsnummer,
             sakenGjelderVirksomhetsnavn = sakenGjelderVirksomhet?.navn?.sammensattNavn(),
             klagerFoedselsnummer = klagerFoedselsnummer,
             klagerVirksomhetsnummer = klagerVirksomhetsnummer,
             klagerVirksomhetsnavn = klagerVirksomhet?.navn?.sammensattNavn(),
-            klagerNavn = klager.getNavn(),
+            klagerNavn = klager.mapNavnToView(),
             klagerKjoenn = klager?.kjoenn,
             tema = klagebehandling.tema.id,
             type = klagebehandling.type.id,
@@ -82,7 +81,8 @@ class KlagebehandlingMapper(
             modified = klagebehandling.modified,
             created = klagebehandling.created,
             klagebehandlingVersjon = klagebehandling.versjon,
-            vedtak = if (klagebehandling.vedtak != null) listOf(mapVedtakToVedtakView(klagebehandling.vedtak)) else emptyList(),
+            vedtak = if (klagebehandling.vedtak != null) listOf(klagebehandling.vedtak.mapToVedtakView()) else emptyList(),
+            vedtaket = klagebehandling.vedtak?.mapToVedtakView(),
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
                 TilknyttetDokument(
@@ -96,16 +96,56 @@ class KlagebehandlingMapper(
         )
     }
 
-    fun mapVedtakToVedtakView(vedtak: Vedtak): VedtakView {
+    private fun SakenGjelder.mapToView(): KlagebehandlingDetaljerView.SakenGjelderView {
+        if (erPerson()) {
+            val person = pdlFacade.getPersonInfo(partId.value)
+            return KlagebehandlingDetaljerView.SakenGjelderView(
+                person = KlagebehandlingDetaljerView.PersonView(
+                    foedselsnummer = person.foedselsnr,
+                    navn = person.mapNavnToView(),
+                    kjoenn = person.kjoenn
+                ), virksomhet = null
+            )
+        } else {
+            return KlagebehandlingDetaljerView.SakenGjelderView(
+                person = null, virksomhet = KlagebehandlingDetaljerView.VirksomhetView(
+                    virksomhetsnummer = partId.value,
+                    navn = eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
+                )
+            )
+        }
+    }
+
+    private fun Klager.mapToView(): KlagebehandlingDetaljerView.KlagerView {
+        if (erPerson()) {
+            val person = pdlFacade.getPersonInfo(partId.value)
+            return KlagebehandlingDetaljerView.KlagerView(
+                person = KlagebehandlingDetaljerView.PersonView(
+                    foedselsnummer = person.foedselsnr,
+                    navn = person.mapNavnToView(),
+                    kjoenn = person.kjoenn
+                ), virksomhet = null
+            )
+        } else {
+            return KlagebehandlingDetaljerView.KlagerView(
+                person = null, virksomhet = KlagebehandlingDetaljerView.VirksomhetView(
+                    virksomhetsnummer = partId.value,
+                    navn = eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
+                )
+            )
+        }
+    }
+
+    fun Vedtak.mapToVedtakView(): VedtakView {
         return VedtakView(
-            id = vedtak.id,
-            utfall = vedtak.utfall?.id,
-            grunn = vedtak.grunn?.id,
-            hjemler = vedtak.hjemler.map { it.id }.toSet(),
-            brevMottakere = vedtak.brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-            file = getVedleggView(vedtak.journalpostId, vedtak.opplastet, vedtak.mellomlagerId),
-            ferdigstilt = vedtak.ferdigstiltIJoark,
-            opplastet = vedtak.opplastet
+            id = id,
+            utfall = utfall?.id,
+            grunn = grunn?.id,
+            hjemler = hjemler.map { it.id }.toSet(),
+            brevMottakere = brevmottakere.map { mapBrevmottaker(it) }.toSet(),
+            file = getVedleggView(journalpostId, opplastet, mellomlagerId),
+            ferdigstilt = ferdigstiltIJoark,
+            opplastet = opplastet
         )
     }
 
@@ -159,9 +199,9 @@ class KlagebehandlingMapper(
             null
         }
 
-    private fun Person?.getNavn(): KlagebehandlingDetaljerView.Navn? =
+    private fun Person?.mapNavnToView(): KlagebehandlingDetaljerView.NavnView? =
         if (this != null) {
-            KlagebehandlingDetaljerView.Navn(
+            KlagebehandlingDetaljerView.NavnView(
                 fornavn = fornavn,
                 mellomnavn = mellomnavn,
                 etternavn = etternavn

@@ -49,6 +49,5 @@ class FileApiService(
     }
 
 
-
     private fun getFileNameFromMellomlagerId(mellomlagerId: String): String = mellomlagerId.substring(36)
 }
