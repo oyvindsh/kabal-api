@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.clients.axsys.AxsysGateway
+import no.nav.klage.oppgave.gateway.AxsysGateway
 import org.springframework.stereotype.Service
 
 @Service

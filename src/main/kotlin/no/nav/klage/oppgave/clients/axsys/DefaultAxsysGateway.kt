@@ -2,14 +2,14 @@ package no.nav.klage.oppgave.clients.axsys
 
 import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerIdent
-import no.nav.klage.oppgave.gateway.IAxsysGateway
+import no.nav.klage.oppgave.gateway.AxsysGateway
 import org.springframework.stereotype.Service
 
 @Service
-class AxsysGateway(
+class DefaultAxsysGateway(
     private val axsysClient: AxsysClient,
     private val tilgangerMapper: TilgangerMapper
-) : IAxsysGateway {
+) : AxsysGateway {
 
     override fun getEnheterMedTemaerForSaksbehandler(ident: String): EnheterMedLovligeTemaer =
         tilgangerMapper.mapTilgangerToEnheterMedLovligeTemaer(axsysClient.getTilgangerForSaksbehandler(ident))

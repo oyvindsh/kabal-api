@@ -8,7 +8,7 @@ import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.saksbehandler.*
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.gateway.IAzureGateway
+import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.InnstillingerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
@@ -25,7 +25,7 @@ class SaksbehandlerService(
     private val valgtEnhetRepository: ValgtEnhetRepository,
     private val innstillingerRepository: InnstillingerRepository,
     private val tilgangService: TilgangService,
-    private val azureGateway: IAzureGateway
+    private val azureGateway: AzureGateway
 ) {
     fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
         innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()

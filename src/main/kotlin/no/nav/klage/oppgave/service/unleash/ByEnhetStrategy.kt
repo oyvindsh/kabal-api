@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.service.unleash
 
 import no.finn.unleash.UnleashContext
 import no.finn.unleash.strategy.Strategy
-import no.nav.klage.oppgave.clients.axsys.AxsysGateway
+import no.nav.klage.oppgave.gateway.AxsysGateway
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Component
 

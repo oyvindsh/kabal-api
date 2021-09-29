@@ -2,13 +2,13 @@ package no.nav.klage.oppgave.clients.azure
 
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerPersonligInfo
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerRolle
-import no.nav.klage.oppgave.gateway.IAzureGateway
+import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 
 @Service
-class AzureGateway(private val microsoftGraphClient: MicrosoftGraphClient) : IAzureGateway {
+class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient) : AzureGateway {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")

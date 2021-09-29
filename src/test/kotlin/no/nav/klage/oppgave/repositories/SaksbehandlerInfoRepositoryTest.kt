@@ -2,25 +2,22 @@ package no.nav.klage.oppgave.repositories
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.klage.oppgave.clients.axsys.AxsysGateway
-import no.nav.klage.oppgave.clients.axsys.Tilganger
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
-import no.nav.klage.oppgave.gateway.IAzureGateway
+import no.nav.klage.oppgave.gateway.AxsysGateway
+import no.nav.klage.oppgave.gateway.AzureGateway
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.Test
 
 internal class SaksbehandlerInfoRepositoryTest {
 
     private val axsysGateway: AxsysGateway = mockk()
-    private val msClient: IAzureGateway = mockk()
-    private val tilganger = Tilganger(emptyList())
+    private val msClient: AzureGateway = mockk()
 
     private val repo: SaksbehandlerRepository =
         SaksbehandlerRepository(msClient, axsysGateway, "", "", "", "", "", "", "", "")
-
-
+    
     @Test
     fun harTilgangTilEnhetOgTema() {
         every { axsysGateway.getEnheterMedTemaerForSaksbehandler("01010112345") } returns EnheterMedLovligeTemaer(

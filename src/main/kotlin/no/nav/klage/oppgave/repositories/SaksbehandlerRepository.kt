@@ -2,8 +2,8 @@ package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
-import no.nav.klage.oppgave.gateway.IAxsysGateway
-import no.nav.klage.oppgave.gateway.IAzureGateway
+import no.nav.klage.oppgave.gateway.AxsysGateway
+import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -11,8 +11,8 @@ import kotlin.system.measureTimeMillis
 
 @Service
 class SaksbehandlerRepository(
-    private val azureGateway: IAzureGateway,
-    private val axsysGateway: IAxsysGateway,
+    private val azureGateway: AzureGateway,
+    private val axsysGateway: AxsysGateway,
     @Value("\${ROLE_GOSYS_OPPGAVE_BEHANDLER}") private val gosysSaksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
