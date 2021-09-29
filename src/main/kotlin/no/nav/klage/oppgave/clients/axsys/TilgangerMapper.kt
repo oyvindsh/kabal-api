@@ -1,6 +1,5 @@
-package no.nav.klage.oppgave.repositories
+package no.nav.klage.oppgave.clients.axsys
 
-import no.nav.klage.oppgave.clients.axsys.Tilganger
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
@@ -10,7 +9,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class SaksbehandlerMapper(environment: Environment) {
+class TilgangerMapper(environment: Environment) {
 
     private val lovligeTemaerIKabal = LovligeTemaer.lovligeTemaer(environment)
 

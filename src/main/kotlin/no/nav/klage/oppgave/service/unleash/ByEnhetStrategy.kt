@@ -2,12 +2,12 @@ package no.nav.klage.oppgave.service.unleash
 
 import no.finn.unleash.UnleashContext
 import no.finn.unleash.strategy.Strategy
-import no.nav.klage.oppgave.clients.axsys.AxsysClient
+import no.nav.klage.oppgave.clients.axsys.AxsysGateway
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Component
 
 @Component
-class ByEnhetStrategy(private val axsysClient: AxsysClient) : Strategy {
+class ByEnhetStrategy(private val axsysGateway: AxsysGateway) : Strategy {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -38,7 +38,7 @@ class ByEnhetStrategy(private val axsysClient: AxsysClient) : Strategy {
 
     private fun getSaksbehandlersEnheter(unleashContext: UnleashContext): List<String> {
         logger.debug("Getting saksbehandlers enheter")
-        return axsysClient.getTilgangerForSaksbehandler(unleashContext.userId.get()).enheter
+        return axsysGateway.getEnheterMedTemaerForSaksbehandler(unleashContext.userId.get()).enheter
             .map { it.enhetId }
     }
 

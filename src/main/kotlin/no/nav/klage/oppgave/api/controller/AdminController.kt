@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.api.controller
 
+import no.nav.klage.oppgave.clients.azure.AzureGateway
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.util.getLogger
