@@ -20,8 +20,8 @@ class TestElasticsearchContainer private constructor() :
         super.start()
         System.setProperty("AIVEN_ES_HOST", CONTAINER.host)
         System.setProperty("AIVEN_ES_PORT", CONTAINER.firstMappedPort.toString())
-        System.setProperty("AIVEN_ES_USERNAME_ADM", "elastic")
-        System.setProperty("AIVEN_ES_PASSWORD_ADM", "changeme")
+        System.setProperty("ELASTIC_USERNAME", "elastic")
+        System.setProperty("ELASTIC_PASSWORD", "changeme")
         System.setProperty("AIVEN_ES_SCHEME", "http")
         System.setProperty("AIVEN_ES_USE_SSL", "false")
     }

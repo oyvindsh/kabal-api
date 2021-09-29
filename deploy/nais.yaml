@@ -46,6 +46,7 @@ spec:
         extra:
           - NAVident
   elastic:
+    access: admin
     instance: oppgave-es
   kafka:
     pool: {{kafka_pool}}
