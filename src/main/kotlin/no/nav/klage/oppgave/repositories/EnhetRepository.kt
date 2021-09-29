@@ -1,28 +1,28 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.clients.axsys.AxsysClient
+import no.nav.klage.oppgave.gateway.AxsysGateway
 import org.springframework.stereotype.Service
 
 @Service
 class EnhetRepository(
     private val saksbehandlerRepository: SaksbehandlerRepository,
-    private val axsysClient: AxsysClient
+    private val axsysGateway: AxsysGateway
 ) {
 
     fun getAnsatteIEnhet(enhetId: String): List<String> {
-        return axsysClient.getSaksbehandlereIEnhet(enhetId).map { it.appIdent }
+        return axsysGateway.getSaksbehandlereIEnhet(enhetId).map { it.navIdent }
     }
 
     fun getLedereIEnhet(enhetId: String): List<String> {
-        return axsysClient.getSaksbehandlereIEnhet(enhetId)
-            .filter { saksbehandlerRepository.erLeder(it.appIdent) }
-            .map { it.appIdent }
+        return axsysGateway.getSaksbehandlereIEnhet(enhetId)
+            .filter { saksbehandlerRepository.erLeder(it.navIdent) }
+            .map { it.navIdent }
     }
 
     fun getFagansvarligeIEnhet(enhetId: String): List<String> {
-        return axsysClient.getSaksbehandlereIEnhet(enhetId)
-            .filter { saksbehandlerRepository.erFagansvarlig(it.appIdent) }
-            .map { it.appIdent }
+        return axsysGateway.getSaksbehandlereIEnhet(enhetId)
+            .filter { saksbehandlerRepository.erFagansvarlig(it.navIdent) }
+            .map { it.navIdent }
     }
 
 
