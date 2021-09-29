@@ -40,11 +40,11 @@ class KlagebehandlingDokumentController(
         @PathVariable("id") klagebehandlingId: UUID,
         @RequestParam(required = false, name = "antall", defaultValue = "10") pageSize: Int,
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
-        @RequestParam(required = false, name = "tema") tema: List<String>? = emptyList()
+        @RequestParam(required = false, name = "temaer") temaer: List<String>? = emptyList()
     ): DokumenterResponse {
         return klagebehandlingService.fetchDokumentlisteForKlagebehandling(
             klagebehandlingId = klagebehandlingId,
-            temaer = tema?.map { Tema.of(it) } ?: emptyList(),
+            temaer = temaer?.map { Tema.of(it) } ?: emptyList(),
             pageSize = pageSize,
             previousPageRef = previousPageRef
         )
