@@ -9,7 +9,6 @@ import java.util.*
 
 internal class KlagebehandlingTest {
 
-    private val journalpostId = "1"
     private val vedtakId = UUID.randomUUID()
     private val fnr = "12345678910"
     private val fnr2 = "22345678910"
@@ -29,8 +28,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -57,8 +55,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -85,8 +82,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -127,8 +123,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -164,8 +159,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -205,8 +199,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -246,8 +239,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
 
             )
@@ -292,8 +284,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 
@@ -329,8 +320,7 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 vedtak = Vedtak(
-                    id = vedtakId,
-                    journalpostId = journalpostId
+                    id = vedtakId
                 )
             )
 

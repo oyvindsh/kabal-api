@@ -106,6 +106,7 @@ class KlagebehandlingDistribusjonService(
         vedtakId: UUID,
     ): Klagebehandling {
         logger.debug("Sletter mellomlagret fil i vedtak ${vedtakId} i klagebehandling${klagebehandlingId}")
+        //TODO: Burde den også nullet ut opplastet-tidspunktet?
         return vedtakDistribusjonService.slettMellomlagretDokument(
             klagebehandlingId,
             vedtakId

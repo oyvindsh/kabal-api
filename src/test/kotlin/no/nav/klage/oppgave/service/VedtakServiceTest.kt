@@ -1,63 +1,40 @@
 package no.nav.klage.oppgave.service
 
-import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.mockk
 import no.nav.klage.oppgave.api.view.VedtakFullfoerInput
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
 import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
-import no.nav.klage.oppgave.gateway.JournalpostGateway
 import no.nav.klage.oppgave.util.AttachmentValidator
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.test.context.ActiveProfiles
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-@ActiveProfiles("local")
-@Testcontainers
-@SpringBootTest(classes = [KlagebehandlingService::class])
 class VedtakServiceTest {
 
-    @MockkBean
-    lateinit var tilgangService: TilgangService
+    val tilgangService = mockk<TilgangService>()
 
-    @MockkBean(relaxed = true)
-    lateinit var applicationEventPublisher: ApplicationEventPublisher
+    val applicationEventPublisher = mockk<ApplicationEventPublisher>(relaxed = true)
 
-    @MockkBean
-    lateinit var klagebehandlingService: KlagebehandlingService
+    val klagebehandlingService = mockk<KlagebehandlingService>()
 
-    @MockkBean
-    lateinit var attachmentValidator: AttachmentValidator
+    val attachmentValidator = mockk<AttachmentValidator>()
 
-    @MockkBean
-    lateinit var fileApiService: FileApiService
+    val fileApiService = mockk<FileApiService>()
 
-    @MockkBean
-    lateinit var journalpostGateway: JournalpostGateway
-
-    lateinit var vedtakService: VedtakService
-
-    @BeforeEach
-    fun setup() {
-        vedtakService = VedtakService(
-            klagebehandlingService,
-            applicationEventPublisher,
-            attachmentValidator,
-            tilgangService,
-            fileApiService,
-            journalpostGateway
-        )
-    }
-
+    val vedtakService = VedtakService(
+        klagebehandlingService,
+        applicationEventPublisher,
+        attachmentValidator,
+        tilgangService,
+        fileApiService,
+    )
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"
     private val MEDUNDERSKRIVER_IDENT = "MEDUNDERSKRIVER_IDENT"
     private val JOURNALFOERENDE_ENHET = "1234"
@@ -145,7 +122,8 @@ class VedtakServiceTest {
                 any(),
                 any()
             )
-        } returns getKlagebehandlingMedUtfall()
+        } returns getFerdigstiltKlagebehandling()
+
         val result = vedtakService.ferdigstillVedtak(
             KLAGEBEHANDLING_ID,
             VedtakFullfoerInput(
@@ -154,7 +132,7 @@ class VedtakServiceTest {
             ),
             MEDUNDERSKRIVER_IDENT
         )
-        assert(result.getVedtakOrException().avsluttetAvSaksbehandler != null)
+        assert(result.avsluttetAvSaksbehandler != null)
     }
 
     private fun getKlageBehandling(): Klagebehandling {
@@ -189,7 +167,7 @@ class VedtakServiceTest {
     }
 
     private fun getFerdigstiltKlagebehandling(): Klagebehandling {
-        return getKlageBehandling().apply { getVedtakOrException().ferdigstiltIJoark = LocalDateTime.now() }
+        return getKlageBehandling().apply { avsluttetAvSaksbehandler = LocalDateTime.now() }
     }
 
     private fun getKlagebehandlingMedUtfall(): Klagebehandling {

@@ -33,20 +33,10 @@ class Vedtak(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
-    //Dette feltet er ikke egentlig lenger i bruk, det er bare på BrevMottaker dette lagres nå.
-    //En kommentar et annet sted i koden sier at "Brukes bare for å slette gamle journalposter på vedtak"
-    @Column(name = "journalpost_id")
-    var journalpostId: String? = null,
     @Column(name = "opplastet")
     var opplastet: LocalDateTime? = null,
-    //Jeg tror ikke denne er i bruk lenger heller, den settes så vidt jeg kan se aldri.
-    //MEN, den LESES flere steder, f.eks forventes det at den er satt ifm data som sendes til DVH. Burde man der brukt ferdigDistribuert i stedet?
-    @Column(name = "ferdigstilt_i_joark")
-    var ferdigstiltIJoark: LocalDateTime? = null,
     @Column(name = "ferdig_distribuert")
     var ferdigDistribuert: LocalDateTime? = null,
-    @Column(name = "avsluttet_av_saksbehandler")
-    var avsluttetAvSaksbehandler: LocalDateTime? = null,
     @Column(name = "mellomlager_id")
     var mellomlagerId: String? = null
 ) {

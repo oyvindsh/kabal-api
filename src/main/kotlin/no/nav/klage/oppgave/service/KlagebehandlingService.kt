@@ -378,7 +378,8 @@ class KlagebehandlingService(
                 vedtak = Vedtak(
                     utfall = kvalitetsvurdering.utfall,
                     grunn = kvalitetsvurdering.grunn,
-                    journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
+                    //TODO Hvor skal den istedet?
+                    //journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
                     hjemler = hjemler
                 )
             )

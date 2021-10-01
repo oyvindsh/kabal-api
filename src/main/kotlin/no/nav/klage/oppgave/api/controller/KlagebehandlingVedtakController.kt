@@ -175,9 +175,6 @@ class KlagebehandlingVedtakController(
 
         val arkivertDokumentWithTitle =
             when {
-                vedtak.journalpostId != null -> {
-                    dokumentService.getArkivertDokumentWithTitleAsSaksbehandler(vedtak.journalpostId!!)
-                }
                 vedtak.mellomlagerId != null -> {
                     fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
                 }
@@ -211,18 +208,11 @@ class KlagebehandlingVedtakController(
         val vedtak = vedtakService.getVedtak(klagebehandling)
 
         val arkivertDokumentWithTitle =
-            when {
-                vedtak.journalpostId != null -> {
-                    dokumentService.getArkivertDokumentWithTitleAsSaksbehandler(vedtak.journalpostId!!)
-                }
-                vedtak.mellomlagerId != null -> {
-                    fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
-                }
-                else -> {
-                    throw JournalpostNotFoundException("Vedtak er ikke lastet opp")
-                }
+            if (vedtak.mellomlagerId != null) {
+                fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
+            } else {
+                throw JournalpostNotFoundException("Vedtak er ikke lastet opp")
             }
-
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = arkivertDokumentWithTitle.contentType
         responseHeaders.add("Content-Disposition", "inline; filename=${arkivertDokumentWithTitle.title}")
