@@ -164,7 +164,6 @@ class VedtakService(
             input.klagebehandlingVersjon
         )
 
-        //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
         val vedtak = klagebehandling.getVedtakOrException()
@@ -209,30 +208,45 @@ class VedtakService(
             ignoreCheckSkrivetilgang = true
         )
 
-        if (klagebehandling.medunderskriver?.saksbehandlerident != innloggetIdent) {
-            secureLogger.error(
-                "{} prøvde å fullføre vedtak for klagebehandling {}, men er ikke medunderskriver.",
-                innloggetIdent,
-                klagebehandlingId
-            )
-            throw MissingTilgangException("Vedtak kan kun ferdigstilles av medunderskriver")
-        }
+        verifyTilgangTilAaFerdigstilleVedtak(klagebehandling, innloggetIdent)
 
         val vedtak = klagebehandling.getVedtakOrException()
+        //Denne settes ikke lenger, virker å være en etterlevning fra hvordan det ble gjort før..
         if (vedtak.ferdigstiltIJoark != null) throw VedtakFinalizedException("Vedtak med id ${vedtak.id} er allerede ferdigstilt")
 
+        //Sjekker om fil er lastet opp til mellomlager
         if (vedtak.mellomlagerId == null) {
             throw VedtakNotFoundException("Vennligst last opp vedtaksdokument på nytt")
         }
 
+        //Forretningsmessig krav før vedtak kan ferdigstilles
         if (vedtak.utfall == null) throw UtfallNotSetException("Utfall på vedtak ${vedtak.id} er ikke satt")
 
+        //Setter en markør, som så trigger en asynkron behandling (utsending av brev)
+        //Rettelse, det er egentlig avsluttetAvSaksbehandler i Klagebehandling som gjør det, så hva trenger vi da denne til?
         markerVedtakSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
 
-        if (klagebehandling.vedtak?.avsluttetAvSaksbehandler != null) {
+        //Denne kan ikke være null her, den settes jo til ikke-null i linja over..
+        // Dette er nok en etterlevning av at vi hadde støtte for flere vedtak
+        if (klagebehandling.getVedtakOrException().avsluttetAvSaksbehandler != null) {
+            //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
             klagebehandlingService.markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
         }
         return klagebehandling
+    }
+
+    private fun verifyTilgangTilAaFerdigstilleVedtak(
+        klagebehandling: Klagebehandling,
+        innloggetIdent: String
+    ) {
+        if (klagebehandling.medunderskriver?.saksbehandlerident != innloggetIdent) {
+            secureLogger.error(
+                "{} prøvde å fullføre vedtak for klagebehandling {}, men er ikke medunderskriver.",
+                innloggetIdent,
+                klagebehandling.id
+            )
+            throw MissingTilgangException("Vedtak kan kun ferdigstilles av medunderskriver")
+        }
     }
 
     private fun kansellerJournalpost(
