@@ -20,6 +20,8 @@ class BrevMottakerNotFoundException(msg: String) : RuntimeException(msg)
 
 class MeldingNotFoundException(msg: String) : RuntimeException(msg)
 
+class SaksdokumentNotFoundException(msg: String) : RuntimeException(msg)
+
 class VedtakFinalizedException(msg: String) : RuntimeException(msg)
 
 open class ValidationException(msg: String) : RuntimeException(msg)
