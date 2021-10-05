@@ -4,6 +4,8 @@ import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
+import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
@@ -230,6 +232,42 @@ class KlagebehandlingVedtakController(
             arkivertDokumentWithTitle.content,
             responseHeaders,
             HttpStatus.OK
+        )
+    }
+
+    @PutMapping("/{id}/vedtak/utfall")
+    fun setUtfall(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: VedtakUtfallInput
+    ): VedtakEditedView {
+        logKlagebehandlingMethodDetails(
+            "setUtfall", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
+            logger
+        )
+        return VedtakEditedView(
+            vedtakService.setUtfall(
+                klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId),
+                input.utfall?.let { Utfall.of(it) },
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            ).modified
+        )
+    }
+
+    @PutMapping("/{id}/vedtak/hjemler")
+    fun setHjemler(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: VedtakHjemlerInput
+    ): VedtakEditedView {
+        logKlagebehandlingMethodDetails(
+            "setHjemler", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
+            logger
+        )
+        return VedtakEditedView(
+            vedtakService.setHjemler(
+                klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId),
+                input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet(),
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            ).modified
         )
     }
 }
