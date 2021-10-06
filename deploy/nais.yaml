@@ -70,10 +70,10 @@ spec:
   resources:
     limits:
       cpu: 2000m
-      memory: 2048Mi
+      memory: 5000Mi
     requests:
       cpu: 2000m
-      memory: 2048Mi
+      memory: 5000Mi
   ingresses:
   {{#each ingresses as |ingress|}}
     - {{ingress}}
