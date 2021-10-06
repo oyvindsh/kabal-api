@@ -73,7 +73,7 @@ spec:
       memory: 2048Mi
     requests:
       cpu: 400m
-      memory: 256Mi
+      memory: 512Mi
   ingresses:
   {{#each ingresses as |ingress|}}
     - {{ingress}}
