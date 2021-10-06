@@ -72,15 +72,15 @@ spec:
       cpu: 2000m
       memory: 2048Mi
     requests:
-      cpu: 400m
-      memory: 512Mi
+      cpu: 2000m
+      memory: 2048Mi
   ingresses:
   {{#each ingresses as |ingress|}}
     - {{ingress}}
   {{/each}}
   replicas:
     min: 2
-    max: 4
+    max: 2
     cpuThresholdPercentage: 80
   prometheus:
     enabled: true
@@ -130,4 +130,4 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
     - name: JAVA_OPTS
-      value: "-Xms512m -Xmx2048m"
+      value: "-Xms512m -Xmx4096m"
