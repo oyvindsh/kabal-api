@@ -130,4 +130,4 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
     - name: JAVA_OPTS
-      value: "-Xms512m -Xmx1024m"
+      value: "-Xms512m -Xmx2048m"
