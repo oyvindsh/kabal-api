@@ -2,11 +2,12 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
+import no.nav.klage.oppgave.api.view.KlagebehandlingMedunderskriveridentInput
+import no.nav.klage.oppgave.api.view.SendtMedunderskriverView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.KlagebehandlingEditableFieldsFacade
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
@@ -23,8 +24,7 @@ class KlagebehandlingDetaljerController(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
-    private val auditLogger: AuditLogger,
-    private val editableFieldsFacade: KlagebehandlingEditableFieldsFacade
+    private val auditLogger: AuditLogger
 ) {
 
     companion object {
@@ -47,21 +47,6 @@ class KlagebehandlingDetaljerController(
                 )
             )
         }
-    }
-
-    @PutMapping("/{id}/detaljer/editerbare")
-    fun putEditableFields(
-        @PathVariable("id") klagebehandlingId: UUID,
-        @RequestBody input: KlagebehandlingEditableFieldsInput
-    ): KlagebehandlingEditedView {
-        logKlagebehandlingMethodDetails("putEditableFields", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId, logger)
-        return klagebehandlingMapper.mapKlagebehandlingToKlagebehandlingEditableFieldsView(
-            editableFieldsFacade.updateEditableFields(
-                klagebehandlingId,
-                input,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
     }
 
     @PutMapping("/{id}/detaljer/medunderskriverident")

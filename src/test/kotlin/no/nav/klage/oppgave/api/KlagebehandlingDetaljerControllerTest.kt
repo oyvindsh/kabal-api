@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.api.view.KlagebehandlingMedunderskriveridentInput
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.KlagebehandlingEditableFieldsFacade
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
@@ -47,9 +46,6 @@ class KlagebehandlingDetaljerControllerTest {
 
     @MockkBean
     lateinit var auditLogger: AuditLogger
-
-    @MockkBean
-    lateinit var editableFieldsFacade: KlagebehandlingEditableFieldsFacade
 
     @MockkBean
     lateinit var unleash: Unleash

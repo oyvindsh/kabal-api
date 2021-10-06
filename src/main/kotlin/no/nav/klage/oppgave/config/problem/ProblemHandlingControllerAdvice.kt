@@ -71,6 +71,13 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
+    fun handleSaksdokumentNotFound(
+        ex: SaksdokumentNotFoundException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.NOT_FOUND, ex, request)
+
+    @ExceptionHandler
     fun handleValidationException(
         ex: ValidationException,
         request: NativeWebRequest

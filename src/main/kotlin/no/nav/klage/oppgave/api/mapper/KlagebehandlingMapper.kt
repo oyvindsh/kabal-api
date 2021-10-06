@@ -81,11 +81,11 @@ class KlagebehandlingMapper(
             modified = klagebehandling.modified,
             created = klagebehandling.created,
             klagebehandlingVersjon = klagebehandling.versjon,
-            vedtak = if (klagebehandling.vedtak != null) listOf(klagebehandling.vedtak.mapToVedtakView()) else emptyList(),
-            vedtaket = klagebehandling.vedtak?.mapToVedtakView(),
+            resultat = klagebehandling.vedtak?.mapToVedtakView(),
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
                 TilknyttetDokument(
+                    id = it.id,
                     journalpostId = it.journalpostId,
                     dokumentInfoId = it.dokumentInfoId
                 )
@@ -211,7 +211,7 @@ class KlagebehandlingMapper(
         }
 
     fun mapKlagebehandlingToKlagebehandlingEditableFieldsView(klagebehandling: Klagebehandling): KlagebehandlingEditedView {
-        return KlagebehandlingEditedView(klagebehandling.versjon, klagebehandling.modified)
+        return KlagebehandlingEditedView(klagebehandling.modified)
     }
 
     fun mapToVedleggEditedView(klagebehandling: Klagebehandling): VedleggEditedView {

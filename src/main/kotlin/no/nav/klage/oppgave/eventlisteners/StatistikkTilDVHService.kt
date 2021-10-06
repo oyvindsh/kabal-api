@@ -86,7 +86,7 @@ class StatistikkTilDVHService(
             saksbehandlerEnhet = klagebehandling.tildeling?.enhet,
             tekniskTid = klagebehandling.modified,
             vedtakId = vedtak.id.toString(),
-            vedtaksdato = vedtak.ferdigstiltIJoark?.toLocalDate(),
+            vedtaksdato = vedtak.avsluttetAvSaksbehandler?.toLocalDate(),
             ytelseType = "TODO",
             kvalitetsvurdering = klagebehandling.toKvalitetsvurdering()
         )
