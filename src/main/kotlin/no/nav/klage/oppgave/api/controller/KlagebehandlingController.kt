@@ -101,14 +101,13 @@ class KlagebehandlingController(
             "setTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
             logger
         )
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId)
-        val saksdokumentId = klagebehandlingService.connectDokumentToKlagebehandling(
-            klagebehandling = klagebehandling,
+        val (saksdokumentId, modified) = klagebehandlingService.connectDokumentToKlagebehandling(
+            klagebehandlingId = klagebehandlingId,
             journalpostId = input.journalpostId,
             dokumentInfoId = input.dokumentInfoId,
             saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return TilknyttetDokumentAddedResponse(id = saksdokumentId, modified = klagebehandling.modified)
+        return TilknyttetDokumentAddedResponse(id = saksdokumentId, modified = modified)
     }
 
     @DeleteMapping("/{id}/dokumenttilknytninger/{dokumentId}")
@@ -120,12 +119,11 @@ class KlagebehandlingController(
             "removeTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
             logger
         )
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId)
-        klagebehandlingService.disconnectDokumentFromKlagebehandling(
-            klagebehandling = klagebehandling,
+        val modified = klagebehandlingService.disconnectDokumentFromKlagebehandling(
+            klagebehandlingId = klagebehandlingId,
             saksdokumentId = tilknyttetDokumentId,
             saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return KlagebehandlingEditedView(modified = klagebehandling.modified)
+        return KlagebehandlingEditedView(modified)
     }
 }

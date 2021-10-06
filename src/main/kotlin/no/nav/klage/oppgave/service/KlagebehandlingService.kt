@@ -506,25 +506,27 @@ class KlagebehandlingService(
     }
 
     fun connectDokumentToKlagebehandling(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ): UUID {
+    ): Pair<UUID, LocalDateTime> {
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         dokumentService.validateJournalpostExists(journalpostId)
         return addDokument(
             klagebehandling,
             journalpostId,
             dokumentInfoId,
             saksbehandlerIdent
-        )
+        ) to klagebehandling.modified
     }
 
     fun disconnectDokumentFromKlagebehandling(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         saksdokumentId: UUID,
         saksbehandlerIdent: String
-    ) {
+    ): LocalDateTime {
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val saksdokument = klagebehandling.saksdokumenter.find { it.id == saksdokumentId }
             ?: throw SaksdokumentNotFoundException("no saksdokument found based on id $saksdokumentId")
         removeDokument(
@@ -532,6 +534,7 @@ class KlagebehandlingService(
             saksdokument,
             saksbehandlerIdent
         )
+        return klagebehandling.modified
     }
 
     private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)
