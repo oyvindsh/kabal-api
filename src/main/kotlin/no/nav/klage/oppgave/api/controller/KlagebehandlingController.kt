@@ -5,7 +5,6 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingEditedView
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
 import no.nav.klage.oppgave.api.view.TilknyttetDokument
-import no.nav.klage.oppgave.api.view.TilknyttetDokumentAddedResponse
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -96,24 +95,25 @@ class KlagebehandlingController(
     fun setTilknyttetDokument(
         @PathVariable("id") klagebehandlingId: UUID,
         @RequestBody input: TilknyttetDokument
-    ): TilknyttetDokumentAddedResponse {
+    ): KlagebehandlingEditedView {
         logKlagebehandlingMethodDetails(
             "setTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
             logger
         )
-        val (saksdokumentId, modified) = klagebehandlingService.connectDokumentToKlagebehandling(
+        val modified = klagebehandlingService.connectDokumentToKlagebehandling(
             klagebehandlingId = klagebehandlingId,
             journalpostId = input.journalpostId,
             dokumentInfoId = input.dokumentInfoId,
             saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return TilknyttetDokumentAddedResponse(id = saksdokumentId, modified = modified)
+        return KlagebehandlingEditedView(modified = modified)
     }
 
-    @DeleteMapping("/{id}/dokumenttilknytninger/{dokumentId}")
+    @DeleteMapping("/{id}/dokumenttilknytninger/{journalpostId}/{dokumentInfoId}")
     fun removeTilknyttetDokument(
         @PathVariable("id") klagebehandlingId: UUID,
-        @PathVariable("dokumentId") tilknyttetDokumentId: UUID
+        @PathVariable("journalpostId") journalpostId: String,
+        @PathVariable("dokumentInfoId") dokumentInfoId: String
     ): KlagebehandlingEditedView {
         logKlagebehandlingMethodDetails(
             "removeTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
@@ -121,7 +121,8 @@ class KlagebehandlingController(
         )
         val modified = klagebehandlingService.disconnectDokumentFromKlagebehandling(
             klagebehandlingId = klagebehandlingId,
-            saksdokumentId = tilknyttetDokumentId,
+            journalpostId = journalpostId,
+            dokumentInfoId = dokumentInfoId,
             saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
         return KlagebehandlingEditedView(modified)

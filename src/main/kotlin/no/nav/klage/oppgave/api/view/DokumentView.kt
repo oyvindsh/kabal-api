@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 
 data class DokumenterResponse(
     val dokumenter: List<DokumentReferanse>,
@@ -30,6 +28,4 @@ data class DokumentReferanse(
     )
 }
 
-data class TilknyttetDokument(val id: UUID? = null, val journalpostId: String, val dokumentInfoId: String)
-
-data class TilknyttetDokumentAddedResponse(val id: UUID, val modified: LocalDateTime)
+data class TilknyttetDokument(val journalpostId: String, val dokumentInfoId: String)
