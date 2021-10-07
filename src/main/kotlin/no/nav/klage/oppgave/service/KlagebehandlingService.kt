@@ -444,13 +444,12 @@ class KlagebehandlingService(
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ): UUID {
+    ) {
         try {
             val foundSaksdokument =
                 klagebehandling.saksdokumenter.find { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }
-            return if (foundSaksdokument != null) {
+            if (foundSaksdokument != null) {
                 logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to klagebehandling ${klagebehandling.id}, doing nothing")
-                foundSaksdokument.id
             } else {
                 val saksdokument = Saksdokument(
                     journalpostId = journalpostId,
@@ -461,8 +460,6 @@ class KlagebehandlingService(
                     saksbehandlerIdent
                 )
                 event?.let { applicationEventPublisher.publishEvent(it) }
-
-                saksdokument.id
             }
         } catch (e: Exception) {
             logger.error("Error connecting journalpost $journalpostId to klagebehandling ${klagebehandling.id}", e)
@@ -510,25 +507,28 @@ class KlagebehandlingService(
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ): Pair<UUID, LocalDateTime> {
+    ): LocalDateTime {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         dokumentService.validateJournalpostExists(journalpostId)
-        return addDokument(
+        addDokument(
             klagebehandling,
             journalpostId,
             dokumentInfoId,
             saksbehandlerIdent
-        ) to klagebehandling.modified
+        )
+        return klagebehandling.modified
     }
 
     fun disconnectDokumentFromKlagebehandling(
         klagebehandlingId: UUID,
-        saksdokumentId: UUID,
+        journalpostId: String,
+        dokumentInfoId: String,
         saksbehandlerIdent: String
     ): LocalDateTime {
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
-        val saksdokument = klagebehandling.saksdokumenter.find { it.id == saksdokumentId }
-            ?: throw SaksdokumentNotFoundException("no saksdokument found based on id $saksdokumentId")
+        val saksdokument =
+            klagebehandling.saksdokumenter.find { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }
+                ?: throw SaksdokumentNotFoundException("no saksdokument found based on id $journalpostId/$dokumentInfoId")
         removeDokument(
             klagebehandling,
             saksdokument,

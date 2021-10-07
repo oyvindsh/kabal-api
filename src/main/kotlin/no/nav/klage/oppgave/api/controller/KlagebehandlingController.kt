@@ -2,10 +2,7 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
-import no.nav.klage.oppgave.api.view.KlagebehandlingEditedView
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
-import no.nav.klage.oppgave.api.view.TilknyttetDokument
-import no.nav.klage.oppgave.api.view.TilknyttetDokumentAddedResponse
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -20,7 +17,10 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.env.Environment
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.util.*
 
@@ -90,40 +90,5 @@ class KlagebehandlingController(
                 sivilstand = sivilstand
             )
         )
-    }
-
-    @PostMapping("/{id}/dokumenttilknytninger")
-    fun setTilknyttetDokument(
-        @PathVariable("id") klagebehandlingId: UUID,
-        @RequestBody input: TilknyttetDokument
-    ): TilknyttetDokumentAddedResponse {
-        logKlagebehandlingMethodDetails(
-            "setTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
-            logger
-        )
-        val (saksdokumentId, modified) = klagebehandlingService.connectDokumentToKlagebehandling(
-            klagebehandlingId = klagebehandlingId,
-            journalpostId = input.journalpostId,
-            dokumentInfoId = input.dokumentInfoId,
-            saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        )
-        return TilknyttetDokumentAddedResponse(id = saksdokumentId, modified = modified)
-    }
-
-    @DeleteMapping("/{id}/dokumenttilknytninger/{dokumentId}")
-    fun removeTilknyttetDokument(
-        @PathVariable("id") klagebehandlingId: UUID,
-        @PathVariable("dokumentId") tilknyttetDokumentId: UUID
-    ): KlagebehandlingEditedView {
-        logKlagebehandlingMethodDetails(
-            "removeTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
-            logger
-        )
-        val modified = klagebehandlingService.disconnectDokumentFromKlagebehandling(
-            klagebehandlingId = klagebehandlingId,
-            saksdokumentId = tilknyttetDokumentId,
-            saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        )
-        return KlagebehandlingEditedView(modified)
     }
 }
