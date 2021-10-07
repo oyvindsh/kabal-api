@@ -21,7 +21,6 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTyp
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingManglerMedunderskriverException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
-import no.nav.klage.oppgave.exceptions.SaksdokumentNotFoundException
 import no.nav.klage.oppgave.exceptions.ValidationException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.TokenUtil
@@ -578,12 +577,16 @@ class KlagebehandlingService(
         val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val saksdokument =
             klagebehandling.saksdokumenter.find { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }
-                ?: throw SaksdokumentNotFoundException("no saksdokument found based on id $journalpostId/$dokumentInfoId")
-        removeDokument(
-            klagebehandling,
-            saksdokument,
-            saksbehandlerIdent
-        )
+
+        if (saksdokument == null) {
+            logger.warn("no saksdokument found based on id $journalpostId/$dokumentInfoId")
+        } else {
+            removeDokument(
+                klagebehandling,
+                saksdokument,
+                saksbehandlerIdent
+            )
+        }
         return klagebehandling.modified
     }
 
