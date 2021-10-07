@@ -562,28 +562,6 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
     }
 
-    fun Klagebehandling.setMellomlagerIdInVedtak(
-        nyVerdi: String?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtakOrException()
-        val gammelVerdi = vedtak.mellomlagerId
-        val tidspunkt = LocalDateTime.now()
-        vedtak.mellomlagerId = nyVerdi
-        vedtak.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg = listOfNotNull(
-            endringslogg(
-                saksbehandlerident,
-                Felt.MELLOMLAGER_ID_I_VEDTAK,
-                gammelVerdi,
-                nyVerdi,
-                tidspunkt
-            )
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
-    }
-
     fun Klagebehandling.setMellomlagerIdOgOpplastetInVedtak(
         nyVerdi: String?,
         saksbehandlerident: String

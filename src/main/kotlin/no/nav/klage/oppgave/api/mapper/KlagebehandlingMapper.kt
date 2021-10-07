@@ -143,7 +143,6 @@ class KlagebehandlingMapper(
             hjemler = hjemler.map { it.id }.toSet(),
             brevMottakere = brevmottakere.map { mapBrevmottaker(it) }.toSet(),
             file = getVedleggView(opplastet, mellomlagerId),
-            ferdigstilt = ferdigDistribuert, //TODO Litt usikker her.. Må jeg ned på klagebehandling.avsluttetAvSaksbehandler mon tro? Brukes i det hele tatt dette feltet til noe? Kanskje det kan fjernes?
             opplastet = opplastet
         )
     }
