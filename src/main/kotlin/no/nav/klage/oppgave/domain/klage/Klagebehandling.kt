@@ -4,6 +4,9 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling.Status.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import no.nav.klage.oppgave.exceptions.VedtakNotFoundException
+import org.hibernate.annotations.BatchSize
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -74,9 +77,13 @@ class Klagebehandling(
     var tildeling: Tildeling? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 100)
     val tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 100)
     val medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
     @Column(name = "mottak_id")
     val mottakId: UUID,
@@ -99,6 +106,8 @@ class Klagebehandling(
     val vedtak: Vedtak? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 100)
     val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
