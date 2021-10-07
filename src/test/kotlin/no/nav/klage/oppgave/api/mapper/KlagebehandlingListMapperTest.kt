@@ -1,11 +1,8 @@
 package no.nav.klage.oppgave.api.mapper
 
-import no.nav.klage.oppgave.api.view.PersonSoekPersonView
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -16,7 +13,6 @@ internal class KlagebehandlingListMapperTest {
 
     val klagebehandling1 = EsKlagebehandling(
         id = "1001L",
-        versjon = 1L,
         sakenGjelderFnr = fnr1,
         tildeltEnhet = "4219",
         tema = Tema.OMS.id,
@@ -36,7 +32,6 @@ internal class KlagebehandlingListMapperTest {
     val klagebehandling2 =
         EsKlagebehandling(
             id = "1002L",
-            versjon = 1L,
             sakenGjelderFnr = fnr1,
             tildeltEnhet = "4219",
             tema = Tema.SYK.id,
@@ -57,7 +52,6 @@ internal class KlagebehandlingListMapperTest {
     val klagebehandling3 =
         EsKlagebehandling(
             id = "1003L",
-            versjon = 1L,
             sakenGjelderFnr = fnr2,
             tildeltEnhet = "4219",
             tema = Tema.SYK.id,

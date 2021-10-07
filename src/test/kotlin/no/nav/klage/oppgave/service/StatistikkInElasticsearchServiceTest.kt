@@ -78,7 +78,6 @@ class StatistikkInElasticsearchServiceTest {
     private fun klagebehandling(id: Long, innsendt: LocalDate, frist: LocalDate, avsluttet: LocalDateTime? = null) =
         EsKlagebehandling(
             id = id.toString(),
-            versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.OMS.id,
             type = Type.KLAGE.id,

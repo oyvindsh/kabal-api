@@ -36,7 +36,7 @@ class VedtakDistribusjonService(
         mottakerId: UUID
     ): Klagebehandling {
         val klagebehandling =
-            klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+            klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         val vedtak = klagebehandling.getVedtakOrException()
         val mottaker = vedtak.getMottaker(mottakerId)
         try {
@@ -66,14 +66,14 @@ class VedtakDistribusjonService(
 
     @Transactional
     fun lagBrevmottakere(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         logger.debug("Lager brevmottakere for vedtak $vedtakId i klagebehandling ${klagebehandling.id}")
         klagebehandling.lagBrevmottakereForVedtak()
         return klagebehandling
     }
 
     fun markerVedtakSomFerdigDistribuert(klagebehandlingId: UUID, vedtakId: UUID): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         val event = klagebehandling.setVedtakFerdigDistribuert(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
@@ -83,7 +83,7 @@ class VedtakDistribusjonService(
         klagebehandlingId: UUID,
         vedtakId: UUID
     ): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         val vedtak = klagebehandling.getVedtakOrException()
         fileApiService.deleteDocumentAsSystemUser(vedtak.mellomlagerId!!)
         val event = klagebehandling.setMellomlagerIdOgOpplastetInVedtak(null, SYSTEMBRUKER)

@@ -100,7 +100,6 @@ class ElasticsearchServiceStatusTest {
 
     private fun getKlagebehandling(status: EsKlagebehandling.Status) = EsKlagebehandling(
         id = UUID.randomUUID().toString(),
-        versjon = 1L,
         tildeltEnhet = "4219",
         tema = Tema.OMS.id,
         type = Type.KLAGE.id,

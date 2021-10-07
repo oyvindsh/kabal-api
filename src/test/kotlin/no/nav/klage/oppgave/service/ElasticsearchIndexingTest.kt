@@ -10,8 +10,6 @@ import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.index.query.QueryBuilders
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -22,7 +20,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.elasticsearch.UncategorizedElasticsearchException
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
 import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
@@ -82,7 +79,6 @@ class ElasticsearchIndexingTest {
 
         val klagebehandling = klagebehandlingWith(
             id = "1001L",
-            versjon = 1L,
             saksreferanse = "hei"
         )
         repo.save(klagebehandling)
@@ -101,14 +97,12 @@ class ElasticsearchIndexingTest {
 
         var klagebehandling = klagebehandlingWith(
             id = "2001L",
-            versjon = 1L,
             saksreferanse = "hei"
         )
         repo.save(klagebehandling)
 
         klagebehandling = klagebehandlingWith(
             id = "2001L",
-            versjon = 2L,
             saksreferanse = "hallo"
         )
         repo.save(klagebehandling)
@@ -121,40 +115,9 @@ class ElasticsearchIndexingTest {
         assertThat(searchHits.searchHits.first().content.kildeReferanse).isEqualTo("hallo")
     }
 
-    @Test
-    @Order(5)
-    fun `saving an earlier version of klagebehandling causes a conflict`() {
-
-        var klagebehandling = klagebehandlingWith(
-            id = "3001L",
-            versjon = 2L,
-            saksreferanse = "hei"
-        )
-        repo.save(klagebehandling)
-
-        klagebehandling = klagebehandlingWith(
-            id = "3001L",
-            versjon = 1L,
-            saksreferanse = "hallo"
-        )
-        assertThatThrownBy {
-            repo.save(klagebehandling)
-        }.isInstanceOf(UncategorizedElasticsearchException::class.java)
-            .hasRootCauseInstanceOf(ElasticsearchStatusException::class.java)
-            .hasMessageContaining("type=version_conflict_engine_exception")
-
-        val query: Query = NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.idsQuery().addIds("3001L"))
-            .build()
-        val searchHits: SearchHits<EsKlagebehandling> = esTemplate.search(query, EsKlagebehandling::class.java)
-        assertThat(searchHits.totalHits).isEqualTo(1L)
-        assertThat(searchHits.searchHits.first().content.kildeReferanse).isEqualTo("hei")
-    }
-
-    private fun klagebehandlingWith(id: String, versjon: Long, saksreferanse: String): EsKlagebehandling {
+    private fun klagebehandlingWith(id: String, saksreferanse: String): EsKlagebehandling {
         return EsKlagebehandling(
             id = id,
-            versjon = versjon,
             kildeReferanse = saksreferanse,
             tildeltEnhet = "",
             tema = Tema.OMS.id,

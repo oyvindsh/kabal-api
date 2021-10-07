@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
 data class KvalitetsvurderingEditableFieldsInput(
-    val klagebehandlingVersjon: Long,
     val kvalitetOversendelsesbrevBra: Boolean?,
     val kvalitetsavvikOversendelsesbrev: Set<String> = emptySet(),
     val kommentarOversendelsesbrev: String?,

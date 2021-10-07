@@ -33,7 +33,7 @@ class KlagebehandlingAvslutningService(
 
     @Transactional
     fun avsluttKlagebehandling(klagebehandlingId: UUID): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         val vedtak = klagebehandling.getVedtakOrException()
         kafkaVedtakEventRepository.save(
             KafkaVedtakEvent(

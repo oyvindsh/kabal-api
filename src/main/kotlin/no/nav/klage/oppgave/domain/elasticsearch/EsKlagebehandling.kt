@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.domain.elasticsearch
 
 import org.elasticsearch.index.VersionType
 import org.springframework.data.annotation.Id
-import org.springframework.data.annotation.Version
 import org.springframework.data.elasticsearch.annotations.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,15 +10,12 @@ import java.time.LocalDateTime
     indexName = "klagebehandling",
     shards = 3,
     replicas = 2,
-    versionType = VersionType.EXTERNAL,
+    versionType = VersionType.INTERNAL,
     createIndex = false
 )
 data class EsKlagebehandling(
     @Id
     val id: String,
-    //Må være Long? for å bli Long på JVMen (isf long), og det krever Spring DataES..
-    @Version
-    val versjon: Long?,
 
     @Field(type = FieldType.Keyword)
     val klagerFnr: String? = null,

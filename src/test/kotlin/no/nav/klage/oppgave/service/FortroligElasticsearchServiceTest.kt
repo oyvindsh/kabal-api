@@ -94,7 +94,6 @@ class FortroligElasticsearchServiceTest {
 
         val normalPerson = EsKlagebehandling(
             id = idNormal,
-            versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.OMS.id,
             type = Type.KLAGE.id,
@@ -115,7 +114,6 @@ class FortroligElasticsearchServiceTest {
         val fortroligPerson =
             EsKlagebehandling(
                 id = idFortrolig,
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.OMS.id,
                 type = Type.KLAGE.id,
@@ -136,7 +134,6 @@ class FortroligElasticsearchServiceTest {
             )
         val strengtFortroligPerson = EsKlagebehandling(
             id = idStrengtFortrolig,
-            versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.OMS.id,
             type = Type.KLAGE.id,
@@ -158,7 +155,6 @@ class FortroligElasticsearchServiceTest {
         val egenAnsattPerson =
             EsKlagebehandling(
                 id = idEgenAnsatt,
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.OMS.id,
                 type = Type.KLAGE.id,
@@ -180,7 +176,6 @@ class FortroligElasticsearchServiceTest {
         val egenAnsattOgFortroligPerson =
             EsKlagebehandling(
                 id = idEgenAnsattOgFortrolig,
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.OMS.id,
                 type = Type.KLAGE.id,
@@ -203,7 +198,6 @@ class FortroligElasticsearchServiceTest {
         val egenAnsattOgStrengtFortroligPerson =
             EsKlagebehandling(
                 id = idEgenAnsattOgStrengtFortrolig,
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.OMS.id,
                 type = Type.KLAGE.id,

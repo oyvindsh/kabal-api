@@ -199,7 +199,6 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         val klagebehandling =
             klagebehandlingRepository.findByIdOrNull(klagebehandlingId) ?: throw NullPointerException()
-        println(klagebehandling.versjon)
     }
 
     @Test
