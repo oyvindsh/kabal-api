@@ -79,20 +79,6 @@ class VedtakService(
         return klagebehandling
     }
 
-    /*
-    fun setJournalpostIdOgOpplastet(
-        klagebehandling: Klagebehandling,
-        vedtakId: UUID,
-        journalpostId: String?,
-        utfoerendeSaksbehandlerIdent: String
-    ): Klagebehandling {
-        val event =
-            klagebehandling.setJournalpostIdOgOpplastetInVedtak(journalpostId, utfoerendeSaksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-     */
-
     private fun setMellomlagerIdOgOpplastet(
         klagebehandling: Klagebehandling,
         mellomlagerId: String?,
