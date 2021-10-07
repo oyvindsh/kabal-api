@@ -11,13 +11,15 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvs
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setFrist
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setInnsendt
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverIdent
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverIdentAndMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattFoersteinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTema
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.exceptions.KlagebehandlingManglerMedunderskriverException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
 import no.nav.klage.oppgave.exceptions.SaksdokumentNotFoundException
 import no.nav.klage.oppgave.exceptions.ValidationException
@@ -54,6 +56,10 @@ class KlagebehandlingService(
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(klagebehandling.tema)
     }
 
+    private fun checkMedunderskriverStatus(klagebehandling: Klagebehandling) {
+        tilgangService.verifyInnloggetSaksbehandlerErMedunderskriver(klagebehandling)
+    }
+
     private fun checkSkrivetilgang(klagebehandling: Klagebehandling) {
         tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling)
     }
@@ -88,6 +94,15 @@ class KlagebehandlingService(
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
             .also { if (!ignoreCheckSkrivetilgang) checkSkrivetilgang(it) }
+            .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
+
+    fun getKlagebehandlingForUpdateByMedunderskriver(
+        klagebehandlingId: UUID,
+        klagebehandlingVersjon: Long?
+    ): Klagebehandling =
+        klagebehandlingRepository.getOne(klagebehandlingId)
+            .also { checkLeseTilgang(it) }
+            .also { checkMedunderskriverStatus(it) }
             .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun getKlagebehandlingForUpdateBySystembruker(
@@ -149,6 +164,39 @@ class KlagebehandlingService(
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+    }
+
+    fun switchMedunderskriverFlyt(
+        klagebehandlingId: UUID,
+        utfoerendeSaksbehandlerIdent: String
+    ): Klagebehandling {
+        val klagebehandling = getKlagebehandling(klagebehandlingId)
+
+        if (klagebehandling.medunderskriver?.saksbehandlerident == null) {
+            throw KlagebehandlingManglerMedunderskriverException("Klagebehandlingen har ikke registrert noen medunderskriver")
+        }
+
+        if (klagebehandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
+            checkMedunderskriverStatus(klagebehandling)
+            if (klagebehandling.medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
+                val event = klagebehandling.setMedunderskriverFlyt(
+                    MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
+                    utfoerendeSaksbehandlerIdent
+                )
+                applicationEventPublisher.publishEvent(event)
+            }
+        } else {
+            checkSkrivetilgang(klagebehandling)
+            if (klagebehandling.medunderskriverFlyt != MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER) {
+                val event = klagebehandling.setMedunderskriverFlyt(
+                    MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+                    utfoerendeSaksbehandlerIdent
+                )
+                applicationEventPublisher.publishEvent(event)
+            }
+        }
+
         return klagebehandling
     }
 
@@ -262,23 +310,24 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
-    fun setMedunderskriverIdent(
+    fun setMedunderskriverIdentAndMedunderskriverFlyt(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         medunderskriverIdent: String?,
-        utfoerendeSaksbehandlerIdent: String
+        utfoerendeSaksbehandlerIdent: String,
+        medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
-        validateBeforeMedunderskriver(klagebehandling)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
-            klagebehandling.setMedunderskriverIdent(
+            klagebehandling.setMedunderskriverIdentAndMedunderskriverFlyt(
                 medunderskriverIdent,
+                medunderskriverFlyt,
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
 
+    //TODO: Valider før fullføring av klagebehandling
     private fun validateBeforeMedunderskriver(klagebehandling: Klagebehandling) {
         if (klagebehandling.vedtak == null) {
             throw ValidationException("Klagebehandling har ikke vedtak")

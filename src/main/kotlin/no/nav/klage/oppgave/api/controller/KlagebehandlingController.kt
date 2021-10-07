@@ -1,8 +1,13 @@
 package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
+import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
+import no.nav.klage.oppgave.api.view.KlagebehandlingMedunderskriveridentInput
 import no.nav.klage.oppgave.api.view.KlagebehandlingerListRespons
+import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -17,10 +22,7 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.env.Environment
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.util.*
 
@@ -30,6 +32,7 @@ import java.util.*
 @RequestMapping("/klagebehandlinger")
 class KlagebehandlingController(
     private val klagebehandlingService: KlagebehandlingService,
+    private val klagebehandlingMapper: KlagebehandlingMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val saksbehandlerService: SaksbehandlerService,
     private val environment: Environment,
@@ -90,5 +93,38 @@ class KlagebehandlingController(
                 sivilstand = sivilstand
             )
         )
+    }
+
+    @PutMapping("/{id}/medunderskriverident")
+    fun putMedunderskriverident(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: KlagebehandlingMedunderskriveridentInput
+    ): MedunderskriverFlytResponse {
+        logKlagebehandlingMethodDetails("putMedunderskriverident", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId, logger)
+        val klagebehandling = klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            klagebehandlingId,
+            input.medunderskriverident,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+        return klagebehandlingMapper.mapToMedunderskriverFlytResponse(klagebehandling)
+    }
+
+
+    @ApiOperation(
+        value = "Flytter klagebehandlingen mellom saksbehandler og medunderskriver.",
+        notes = "Flytter fra saksbehandler til medunderskriver dersom saksbehandler utfører, flytter til saksbehandler med returnert-status dersom medunderskriver utfører."
+    )
+    @PostMapping("/{id}/send")
+    fun switchMedunderskriverFlyt(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable("id") klagebehandlingId: UUID
+    ): MedunderskriverFlytResponse {
+        logger.debug("switchMedunderskriverFlyt is requested for klagebehandling: {}", klagebehandlingId)
+
+        val klagebehandling = klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+        return klagebehandlingMapper.mapToMedunderskriverFlytResponse(klagebehandling)
     }
 }

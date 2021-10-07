@@ -64,8 +64,7 @@ class KlagebehandlingMeldingController(
     )
     @GetMapping("/{id}/meldinger")
     fun getMeldinger(
-        @PathVariable("id") klagebehandlingId: UUID,
-        @RequestBody input: MeldingInput
+        @PathVariable("id") klagebehandlingId: UUID
     ): List<MeldingView> {
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         logKlagebehandlingMethodDetails("getMeldinger", innloggetIdent, klagebehandlingId, logger)

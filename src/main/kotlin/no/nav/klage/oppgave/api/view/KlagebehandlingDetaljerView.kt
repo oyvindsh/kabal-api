@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -31,6 +32,7 @@ data class KlagebehandlingDetaljerView(
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
     val medunderskriverident: String? = null,
+    val medunderskriverFlyt: MedunderskriverFlyt,
     val datoSendtMedunderskriver: LocalDate?,
     val hjemler: List<String>,
     val modified: LocalDateTime,

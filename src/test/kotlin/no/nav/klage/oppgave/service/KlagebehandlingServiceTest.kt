@@ -1,15 +1,21 @@
 package no.nav.klage.oppgave.service
 
 import com.ninjasquad.springmockk.MockkBean
+import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
+import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
+import no.nav.klage.oppgave.exceptions.KlagebehandlingManglerMedunderskriverException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -47,10 +53,23 @@ class KlagebehandlingServiceTest {
     @Autowired
     lateinit var klagebehandlingRepository: KlagebehandlingRepository
 
-    private val tilgangService: TilgangService = mockk()
+    @SpykBean
+    lateinit var tilgangService: TilgangService
+
+    @MockkBean
+    lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
 
     @MockkBean(relaxed = true)
     lateinit var applicationEventPublisher: ApplicationEventPublisher
+
+    @MockkBean
+    lateinit var pdlFacade: PdlFacade
+
+    @MockkBean
+    lateinit var egenAnsattService: EgenAnsattService
+
+    @MockkBean
+    lateinit var saksbehandlerRepository: SaksbehandlerRepository
 
     private val dokumentService: DokumentService = mockk()
 
@@ -125,16 +144,14 @@ class KlagebehandlingServiceTest {
         every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
 
-        klagebehandlingService.setMedunderskriverIdent(
+        klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
             klagebehandlingId,
-            null,
             medunderskriverIdent,
             utfoerendeSaksehandlerIdent
         )
 
-        val result = klagebehandlingService.setMedunderskriverIdent(
+        val result = klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
             klagebehandlingId,
-            null,
             null,
             utfoerendeSaksehandlerIdent
         )
@@ -143,6 +160,139 @@ class KlagebehandlingServiceTest {
         assert(result.medunderskriverHistorikk.size == 1)
     }
 
+    @Test
+    fun `switchMedunderskriverFlyt gir forventet feil når bruker er saksbehandler og medunderskriver ikke er satt`() {
+        val klagebehandling = simpleInsert()
+        val klagebehandlingId = klagebehandling.id
+        val utfoerendeSaksehandlerIdent = "SAKSBEHANDLER"
+
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns utfoerendeSaksehandlerIdent
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+
+        assertThrows<KlagebehandlingManglerMedunderskriverException> {
+            klagebehandlingService.switchMedunderskriverFlyt(
+                klagebehandlingId,
+                utfoerendeSaksehandlerIdent
+            )
+        }
+    }
+
+    @Test
+    fun `switchMedunderskriverFlyt gir forventet status når bruker er saksbehandler og medunderskriver er satt`() {
+        val klagebehandling = simpleInsert()
+        val klagebehandlingId = klagebehandling.id
+        val utfoerendeSaksehandlerIdent = "SAKSBEHANDLER"
+        val medunderskriverIdent = "MEDUNDERSKRIVER"
+
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns utfoerendeSaksehandlerIdent
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+
+        klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent,
+            utfoerendeSaksehandlerIdent
+        )
+
+        val result = klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            utfoerendeSaksehandlerIdent
+        )
+
+        assert(result.medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+    }
+
+    @Test
+    fun `switchMedunderskriverFlyt gir forventet status når bruker er medunderskriver`() {
+        val klagebehandling = simpleInsert()
+        val klagebehandlingId = klagebehandling.id
+        val utfoerendeSaksehandlerIdent = "SAKSBEHANDLER"
+        val medunderskriverIdent = "MEDUNDERSKRIVER"
+
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns medunderskriverIdent
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+
+        klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent,
+            utfoerendeSaksehandlerIdent,
+            MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+        )
+
+        val result = klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent
+        )
+
+        assert(result.medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+    }
+
+    @Test
+    fun `flere kall til switchMedunderskriverFlyt fra saksbehandler er idempotent`() {
+        val klagebehandling = simpleInsert()
+        val klagebehandlingId = klagebehandling.id
+        val utfoerendeSaksehandlerIdent = "SAKSBEHANDLER"
+        val medunderskriverIdent = "MEDUNDERSKRIVER"
+
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns utfoerendeSaksehandlerIdent
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+
+        klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent,
+            utfoerendeSaksehandlerIdent
+        )
+
+        klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            utfoerendeSaksehandlerIdent
+        )
+
+        val result = klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            utfoerendeSaksehandlerIdent
+        )
+
+        assert(result.medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+    }
+
+    @Test
+    fun `flere kall til switchMedunderskriverFlyt fra medunderskriver er idempotent`() {
+        val klagebehandling = simpleInsert()
+        val klagebehandlingId = klagebehandling.id
+        val utfoerendeSaksehandlerIdent = "SAKSBEHANDLER"
+        val medunderskriverIdent = "MEDUNDERSKRIVER"
+
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns medunderskriverIdent
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+
+        klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent,
+            utfoerendeSaksehandlerIdent,
+            MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+        )
+
+        klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent
+        )
+
+        val result = klagebehandlingService.switchMedunderskriverFlyt(
+            klagebehandlingId,
+            medunderskriverIdent
+        )
+
+        assert(result.medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+    }
 
     private fun simpleInsert(): Klagebehandling {
         val mottak = Mottak(
