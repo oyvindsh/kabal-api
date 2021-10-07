@@ -39,7 +39,7 @@ class VedtakJournalfoeringService(
         klagebehandlingId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
 
         val vedtak = klagebehandling.getVedtakOrException()
         val brevMottaker = vedtak.getMottaker(brevMottakerId)
@@ -66,7 +66,7 @@ class VedtakJournalfoeringService(
         klagebehandlingId: UUID,
         brevMottakerId: UUID
     ): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         val vedtak = klagebehandling.getVedtakOrException()
         val brevMottaker = vedtak.getMottaker(brevMottakerId)
 

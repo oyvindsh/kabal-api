@@ -87,30 +87,24 @@ class KlagebehandlingService(
 
     fun getKlagebehandlingForUpdate(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long? = null,
         ignoreCheckSkrivetilgang: Boolean = false
     ): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
             .also { if (!ignoreCheckSkrivetilgang) checkSkrivetilgang(it) }
-            .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun getKlagebehandlingForUpdateByMedunderskriver(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?
     ): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkLeseTilgang(it) }
             .also { checkMedunderskriverStatus(it) }
-            .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     fun getKlagebehandlingForUpdateBySystembruker(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?
     ): Klagebehandling =
         klagebehandlingRepository.getOne(klagebehandlingId)
             .also { checkSkrivetilgangForSystembruker(it) }
-            .also { it.checkOptimisticLocking(klagebehandlingVersjon) }
 
     var muligAnkeUtfall = setOf(
         Utfall.MEDHOLD,
@@ -146,12 +140,11 @@ class KlagebehandlingService(
 
     fun assignKlagebehandling(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         tildeltSaksbehandlerIdent: String?,
         enhetId: String?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon, true)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, true)
         if (tildeltSaksbehandlerIdent != null) {
             //Denne sjekken gjøres kun når det er en tildeling:
             checkEnhetOgTemaTilgang(tildeltSaksbehandlerIdent, enhetId!!, klagebehandling)
@@ -201,11 +194,10 @@ class KlagebehandlingService(
 
     fun setType(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         type: Type,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setType(type, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -214,11 +206,10 @@ class KlagebehandlingService(
 
     fun setTema(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         tema: Tema,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setTema(tema, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -227,11 +218,10 @@ class KlagebehandlingService(
 
     fun setInnsendt(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         innsendt: LocalDate,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setInnsendt(innsendt, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -240,11 +230,10 @@ class KlagebehandlingService(
 
     fun setMottattFoersteinstans(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         mottattFoersteinstans: LocalDate,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setMottattFoersteinstans(mottattFoersteinstans, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -253,11 +242,10 @@ class KlagebehandlingService(
 
     fun setMottattKlageinstans(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         mottattKlageinstans: LocalDateTime,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setMottattKlageinstans(mottattKlageinstans, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -266,11 +254,10 @@ class KlagebehandlingService(
 
     fun setFrist(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         frist: LocalDate,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setFrist(frist, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -279,11 +266,10 @@ class KlagebehandlingService(
 
     fun setAvsenderSaksbehandleridentFoersteinstans(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         saksbehandlerIdent: String,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setAvsenderSaksbehandleridentFoersteinstans(
                 saksbehandlerIdent,
@@ -295,11 +281,10 @@ class KlagebehandlingService(
 
     fun setAvsenderEnhetFoersteinstans(
         klagebehandlingId: UUID,
-        klagebehandlingVersjon: Long?,
         enhet: String,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
-        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId, klagebehandlingVersjon)
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         val event =
             klagebehandling.setAvsenderEnhetFoersteinstans(
                 enhet,

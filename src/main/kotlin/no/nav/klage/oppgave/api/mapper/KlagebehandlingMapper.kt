@@ -82,7 +82,6 @@ class KlagebehandlingMapper(
             hjemler = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
-            klagebehandlingVersjon = klagebehandling.versjon,
             resultat = klagebehandling.vedtak?.mapToVedtakView(),
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
@@ -209,7 +208,6 @@ class KlagebehandlingMapper(
     fun mapToVedleggEditedView(klagebehandling: Klagebehandling): VedleggEditedView {
         val vedtak = klagebehandling.getVedtakOrException()
         return VedleggEditedView(
-            klagebehandling.versjon,
             klagebehandling.modified,
             file = getVedleggView(vedtak.opplastet, vedtak.mellomlagerId),
         )
@@ -217,7 +215,6 @@ class KlagebehandlingMapper(
 
     fun mapToVedtakFullfoertView(klagebehandling: Klagebehandling): VedtakFullfoertView {
         return VedtakFullfoertView(
-            klagebehandling.versjon,
             klagebehandling.modified,
             klagebehandling.avsluttetAvSaksbehandler!!,
             klagebehandling.avsluttetAvSaksbehandler?.toLocalDate()

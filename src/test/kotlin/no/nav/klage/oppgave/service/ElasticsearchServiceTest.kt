@@ -81,7 +81,6 @@ class ElasticsearchServiceTest {
 
         val klagebehandling1 = EsKlagebehandling(
             id = "1001L",
-            versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.OMS.id,
             type = Type.KLAGE.id,
@@ -101,7 +100,6 @@ class ElasticsearchServiceTest {
         val klagebehandling2 =
             EsKlagebehandling(
                 id = "1002L",
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.SYK.id,
                 type = Type.KLAGE.id,

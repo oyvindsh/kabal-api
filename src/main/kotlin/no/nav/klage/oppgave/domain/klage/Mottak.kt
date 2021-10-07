@@ -11,9 +11,6 @@ import javax.persistence.*
 class Mottak(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Version
-    @Column(name = "versjon")
-    val versjon: Long = 1L,
     @Column(name = "tema_id")
     @Convert(converter = TemaConverter::class)
     var tema: Tema,

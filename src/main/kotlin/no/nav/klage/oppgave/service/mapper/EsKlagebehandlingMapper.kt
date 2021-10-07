@@ -47,7 +47,6 @@ class EsKlagebehandlingMapper(
 
         return EsKlagebehandling(
             id = klagebehandling.id.toString(),
-            versjon = klagebehandling.versjon,
             klagerFnr = klagerFnr,
             klagerNavn = klagerPersonInfo?.sammensattNavn,
             klagerFornavn = klagerPersonInfo?.fornavn,

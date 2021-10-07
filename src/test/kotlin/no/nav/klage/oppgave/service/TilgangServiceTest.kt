@@ -35,7 +35,6 @@ class TilgangServiceTest {
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet`() {
         val klage = Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
@@ -65,7 +64,6 @@ class TilgangServiceTest {
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet av saksbehandler`() {
         val klage = Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
@@ -95,7 +93,6 @@ class TilgangServiceTest {
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved annen tildelt saksbehandler`() {
         val klage = Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
@@ -123,7 +120,6 @@ class TilgangServiceTest {
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil når ingen har tildelt`() {
         val klage = Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
@@ -150,7 +146,6 @@ class TilgangServiceTest {
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir ok ved samme ident`() {
         val klage = Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),

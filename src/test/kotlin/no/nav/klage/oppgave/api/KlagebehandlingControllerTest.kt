@@ -84,7 +84,6 @@ class KlagebehandlingControllerTest {
     private val klagebehandlingId = UUID.randomUUID()
 
     private val klagebehandling = Klagebehandling(
-        versjon = 2L,
         klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
         sakenGjelder = SakenGjelder(
             partId = PartId(type = PartIdType.PERSON, value = "23452354"),

@@ -136,13 +136,11 @@ class KlagebehandlingListController(
         logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         val klagebehandling = klagebehandlingService.assignKlagebehandling(
             klagebehandlingId,
-            saksbehandlertildeling.klagebehandlingVersjon,
             saksbehandlertildeling.navIdent,
             saksbehandlertildeling.angittEnhetOrDefault(),
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
         return TildelingEditedView(
-            klagebehandling.versjon,
             klagebehandling.modified,
             klagebehandling.tildeling!!.tidspunkt.toLocalDate()
         )
@@ -153,20 +151,17 @@ class KlagebehandlingListController(
         @ApiParam(value = "NavIdent til en ansatt")
         @PathVariable navIdent: String,
         @ApiParam(value = "Id til en klagebehandling")
-        @PathVariable("id") klagebehandlingId: UUID,
-        @RequestBody(required = false) saksbehandlerfradeling: Saksbehandlerfradeling?
+        @PathVariable("id") klagebehandlingId: UUID
     ): TildelingEditedView {
         logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
         val klagebehandling = klagebehandlingService.assignKlagebehandling(
             klagebehandlingId,
-            saksbehandlerfradeling?.klagebehandlingVersjon,
             null,
             null,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
 
         return TildelingEditedView(
-            klagebehandling.versjon,
             klagebehandling.modified,
             klagebehandling.tildeling!!.tidspunkt.toLocalDate()
         )

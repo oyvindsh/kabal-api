@@ -30,7 +30,7 @@ class KlagebehandlingDistribusjonService(
     fun distribuerKlagebehandling(klagebehandlingId: UUID) {
         try {
             var klagebehandling =
-                klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
+                klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
             if (klagebehandling.vedtak?.erIkkeFerdigDistribuert() == true) {
                 klagebehandling.vedtak?.let { vedtak ->
                     logger.debug("Vedtak ${vedtak.id} i klagebehandling $klagebehandlingId er ikke distribuert")

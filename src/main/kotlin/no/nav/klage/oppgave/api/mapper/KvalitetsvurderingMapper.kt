@@ -19,7 +19,6 @@ class KvalitetsvurderingMapper {
     fun mapKlagebehandlingToKvalitetsvurderingView(klagebehandling: Klagebehandling): KlagebehandlingKvalitetsvurderingView {
         return KlagebehandlingKvalitetsvurderingView(
             klagebehandlingId = klagebehandling.id,
-            klagebehandlingVersjon = klagebehandling.versjon,
             kvalitetOversendelsesbrevBra = klagebehandling.kvalitetsvurdering?.oversendelsesbrevBra,
             kvalitetsavvikOversendelsesbrev = klagebehandling.kvalitetsvurdering?.kvalitetsavvikOversendelsesbrev?.map {
                 it.id

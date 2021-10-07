@@ -11,7 +11,6 @@ import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingManglerMedunderskriverException
-import no.nav.klage.oppgave.exceptions.KlagebehandlingSamtidigEndretException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
@@ -101,22 +100,6 @@ class KlagebehandlingServiceTest {
                 ignoreCheckSkrivetilgang = true
             )
         ).isEqualTo(klage)
-    }
-
-    @Test
-    fun `getKlagebehandlingForUpdate slår til på optimistic locking`() {
-        val klage = simpleInsert()
-
-        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
-
-        assertThrows<KlagebehandlingSamtidigEndretException> {
-            klagebehandlingService.getKlagebehandlingForUpdate(
-                klage.id,
-                1L,
-                true
-            )
-        }
     }
 
     @Test
@@ -308,7 +291,6 @@ class KlagebehandlingServiceTest {
         mottakRepository.save(mottak)
 
         val klage = Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),

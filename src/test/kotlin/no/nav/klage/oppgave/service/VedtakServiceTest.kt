@@ -44,13 +44,12 @@ class VedtakServiceTest {
 
     @Test
     fun `Forsøk på avslutting av vedtak fra andre enn medunderskriver skal ikke lykkes`() {
-        every { klagebehandlingService.getKlagebehandlingForUpdate(any(), any(), any()) } returns getKlageBehandling()
+        every { klagebehandlingService.getKlagebehandlingForUpdate(any(), any()) } returns getKlageBehandling()
         assertThrows<MissingTilgangException> {
             vedtakService.ferdigstillVedtak(
                 KLAGEBEHANDLING_ID,
                 VedtakFullfoerInput(
-                    JOURNALFOERENDE_ENHET,
-                    1L
+                    JOURNALFOERENDE_ENHET
                 ),
                 SAKSBEHANDLER_IDENT
             )
@@ -62,7 +61,6 @@ class VedtakServiceTest {
         every {
             klagebehandlingService.getKlagebehandlingForUpdate(
                 any(),
-                any(),
                 any()
             )
         } returns getFerdigstiltKlagebehandling()
@@ -70,8 +68,7 @@ class VedtakServiceTest {
             vedtakService.ferdigstillVedtak(
                 KLAGEBEHANDLING_ID,
                 VedtakFullfoerInput(
-                    JOURNALFOERENDE_ENHET,
-                    1L
+                    JOURNALFOERENDE_ENHET
                 ),
                 MEDUNDERSKRIVER_IDENT
             )
@@ -80,13 +77,12 @@ class VedtakServiceTest {
 
     @Test
     fun `Forsøk på avslutting av vedtak som ikke har mellomlagret dokument skal ikke lykkes`() {
-        every { klagebehandlingService.getKlagebehandlingForUpdate(any(), any(), any()) } returns getKlageBehandling()
+        every { klagebehandlingService.getKlagebehandlingForUpdate(any(), any()) } returns getKlageBehandling()
         assertThrows<VedtakNotFoundException> {
             vedtakService.ferdigstillVedtak(
                 KLAGEBEHANDLING_ID,
                 VedtakFullfoerInput(
-                    JOURNALFOERENDE_ENHET,
-                    1L
+                    JOURNALFOERENDE_ENHET
                 ),
                 MEDUNDERSKRIVER_IDENT
             )
@@ -95,13 +91,12 @@ class VedtakServiceTest {
 
     @Test
     fun `Forsøk på avslutting av vedtak som ikke har utfall skal ikke lykkes`() {
-        every { klagebehandlingService.getKlagebehandlingForUpdate(any(), any(), any()) } returns getKlageBehandling()
+        every { klagebehandlingService.getKlagebehandlingForUpdate(any(), any()) } returns getKlageBehandling()
         assertThrows<VedtakNotFoundException> {
             vedtakService.ferdigstillVedtak(
                 KLAGEBEHANDLING_ID,
                 VedtakFullfoerInput(
-                    JOURNALFOERENDE_ENHET,
-                    1L
+                    JOURNALFOERENDE_ENHET
                 ),
                 MEDUNDERSKRIVER_IDENT
             )
@@ -112,7 +107,6 @@ class VedtakServiceTest {
     fun `Forsøk på avslutting av vedtak som er riktig utfylt skal lykkes`() {
         every {
             klagebehandlingService.getKlagebehandlingForUpdate(
-                any(),
                 any(),
                 any()
             )
@@ -127,8 +121,7 @@ class VedtakServiceTest {
         val result = vedtakService.ferdigstillVedtak(
             KLAGEBEHANDLING_ID,
             VedtakFullfoerInput(
-                JOURNALFOERENDE_ENHET,
-                1L
+                JOURNALFOERENDE_ENHET
             ),
             MEDUNDERSKRIVER_IDENT
         )
@@ -137,7 +130,6 @@ class VedtakServiceTest {
 
     private fun getKlageBehandling(): Klagebehandling {
         return Klagebehandling(
-            versjon = 2L,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),

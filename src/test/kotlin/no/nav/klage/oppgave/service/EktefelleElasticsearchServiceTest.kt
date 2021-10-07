@@ -81,7 +81,6 @@ class EktefelleElasticsearchServiceTest {
 
         val klagebehandling1 = EsKlagebehandling(
             id = "1001L",
-            versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.OMS.id,
             type = Type.KLAGE.id,
@@ -102,7 +101,6 @@ class EktefelleElasticsearchServiceTest {
         val klagebehandling2 =
             EsKlagebehandling(
                 id = "1002L",
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.SYK.id,
                 type = Type.KLAGE.id,
@@ -122,7 +120,6 @@ class EktefelleElasticsearchServiceTest {
             )
         val klagebehandling3 = EsKlagebehandling(
             id = "1003L",
-            versjon = 1L,
             tildeltEnhet = "4219",
             tema = Tema.SYK.id,
             type = Type.KLAGE.id,
@@ -143,7 +140,6 @@ class EktefelleElasticsearchServiceTest {
         val klagebehandling4 =
             EsKlagebehandling(
                 id = "1004L",
-                versjon = 1L,
                 tildeltEnhet = "4219",
                 tema = Tema.OMS.id,
                 type = Type.KLAGE.id,

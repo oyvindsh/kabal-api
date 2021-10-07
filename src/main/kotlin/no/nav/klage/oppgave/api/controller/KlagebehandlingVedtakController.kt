@@ -61,8 +61,7 @@ class KlagebehandlingVedtakController(
 
     @DeleteMapping("/{klagebehandlingid}/resultat/vedlegg")
     fun deleteVedlegg(
-        @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
-        @RequestBody input: VedtakSlettVedleggInput
+        @PathVariable("klagebehandlingid") klagebehandlingId: UUID
     ): VedleggEditedView {
         logKlagebehandlingMethodDetails(
             "deleteVedlegg",
@@ -73,7 +72,6 @@ class KlagebehandlingVedtakController(
         return klagebehandlingMapper.mapToVedleggEditedView(
             vedtakService.slettFilTilknyttetVedtak(
                 klagebehandlingId,
-                input,
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             )
         )

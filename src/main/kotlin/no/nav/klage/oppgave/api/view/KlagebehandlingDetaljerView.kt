@@ -38,7 +38,6 @@ data class KlagebehandlingDetaljerView(
     val modified: LocalDateTime,
     val created: LocalDateTime,
     val fraSaksbehandlerident: String? = null,
-    val klagebehandlingVersjon: Long,
     val resultat: VedtakView?,
     val kommentarFraFoersteinstans: String?,
     val tilknyttedeDokumenter: Set<TilknyttetDokument>,

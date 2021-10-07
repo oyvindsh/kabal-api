@@ -77,8 +77,6 @@ class KlagebehandlingListMapper {
                 hjemmel = esKlagebehandling.hjemler.firstOrNull(),
                 frist = esKlagebehandling.frist,
                 mottatt = esKlagebehandling.mottattKlageinstans.toLocalDate(),
-                versjon = esKlagebehandling.versjon!!.toInt(),
-                klagebehandlingVersjon = esKlagebehandling.versjon,
                 harMedunderskriver = esKlagebehandling.medunderskriverident != null,
                 erMedunderskriver = esKlagebehandling.medunderskriverident != null && esKlagebehandling.medunderskriverident == saksbehandler,
                 medunderskriverident = esKlagebehandling.medunderskriverident,

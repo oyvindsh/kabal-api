@@ -21,8 +21,7 @@ class KvalitetsvurderingEditableFieldsFacade(
         input: KvalitetsvurderingEditableFieldsInput,
         innloggetIdent: String
     ): Klagebehandling {
-        val klagebehandlingForUpdate =
-            klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId, input.klagebehandlingVersjon)
+        val klagebehandlingForUpdate = klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId)
 
         dirtyCheckAndUpdateOversendelsesbrevBra(input, klagebehandlingForUpdate, innloggetIdent)
         dirtyCheckAndUpdateAvvikOversendelsesbrev(input, klagebehandlingForUpdate, innloggetIdent)
