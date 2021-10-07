@@ -4,6 +4,8 @@ import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
+import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
@@ -37,28 +39,7 @@ class KlagebehandlingVedtakController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/{klagebehandlingid}/vedtak/{vedtakid}/vedlegg")
-    fun deprecatedPostVedlegg(
-        @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
-        @PathVariable("vedtakid") vedtakId: UUID,
-        @ModelAttribute input: VedtakVedleggInput
-    ): VedleggEditedView? {
-        logKlagebehandlingMethodDetails(
-            "postVedlegg",
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            klagebehandlingId,
-            logger
-        )
-        return klagebehandlingMapper.mapToVedleggEditedView(
-            vedtakService.knyttVedtaksFilTilVedtak(
-                klagebehandlingId,
-                input,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
-    }
-
-    @PostMapping("/{klagebehandlingid}/vedtak/vedlegg")
+    @PostMapping("/{klagebehandlingid}/resultat/vedlegg")
     fun postVedlegg(
         @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
         @ModelAttribute input: VedtakVedleggInput
@@ -78,28 +59,7 @@ class KlagebehandlingVedtakController(
         )
     }
 
-    @DeleteMapping("/{klagebehandlingid}/vedtak/{vedtakid}/vedlegg")
-    fun deprecatedDeleteVedlegg(
-        @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
-        @PathVariable("vedtakid") vedtakId: UUID,
-        @RequestBody input: VedtakSlettVedleggInput
-    ): VedleggEditedView {
-        logKlagebehandlingMethodDetails(
-            "deleteVedlegg",
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            klagebehandlingId,
-            logger
-        )
-        return klagebehandlingMapper.mapToVedleggEditedView(
-            vedtakService.slettFilTilknyttetVedtak(
-                klagebehandlingId,
-                input,
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
-            )
-        )
-    }
-
-    @DeleteMapping("/{klagebehandlingid}/vedtak/vedlegg")
+    @DeleteMapping("/{klagebehandlingid}/resultat/vedlegg")
     fun deleteVedlegg(
         @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
         @RequestBody input: VedtakSlettVedleggInput
@@ -119,27 +79,7 @@ class KlagebehandlingVedtakController(
         )
     }
 
-    @PostMapping("/{klagebehandlingid}/vedtak/{vedtakid}/fullfoer")
-    fun deprecatedFullfoerVedtak(
-        @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
-        @PathVariable("vedtakid") vedtakId: UUID,
-        @RequestBody input: VedtakFullfoerInput
-    ): VedtakFullfoertView {
-        logKlagebehandlingMethodDetails(
-            "fullfoerVedtak",
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            klagebehandlingId,
-            logger
-        )
-        val klagebehandling = vedtakService.ferdigstillVedtak(
-            klagebehandlingId,
-            input,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
-        )
-        return klagebehandlingMapper.mapToVedtakFullfoertView(klagebehandling)
-    }
-
-    @PostMapping("/{klagebehandlingid}/vedtak/fullfoer")
+    @PostMapping("/{klagebehandlingid}/resultat/fullfoer")
     fun fullfoerVedtak(
         @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
         @RequestBody input: VedtakFullfoerInput
@@ -159,10 +99,9 @@ class KlagebehandlingVedtakController(
     }
 
     @ResponseBody
-    @GetMapping("/{klagebehandlingid}/vedtak/{vedtakid}/pdf")
-    fun deprecatedGetVedlegg(
-        @PathVariable("klagebehandlingid") klagebehandlingId: UUID,
-        @PathVariable("vedtakid") vedtakId: UUID,
+    @GetMapping("/{klagebehandlingid}/resultat/pdf")
+    fun getVedlegg(
+        @PathVariable("klagebehandlingid") klagebehandlingId: UUID
     ): ResponseEntity<ByteArray> {
         logKlagebehandlingMethodDetails(
             "getVedlegg",
@@ -179,7 +118,7 @@ class KlagebehandlingVedtakController(
                     fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
                 }
                 else -> {
-                    throw JournalpostNotFoundException("Vedtak med id $vedtakId er ikke lastet opp")
+                    throw JournalpostNotFoundException("Vedtak er ikke lastet opp")
                 }
             }
 
@@ -193,33 +132,39 @@ class KlagebehandlingVedtakController(
         )
     }
 
-    @ResponseBody
-    @GetMapping("/{klagebehandlingid}/vedtak/pdf")
-    fun getVedlegg(
-        @PathVariable("klagebehandlingid") klagebehandlingId: UUID
-    ): ResponseEntity<ByteArray> {
+    @PutMapping("/{id}/resultat/utfall")
+    fun setUtfall(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: VedtakUtfallInput
+    ): VedtakEditedView {
         logKlagebehandlingMethodDetails(
-            "getVedlegg",
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            klagebehandlingId,
+            "setUtfall", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
             logger
         )
-        val klagebehandling = klagebehandlingService.getKlagebehandling(klagebehandlingId)
-        val vedtak = vedtakService.getVedtak(klagebehandling)
+        return VedtakEditedView(
+            vedtakService.setUtfall(
+                klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId),
+                input.utfall?.let { Utfall.of(it) },
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            ).modified
+        )
+    }
 
-        val arkivertDokumentWithTitle =
-            if (vedtak.mellomlagerId != null) {
-                fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
-            } else {
-                throw JournalpostNotFoundException("Vedtak er ikke lastet opp")
-            }
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = arkivertDokumentWithTitle.contentType
-        responseHeaders.add("Content-Disposition", "inline; filename=${arkivertDokumentWithTitle.title}")
-        return ResponseEntity(
-            arkivertDokumentWithTitle.content,
-            responseHeaders,
-            HttpStatus.OK
+    @PutMapping("/{id}/resultat/hjemler")
+    fun setHjemler(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: VedtakHjemlerInput
+    ): VedtakEditedView {
+        logKlagebehandlingMethodDetails(
+            "setHjemler", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
+            logger
+        )
+        return VedtakEditedView(
+            vedtakService.setHjemler(
+                klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId),
+                input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet(),
+                innloggetSaksbehandlerRepository.getInnloggetIdent()
+            ).modified
         )
     }
 }

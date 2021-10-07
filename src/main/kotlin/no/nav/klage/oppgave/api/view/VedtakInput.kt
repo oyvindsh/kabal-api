@@ -15,3 +15,11 @@ data class VedtakFullfoerInput(
 data class VedtakSlettVedleggInput(
     val klagebehandlingVersjon: Long
 )
+
+data class VedtakUtfallInput(
+    val utfall: String?
+)
+
+data class VedtakHjemlerInput(
+    val hjemler: Set<String>?
+)

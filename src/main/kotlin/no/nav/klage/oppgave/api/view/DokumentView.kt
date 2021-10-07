@@ -9,8 +9,6 @@ data class DokumenterResponse(
     val totaltAntall: Int
 )
 
-data class DokumentReferanserResponse(val journalpostIder: List<String>)
-
 data class DokumentReferanse(
     val journalpostId: String,
     val dokumentInfoId: String,
@@ -30,8 +28,4 @@ data class DokumentReferanse(
     )
 }
 
-data class DokumentKnytning(val journalpostId: String, val dokumentInfoId: String)
-
-data class ToggleDokument(val journalpostId: String, val dokumentInfoId: String)
-
-data class ToggleDokumentResponse(val tilknyttet: Boolean)
+data class TilknyttetDokument(val journalpostId: String, val dokumentInfoId: String)

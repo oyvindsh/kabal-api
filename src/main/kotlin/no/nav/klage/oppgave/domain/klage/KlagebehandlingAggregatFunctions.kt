@@ -744,22 +744,19 @@ object KlagebehandlingAggregatFunctions {
     fun Klagebehandling.removeSaksdokument(
         saksdokument: Saksdokument,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent? {
-        if (saksdokumenter.any { it.journalpostId == saksdokument.journalpostId && it.dokumentInfoId == saksdokument.dokumentInfoId }) {
-            val tidspunkt = LocalDateTime.now()
-            saksdokumenter.removeIf { it.journalpostId == saksdokument.journalpostId && it.dokumentInfoId == saksdokument.dokumentInfoId }
-            modified = tidspunkt
-            val endringslogg = Endringslogginnslag.endringslogg(
-                saksbehandlerident,
-                Felt.SAKSDOKUMENT,
-                saksdokument.dokumentInfoId,
-                null,
-                id,
-                tidspunkt
-            )
-            return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-        }
-        return null
+    ): KlagebehandlingEndretEvent {
+        val tidspunkt = LocalDateTime.now()
+        saksdokumenter.removeIf { it.id == saksdokument.id }
+        modified = tidspunkt
+        val endringslogg = Endringslogginnslag.endringslogg(
+            saksbehandlerident,
+            Felt.SAKSDOKUMENT,
+            saksdokument.dokumentInfoId,
+            null,
+            id,
+            tidspunkt
+        )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
     private fun Klagebehandling.endringslogg(

@@ -19,6 +19,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTil
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setType
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingNotFoundException
+import no.nav.klage.oppgave.exceptions.SaksdokumentNotFoundException
 import no.nav.klage.oppgave.exceptions.ValidationException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.TokenUtil
@@ -439,54 +440,50 @@ class KlagebehandlingService(
         dokumentService.fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
-    fun addDokument(
+    private fun addDokument(
         klagebehandling: Klagebehandling,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ): Klagebehandling {
+    ) {
         try {
-            if (klagebehandling.saksdokumenter.any { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
+            val foundSaksdokument =
+                klagebehandling.saksdokumenter.find { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }
+            if (foundSaksdokument != null) {
                 logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to klagebehandling ${klagebehandling.id}, doing nothing")
             } else {
-                val event =
-                    klagebehandling.addSaksdokument(
-                        Saksdokument(
-                            journalpostId = journalpostId,
-                            dokumentInfoId = dokumentInfoId
-                        ), saksbehandlerIdent
-                    )
+                val saksdokument = Saksdokument(
+                    journalpostId = journalpostId,
+                    dokumentInfoId = dokumentInfoId
+                )
+                val event = klagebehandling.addSaksdokument(
+                    saksdokument,
+                    saksbehandlerIdent
+                )
                 event?.let { applicationEventPublisher.publishEvent(it) }
             }
-            return klagebehandling
         } catch (e: Exception) {
             logger.error("Error connecting journalpost $journalpostId to klagebehandling ${klagebehandling.id}", e)
             throw e
         }
     }
 
-    fun removeDokument(
+    private fun removeDokument(
         klagebehandling: Klagebehandling,
-        journalpostId: String,
-        dokumentInfoId: String,
+        saksdokument: Saksdokument,
         saksbehandlerIdent: String
     ): Klagebehandling {
         try {
-            if (klagebehandling.saksdokumenter.none { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }) {
-                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is not connected to klagebehandling ${klagebehandling.id}, doing nothing")
-            } else {
-                val event =
-                    klagebehandling.removeSaksdokument(
-                        Saksdokument(
-                            journalpostId = journalpostId,
-                            dokumentInfoId = dokumentInfoId
-                        ), saksbehandlerIdent
-                    )
-                event?.let { applicationEventPublisher.publishEvent(it) }
-            }
+            val event =
+                klagebehandling.removeSaksdokument(
+                    saksdokument,
+                    saksbehandlerIdent
+                )
+            event.let { applicationEventPublisher.publishEvent(it) }
+
             return klagebehandling
         } catch (e: Exception) {
-            logger.error("Error disconnecting journalpost $journalpostId to klagebehandling ${klagebehandling.id}", e)
+            logger.error("Error disconnecting document ${saksdokument.id} to klagebehandling ${klagebehandling.id}", e)
             throw e
         }
     }
@@ -507,11 +504,12 @@ class KlagebehandlingService(
     }
 
     fun connectDokumentToKlagebehandling(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ) {
+    ): LocalDateTime {
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
         dokumentService.validateJournalpostExists(journalpostId)
         addDokument(
             klagebehandling,
@@ -519,20 +517,25 @@ class KlagebehandlingService(
             dokumentInfoId,
             saksbehandlerIdent
         )
+        return klagebehandling.modified
     }
 
     fun disconnectDokumentFromKlagebehandling(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String
-    ) {
+    ): LocalDateTime {
+        val klagebehandling = getKlagebehandlingForUpdate(klagebehandlingId)
+        val saksdokument =
+            klagebehandling.saksdokumenter.find { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }
+                ?: throw SaksdokumentNotFoundException("no saksdokument found based on id $journalpostId/$dokumentInfoId")
         removeDokument(
             klagebehandling,
-            journalpostId,
-            dokumentInfoId,
+            saksdokument,
             saksbehandlerIdent
         )
+        return klagebehandling.modified
     }
 
     private fun Mottak.generateFrist() = oversendtKaDato.toLocalDate() + Period.ofWeeks(12)

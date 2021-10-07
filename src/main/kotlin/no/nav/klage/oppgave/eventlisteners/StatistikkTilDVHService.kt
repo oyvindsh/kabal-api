@@ -44,13 +44,13 @@ class StatistikkTilDVHService(
 
     private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
         endringslogginnslag.isEmpty() ||
-                endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.VEDTAK_SLUTTFOERT }
+                endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER }
 
     private fun getKlagebehandlingState(endringslogginnslag: List<Endringslogginnslag>): KlagebehandlingState {
         return when {
             endringslogginnslag.isEmpty() -> KlagebehandlingState.MOTTATT
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> KlagebehandlingState.TILDELT_SAKSBEHANDLER
-            endringslogginnslag.any { it.felt === Felt.VEDTAK_SLUTTFOERT } -> KlagebehandlingState.AVSLUTTET
+            endringslogginnslag.any { it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER } -> KlagebehandlingState.AVSLUTTET
             else -> KlagebehandlingState.UKJENT.also {
                 logger.warn(
                     "unknown state for klagebehandling with id {}",

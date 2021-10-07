@@ -45,6 +45,13 @@ spring:
         enabled: false
   jpa:
     open-in-view: false
+    properties:
+      hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 20
+      hibernate:
+        session:
+          events:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 20
   lifecycle:
     timeout-per-shutdown-phase: 20s
   servlet:
@@ -56,6 +63,10 @@ spring:
     max-in-memory-size: 16MB
 
 maxAttachmentSize: 8MB
+
+org:
+  hibernate:
+    SQL_SLOW: info
 
 server:
   port: 7081
