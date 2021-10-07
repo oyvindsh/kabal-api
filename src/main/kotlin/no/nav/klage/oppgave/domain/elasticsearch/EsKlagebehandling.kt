@@ -136,9 +136,6 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Text)
     val internVurdering: String? = null,
 
-    @Field(type = FieldType.Object)
-    val vedtak: EsVedtak? = null,
-
     @Field(type = FieldType.Nested)
     val saksdokumenter: List<EsSaksdokument> = emptyList(),
 
@@ -174,14 +171,10 @@ data class EsKlagebehandling(
     val vedtakBrevmottakerFnr: List<String> = emptyList(),
     @Field(type = FieldType.Keyword)
     val vedtakBrevmottakerOrgnr: List<String> = emptyList(),
-    @Field(type = FieldType.Keyword)
-    val vedtakJournalpostId: String? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val vedtakCreated: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val vedtakModified: LocalDateTime? = null,
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val vedtakFerdigstiltIJoark: LocalDateTime? = null,
     @Field(type = FieldType.Keyword)
     val status: Status
 ) {

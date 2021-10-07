@@ -165,46 +165,6 @@
     "internVurdering": {
       "type": "text"
     },
-    "vedtak": {
-      "type": "object",
-      "properties": {
-        "utfall": {
-          "type": "keyword"
-        },
-        "grunn": {
-          "type": "keyword"
-        },
-        "hjemler": {
-          "type": "keyword",
-          "fields": {
-            "text": {
-              "type": "text"
-            }
-          }
-        },
-        "brevmottakerFnr": {
-          "type": "keyword"
-        },
-        "brevmottakerOrgnr": {
-          "type": "keyword"
-        },
-        "journalpostId": {
-          "type": "keyword"
-        },
-        "created": {
-          "type": "date",
-          "format": "date_time"
-        },
-        "modified": {
-          "type": "date",
-          "format": "date_time"
-        },
-        "ferdigstiltIJoark": {
-          "type": "date",
-          "format": "date_time"
-        }
-      }
-    },
     "saksdokumenter": {
       "type": "nested",
       "properties": {
@@ -260,18 +220,11 @@
     "vedtakBrevmottakerOrgnr": {
       "type": "keyword"
     },
-    "vedtakJournalpostId": {
-      "type": "keyword"
-    },
     "vedtakCreated": {
       "type": "date",
       "format": "date_time"
     },
     "vedtakModified": {
-      "type": "date",
-      "format": "date_time"
-    },
-    "vedtakFerdigstiltIJoark": {
       "type": "date",
       "format": "date_time"
     },

@@ -428,7 +428,8 @@ class KlagebehandlingService(
                 vedtak = Vedtak(
                     utfall = kvalitetsvurdering.utfall,
                     grunn = kvalitetsvurdering.grunn,
-                    journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
+                    //TODO Dette må fikses når vi ordner kvalitetsvurdering uten klagebehandling på nytt. Bør vel kanskje puttes i saksdokumenter, ikke i vedtaket?
+                    //journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
                     hjemler = hjemler
                 )
             )

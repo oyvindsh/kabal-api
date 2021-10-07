@@ -4,6 +4,7 @@ import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.KafkaVedtakEvent
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttet
+import no.nav.klage.oppgave.domain.kodeverk.Rolle
 import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
 import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -39,7 +40,8 @@ class KlagebehandlingAvslutningService(
                 kildeReferanse = klagebehandling.kildeReferanse ?: "UKJENT",
                 kilde = klagebehandling.kildesystem.name,
                 utfall = vedtak.utfall!!,
-                vedtaksbrevReferanse = vedtak.journalpostId,
+                vedtaksbrevReferanse = (vedtak.brevmottakere.find { it.rolle == Rolle.PROSESSFULLMEKTIG }
+                    ?: vedtak.brevmottakere.find { it.rolle == Rolle.KLAGER })!!.journalpostId,
                 kabalReferanse = vedtak.id.toString(),
                 status = UtsendingStatus.IKKE_SENDT
             )

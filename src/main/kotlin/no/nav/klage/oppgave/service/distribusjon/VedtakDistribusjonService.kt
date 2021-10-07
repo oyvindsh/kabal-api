@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.service.distribusjon
 import no.nav.klage.oppgave.clients.dokdistfordeling.DokDistFordelingClient
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokdistReferanseInVedtaksmottaker
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdInVedtak
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdOgOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setVedtakFerdigDistribuert
 import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -86,7 +86,7 @@ class VedtakDistribusjonService(
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId, null)
         val vedtak = klagebehandling.getVedtakOrException()
         fileApiService.deleteDocumentAsSystemUser(vedtak.mellomlagerId!!)
-        val event = klagebehandling.setMellomlagerIdInVedtak(null, SYSTEMBRUKER)
+        val event = klagebehandling.setMellomlagerIdOgOpplastetInVedtak(null, SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }

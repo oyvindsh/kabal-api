@@ -114,9 +114,6 @@ class KlagebehandlingVedtakController(
 
         val arkivertDokumentWithTitle =
             when {
-                vedtak.journalpostId != null -> {
-                    dokumentService.getArkivertDokumentWithTitleAsSaksbehandler(vedtak.journalpostId!!)
-                }
                 vedtak.mellomlagerId != null -> {
                     fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
                 }

@@ -144,29 +144,20 @@ class KlagebehandlingMapper(
             grunn = grunn?.id,
             hjemler = hjemler.map { it.id }.toSet(),
             brevMottakere = brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-            file = getVedleggView(journalpostId, opplastet, mellomlagerId),
-            ferdigstilt = ferdigstiltIJoark,
+            file = getVedleggView(opplastet, mellomlagerId),
             opplastet = opplastet
         )
     }
 
-    fun getVedleggView(vedtakJournalpostId: String?, opplastet: LocalDateTime?, mellomlagerId: String?): VedleggView? {
-        if (opplastet != null) {
-            val arkivertDokumentWithTitle =
-                when {
-                    vedtakJournalpostId != null -> {
-                        dokumentService.getArkivertDokumentWithTitleAsSaksbehandler(vedtakJournalpostId)
-                    }
-                    mellomlagerId != null -> {
-                        fileApiService.getUploadedDocument(mellomlagerId)
-                    }
-                    else -> null
-                }
-
-            if (arkivertDokumentWithTitle != null)
-                return mapArkivertDokumentWithTitleToVedleggView(arkivertDokumentWithTitle, opplastet)
-        }
-        return null
+    fun getVedleggView(opplastet: LocalDateTime?, mellomlagerId: String?): VedleggView? {
+        return if (opplastet != null) {
+            mellomlagerId?.let {
+                mapArkivertDokumentWithTitleToVedleggView(
+                    fileApiService.getUploadedDocument(it),
+                    opplastet
+                )
+            }
+        } else null
     }
 
     fun mapArkivertDokumentWithTitleToVedleggView(
@@ -220,7 +211,7 @@ class KlagebehandlingMapper(
         return VedleggEditedView(
             klagebehandling.versjon,
             klagebehandling.modified,
-            file = getVedleggView(vedtak.journalpostId, vedtak.opplastet, vedtak.mellomlagerId),
+            file = getVedleggView(vedtak.opplastet, vedtak.mellomlagerId),
         )
     }
 
@@ -228,7 +219,7 @@ class KlagebehandlingMapper(
         return VedtakFullfoertView(
             klagebehandling.versjon,
             klagebehandling.modified,
-            klagebehandling.getVedtakOrException().avsluttetAvSaksbehandler!!,
+            klagebehandling.avsluttetAvSaksbehandler!!,
             klagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
         )
     }

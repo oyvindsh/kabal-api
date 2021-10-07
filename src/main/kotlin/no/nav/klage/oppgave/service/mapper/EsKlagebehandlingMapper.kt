@@ -6,7 +6,6 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsSaksdokument
-import no.nav.klage.oppgave.domain.elasticsearch.EsVedtak
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
@@ -90,21 +89,6 @@ class EsKlagebehandlingMapper(
             modified = klagebehandling.modified,
             kilde = klagebehandling.kildesystem.id,
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
-            vedtak = klagebehandling.vedtak?.let { vedtak ->
-                EsVedtak(
-                    utfall = vedtak.utfall?.id,
-                    grunn = vedtak.grunn?.id,
-                    hjemler = vedtak.hjemler.map { hjemmel -> hjemmel.id },
-                    brevmottakerFnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.PERSON }
-                        .map { it.partId.value },
-                    brevmottakerOrgnr = vedtak.brevmottakere.filter { it.partId.type == PartIdType.VIRKSOMHET }
-                        .map { it.partId.value },
-                    journalpostId = vedtak.journalpostId,
-                    created = vedtak.created,
-                    modified = vedtak.modified,
-                    ferdigstiltIJoark = vedtak.ferdigstiltIJoark
-                )
-            },
             saksdokumenter = klagebehandling.saksdokumenter.map { EsSaksdokument(it.journalpostId, it.dokumentInfoId) },
             saksdokumenterJournalpostId = klagebehandling.saksdokumenter.map { it.journalpostId },
             saksdokumenterJournalpostIdOgDokumentInfoId = klagebehandling.saksdokumenter.map {
@@ -120,10 +104,8 @@ class EsKlagebehandlingMapper(
                 ?.map { it.partId.value } ?: emptyList(),
             vedtakBrevmottakerOrgnr = klagebehandling.vedtak?.brevmottakere?.filter { it.partId.type == PartIdType.VIRKSOMHET }
                 ?.map { it.partId.value } ?: emptyList(),
-            vedtakJournalpostId = klagebehandling.vedtak?.journalpostId,
             vedtakCreated = klagebehandling.vedtak?.created,
             vedtakModified = klagebehandling.vedtak?.modified,
-            vedtakFerdigstiltIJoark = klagebehandling.vedtak?.ferdigstiltIJoark,
             temaNavn = klagebehandling.tema.name,
             typeNavn = klagebehandling.type.name,
             hjemlerNavn = klagebehandling.hjemler.map { it.name },

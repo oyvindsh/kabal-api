@@ -33,16 +33,10 @@ class Vedtak(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "journalpost_id")
-    var journalpostId: String? = null,
     @Column(name = "opplastet")
     var opplastet: LocalDateTime? = null,
-    @Column(name = "ferdigstilt_i_joark")
-    var ferdigstiltIJoark: LocalDateTime? = null,
     @Column(name = "ferdig_distribuert")
     var ferdigDistribuert: LocalDateTime? = null,
-    @Column(name = "avsluttet_av_saksbehandler")
-    var avsluttetAvSaksbehandler: LocalDateTime? = null,
     @Column(name = "mellomlager_id")
     var mellomlagerId: String? = null
 ) {
