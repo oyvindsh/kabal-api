@@ -10,7 +10,7 @@ import java.time.LocalDateTime
     indexName = "klagebehandling",
     shards = 3,
     replicas = 2,
-    versionType = VersionType.EXTERNAL,
+    versionType = VersionType.INTERNAL,
     createIndex = false
 )
 data class EsKlagebehandling(
