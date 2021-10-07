@@ -4,11 +4,15 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.KlagebehandlingEditedView
+import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -22,6 +26,7 @@ import java.util.*
 @RequestMapping("/klagebehandlinger")
 class KlagebehandlingDokumentController(
     private val klagebehandlingService: KlagebehandlingService,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val dokumentService: DokumentService
 ) {
 
@@ -47,18 +52,6 @@ class KlagebehandlingDokumentController(
             pageSize = pageSize,
             previousPageRef = previousPageRef
         )
-    }
-
-    @ApiOperation(
-        value = "Henter metadata om dokumenter knyttet til en klagebehandling",
-        notes = "Henter metadata om dokumenter knyttet til en klagebehandling. Berikes med data fra SAF."
-    )
-    @GetMapping("/{id}/dokumenttilknytninger", produces = ["application/json"])
-    fun fetchConnectedDokumenter(
-        @ApiParam(value = "Id til klagebehandlingen i vårt system")
-        @PathVariable("id") klagebehandlingId: UUID
-    ): DokumenterResponse {
-        return klagebehandlingService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
     }
 
     @ApiOperation(
@@ -93,5 +86,54 @@ class KlagebehandlingDokumentController(
             responseHeaders,
             HttpStatus.OK
         )
+    }
+
+    @ApiOperation(
+        value = "Henter metadata om dokumenter knyttet til en klagebehandling",
+        notes = "Henter metadata om dokumenter knyttet til en klagebehandling. Berikes med data fra SAF."
+    )
+    @GetMapping("/{id}/dokumenttilknytninger", produces = ["application/json"])
+    fun fetchConnectedDokumenter(
+        @ApiParam(value = "Id til klagebehandlingen i vårt system")
+        @PathVariable("id") klagebehandlingId: UUID
+    ): DokumenterResponse {
+        return klagebehandlingService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
+    }
+
+    @PostMapping("/{id}/dokumenttilknytninger")
+    fun setTilknyttetDokument(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: TilknyttetDokument
+    ): KlagebehandlingEditedView {
+        logKlagebehandlingMethodDetails(
+            "setTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
+            logger
+        )
+        val modified = klagebehandlingService.connectDokumentToKlagebehandling(
+            klagebehandlingId = klagebehandlingId,
+            journalpostId = input.journalpostId,
+            dokumentInfoId = input.dokumentInfoId,
+            saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+        return KlagebehandlingEditedView(modified = modified)
+    }
+
+    @DeleteMapping("/{id}/dokumenttilknytninger/{journalpostId}/{dokumentInfoId}")
+    fun removeTilknyttetDokument(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @PathVariable("journalpostId") journalpostId: String,
+        @PathVariable("dokumentInfoId") dokumentInfoId: String
+    ): KlagebehandlingEditedView {
+        logKlagebehandlingMethodDetails(
+            "removeTilknyttetDokument", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
+            logger
+        )
+        val modified = klagebehandlingService.disconnectDokumentFromKlagebehandling(
+            klagebehandlingId = klagebehandlingId,
+            journalpostId = journalpostId,
+            dokumentInfoId = dokumentInfoId,
+            saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+        return KlagebehandlingEditedView(modified)
     }
 }
