@@ -85,7 +85,6 @@ class KlagebehandlingMapper(
             kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
                 TilknyttetDokument(
-                    id = it.id,
                     journalpostId = it.journalpostId,
                     dokumentInfoId = it.dokumentInfoId
                 )

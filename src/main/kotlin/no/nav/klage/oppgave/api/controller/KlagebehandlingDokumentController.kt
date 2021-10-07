@@ -31,10 +31,9 @@ class KlagebehandlingDokumentController(
     }
 
     @ApiOperation(
-        value = "Hent dokumenter for en klagebehandling",
-        notes = "Henter alle dokumenter om en person som saksbehandler har tilgang til."
+        value = "Hent metadata om dokumenter for brukeren som saken gjelder"
     )
-    @GetMapping("/{id}/alledokumenter", produces = ["application/json"])
+    @GetMapping("/{id}/arkivertedokumenter", produces = ["application/json"])
     fun fetchDokumenter(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable("id") klagebehandlingId: UUID,
@@ -51,10 +50,10 @@ class KlagebehandlingDokumentController(
     }
 
     @ApiOperation(
-        value = "Henter journalposter med dokumenter knyttet til en klagebehandling",
-        notes = "Henter journalpostene til dokumentene som saksbehandler har markert at skal knyttes til klagebehandlingen."
+        value = "Henter metadata om dokumenter knyttet til en klagebehandling",
+        notes = "Henter metadata om dokumenter knyttet til en klagebehandling. Berikes med data fra SAF."
     )
-    @GetMapping("/{id}/dokumenter", produces = ["application/json"])
+    @GetMapping("/{id}/dokumenttilknytninger", produces = ["application/json"])
     fun fetchConnectedDokumenter(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable("id") klagebehandlingId: UUID
@@ -62,8 +61,12 @@ class KlagebehandlingDokumentController(
         return klagebehandlingService.fetchJournalposterConnectedToKlagebehandling(klagebehandlingId)
     }
 
+    @ApiOperation(
+        value = "Henter fil fra dokumentarkivet",
+        notes = "Henter fil fra dokumentarkivet som pdf gitt at saksbehandler har tilgang"
+    )
     @ResponseBody
-    @GetMapping("/{id}/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}")
+    @GetMapping("/{id}/arkivertedokumenter/{journalpostId}/{dokumentInfoId}/pdf")
     fun getArkivertDokument(
         @ApiParam(value = "Id til klagebehandlingen i vårt system")
         @PathVariable("id") klagebehandlingId: UUID,
