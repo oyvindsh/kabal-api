@@ -581,30 +581,25 @@ class KlagebehandlingService(
 
         if (klagebehandling.avsluttetAvSaksbehandler != null) throw KlagebehandlingFinalizedException("Klagebehandlingen er avsluttet")
 
-        val vedtak = klagebehandling.getVedtakOrException()
-
         //Forretningsmessige krav før vedtak kan ferdigstilles
-        validateVedtakBeforeFinalize(vedtak)
+        validateKlagebehandlingBeforeFinalize(klagebehandling)
 
         //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
         return markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
     }
 
-    private fun validateVedtakBeforeFinalize(vedtak: Vedtak) {
-        if (vedtak.mellomlagerId == null) {
+    private fun validateKlagebehandlingBeforeFinalize(klagebehandling: Klagebehandling) {
+        if (klagebehandling.vedtak?.mellomlagerId == null) {
             throw ResultatDokumentNotFoundException("Vennligst last opp vedtaksdokument på nytt")
         }
-        if (vedtak.utfall == null) {
+        if (klagebehandling.vedtak.utfall == null) {
             throw ValidationException("Utfall er ikke satt på vedtak")
         }
-        //TODO validate based on kvalitetsvurdering when that feature is done
-//        if (klagebehandling.vedtak.first().utfall in listOf(Utfall.OPPHEVET, Utfall.MEDHOLD, Utfall.DELVIS_MEDHOLD)) {
-//            if (klagebehandling.vedtak.first().grunn == null) {
-//                throw ValidationException("Omgjøringsgrunn er ikke satt på vedtak")
-//            }
-//        }
-        if (vedtak.utfall != Utfall.TRUKKET && vedtak.hjemler.isEmpty()) {
-            throw ValidationException("Hjemmel er ikke satt på vedtak")
+        if (klagebehandling.vedtak.utfall != Utfall.TRUKKET) {
+            if (klagebehandling.vedtak.hjemler.isEmpty()) {
+                throw ValidationException("Hjemmel er ikke satt på vedtak")
+            }
+            klagebehandling.kvalitetsvurdering?.validate()
         }
     }
 
