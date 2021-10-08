@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.exceptions.ValidationException
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -95,5 +96,19 @@ class Kvalitetsvurdering(
 
     override fun hashCode(): Int {
         return id.hashCode()
+    }
+
+    fun validate() {
+        validateBooleanAndAvviklistSize(oversendelsesbrevBra, kvalitetsavvikOversendelsesbrev.size)
+        validateBooleanAndAvviklistSize(utredningBra, kvalitetsavvikUtredning.size)
+        validateBooleanAndAvviklistSize(vedtakBra, kvalitetsavvikVedtak.size)
+    }
+
+    private fun validateBooleanAndAvviklistSize(kategoriBra: Boolean?, kategoriSize: Int) {
+        if ((kategoriBra == false && kategoriSize == 0) ||
+            (kategoriBra == null)
+        ) {
+            throw ValidationException("Manglende utfylling av kvalitetsskjema.")
+        }
     }
 }
