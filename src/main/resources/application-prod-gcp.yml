@@ -26,7 +26,7 @@ AIVEN_ES_SCHEME: https
 AIVEN_ES_USE_SSL: true
 
 SAF_BASE_URL: https://saf.prod-fss-pub.nais.io/
-SAF_APP_CLIENT_ID: feb9588b-a3d6-4d2f-8809-97284046ae72
+SAF_APP_CLIENT_ID: prod-fss.teamdokumenthandtering.saf
 
 DOKARKIV_CLIENT_ID: 162b3255-2f72-4399-8f7a-244add9ffaac
 
