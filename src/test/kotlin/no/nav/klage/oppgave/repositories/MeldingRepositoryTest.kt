@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -87,13 +88,13 @@ class MeldingRepositoryTest {
         val melding1 = Melding(
             text = meldingTil1,
             saksbehandlerident = "abc123",
-            created = LocalDateTime.now(),
+            created = LocalDateTime.of(LocalDate.now(), LocalTime.of(10, 10)),
             klagebehandlingId = foundKlagebehandling.id
         )
         val melding2 = Melding(
             text = meldingTil2,
             saksbehandlerident = "abc456",
-            created = LocalDateTime.now(),
+            created = LocalDateTime.of(LocalDate.now(), LocalTime.of(20, 20)),
             klagebehandlingId = foundKlagebehandling.id
         )
 
