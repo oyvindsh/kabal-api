@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.VedtakService
@@ -30,7 +29,6 @@ class KlagebehandlingVedtakController(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val vedtakService: VedtakService,
     private val klagebehandlingService: KlagebehandlingService,
-    private val dokumentService: DokumentService,
     private val fileApiService: FileApiService
 ) {
 
@@ -122,7 +120,7 @@ class KlagebehandlingVedtakController(
         )
         return VedtakEditedView(
             vedtakService.setUtfall(
-                klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId),
+                klagebehandlingId,
                 input.utfall?.let { Utfall.of(it) },
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             ).modified
@@ -140,7 +138,7 @@ class KlagebehandlingVedtakController(
         )
         return VedtakEditedView(
             vedtakService.setHjemler(
-                klagebehandlingService.getKlagebehandlingForUpdate(klagebehandlingId),
+                klagebehandlingId,
                 input.hjemler?.map { Hjemmel.of(it) }?.toSet() ?: emptySet(),
                 innloggetSaksbehandlerRepository.getInnloggetIdent()
             ).modified

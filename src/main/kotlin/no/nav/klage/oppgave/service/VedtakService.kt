@@ -41,10 +41,13 @@ class VedtakService(
     }
 
     fun setUtfall(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         utfall: Utfall?,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
+            klagebehandlingId
+        )
         val event =
             klagebehandling.setUtfallInVedtak(utfall, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
@@ -64,10 +67,13 @@ class VedtakService(
     }
 
     fun setHjemler(
-        klagebehandling: Klagebehandling,
+        klagebehandlingId: UUID,
         hjemler: Set<Hjemmel>,
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
+            klagebehandlingId
+        )
         val event =
             klagebehandling.setHjemlerInVedtak(hjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
