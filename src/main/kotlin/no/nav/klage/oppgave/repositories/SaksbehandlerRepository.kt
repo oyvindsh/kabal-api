@@ -88,4 +88,8 @@ class SaksbehandlerRepository(
     private fun getRoller(ident: String): List<String> = azureGateway.getRolleIder(ident)
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
+
+    fun getNameForSaksbehandler(navIdent: String): String {
+        return azureGateway.getPersonligDataOmSaksbehandlerMedIdent(navIdent).sammensattNavn
+    }
 }
