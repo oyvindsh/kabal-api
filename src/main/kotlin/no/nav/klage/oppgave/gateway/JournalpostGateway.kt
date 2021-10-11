@@ -108,11 +108,11 @@ class JournalpostGateway(
         }
     }
 
-    private fun createBruker(klagebehandling: Klagebehandling): Bruker? {
+    private fun createBruker(klagebehandling: Klagebehandling): Bruker {
         return klagebehandling.sakenGjelder.partId.let {
             Bruker(
                 it.value,
-                BrukerIdType.FNR
+                if (it.type == PartIdType.VIRKSOMHET) BrukerIdType.ORGNR else BrukerIdType.FNR
             )
         }
     }
