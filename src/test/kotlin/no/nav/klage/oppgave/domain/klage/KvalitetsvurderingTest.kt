@@ -15,7 +15,6 @@ internal class KvalitetsvurderingTest {
             vedtakBra = true
         )
         kvalitetsvurdering.validate()
-        assert(true)
     }
 
     @Test
@@ -41,6 +40,5 @@ internal class KvalitetsvurderingTest {
             vedtakBra = true
         )
         kvalitetsvurdering.validate()
-        assert(true)
     }
 }
