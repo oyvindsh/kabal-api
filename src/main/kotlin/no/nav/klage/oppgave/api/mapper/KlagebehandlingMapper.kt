@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.domain.ArkivertDokumentWithTitle
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.util.getLogger
@@ -25,7 +26,8 @@ class KlagebehandlingMapper(
     private val norg2Client: Norg2Client,
     private val eregClient: EregClient,
     private val dokumentService: DokumentService,
-    private val fileApiService: FileApiService
+    private val fileApiService: FileApiService,
+    private val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
     companion object {
@@ -76,7 +78,9 @@ class KlagebehandlingMapper(
             avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
+            tildeltSaksbehandler = berikSaksbehandler(klagebehandling.tildeling?.saksbehandlerident),
             medunderskriverident = klagebehandling.medunderskriver?.saksbehandlerident,
+            medunderskriver = berikSaksbehandler(klagebehandling.medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = klagebehandling.medunderskriverFlyt ?: MedunderskriverFlyt.IKKE_SENDT,
             datoSendtMedunderskriver = klagebehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemler = klagebehandling.hjemler.map { it.id },
@@ -94,6 +98,12 @@ class KlagebehandlingMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig
         )
+    }
+
+    private fun berikSaksbehandler(saksbehandlerident: String?): SaksbehandlerRefView? {
+        return saksbehandlerident?.let {
+            SaksbehandlerRefView(it, saksbehandlerRepository.getNameForSaksbehandler(it))
+        }
     }
 
     private fun SakenGjelder.mapToView(): KlagebehandlingDetaljerView.SakenGjelderView {

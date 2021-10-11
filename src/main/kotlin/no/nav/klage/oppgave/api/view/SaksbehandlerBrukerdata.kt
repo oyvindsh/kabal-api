@@ -22,3 +22,8 @@ data class SaksbehandlerView(
         val typer: List<String>
     )
 }
+
+data class SaksbehandlerRefView(
+    val navIdent: String,
+    val navn: String
+)
