@@ -59,7 +59,7 @@ class SaksbehandlerService(
         saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(ident).enheter.flatMap { it.temaer }
             .contains(tema)
 
-    private fun getNameForIdent(it: String) =
+    fun getNameForIdent(it: String) =
         saksbehandlerRepository.getNamesForSaksbehandlere(setOf(it)).getOrDefault(it, "Ukjent navn")
 
     fun getNamesForSaksbehandlere(idents: Set<String>): Map<String, String> =

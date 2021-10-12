@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.api.mapper
 
-import no.nav.klage.oppgave.api.view.MeldingCreated
 import no.nav.klage.oppgave.api.view.MeldingModified
 import no.nav.klage.oppgave.api.view.MeldingView
 import no.nav.klage.oppgave.domain.klage.Melding
@@ -12,9 +11,16 @@ class MeldingMapper(
     private val saksbehandlerService: SaksbehandlerService
 ) {
 
-    fun toCreatedView(melding: Melding): MeldingCreated {
-        return MeldingCreated(
-            created = melding.created
+    fun toMeldingView(melding: Melding): MeldingView {
+        return MeldingView(
+            id = melding.id,
+            text = melding.text,
+            author = MeldingView.Author(
+                saksbehandlerIdent = melding.saksbehandlerident,
+                name = saksbehandlerService.getNameForIdent(melding.saksbehandlerident),
+            ),
+            created = melding.created,
+            modified = melding.modified
         )
     }
 
@@ -25,17 +31,13 @@ class MeldingMapper(
     }
 
     fun toMeldingerView(meldinger: List<Melding>): List<MeldingView> {
-        val names = saksbehandlerService.getNamesForSaksbehandlere(
-            meldinger.map { it.saksbehandlerident }.toSet()
-        )
-
         return meldinger.map { melding ->
             MeldingView(
                 id = melding.id,
                 text = melding.text,
                 author = MeldingView.Author(
                     saksbehandlerIdent = melding.saksbehandlerident,
-                    name = names[melding.saksbehandlerident] ?: "ukjent navn",
+                    name = saksbehandlerService.getNameForIdent(melding.saksbehandlerident),
                 ),
                 created = melding.created,
                 modified = melding.modified

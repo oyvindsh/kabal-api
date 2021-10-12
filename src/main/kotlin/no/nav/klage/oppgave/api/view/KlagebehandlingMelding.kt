@@ -7,10 +7,6 @@ data class MeldingInput(
     val text: String
 )
 
-data class MeldingCreated(
-    val created: LocalDateTime
-)
-
 data class MeldingModified(
     val modified: LocalDateTime
 )

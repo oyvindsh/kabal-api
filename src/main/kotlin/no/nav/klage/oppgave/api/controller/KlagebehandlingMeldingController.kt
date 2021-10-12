@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import no.nav.klage.oppgave.api.mapper.MeldingMapper
-import no.nav.klage.oppgave.api.view.MeldingCreated
 import no.nav.klage.oppgave.api.view.MeldingInput
 import no.nav.klage.oppgave.api.view.MeldingModified
 import no.nav.klage.oppgave.api.view.MeldingView
@@ -43,13 +42,13 @@ class KlagebehandlingMeldingController(
     fun addMelding(
         @PathVariable("id") klagebehandlingId: UUID,
         @RequestBody input: MeldingInput
-    ): MeldingCreated {
+    ): MeldingView {
         val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         logKlagebehandlingMethodDetails("addMelding", innloggetIdent, klagebehandlingId, logger)
 
         validateAccessToKlagebehandling(klagebehandlingId)
 
-        return meldingMapper.toCreatedView(
+        return meldingMapper.toMeldingView(
             meldingService.addMelding(
                 klagebehandlingId,
                 innloggetIdent,
