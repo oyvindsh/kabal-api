@@ -76,6 +76,7 @@ class KlagebehandlingMapper(
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
             avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
+            isAvsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate() != null,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandler = berikSaksbehandler(klagebehandling.tildeling?.saksbehandlerident),

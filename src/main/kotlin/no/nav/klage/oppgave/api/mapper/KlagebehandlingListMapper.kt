@@ -94,6 +94,7 @@ class KlagebehandlingListMapper {
                 } else {
                     null
                 },
+                isAvsluttetAvSaksbehandler = esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate() != null,
                 saksbehandlerHarTilgang = tilgangTilTemaer.contains(Tema.of(esKlagebehandling.tema)),
                 egenAnsatt = esKlagebehandling.egenAnsatt,
                 fortrolig = esKlagebehandling.fortrolig,
