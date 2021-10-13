@@ -62,13 +62,21 @@ class KlagebehandlingerSearchCriteriaMapper {
         } else {
             KlagebehandlingerSearchCriteria.SortField.FRIST
         },
-        ferdigstiltFom = queryParams.ferdigstiltFom,
+        ferdigstiltFom = getFerdigstiltFom(queryParams),
         statuskategori = if (queryParams.ferdigstiltFom != null) {
             KlagebehandlingerSearchCriteria.Statuskategori.AVSLUTTET
         } else {
             KlagebehandlingerSearchCriteria.Statuskategori.AAPEN
         }
     )
+
+    private fun getFerdigstiltFom(queryParams: KlagebehandlingerQueryParams): LocalDate? {
+        return if (queryParams.ferdigstiltDaysAgo != null) {
+            LocalDate.now().minusDays(queryParams.ferdigstiltDaysAgo.toLong())
+        } else {
+            queryParams.ferdigstiltFom
+        }
+    }
 
     fun toFristUtgaattIkkeTildeltSearchCriteria(navIdent: String, queryParams: KlagebehandlingerQueryParams) =
         KlagebehandlingerSearchCriteria(
