@@ -113,7 +113,7 @@ class RelatedKlagebehandlingerTest {
             temaNavn = Tema.OMS.name,
             typeNavn = Type.KLAGE.name,
             status = UKJENT,
-            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
 
     @Test

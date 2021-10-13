@@ -116,7 +116,7 @@ class ElasticsearchServiceStatusTest {
         temaNavn = "",
         typeNavn = "",
         status = status,
-        medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+        medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
     )
 
 }

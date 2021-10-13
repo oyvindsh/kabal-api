@@ -142,7 +142,7 @@ class ElasticsearchIndexingTest {
             temaNavn = Tema.OMS.name,
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
-            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
     }
 }

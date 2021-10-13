@@ -98,7 +98,7 @@ class EktefelleElasticsearchServiceTest {
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
             sakenGjelderFnr = "123",
-            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
         val klagebehandling2 =
             EsKlagebehandling(
@@ -119,7 +119,7 @@ class EktefelleElasticsearchServiceTest {
                 typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT,
                 sakenGjelderFnr = "456",
-                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
             )
         val klagebehandling3 = EsKlagebehandling(
             id = "1003L",
@@ -139,7 +139,7 @@ class EktefelleElasticsearchServiceTest {
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
             sakenGjelderFnr = "123",
-            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
         val klagebehandling4 =
             EsKlagebehandling(
@@ -160,7 +160,7 @@ class EktefelleElasticsearchServiceTest {
                 typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT,
                 sakenGjelderFnr = "456",
-                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
             )
         repo.save(klagebehandling1)
         repo.save(klagebehandling2)

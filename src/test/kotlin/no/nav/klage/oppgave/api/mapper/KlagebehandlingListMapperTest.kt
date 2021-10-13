@@ -29,7 +29,7 @@ internal class KlagebehandlingListMapperTest {
         temaNavn = Tema.OMS.name,
         typeNavn = Type.KLAGE.name,
         status = EsKlagebehandling.Status.IKKE_TILDELT,
-        medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+        medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
     )
     val klagebehandling2 =
         EsKlagebehandling(
@@ -50,7 +50,7 @@ internal class KlagebehandlingListMapperTest {
             temaNavn = Tema.SYK.name,
             typeNavn = Type.KLAGE.name,
             status = EsKlagebehandling.Status.IKKE_TILDELT,
-            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
     val klagebehandling3 =
         EsKlagebehandling(
@@ -71,6 +71,6 @@ internal class KlagebehandlingListMapperTest {
             temaNavn = Tema.SYK.name,
             typeNavn = Type.KLAGE.name,
             status = EsKlagebehandling.Status.IKKE_TILDELT,
-            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
 }
