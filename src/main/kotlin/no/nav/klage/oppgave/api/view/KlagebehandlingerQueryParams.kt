@@ -15,7 +15,8 @@ data class KlagebehandlingerQueryParams(
     val erTildeltSaksbehandler: Boolean? = null,
     val tildeltSaksbehandler: String? = null,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    val ferdigstiltFom: LocalDate? = null
+    val ferdigstiltFom: LocalDate? = null,
+    val ferdigstiltDaysAgo: Long? = null
 ) {
 
     enum class Rekkefoelge {
