@@ -101,7 +101,7 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Keyword)
     val medunderskriverident: String? = null,
     @Field(type = FieldType.Keyword)
-    val medunderskriverFlyt: String? = null,
+    val medunderskriverFlyt: String,
 
     @MultiField(
         mainField = Field(type = FieldType.Keyword),
