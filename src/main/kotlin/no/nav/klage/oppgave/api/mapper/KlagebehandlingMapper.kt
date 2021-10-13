@@ -82,7 +82,7 @@ class KlagebehandlingMapper(
             tildeltSaksbehandler = berikSaksbehandler(klagebehandling.tildeling?.saksbehandlerident),
             medunderskriverident = klagebehandling.medunderskriver?.saksbehandlerident,
             medunderskriver = berikSaksbehandler(klagebehandling.medunderskriver?.saksbehandlerident),
-            medunderskriverFlyt = klagebehandling.medunderskriverFlyt ?: MedunderskriverFlyt.IKKE_SENDT,
+            medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
             datoSendtMedunderskriver = klagebehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemler = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,

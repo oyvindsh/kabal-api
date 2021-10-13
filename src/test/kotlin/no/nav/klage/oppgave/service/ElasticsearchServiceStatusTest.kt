@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.*
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -114,7 +115,8 @@ class ElasticsearchServiceStatusTest {
         kilde = "K9",
         temaNavn = "",
         typeNavn = "",
-        status = status
+        status = status,
+        medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
     )
 
 }

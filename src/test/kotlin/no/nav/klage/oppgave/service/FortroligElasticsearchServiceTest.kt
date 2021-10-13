@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.IKKE_TILDELT
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -110,6 +111,7 @@ class FortroligElasticsearchServiceTest {
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
             sakenGjelderFnr = "123",
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
         val fortroligPerson =
             EsKlagebehandling(
@@ -130,7 +132,8 @@ class FortroligElasticsearchServiceTest {
                 typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT,
                 sakenGjelderFnr = "123",
-                fortrolig = true
+                fortrolig = true,
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
             )
         val strengtFortroligPerson = EsKlagebehandling(
             id = idStrengtFortrolig,
@@ -150,7 +153,8 @@ class FortroligElasticsearchServiceTest {
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
             sakenGjelderFnr = "123",
-            strengtFortrolig = true
+            strengtFortrolig = true,
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
         val egenAnsattPerson =
             EsKlagebehandling(
@@ -171,7 +175,8 @@ class FortroligElasticsearchServiceTest {
                 typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT,
                 sakenGjelderFnr = "123",
-                egenAnsatt = true
+                egenAnsatt = true,
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
             )
         val egenAnsattOgFortroligPerson =
             EsKlagebehandling(
@@ -193,7 +198,8 @@ class FortroligElasticsearchServiceTest {
                 status = IKKE_TILDELT,
                 sakenGjelderFnr = "123",
                 egenAnsatt = true,
-                fortrolig = true
+                fortrolig = true,
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
             )
         val egenAnsattOgStrengtFortroligPerson =
             EsKlagebehandling(
@@ -215,7 +221,8 @@ class FortroligElasticsearchServiceTest {
                 status = IKKE_TILDELT,
                 sakenGjelderFnr = "123",
                 egenAnsatt = true,
-                strengtFortrolig = true
+                strengtFortrolig = true,
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
             )
         repo.save(normalPerson)
         repo.save(fortroligPerson)

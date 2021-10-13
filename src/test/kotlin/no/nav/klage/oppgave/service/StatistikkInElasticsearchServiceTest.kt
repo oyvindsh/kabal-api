@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.UKJENT
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -94,7 +95,8 @@ class StatistikkInElasticsearchServiceTest {
             kilde = "K9",
             temaNavn = Tema.OMS.name,
             typeNavn = Type.KLAGE.name,
-            status = UKJENT
+            status = UKJENT,
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.name
         )
 
     @Test
