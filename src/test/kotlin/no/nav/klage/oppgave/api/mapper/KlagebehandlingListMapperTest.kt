@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import java.time.LocalDate
@@ -27,7 +28,8 @@ internal class KlagebehandlingListMapperTest {
         kilde = "K9",
         temaNavn = Tema.OMS.name,
         typeNavn = Type.KLAGE.name,
-        status = EsKlagebehandling.Status.IKKE_TILDELT
+        status = EsKlagebehandling.Status.IKKE_TILDELT,
+        medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
     )
     val klagebehandling2 =
         EsKlagebehandling(
@@ -47,7 +49,8 @@ internal class KlagebehandlingListMapperTest {
             kilde = "K9",
             temaNavn = Tema.SYK.name,
             typeNavn = Type.KLAGE.name,
-            status = EsKlagebehandling.Status.IKKE_TILDELT
+            status = EsKlagebehandling.Status.IKKE_TILDELT,
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
         )
     val klagebehandling3 =
         EsKlagebehandling(
@@ -67,6 +70,7 @@ internal class KlagebehandlingListMapperTest {
             kilde = "K9",
             temaNavn = Tema.SYK.name,
             typeNavn = Type.KLAGE.name,
-            status = EsKlagebehandling.Status.IKKE_TILDELT
+            status = EsKlagebehandling.Status.IKKE_TILDELT,
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
         )
 }

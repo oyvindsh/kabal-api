@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.IKKE_TILDELT
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -96,7 +97,8 @@ class EktefelleElasticsearchServiceTest {
             temaNavn = Tema.OMS.name,
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
-            sakenGjelderFnr = "123"
+            sakenGjelderFnr = "123",
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
         )
         val klagebehandling2 =
             EsKlagebehandling(
@@ -116,7 +118,8 @@ class EktefelleElasticsearchServiceTest {
                 temaNavn = Tema.SYK.name,
                 typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT,
-                sakenGjelderFnr = "456"
+                sakenGjelderFnr = "456",
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
             )
         val klagebehandling3 = EsKlagebehandling(
             id = "1003L",
@@ -135,7 +138,8 @@ class EktefelleElasticsearchServiceTest {
             temaNavn = Tema.SYK.name,
             typeNavn = Type.KLAGE.name,
             status = IKKE_TILDELT,
-            sakenGjelderFnr = "123"
+            sakenGjelderFnr = "123",
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
         )
         val klagebehandling4 =
             EsKlagebehandling(
@@ -155,7 +159,8 @@ class EktefelleElasticsearchServiceTest {
                 temaNavn = Tema.OMS.name,
                 typeNavn = Type.KLAGE.name,
                 status = IKKE_TILDELT,
-                sakenGjelderFnr = "456"
+                sakenGjelderFnr = "456",
+                medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
             )
         repo.save(klagebehandling1)
         repo.save(klagebehandling2)

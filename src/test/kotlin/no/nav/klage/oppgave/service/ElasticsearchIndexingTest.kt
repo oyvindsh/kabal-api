@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.config.ElasticsearchServiceConfiguration
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.IKKE_TILDELT
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
@@ -140,7 +141,8 @@ class ElasticsearchIndexingTest {
             kilde = "K9",
             temaNavn = Tema.OMS.name,
             typeNavn = Type.KLAGE.name,
-            status = IKKE_TILDELT
+            status = IKKE_TILDELT,
+            medunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT.navn
         )
     }
 }
