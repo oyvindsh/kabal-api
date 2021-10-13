@@ -1,11 +1,9 @@
 package no.nav.klage.oppgave.domain.klage
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.oppgave.domain.kodeverk.KvalitetsavvikOversendelsesbrev
 import no.nav.klage.oppgave.exceptions.ValidationException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDateTime
 
 internal class KvalitetsvurderingTest {
 
@@ -43,22 +41,4 @@ internal class KvalitetsvurderingTest {
         )
         kvalitetsvurdering.validate()
     }
-
-    @Test
-    fun `test boolean`() {
-
-        val nullValue: LocalDateTime? = null
-        val notNullValue = LocalDateTime.now()
-
-        val data = Data(
-            isAvsluttetAvSaksbehandler = nullValue?.toLocalDate() != null
-        )
-
-        println(jacksonObjectMapper().writeValueAsString(data))
-
-        println(data)
-    }
-
-    private data class Data(val isAvsluttetAvSaksbehandler: Boolean)
-
 }
