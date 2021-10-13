@@ -37,8 +37,8 @@ class KlagebehandlingListMapper {
                     navn = person.navn,
                     foedselsdato = person.foedselsdato,
                     klagebehandlinger = klagebehandlinger,
-                    aapneKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler == null },
-                    avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.avsluttetAvSaksbehandler != null }
+                    aapneKlagebehandlinger = klagebehandlinger.filter { !it.isAvsluttetAvSaksbehandler },
+                    avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.isAvsluttetAvSaksbehandler }
                 )
             }
         } else {
@@ -89,7 +89,7 @@ class KlagebehandlingListMapper {
                 } else {
                     null
                 },
-                avsluttetAvSaksbehandler = if (viseFullfoerte) {
+                avsluttetAvSaksbehandlerDate = if (viseFullfoerte) {
                     esKlagebehandling.avsluttetAvSaksbehandler?.toLocalDate()
                 } else {
                     null

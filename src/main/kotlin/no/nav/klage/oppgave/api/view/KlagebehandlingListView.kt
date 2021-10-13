@@ -21,7 +21,7 @@ data class KlagebehandlingListView(
     val medunderskriverident: String?,
     val medunderskriverFlyt: MedunderskriverFlyt,
     val utfall: String?,
-    val avsluttetAvSaksbehandler: LocalDate?,
+    val avsluttetAvSaksbehandlerDate: LocalDate?,
     val isAvsluttetAvSaksbehandler: Boolean,
     val erTildelt: Boolean,
     val tildeltSaksbehandlerident: String?,
