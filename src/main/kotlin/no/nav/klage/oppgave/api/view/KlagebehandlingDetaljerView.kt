@@ -29,6 +29,7 @@ data class KlagebehandlingDetaljerView(
     val mottattKlageinstans: LocalDate?,
     val tildelt: LocalDate? = null,
     val avsluttetAvSaksbehandler: LocalDate?,
+    val isAvsluttetAvSaksbehandler: Boolean,
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
     val tildeltSaksbehandler: SaksbehandlerRefView? = null,
