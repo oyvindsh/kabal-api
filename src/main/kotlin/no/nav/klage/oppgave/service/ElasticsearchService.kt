@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling.Status.*
 import no.nav.klage.oppgave.domain.elasticsearch.KlageStatistikk
 import no.nav.klage.oppgave.domain.elasticsearch.RelatedKlagebehandlinger
+import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -251,7 +252,15 @@ open class ElasticsearchService(
             innerQuerySaksbehandler.should(QueryBuilders.termQuery("tildeltSaksbehandlerident", saksbehandler))
 
             if (statuskategori == AAPEN) {
-                innerQuerySaksbehandler.should(QueryBuilders.termQuery("medunderskriverident", saksbehandler))
+                val innerMedunderskriverQuery = QueryBuilders.boolQuery()
+                innerMedunderskriverQuery.must(QueryBuilders.termQuery("medunderskriverident", saksbehandler))
+                innerMedunderskriverQuery.must(
+                    QueryBuilders.termQuery(
+                        "medunderskriverFlyt",
+                        MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER.name
+                    )
+                )
+                innerQuerySaksbehandler.should(innerMedunderskriverQuery)
             }
 
             baseQuery.must(innerQuerySaksbehandler)
