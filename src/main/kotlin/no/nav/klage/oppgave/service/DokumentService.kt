@@ -66,7 +66,7 @@ class DokumentService(
             .mapNotNull { safGraphQlClient.getJournalpostAsSaksbehandler(it) }
             .map { dokumentMapper.mapJournalpostToDokumentReferanse(it, klagebehandling) }
         return DokumenterResponse(
-            dokumenter = dokumentReferanser.sortedBy { it.registrert },
+            dokumenter = dokumentReferanser.sortedByDescending { it.registrert },
             pageReference = null,
             antall = dokumentReferanser.size,
             totaltAntall = dokumentReferanser.size
