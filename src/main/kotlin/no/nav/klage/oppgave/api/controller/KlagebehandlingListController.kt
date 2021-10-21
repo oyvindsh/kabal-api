@@ -98,6 +98,7 @@ class KlagebehandlingListController(
     private fun canSeeTildelteOppgaver() = innloggetSaksbehandlerRepository.erLeder() ||
             innloggetSaksbehandlerRepository.erFagansvarlig() || true
 
+    //FIXME remove when not in use anymore
     @ApiOperation(
         value = "Hent oppgaver som gjelder en gitt person",
         notes = "Henter alle oppgaver som saksbehandler har tilgang til som omhandler en gitt person."
@@ -115,7 +116,7 @@ class KlagebehandlingListController(
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
         val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
         return KlagebehandlingerPersonSoekListRespons(
-            antallTreffTotalt = personsoekResponse.liste.size,
+            antallTreffTotalt = personsoekResponse.size,
             personer = klagebehandlingMapper.mapPersonSoekResponseToPersonSoekListView(
                 personSoekResponse = personsoekResponse,
                 viseUtvidet = searchCriteria.isProjectionUtvidet(),

@@ -1,13 +1,14 @@
 package no.nav.klage.oppgave.api.mapper
 
 
+import no.nav.klage.oppgave.api.view.FnrSearchResponse
 import no.nav.klage.oppgave.api.view.KlagebehandlingListView
 import no.nav.klage.oppgave.api.view.PersonSoekPersonView
 import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.domain.elasticsearch.EsKlagebehandling
 import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponseList
+import no.nav.klage.oppgave.domain.personsoek.PersonSoekResponse
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,14 +17,15 @@ import java.time.temporal.ChronoUnit
 @Service
 class KlagebehandlingListMapper {
 
+    //FIXME remove when not in use
     fun mapPersonSoekResponseToPersonSoekListView(
-        personSoekResponse: PersonSoekResponseList,
+        personSoekResponse: List<PersonSoekResponse>,
         viseUtvidet: Boolean,
         saksbehandler: String?,
         tilgangTilTemaer: List<Tema>
     ): List<PersonSoekPersonView> {
-        return if (personSoekResponse.liste.size == 1) {
-            personSoekResponse.liste.map { person ->
+        return if (personSoekResponse.size == 1) {
+            personSoekResponse.map { person ->
                 val klagebehandlinger =
                     mapEsKlagebehandlingerToListView(
                         esKlagebehandlinger = person.klagebehandlinger,
@@ -42,13 +44,40 @@ class KlagebehandlingListMapper {
                 )
             }
         } else {
-            personSoekResponse.liste.map { person ->
+            personSoekResponse.map { person ->
                 PersonSoekPersonView(
                     fnr = person.fnr,
                     navn = person.navn,
                     foedselsdato = person.foedselsdato
                 )
             }
+        }
+    }
+
+    fun mapPersonSoekHitsToFnrSearchResponse(
+        personSoekHits: List<PersonSoekResponse>,
+        saksbehandler: String?,
+        tilgangTilTemaer: List<Tema>
+    ): FnrSearchResponse? {
+        return if (personSoekHits.size == 1) {
+            val person = personSoekHits.first()
+            val klagebehandlinger =
+                mapEsKlagebehandlingerToListView(
+                    esKlagebehandlinger = person.klagebehandlinger,
+                    viseUtvidet = false,
+                    viseFullfoerte = true,
+                    saksbehandler = saksbehandler,
+                    tilgangTilTemaer = tilgangTilTemaer
+                )
+            FnrSearchResponse(
+                fnr = person.fnr,
+                name = person.navn ?: throw RuntimeException("name missing"),
+                klagebehandlinger = klagebehandlinger,
+                aapneKlagebehandlinger = klagebehandlinger.filter { !it.isAvsluttetAvSaksbehandler },
+                avsluttedeKlagebehandlinger = klagebehandlinger.filter { it.isAvsluttetAvSaksbehandler }
+            )
+        } else {
+            throw RuntimeException("more than one hit for fnr")
         }
     }
 
