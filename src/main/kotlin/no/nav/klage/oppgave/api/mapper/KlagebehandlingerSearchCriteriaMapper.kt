@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.mapper
 
 import no.nav.klage.oppgave.api.view.KlagebehandlingerQueryParams
 import no.nav.klage.oppgave.api.view.PersonSoekInput
+import no.nav.klage.oppgave.api.view.SearchPersonByFnrInput
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -18,6 +19,13 @@ class KlagebehandlingerSearchCriteriaMapper {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
+
+    fun toSearchCriteria(input: SearchPersonByFnrInput) = KlagebehandlingerSearchCriteria(
+        foedselsnr = listOf(input.query),
+        statuskategori = KlagebehandlingerSearchCriteria.Statuskategori.ALLE,
+        offset = 0,
+        limit = 2
+    )
 
     fun toSearchCriteria(navIdent: String, input: PersonSoekInput) = KlagebehandlingerSearchCriteria(
         foedselsnr = listOf(input.soekString ?: input.fnr),

@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
+//FIXME remove when not in use
 data class PersonSoekInput(
     val fnr: String,
     val soekString: String?,
