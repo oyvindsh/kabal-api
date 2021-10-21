@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingerSearchCriteriaMapper
 import no.nav.klage.oppgave.api.view.FnrSearchResponse
-import no.nav.klage.oppgave.api.view.PersonView
+import no.nav.klage.oppgave.api.view.NameSearchResponse
 import no.nav.klage.oppgave.api.view.SearchPersonByFnrInput
 import no.nav.klage.oppgave.api.view.SearchPersonByNameInput
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -58,14 +58,16 @@ class KlagebehandlingSearchController(
         notes = "Henter alle oppgaver som saksbehandler har tilgang til som omhandler en gitt person."
     )
     @PostMapping("/name", produces = ["application/json"])
-    fun getNameSearchResponse(@RequestBody input: SearchPersonByNameInput): List<PersonView> {
+    fun getNameSearchResponse(@RequestBody input: SearchPersonByNameInput): NameSearchResponse {
         val people = personsoekService.nameSearch(input.query)
-        return people.map {
-            PersonView(
-                fnr = it.fnr,
-                name = it.name
-            )
-        }
+        return NameSearchResponse(
+            people = people.map {
+                NameSearchResponse.PersonView(
+                    fnr = it.fnr,
+                    name = it.name
+                )
+            }
+        )
     }
 }
 

@@ -14,7 +14,11 @@ data class FnrSearchResponse(
 /**
  * Used for name search
  */
-data class PersonView(
-    val fnr: String,
-    val name: String
-)
+data class NameSearchResponse(
+    val people: List<PersonView>
+) {
+    data class PersonView(
+        val fnr: String,
+        val name: String
+    )
+}
