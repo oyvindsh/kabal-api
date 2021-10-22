@@ -33,7 +33,7 @@ import org.zalando.problem.spring.web.autoconfigure.ProblemJacksonWebMvcAutoConf
         ProblemAutoConfiguration::class]
 )
 @ActiveProfiles("local")
-class ProblemHandlingTest() {
+class ProblemHandlingTest {
 
     @Autowired
     lateinit var mockMvc: MockMvc

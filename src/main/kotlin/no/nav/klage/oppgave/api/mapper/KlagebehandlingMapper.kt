@@ -9,10 +9,8 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.ArkivertDokumentWithTitle
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.kodeverk.MedunderskriverFlyt
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
-import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger

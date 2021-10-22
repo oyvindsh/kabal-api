@@ -76,7 +76,7 @@ class JournalpostGateway(
         )
 
 
-    private fun createAvsenderMottager(brevMottaker: BrevMottaker): AvsenderMottaker? {
+    private fun createAvsenderMottager(brevMottaker: BrevMottaker): AvsenderMottaker {
         if (brevMottaker.partId.type == PartIdType.PERSON) {
             val person = pdlFacade.getPersonInfo(brevMottaker.partId.value)
             return person.let {

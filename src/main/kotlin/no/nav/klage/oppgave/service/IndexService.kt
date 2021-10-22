@@ -43,7 +43,7 @@ class IndexService(
                     logger.warn("Exception during indexing", e)
                 }
             }
-            pageable = page.nextPageable();
+            pageable = page.nextPageable()
         } while (pageable.isPaged)
     }
 
@@ -83,7 +83,7 @@ class IndexService(
         do {
             val page = klagebehandlingRepository.findAll(pageable)
             page.content.map { it.id.toString() to it.modified }.let { idsInDb.addAll(it) }
-            pageable = page.nextPageable();
+            pageable = page.nextPageable()
         } while (pageable.isPaged)
         return idsInDb.toMap()
     }
