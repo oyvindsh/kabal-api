@@ -129,5 +129,7 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
-    - name: JAVA_OPTS
-      value: "-Xms512m -Xmx4096m"
+  {{#each envs}}
+    - name: {{name}}
+      value: {{value}}
+  {{/each}}
