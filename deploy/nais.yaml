@@ -127,6 +127,9 @@ spec:
     - secret: influx
     - secret: dokdist-apikey
   env:
-  {{#each envs as |env|}}
-     {{env}}
+    - name: SPRING_PROFILES_ACTIVE
+      value: {{springProfile}}
+  {{#each envs}}
+    - name: {{name}}
+      value: {{value}}
   {{/each}}

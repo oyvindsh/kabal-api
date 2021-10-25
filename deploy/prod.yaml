@@ -32,7 +32,5 @@ ROLE_GOSYS_OPPGAVE_BEHANDLER: 185a4e29-5f9c-4319-bdb3-0f5f2b30ac90
 ROLE_ADMIN: cd78b8e8-73a3-4fb6-8234-7bebb5e5b9e9
 
 envs:
-  - name: SPRING_PROFILES_ACTIVE
-    value: {{springProfile}}
   - name: JAVA_OPTS
     value: "-Xms512m -Xmx4096m"
