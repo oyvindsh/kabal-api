@@ -38,7 +38,9 @@ class Vedtak(
     @Column(name = "ferdig_distribuert")
     var ferdigDistribuert: LocalDateTime? = null,
     @Column(name = "mellomlager_id")
-    var mellomlagerId: String? = null
+    var mellomlagerId: String? = null,
+    @Column(name = "smart_editor_id")
+    var smartEditorId: String? = null
 ) {
     override fun toString(): String {
         return "Vedtak(id=$id, " +

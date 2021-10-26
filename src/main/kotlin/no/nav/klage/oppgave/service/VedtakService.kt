@@ -17,6 +17,7 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -157,5 +158,20 @@ class VedtakService(
             null,
             utfoerendeSaksbehandlerIdent
         )
+    }
+
+    fun setSmartEditorId(klagebehandlingId: UUID, smartEditorId: String?): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
+            klagebehandlingId
+        )
+
+        val vedtak = klagebehandling.getVedtakOrException()
+        vedtak.smartEditorId = smartEditorId
+
+        val now = LocalDateTime.now()
+        vedtak.modified = now
+        klagebehandling.modified = now
+
+        return klagebehandling
     }
 }

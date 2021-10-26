@@ -144,4 +144,18 @@ class KlagebehandlingVedtakController(
             ).modified
         )
     }
+
+    @PutMapping("/{id}/smarteditorid")
+    fun setSmartEditorId(
+        @PathVariable("id") klagebehandlingId: UUID,
+        @RequestBody input: SmartEditorIdInput
+    ): VedtakEditedView {
+        logKlagebehandlingMethodDetails(
+            "setSmartEditorId", innloggetSaksbehandlerRepository.getInnloggetIdent(), klagebehandlingId,
+            logger
+        )
+        return VedtakEditedView(
+            modified = vedtakService.setSmartEditorId(klagebehandlingId, input.smartEditorId).modified
+        )
+    }
 }
