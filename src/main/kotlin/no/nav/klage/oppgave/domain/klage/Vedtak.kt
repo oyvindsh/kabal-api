@@ -14,6 +14,7 @@ class Vedtak(
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     var utfall: Utfall? = null,
+    //Deprecated, er ikke lenger i bruk, skal fjernes når kvalitetsvurderingen er spikret.
     @Column(name = "grunn_id")
     @Convert(converter = GrunnConverter::class)
     var grunn: Grunn? = null,
@@ -26,6 +27,7 @@ class Vedtak(
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
     var hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "vedtak_id", referencedColumnName = "id", nullable = false)
     var brevmottakere: MutableSet<BrevMottaker> = mutableSetOf(),
@@ -33,14 +35,19 @@ class Vedtak(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
+    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
     @Column(name = "opplastet")
     var opplastet: LocalDateTime? = null,
+    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
     @Column(name = "ferdig_distribuert")
     var ferdigDistribuert: LocalDateTime? = null,
+    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
     @Column(name = "mellomlager_id")
     var mellomlagerId: String? = null,
+    @Column(name = "dokument_enhet_id")
+    var dokumentEnhetId: UUID? = null,
     @Column(name = "smart_editor_id")
-    var smartEditorId: String? = null
+    var smartEditorId: String? = null,
 ) {
     override fun toString(): String {
         return "Vedtak(id=$id, " +
