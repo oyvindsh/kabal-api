@@ -160,7 +160,11 @@ class KlagebehandlingVedtakController(
             logger
         )
         return VedtakEditedView(
-            modified = vedtakService.setSmartEditorId(klagebehandlingId, input.smartEditorId).modified
+            modified = vedtakService.setSmartEditorId(
+                klagebehandlingId = klagebehandlingId,
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
+                smartEditorId = input.smartEditorId
+            ).modified
         )
     }
 }
