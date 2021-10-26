@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(FeatureToggleController::class)
 @ActiveProfiles("local")
-class FeatureToggleControllerTest() {
+class FeatureToggleControllerTest {
 
     @Autowired
     lateinit var mockMvc: MockMvc

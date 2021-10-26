@@ -10,7 +10,7 @@ enum class UtsendingStatus(override val id: String, override val navn: String, o
 
     companion object {
         fun of(id: String): UtsendingStatus {
-            return UtsendingStatus.values().firstOrNull { it.id == id }
+            return values().firstOrNull { it.id == id }
                 ?: throw IllegalArgumentException("No UtsendingStatus with $id exists")
         }
     }

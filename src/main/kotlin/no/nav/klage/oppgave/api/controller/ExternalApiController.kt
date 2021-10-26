@@ -41,7 +41,7 @@ class ExternalApiController(
         notes = "Endepunkt for å se detaljert informasjon om en klagebehandling fra "
     )
     @GetMapping("innsyn/v1/behandling/{id}")
-    fun InnsynBehandling(
+    fun innsynBehandling(
         @ApiParam(value = "Id for klagebehandling")
         @PathVariable("id") nehandlingId: String
     ): String {

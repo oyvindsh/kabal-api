@@ -57,7 +57,7 @@ object KlagebehandlingAggregatFunctions {
         type = nyVerdi
         modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.SAKSTYPE, gammelVerdi.id.toString(), nyVerdi.id.toString(), tidspunkt)
+            endringslogg(saksbehandlerident, Felt.SAKSTYPE, gammelVerdi.id, nyVerdi.id, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
@@ -70,7 +70,7 @@ object KlagebehandlingAggregatFunctions {
         tema = nyVerdi
         modified = tidspunkt
         val endringslogg =
-            endringslogg(saksbehandlerident, Felt.TEMA, gammelVerdi.id.toString(), nyVerdi.id.toString(), tidspunkt)
+            endringslogg(saksbehandlerident, Felt.TEMA, gammelVerdi.id, nyVerdi.id, tidspunkt)
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
@@ -239,8 +239,8 @@ object KlagebehandlingAggregatFunctions {
         endringslogg(
             saksbehandlerident,
             Felt.MEDUNDERSKRIVERFLYT,
-            gammelVerdiMedunderskriverFlyt.id.toString(),
-            nyMedunderskriverFlyt.id.toString(),
+            gammelVerdiMedunderskriverFlyt.id,
+            nyMedunderskriverFlyt.id,
             tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
