@@ -17,3 +17,7 @@ data class VedtakUtfallInput(
 data class VedtakHjemlerInput(
     val hjemler: Set<String>?
 )
+
+data class SmartEditorIdInput(
+    val smartEditorId: String?
+)

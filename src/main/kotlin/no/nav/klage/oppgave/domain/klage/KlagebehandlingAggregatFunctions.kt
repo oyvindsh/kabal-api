@@ -811,6 +811,27 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
+    fun Klagebehandling.setSmartEditorIdInVedtak(
+        nyVerdi: String?,
+        saksbehandlerident: String
+    ): KlagebehandlingEndretEvent {
+        val vedtak = this.getVedtakOrException()
+        val gammelVerdi = vedtak.smartEditorId
+        val tidspunkt = LocalDateTime.now()
+        vedtak.smartEditorId = nyVerdi
+        vedtak.modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.SMART_EDITOR_ID,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
     private fun Klagebehandling.endringslogg(
         saksbehandlerident: String,
         felt: Felt,

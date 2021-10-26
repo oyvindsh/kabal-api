@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDok
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdOgOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setOpplastetInVedtak
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSmartEditorIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
 import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
@@ -207,5 +208,19 @@ class VedtakService(
     ): Klagebehandling {
         kabalDocumentGateway.uploadHovedDokument(dokumentEnhetId, file)
         return setOpplastet(klagebehandling, utfoerendeSaksbehandlerIdent)
+    }
+
+    fun setSmartEditorId(
+        klagebehandlingId: UUID,
+        utfoerendeSaksbehandlerIdent: String,
+        smartEditorId: String?
+    ): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdate(
+            klagebehandlingId
+        )
+        val event =
+            klagebehandling.setSmartEditorIdInVedtak(smartEditorId, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
     }
 }

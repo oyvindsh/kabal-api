@@ -46,6 +46,8 @@ class Vedtak(
     var mellomlagerId: String? = null,
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
+    @Column(name = "smart_editor_id")
+    var smartEditorId: String? = null,
 ) {
     override fun toString(): String {
         return "Vedtak(id=$id, " +
