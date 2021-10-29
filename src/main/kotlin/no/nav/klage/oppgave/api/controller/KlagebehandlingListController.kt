@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingerSearchCriteriaMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -51,7 +52,7 @@ class KlagebehandlingListController(
 
         validateRettigheter(queryParams, navIdent)
 
-        val valgtEnhet = saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
+        val valgtEnhet = enhetFromInputOrInnstillinger(queryParams.enhet)
         val searchCriteria = if (queryParams.temaer.isEmpty()) {
             klagebehandlingerSearchCriteriaMapper.toSearchCriteria(
                 navIdent,
@@ -110,7 +111,8 @@ class KlagebehandlingListController(
         val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
         val personsoekResponse = personsoekService.personsoek(searchCriteria)
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
+        val valgtEnhet = enhetFromInputOrInnstillinger(input.enhet)
+
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = personsoekResponse.size,
             personer = klagebehandlingListMapper.mapPersonSoekResponseToPersonSoekListView(
@@ -153,5 +155,9 @@ class KlagebehandlingListController(
             )
         }
     }
+
+    private fun enhetFromInputOrInnstillinger(enhetId: String?): EnhetMedLovligeTemaer =
+        enhetId?.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
+            ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
 }
 
