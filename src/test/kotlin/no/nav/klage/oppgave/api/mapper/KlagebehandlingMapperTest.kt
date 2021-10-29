@@ -79,6 +79,7 @@ class KlagebehandlingMapperTest {
     private fun getKlagebehandling(): Klagebehandling {
         return Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, FNR)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, FNR), false),
             mottakId = UUID.randomUUID(),

@@ -1,32 +1,37 @@
 package no.nav.klage.oppgave.eventlisteners
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
 import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState
-import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
-import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
+import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
+import no.nav.klage.oppgave.repositories.KafkaDVHEventRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.service.StatistikkTilDVHKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
+@Transactional
 class StatistikkTilDVHService(
     private val statistikkTilDVHKafkaProducer: StatistikkTilDVHKafkaProducer,
-    private val mottakRepository: MottakRepository
+    private val mottakRepository: MottakRepository,
+    private val kafkaDVHEventRepository: KafkaDVHEventRepository
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
+        private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     }
 
-    @Transactional(readOnly = true)
     fun process(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
         val klagebehandling = klagebehandlingEndretEvent.klagebehandling
 
@@ -38,9 +43,39 @@ class StatistikkTilDVHService(
                 mottak,
                 getKlagebehandlingState(klagebehandlingEndretEvent.endringslogginnslag)
             )
-            statistikkTilDVHKafkaProducer.sendStatistikkTilDVH(klageStatistikkTilDVH)
+
+            kafkaDVHEventRepository.save(
+                KafkaDVHEvent(
+                    klagebehandlingId = klagebehandlingEndretEvent.klagebehandling.id,
+                    kilde = klagebehandlingEndretEvent.klagebehandling.kildesystem.navn,
+                    kildeReferanse = klagebehandlingEndretEvent.klagebehandling.kildeReferanse,
+                    status = UtsendingStatus.IKKE_SENDT,
+                    jsonPayload = klageStatistikkTilDVH.toJson()
+                )
+            )
         }
     }
+
+    fun dispatchUnsendtDVHStatsToKafka() {
+        kafkaDVHEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
+            runCatching {
+                statistikkTilDVHKafkaProducer.sendStatistikkTilDVH(
+                    klagebehandlingId = event.klagebehandlingId,
+                    json = event.jsonPayload
+                )
+            }.onFailure {
+                event.status = UtsendingStatus.FEILET
+                event.errorMessage = it.message
+                logger.error("Send dvh event ${event.id} to kafka failed, see secure log for details")
+                secureLogger.error("Send dvh event ${event.id} to kafka failed. Object: $event")
+            }.onSuccess {
+                event.status = UtsendingStatus.SENDT
+                event.errorMessage = null
+            }
+        }
+    }
+
+    private fun KlageStatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
 
     private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
         endringslogginnslag.isEmpty() ||

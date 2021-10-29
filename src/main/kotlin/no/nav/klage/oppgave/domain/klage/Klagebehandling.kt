@@ -28,8 +28,8 @@ class Klagebehandling(
     @Column(name = "type_id")
     @Convert(converter = TypeConverter::class)
     var type: Type,
-    @Column(name = "referanse_id")
-    var kildeReferanse: String? = null,
+    @Column(name = "kilde_referanse")
+    var kildeReferanse: String,
     @Column(name = "sak_fagsystem")
     @Convert(converter = FagsystemConverter::class)
     var sakFagsystem: Fagsystem? = null,

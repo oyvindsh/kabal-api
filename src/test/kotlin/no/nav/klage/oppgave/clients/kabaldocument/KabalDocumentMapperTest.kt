@@ -60,6 +60,7 @@ class KabalDocumentMapperTest {
     fun `klager og sakenGjelder er samme person`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
             mottakId = UUID.randomUUID(),
@@ -85,6 +86,7 @@ class KabalDocumentMapperTest {
     fun `klager og sakenGjelder er ikke samme person, sakenGjelder skal ikke ha kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr2), false),
             mottakId = UUID.randomUUID(),
@@ -111,6 +113,7 @@ class KabalDocumentMapperTest {
     fun `klager og sakengjelder er ikke samme person, sakenGjelder skal ha kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr2), true),
             mottakId = UUID.randomUUID(),
@@ -143,6 +146,7 @@ class KabalDocumentMapperTest {
     fun `klager er prosessfullmektig, parten skal ikke motta kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),
                 prosessfullmektig = Prosessfullmektig(
@@ -178,6 +182,7 @@ class KabalDocumentMapperTest {
     fun `klager er prosessfullmektig, parten skal motta kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),
                 prosessfullmektig = Prosessfullmektig(
@@ -218,6 +223,7 @@ class KabalDocumentMapperTest {
     fun `klager er prosessfullmektig, parten skal motta kopi, sakenGjelder er en annen, sakenGjelder skal ikke ha kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),
                 prosessfullmektig = Prosessfullmektig(
@@ -258,6 +264,7 @@ class KabalDocumentMapperTest {
     fun `klager er prosessfullmektig, parten skal motta kopi, sakenGjelder er en annen, sakenGjelder skal ha kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),
                 prosessfullmektig = Prosessfullmektig(
@@ -304,6 +311,7 @@ class KabalDocumentMapperTest {
     fun `klager er prosessfullmektig, parten skal ikke motta kopi, sakenGjelder er en annen, sakenGjelder skal ikke ha kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),
                 prosessfullmektig = Prosessfullmektig(
@@ -339,6 +347,7 @@ class KabalDocumentMapperTest {
     fun `klager er prosessfullmektig, parten skal ikke motta kopi, sakenGjelder er en annen, sakenGjelder skal ha kopi`() {
         val klagebehandling = Klagebehandling(
             kildesystem = Fagsystem.AO01,
+            kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),
                 prosessfullmektig = Prosessfullmektig(

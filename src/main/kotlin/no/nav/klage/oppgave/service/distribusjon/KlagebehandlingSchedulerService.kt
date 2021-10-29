@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import no.nav.klage.oppgave.eventlisteners.StatistikkTilDVHService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -10,7 +11,8 @@ import java.util.*
 class KlagebehandlingSchedulerService(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService,
-    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService
+    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService,
+    private val statistikkTilDVHService: StatistikkTilDVHService
 ) {
 
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
@@ -28,5 +30,11 @@ class KlagebehandlingSchedulerService(
     @SchedulerLock(name = "dispatchUnsendtVedtakToKafka")
     fun dispatchUnsendtVedtakToKafka() {
         klagebehandlingAvslutningService.dispatchUnsendtVedtakToKafka()
+    }
+
+    @Scheduled(fixedDelay = 240000, initialDelay = 360000)
+    @SchedulerLock(name = "dispatchUnsendtDVHStatsToKafka")
+    fun dispatchUnsendtDVHStatsToKafka() {
+        statistikkTilDVHService.dispatchUnsendtDVHStatsToKafka()
     }
 }

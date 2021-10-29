@@ -185,6 +185,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
         modified = LocalDateTime.now(),
         mottattKlageinstans = LocalDateTime.now(),
         kildesystem = Fagsystem.K9,
+        kildeReferanse = "abc",
         mottakId = mottak.id,
         vedtak = Vedtak(
             id = vedtakId,
