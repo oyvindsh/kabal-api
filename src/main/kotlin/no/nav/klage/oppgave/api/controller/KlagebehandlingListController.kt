@@ -11,13 +11,11 @@ import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
-import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.PersonsoekService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 @RestController
 @Api(tags = ["kabal-api"])
@@ -25,8 +23,7 @@ import java.util.*
 //TODO: Er det litt merkelig med "ansatte" på rot i path her?
 @RequestMapping("/ansatte")
 class KlagebehandlingListController(
-    private val klagebehandlingService: KlagebehandlingService,
-    private val klagebehandlingMapper: KlagebehandlingListMapper,
+    private val klagebehandlingListMapper: KlagebehandlingListMapper,
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingerSearchCriteriaMapper: KlagebehandlingerSearchCriteriaMapper,
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
@@ -65,11 +62,10 @@ class KlagebehandlingListController(
             klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, queryParams, valgtEnhet)
         }
 
-
         val esResponse = elasticsearchService.findByCriteria(searchCriteria)
         return KlagebehandlingerListRespons(
             antallTreffTotalt = esResponse.totalHits.toInt(),
-            klagebehandlinger = klagebehandlingMapper.mapEsKlagebehandlingerToListView(
+            klagebehandlinger = klagebehandlingListMapper.mapEsKlagebehandlingerToListView(
                 esResponse.searchHits.map { it.content },
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
@@ -117,54 +113,12 @@ class KlagebehandlingListController(
         val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = personsoekResponse.size,
-            personer = klagebehandlingMapper.mapPersonSoekResponseToPersonSoekListView(
+            personer = klagebehandlingListMapper.mapPersonSoekResponseToPersonSoekListView(
                 personSoekResponse = personsoekResponse,
                 viseUtvidet = searchCriteria.isProjectionUtvidet(),
                 saksbehandler = saksbehandler,
                 tilgangTilTemaer = valgtEnhet.temaer
             )
-        )
-    }
-
-    @PostMapping("/{navIdent}/klagebehandlinger/{id}/saksbehandlertildeling")
-    fun assignSaksbehandler(
-        @ApiParam(value = "NavIdent til en ansatt")
-        @PathVariable navIdent: String,
-        @ApiParam(value = "Id til en klagebehandling")
-        @PathVariable("id") klagebehandlingId: UUID,
-        @RequestBody saksbehandlertildeling: Saksbehandlertildeling
-    ): TildelingEditedView {
-        logger.debug("assignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
-        val klagebehandling = klagebehandlingService.assignKlagebehandling(
-            klagebehandlingId,
-            saksbehandlertildeling.navIdent,
-            saksbehandlertildeling.angittEnhetOrDefault(),
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
-        )
-        return TildelingEditedView(
-            klagebehandling.modified,
-            klagebehandling.tildeling!!.tidspunkt.toLocalDate()
-        )
-    }
-
-    @PostMapping("/{navIdent}/klagebehandlinger/{id}/saksbehandlerfradeling")
-    fun unassignSaksbehandler(
-        @ApiParam(value = "NavIdent til en ansatt")
-        @PathVariable navIdent: String,
-        @ApiParam(value = "Id til en klagebehandling")
-        @PathVariable("id") klagebehandlingId: UUID
-    ): TildelingEditedView {
-        logger.debug("unassignSaksbehandler is requested for klagebehandling: {}", klagebehandlingId)
-        val klagebehandling = klagebehandlingService.assignKlagebehandling(
-            klagebehandlingId,
-            null,
-            null,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
-        )
-
-        return TildelingEditedView(
-            klagebehandling.modified,
-            klagebehandling.tildeling!!.tidspunkt.toLocalDate()
         )
     }
 
@@ -199,24 +153,5 @@ class KlagebehandlingListController(
             )
         }
     }
-
-    // Vi har bestemt at det er greit å hente dette fra db, men jeg beholder muligheten her til å sende det inn fra frontend "just in case".. :)
-    private fun Saksbehandlertildeling.angittEnhetOrDefault(): String =
-        enhetId ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).enhetId
-
-    //    @PutMapping("/oppgaver/{id}/hjemmel")
-//    fun setHjemmel(
-//        @PathVariable("id") oppgaveId: String,
-//        @RequestBody hjemmelUpdate: HjemmelUpdate
-//    ): ResponseEntity<OppgaveView> {
-//        logger.debug("setHjemmel is requested")
-//        val oppgave =
-//            oppgaveService.setHjemmel(oppgaveId.toLongOrException(), hjemmelUpdate.hjemmel, hjemmelUpdate.versjon)
-//        val uri = MvcUriComponentsBuilder
-//            .fromMethodName(OppgaveController::class.java, "getOppgave", oppgaveId)
-//            .buildAndExpand(oppgaveId).toUri()
-//        return ResponseEntity.ok().location(uri).body(oppgave)
-//    }
-//
 }
 

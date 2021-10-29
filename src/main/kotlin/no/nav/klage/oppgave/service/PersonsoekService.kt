@@ -13,7 +13,7 @@ import java.time.LocalDate
 
 @Service
 class PersonsoekService(
-    private val pdlClient: PdlClient,
+    private val pdlClient: PdlClient, //TODO: Burde bruke PdlFacade ?
     private val elasticsearchService: ElasticsearchService
 ) {
     companion object {
