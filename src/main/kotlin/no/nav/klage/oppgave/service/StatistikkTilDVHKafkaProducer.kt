@@ -1,13 +1,11 @@
 package no.nav.klage.oppgave.service
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class StatistikkTilDVHKafkaProducer(
@@ -20,21 +18,20 @@ class StatistikkTilDVHKafkaProducer(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-        private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+
     }
 
-    fun sendStatistikkTilDVH(statistikk: KlageStatistikkTilDVH) {
+    fun sendStatistikkTilDVH(klagebehandlingId: UUID, json: String) {
         logger.debug("Sending to Kafka topic: {}", topic)
-        secureLogger.debug("Sending to Kafka topic: {}\nKlageStatistikkTilDVH: {}", topic, statistikk)
+        secureLogger.debug("Sending to Kafka topic: {}\npayload: {}", topic, json)
         runCatching {
-            aivenKafkaTemplate.send(topic, statistikk.behandlingIdKabal, statistikk.toJson()).get()
-            logger.debug("KlageStatistikkTilDVH sent to Kafka.")
+            aivenKafkaTemplate.send(topic, klagebehandlingId.toString(), json).get()
+            logger.debug("Klagestatistikk til DVH sent to Kafka.")
         }.onFailure {
-            val errorMessage = "Could not send KlageStatistikkTilDVH to Kafka. Check secure logs for more information."
+            val errorMessage =
+                "Could not send Klagestatistikk til DVH to Kafka. Check secure logs for more information."
             logger.error(errorMessage)
-            secureLogger.error("Could not send KlageStatistikkTilDVH to Kafka", it)
+            secureLogger.error("Could not send Klagestatistikk til DVH to Kafka", it)
         }
     }
-
-    private fun KlageStatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
 }

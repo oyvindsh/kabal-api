@@ -68,6 +68,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
+            kildeReferanse = "abc",
             mottakId = mottak.id
         )
 
@@ -114,6 +115,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
+            kildeReferanse = "abc",
             mottakId = mottak.id
         )
 
@@ -163,6 +165,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
+            kildeReferanse = "abc",
             mottakId = mottak.id
         )
 

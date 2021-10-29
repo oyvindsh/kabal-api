@@ -77,12 +77,12 @@ class KlagebehandlingAvslutningService(
                 )
             }.onFailure {
                 event.status = UtsendingStatus.FEILET
-                event.melding = it.message
+                event.errorMessage = it.message
                 logger.error("Send event ${event.id} to kafka failed, see secure log for details")
                 secureLogger.error("Send event ${event.id} to kafka failed. Object: $event")
             }.onSuccess {
                 event.status = UtsendingStatus.SENDT
-                event.melding = null
+                event.errorMessage = null
             }
         }
     }

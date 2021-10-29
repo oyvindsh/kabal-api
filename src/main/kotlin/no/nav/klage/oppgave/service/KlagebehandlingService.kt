@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.DokumenterResponse
-import no.nav.klage.oppgave.api.view.KvalitetsvurderingManuellInput
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
@@ -351,64 +350,6 @@ class KlagebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
-    }
-
-    fun createKlagebehandlingFromKvalitetsvurdering(
-        kvalitetsvurdering: KvalitetsvurderingManuellInput,
-        mottakId: UUID
-    ): UUID {
-        val klager = Klager(
-            partId = PartId(
-                type = PartIdType.PERSON,
-                value = kvalitetsvurdering.foedselsnummer
-            )
-        )
-
-        val hjemler = createHjemmelSetFromMottak(kvalitetsvurdering.hjemler)
-
-        val klagebehandling = klagebehandlingRepository.save(
-            Klagebehandling(
-                klager = klager,
-                sakenGjelder = klager.toSakenGjelder(),
-                tema = kvalitetsvurdering.tema,
-                type = Type.KLAGE, // TODO
-                mottakId = mottakId,
-                kildesystem = Fagsystem.MANUELL,
-                mottattKlageinstans = kvalitetsvurdering.datoMottattKlageinstans,
-                tildeling = Tildeling(
-                    tokenUtil.getIdent(),
-                    kvalitetsvurdering.tildeltKlageenhet,
-                    kvalitetsvurdering.datoMottattKlageinstans
-                ),
-                hjemler = hjemler,
-                //TODO New model
-//                kvalitetsvurdering = Kvalitetsvurdering(
-//                    eoes = kvalitetsvurdering.eoes,
-//                    raadfoertMedLege = kvalitetsvurdering.raadfoertMedLege,
-//                    internVurdering = kvalitetsvurdering.internVurdering,
-//                    sendTilbakemelding = kvalitetsvurdering.sendTilbakemelding,
-//                    tilbakemelding = kvalitetsvurdering.tilbakemelding,
-//                    mottakerSaksbehandlerident = kvalitetsvurdering.foersteinstansSaksbehandler,
-//                    mottakerEnhet = kvalitetsvurdering.foersteinstansEnhet
-//                ),
-                vedtak = Vedtak(
-                    utfall = kvalitetsvurdering.utfall,
-                    grunn = kvalitetsvurdering.grunn,
-                    //TODO Dette må fikses når vi ordner kvalitetsvurdering uten klagebehandling på nytt. Bør vel kanskje puttes i saksdokumenter, ikke i vedtaket?
-                    //journalpostId = kvalitetsvurdering.vedtaksbrevJournalpostId,
-                    hjemler = hjemler
-                )
-            )
-        )
-        logger.debug("Created behandling ${klagebehandling.id} from manuell kvalitetsvurdering")
-        applicationEventPublisher.publishEvent(
-            KlagebehandlingEndretEvent(
-                klagebehandling = klagebehandling,
-                endringslogginnslag = emptyList()
-            )
-        )
-
-        return klagebehandling.id
     }
 
     private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =

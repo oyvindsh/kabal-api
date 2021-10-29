@@ -99,6 +99,7 @@ class KlagebehandlingControllerTest {
         modified = LocalDateTime.now(),
         mottattKlageinstans = LocalDateTime.now(),
         kildesystem = Fagsystem.K9,
+        kildeReferanse = "abc",
         mottakId = UUID.randomUUID(),
         vedtak = Vedtak(
             utfall = Utfall.AVVIST,
