@@ -31,7 +31,7 @@ jobs:
           RESOURCE: kafka-aiven/kabal-statistikk.v1/topic.yaml
           VARS: kafka-aiven/kabal-statistikk.v1/dev-vars.yaml
           PRINT_PAYLOAD: true
-      - name: deploy dvh-topic to dev
+      - name: deploy klage-endret-topic to dev
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
@@ -55,7 +55,7 @@ jobs:
           RESOURCE: kafka-aiven/kabal-statistikk.v1/topic.yaml
           VARS: kafka-aiven/kabal-statistikk.v1/prod-vars.yaml
           PRINT_PAYLOAD: true
-      - name: deploy dvh-topic to prod
+      - name: deploy klage-endret-topic to prod
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
