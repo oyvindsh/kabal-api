@@ -31,6 +31,14 @@ jobs:
           RESOURCE: kafka-aiven/kabal-statistikk.v1/topic.yaml
           VARS: kafka-aiven/kabal-statistikk.v1/dev-vars.yaml
           PRINT_PAYLOAD: true
+      - name: deploy klage-endret-topic to dev
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: kafka-aiven/klage-endret.v1/topic.yaml
+          VARS: kafka-aiven/klage-endret.v1/dev-vars.yaml
+          PRINT_PAYLOAD: true
       - name: deploy vedtak-fattet-topic to prod
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -46,4 +54,12 @@ jobs:
           CLUSTER: prod-gcp
           RESOURCE: kafka-aiven/kabal-statistikk.v1/topic.yaml
           VARS: kafka-aiven/kabal-statistikk.v1/prod-vars.yaml
+          PRINT_PAYLOAD: true
+      - name: deploy klage-endret-topic to prod
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_API_KEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: kafka-aiven/klage-endret.v1/topic.yaml
+          VARS: kafka-aiven/klage-endret.v1/prod-vars.yaml
           PRINT_PAYLOAD: true
