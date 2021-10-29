@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.clients.pdl.Sivilstand
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.KlagebehandlingerSearchCriteria
 import no.nav.klage.oppgave.domain.kodeverk.TemaTilgjengeligeForEktefelle
+import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.PersonsoekService
@@ -52,7 +53,7 @@ class KlagebehandlingSearchController(
         val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(input)
         val personSoekHits = personsoekService.fnrSearch(searchCriteria)
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        val valgtEnhet = saksbehandlerService.findValgtEnhet(saksbehandler)
+        val valgtEnhet = enhetFromInputOrInnstillinger(input.enhet)
         return klagebehandlingListMapper.mapPersonSoekHitsToFnrSearchResponse(
             personSoekHits = personSoekHits,
             saksbehandler = saksbehandler,
@@ -82,8 +83,7 @@ class KlagebehandlingSearchController(
         @RequestBody input: SearchPersonByFnrInput
     ): KlagebehandlingerListRespons {
         //TODO: Move logic to PersonsoekService
-        val lovligeTemaer =
-            saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).temaer
+        val lovligeTemaer = enhetFromInputOrInnstillinger(input.enhet).temaer
         val sivilstand: Sivilstand? = pdlFacade.getPersonInfo(input.query).sivilstand
 
         val searchCriteria = KlagebehandlingerSearchCriteria(
@@ -114,5 +114,9 @@ class KlagebehandlingSearchController(
             )
         )
     }
+
+    private fun enhetFromInputOrInnstillinger(enhetId: String?): EnhetMedLovligeTemaer =
+        enhetId?.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
+            ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
 }
 
