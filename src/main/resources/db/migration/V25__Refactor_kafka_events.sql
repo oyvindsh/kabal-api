@@ -9,6 +9,6 @@ CREATE TABLE klage.kafka_event
     json_payload       TEXT      NOT NULL,
     status_id          TEXT      NOT NULL DEFAULT '1',
     error_message      TEXT,
-    "type"             TEXT,
+    type               TEXT,
     created            TIMESTAMP NOT NULL
 );
