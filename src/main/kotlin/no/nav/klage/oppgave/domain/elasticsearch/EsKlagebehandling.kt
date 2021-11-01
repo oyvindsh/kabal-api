@@ -82,10 +82,6 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val tildelt: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val foerstTildelt: LocalDateTime? = null,
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val sistTildelt: LocalDateTime? = null,
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
     val sendtMedunderskriver: LocalDateTime? = null,
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     val avsluttet: LocalDateTime? = null,
@@ -126,12 +122,6 @@ data class EsKlagebehandling(
     @Field(type = FieldType.Keyword)
     val kilde: String,
 
-    @Field(type = FieldType.Text)
-    val kommentarFraFoersteinstans: String? = null,
-
-    @Field(type = FieldType.Text)
-    val internVurdering: String? = null,
-
     @Field(type = FieldType.Nested)
     val saksdokumenter: List<EsSaksdokument> = emptyList(),
 
@@ -152,10 +142,6 @@ data class EsKlagebehandling(
     val vedtakUtfall: String? = null,
     @Field(type = FieldType.Keyword)
     val vedtakUtfallNavn: String? = null,
-    @Field(type = FieldType.Keyword)
-    val vedtakGrunn: String? = null,
-    @Field(type = FieldType.Keyword)
-    val vedtakGrunnNavn: String? = null,
     @MultiField(
         mainField = Field(type = FieldType.Keyword),
         otherFields = [InnerField(type = FieldType.Text, suffix = "text")]
@@ -163,14 +149,6 @@ data class EsKlagebehandling(
     val vedtakHjemler: List<String> = emptyList(),
     @Field(type = FieldType.Keyword)
     val vedtakHjemlerNavn: List<String> = emptyList(),
-    @Field(type = FieldType.Keyword)
-    val vedtakBrevmottakerFnr: List<String> = emptyList(),
-    @Field(type = FieldType.Keyword)
-    val vedtakBrevmottakerOrgnr: List<String> = emptyList(),
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val vedtakCreated: LocalDateTime? = null,
-    @Field(type = FieldType.Date, format = DateFormat.date_time)
-    val vedtakModified: LocalDateTime? = null,
     @Field(type = FieldType.Keyword)
     val status: Status
 ) {
