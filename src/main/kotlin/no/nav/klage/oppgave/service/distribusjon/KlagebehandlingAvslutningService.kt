@@ -47,7 +47,7 @@ class KlagebehandlingAvslutningService(
 
         kafkaVedtakEventRepository.save(
             KafkaVedtakEvent(
-                kildeReferanse = klagebehandling.kildeReferanse ?: "UKJENT",
+                kildeReferanse = klagebehandling.kildeReferanse,
                 kilde = klagebehandling.kildesystem.name,
                 utfall = vedtak.utfall!!,
                 vedtaksbrevReferanse = journalpostId,

@@ -18,7 +18,6 @@ class StatistikkTilDVHKafkaProducer(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-
     }
 
     fun sendStatistikkTilDVH(klagebehandlingId: UUID, json: String) {
