@@ -154,7 +154,6 @@ class VedtakService(
     ): Klagebehandling {
         kabalDocumentGateway.deleteHovedDokument(dokumentEnhetId)
         return setOpplastet(klagebehandling, utfoerendeSaksbehandlerIdent)
-        return klagebehandling
     }
 
     private fun uploadHovedDokument(
@@ -165,7 +164,6 @@ class VedtakService(
     ): Klagebehandling {
         kabalDocumentGateway.uploadHovedDokument(dokumentEnhetId, file)
         return setOpplastet(klagebehandling, utfoerendeSaksbehandlerIdent)
-        return klagebehandling
     }
 
     fun setSmartEditorId(
