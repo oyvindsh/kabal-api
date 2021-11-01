@@ -1,7 +1,8 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import no.nav.klage.oppgave.eventlisteners.StatistikkTilDVHService
+import no.nav.klage.oppgave.domain.kafka.EventType
+import no.nav.klage.oppgave.service.KafkaDispatcher
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -11,8 +12,7 @@ import java.util.*
 class KlagebehandlingSchedulerService(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService,
-    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService,
-    private val statistikkTilDVHService: StatistikkTilDVHService
+    private val kafkaDispatcher: KafkaDispatcher
 ) {
 
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
@@ -27,14 +27,14 @@ class KlagebehandlingSchedulerService(
     }
 
     @Scheduled(fixedDelay = 240000, initialDelay = 300000)
-    @SchedulerLock(name = "dispatchUnsendtVedtakToKafka")
-    fun dispatchUnsendtVedtakToKafka() {
-        klagebehandlingAvslutningService.dispatchUnsendtVedtakToKafka()
+    @SchedulerLock(name = "dispatchUnsentVedtakToKafka")
+    fun dispatchUnsentVedtakToKafka() {
+        kafkaDispatcher.dispatchUnsentEventsToKafka(EventType.KLAGE_VEDTAK)
     }
 
     @Scheduled(fixedDelay = 240000, initialDelay = 360000)
-    @SchedulerLock(name = "dispatchUnsendtDVHStatsToKafka")
-    fun dispatchUnsendtDVHStatsToKafka() {
-        statistikkTilDVHService.dispatchUnsendtDVHStatsToKafka()
+    @SchedulerLock(name = "dispatchUnsentDVHStatsToKafka")
+    fun dispatchUnsentDVHStatsToKafka() {
+        kafkaDispatcher.dispatchUnsentEventsToKafka(EventType.STATS_DVH)
     }
 }

@@ -6,6 +6,7 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaFormat
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 const val DATE_TIME_FORMAT_LABEL = "date-time"
 const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
@@ -19,6 +20,10 @@ const val DATE_FORMAT = "yyyy-MM-dd"
  */
 @JsonSchemaTitle("SaksbehandlingKA")
 data class KlageStatistikkTilDVH(
+
+    /** Kan brukes til idempotency av konsumenter */
+    @JsonSchemaDescription("Unik id for denne forsendelsen/eventen.")
+    val eventId: UUID,
 
     @JsonSchemaDescription("Kode som angir hvilken enhet som er ansvarlig for behandlingen på det gjeldende tidspunktet. Dette begrepet har vi ikke helt i Kabal per nå.")
     val ansvarligEnhetKode: String? = null,

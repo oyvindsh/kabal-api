@@ -3,26 +3,26 @@ package no.nav.klage.oppgave.eventlisteners
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
-import no.nav.klage.oppgave.domain.kafka.KlageStatistikkTilDVH
-import no.nav.klage.oppgave.domain.kafka.KlagebehandlingState
-import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.kafka.*
+import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
+import no.nav.klage.oppgave.domain.klage.Felt
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
-import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
-import no.nav.klage.oppgave.repositories.KafkaDVHEventRepository
+import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
-import no.nav.klage.oppgave.service.StatistikkTilDVHKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.*
 
 @Service
 @Transactional
 class StatistikkTilDVHService(
-    private val statistikkTilDVHKafkaProducer: StatistikkTilDVHKafkaProducer,
     private val mottakRepository: MottakRepository,
-    private val kafkaDVHEventRepository: KafkaDVHEventRepository
+    private val kafkaEventRepository: KafkaEventRepository
 ) {
 
     companion object {
@@ -38,40 +38,26 @@ class StatistikkTilDVHService(
         val mottak = mottakRepository.getOne(klagebehandling.mottakId)
 
         if (shouldSendStats(klagebehandlingEndretEvent.endringslogginnslag)) {
+            val eventId = UUID.randomUUID()
+
             val klageStatistikkTilDVH = createKlageStatistikkTilDVH(
-                klagebehandling,
-                mottak,
-                getKlagebehandlingState(klagebehandlingEndretEvent.endringslogginnslag)
+                eventId = eventId,
+                klagebehandling = klagebehandling,
+                mottak = mottak,
+                klagebehandlingState = getKlagebehandlingState(klagebehandlingEndretEvent.endringslogginnslag)
             )
 
-            kafkaDVHEventRepository.save(
-                KafkaDVHEvent(
+            kafkaEventRepository.save(
+                KafkaEvent(
+                    id = eventId,
                     klagebehandlingId = klagebehandlingEndretEvent.klagebehandling.id,
                     kilde = klagebehandlingEndretEvent.klagebehandling.kildesystem.navn,
                     kildeReferanse = klagebehandlingEndretEvent.klagebehandling.kildeReferanse,
                     status = UtsendingStatus.IKKE_SENDT,
-                    jsonPayload = klageStatistikkTilDVH.toJson()
+                    jsonPayload = klageStatistikkTilDVH.toJson(),
+                    type = EventType.STATS_DVH
                 )
             )
-        }
-    }
-
-    fun dispatchUnsendtDVHStatsToKafka() {
-        kafkaDVHEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT).forEach { event ->
-            runCatching {
-                statistikkTilDVHKafkaProducer.sendStatistikkTilDVH(
-                    klagebehandlingId = event.klagebehandlingId,
-                    json = event.jsonPayload
-                )
-            }.onFailure {
-                event.status = UtsendingStatus.FEILET
-                event.errorMessage = it.message
-                logger.error("Send dvh event ${event.id} to kafka failed, see secure log for details")
-                secureLogger.error("Send dvh event ${event.id} to kafka failed. Object: $event")
-            }.onSuccess {
-                event.status = UtsendingStatus.SENDT
-                event.errorMessage = null
-            }
         }
     }
 
@@ -96,6 +82,7 @@ class StatistikkTilDVHService(
     }
 
     private fun createKlageStatistikkTilDVH(
+        eventId: UUID,
         klagebehandling: Klagebehandling,
         mottak: Mottak,
         klagebehandlingState: KlagebehandlingState
@@ -106,6 +93,7 @@ class StatistikkTilDVHService(
             getFunksjoneltEndringstidspunkt(klagebehandling, klagebehandlingState)
 
         return KlageStatistikkTilDVH(
+            eventId = eventId,
             behandlingId = mottak.dvhReferanse ?: mottak.kildeReferanse,
             behandlingIdKabal = klagebehandling.id.toString(),
             behandlingStartetKA = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),

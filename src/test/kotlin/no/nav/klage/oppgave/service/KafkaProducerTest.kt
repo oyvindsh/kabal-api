@@ -1,9 +1,7 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
-import no.nav.klage.oppgave.domain.kodeverk.Utfall
-import org.assertj.core.api.Assertions.assertThat
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
@@ -13,36 +11,35 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.stereotype.Component
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+const val TEST_TOPIC = "test-topic"
+
 @SpringBootTest(
     classes = [
-        VedtakKafkaProducer::class,
+        KafkaProducer::class,
         KafkaAutoConfiguration::class,
         KafkaConsumer::class
     ]
 )
 @ActiveProfiles("local")
 @DirtiesContext
-@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"] )
-class VedtakProducerTest {
+@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
+class KafkaProducerTest {
 
     @Autowired
-    lateinit var vedtakProducer: VedtakKafkaProducer
+    lateinit var kafkaProducer: KafkaProducer
 
     @Autowired
     lateinit var kafkaConsumer: KafkaConsumer
 
     @Test
     fun `payload sent properly`() {
-        vedtakProducer.sendVedtak(KlagevedtakFattet(
-            kilde = "Test",
-            kildeReferanse = "Testref",
-            utfall = Utfall.MEDHOLD,
-            vedtaksbrevReferanse = "Brev1",
-            kabalReferanse = "12345"
-        ))
+        kafkaProducer.publishToKafkaTopic(
+            UUID.randomUUID(), "{}", TEST_TOPIC
+        )
         kafkaConsumer.latch.await(1000, TimeUnit.MILLISECONDS)
 
         assertThat(kafkaConsumer.payload?.contains("Testref") ?: false)
@@ -55,7 +52,7 @@ class KafkaConsumer {
     val latch = CountDownLatch(1)
     var payload: String? = null
 
-    @KafkaListener(topics = ["\${VEDTAK_FATTET_TOPIC}"])
+    @KafkaListener(topics = [TEST_TOPIC])
     fun receive(consumerRecord: ConsumerRecord<*, *>) {
         println("received payload='${consumerRecord}'")
         payload = consumerRecord.toString()
