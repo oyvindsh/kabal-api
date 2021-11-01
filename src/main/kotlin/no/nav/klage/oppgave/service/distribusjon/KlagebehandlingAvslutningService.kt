@@ -49,7 +49,7 @@ class KlagebehandlingAvslutningService(
 
         val eventId = UUID.randomUUID()
 
-        val fattet = KlagevedtakFattet(
+        val vedtakFattet = KlagevedtakFattet(
             eventId = eventId,
             kildeReferanse = klagebehandling.kildeReferanse,
             kilde = klagebehandling.kildesystem.navn,
@@ -64,7 +64,7 @@ class KlagebehandlingAvslutningService(
                 klagebehandlingId = klagebehandlingId,
                 kilde = klagebehandling.kildesystem.navn,
                 kildeReferanse = klagebehandling.kildeReferanse,
-                jsonPayload = fattet.toJson(),
+                jsonPayload = vedtakFattet.toJson(),
                 type = EventType.KLAGE_VEDTAK
             )
         )
