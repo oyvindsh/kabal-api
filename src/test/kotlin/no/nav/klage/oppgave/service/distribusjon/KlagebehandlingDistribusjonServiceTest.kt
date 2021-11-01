@@ -17,7 +17,7 @@ import no.nav.klage.oppgave.domain.DokumentInnholdOgTittel
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.gateway.JournalpostGateway
-import no.nav.klage.oppgave.repositories.KafkaVedtakEventRepository
+import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.service.*
@@ -144,7 +144,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
     lateinit var vedtakJournalfoeringService: VedtakJournalfoeringService
 
     @SpykBean
-    lateinit var kafkaVedtakEventRepository: KafkaVedtakEventRepository
+    lateinit var kafkaEventRepository: KafkaEventRepository
 
     @SpykBean
     lateinit var klagebehandlingAvslutningService: KlagebehandlingAvslutningService
@@ -219,7 +219,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         every { dokDistFordelingClient.distribuerJournalpost(any()) } returns dokdistResponse
 
-        every { kafkaVedtakEventRepository.save(any()) } returns null
+        every { kafkaEventRepository.save(any()) } returns null
 
         every { fileApiService.getUploadedDocumentAsSystemUser(any()) } returns fileApiServiceResponse
 

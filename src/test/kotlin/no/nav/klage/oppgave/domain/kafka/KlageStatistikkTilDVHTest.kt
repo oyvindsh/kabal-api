@@ -7,6 +7,7 @@ import com.kjetland.jackson.jsonSchema.JsonSchemaDraft
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 internal class KlageStatistikkTilDVHTest {
 
@@ -22,6 +23,7 @@ internal class KlageStatistikkTilDVHTest {
         println(objectMapper.writeValueAsString(jsonSchema))
 
         val klageStatistikkTilDVH = KlageStatistikkTilDVH(
+            eventId = UUID.randomUUID(),
             ansvarligEnhetKode = "kode",
             ansvarligEnhetType = "type",
             avsender = "avsender",

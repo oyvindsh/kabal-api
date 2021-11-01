@@ -1,8 +1,9 @@
 package no.nav.klage.oppgave.repositories
 
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
-import no.nav.klage.oppgave.domain.klage.KafkaDVHEvent
-import no.nav.klage.oppgave.domain.kodeverk.UtsendingStatus
+import no.nav.klage.oppgave.domain.kafka.EventType
+import no.nav.klage.oppgave.domain.kafka.KafkaEvent
+import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,13 +13,14 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("local")
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class KafkaDVHEventRepositoryTest {
+class KafkaEventRepositoryTest {
 
     companion object {
         @Container
@@ -30,51 +32,71 @@ class KafkaDVHEventRepositoryTest {
     lateinit var testEntityManager: TestEntityManager
 
     @Autowired
-    lateinit var kafkaDVHEventRepository: KafkaDVHEventRepository
+    lateinit var kafkaEventRepository: KafkaEventRepository
 
     @Test
     fun `store event works`() {
-        val event = KafkaDVHEvent(
+        val event = KafkaEvent(
             kildeReferanse = "TEST",
             kilde = "TEST",
             klagebehandlingId = UUID.randomUUID(),
             status = UtsendingStatus.IKKE_SENDT,
-            jsonPayload = "{}"
+            jsonPayload = "{}",
+            type = EventType.STATS_DVH
         )
 
-        kafkaDVHEventRepository.save(event)
+        kafkaEventRepository.save(event)
 
         testEntityManager.flush()
 
-        assertThat(kafkaDVHEventRepository.findById(event.id).get()).isEqualTo(event)
+        assertThat(kafkaEventRepository.findById(event.id).get()).isEqualTo(event)
     }
 
     @Test
-    fun `fetch for status works`() {
-        kafkaDVHEventRepository.save(
-            KafkaDVHEvent(
+    fun `fetch for status works and in right order (asc)`() {
+        kafkaEventRepository.save(
+            KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
                 klagebehandlingId = UUID.randomUUID(),
                 status = UtsendingStatus.IKKE_SENDT,
-                jsonPayload = "{}"
+                jsonPayload = "{}",
+                type = EventType.STATS_DVH
             )
         )
 
-        kafkaDVHEventRepository.save(
-            KafkaDVHEvent(
+        val oldestKafkaEvent = KafkaEvent(
+            kildeReferanse = "TEST",
+            kilde = "TEST",
+            klagebehandlingId = UUID.randomUUID(),
+            status = UtsendingStatus.FEILET,
+            jsonPayload = "{}",
+            type = EventType.STATS_DVH,
+            created = LocalDateTime.now().minusDays(1)
+        )
+        kafkaEventRepository.save(
+            oldestKafkaEvent
+        )
+
+        kafkaEventRepository.save(
+            KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
                 klagebehandlingId = UUID.randomUUID(),
                 status = UtsendingStatus.FEILET,
-                jsonPayload = "{}"
+                jsonPayload = "{}",
+                type = EventType.KLAGE_VEDTAK
             )
         )
 
         testEntityManager.flush()
 
-        val list = kafkaDVHEventRepository.getAllByStatusIsNotLike(UtsendingStatus.SENDT)
+        val list = kafkaEventRepository.getAllByStatusIsNotLikeAndTypeIsLikeOrderByCreated(
+            UtsendingStatus.SENDT,
+            EventType.STATS_DVH
+        )
         assertThat(list.size).isEqualTo(2)
+        assertThat(list.first()).isEqualTo(oldestKafkaEvent)
     }
 
 }
