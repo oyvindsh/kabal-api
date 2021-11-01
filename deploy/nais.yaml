@@ -97,10 +97,7 @@ spec:
           cluster: {{k9_cluster}}
     outbound:
       rules:
-        - application: kabal-file-api
         - application: kabal-document
-        - application: clamav
-          namespace: clamav
       external:
       {{#each externalHosts}}
         - host: {{host}}
@@ -123,10 +120,8 @@ spec:
     - secret: norg2
     - secret: axsys
     - secret: elastic
-    - secret: journalpost-apikey
     - secret: ereg
     - secret: influx
-    - secret: dokdist-apikey
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}

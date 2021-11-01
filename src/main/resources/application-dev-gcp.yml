@@ -29,8 +29,6 @@ AIVEN_ES_USE_SSL: true
 SAF_BASE_URL: https://saf.dev-fss-pub.nais.io/
 SAF_APP_CLIENT_ID: dev-fss.teamdokumenthandtering.saf
 
-DOKARKIV_CLIENT_ID: 972814f3-8bdf-44f8-a191-c2ed00020b54
-
 ROLE_KLAGE_SAKSBEHANDLER: 07add1e7-7195-4c37-828d-fdf23ec6bef1
 ROLE_KLAGE_FAGANSVARLIG: 94d34f17-e325-4ed6-9667-d23041a3f40c
 ROLE_KLAGE_LEDER: 016fb83f-4e7c-47ec-ae8a-e3efa72a43e7
@@ -41,11 +39,6 @@ ROLE_KLAGE_EGEN_ANSATT: 011af9b0-792d-4d2c-a2eb-9a59fc095002
 
 ROLE_GOSYS_OPPGAVE_BEHANDLER: a9f5ef81-4e81-42e8-b368-0273071b64b9
 ROLE_ADMIN: a9f5ef81-4e81-42e8-b368-0273071b64b9
-
-JOARK_SERVICE_URL: https://api-gw-q1.oera.no/dokarkiv/rest/journalpostapi/v1/journalpost
-DOKDIST_SERVICE_URL: https://api-gw-q1.oera.no/dokdistfordeling/rest/v1/distribuerjournalpost
-
-CLAM_AV_URL: http://clamav.clamav/scan
 
 INFLUX_HOST: influx-klage-nav-dev.aivencloud.com
 INFLUX_PORT: 26482

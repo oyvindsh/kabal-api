@@ -8,16 +8,13 @@ import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
-import no.nav.klage.oppgave.domain.DokumentInnholdOgTittel
 import no.nav.klage.oppgave.domain.DokumentMetadata
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
-import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -26,7 +23,6 @@ class KlagebehandlingMapper(
     private val egenAnsattService: EgenAnsattService,
     private val norg2Client: Norg2Client,
     private val eregClient: EregClient,
-    private val fileApiService: FileApiService,
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val kabalDocumentGateway: KabalDocumentGateway
 ) {
@@ -152,37 +148,18 @@ class KlagebehandlingMapper(
         return VedtakView(
             id = id,
             utfall = utfall?.id,
-            grunn = grunn?.id,
             hjemler = hjemler.map { it.id }.toSet(),
-            brevMottakere = brevmottakere.map { mapBrevmottaker(it) }.toSet(),
-            file = getVedleggView(opplastet, mellomlagerId, dokumentEnhetId),
+            file = getVedleggView(dokumentEnhetId),
             opplastet = opplastet
         )
     }
 
-    fun getVedleggView(opplastet: LocalDateTime?, mellomlagerId: String?, dokumentEnhetId: UUID?): VedleggView? {
-        return if (opplastet != null) {
-            if (dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(dokumentEnhetId)) {
-                mapDokumentMetadataToVedleggView(
-                    kabalDocumentGateway.getMetadataOmHovedDokument(dokumentEnhetId)!!,
-                )
-            } else if (mellomlagerId != null) {
-                mapDokumentInnholdOgTittelToVedleggView(
-                    fileApiService.getUploadedDocument(mellomlagerId), opplastet
-                )
-            } else null
+    fun getVedleggView(dokumentEnhetId: UUID?): VedleggView? {
+        return if (dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(dokumentEnhetId)) {
+            mapDokumentMetadataToVedleggView(
+                kabalDocumentGateway.getMetadataOmHovedDokument(dokumentEnhetId)!!,
+            )
         } else null
-    }
-
-    fun mapDokumentInnholdOgTittelToVedleggView(
-        dokumentInnholdOgTittel: DokumentInnholdOgTittel,
-        opplastet: LocalDateTime
-    ): VedleggView {
-        return VedleggView(
-            dokumentInnholdOgTittel.title,
-            dokumentInnholdOgTittel.content.size.toLong(),
-            opplastet
-        )
     }
 
     fun mapDokumentMetadataToVedleggView(
@@ -194,12 +171,6 @@ class KlagebehandlingMapper(
             dokumentMetadata.opplastet
         )
     }
-
-    private fun mapBrevmottaker(it: BrevMottaker) = BrevMottakerView(
-        it.partId.type.id,
-        it.partId.value,
-        it.rolle.id
-    )
 
     private fun foedselsnummer(partId: PartId) =
         if (partId.type == PartIdType.PERSON) {
@@ -234,7 +205,7 @@ class KlagebehandlingMapper(
         val vedtak = klagebehandling.getVedtakOrException()
         return VedleggEditedView(
             klagebehandling.modified,
-            file = getVedleggView(vedtak.opplastet, vedtak.mellomlagerId, vedtak.dokumentEnhetId),
+            file = getVedleggView(vedtak.dokumentEnhetId),
         )
     }
 

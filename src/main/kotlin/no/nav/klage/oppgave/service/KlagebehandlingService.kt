@@ -547,13 +547,10 @@ class KlagebehandlingService(
     }
 
     private fun harIkkeLagretVedtaksdokument(klagebehandling: Klagebehandling) =
-        !(harMellomlagretVedtaksDokument(klagebehandling) || harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling))
+        !(harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling))
 
     private fun harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling: Klagebehandling) =
         klagebehandling.vedtak?.dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(klagebehandling.vedtak.dokumentEnhetId!!)
-
-    fun harMellomlagretVedtaksDokument(klagebehandling: Klagebehandling) =
-        klagebehandling.vedtak?.mellomlagerId != null
 
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,

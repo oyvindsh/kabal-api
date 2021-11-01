@@ -31,6 +31,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -82,7 +83,7 @@ class KlagebehandlingServiceTest {
 
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"
     private val MEDUNDERSKRIVER_IDENT = "MEDUNDERSKRIVER_IDENT"
-    private val MELLOMLAGER_ID = "MELLOMLAGER_ID"
+    private val DOKUMENTENHET_ID = UUID.randomUUID()
 
     @BeforeEach
     fun setup() {
@@ -288,8 +289,8 @@ class KlagebehandlingServiceTest {
     inner class FerdigstillKlagebehandling {
 
         @Test
-        fun `Forsøk på avslutting av klagebehandling som allerede er ferdigstilt i Joark skal ikke lykkes`() {
-            val klagebehandling = simpleInsert(mellomlagerId = true, fullfoert = true)
+        fun `Forsøk på avslutting av klagebehandling som allerede er avsluttet av saksbehandler skal ikke lykkes`() {
+            val klagebehandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
@@ -321,11 +322,12 @@ class KlagebehandlingServiceTest {
 
         @Test
         fun `Forsøk på avslutting av klagebehandling som ikke har utfall skal ikke lykkes`() {
-            val klagebehandling = simpleInsert(mellomlagerId = true, fullfoert = false, utfall = false)
+            val klagebehandling = simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = false)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
 
             assertThrows<ValidationException> {
                 klagebehandlingService.ferdigstillKlagebehandling(
@@ -337,11 +339,13 @@ class KlagebehandlingServiceTest {
 
         @Test
         fun `Forsøk på avslutting av klagebehandling som ikke har hjemler skal ikke lykkes`() {
-            val klagebehandling = simpleInsert(mellomlagerId = true, fullfoert = false, utfall = true, hjemler = false)
+            val klagebehandling =
+                simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = true, hjemler = false)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
 
             assertThrows<ValidationException> {
                 klagebehandlingService.ferdigstillKlagebehandling(
@@ -354,7 +358,7 @@ class KlagebehandlingServiceTest {
         @Test
         fun `Forsøk på avslutting av klagebehandling som er trukket og som ikke har hjemler skal lykkes`() {
             val klagebehandling = simpleInsert(
-                mellomlagerId = true,
+                dokumentEnhetId = true,
                 fullfoert = false,
                 utfall = true,
                 hjemler = false,
@@ -364,6 +368,7 @@ class KlagebehandlingServiceTest {
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
 
             val result = klagebehandlingService.ferdigstillKlagebehandling(
                 klagebehandling.id,
@@ -374,12 +379,12 @@ class KlagebehandlingServiceTest {
 
         @Test
         fun `Forsøk på avslutting av klagebehandling som er riktig utfylt skal lykkes`() {
-            val klagebehandling = simpleInsert()
+            val klagebehandling = simpleInsert(dokumentEnhetId = true)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
-
+            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
 
             val result = klagebehandlingService.ferdigstillKlagebehandling(
                 klagebehandling.id,
@@ -391,7 +396,7 @@ class KlagebehandlingServiceTest {
 
 
     private fun simpleInsert(
-        mellomlagerId: Boolean = true,
+        dokumentEnhetId: Boolean = false,
         fullfoert: Boolean = false,
         utfall: Boolean = true,
         hjemler: Boolean = true,
@@ -436,7 +441,7 @@ class KlagebehandlingServiceTest {
                 hjemler = if (hjemler) mutableSetOf(
                     Hjemmel.FTL
                 ) else mutableSetOf(),
-                mellomlagerId = if (mellomlagerId) MELLOMLAGER_ID else null
+                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null
             ),
             avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
             kvalitetsvurdering = Kvalitetsvurdering(

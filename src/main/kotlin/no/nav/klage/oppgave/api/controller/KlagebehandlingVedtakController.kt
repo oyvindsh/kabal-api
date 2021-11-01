@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.FileApiService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.VedtakService
 import no.nav.klage.oppgave.util.getLogger
@@ -30,7 +29,6 @@ class KlagebehandlingVedtakController(
     private val klagebehandlingMapper: KlagebehandlingMapper,
     private val vedtakService: VedtakService,
     private val klagebehandlingService: KlagebehandlingService,
-    private val fileApiService: FileApiService,
     private val kabalDocumentGateway: KabalDocumentGateway
 ) {
 
@@ -92,16 +90,10 @@ class KlagebehandlingVedtakController(
         val vedtak = vedtakService.getVedtak(klagebehandling)
 
         val arkivertDokumentWithTitle =
-            when {
-                vedtak.dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(vedtak.dokumentEnhetId!!) -> {
-                    kabalDocumentGateway.getHovedDokumentOgMetadata(vedtak.dokumentEnhetId!!)
-                }
-                vedtak.mellomlagerId != null -> {
-                    fileApiService.getUploadedDocument(vedtak.mellomlagerId!!)
-                }
-                else -> {
-                    throw JournalpostNotFoundException("Vedtak er ikke lastet opp")
-                }
+            if (vedtak.dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(vedtak.dokumentEnhetId!!)) {
+                kabalDocumentGateway.getHovedDokumentOgMetadata(vedtak.dokumentEnhetId!!)
+            } else {
+                throw JournalpostNotFoundException("Vedtak er ikke lastet opp")
             }
 
         val responseHeaders = HttpHeaders()
