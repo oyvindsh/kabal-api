@@ -8,7 +8,7 @@ import java.util.*
  */
 data class KlagevedtakFattet(
     /** Kan brukes til idempotency av konsumenter */
-    val transactionId: UUID,
+    val eventId: UUID,
     val kildeReferanse: String,
     val kilde: String,
     val utfall: Utfall,

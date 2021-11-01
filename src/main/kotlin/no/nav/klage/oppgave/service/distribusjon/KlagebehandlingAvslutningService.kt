@@ -50,7 +50,7 @@ class KlagebehandlingAvslutningService(
         val eventId = UUID.randomUUID()
 
         val fattet = KlagevedtakFattet(
-            transactionId = eventId,
+            eventId = eventId,
             kildeReferanse = klagebehandling.kildeReferanse,
             kilde = klagebehandling.kildesystem.navn,
             utfall = vedtak.utfall!!,
