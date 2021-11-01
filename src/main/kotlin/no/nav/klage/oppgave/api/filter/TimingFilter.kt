@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest
 class TimingFilter : Filter {
 
     companion object {
-        private val logger = getLogger(javaClass.enclosingClass)
+        private val logger = getLogger(TimingFilter::class.java)
     }
 
     @Throws(ServletException::class)

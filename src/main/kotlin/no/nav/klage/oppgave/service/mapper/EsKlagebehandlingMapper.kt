@@ -72,8 +72,6 @@ class EsKlagebehandlingMapper(
             avsenderEnhetFoersteinstans = klagebehandling.avsenderEnhetFoersteinstans,
             mottattKlageinstans = klagebehandling.mottattKlageinstans,
             tildelt = klagebehandling.tildeling?.tidspunkt,
-            foerstTildelt = klagebehandling.tildelingHistorikk.map { it.tildeling.tidspunkt }.minOrNull(),
-            sistTildelt = klagebehandling.tildeling?.tidspunkt,
             avsluttet = klagebehandling.avsluttet,
             avsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler,
             frist = klagebehandling.frist,
@@ -87,7 +85,6 @@ class EsKlagebehandlingMapper(
             created = klagebehandling.created,
             modified = klagebehandling.modified,
             kilde = klagebehandling.kildesystem.id,
-            kommentarFraFoersteinstans = klagebehandling.kommentarFraFoersteinstans,
             saksdokumenter = klagebehandling.saksdokumenter.map { EsSaksdokument(it.journalpostId, it.dokumentInfoId) },
             saksdokumenterJournalpostId = klagebehandling.saksdokumenter.map { it.journalpostId },
             saksdokumenterJournalpostIdOgDokumentInfoId = klagebehandling.saksdokumenter.map {
@@ -97,19 +94,11 @@ class EsKlagebehandlingMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
             vedtakUtfall = klagebehandling.vedtak?.utfall?.id,
-            vedtakGrunn = klagebehandling.vedtak?.grunn?.id,
             vedtakHjemler = klagebehandling.vedtak?.hjemler?.map { hjemmel -> hjemmel.id } ?: emptyList(),
-            vedtakBrevmottakerFnr = klagebehandling.vedtak?.brevmottakere?.filter { it.partId.type == PartIdType.PERSON }
-                ?.map { it.partId.value } ?: emptyList(),
-            vedtakBrevmottakerOrgnr = klagebehandling.vedtak?.brevmottakere?.filter { it.partId.type == PartIdType.VIRKSOMHET }
-                ?.map { it.partId.value } ?: emptyList(),
-            vedtakCreated = klagebehandling.vedtak?.created,
-            vedtakModified = klagebehandling.vedtak?.modified,
             temaNavn = klagebehandling.tema.name,
             typeNavn = klagebehandling.type.name,
             hjemlerNavn = klagebehandling.hjemler.map { it.name },
             vedtakUtfallNavn = klagebehandling.vedtak?.utfall?.name,
-            vedtakGrunnNavn = klagebehandling.vedtak?.grunn?.name,
             sakFagsystemNavn = klagebehandling.sakFagsystem?.name,
             status = EsKlagebehandling.Status.valueOf(klagebehandling.getStatus().name)
         )

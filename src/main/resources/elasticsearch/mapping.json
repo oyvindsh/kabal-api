@@ -93,14 +93,6 @@
       "type": "date",
       "format": "date_time"
     },
-    "foerstTildelt": {
-      "type": "date",
-      "format": "date_time"
-    },
-    "sistTildelt": {
-      "type": "date",
-      "format": "date_time"
-    },
     "sendtMedunderskriver": {
       "type": "date",
       "format": "date_time"
@@ -127,7 +119,7 @@
       "type": "keyword"
     },
     "medunderskriverFlyt": {
-      "type":"keyword"
+      "type": "keyword"
     },
     "tildeltEnhet": {
       "type": "keyword",
@@ -158,12 +150,6 @@
     },
     "kilde": {
       "type": "keyword"
-    },
-    "kommentarFraFoersteinstans": {
-      "type": "text"
-    },
-    "internVurdering": {
-      "type": "text"
     },
     "saksdokumenter": {
       "type": "nested",
@@ -197,12 +183,6 @@
     "vedtakUtfallNavn": {
       "type": "keyword"
     },
-    "vedtakGrunn": {
-      "type": "keyword"
-    },
-    "vedtakGrunnNavn": {
-      "type": "keyword"
-    },
     "vedtakHjemler": {
       "type": "keyword",
       "fields": {
@@ -213,20 +193,6 @@
     },
     "vedtakHjemlerNavn": {
       "type": "keyword"
-    },
-    "vedtakBrevmottakerFnr": {
-      "type": "keyword"
-    },
-    "vedtakBrevmottakerOrgnr": {
-      "type": "keyword"
-    },
-    "vedtakCreated": {
-      "type": "date",
-      "format": "date_time"
-    },
-    "vedtakModified": {
-      "type": "date",
-      "format": "date_time"
     },
     "status": {
       "type": "keyword"
