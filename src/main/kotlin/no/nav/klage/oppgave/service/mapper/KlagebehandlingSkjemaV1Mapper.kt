@@ -29,10 +29,16 @@ private fun Prosessfullmektig.mapToSkjemaV1(): KlagebehandlingSkjemaV1.PersonEll
     }
 }
 
-private fun SakenGjelder.mapToSkjemaV1(): KlagebehandlingSkjemaV1.Person {
-    return KlagebehandlingSkjemaV1.Person(
-        fnr = this.partId.value,
-    )
+private fun SakenGjelder.mapToSkjemaV1(): KlagebehandlingSkjemaV1.PersonEllerOrganisasjon {
+    return if (this.erPerson()) {
+        KlagebehandlingSkjemaV1.PersonEllerOrganisasjon(
+            KlagebehandlingSkjemaV1.Person(fnr = this.partId.value)
+        )
+    } else {
+        KlagebehandlingSkjemaV1.PersonEllerOrganisasjon(
+            KlagebehandlingSkjemaV1.Organisasjon(orgnr = this.partId.value)
+        )
+    }
 }
 
 private fun Tildeling.mapToSkjemaV1(): KlagebehandlingSkjemaV1.TildeltSaksbehandler {
@@ -60,8 +66,9 @@ private fun MedunderskriverTildeling.mapToSkjemaV1(): KlagebehandlingSkjemaV1.Ti
 
 private fun Kode.mapToSkjemaV1(): KlagebehandlingSkjemaV1.Kode {
     return KlagebehandlingSkjemaV1.Kode(
-        kortNavn = this.navn,
-        langNavn = this.beskrivelse
+        id = this.id,
+        navn = this.navn,
+        beskrivelse = this.beskrivelse
     )
 }
 
@@ -88,17 +95,12 @@ fun Klagebehandling.mapToSkjemaV1(): KlagebehandlingSkjemaV1 {
         avsluttetTidspunkt = this.avsluttet,
         fristDato = this.frist,
         gjeldendeTildeling = this.tildeling?.mapToSkjemaV1(),
-        foersteTildeling = this.tildelingHistorikk
-            .filter { it.tildeling.saksbehandlerident != null }
-            .minByOrNull { it.tildeling.tidspunkt }
-            ?.let { it.tildeling.mapToSkjemaV1() },
         medunderskriver = this.medunderskriver?.mapToSkjemaV1(),
         medunderskriverFlytStatus = this.medunderskriverFlyt.mapToSkjemaV1(),
         hjemler = this.hjemler.map { it.mapToSkjemaV1() },
         opprettetTidspunkt = this.created,
         sistEndretTidspunkt = this.modified,
         kildesystem = this.kildesystem.mapToSkjemaV1(),
-        kommentarFraFoersteInstans = this.kommentarFraFoersteinstans,
         saksdokumenter = listOf(),
         vedtak = this.vedtak?.let { vedtak ->
             KlagebehandlingSkjemaV1.Vedtak(
@@ -114,7 +116,7 @@ data class KlagebehandlingSkjemaV1(
     val id: String,
     val klager: PersonEllerOrganisasjon,
     val klagersProsessfullmektig: PersonEllerOrganisasjon?,
-    val sakenGjelder: Person,
+    val sakenGjelder: PersonEllerOrganisasjon,
     val tema: Kode,
     val type: Kode,
     val kildeReferanse: String,
@@ -130,14 +132,12 @@ data class KlagebehandlingSkjemaV1(
     val fristDato: LocalDate?,
 
     val gjeldendeTildeling: TildeltSaksbehandler?,
-    val foersteTildeling: TildeltSaksbehandler?,
     val medunderskriver: TildeltMedunderskriver?,
     val medunderskriverFlytStatus: Kode,
     val hjemler: List<Kode>,
     val opprettetTidspunkt: LocalDateTime,
     val sistEndretTidspunkt: LocalDateTime,
     val kildesystem: Kode,
-    val kommentarFraFoersteInstans: String?,
 
     val saksdokumenter: List<Dokument>,
     val vedtak: Vedtak?,
@@ -168,8 +168,9 @@ data class KlagebehandlingSkjemaV1(
     }
 
     data class Kode(
-        val kortNavn: String,
-        val langNavn: String,
+        val id: String,
+        val navn: String,
+        val beskrivelse: String,
     )
 
     data class Enhet(
