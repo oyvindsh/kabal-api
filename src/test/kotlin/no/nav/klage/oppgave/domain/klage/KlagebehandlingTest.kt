@@ -147,22 +147,4 @@ internal class KlagebehandlingTest {
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.FULLFOERT)
         }
     }
-
-    private fun BrevMottaker.isEqualTo(other: BrevMottaker): Boolean {
-        return partId == other.partId &&
-                rolle == other.rolle &&
-                dokdistReferanse == other.dokdistReferanse &&
-                journalpostId == other.journalpostId
-    }
-
-    private fun BrevMottaker.isMemberOf(otherSet: Set<BrevMottaker>): Boolean {
-        return otherSet.any { brevMottaker ->
-            this.isEqualTo(brevMottaker)
-        }
-    }
-
-    private fun brevMottakerSetsAreEqual(firstSet: Set<BrevMottaker>, secondSet: Set<BrevMottaker>): Boolean {
-        return firstSet.size == secondSet.size &&
-                firstSet.all { brevMottaker -> brevMottaker.isMemberOf(secondSet) }
-    }
 }
