@@ -49,6 +49,20 @@ class AdminController(
         }
     }
 
+    @PostMapping("/internal/dvh/resend", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun resendStatsToDVH() {
+        logger.debug("resendStatsToDVH is called")
+        krevAdminTilgang()
+
+        try {
+            adminService.resendToDVH()
+        } catch (e: Exception) {
+            logger.warn("Failed to resend to DVH", e)
+            throw e
+        }
+    }
+
     private fun krevAdminTilgang() {
         if (!innloggetSaksbehandlerRepository.erAdmin()) {
             throw MissingTilgangException("Not an admin")
