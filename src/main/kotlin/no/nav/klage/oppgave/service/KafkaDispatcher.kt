@@ -28,9 +28,9 @@ class KafkaDispatcher(
     @Value("\${VEDTAK_FATTET_TOPIC}")
     lateinit var vedtakTopic: String
 
-    fun dispatchUnsentEventsToKafka(type: EventType) {
-        logger.debug("dispatchUnsentEventsToKafka for type: $type")
-        kafkaEventRepository.getAllByStatusIsNotLikeAndTypeIsLikeOrderByCreated(UtsendingStatus.SENDT, type)
+    fun dispatchEventsToKafka(type: EventType, utsendingStatusList: List<UtsendingStatus>) {
+        logger.debug("dispatchUnsentEventsToKafka for type: $type, and statuses: $utsendingStatusList")
+        kafkaEventRepository.getAllByStatusInAndTypeIsLikeOrderByCreated(utsendingStatusList, type)
             .forEach { event ->
                 runCatching {
                     kafkaProducer.publishToKafkaTopic(

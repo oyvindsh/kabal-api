@@ -4,5 +4,6 @@ import java.time.LocalDateTime
 
 data class KlagebehandlingFullfoertView(
     val modified: LocalDateTime,
-    val ferdigstilt: Boolean
+    val ferdigstilt: Boolean,
+    val isAvsluttetAvSaksbehandler: Boolean
 )
