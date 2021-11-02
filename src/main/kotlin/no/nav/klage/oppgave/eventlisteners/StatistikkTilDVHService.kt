@@ -33,11 +33,10 @@ class StatistikkTilDVHService(
     }
 
     fun process(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
-        val klagebehandling = klagebehandlingEndretEvent.klagebehandling
-
-        val mottak = mottakRepository.getOne(klagebehandling.mottakId)
-
         if (shouldSendStats(klagebehandlingEndretEvent.endringslogginnslag)) {
+
+            val klagebehandling = klagebehandlingEndretEvent.klagebehandling
+            val mottak = mottakRepository.getOne(klagebehandling.mottakId)
             val eventId = UUID.randomUUID()
 
             val klageStatistikkTilDVH = createKlageStatistikkTilDVH(
