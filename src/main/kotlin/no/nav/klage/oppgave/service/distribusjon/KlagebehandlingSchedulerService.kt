@@ -2,6 +2,8 @@ package no.nav.klage.oppgave.service.distribusjon
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.oppgave.domain.kafka.EventType
+import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.FEILET
+import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.IKKE_SENDT
 import no.nav.klage.oppgave.service.KafkaDispatcher
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import org.springframework.scheduling.annotation.Scheduled
@@ -29,12 +31,18 @@ class KlagebehandlingSchedulerService(
     @Scheduled(fixedDelay = 240000, initialDelay = 300000)
     @SchedulerLock(name = "dispatchUnsentVedtakToKafka")
     fun dispatchUnsentVedtakToKafka() {
-        kafkaDispatcher.dispatchUnsentEventsToKafka(EventType.KLAGE_VEDTAK)
+        kafkaDispatcher.dispatchEventsToKafka(
+            type = EventType.KLAGE_VEDTAK,
+            utsendingStatusList = listOf(IKKE_SENDT, FEILET)
+        )
     }
 
     @Scheduled(fixedDelay = 240000, initialDelay = 360000)
     @SchedulerLock(name = "dispatchUnsentDVHStatsToKafka")
     fun dispatchUnsentDVHStatsToKafka() {
-        kafkaDispatcher.dispatchUnsentEventsToKafka(EventType.STATS_DVH)
+        kafkaDispatcher.dispatchEventsToKafka(
+            type = EventType.STATS_DVH,
+            utsendingStatusList = listOf(IKKE_SENDT, FEILET)
+        )
     }
 }

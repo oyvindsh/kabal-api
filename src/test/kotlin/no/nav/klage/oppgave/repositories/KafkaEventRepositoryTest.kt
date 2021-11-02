@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.repositories
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.KafkaEvent
-import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
+import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,7 +40,7 @@ class KafkaEventRepositoryTest {
             kildeReferanse = "TEST",
             kilde = "TEST",
             klagebehandlingId = UUID.randomUUID(),
-            status = UtsendingStatus.IKKE_SENDT,
+            status = IKKE_SENDT,
             jsonPayload = "{}",
             type = EventType.STATS_DVH
         )
@@ -53,13 +53,13 @@ class KafkaEventRepositoryTest {
     }
 
     @Test
-    fun `fetch for status works and in right order (asc)`() {
+    fun `fetch for status and type works and in right order (asc)`() {
         kafkaEventRepository.save(
             KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
                 klagebehandlingId = UUID.randomUUID(),
-                status = UtsendingStatus.IKKE_SENDT,
+                status = IKKE_SENDT,
                 jsonPayload = "{}",
                 type = EventType.STATS_DVH
             )
@@ -69,7 +69,7 @@ class KafkaEventRepositoryTest {
             kildeReferanse = "TEST",
             kilde = "TEST",
             klagebehandlingId = UUID.randomUUID(),
-            status = UtsendingStatus.FEILET,
+            status = FEILET,
             jsonPayload = "{}",
             type = EventType.STATS_DVH,
             created = LocalDateTime.now().minusDays(1)
@@ -78,21 +78,34 @@ class KafkaEventRepositoryTest {
             oldestKafkaEvent
         )
 
+        //Should be ignored b/c wrong type
         kafkaEventRepository.save(
             KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
                 klagebehandlingId = UUID.randomUUID(),
-                status = UtsendingStatus.FEILET,
+                status = FEILET,
                 jsonPayload = "{}",
                 type = EventType.KLAGE_VEDTAK
             )
         )
 
+        //Should be ignored b/c status = SENDT
+        kafkaEventRepository.save(
+            KafkaEvent(
+                kildeReferanse = "TEST",
+                kilde = "TEST",
+                klagebehandlingId = UUID.randomUUID(),
+                status = SENDT,
+                jsonPayload = "{}",
+                type = EventType.STATS_DVH
+            )
+        )
+
         testEntityManager.flush()
 
-        val list = kafkaEventRepository.getAllByStatusIsNotLikeAndTypeIsLikeOrderByCreated(
-            UtsendingStatus.SENDT,
+        val list = kafkaEventRepository.getAllByStatusInAndTypeIsLikeOrderByCreated(
+            listOf(IKKE_SENDT, FEILET),
             EventType.STATS_DVH
         )
         assertThat(list.size).isEqualTo(2)
