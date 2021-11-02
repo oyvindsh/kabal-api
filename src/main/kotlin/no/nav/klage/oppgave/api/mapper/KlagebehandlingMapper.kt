@@ -149,8 +149,7 @@ class KlagebehandlingMapper(
             id = id,
             utfall = utfall?.id,
             hjemler = hjemler.map { it.id }.toSet(),
-            file = getVedleggView(dokumentEnhetId),
-            opplastet = opplastet
+            file = getVedleggView(dokumentEnhetId)
         )
     }
 

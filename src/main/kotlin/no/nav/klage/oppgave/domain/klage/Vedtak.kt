@@ -30,9 +30,6 @@ class Vedtak(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
-    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
-    @Column(name = "opplastet")
-    var opplastet: LocalDateTime? = null,
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
     @Column(name = "smart_editor_id")
