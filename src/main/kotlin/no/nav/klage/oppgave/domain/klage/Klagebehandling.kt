@@ -141,23 +141,6 @@ class Klagebehandling(
         return vedtak ?: throw VedtakNotFoundException("Vedtak ikke funnet for klagebehandling $id")
     }
 
-    fun lagBrevmottakereForVedtak() {
-        val vedtak = getVedtakOrException()
-        val klager = klager
-        if (klager.prosessfullmektig != null) {
-            vedtak.leggTilProsessfullmektigSomBrevmottaker(klager.prosessfullmektig)
-            if (klager.prosessfullmektig.skalPartenMottaKopi) {
-                vedtak.leggTilKlagerSomBrevmottaker(klager)
-            }
-        } else {
-            vedtak.leggTilKlagerSomBrevmottaker(klager)
-        }
-        val sakenGjelder = sakenGjelder
-        if (sakenGjelder.partId != klager.partId && sakenGjelder.skalMottaKopi) {
-            vedtak.leggTilSakenGjelderSomBrevmottaker(sakenGjelder)
-        }
-    }
-
     /**
      * Brukes til ES og statistikk per nå
      */

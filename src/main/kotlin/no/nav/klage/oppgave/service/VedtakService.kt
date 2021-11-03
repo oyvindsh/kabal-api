@@ -3,24 +3,20 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.api.view.VedtakVedleggInput
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokumentEnhetIdOgOpplastetInVedtak
+import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokumentEnhetIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMellomlagerIdOgOpplastetInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setOpplastetInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSmartEditorIdInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
 import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.domain.kodeverk.Hjemmel
 import no.nav.klage.oppgave.domain.kodeverk.Utfall
 import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
-import no.nav.klage.oppgave.util.AttachmentValidator
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -28,9 +24,7 @@ import java.util.*
 class VedtakService(
     private val klagebehandlingService: KlagebehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val attachmentValidator: AttachmentValidator,
     private val tilgangService: TilgangService,
-    private val fileApiService: FileApiService,
     private val kabalDocumentGateway: KabalDocumentGateway
 ) {
 
@@ -86,17 +80,9 @@ class VedtakService(
 
         val vedtak = klagebehandling.getVedtakOrException()
 
-        var oppdatertKlagebehandling = if (vedtak.mellomlagerId != null) {
-            slettMellomlagretDokument(
-                klagebehandling,
-                vedtak,
-                innloggetIdent
-            )
+        var oppdatertKlagebehandling = if (vedtak.dokumentEnhetId != null) {
+            deleteHovedDokument(klagebehandling, vedtak.dokumentEnhetId!!)
         } else klagebehandling
-
-        oppdatertKlagebehandling = if (vedtak.dokumentEnhetId != null) {
-            deleteHovedDokument(oppdatertKlagebehandling, innloggetIdent, vedtak.dokumentEnhetId!!)
-        } else oppdatertKlagebehandling
 
         return oppdatertKlagebehandling
     }
@@ -112,7 +98,6 @@ class VedtakService(
 
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
         if (klagebehandling.avsluttetAvSaksbehandler != null) throw VedtakFinalizedException("Klagebehandlingen er avsluttet")
-        attachmentValidator.validateAttachment(input.vedlegg)
 
         var oppdatertKlagebehandling = if (klagebehandling.getVedtakOrException().dokumentEnhetId == null) {
             createDokumentEnhet(klagebehandling, innloggetIdent)
@@ -121,43 +106,11 @@ class VedtakService(
         oppdatertKlagebehandling =
             uploadHovedDokument(
                 oppdatertKlagebehandling,
-                innloggetIdent,
                 oppdatertKlagebehandling.getVedtakOrException().dokumentEnhetId!!,
                 input.vedlegg
             )
 
-        //Rydd opp gammel moro:
-        if (klagebehandling.getVedtakOrException().mellomlagerId != null) {
-            slettMellomlagretDokument(klagebehandling, klagebehandling.getVedtakOrException(), innloggetIdent)
-        }
-
         return oppdatertKlagebehandling
-    }
-
-    private fun slettMellomlagretDokument(
-        klagebehandling: Klagebehandling,
-        vedtak: Vedtak,
-        utfoerendeSaksbehandlerIdent: String
-    ): Klagebehandling {
-        if (vedtak.mellomlagerId != null) {
-            fileApiService.deleteDocument(vedtak.mellomlagerId!!)
-        }
-        return setMellomlagerIdOgOpplastet(
-            klagebehandling,
-            null,
-            utfoerendeSaksbehandlerIdent
-        )
-    }
-
-    private fun setMellomlagerIdOgOpplastet(
-        klagebehandling: Klagebehandling,
-        mellomlagerId: String?,
-        utfoerendeSaksbehandlerIdent: String
-    ): Klagebehandling {
-        val event =
-            klagebehandling.setMellomlagerIdOgOpplastetInVedtak(mellomlagerId, utfoerendeSaksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
     }
 
     private fun setDokumentEnhetIdOgOpplastet(
@@ -166,17 +119,7 @@ class VedtakService(
         utfoerendeSaksbehandlerIdent: String
     ): Klagebehandling {
         val event =
-            klagebehandling.setDokumentEnhetIdOgOpplastetInVedtak(dokumentEnhetId, utfoerendeSaksbehandlerIdent)
-        applicationEventPublisher.publishEvent(event)
-        return klagebehandling
-    }
-
-    private fun setOpplastet(
-        klagebehandling: Klagebehandling,
-        utfoerendeSaksbehandlerIdent: String
-    ): Klagebehandling {
-        val event =
-            klagebehandling.setOpplastetInVedtak(LocalDateTime.now(), utfoerendeSaksbehandlerIdent)
+            klagebehandling.setDokumentEnhetIdInVedtak(dokumentEnhetId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
     }
@@ -193,21 +136,19 @@ class VedtakService(
 
     private fun deleteHovedDokument(
         klagebehandling: Klagebehandling,
-        utfoerendeSaksbehandlerIdent: String,
         dokumentEnhetId: UUID
     ): Klagebehandling {
         kabalDocumentGateway.deleteHovedDokument(dokumentEnhetId)
-        return setOpplastet(klagebehandling, utfoerendeSaksbehandlerIdent)
+        return klagebehandling
     }
 
     private fun uploadHovedDokument(
         klagebehandling: Klagebehandling,
-        utfoerendeSaksbehandlerIdent: String,
         dokumentEnhetId: UUID,
         file: MultipartFile
     ): Klagebehandling {
         kabalDocumentGateway.uploadHovedDokument(dokumentEnhetId, file)
-        return setOpplastet(klagebehandling, utfoerendeSaksbehandlerIdent)
+        return klagebehandling
     }
 
     fun setSmartEditorId(

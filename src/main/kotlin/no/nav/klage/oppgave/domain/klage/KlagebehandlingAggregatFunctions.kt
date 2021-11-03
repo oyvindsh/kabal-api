@@ -563,72 +563,15 @@ object KlagebehandlingAggregatFunctions {
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setJournalpostIdInBrevmottaker(
-        mottakerId: UUID,
-        nyVerdi: String?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtakOrException()
-        val mottaker = vedtak.getMottaker(mottakerId)
-        val gammelVerdi = mottaker.journalpostId
-        val tidspunkt = LocalDateTime.now()
-        mottaker.journalpostId = nyVerdi
-        vedtak.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg = listOfNotNull(
-            endringslogg(
-                saksbehandlerident,
-                Felt.JOURNALPOST_I_BREVMOTTAKER,
-                gammelVerdi,
-                nyVerdi,
-                tidspunkt
-            )
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
-    }
-
-    fun Klagebehandling.setMellomlagerIdOgOpplastetInVedtak(
-        nyVerdi: String?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtakOrException()
-        val gammelVerdi = vedtak.mellomlagerId
-        val tidspunkt = LocalDateTime.now()
-        val gammelVerdiOpplastet = vedtak.opplastet
-        vedtak.mellomlagerId = nyVerdi
-        vedtak.modified = tidspunkt
-        vedtak.opplastet = if (nyVerdi == null) null else tidspunkt
-        modified = tidspunkt
-        val endringslogg = listOfNotNull(
-            endringslogg(
-                saksbehandlerident,
-                Felt.MELLOMLAGER_ID_I_VEDTAK,
-                gammelVerdi,
-                nyVerdi,
-                tidspunkt
-            ),
-            endringslogg(
-                saksbehandlerident,
-                Felt.OPPLASTET_I_VEDTAK,
-                gammelVerdiOpplastet.toString(),
-                tidspunkt.toString(),
-                tidspunkt
-            )
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
-    }
-
-    fun Klagebehandling.setDokumentEnhetIdOgOpplastetInVedtak(
+    fun Klagebehandling.setDokumentEnhetIdInVedtak(
         nyVerdi: UUID?,
         saksbehandlerident: String
     ): KlagebehandlingEndretEvent {
         val vedtak = this.getVedtakOrException()
         val gammelVerdi = vedtak.dokumentEnhetId
         val tidspunkt = LocalDateTime.now()
-        val gammelVerdiOpplastet = vedtak.opplastet
         vedtak.dokumentEnhetId = nyVerdi
         vedtak.modified = tidspunkt
-        vedtak.opplastet = if (nyVerdi == null) null else tidspunkt
         modified = tidspunkt
         val endringslogg = listOfNotNull(
             endringslogg(
@@ -637,80 +580,9 @@ object KlagebehandlingAggregatFunctions {
                 gammelVerdi.toString(),
                 nyVerdi.toString(),
                 tidspunkt
-            ),
-            endringslogg(
-                saksbehandlerident,
-                Felt.OPPLASTET_I_VEDTAK,
-                gammelVerdiOpplastet.toString(),
-                tidspunkt.toString(),
-                tidspunkt
             )
         )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
-    }
-
-    fun Klagebehandling.setOpplastetInVedtak(
-        nyVerdi: LocalDateTime?,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val modified = nyVerdi ?: LocalDateTime.now()
-        val vedtak = this.getVedtakOrException()
-        val gammelVerdi = vedtak.opplastet
-        vedtak.modified = modified
-        vedtak.opplastet = nyVerdi
-        this.modified = modified
-        val endringslogg = listOfNotNull(
-            endringslogg(
-                saksbehandlerident,
-                Felt.OPPLASTET_I_VEDTAK,
-                gammelVerdi.toString(),
-                nyVerdi?.toString(),
-                modified
-            )
-        )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
-    }
-
-    fun Klagebehandling.setVedtakFerdigDistribuert(
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtakOrException()
-        val gammelVerdi = vedtak.ferdigDistribuert
-        val tidspunkt = LocalDateTime.now()
-        vedtak.ferdigDistribuert = tidspunkt
-        vedtak.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.VEDTAK_DISTRIBUERT,
-                gammelVerdi.toString(),
-                tidspunkt.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.setBrevMottakerFerdigstiltIJoark(
-        brevMottakerId: UUID,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtakOrException()
-        val brevMottaker = vedtak.getMottaker(brevMottakerId)
-        val gammelVerdi = brevMottaker.ferdigstiltIJoark
-        val tidspunkt = LocalDateTime.now()
-        brevMottaker.ferdigstiltIJoark = tidspunkt
-        vedtak.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.BREVMOTTAKER_FERDIGSTILT_I_JOARK,
-                gammelVerdi.toString(),
-                tidspunkt.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
     fun Klagebehandling.setAvsluttetAvSaksbehandler(
@@ -744,29 +616,6 @@ object KlagebehandlingAggregatFunctions {
                 Felt.AVSLUTTET,
                 gammelVerdi.toString(),
                 tidspunkt.toString(),
-                tidspunkt
-            )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
-    }
-
-    fun Klagebehandling.setDokdistReferanseInVedtaksmottaker(
-        mottakerId: UUID,
-        nyVerdi: UUID,
-        saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val vedtak = this.getVedtakOrException()
-        val mottaker = vedtak.getMottaker(mottakerId)
-        val gammelVerdi = mottaker.dokdistReferanse
-        val tidspunkt = LocalDateTime.now()
-        mottaker.dokdistReferanse = nyVerdi
-        vedtak.modified = tidspunkt
-        modified = tidspunkt
-        val endringslogg =
-            endringslogg(
-                saksbehandlerident,
-                Felt.DOKDIST_REFERANSE,
-                gammelVerdi.toString(),
-                nyVerdi.toString(),
                 tidspunkt
             )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
@@ -810,7 +659,7 @@ object KlagebehandlingAggregatFunctions {
         )
         return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
-
+    
     fun Klagebehandling.setSmartEditorIdInVedtak(
         nyVerdi: String?,
         saksbehandlerident: String

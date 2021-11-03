@@ -11,7 +11,6 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
-import no.nav.klage.oppgave.service.FileApiService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,10 +33,7 @@ class KlagebehandlingMapperTest {
 
     @MockkBean
     lateinit var eregClient: EregClient
-
-    @MockkBean
-    lateinit var fileApiService: FileApiService
-
+    
     @MockkBean
     lateinit var saksbehandlerRepository: SaksbehandlerRepository
 

@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.oppgave.domain.kodeverk.*
-import no.nav.klage.oppgave.exceptions.BrevMottakerNotFoundException
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -27,23 +26,10 @@ class Vedtak(
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
     var hjemler: MutableSet<Hjemmel> = mutableSetOf(),
-    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "vedtak_id", referencedColumnName = "id", nullable = false)
-    var brevmottakere: MutableSet<BrevMottaker> = mutableSetOf(),
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
-    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
-    @Column(name = "opplastet")
-    var opplastet: LocalDateTime? = null,
-    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
-    @Column(name = "ferdig_distribuert")
-    var ferdigDistribuert: LocalDateTime? = null,
-    //Deprecated, skal fjernes når alle aktive saker bruker dokumentEnhetId
-    @Column(name = "mellomlager_id")
-    var mellomlagerId: String? = null,
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
     @Column(name = "smart_editor_id")
@@ -69,39 +55,4 @@ class Vedtak(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
-    fun getMottaker(mottakerId: UUID): BrevMottaker =
-        brevmottakere.firstOrNull { it.id == mottakerId }
-            ?: throw BrevMottakerNotFoundException("Brevmottaker med id $mottakerId ikke funnet")
-
-    fun leggTilSakenGjelderSomBrevmottaker(sakenGjelder: SakenGjelder) {
-        brevmottakere.add(
-            BrevMottaker(
-                partId = sakenGjelder.partId,
-                rolle = Rolle.SAKEN_GJELDER
-            )
-        )
-    }
-
-    fun leggTilKlagerSomBrevmottaker(klager: Klager) {
-        brevmottakere.add(
-            BrevMottaker(
-                partId = klager.partId,
-                rolle = Rolle.KLAGER
-            )
-        )
-    }
-
-    fun leggTilProsessfullmektigSomBrevmottaker(prosessfullmektig: Prosessfullmektig) {
-        brevmottakere.add(
-            BrevMottaker(
-                partId = prosessfullmektig.partId,
-                rolle = Rolle.PROSESSFULLMEKTIG
-            )
-        )
-    }
-
-    fun erIkkeFerdigDistribuert() = ferdigDistribuert == null
-
-    fun harIngenBrevMottakere(): Boolean = brevmottakere.isEmpty()
 }

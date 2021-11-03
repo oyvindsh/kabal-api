@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.domain.kafka.KafkaEvent
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttet
-import no.nav.klage.oppgave.domain.kodeverk.Rolle
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
@@ -32,20 +31,18 @@ class KlagebehandlingAvslutningService(
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
         private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
+        const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
+        const val SYSTEM_JOURNALFOERENDE_ENHET = "9999"
 
     }
 
     @Transactional
-    fun avsluttKlagebehandling(klagebehandlingId: UUID, gammelFlyt: Boolean): Klagebehandling {
+    fun avsluttKlagebehandling(klagebehandlingId: UUID): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
         val vedtak = klagebehandling.getVedtakOrException()
 
-        val journalpostId = if (gammelFlyt) {
-            (vedtak.brevmottakere.find { it.rolle == Rolle.PROSESSFULLMEKTIG }
-                ?: vedtak.brevmottakere.find { it.rolle == Rolle.KLAGER })!!.journalpostId
-        } else {
+        val journalpostId =
             kabalDocumentGateway.getJournalpostIdForHovedadressat(klagebehandling.getVedtakOrException().dokumentEnhetId!!)!!
-        }
 
         val eventId = UUID.randomUUID()
 
@@ -69,7 +66,7 @@ class KlagebehandlingAvslutningService(
             )
         )
 
-        val event = klagebehandling.setAvsluttet(VedtakDistribusjonService.SYSTEMBRUKER)
+        val event = klagebehandling.setAvsluttet(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
 
         return klagebehandling
