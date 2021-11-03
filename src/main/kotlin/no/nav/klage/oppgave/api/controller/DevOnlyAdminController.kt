@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.service.VedtakKafkaProducer
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class DevOnlyAdminController(
     private val adminService: AdminService,
-    private val vedtakKafkaProducer: VedtakKafkaProducer
+    private val vedtakKafkaProducer: VedtakKafkaProducer,
+    private val unleash: Unleash
 ) {
 
     companion object {
@@ -27,12 +29,22 @@ class DevOnlyAdminController(
     @ResponseStatus(HttpStatus.OK)
     fun resetElasticIndex() {
         try {
-            adminService.recreateEsIndex()
-            adminService.syncEsWithDb()
-            adminService.findAndLogOutOfSyncKlagebehandlinger()
+            logger.info("Syncing db with Kafka")
+            adminService.syncKafkaWithDb()
         } catch (e: Exception) {
-            logger.warn("Failed to reset ES index", e)
+            logger.warn("Failed to resync db with Kafka")
             throw e
+        }
+        if (!unleash.isEnabled("klage.indexFromSearch", false)) {
+            try {
+                logger.info("Recreating ES index and syncing db with ES")
+                adminService.recreateEsIndex()
+                adminService.syncEsWithDb()
+                adminService.findAndLogOutOfSyncKlagebehandlinger()
+            } catch (e: Exception) {
+                logger.warn("Failed to reset ES index", e)
+                throw e
+            }
         }
     }
 

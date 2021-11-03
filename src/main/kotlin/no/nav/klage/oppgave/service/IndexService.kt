@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.service.mapper.EsKlagebehandlingMapper
@@ -17,7 +18,8 @@ import java.time.temporal.ChronoUnit
 class IndexService(
     private val elasticsearchService: ElasticsearchService,
     private val klagebehandlingRepository: KlagebehandlingRepository,
-    private val esKlagebehandlingMapper: EsKlagebehandlingMapper
+    private val esKlagebehandlingMapper: EsKlagebehandlingMapper,
+    private val unleash: Unleash
 ) {
 
     companion object {
@@ -91,16 +93,18 @@ class IndexService(
 
     @Retryable
     fun indexKlagebehandling(klagebehandling: Klagebehandling) {
-        try {
-            elasticsearchService.save(
-                esKlagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
-            )
-        } catch (e: Exception) {
-            if (e.message?.contains("version_conflict_engine_exception") == true) {
-                logger.info("Later version already indexed, ignoring this..")
-            } else {
-                logger.error("Unable to index klagebehandling ${klagebehandling.id}, see securelogs for details")
-                securelogger.error("Unable to index klagebehandling ${klagebehandling.id}", e)
+        if (!unleash.isEnabled("klage.indexFromSearch", false)) {
+            try {
+                elasticsearchService.save(
+                    esKlagebehandlingMapper.mapKlagebehandlingOgMottakToEsKlagebehandling(klagebehandling)
+                )
+            } catch (e: Exception) {
+                if (e.message?.contains("version_conflict_engine_exception") == true) {
+                    logger.info("Later version already indexed, ignoring this..")
+                } else {
+                    logger.error("Unable to index klagebehandling ${klagebehandling.id}, see securelogs for details")
+                    securelogger.error("Unable to index klagebehandling ${klagebehandling.id}", e)
+                }
             }
         }
     }
