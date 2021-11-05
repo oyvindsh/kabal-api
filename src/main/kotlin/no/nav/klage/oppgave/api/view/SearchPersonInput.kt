@@ -8,6 +8,6 @@ data class SearchPersonByNameInput(
 
 data class SearchPersonByFnrInput(
     val query: String,
-    val enhet: String? = null
+    val enhet: String
 )
 

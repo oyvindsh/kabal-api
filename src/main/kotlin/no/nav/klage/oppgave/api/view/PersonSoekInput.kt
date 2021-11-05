@@ -9,7 +9,7 @@ data class PersonSoekInput(
     val start: Int,
     val antall: Int,
     val projeksjon: Projeksjon? = null,
-    val enhet: String? = null
+    val enhet: String
 ) {
     enum class Rekkefoelge {
         STIGENDE, SYNKENDE
