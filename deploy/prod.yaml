@@ -1,5 +1,4 @@
 ingresses:
-  - https://klage-oppgave-api.intern.nav.no
   - https://kabal-api.intern.nav.no
 externalHosts:
   - host: login.microsoftonline.com

@@ -1,5 +1,4 @@
 ingresses:
-  - https://kabal-api.dev.nav.no
   - https://kabal-api.dev.intern.nav.no
 externalHosts:
   - host: login.microsoftonline.com
