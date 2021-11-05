@@ -53,11 +53,11 @@ class KlagebehandlingSearchController(
         val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(input)
         val personSoekHits = personsoekService.fnrSearch(searchCriteria)
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        val valgtEnhet = enhetFromInputOrInnstillinger(input.enhet)
+        val valgtEnhet = enhetFromInput(input.enhet)
         return klagebehandlingListMapper.mapPersonSoekHitsToFnrSearchResponse(
             personSoekHits = personSoekHits,
             saksbehandler = saksbehandler,
-            tilgangTilTemaer = valgtEnhet.temaer
+            tilgangTilTemaer = valgtEnhet?.temaer ?: emptyList()
         )
     }
 
@@ -83,7 +83,7 @@ class KlagebehandlingSearchController(
         @RequestBody input: SearchPersonByFnrInput
     ): KlagebehandlingerListRespons {
         //TODO: Move logic to PersonsoekService
-        val lovligeTemaer = enhetFromInputOrInnstillinger(input.enhet).temaer
+        val lovligeTemaer = enhetFromInput(input.enhet)?.temaer ?: emptyList()
         val sivilstand: Sivilstand? = pdlFacade.getPersonInfo(input.query).sivilstand
 
         val searchCriteria = KlagebehandlingerSearchCriteria(
@@ -115,8 +115,8 @@ class KlagebehandlingSearchController(
         )
     }
 
-    private fun enhetFromInputOrInnstillinger(enhetId: String?): EnhetMedLovligeTemaer =
-        enhetId?.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
-            ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
+    private fun enhetFromInput(enhetId: String?): EnhetMedLovligeTemaer? =
+        enhetId.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
+
 }
 

@@ -52,11 +52,11 @@ class KlagebehandlingListController(
 
         validateRettigheter(queryParams, navIdent)
 
-        val valgtEnhet = enhetFromInputOrInnstillinger(queryParams.enhet)
+        val valgtEnhet = enhetFromInput(queryParams.enhet)
         val searchCriteria = if (queryParams.temaer.isEmpty()) {
             klagebehandlingerSearchCriteriaMapper.toSearchCriteria(
                 navIdent,
-                queryParams.copy(temaer = valgtEnhet.temaer.map { it.id }),
+                queryParams.copy(temaer = valgtEnhet?.temaer?.map { it.id } ?: emptyList()),
                 valgtEnhet
             )
         } else {
@@ -71,7 +71,7 @@ class KlagebehandlingListController(
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
                 searchCriteria.saksbehandler,
-                valgtEnhet.temaer
+                valgtEnhet?.temaer ?: emptyList()
             )
         )
     }
@@ -111,7 +111,7 @@ class KlagebehandlingListController(
         val searchCriteria = klagebehandlingerSearchCriteriaMapper.toSearchCriteria(navIdent, input)
         val personsoekResponse = personsoekService.personsoek(searchCriteria)
         val saksbehandler = innloggetSaksbehandlerRepository.getInnloggetIdent()
-        val valgtEnhet = enhetFromInputOrInnstillinger(input.enhet)
+        val valgtEnhet = enhetFromInput(input.enhet)
 
         return KlagebehandlingerPersonSoekListRespons(
             antallTreffTotalt = personsoekResponse.size,
@@ -119,7 +119,7 @@ class KlagebehandlingListController(
                 personSoekResponse = personsoekResponse,
                 viseUtvidet = searchCriteria.isProjectionUtvidet(),
                 saksbehandler = saksbehandler,
-                tilgangTilTemaer = valgtEnhet.temaer
+                tilgangTilTemaer = valgtEnhet?.temaer ?: emptyList()
             )
         )
     }
@@ -156,8 +156,7 @@ class KlagebehandlingListController(
         }
     }
 
-    private fun enhetFromInputOrInnstillinger(enhetId: String?): EnhetMedLovligeTemaer =
-        enhetId?.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
-            ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent())
+    private fun enhetFromInput(enhetId: String): EnhetMedLovligeTemaer? =
+        enhetId.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
 }
 
