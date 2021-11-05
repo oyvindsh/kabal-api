@@ -57,7 +57,7 @@ class KlagebehandlingSearchController(
         return klagebehandlingListMapper.mapPersonSoekHitsToFnrSearchResponse(
             personSoekHits = personSoekHits,
             saksbehandler = saksbehandler,
-            tilgangTilTemaer = valgtEnhet?.temaer ?: emptyList()
+            tilgangTilTemaer = valgtEnhet.temaer
         )
     }
 
@@ -83,7 +83,7 @@ class KlagebehandlingSearchController(
         @RequestBody input: SearchPersonByFnrInput
     ): KlagebehandlingerListRespons {
         //TODO: Move logic to PersonsoekService
-        val lovligeTemaer = enhetFromInput(input.enhet)?.temaer ?: emptyList()
+        val lovligeTemaer = enhetFromInput(input.enhet).temaer
         val sivilstand: Sivilstand? = pdlFacade.getPersonInfo(input.query).sivilstand
 
         val searchCriteria = KlagebehandlingerSearchCriteria(
@@ -115,8 +115,8 @@ class KlagebehandlingSearchController(
         )
     }
 
-    private fun enhetFromInput(enhetId: String?): EnhetMedLovligeTemaer? =
+    private fun enhetFromInput(enhetId: String): EnhetMedLovligeTemaer =
         enhetId.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
-
+            ?: throw IllegalArgumentException("Saksbehandler har ikke tilgang til angitt enhet")
 }
 

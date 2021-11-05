@@ -56,7 +56,7 @@ class KlagebehandlingListController(
         val searchCriteria = if (queryParams.temaer.isEmpty()) {
             klagebehandlingerSearchCriteriaMapper.toSearchCriteria(
                 navIdent,
-                queryParams.copy(temaer = valgtEnhet?.temaer?.map { it.id } ?: emptyList()),
+                queryParams.copy(temaer = valgtEnhet.temaer.map { it.id }),
                 valgtEnhet
             )
         } else {
@@ -71,7 +71,7 @@ class KlagebehandlingListController(
                 searchCriteria.isProjectionUtvidet(),
                 searchCriteria.ferdigstiltFom != null,
                 searchCriteria.saksbehandler,
-                valgtEnhet?.temaer ?: emptyList()
+                valgtEnhet.temaer
             )
         )
     }
@@ -119,7 +119,7 @@ class KlagebehandlingListController(
                 personSoekResponse = personsoekResponse,
                 viseUtvidet = searchCriteria.isProjectionUtvidet(),
                 saksbehandler = saksbehandler,
-                tilgangTilTemaer = valgtEnhet?.temaer ?: emptyList()
+                tilgangTilTemaer = valgtEnhet.temaer
             )
         )
     }
@@ -156,7 +156,8 @@ class KlagebehandlingListController(
         }
     }
 
-    private fun enhetFromInput(enhetId: String): EnhetMedLovligeTemaer? =
+    private fun enhetFromInput(enhetId: String): EnhetMedLovligeTemaer =
         enhetId.let { saksbehandlerService.getEnheterMedTemaerForSaksbehandler().enheter.find { enhet -> enhet.enhetId == it } }
+            ?: throw IllegalArgumentException("Saksbehandler har ikke tilgang til angitt enhet")
 }
 
