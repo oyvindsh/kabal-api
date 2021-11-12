@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -82,7 +83,9 @@ class KlagebehandlingMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             tema = Tema.AAP,
             type = Type.KLAGE,
-            avsluttet = LocalDateTime.now()
+            avsluttet = LocalDateTime.now(),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
     }
 

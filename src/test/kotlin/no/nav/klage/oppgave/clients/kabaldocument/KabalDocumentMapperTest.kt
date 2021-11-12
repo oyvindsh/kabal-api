@@ -18,6 +18,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -56,6 +57,7 @@ class KabalDocumentMapperTest {
         )
     }
 
+
     @Test
     fun `klager og sakenGjelder er samme person`() {
         val klagebehandling = Klagebehandling(
@@ -69,7 +71,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = listOf(
@@ -95,7 +99,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(
@@ -122,7 +128,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(
@@ -164,7 +172,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(
@@ -200,7 +210,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(
@@ -241,7 +253,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(
@@ -282,9 +296,11 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
 
-        )
+            )
 
         val fasitMottakere = setOf(
             BrevMottakerInput(
@@ -329,7 +345,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(
@@ -365,7 +383,9 @@ class KabalDocumentMapperTest {
             type = Type.KLAGE,
             vedtak = Vedtak(
                 id = vedtakId
-            )
+            ),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         val fasitMottakere = setOf(

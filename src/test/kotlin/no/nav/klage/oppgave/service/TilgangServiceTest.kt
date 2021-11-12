@@ -52,7 +52,9 @@ class TilgangServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = UUID.randomUUID(),
-            avsluttet = LocalDateTime.now()
+            avsluttet = LocalDateTime.now(),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         assertThrows<KlagebehandlingAvsluttetException> {
@@ -82,7 +84,9 @@ class TilgangServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = UUID.randomUUID(),
-            avsluttetAvSaksbehandler = LocalDateTime.now()
+            avsluttetAvSaksbehandler = LocalDateTime.now(),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         assertThrows<KlagebehandlingAvsluttetException> {
@@ -112,7 +116,9 @@ class TilgangServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = UUID.randomUUID(),
-            tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now())
+            tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now()),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z654321")
@@ -139,7 +145,9 @@ class TilgangServiceTest {
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
-            mottakId = UUID.randomUUID()
+            mottakId = UUID.randomUUID(),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z654321")
@@ -167,7 +175,9 @@ class TilgangServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = UUID.randomUUID(),
-            tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now())
+            tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now()),
+            avsenderEnhetFoersteinstans = "4100",
+            mottattFoersteinstans = LocalDate.now(),
         )
 
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
