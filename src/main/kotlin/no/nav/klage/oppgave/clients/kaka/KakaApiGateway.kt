@@ -19,6 +19,7 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
     fun createKvalitetsvurdering(): UUID = kakaApiClient.createKvalitetsvurdering().id
 
     fun finalizeKlagebehandling(klagebehandling: Klagebehandling) {
+        logger.debug("Sending saksdata to Kaka because klagebehandling is finished.")
         kakaApiClient.finalizeKlagebehandling(klagebehandling.toSaksdataInput())
     }
 
