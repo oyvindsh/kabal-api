@@ -96,6 +96,11 @@ class KlagebehandlingService(
             .orElseThrow { KlagebehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet") }
             .also { checkLeseTilgang(it) }
 
+    @Transactional(readOnly = true)
+    fun getKlagebehandlingForReadWithoutCheckForAccess(klagebehandlingId: UUID): Klagebehandling =
+        klagebehandlingRepository.findById(klagebehandlingId)
+            .orElseThrow { KlagebehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet") }
+
     fun getKlagebehandlingForUpdate(
         klagebehandlingId: UUID,
         ignoreCheckSkrivetilgang: Boolean = false

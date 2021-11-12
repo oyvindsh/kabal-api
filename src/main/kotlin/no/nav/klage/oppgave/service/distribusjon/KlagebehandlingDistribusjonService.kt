@@ -26,7 +26,7 @@ class KlagebehandlingDistribusjonService(
     @Transactional(propagation = Propagation.NEVER)
     fun distribuerKlagebehandling(klagebehandlingId: UUID) {
         try {
-            var klagebehandling =
+            val klagebehandling =
                 klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
 
             logger.debug("Distribuerer dokument med dokumentEnhetId ${klagebehandling.getVedtakOrException().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")

@@ -25,7 +25,11 @@ class KlagebehandlingSchedulerService(
         val klagebehandlingIdList: List<UUID> = klagebehandlingService.findKlagebehandlingForDistribusjon()
 
         klagebehandlingIdList.forEach { klagebehandlingId ->
-            kakaApiGateway.finalizeKlagebehandling(klagebehandlingService.getKlagebehandling(klagebehandlingId))
+            kakaApiGateway.finalizeKlagebehandling(
+                klagebehandlingService.getKlagebehandlingForReadWithoutCheckForAccess(
+                    klagebehandlingId
+                )
+            )
             klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
         }
     }
