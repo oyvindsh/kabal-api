@@ -122,7 +122,9 @@ class KlagebehandlingRepositoryTest {
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
-            mottakId = mottak.id
+            mottakId = mottak.id,
+            mottattFoersteinstans = LocalDate.now(),
+            avsenderEnhetFoersteinstans = "enhet"
         )
 
         klagebehandlingRepository.save(klage)
@@ -174,7 +176,9 @@ class KlagebehandlingRepositoryTest {
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
-            mottakId = mottak.id
+            mottakId = mottak.id,
+            mottattFoersteinstans = LocalDate.now(),
+            avsenderEnhetFoersteinstans = "enhet"
         )
 
         klagebehandlingRepository.save(klage)

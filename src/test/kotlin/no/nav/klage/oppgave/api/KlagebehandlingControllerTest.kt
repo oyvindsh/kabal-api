@@ -110,7 +110,9 @@ class KlagebehandlingControllerTest {
         medunderskriver = MedunderskriverTildeling(
             saksbehandlerident = "C78901",
             tidspunkt = LocalDateTime.now()
-        )
+        ),
+        mottattFoersteinstans = LocalDate.now(),
+        avsenderEnhetFoersteinstans = "0101"
     )
 
     @BeforeEach

@@ -539,6 +539,7 @@ class KlagebehandlingService(
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateKlagebehandlingBeforeFinalize(klagebehandling)
 
+        //TODO: Valider kvalitetsvurdering i kaka-api.
         //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
         return markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
     }

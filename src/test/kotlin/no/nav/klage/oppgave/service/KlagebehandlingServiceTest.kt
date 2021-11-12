@@ -410,7 +410,9 @@ class KlagebehandlingServiceTest {
             kildeReferanse = "1234234",
             oversendtKaDato = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
-            ytelse = "ABC"
+            ytelse = "ABC",
+            avsenderEnhet = "0101",
+            mottattNavDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
@@ -445,6 +447,8 @@ class KlagebehandlingServiceTest {
                 dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null
             ),
             avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
+            mottattFoersteinstans = LocalDate.now(),
+            avsenderEnhetFoersteinstans = "enhet"
         )
 
         klagebehandlingRepository.save(klage)

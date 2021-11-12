@@ -4,6 +4,7 @@ import no.nav.klage.oppgave.domain.kodeverk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -13,6 +14,7 @@ internal class KlagebehandlingTest {
     private val fnr = "12345678910"
     private val fnr2 = "22345678910"
     private val fnr3 = "32345678910"
+    private val enhet = "ENHET"
 
     @Nested
     inner class Status {
@@ -26,7 +28,9 @@ internal class KlagebehandlingTest {
                 mottakId = UUID.randomUUID(),
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
-                type = Type.KLAGE
+                type = Type.KLAGE,
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.IKKE_TILDELT)
         }
@@ -42,7 +46,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                tildeling = Tildeling(saksbehandlerident = null, tidspunkt = LocalDateTime.now())
+                tildeling = Tildeling(saksbehandlerident = null, tidspunkt = LocalDateTime.now()),
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.IKKE_TILDELT)
         }
@@ -58,7 +64,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now())
+                tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now()),
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.TILDELT)
         }
@@ -75,7 +83,9 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+                medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
         }
@@ -92,7 +102,9 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER
+                medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.RETURNERT_TIL_SAKSBEHANDLER)
         }
@@ -108,7 +120,9 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 tema = Tema.AAP,
                 type = Type.KLAGE,
-                medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now())
+                medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.MEDUNDERSKRIVER_VALGT)
         }
@@ -125,7 +139,9 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now()),
-                medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now())
+                medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.TILDELT)
         }
@@ -142,7 +158,9 @@ internal class KlagebehandlingTest {
                 tema = Tema.AAP,
                 type = Type.KLAGE,
                 medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                avsluttet = LocalDateTime.now()
+                avsluttet = LocalDateTime.now(),
+                mottattFoersteinstans = LocalDate.now(),
+                avsenderEnhetFoersteinstans = enhet
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.FULLFOERT)
         }
