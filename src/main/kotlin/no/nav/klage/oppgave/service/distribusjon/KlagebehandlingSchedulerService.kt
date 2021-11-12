@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.FEILET
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.IKKE_SENDT
@@ -14,17 +15,18 @@ import java.util.*
 class KlagebehandlingSchedulerService(
     private val klagebehandlingService: KlagebehandlingService,
     private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService,
-    private val kafkaDispatcher: KafkaDispatcher
+    private val kafkaDispatcher: KafkaDispatcher,
+    private val kakaApiGateway: KakaApiGateway
 ) {
 
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
     @SchedulerLock(name = "distribuerVedtak")
     fun distribuerVedtak() {
+        val klagebehandlingIdList: List<UUID> = klagebehandlingService.findKlagebehandlingForDistribusjon()
 
-        val klagebehandlinger: List<UUID> = klagebehandlingService.findKlagebehandlingForDistribusjon()
-
-        klagebehandlinger.forEach { klagebehandling ->
-            klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandling)
+        klagebehandlingIdList.forEach { klagebehandlingId ->
+            kakaApiGateway.finalizeKlagebehandling(klagebehandlingService.getKlagebehandling(klagebehandlingId))
+            klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
         }
     }
 

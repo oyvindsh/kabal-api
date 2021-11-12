@@ -50,7 +50,9 @@ class MeldingRepositoryTest {
             kildeReferanse = "1234234",
             oversendtKaDato = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
-            ytelse = "ABC"
+            ytelse = "ABC",
+            avsenderEnhet = "0101",
+            mottattNavDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
@@ -72,7 +74,9 @@ class MeldingRepositoryTest {
             mottattKlageinstans = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
-            mottakId = mottak.id
+            mottakId = mottak.id,
+            avsenderEnhetFoersteinstans = "0101",
+            mottattFoersteinstans = LocalDate.now()
         )
 
         klagebehandlingRepository.save(klage)

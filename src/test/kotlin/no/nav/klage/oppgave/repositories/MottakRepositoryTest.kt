@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @ActiveProfiles("local")
@@ -53,7 +54,8 @@ class MottakRepositoryTest {
             ),
             oversendtKaDato = LocalDateTime.now(),
             kildesystem = Fagsystem.AO01,
-            ytelse = "ABC"
+            ytelse = "ABC",
+            mottattNavDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)

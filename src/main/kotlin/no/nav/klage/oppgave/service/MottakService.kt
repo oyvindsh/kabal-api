@@ -6,10 +6,10 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
-import no.nav.klage.oppgave.domain.klage.Klager
-import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.PartId
-import no.nav.klage.oppgave.domain.kodeverk.*
+import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
+import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Type
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
@@ -22,7 +22,6 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 class MottakService(
@@ -59,29 +58,6 @@ class MottakService(
 
         //TODO: Move to outside of transaction to make sure it went well
         meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.tema.navn)
-    }
-
-    fun createMottakFromKvalitetsvurdering(kvalitetsvurdering: KvalitetsvurderingManuellInput): UUID {
-        val klager = Klager(
-            partId = PartId(
-                type = PartIdType.PERSON,
-                value = kvalitetsvurdering.foedselsnummer
-            )
-        )
-
-        val mottak = mottakRepository.save(
-            Mottak(
-                tema = kvalitetsvurdering.tema,
-                type = Type.KLAGE,
-                klager = klager,
-                kildeReferanse = "N/A",
-                oversendtKaDato = kvalitetsvurdering.datoMottattKlageinstans,
-                kildesystem = Fagsystem.MANUELL,
-                ytelse = null
-            )
-        )
-
-        return mottak.id
     }
 
     fun OversendtKlage.validate() {

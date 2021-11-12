@@ -38,14 +38,14 @@ class Mottak(
     @Column(name = "avsender_saksbehandlerident")
     var avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")
-    var avsenderEnhet: String? = null,
+    var avsenderEnhet: String,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
     val mottakDokument: MutableSet<MottakDokument> = mutableSetOf(),
     @Column(name = "dato_innsendt")
     val innsendtDato: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
-    val mottattNavDato: LocalDate? = null,
+    val mottattNavDato: LocalDate,
     @Column(name = "dato_oversendt_klageinstans")
     var oversendtKaDato: LocalDateTime,
     @Column(name = "dato_frist_fra_foersteinstans")

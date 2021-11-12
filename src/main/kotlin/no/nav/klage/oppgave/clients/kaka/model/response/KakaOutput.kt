@@ -2,6 +2,6 @@ package no.nav.klage.oppgave.clients.kaka.model.response
 
 import java.util.*
 
-data class KvalitetsvurderingOutput(
+data class KakaOutput(
     val id: UUID
 )

@@ -131,7 +131,9 @@ internal class KlagebehandlingDistribusjonServiceTest {
         kildeReferanse = UUID.randomUUID().toString(),
         oversendtKaDato = LocalDateTime.now(),
         kildesystem = Fagsystem.K9,
-        ytelse = "ABC"
+        ytelse = "ABC",
+        avsenderEnhet = "0101",
+        mottattNavDato = LocalDate.now()
     )
 
     private val klage = Klagebehandling(
@@ -157,7 +159,9 @@ internal class KlagebehandlingDistribusjonServiceTest {
             id = vedtakId,
             utfall = Utfall.MEDHOLD,
             dokumentEnhetId = UUID.randomUUID()
-        )
+        ),
+        avsenderEnhetFoersteinstans = "0101",
+        mottattFoersteinstans = LocalDate.now()
     )
 
     @Test

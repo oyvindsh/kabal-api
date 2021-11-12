@@ -38,11 +38,11 @@ class Klagebehandling(
     @Column(name = "dato_innsendt")
     var innsendt: LocalDate? = null,
     @Column(name = "dato_mottatt_foersteinstans")
-    var mottattFoersteinstans: LocalDate? = null,
+    var mottattFoersteinstans: LocalDate,
     @Column(name = "avsender_saksbehandlerident_foersteinstans")
     var avsenderSaksbehandleridentFoersteinstans: String? = null,
     @Column(name = "avsender_enhet_foersteinstans")
-    var avsenderEnhetFoersteinstans: String? = null,
+    var avsenderEnhetFoersteinstans: String,
     @Column(name = "dato_mottatt_klageinstans")
     var mottattKlageinstans: LocalDateTime,
     @Column(name = "dato_behandling_avsluttet")
