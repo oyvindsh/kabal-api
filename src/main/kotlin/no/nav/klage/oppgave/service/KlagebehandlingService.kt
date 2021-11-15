@@ -82,10 +82,12 @@ class KlagebehandlingService(
 
     //TODO Quick fix to make sure all old klagebehandlinger get kakaKvalitetsvurderingId
     fun createAndStoreKakaKvalitetsvurderingIdIfMissing(klagebehandlingId: UUID) {
+        logger.debug("Checking if Klagebehandling contains kvalitetsvurdering from Kaka.")
         val klagebehandling = klagebehandlingRepository.findById(klagebehandlingId)
             .orElseThrow { KlagebehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet") }
 
         if (klagebehandling.kakaKvalitetsvurderingId == null) {
+            logger.debug("Klagebehandling did not contain a kvalitetsvurdering from Kaka, so will create it.")
             klagebehandling.kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering()
         }
     }

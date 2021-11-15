@@ -21,6 +21,7 @@ class KakaApiClient(
     }
 
     fun createKvalitetsvurdering(): KakaOutput {
+        logger.debug("Creating kvalitetsvurdering i kaka")
         return kakaApiWebClient.post()
             .uri { it.path("/kabal/kvalitetsvurdering").build() }
             .header(

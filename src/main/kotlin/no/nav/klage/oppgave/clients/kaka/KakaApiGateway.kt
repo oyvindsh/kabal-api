@@ -16,7 +16,11 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         private val secureLogger = getSecureLogger()
     }
 
-    fun createKvalitetsvurdering(): UUID = kakaApiClient.createKvalitetsvurdering().id
+    fun createKvalitetsvurdering(): UUID {
+        val id = kakaApiClient.createKvalitetsvurdering().id
+        logger.debug("New kvalitetsvurderingId created in kaka: $id")
+        return id
+    }
 
     fun finalizeKlagebehandling(klagebehandling: Klagebehandling) {
         logger.debug("Sending saksdata to Kaka because klagebehandling is finished.")
