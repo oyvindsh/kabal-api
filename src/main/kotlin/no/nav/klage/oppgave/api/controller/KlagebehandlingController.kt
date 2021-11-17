@@ -4,10 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.view.KlagebehandlingFullfoertView
-import no.nav.klage.oppgave.api.view.KlagebehandlingMedunderskriveridentInput
-import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
-import no.nav.klage.oppgave.api.view.MedunderskriverInfoView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -94,7 +91,7 @@ class KlagebehandlingController(
     @GetMapping("/{id}/validate")
     fun validate(
         @PathVariable("id") klagebehandlingId: UUID
-    ) {
+    ): ValidationPassedResponse {
         logKlagebehandlingMethodDetails(
             "validate",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
@@ -106,6 +103,7 @@ class KlagebehandlingController(
                 klagebehandlingId
             )
         )
+        return ValidationPassedResponse()
     }
 
     @GetMapping("/{id}/medunderskriverinfo")
