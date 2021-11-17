@@ -45,16 +45,6 @@ class HentPersonMapper {
             else -> throw IllegalArgumentException("This should never occur")
         }
 
-    fun mapToPersoner(people: List<HentPersonBolkResult>): List<Person> {
-
-        logger.debug("pdl returned {} people", people.size)
-        secureLogger.debug("pdl returned {}", people)
-
-        return people.mapNotNull {
-            if (it.person == null) null else mapToPerson(it.ident, it.person)
-        }
-    }
-
     private fun sammensattNavn(navn: PdlPerson.Navn?): String? =
         navn?.let { "${it.fornavn} ${it.etternavn}" }
 

@@ -6,16 +6,13 @@ import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
 import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.api.controller.KlagebehandlingController
-import no.nav.klage.oppgave.api.mapper.KlagebehandlingListMapper
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
 import no.nav.klage.oppgave.api.view.KlagebehandlingMedunderskriveridentInput
 import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.*
-import no.nav.klage.oppgave.repositories.EsKlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.ElasticsearchService
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
@@ -24,7 +21,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.core.env.Environment
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -61,17 +57,6 @@ class KlagebehandlingControllerTest {
     @SpykBean
     lateinit var environment: Environment
 
-    @SpykBean
-    lateinit var elasticsearchService: ElasticsearchService
-
-    @MockkBean
-    lateinit var elasticsearchOperations: ElasticsearchOperations
-
-    @MockkBean
-    lateinit var esKlagebehandlingRepository: EsKlagebehandlingRepository
-
-    @MockkBean
-    lateinit var klagebehandlingListMapper: KlagebehandlingListMapper
 
     @MockkBean
     lateinit var unleash: Unleash
