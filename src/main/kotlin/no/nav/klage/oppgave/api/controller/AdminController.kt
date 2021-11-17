@@ -30,11 +30,9 @@ class AdminController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/internal/elasticadmin/rebuild", produces = ["application/json"])
+    @PostMapping("/internal/kafkaadmin/refill", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
-    fun resetElasticIndexWithPost() {
-
-
+    fun refillKafka() {
         azureGateway.getDataOmInnloggetSaksbehandler()
         azureGateway.getRollerForInnloggetSaksbehandler()
 
