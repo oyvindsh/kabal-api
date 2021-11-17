@@ -35,17 +35,6 @@ class DevOnlyAdminController(
             logger.warn("Failed to resync db with Kafka")
             throw e
         }
-        if (!unleash.isEnabled("klage.indexFromSearch", false)) {
-            try {
-                logger.info("Recreating ES index and syncing db with ES")
-                adminService.recreateEsIndex()
-                adminService.syncEsWithDb()
-                adminService.findAndLogOutOfSyncKlagebehandlinger()
-            } catch (e: Exception) {
-                logger.warn("Failed to reset ES index", e)
-                throw e
-            }
-        }
     }
 
     @Unprotected

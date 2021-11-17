@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.finn.unleash.Unleash
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
@@ -24,7 +23,6 @@ class AdminController(
     private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
     private val eregClient: EregClient,
     private val azureGateway: AzureGateway,
-    private val unleash: Unleash
 ) {
 
     companion object {
@@ -48,17 +46,6 @@ class AdminController(
         } catch (e: Exception) {
             logger.warn("Failed to resync db with Kafka")
             throw e
-        }
-        if (!unleash.isEnabled("klage.indexFromSearch", false)) {
-            try {
-                logger.info("Recreating ES index and syncing db with ES")
-                adminService.recreateEsIndex()
-                adminService.syncEsWithDb()
-                adminService.findAndLogOutOfSyncKlagebehandlinger()
-            } catch (e: Exception) {
-                logger.warn("Failed to reset ES index", e)
-                throw e
-            }
         }
     }
 

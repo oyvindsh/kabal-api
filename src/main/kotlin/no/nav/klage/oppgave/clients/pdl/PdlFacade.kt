@@ -1,6 +1,9 @@
 package no.nav.klage.oppgave.clients.pdl
 
-import no.nav.klage.oppgave.clients.pdl.graphql.*
+import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonMapper
+import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonResponse
+import no.nav.klage.oppgave.clients.pdl.graphql.PdlClient
+import no.nav.klage.oppgave.clients.pdl.graphql.PdlPerson
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
@@ -16,30 +19,6 @@ class PdlFacade(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-    }
-
-    fun getPersonerInfo(fnrListe: List<String>): List<Person> {
-        val fnrPartition: Pair<List<String>, List<String>> =
-            fnrListe.partition { personCacheService.isCached(it) }
-
-        val fnrIsCached = fnrPartition.first
-        val cachedPersoner = fnrIsCached.map { personCacheService.getPerson(it) }
-
-        val fnrIsNotCached = fnrPartition.second
-        if (fnrIsNotCached.isNotEmpty()) {
-            val hentPersonBolkResult = pdlClient.getPersonerInfo(fnrIsNotCached).getHentPersonBolkAndLogErrors()
-            val newPersoner = hentPersonMapper.mapToPersoner(hentPersonBolkResult)
-            oppdaterCache(newPersoner)
-            return cachedPersoner + newPersoner
-        }
-        return cachedPersoner
-
-        //Evt. enklere men tregere versjon:
-        // fnrListe.map { getPersonInfo(it) }
-    }
-
-    private fun oppdaterCache(newPersoner: List<Person>) {
-        newPersoner.forEach { personCacheService.updatePersonCache(it) }
     }
 
     fun getPersonInfo(fnr: String): Person {
@@ -59,12 +38,4 @@ class PdlFacade(
             secureLogger.warn("Errors returned for hentPerson($fnr) from PDL: ${this.errors}")
             throw RuntimeException("Klarte ikke å hente person fra PDL")
         }
-
-    private fun HentPersonerResponse.getHentPersonBolkAndLogErrors(): List<HentPersonBolkResult> {
-        if (!this.errors.isNullOrEmpty()) {
-            logger.warn("Errors returned from PDL. See securelogs for details.")
-            secureLogger.warn("Errors returned from PDL: ${this.errors}")
-        }
-        return this.data?.hentPersonBolk ?: emptyList()
-    }
 }

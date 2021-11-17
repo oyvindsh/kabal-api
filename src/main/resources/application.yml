@@ -26,23 +26,6 @@ spring:
     enabled: true
     clean-on-validation-error: false
     schemas: flyway_history_schema,klage
-  elasticsearch:
-    rest:
-      uris: "${AIVEN_ES_SCHEME}://${AIVEN_ES_HOST}:${AIVEN_ES_PORT}"
-      read-timeout: "10s"
-      username: "${ELASTIC_USERNAME}"
-      password: "${ELASTIC_PASSWORD}"
-  data:
-    elasticsearch:
-      client:
-        reactive:
-          endpoints: "${AIVEN_ES_HOST}:${AIVEN_ES_PORT}"
-          use-ssl: ${AIVEN_ES_USE_SSL}
-          socket-timeout: "10s"
-          username: "${ELASTIC_USERNAME}"
-          password: "${ELASTIC_PASSWORD}"
-      repositories:
-        enabled: false
   jpa:
     open-in-view: false
     properties:
@@ -188,14 +171,6 @@ no.nav.security.jwt:
         token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
         grant-type: client_credentials
         scope: api://${AXSYS_CLUSTER}.${AXSYS_NAMESPACE}.${AXSYS_APP}/.default
-        authentication:
-          client-id: ${AZURE_APP_CLIENT_ID}
-          client-jwk: ${AZURE_APP_JWK}
-          client-auth-method: private_key_jwt
-      proxy-onbehalfof:
-        token-endpoint-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
-        grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
-        scope: api://${PROXY_APP_CLIENT_ID}/.default
         authentication:
           client-id: ${AZURE_APP_CLIENT_ID}
           client-jwk: ${AZURE_APP_JWK}
