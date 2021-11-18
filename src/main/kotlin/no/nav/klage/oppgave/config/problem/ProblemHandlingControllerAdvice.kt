@@ -147,13 +147,6 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
-    fun handleValidationErrorWithDetailsException(
-        ex: ValidationErrorWithDetailsException,
-        request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(ex, createValidationProblem(ex), request)
-
-    @ExceptionHandler
     fun handleSectionedValidationErrorWithDetailsException(
         ex: SectionedValidationErrorWithDetailsException,
         request: NativeWebRequest
@@ -165,14 +158,6 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
             .withStatus(mapStatus(ex.statusCode))
             .withTitle(ex.statusText)
             .withDetail(ex.responseBodyAsString)
-            .build()
-    }
-
-    private fun createValidationProblem(ex: ValidationErrorWithDetailsException): ThrowableProblem {
-        return Problem.builder()
-            .withStatus(Status.BAD_REQUEST)
-            .withTitle(ex.title)
-            .with("invalid-properties", ex.invalidProperties)
             .build()
     }
 
