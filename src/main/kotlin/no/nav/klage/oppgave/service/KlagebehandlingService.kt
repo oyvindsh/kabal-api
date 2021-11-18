@@ -431,10 +431,11 @@ class KlagebehandlingService(
     }
 
     fun validateKlagebehandlingBeforeFinalize(klagebehandling: Klagebehandling) {
-        val result = mutableListOf<InvalidProperty>()
+        val validationErrors = mutableListOf<InvalidProperty>()
+        val sectionList = mutableListOf<ValidationSection>()
 
         if (harIkkeLagretVedtaksdokument(klagebehandling)) {
-            result.add(
+            validationErrors.add(
                 InvalidProperty(
                     field = "vedtaksdokument",
                     reason = "Mangler vedtaksdokument"
@@ -442,7 +443,7 @@ class KlagebehandlingService(
             )
         }
         if (klagebehandling.vedtak!!.utfall == null) {
-            result.add(
+            validationErrors.add(
                 InvalidProperty(
                     field = "utfall",
                     reason = "Utfall er ikke satt på vedtak"
@@ -451,7 +452,7 @@ class KlagebehandlingService(
         }
         if (klagebehandling.vedtak.utfall != Utfall.TRUKKET) {
             if (klagebehandling.vedtak.hjemler.isEmpty()) {
-                result.add(
+                validationErrors.add(
                     InvalidProperty(
                         field = "hjemmel",
                         reason = "Hjemmel er ikke satt på vedtak"
@@ -460,12 +461,30 @@ class KlagebehandlingService(
             }
         }
 
-        result.addAll(kakaApiGateway.getValidationErrors(klagebehandling))
+        if (validationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "klagebehandling",
+                    properties = validationErrors
+                )
+            )
+        }
 
-        if (result.isNotEmpty()) {
-            throw ValidationErrorWithDetailsException(
+        val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(klagebehandling)
+
+        if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "kvalitetsvurdering",
+                    properties = kvalitetsvurderingValidationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
                 title = "Validation error",
-                invalidProperties = result
+                sections = sectionList
             )
         }
     }
