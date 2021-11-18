@@ -79,7 +79,7 @@ class KabalDocumentClient(
         input: FilInput
     ): HovedDokumentEditedOutput {
         val bodyBuilder = MultipartBodyBuilder()
-        bodyBuilder.part("file", input.file.bytes).filename(input.file.originalFilename)
+        bodyBuilder.part("file", input.file.bytes).filename(input.file.originalFilename!!)
         return kabalDocumentWebClient
             .post()
             .uri { it.path("/dokumentenheter/{dokumentEnhetId}/innhold").build(dokumentEnhetId) }
@@ -91,7 +91,7 @@ class KabalDocumentClient(
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
             .bodyToMono<HovedDokumentEditedOutput>()
-            .block()
+            .block() ?: throw RuntimeException("Unable to upload HovedDokument")
     }
 
     fun getHovedDokument(dokumentEnhetId: UUID): Pair<ByteArray, MediaType> {

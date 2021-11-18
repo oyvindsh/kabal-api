@@ -43,7 +43,7 @@ class LayeredArchitectureTest {
     @ArchTest
     val layer_dependencies_are_respected_for_persistence: ArchRule = kabalApiLayeredArchitecture()
         .whereLayer("Repositories")
-        .mayOnlyBeAccessedByLayers("Services", "Controllers", "Config", "Eventlisteners, ApiMappers")
+        .mayOnlyBeAccessedByLayers("Services", "Controllers", "Config", "Eventlisteners", "ApiMappers")
 
     @ArchTest
     val layer_dependencies_are_respected_for_clients: ArchRule = kabalApiLayeredArchitecture()

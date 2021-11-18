@@ -37,7 +37,7 @@ class FeatureToggleController(
     private fun isEnabled(feature: String): Boolean =
         unleash.isEnabled(feature, contextMedInnloggetBruker())
 
-    private fun contextMedInnloggetBruker(): UnleashContext? =
+    private fun contextMedInnloggetBruker(): UnleashContext =
         UnleashContext.builder().userId(getIdent()).build()
 
     private fun getIdent() = try {
