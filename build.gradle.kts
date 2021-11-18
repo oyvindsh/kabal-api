@@ -1,24 +1,19 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val mockkVersion = "1.10.5"
-val h2Version = "1.4.200"
 val tokenValidationVersion = "1.3.2"
 val logstashVersion = "6.6"
 val springSleuthVersion = "3.0.0"
 val unleashVersion = "3.3.3"
 val problemSpringWebStartVersion = "0.26.2"
-val kafkaAvroVersion = "5.5.2"
-val pdfboxVersion = "2.0.19"
 val springRetryVersion = "1.3.1"
 val springMockkVersion = "3.0.1"
 val springFoxVersion = "3.0.0"
 val testContainersVersion = "1.15.1"
-val tikaVersion = "1.24.1"
 val nimbusVersion = "8.20.1"
 val threeTenExtraVersion = "1.6.0"
 val shedlockVersion = "4.23.0"
 val archunitVersion = "0.19.0"
-val verapdfVersion = "1.18.8"
 
 val githubUser: String by project
 val githubPassword: String by project
@@ -63,15 +58,11 @@ dependencies {
     implementation("org.ehcache:ehcache")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("io.confluent:kafka-avro-serializer:$kafkaAvroVersion") {
-        exclude(group = "org.slf4j", module = "slf4j-log4j12")
-    }
 
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
     implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
@@ -95,14 +86,9 @@ dependencies {
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
 
-    implementation("no.nav.slackposter:simple-slack-poster:5")
     implementation("org.springframework.retry:spring-retry:$springRetryVersion")
     implementation("no.finn.unleash:unleash-client-java:$unleashVersion")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
-
-    implementation("org.verapdf:validation-model:$verapdfVersion")
-    implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
-    implementation("org.apache.tika:tika-core:$tikaVersion")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
@@ -113,7 +99,6 @@ dependencies {
     }
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation("org.testcontainers:elasticsearch:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.tngtech.archunit:archunit-junit5:$archunitVersion")
