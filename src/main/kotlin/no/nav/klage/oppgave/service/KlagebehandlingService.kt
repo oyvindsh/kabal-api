@@ -459,8 +459,8 @@ class KlagebehandlingService(
                 )
             }
         }
-        //TODO: Skru på denne når frontend har fått på plass ROL-felter.
-//        result.addAll(kakaApiGateway.getValidationErrors(klagebehandling))
+
+        result.addAll(kakaApiGateway.getValidationErrors(klagebehandling))
 
         if (result.isNotEmpty()) {
             throw ValidationErrorWithDetailsException(
