@@ -68,17 +68,13 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
-    implementation("org.threeten:threeten-extra:$threeTenExtraVersion")
-
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:$springSleuthVersion")
     implementation("io.springfox:springfox-boot-starter:$springFoxVersion")
 
-    implementation("org.projectreactor:reactor-spring:$reactorSpringVersion")
-
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
+    implementation("com.papertrailapp:logback-syslog4j:$logbackSyslog4jVersion")
 
     implementation("com.kjetland:mbknor-jackson-jsonschema_2.13:$jacksonJsonschemaVersion")
-    implementation("com.papertrailapp:logback-syslog4j:$logbackSyslog4jVersion")
 
     implementation("org.redundent:kotlin-xml-builder:$kotlinXmlBuilderVersion")
 
