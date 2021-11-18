@@ -14,7 +14,7 @@ import no.nav.klage.oppgave.domain.kodeverk.*
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingFinalizedException
 import no.nav.klage.oppgave.exceptions.KlagebehandlingManglerMedunderskriverException
-import no.nav.klage.oppgave.exceptions.ValidationErrorWithDetailsException
+import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
@@ -321,7 +321,7 @@ class KlagebehandlingServiceTest {
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
 
-            assertThrows<ValidationErrorWithDetailsException> {
+            assertThrows<SectionedValidationErrorWithDetailsException> {
                 klagebehandlingService.ferdigstillKlagebehandling(
                     klagebehandling.id,
                     SAKSBEHANDLER_IDENT
@@ -339,7 +339,7 @@ class KlagebehandlingServiceTest {
             every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
 
-            assertThrows<ValidationErrorWithDetailsException> {
+            assertThrows<SectionedValidationErrorWithDetailsException> {
                 klagebehandlingService.ferdigstillKlagebehandling(
                     klagebehandling.id,
                     SAKSBEHANDLER_IDENT
@@ -358,7 +358,7 @@ class KlagebehandlingServiceTest {
             every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
 
-            assertThrows<ValidationErrorWithDetailsException> {
+            assertThrows<SectionedValidationErrorWithDetailsException> {
                 klagebehandlingService.ferdigstillKlagebehandling(
                     klagebehandling.id,
                     SAKSBEHANDLER_IDENT
