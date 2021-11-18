@@ -10,7 +10,6 @@ val springRetryVersion = "1.3.1"
 val springMockkVersion = "3.0.1"
 val springFoxVersion = "3.0.0"
 val testContainersVersion = "1.16.2"
-val nimbusVersion = "8.20.1"
 val threeTenExtraVersion = "1.7.0"
 val shedlockVersion = "4.29.0"
 val archunitVersion = "0.22.0"
@@ -44,14 +43,9 @@ plugins {
     idea
 }
 
-//apply(plugin = "io.spring.dependency-management")
-
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    //temporary fix:
-    //implementation("com.nimbusds:nimbus-jose-jwt:$nimbusVersion")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
