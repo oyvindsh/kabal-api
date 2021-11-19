@@ -13,7 +13,7 @@ class ByClusterStrategy(@Value("\${nais.cluster.name}") val currentCluster: Stri
 
     override fun getName(): String = "byCluster"
 
-    override fun isEnabled(parameters: Map<String, String>?): Boolean =
+    override fun isEnabled(parameters: MutableMap<String, String>): Boolean =
         getEnabledClusters(parameters)?.any { isCurrentClusterEnabled(it) } ?: false
 
     private fun getEnabledClusters(parameters: Map<String, String>?) =

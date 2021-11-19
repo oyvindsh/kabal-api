@@ -89,7 +89,7 @@ fun Klagebehandling.mapToSkjemaV1(): KlagebehandlingSkjemaV1 {
         avsenderSaksbehandlerFoersteinstans = this.avsenderSaksbehandleridentFoersteinstans?.let {
             KlagebehandlingSkjemaV1.Saksbehandler(it)
         },
-        avsenderEnhetFoersteinstans = this.avsenderEnhetFoersteinstans?.let { KlagebehandlingSkjemaV1.Enhet(it) },
+        avsenderEnhetFoersteinstans = this.avsenderEnhetFoersteinstans.let { KlagebehandlingSkjemaV1.Enhet(it) },
         mottattKlageinstansTidspunkt = this.mottattKlageinstans,
         avsluttetAvSaksbehandlerTidspunkt = this.avsluttetAvSaksbehandler,
         avsluttetTidspunkt = this.avsluttet,
@@ -102,7 +102,7 @@ fun Klagebehandling.mapToSkjemaV1(): KlagebehandlingSkjemaV1 {
         sistEndretTidspunkt = this.modified,
         kildesystem = this.kildesystem.mapToSkjemaV1(),
         saksdokumenter = listOf(),
-        vedtak = this.vedtak?.let { vedtak ->
+        vedtak = this.vedtak.let { vedtak ->
             KlagebehandlingSkjemaV1.Vedtak(
                 utfall = vedtak.utfall?.mapToSkjemaV1(),
                 hjemler = vedtak.hjemler.map { it.mapToSkjemaV1() },

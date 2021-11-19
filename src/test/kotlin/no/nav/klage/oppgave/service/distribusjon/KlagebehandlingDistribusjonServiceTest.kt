@@ -4,6 +4,7 @@ import brave.Tracer
 import com.ninjasquad.springmockk.MockkBean
 import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
+import io.mockk.mockk
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
@@ -178,7 +179,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
     @Test
     fun `distribusjon av klagebehandling fører til avsluttet klagebehandling`() {
 
-        every { kafkaEventRepository.save(any()) } returns null
+        every { kafkaEventRepository.save(any()) } returns mockk()
         every { kabalDocumentGateway.fullfoerDokumentEnhet(any()) } returns Unit
         every { kabalDocumentGateway.getJournalpostIdForHovedadressat(any()) } returns journalpostId
 

@@ -13,7 +13,7 @@ class ByUserStrategy(private val innloggetSaksbehandlerRepository: InnloggetSaks
 
     override fun getName(): String = "byUserId"
 
-    override fun isEnabled(parameters: Map<String, String>?): Boolean =
+    override fun isEnabled(parameters: MutableMap<String, String>): Boolean =
         getEnabledUsers(parameters)?.any { isCurrentUserEnabled(it) } ?: false
 
     private fun getEnabledUsers(parameters: Map<String, String>?) =

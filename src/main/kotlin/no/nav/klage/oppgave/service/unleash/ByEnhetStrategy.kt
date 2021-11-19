@@ -20,7 +20,7 @@ class ByEnhetStrategy(private val axsysGateway: AxsysGateway) : Strategy {
         return "byEnhet"
     }
 
-    override fun isEnabled(parameters: Map<String, String>): Boolean {
+    override fun isEnabled(parameters: MutableMap<String, String>): Boolean {
         return false
     }
 

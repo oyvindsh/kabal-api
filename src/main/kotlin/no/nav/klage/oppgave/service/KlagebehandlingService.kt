@@ -121,7 +121,7 @@ class KlagebehandlingService(
         klagebehandlingRepository.findByAvsluttetIsNotNull()
             .filter {
                 it.klager.partId.value == partId &&
-                        muligAnkeUtfall.contains(it.vedtak?.utfall)
+                        muligAnkeUtfall.contains(it.vedtak.utfall)
             }
             .map { it.toMuligAnke() }
 
@@ -131,7 +131,7 @@ class KlagebehandlingService(
     ): MuligAnke? {
         val klagebehandling = klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
-            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.vedtak?.utfall)
+            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.vedtak.utfall)
         ) {
             klagebehandling.toMuligAnke()
         } else {
@@ -442,7 +442,7 @@ class KlagebehandlingService(
                 )
             )
         }
-        if (klagebehandling.vedtak!!.utfall == null) {
+        if (klagebehandling.vedtak.utfall == null) {
             validationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -493,12 +493,12 @@ class KlagebehandlingService(
         !(harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling))
 
     private fun harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling: Klagebehandling) =
-        klagebehandling.vedtak?.dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(klagebehandling.vedtak.dokumentEnhetId!!)
+        klagebehandling.vedtak.dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(klagebehandling.vedtak.dokumentEnhetId!!)
 
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,
         this.tema,
-        this.vedtak?.utfall!!,
+        this.vedtak.utfall!!,
         this.innsendt!!,
         this.avsluttetAvSaksbehandler!!,
         this.klager.partId.value
