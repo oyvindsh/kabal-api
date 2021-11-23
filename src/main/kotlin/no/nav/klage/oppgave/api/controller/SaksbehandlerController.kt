@@ -160,9 +160,9 @@ class SaksbehandlerController(
     fun getMedunderskrivereForYtelse(
         @ApiParam(value = "Ytelse man trenger medunderskrivere for")
         @PathVariable ytelse: String,
-        @ApiParam(value = "Enhet man saksbehandleren jobber i")
+        @ApiParam(value = "Enhet saksbehandleren man skal finne medunderskriver til jobber i")
         @PathVariable enhet: String,
-        @ApiParam(value = "NavIdent til saksbehandleren")
+        @ApiParam(value = "NavIdent til saksbehandleren man skal finne medunderskriver til")
         @PathVariable navIdent: String,
     ): Medunderskrivere {
         logger.debug("getMedunderskrivereForYtelse is requested by $navIdent")
