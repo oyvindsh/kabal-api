@@ -46,8 +46,7 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         return SaksdataInput(
             sakenGjelder = sakenGjelder.partId.value,
             sakstype = type.id,
-            //TODO: Endre til ytelse når det er på plass i Kaka.
-            tema = ytelse.toTema().id,
+            ytelseId = ytelse.id,
             mottattKlageinstans = mottattKlageinstans.toLocalDate(),
             vedtaksinstansEnhet = avsenderEnhetFoersteinstans,
             mottattVedtaksinstans = mottattFoersteinstans,
