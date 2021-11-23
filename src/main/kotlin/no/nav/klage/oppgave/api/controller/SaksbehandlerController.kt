@@ -158,9 +158,9 @@ class SaksbehandlerController(
     )
     @GetMapping("/medunderskrivere/ytelser/{ytelse}/enheter/{enhet}/ansatte/{navIdent}", produces = ["application/json"])
     fun getMedunderskrivereForYtelse(
-        @ApiParam(value = "Ytelse man trenger medunderskrivere for")
+        @ApiParam(value = "Id for ytelse man trenger medunderskrivere for")
         @PathVariable ytelse: String,
-        @ApiParam(value = "Enhet saksbehandleren man skal finne medunderskriver til jobber i")
+        @ApiParam(value = "Enhetsnr for enhet saksbehandleren man skal finne medunderskriver til jobber i")
         @PathVariable enhet: String,
         @ApiParam(value = "NavIdent til saksbehandleren man skal finne medunderskriver til")
         @PathVariable navIdent: String,
