@@ -4,10 +4,11 @@ import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
 enum class Ytelse(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
-    OMS_OMS("1", "Omsorgspenger", "Omsorgspenger"),
-    OMS_PLE("2", "Pleiepenger", "Pleiepenger"),
-    OMS_OPP("3", "Opplæringspenger", "Opplæringspenger"),
-
+    OMS_OMP("1", "Omsorgspenger", "Omsorgspenger"),
+    OMS_OLP("2", "Opplæringspenger", "Opplæringspenger"),
+    OMS_PSB("3", "Pleiepenger sykt barn", "Pleiepenger sykt barn"),
+    OMS_PLS("4", "Pleiepenger i livets sluttfase", "Pleiepenger i livets sluttfase"),
+    SYK_SYK("5", "Sykepenger", "Sykepenger")
     ;
 
 
