@@ -6,13 +6,13 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Ytelse
+import no.nav.klage.oppgave.domain.kodeverk.enheterPerYtelse
 import no.nav.klage.oppgave.domain.saksbehandler.*
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.gateway.AzureGateway
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.repositories.InnstillingerRepository
-import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
-import no.nav.klage.oppgave.repositories.ValgtEnhetRepository
+import no.nav.klage.oppgave.repositories.*
+import no.nav.klage.oppgave.util.getLogger
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,28 +25,38 @@ class SaksbehandlerService(
     private val valgtEnhetRepository: ValgtEnhetRepository,
     private val innstillingerRepository: InnstillingerRepository,
     private val tilgangService: TilgangService,
-    private val azureGateway: AzureGateway
+    private val azureGateway: AzureGateway,
+    private val enhetRepository: EnhetRepository,
 ) {
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
+
     fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
         innloggetSaksbehandlerRepository.getEnheterMedTemaerForSaksbehandler()
-
-    fun getMedunderskrivere(innloggetSaksbehandlerident: String, klagebehandling: Klagebehandling): Medunderskrivere {
-        val ident = klagebehandling.tildeling?.saksbehandlerident ?: innloggetSaksbehandlerident
-        val medunderskrivere = saksbehandlerRepository.getAlleSaksbehandlerIdenter()
-            .filter { it != ident }
-            .filter { saksbehandlerHarTilgangTilTema(it, klagebehandling.ytelse.toTema()) }
-            .filter { saksbehandlerHarTilgangTilPerson(it, klagebehandling.sakenGjelder.partId) }
-            .map { Medunderskriver(it, getNameForIdent(it)) }
-        return Medunderskrivere(klagebehandling.ytelse.toTema().id, medunderskrivere)
-    }
 
     fun getMedunderskrivere(ident: String, tema: Tema): Medunderskrivere {
         val medunderskrivere = saksbehandlerRepository.getAlleSaksbehandlerIdenter()
             .filter { it != ident }
             .filter { saksbehandlerHarTilgangTilTema(it, tema) }
             .map { Medunderskriver(it, getNameForIdent(it)) }
-        return Medunderskrivere(tema.id, medunderskrivere)
+        return Medunderskrivere(tema = tema.id, ytelse = null, medunderskrivere = medunderskrivere)
     }
+
+    fun getMedunderskrivere(ident: String, enhetId: String, ytelse: Ytelse): Medunderskrivere =
+        if (enheterPerYtelse.contains(ytelse)) {
+            val medunderskrivere = enheterPerYtelse[ytelse]!!
+                .flatMap { enhetRepository.getAnsatteIEnhet(it) }
+                .filter { it != ident }
+                .distinct()
+                .map { Medunderskriver(it, getNameForIdent(it)) }
+            Medunderskrivere(tema = null, ytelse = ytelse.id, medunderskrivere = medunderskrivere)
+        } else {
+            logger.error("Ytelsen $ytelse har ingen registrerte enheter i systemet vårt")
+            Medunderskrivere(tema = null, ytelse = ytelse.id, medunderskrivere = emptyList())
+        }
 
     private fun saksbehandlerHarTilgangTilPerson(ident: String, partId: PartId): Boolean =
         if (partId.type == PartIdType.VIRKSOMHET) {
