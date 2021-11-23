@@ -13,7 +13,6 @@ enum class Ytelse(override val id: String, override val navn: String, override v
     SYK_SYK("5", "Sykepenger", "Sykepenger")
     ;
 
-
     companion object {
         fun of(id: String): Ytelse {
             return values().firstOrNull { it.id == id }
@@ -28,6 +27,23 @@ enum class Ytelse(override val id: String, override val navn: String, override v
         }
     }
 }
+
+val ytelserPerEnhet = mapOf(
+    "4203" to listOf(Ytelse.SYK_SYK),
+    "4205" to listOf(Ytelse.SYK_SYK),
+    "4207" to listOf(),
+    "4214" to listOf(Ytelse.SYK_SYK),
+    "4219" to listOf(Ytelse.OMS_OMP, Ytelse.OMS_PLS, Ytelse.OMS_PSB, Ytelse.OMS_OLP),
+    "4250" to listOf(),
+)
+
+val enheterPerYtelse = mapOf(
+    Ytelse.SYK_SYK to listOf("4203", "4205", "4214"),
+    Ytelse.OMS_OMP to listOf("4219"),
+    Ytelse.OMS_PLS to listOf("4219"),
+    Ytelse.OMS_PSB to listOf("4219"),
+    Ytelse.OMS_OLP to listOf("4219"),
+)
 
 object LovligeYtelser {
     private val lovligeYtelserIProdGcp = EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS)

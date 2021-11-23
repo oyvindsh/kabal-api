@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.mapper.mapToView
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Ytelse
 import no.nav.klage.oppgave.exceptions.NotMatchingUserException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -138,8 +139,39 @@ class SaksbehandlerController(
         return if (environment.activeProfiles.contains("prod-gcp")) {
             saksbehandlerService.getMedunderskrivere(navIdent, Tema.of(tema))
         } else Medunderskrivere(
-            tema,
-            listOf(
+            tema = tema,
+            ytelse = null,
+            medunderskrivere = listOf(
+                Medunderskriver("Z994488", "F_Z994488, E_Z994488"),
+                Medunderskriver("Z994330", "F_Z994330 E_Z994330"),
+                Medunderskriver("Z994861", "F_Z994861 E_Z994861"),
+                Medunderskriver("Z994864", "F_Z994864 E_Z994864"),
+                Medunderskriver("Z994863", "F_Z994863 E_Z994863"),
+                Medunderskriver("Z994862", "F_Z994862 E_Z994862"),
+            ).filter { it.ident != navIdent }
+        )
+    }
+
+    @ApiOperation(
+        value = "Hent medunderskriver for en ansatt",
+        notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for en gitt ytelse."
+    )
+    @GetMapping("/medunderskrivere/ytelser/{ytelse}/enheter/{enhet}/ansatte/{navIdent}", produces = ["application/json"])
+    fun getMedunderskrivereForYtelse(
+        @ApiParam(value = "Id for ytelse man trenger medunderskrivere for")
+        @PathVariable ytelse: String,
+        @ApiParam(value = "Enhetsnr for enhet saksbehandleren man skal finne medunderskriver til jobber i")
+        @PathVariable enhet: String,
+        @ApiParam(value = "NavIdent til saksbehandleren man skal finne medunderskriver til")
+        @PathVariable navIdent: String,
+    ): Medunderskrivere {
+        logger.debug("getMedunderskrivereForYtelse is requested by $navIdent")
+        return if (environment.activeProfiles.contains("prod-gcp")) {
+            saksbehandlerService.getMedunderskrivere(navIdent, enhet, Ytelse.of(ytelse))
+        } else Medunderskrivere(
+            tema = null,
+            ytelse = ytelse,
+            medunderskrivere = listOf(
                 Medunderskriver("Z994488", "F_Z994488, E_Z994488"),
                 Medunderskriver("Z994330", "F_Z994330 E_Z994330"),
                 Medunderskriver("Z994861", "F_Z994861 E_Z994861"),
