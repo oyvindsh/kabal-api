@@ -112,7 +112,7 @@ class KlagebehandlingServiceTest {
             val klage = simpleInsert()
 
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
 
             assertThat(
                 klagebehandlingService.getKlagebehandlingForUpdate(
@@ -127,7 +127,7 @@ class KlagebehandlingServiceTest {
             val klage = simpleInsert()
 
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }.throws(
                 KlagebehandlingAvsluttetException("")
             )
@@ -144,7 +144,7 @@ class KlagebehandlingServiceTest {
             val klagebehandlingId = klagebehandling.id
 
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
 
@@ -174,7 +174,7 @@ class KlagebehandlingServiceTest {
 
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
 
             assertThrows<KlagebehandlingManglerMedunderskriverException> {
                 klagebehandlingService.switchMedunderskriverFlyt(
@@ -191,7 +191,7 @@ class KlagebehandlingServiceTest {
 
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
             klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -215,7 +215,7 @@ class KlagebehandlingServiceTest {
 
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
             klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -240,7 +240,7 @@ class KlagebehandlingServiceTest {
 
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
             klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -269,7 +269,7 @@ class KlagebehandlingServiceTest {
 
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
             klagebehandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -301,7 +301,7 @@ class KlagebehandlingServiceTest {
             val klagebehandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
             assertThrows<KlagebehandlingFinalizedException> {
@@ -317,7 +317,7 @@ class KlagebehandlingServiceTest {
             val klagebehandling = simpleInsert(false)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
 
@@ -334,7 +334,7 @@ class KlagebehandlingServiceTest {
             val klagebehandling = simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = false)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
             every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
@@ -353,7 +353,7 @@ class KlagebehandlingServiceTest {
                 simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = true, hjemler = false)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
             every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
@@ -377,7 +377,7 @@ class KlagebehandlingServiceTest {
             )
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
             every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
@@ -394,7 +394,7 @@ class KlagebehandlingServiceTest {
             val klagebehandling = simpleInsert(dokumentEnhetId = true)
             every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
             every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
             every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()

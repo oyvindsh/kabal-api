@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.clients.axsys
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTemaer
 import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeTemaer
+import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.core.env.Environment
@@ -36,4 +37,7 @@ class TilgangerMapper(environment: Environment) {
             logger.warn("Unable to map Tema $tema. Ignoring and moving on", e)
             null
         }
+
+    fun mapTilgangerToEnheter(tilganger: Tilganger): List<Enhet> =
+        tilganger.enheter.map { enhet -> Enhet(enhet.enhetId, enhet.navn) }
 }

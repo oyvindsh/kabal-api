@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.kodeverk.Tema
+import no.nav.klage.oppgave.domain.kodeverk.Ytelse
 import no.nav.klage.oppgave.exceptions.KlagebehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -58,15 +58,15 @@ class TilgangService(
         }
     }
 
-    fun verifySaksbehandlersTilgangTilEnhetOgTema(saksbehandlerIdent: String, enhetId: String, tema: Tema) {
-        if (!saksbehandlerRepository.harTilgangTilEnhetOgTema(saksbehandlerIdent, enhetId, tema)) {
-            throw MissingTilgangException("Saksbehandler har ikke tilgang til tema $tema i enhet $enhetId")
+    fun verifySaksbehandlersTilgangTilEnhetOgYtelse(saksbehandlerIdent: String, enhetId: String, ytelse: Ytelse) {
+        if (!saksbehandlerRepository.harTilgangTilEnhetOgYtelse(saksbehandlerIdent, enhetId, ytelse)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse i enhet $enhetId")
         }
     }
 
-    fun verifyInnloggetSaksbehandlersTilgangTilTema(tema: Tema) {
-        if (!innloggetSaksbehandlerRepository.harTilgangTilTema(tema)) {
-            throw MissingTilgangException("Saksbehandler har ikke tilgang til tema $tema")
+    fun verifyInnloggetSaksbehandlersTilgangTilYtelse(ytelse: Ytelse) {
+        if (!innloggetSaksbehandlerRepository.harTilgangTilYtelse(ytelse)) {
+            throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse")
         }
     }
 

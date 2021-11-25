@@ -43,7 +43,7 @@ class KlagebehandlingService(
         if (klagebehandling.sakenGjelder.erPerson()) {
             tilgangService.verifyInnloggetSaksbehandlersTilgangTil(klagebehandling.sakenGjelder.partId.value)
         }
-        tilgangService.verifyInnloggetSaksbehandlersTilgangTilTema(klagebehandling.ytelse.toTema())
+        tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(klagebehandling.ytelse)
     }
 
     private fun checkMedunderskriverStatus(klagebehandling: Klagebehandling) {
@@ -63,10 +63,10 @@ class KlagebehandlingService(
         tildeltEnhetId: String,
         klagebehandling: Klagebehandling
     ) {
-        tilgangService.verifySaksbehandlersTilgangTilEnhetOgTema(
+        tilgangService.verifySaksbehandlersTilgangTilEnhetOgYtelse(
             tildeltSaksbehandlerIdent,
             tildeltEnhetId,
-            klagebehandling.ytelse.toTema()
+            klagebehandling.ytelse
         )
     }
 
