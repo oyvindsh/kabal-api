@@ -52,7 +52,7 @@ class TilgangService(
     }
 
     fun verifyInnloggetSaksbehandlersTilgangTilEnhet(enhetId: String) {
-        //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
+        //TODO: Burde man sjekket tilgang til EnhetOgYtelse, ikke bare enhet?
         if (!innloggetSaksbehandlerRepository.harTilgangTilEnhet(enhetId)) {
             throw MissingTilgangException("Saksbehandler har ikke tilgang til enhet $enhetId")
         }

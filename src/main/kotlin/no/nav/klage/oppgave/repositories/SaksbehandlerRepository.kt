@@ -1,11 +1,9 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.kodeverk.Tema
 import no.nav.klage.oppgave.domain.kodeverk.Ytelse
 import no.nav.klage.oppgave.domain.kodeverk.ytelserPerEnhet
 import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeYtelser
-import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
 import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeYtelser
 import no.nav.klage.oppgave.gateway.AxsysGateway
 import no.nav.klage.oppgave.gateway.AzureGateway
