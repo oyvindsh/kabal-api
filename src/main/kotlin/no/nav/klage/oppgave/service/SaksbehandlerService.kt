@@ -43,6 +43,7 @@ class SaksbehandlerService(
             val medunderskrivere = enheterPerYtelse[ytelse]!!
                 .flatMap { enhetRepository.getAnsatteIEnhet(it) }
                 .filter { it != ident }
+                .filter { saksbehandlerRepository.erSaksbehandler(it) }
                 .distinct()
                 .map { Medunderskriver(it, getNameForIdent(it)) }
             Medunderskrivere(tema = null, ytelse = ytelse.id, medunderskrivere = medunderskrivere)
