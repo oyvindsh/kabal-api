@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.domain.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.kodeverk.Tema
@@ -50,6 +49,7 @@ class SaksbehandlerService(
             val medunderskrivere = enheterPerYtelse[ytelse]!!
                 .flatMap { enhetRepository.getAnsatteIEnhet(it) }
                 .filter { it != ident }
+                .filter { saksbehandlerRepository.erSaksbehandler(it) }
                 .distinct()
                 .map { Medunderskriver(it, getNameForIdent(it)) }
             Medunderskrivere(tema = null, ytelse = ytelse.id, medunderskrivere = medunderskrivere)
