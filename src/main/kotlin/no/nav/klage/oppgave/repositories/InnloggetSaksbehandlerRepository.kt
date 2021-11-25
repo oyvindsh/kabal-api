@@ -1,7 +1,8 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.oppgave.domain.kodeverk.Tema
-import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeTemaer
+import no.nav.klage.oppgave.domain.kodeverk.Ytelse
+import no.nav.klage.oppgave.domain.saksbehandler.Enhet
+import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeYtelser
 import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -21,8 +22,11 @@ class InnloggetSaksbehandlerRepository(
     @Value("\${ROLE_ADMIN}") private val adminRole: String
 ) {
 
-    fun getEnheterMedTemaerForSaksbehandler(): EnheterMedLovligeTemaer =
-        saksbehandlerRepository.getEnheterMedTemaerForSaksbehandler(getInnloggetIdent())
+    fun getEnheterMedYtelserForSaksbehandler(): EnheterMedLovligeYtelser =
+        saksbehandlerRepository.getEnheterMedYtelserForSaksbehandler(getInnloggetIdent())
+
+    fun getEnheterForSaksbehandler(): List<Enhet> =
+        saksbehandlerRepository.getEnheterForSaksbehandler(getInnloggetIdent())
 
     fun getInnloggetIdent() = tokenUtil.getIdent()
 
@@ -47,12 +51,12 @@ class InnloggetSaksbehandlerRepository(
         return saksbehandlerRepository.harTilgangTilEnhet(getInnloggetIdent(), enhetId)
     }
 
-    fun harTilgangTilTema(tema: Tema): Boolean {
-        return saksbehandlerRepository.harTilgangTilTema(getInnloggetIdent(), tema)
+    fun harTilgangTilYtelse(ytelse: Ytelse): Boolean {
+        return saksbehandlerRepository.harTilgangTilYtelse(getInnloggetIdent(), ytelse)
     }
 
-    fun harTilgangTilEnhetOgTema(enhetId: String, tema: Tema): Boolean {
-        return saksbehandlerRepository.harTilgangTilEnhetOgTema(getInnloggetIdent(), enhetId, tema)
+    fun harTilgangTilEnhetOgYtelse(enhetId: String, ytelse: Ytelse): Boolean {
+        return saksbehandlerRepository.harTilgangTilEnhetOgYtelse(getInnloggetIdent(), enhetId, ytelse)
     }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }

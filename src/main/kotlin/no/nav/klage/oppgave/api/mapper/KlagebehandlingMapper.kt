@@ -100,9 +100,9 @@ class KlagebehandlingMapper(
         )
     }
 
-    private fun berikSaksbehandler(saksbehandlerident: String?): SaksbehandlerRefView? {
+    private fun berikSaksbehandler(saksbehandlerident: String?): SaksbehandlerView? {
         return saksbehandlerident?.let {
-            SaksbehandlerRefView(it, saksbehandlerRepository.getNameForSaksbehandler(it))
+            SaksbehandlerView(it, saksbehandlerRepository.getNameForSaksbehandler(it))
         }
     }
 

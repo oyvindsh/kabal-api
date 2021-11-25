@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.api.mapper
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import no.nav.klage.oppgave.api.view.SaksbehandlerRefView
+import no.nav.klage.oppgave.api.view.SaksbehandlerView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
@@ -65,7 +65,7 @@ class KlagebehandlingMapperTest {
         val result = klagebehandlingMapper.mapToMedunderskriverInfoView(klagebehandling)
 
         assertThat(result.medunderskriver).isEqualTo(
-            SaksbehandlerRefView(
+            SaksbehandlerView(
                 MEDUNDERSKRIVER_IDENT,
                 MEDUNDERSKRIVER_NAVN
             )

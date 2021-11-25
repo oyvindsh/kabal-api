@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.view.Saksbehandlertildeling
 import no.nav.klage.oppgave.api.view.TildelingEditedView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -41,7 +42,7 @@ class KlagebehandlingAssignmentController(
         val klagebehandling = klagebehandlingService.assignKlagebehandling(
             klagebehandlingId,
             saksbehandlertildeling.navIdent,
-            saksbehandlertildeling.angittEnhetOrDefault(),
+            saksbehandlertildeling.getEnhetOrThrowException().enhetId,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
         return TildelingEditedView(
@@ -71,9 +72,9 @@ class KlagebehandlingAssignmentController(
         )
     }
 
-    // Vi har bestemt at det er greit å hente dette fra db, men jeg beholder muligheten her til å sende det inn fra frontend "just in case".. :)
-    private fun Saksbehandlertildeling.angittEnhetOrDefault(): String =
-        enhetId ?: saksbehandlerService.findValgtEnhet(innloggetSaksbehandlerRepository.getInnloggetIdent()).enhetId
+    private fun Saksbehandlertildeling.getEnhetOrThrowException(): Enhet =
+        saksbehandlerService.getEnheterForSaksbehandler(navIdent).find { it.enhetId == enhetId }
+            ?: throw IllegalArgumentException("Saksbehandler med ident  $navIdent har ikke tilgang til enhet $enhetId")
 
 }
 
