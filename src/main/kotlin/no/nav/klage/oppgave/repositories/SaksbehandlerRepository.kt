@@ -68,7 +68,8 @@ class SaksbehandlerRepository(
         if (ytelserPerEnhet.containsKey(enhet.enhetId)) {
             ytelserPerEnhet[enhet.enhetId]!!
         } else {
-            logger.error("Fant ikke noen ytelse for enhet $enhet. Dette må legges til i kodebasen sporenstraks!")
+            //TODO: Gå gjennom logger når vi mangler info her.
+            logger.info("Fant ikke noen ytelse for enhet $enhet. Dette må legges til i kodebasen sporenstraks!")
             emptyList()
         }
 
