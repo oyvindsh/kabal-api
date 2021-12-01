@@ -90,11 +90,15 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: kabal-frontend
-        - application: klage-dittnav-api
-        - application: k9-klage
-          namespace: k9saksbehandling
-          cluster: {{k9_cluster}}
+      { { #each inboundApplications}}
+          - application: {{application } }
+      { { #if namespace}}
+        namespace: {{namespace } }
+      {{/if}}
+      { { #if cluster}}
+        cluster: {{cluster } }
+      {{/if}}
+      {{/each}}
     outbound:
       rules:
         - application: kabal-document

@@ -10,6 +10,9 @@ acl:
   - team: k9saksbehandling
     application: k9-klage
     access: read
+  - team: supstonad
+    application: su-se-bakover
+    access: read
   - team: klage
     application: klage-kafka-manager
     access: read
