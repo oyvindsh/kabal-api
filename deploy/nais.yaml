@@ -92,12 +92,12 @@ spec:
       rules:
       {{#each inboundApplications}}
         - application: {{application}}
-        {{#if namespace}}
+          {{#if namespace}}
           namespace: {{namespace}}
-        {{/if}}
-        {{#if cluster}}
+          {{/if}}
+          {{#if cluster}}
           cluster: {{cluster}}
-        {{/if}}
+          {{/if}}
       {{/each}}
     outbound:
       rules:
