@@ -1,26 +1,50 @@
 # Integrere med Kabal
+
+## Oversikt
+
+Diagram som beskriver grunnleggende klageflyt fra innsendt klage via nav.no:
 ![](klage_teknisk.png "Dataflyt")
 
-## Kort fortalt
-
-- Klage kommer inn via skjema på nav.no
-- Klage arkiveres i JOARK
-- Melding om innkommen klage sendes på JOARK sitt kafka-topic
 - Førsteinstans håndterer klage i sin vedtaksløsning
-- Dersom klage skal videre til klageinstans gjøres en POST på `kabal-api`
-- Når klage er ferdig behandlet på klageinstans, legges en melding på et kafka-topic
+- Dersom klage skal videre til klageinstans gjøres en POST til `kabal-api`
+- Når klage er ferdig behandlet av klageinstansen (KA), legges en melding med resultatet på et kafka-topic
 
-### Oversende klage til Kabal
+## Oversende klage til Kabal
 
-````
+### Azure
+
+Vedtaksapplikasjonen må være en "azure-app" (i nais.yaml):
+
+```
+azure:
+  application:
+    enabled: true
+```
+
+`kabal-api` må konfigurere tilgang til vedtaksappen. Derfor trenger klage-teamet info om: `cluster`, `namespace`
+og `appnavn` i Kubernetes.
+
+Kall mot kabal-api må inneholde et token med scope:
+
+```
+api://{cluster}.klage.kabal-api/.default
+```
+
+Dokumentasjon fra nais: https://security.labs.nais.io/pages/guide/api-kall/maskin_til_maskin_uten_bruker.html
+
+### Oversendelse til kabal-api
+
+```
 POST <kabal-api-url>/oversendelse/klage <oversendt-klage-json>
-````
+```
+
 - DEV-url: `https://kabal-api.dev.nav.no`
 - PROD-url: `https://kabal-api.intern.nav.no`
 
 Skjema for oversendt klage kan finnes [her](https://kabal-api.dev.nav.no/swagger-ui/?urls.primaryName=external#/).
 
 Eksempel
+
 ````
 {
   "avsenderEnhet": "2312",
@@ -40,7 +64,7 @@ Eksempel
   ],
   "innsendtTilNav": "2021-04-26",
   "innsynUrl": "https://k9-sak.adeo.no/behandling/12345678",
-  "kilde": "K9-sak",
+  "kilde": "K9",
   "kildeReferanse": "687687",
   "klager": {
     "id": {
@@ -65,7 +89,7 @@ Eksempel
     },
     "skalMottaKopi": true
   },
-  "tema": "OMS",
+  "ytelse": "OMS_OMP",
   "tilknyttedeJournalposter": [
     {
       "journalpostId": "830498203",
@@ -76,15 +100,19 @@ Eksempel
 }
 ````
 
-### Klage-vedtak på Kafka
+### Motta resultat/vedtak fra KA på Kafka
 
 Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1` kan finnes [her](../schema/klagevedtak-fattet.json).
 
 Eksempel
-````
+
+```
 {
-    "id": "1234",
-    "utfall": "MEDHOLD",
-    "vedtaksbrevReferanse": "34567657"
+    "eventId": "b79cae6f-4afc-4f51-9e0b-623bb53f1805"
+    "kildeReferanse": "23da11e6-8130-4edc-acee-2eb2a5fd4d97"
+    "kilde": "AO01"
+    "utfall": "MEDHOLD"
+    "vedtaksbrevReferanse": "510857598"
+    "kabalReferanse": "af4204bb-7f2c-4354-8af9-b279a5492104"
 }
-````
+```

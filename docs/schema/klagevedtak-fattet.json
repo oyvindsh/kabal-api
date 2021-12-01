@@ -6,10 +6,17 @@
   "type": "object",
   "required": [
     "id",
+    "kildeReferanse",
     "utfall",
     "vedtaksbrevReferanse"
   ],
   "properties": {
+    "eventId": {
+      "$id": "#KlagevedtakFattet/eventId",
+      "title": "EventId",
+      "type": "string",
+      "description": "Unik id for eventen som sendte vedtaket fra Kabal."
+    },
     "kildeReferanse": {
       "$id": "#KlagevedtakFattet/kildeReferanse",
       "title": "Kildereferanse",
@@ -48,7 +55,7 @@
       "$id": "#KlagevedtakFattet/kabalReferanse",
       "title": "Kabalreferanse",
       "type": "string",
-      "description": "Intern referanse fra kabal. Skal i fremtiden brukes for å hente data om vedtak fra Kabal (se Swagger doc)"
+      "description": "Intern referanse fra kabal. Kan i fremtiden brukes for å hente data om vedtak fra Kabal (se Swagger doc)"
     }
   }
 }
