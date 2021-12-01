@@ -90,14 +90,14 @@ spec:
   accessPolicy:
     inbound:
       rules:
-      { { #each inboundApplications}}
-          - application: {{application } }
-      { { #if namespace}}
-        namespace: {{namespace } }
-      {{/if}}
-      { { #if cluster}}
-        cluster: {{cluster } }
-      {{/if}}
+      {{#each inboundApplications}}
+        - application: {{application}}
+        {{#if namespace}}
+          namespace: {{namespace}}
+        {{/if}}
+        {{#if cluster}}
+          cluster: {{cluster}}
+        {{/if}}
       {{/each}}
     outbound:
       rules:
