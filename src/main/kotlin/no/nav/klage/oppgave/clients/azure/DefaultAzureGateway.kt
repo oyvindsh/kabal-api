@@ -72,6 +72,7 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
 
     override fun getRollerForSaksbehandlerMedIdent(navIdent: String): List<SaksbehandlerRolle> =
         try {
+            logger.info("Finding roles for ident $navIdent")
             microsoftGraphClient.getSaksbehandlersGroups(navIdent)
                 .map { SaksbehandlerRolle(it.id, it.displayName ?: it.mailNickname ?: it.id) }
         } catch (e: Exception) {
