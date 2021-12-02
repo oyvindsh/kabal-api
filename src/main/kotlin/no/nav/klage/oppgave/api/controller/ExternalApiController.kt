@@ -37,13 +37,13 @@ class ExternalApiController(
     }
 
     @ApiOperation(
-        value = "Hent informasjon om en klagebehandling",
-        notes = "Endepunkt for å se detaljert informasjon om en klagebehandling fra "
+        value = "Hent informasjon om en klagebehandling. Ikke implementert.",
+        notes = "Endepunkt for å se detaljert informasjon om en klagebehandling. Ikke implementert."
     )
     @GetMapping("innsyn/v1/behandling/{id}")
     fun innsynBehandling(
         @ApiParam(value = "Id for klagebehandling")
-        @PathVariable("id") nehandlingId: String
+        @PathVariable("id") behandlingId: String
     ): String {
         return "Not implemented yet"
     }
