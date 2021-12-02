@@ -109,7 +109,12 @@ class SaksbehandlerRepository(
 
     fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleEgenAnsattRole)
 
-    private fun getRoller(ident: String): List<String> = azureGateway.getRolleIder(ident)
+    private fun getRoller(ident: String): List<String> = try {
+        azureGateway.getRolleIder(ident)
+    } catch (e: Exception) {
+        logger.warn("Failed to retrieve roller for navident $ident, using emptylist instead")
+        emptyList()
+    }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 
