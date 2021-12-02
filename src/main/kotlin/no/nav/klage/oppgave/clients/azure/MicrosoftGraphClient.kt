@@ -162,5 +162,5 @@ class MicrosoftGraphClient(
         .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
         .retrieve()
         .bodyToMono<AzureUserList>().block()?.value?.firstOrNull()?.let { secureLogger.debug("Saksbehandler: $it"); it }
-        ?: throw RuntimeException("AzureAD data about user by nav ident could not be fetched")
+        ?: throw RuntimeException("AzureAD data about user by nav ident $navIdent could not be fetched")
 }
