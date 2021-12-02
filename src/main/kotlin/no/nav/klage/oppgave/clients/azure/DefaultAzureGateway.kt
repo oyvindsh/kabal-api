@@ -40,7 +40,7 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
         val data = try {
             microsoftGraphClient.getSaksbehandler(navIdent)
         } catch (e: Exception) {
-            logger.error("Failed to call getSaksbehandler", e)
+            logger.error("Failed to call getSaksbehandler for navident $navIdent", e)
             throw e
         }
         return SaksbehandlerPersonligInfo(
@@ -76,7 +76,7 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
             microsoftGraphClient.getSaksbehandlersGroups(navIdent)
                 .map { SaksbehandlerRolle(it.id, it.displayName ?: it.mailNickname ?: it.id) }
         } catch (e: Exception) {
-            logger.error("Failed to call getSaksbehandlersGroups", e)
+            logger.error("Failed to call getSaksbehandlersGroups for navident $navIdent", e)
             throw e
         }
 
