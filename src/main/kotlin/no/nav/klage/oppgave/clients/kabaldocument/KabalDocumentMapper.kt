@@ -35,12 +35,12 @@ class KabalDocumentMapper(
             brevMottakere = mapBrevMottakere(klagebehandling),
             journalfoeringData = JournalfoeringDataInput(
                 sakenGjelder = PartIdInput(
-                    type = klagebehandling.sakenGjelder.partId.type.name,
+                    partIdTypeId = klagebehandling.sakenGjelder.partId.type.id,
                     value = klagebehandling.sakenGjelder.partId.value
                 ),
-                tema = klagebehandling.ytelse.toTema().name,
+                temaId = klagebehandling.ytelse.toTema().id,
                 sakFagsakId = klagebehandling.sakFagsakId,
-                sakFagsystem = klagebehandling.sakFagsystem?.name,
+                sakFagsystemId = klagebehandling.sakFagsystem?.id,
                 kildeReferanse = klagebehandling.id.toString(),
                 enhet = klagebehandling.tildeling!!.enhet!!,
                 behandlingstema = BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS,
@@ -95,7 +95,7 @@ class KabalDocumentMapper(
 
     private fun mapPartId(partId: PartId): PartIdInput =
         PartIdInput(
-            type = partId.type.name,
+            partIdTypeId = partId.type.id,
             value = partId.value
         )
 
