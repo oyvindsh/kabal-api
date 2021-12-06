@@ -38,7 +38,7 @@ class ByEnhetStrategy(private val axsysGateway: AxsysGateway) : Strategy {
 
     private fun getSaksbehandlersEnheter(unleashContext: UnleashContext): List<String> {
         logger.debug("Getting saksbehandlers enheter")
-        return axsysGateway.getEnheterMedTemaerForSaksbehandler(unleashContext.userId.get()).enheter
+        return axsysGateway.getEnheterForSaksbehandler(unleashContext.userId.get())
             .map { it.enhetId }
     }
 
