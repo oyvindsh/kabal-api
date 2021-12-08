@@ -41,7 +41,7 @@ POST <kabal-api-url>/oversendelse/klage <oversendt-klage-json>
 - DEV-url: `https://kabal-api.dev.nav.no`
 - PROD-url: `https://kabal-api.intern.nav.no`
 
-Skjema for oversendt klage kan finnes [her](https://kabal-api.dev.nav.no/swagger-ui/?urls.primaryName=external#/).
+[OpenAPI/Swagger doc for å sende over klager](https://kabal-api.dev.nav.no/swagger-ui/?urls.primaryName=external#/).
 
 Eksempel
 
@@ -102,7 +102,7 @@ Eksempel
 
 ### Motta resultat/vedtak fra KA på Kafka
 
-Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1` kan finnes [her](../schema/klagevedtak-fattet.json).
+[Skjema for klage-vedtak sendt på `klage.vedtak-fattet.v1`](../schema/klagevedtak-fattet.json).
 
 Eksempel
 
