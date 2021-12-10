@@ -16,7 +16,6 @@ import kotlin.system.measureTimeMillis
 class SaksbehandlerRepository(
     private val azureGateway: AzureGateway,
     private val axsysGateway: AxsysGateway,
-    @Value("\${ROLE_GOSYS_OPPGAVE_BEHANDLER}") private val gosysSaksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
     @Value("\${ROLE_KLAGE_LEDER}") private val lederRole: String,
@@ -98,9 +97,7 @@ class SaksbehandlerRepository(
 
     fun erLeder(ident: String): Boolean = getRoller(ident).hasRole(lederRole)
 
-    fun erSaksbehandler(ident: String): Boolean =
-        getRoller(ident).hasRole(saksbehandlerRole)
-                || getRoller(ident).hasRole(gosysSaksbehandlerRole)
+    fun erSaksbehandler(ident: String): Boolean = getRoller(ident).hasRole(saksbehandlerRole)
 
     fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleFortroligRole)
 
