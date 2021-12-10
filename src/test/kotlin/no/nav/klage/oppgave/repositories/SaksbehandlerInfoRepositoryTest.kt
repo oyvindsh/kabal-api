@@ -16,7 +16,7 @@ internal class SaksbehandlerInfoRepositoryTest {
     private val msClient: AzureGateway = mockk()
 
     private val repo: SaksbehandlerRepository =
-        SaksbehandlerRepository(msClient, axsysGateway, "", "", "", "", "", "", "", "")
+        SaksbehandlerRepository(msClient, axsysGateway, "", "", "", "", "", "", "")
 
     @Test
     fun harTilgangTilEnhetOgYtelse() {
