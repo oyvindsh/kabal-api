@@ -14,6 +14,7 @@ data class SaksdataInput(
     val utfall: String,
     val hjemler: List<String>,
     val utfoerendeSaksbehandler: String,
+    val tilknyttetEnhet: String,
     val kvalitetsvurderingId: UUID,
     val avsluttetAvSaksbehandler: LocalDateTime,
 )
