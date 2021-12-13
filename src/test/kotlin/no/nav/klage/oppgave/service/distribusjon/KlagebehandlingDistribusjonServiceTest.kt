@@ -111,7 +111,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
     private val fnr = "12345678910"
     private val journalpostId = "5678"
 
-    @SpykBean
+    @MockkBean(relaxed = true)
     lateinit var kafkaEventRepository: KafkaEventRepository
 
     @SpykBean
