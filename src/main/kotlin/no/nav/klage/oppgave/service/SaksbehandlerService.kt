@@ -45,7 +45,7 @@ class SaksbehandlerService(
                 .filter { it != ident }
                 .filter { saksbehandlerRepository.erSaksbehandler(it) }
                 .distinct()
-                .map { Medunderskriver(it, getNameForIdent(it)) }
+                .map { Medunderskriver(it, it, getNameForIdent(it)) }
             Medunderskrivere(tema = null, ytelse = ytelse.id, medunderskrivere = medunderskrivere)
         } else {
             logger.error("Ytelsen $ytelse har ingen registrerte enheter i systemet vårt")
