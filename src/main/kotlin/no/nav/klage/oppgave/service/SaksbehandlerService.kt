@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Ytelse
-import no.nav.klage.kodeverk.enheterPerYtelse
+import no.nav.klage.kodeverk.ytelseTilKlageenheter
 import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
 import no.nav.klage.oppgave.domain.klage.PartId
@@ -39,9 +39,9 @@ class SaksbehandlerService(
         saksbehandlerRepository.getEnheterForSaksbehandler(navIdent)
 
     fun getMedunderskrivere(ident: String, enhetId: String, ytelse: Ytelse): Medunderskrivere =
-        if (enheterPerYtelse.contains(ytelse)) {
-            val medunderskrivere = enheterPerYtelse[ytelse]!!
-                .flatMap { enhetRepository.getAnsatteIEnhet(it) }
+        if (ytelseTilKlageenheter.contains(ytelse)) {
+            val medunderskrivere = ytelseTilKlageenheter[ytelse]!!
+                .flatMap { enhetRepository.getAnsatteIEnhet(it.navn) }
                 .filter { it != ident }
                 .filter { saksbehandlerRepository.erSaksbehandler(it) }
                 .distinct()
