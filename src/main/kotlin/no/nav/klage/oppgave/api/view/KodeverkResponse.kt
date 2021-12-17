@@ -15,9 +15,6 @@ data class KodeverkResponse(
 //    val rolle: List<Kode> = Rolle.values().asList().toDto(),
     val fagsystem: List<Kode> = Fagsystem.values().asList().toDto(),
     val hjemmel: List<Kode> = getHjemlerAsKoder(),
-
-    //TODO remove when not in use by FE
-    val ytelse: List<Kode> = Ytelse.values().asList().toDto(),
 )
 
 fun getYtelser(): List<YtelseKode> =
