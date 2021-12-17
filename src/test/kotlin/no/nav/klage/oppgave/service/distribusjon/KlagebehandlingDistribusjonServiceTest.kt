@@ -148,7 +148,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
         type = Type.KLAGE,
         frist = LocalDate.now(),
         hjemler = mutableSetOf(
-            Hjemmel.FTL_8_7
+            Hjemmel.FTRL_8_7
         ),
         created = LocalDateTime.now(),
         modified = LocalDateTime.now(),

@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.api.view
 
 import no.nav.klage.kodeverk.*
-import no.nav.klage.kodeverk.hjemmel.*
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
+import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemler
 
 data class KodeverkResponse(
     val registreringshjemler: List<KodeDto> = getRegistreringshjemler(),
@@ -12,12 +14,7 @@ data class KodeverkResponse(
     val partIdType: List<Kode> = PartIdType.values().asList().toDto(),
 //    val rolle: List<Kode> = Rolle.values().asList().toDto(),
     val fagsystem: List<Kode> = Fagsystem.values().asList().toDto(),
-
-    //TODO remove when not in use by FE
-    val hjemlerPerYtelse: List<HjemlerPerYtelse> = hjemlerPerYtelse(),
-    val hjemlerPerTema: List<HjemlerPerTema> = hjemlerPerTema(),
-    val ytelse: List<Kode> = Ytelse.values().asList().toDto(),
-    val hjemmel: List<Kode> = Hjemmel.values().asList().toDto(),
+    val hjemmel: List<Kode> = getHjemlerAsKoder(),
 )
 
 fun getYtelser(): List<YtelseKode> =
@@ -65,15 +62,16 @@ data class HjemmelDto(val id: String, val navn: String)
 
 data class KodeDto(override val id: String, override val navn: String, override val beskrivelse: String) : Kode
 
-data class HjemlerPerTema(val temaId: String, val hjemler: List<KodeDto>)
-
-data class HjemlerPerYtelse(val ytelseId: String, val hjemler: List<KodeDto>)
-
 fun Kode.toDto() = KodeDto(id, navn, beskrivelse)
 
 fun List<Kode>.toDto() = map { it.toDto() }
 
-fun hjemlerPerTema(): List<HjemlerPerTema> = hjemlerPerTema.map { HjemlerPerTema(it.tema.id, it.hjemler.toDto()) }
-
-fun hjemlerPerYtelse(): List<HjemlerPerYtelse> =
-    hjemlerPerYtelse.map { HjemlerPerYtelse(it.ytelse.id, it.hjemler.toDto()) }
+fun getHjemlerAsKoder(): List<Kode> {
+    return Hjemmel.values().map {
+        KodeDto(
+            id = it.id,
+            navn = it.lovKilde.beskrivelse + " - " + it.spesifikasjon,
+            beskrivelse = it.lovKilde.navn + " - " + it.spesifikasjon,
+        )
+    }
+}

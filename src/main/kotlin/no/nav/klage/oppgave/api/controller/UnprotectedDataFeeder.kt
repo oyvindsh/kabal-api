@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.api.view.OversendtKlage
+import no.nav.klage.oppgave.api.view.OversendtKlageV1
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -24,11 +24,11 @@ class UnprotectedDataFeeder(
     @Unprotected
     @PostMapping("/internal/manualfeed")
     fun sendInnKlageV1(
-        @Valid @RequestBody oversendtKlage: OversendtKlage
+        @Valid @RequestBody oversendtKlage: OversendtKlageV1
     ) {
         logger.warn("Data manually fed to Kabal through unprotected endpoint")
         secureLogger.warn("Data $oversendtKlage fed to Kabal through unprotected endpoint")
-        mottakService.createMottakForKlage(oversendtKlage)
+        mottakService.createMottakForKlageV1(oversendtKlage)
     }
 
 }

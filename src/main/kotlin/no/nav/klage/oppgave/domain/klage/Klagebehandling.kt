@@ -91,8 +91,6 @@ class Klagebehandling(
     var kvalitetsvurderingId: UUID? = null,
     @Column(name = "kaka_kvalitetsvurdering_id", nullable = true)
     var kakaKvalitetsvurderingId: UUID? = null,
-
-    //Not in use?
     @ElementCollection(targetClass = Hjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "klagebehandling_hjemmel",

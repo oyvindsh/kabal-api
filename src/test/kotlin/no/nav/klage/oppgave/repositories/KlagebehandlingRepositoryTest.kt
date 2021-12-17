@@ -67,7 +67,7 @@ class KlagebehandlingRepositoryTest {
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
-                Hjemmel.FTL_8_7
+                Hjemmel.FTRL_8_7
             ),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
@@ -114,7 +114,7 @@ class KlagebehandlingRepositoryTest {
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
-                Hjemmel.FTL_8_7
+                Hjemmel.FTRL_8_7
             ),
             saksdokumenter = mutableSetOf(
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
@@ -168,7 +168,7 @@ class KlagebehandlingRepositoryTest {
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = mutableSetOf(
-                Hjemmel.FTL_8_7
+                Hjemmel.FTRL_8_7
             ),
             saksdokumenter = mutableSetOf(
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),

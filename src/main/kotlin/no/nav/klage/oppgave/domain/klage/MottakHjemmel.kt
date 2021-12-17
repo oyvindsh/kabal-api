@@ -1,21 +1,18 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.kodeverk.hjemmel.LovKilde
 import java.util.*
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
 
 @Entity
 @Table(name = "mottak_hjemmel", schema = "klage")
 class MottakHjemmel(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "lov")
-    @Enumerated(EnumType.STRING)
-    val lov: LovKilde,
-    @Column(name = "kapittel")
-    val kapittel: Int?,
-    @Column(name = "paragraf")
-    val paragraf: Int?
+    @Column(name = "hjemmel_id")
+    val hjemmelId: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
