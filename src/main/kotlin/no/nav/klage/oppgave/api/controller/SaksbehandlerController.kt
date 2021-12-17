@@ -6,15 +6,14 @@ import io.swagger.annotations.ApiParam
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.api.view.Medunderskriver
 import no.nav.klage.oppgave.api.view.Medunderskrivere
+import no.nav.klage.oppgave.api.view.MedunderskrivereInput
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.core.env.Environment
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 @RestController
@@ -28,6 +27,36 @@ class SaksbehandlerController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+
+    @ApiOperation(
+        value = "Hent medunderskriver for en ansatt",
+        notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for en gitt ytelse pg fnr."
+    )
+    @PostMapping(
+        "/medunderskrivere",
+        produces = ["application/json"]
+    )
+    fun getMedunderskrivereForYtelseOgFnr(
+        @RequestBody input: MedunderskrivereInput
+    ): Medunderskrivere {
+        val innloggetSaksbehandlerNavIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        logger.debug("getMedunderskrivereForYtelseOgFnr is requested by $innloggetSaksbehandlerNavIdent")
+        return if (environment.activeProfiles.contains("prod-gcp")) {
+            saksbehandlerService.getMedunderskrivere(input.navIdent, input.enhet, Ytelse.of(input.ytelse), input.fnr)
+        } else Medunderskrivere(
+            tema = null,
+            ytelse = input.ytelse,
+            medunderskrivere = listOf(
+                Medunderskriver("Z994488", "Z994488", "F_Z994488, E_Z994488"),
+                Medunderskriver("Z994330", "Z994330", "F_Z994330 E_Z994330"),
+                Medunderskriver("Z994861", "Z994861", "F_Z994861 E_Z994861"),
+                Medunderskriver("Z994864", "Z994864", "F_Z994864 E_Z994864"),
+                Medunderskriver("Z994863", "Z994863", "F_Z994863 E_Z994863"),
+                Medunderskriver("Z994862", "Z994862", "F_Z994862 E_Z994862"),
+            ).filter { it.ident != input.navIdent }
+        )
     }
 
     @ApiOperation(

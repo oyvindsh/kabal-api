@@ -107,6 +107,14 @@ class SaksbehandlerRepository(
         emptyList()
     }
 
+    fun getSaksbehandlereSomKanBehandleFortrolig(): List<String> =
+        azureGateway.getGroupMembersNavIdents(kanBehandleFortroligRole)
+
+
+    fun getSaksbehandlereSomKanBehandleEgenAnsatt(): List<String> =
+        azureGateway.getGroupMembersNavIdents(kanBehandleEgenAnsattRole)
+
+
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 
     fun getNameForSaksbehandler(navIdent: String): String {
