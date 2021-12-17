@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.kodeverk.hjemmel.KapittelOgParagraf
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
@@ -241,7 +240,7 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 vedtak = Vedtak(),
                 kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(),
-                hjemler = createHjemmelSetFromMottak(mottak.hjemmelListe),
+                hjemler = createHjemmelSetFromMottak(mottak.hjemler),
                 saksdokumenter = createSaksdokumenter(mottak),
                 kildesystem = mottak.kildesystem,
                 kommentarFraFoersteinstans = mottak.kommentar
@@ -260,7 +259,7 @@ class KlagebehandlingService(
         if (hjemler == null || hjemler.isEmpty()) {
             mutableSetOf(Hjemmel.MANGLER)
         } else {
-            hjemler.mapNotNull { mapMottakHjemmel(it) }.toMutableSet()
+            hjemler.map { Hjemmel.of(it.hjemmelId) }.toMutableSet()
         }
 
 
@@ -268,24 +267,6 @@ class KlagebehandlingService(
         partId = this.partId.copy(),
         skalMottaKopi = false // Siden denne nå peker på samme som klager trenger ikke brev sendes
     )
-
-
-    private fun mapMottakHjemmel(hjemmel: MottakHjemmel): Hjemmel? {
-        return try {
-            val lov = hjemmel.lov
-            val kapittelOgParagraf = mapKapittelOgParagraf(hjemmel.kapittel, hjemmel.paragraf)
-            Hjemmel.of(lov, kapittelOgParagraf)
-        } catch (e: Exception) {
-            logger.warn("Unable to map hjemmel", hjemmel, e)
-            null
-        }
-    }
-
-    private fun mapKapittelOgParagraf(kapittel: Int?, paragraf: Int?): KapittelOgParagraf? {
-        return if (kapittel != null) {
-            KapittelOgParagraf(kapittel, paragraf)
-        } else null
-    }
 
     private fun createSaksdokumenter(mottak: Mottak): MutableSet<Saksdokument> {
         val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf()

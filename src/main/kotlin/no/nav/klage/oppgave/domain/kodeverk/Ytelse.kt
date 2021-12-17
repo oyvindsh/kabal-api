@@ -5,7 +5,8 @@ import org.springframework.core.env.Environment
 import java.util.*
 
 object LovligeYtelser {
-    private val lovligeYtelserIProdGcp = EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS)
+    private val lovligeYtelserIProdGcp =
+        EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS)
     private val lovligeYtelserIDevGcp =
         EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS, Ytelse.SYK_SYK)
 

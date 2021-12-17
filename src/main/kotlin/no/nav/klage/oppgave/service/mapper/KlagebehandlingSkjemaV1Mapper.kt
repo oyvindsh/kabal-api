@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service.mapper
 
 import no.nav.klage.kodeverk.Kode
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.klage.*
 import java.time.LocalDate
@@ -73,6 +74,14 @@ private fun Kode.mapToSkjemaV1(): KlagebehandlingSkjemaV1.Kode {
     )
 }
 
+private fun Hjemmel.mapToSkjemaV1(): KlagebehandlingSkjemaV1.Kode {
+    return KlagebehandlingSkjemaV1.Kode(
+        id = id,
+        navn = lovKilde.beskrivelse + " - " + spesifikasjon,
+        beskrivelse = lovKilde.navn + " - " + spesifikasjon,
+    )
+}
+
 private fun Registreringshjemmel.mapToSkjemaV1(): KlagebehandlingSkjemaV1.Kode {
     return KlagebehandlingSkjemaV1.Kode(
         id = id,
@@ -92,7 +101,7 @@ fun Klagebehandling.mapToSkjemaV1(): KlagebehandlingSkjemaV1 {
         ytelse = ytelse.mapToSkjemaV1(),
         type = type.mapToSkjemaV1(),
         kildeReferanse = kildeReferanse,
-        sakFagsystem = sakFagsystem?.let { it.mapToSkjemaV1() },
+        sakFagsystem = sakFagsystem?.mapToSkjemaV1(),
         sakFagsakId = sakFagsakId,
         innsendtDato = innsendt,
         mottattFoersteinstansDato = mottattFoersteinstans,

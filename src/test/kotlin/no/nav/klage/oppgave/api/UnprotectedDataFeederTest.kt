@@ -38,7 +38,7 @@ class UnprotectedDataFeederTest {
     fun setup() {
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns "H149390"
         every { unleash.isEnabled(any(), any<UnleashContext>()) } returns true
-        every { mottakService.createMottakForKlage(any()) } returns Unit
+        every { mottakService.createMottakForKlageV1(any()) } returns Unit
     }
 
     @Test

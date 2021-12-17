@@ -35,7 +35,7 @@ class Mottak(
     val innsynUrl: String? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
-    val hjemmelListe: MutableSet<MottakHjemmel>? = null,
+    val hjemler: Set<MottakHjemmel>? = null,
     @Column(name = "avsender_saksbehandlerident")
     val avsenderSaksbehandlerident: String? = null,
     @Column(name = "avsender_enhet")

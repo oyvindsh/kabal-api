@@ -3,7 +3,8 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import no.nav.klage.oppgave.api.view.OversendtKlage
+import no.nav.klage.oppgave.api.view.OversendtKlageV1
+import no.nav.klage.oppgave.api.view.OversendtKlageV2
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.klage.oppgave.util.getLogger
@@ -31,9 +32,21 @@ class ExternalApiController(
     @PostMapping("/oversendelse/v1/klage")
     fun sendInnKlageV1(
         @ApiParam(value = "Oversendt klage")
-        @Valid @RequestBody oversendtKlage: OversendtKlage
+        @Valid @RequestBody oversendtKlage: OversendtKlageV1
     ) {
-        mottakService.createMottakForKlage(oversendtKlage)
+        mottakService.createMottakForKlageV1(oversendtKlage)
+    }
+
+    @ApiOperation(
+        value = "Send inn klage til klageinstans",
+        notes = "Endepunkt for å registrere en klage/anke som skal behandles av klageinstans"
+    )
+    @PostMapping("/oversendelse/v2/klage")
+    fun sendInnKlageV2(
+        @ApiParam(value = "Oversendt klage")
+        @Valid @RequestBody oversendtKlage: OversendtKlageV2
+    ) {
+        mottakService.createMottakForKlageV2(oversendtKlage)
     }
 
     @ApiOperation(

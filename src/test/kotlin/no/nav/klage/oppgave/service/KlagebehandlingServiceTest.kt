@@ -440,7 +440,7 @@ class KlagebehandlingServiceTest {
             type = Type.KLAGE,
             frist = LocalDate.now(),
             hjemler = if (hjemler) mutableSetOf(
-                Hjemmel.FTL_8_7
+                Hjemmel.FTRL_8_7
             ) else mutableSetOf(),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),

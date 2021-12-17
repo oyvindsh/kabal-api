@@ -4,7 +4,7 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
-import no.nav.klage.kodeverk.hjemmel.LovKilde
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import org.assertj.core.api.Assertions.assertThat
@@ -47,7 +47,7 @@ class MottakRepositoryTest {
             sakFagsakId = "12345",
             kildeReferanse = "54321",
             dvhReferanse = "5342523",
-            hjemmelListe = mutableSetOf(MottakHjemmel(lov = LovKilde.FOLKETRYGDLOVEN, kapittel = 8, paragraf = 4)),
+            hjemler = mutableSetOf(MottakHjemmel(hjemmelId = Hjemmel.FTRL_8_7.id)),
             avsenderSaksbehandlerident = "Z123456",
             avsenderEnhet = "1234",
             mottakDokument = mutableSetOf(

@@ -2,7 +2,9 @@ package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans.Lov.FOLKETRYGDLOVEN
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.service.MottakService
@@ -39,7 +41,7 @@ class MockDataController(
             SyntheticWithDoc("14437830275", "510534823"),
             SyntheticWithDoc("18418507701", "510534797"),
             SyntheticWithDoc("12518603068", "510534824")
-        ).shuffled().first()
+        ).random()
 
         val fnr = dollyDoc.fnr
         val journalpostId = dollyDoc.journalpost
@@ -47,15 +49,42 @@ class MockDataController(
 
         val dato = LocalDate.of(2020, (1..12).random(), (1..28).random())
 
-        mottakService.createMottakForKlage(
-            OversendtKlage(
-                ytelse = listOf(
-                    Ytelse.SYK_SYK,
-                    Ytelse.OMS_OLP,
-                    Ytelse.OMS_OMP,
-                    Ytelse.OMS_PLS,
-                    Ytelse.OMS_PSB
-                ).shuffled().first(),
+        val randomYtelse = listOf(
+            Ytelse.SYK_SYK,
+            Ytelse.OMS_OLP,
+            Ytelse.OMS_OMP,
+            Ytelse.OMS_PLS,
+            Ytelse.OMS_PSB
+        ).random()
+
+        val randomHjemmelList = if (randomYtelse == Ytelse.SYK_SYK) {
+            listOf(
+                listOf(
+                    Hjemmel.FTRL_8_2,
+                    Hjemmel.FTRL_8_3,
+                    Hjemmel.FTRL_8_4,
+                    Hjemmel.FTRL_8_8,
+                    Hjemmel.FTRL_8_13,
+                )
+                    .random()
+            )
+        } else {
+            listOf(
+                listOf(
+                    Hjemmel.FTRL_8_13,
+                    Hjemmel.FTRL_9_2,
+                    Hjemmel.FTRL_9_3,
+                    Hjemmel.FTRL_9_11,
+                    Hjemmel.FTRL_9_14,
+                    Hjemmel.FTRL_22_13
+                )
+                    .random()
+            )
+        }
+
+        mottakService.createMottakForKlageV2(
+            OversendtKlageV2(
+                ytelse = randomYtelse,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
@@ -68,14 +97,7 @@ class MockDataController(
                 },
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
-                hjemler = listOf(
-                    listOf(
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
-                    ).shuffled().first()
-                ),
+                hjemler = randomHjemmelList,
                 avsenderSaksbehandlerIdent = "Z994674",
                 avsenderEnhet = "0104", //NAV Moss
                 tilknyttedeJournalposter = listOf(
@@ -99,8 +121,8 @@ class MockDataController(
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
-        mottakService.createMottakForKlage(
-            OversendtKlage(
+        mottakService.createMottakForKlageV1(
+            OversendtKlageV1(
                 ytelse = Ytelse.OMS_OMP,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
@@ -116,10 +138,10 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 35)
                     ).shuffled().first()
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -145,8 +167,8 @@ class MockDataController(
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
-        mottakService.createMottakForKlage(
-            OversendtKlage(
+        mottakService.createMottakForKlageV1(
+            OversendtKlageV1(
                 ytelse = Ytelse.OMS_PSB,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
@@ -162,10 +184,10 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 35)
                     ).shuffled().first()
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",
@@ -191,8 +213,8 @@ class MockDataController(
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
-        mottakService.createMottakForKlage(
-            OversendtKlage(
+        mottakService.createMottakForKlageV1(
+            OversendtKlageV1(
                 ytelse = Ytelse.OMS_OLP,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
@@ -212,10 +234,10 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(Lov.FOLKETRYGDLOVEN, 8, 35)
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 4),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 21),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 22),
+                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 35)
                     ).shuffled().first()
                 ),
                 avsenderSaksbehandlerIdent = "Z994674",

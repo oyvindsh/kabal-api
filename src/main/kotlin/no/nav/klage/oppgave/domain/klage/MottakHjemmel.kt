@@ -11,11 +11,13 @@ class MottakHjemmel(
     val id: UUID = UUID.randomUUID(),
     @Column(name = "lov")
     @Enumerated(EnumType.STRING)
-    val lov: LovKilde,
+    val lov: LovKilde? = null,
     @Column(name = "kapittel")
-    val kapittel: Int?,
+    val kapittel: Int? = null,
     @Column(name = "paragraf")
-    val paragraf: Int?
+    val paragraf: Int? = null,
+    @Column(name = "hjemmel_id")
+    val hjemmelId: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
