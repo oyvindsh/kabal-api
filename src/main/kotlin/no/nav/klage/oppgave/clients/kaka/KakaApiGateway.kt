@@ -32,8 +32,7 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         logger.debug("Getting kvalitetsvurdering validation errors")
         return kakaApiClient.getValidationErrors(
             klagebehandling.kakaKvalitetsvurderingId!!,
-            //TODO: Endre til ytelse når dette er på plass i Kaka.
-            klagebehandling.ytelse.toTema().id
+            klagebehandling.ytelse.id
         ).validationErrors.map {
             InvalidProperty(
                 field = it.field,
