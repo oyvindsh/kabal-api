@@ -32,10 +32,10 @@ class SaksbehandlerController(
 
     @ApiOperation(
         value = "Hent medunderskriver for en ansatt",
-        notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for en gitt ytelse pg fnr."
+        notes = "Henter alle medunderskrivere som saksbehandler er knyttet til for en gitt ytelse og fnr."
     )
     @PostMapping(
-        "/medunderskrivere",
+        "/search//medunderskrivere",
         produces = ["application/json"]
     )
     fun getMedunderskrivereForYtelseOgFnr(
@@ -49,7 +49,7 @@ class SaksbehandlerController(
             tema = null,
             ytelse = input.ytelse,
             medunderskrivere = listOf(
-                Medunderskriver("Z994488", "Z994488", "F_Z994488, E_Z994488"),
+                Medunderskriver("Z994488", "Z994488", "F_Z994488 E_Z994488"),
                 Medunderskriver("Z994330", "Z994330", "F_Z994330 E_Z994330"),
                 Medunderskriver("Z994861", "Z994861", "F_Z994861 E_Z994861"),
                 Medunderskriver("Z994864", "Z994864", "F_Z994864 E_Z994864"),
