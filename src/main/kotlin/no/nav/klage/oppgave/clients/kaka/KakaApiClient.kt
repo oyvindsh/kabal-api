@@ -50,12 +50,12 @@ class KakaApiClient(
             .block() ?: throw RuntimeException("Saksdata could not be created")
     }
 
-    fun getValidationErrors(kvalitetsvurderingId: UUID, temaId: String): ValidationErrors {
+    fun getValidationErrors(kvalitetsvurderingId: UUID, ytelseId: String): ValidationErrors {
         logger.debug("Getting validation errors from kaka-api")
         return kakaApiWebClient.get()
             .uri {
                 it.path("/kabal/kvalitetsvurdering/{kvalitetsvurderingId}/validationerrors")
-                    .queryParam("temaId", temaId)
+                    .queryParam("ytelseId", ytelseId)
                     .build(kvalitetsvurderingId)
             }
             .header(
