@@ -8,7 +8,7 @@ object LovligeYtelser {
     private val lovligeYtelserIProdGcp =
         EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS)
     private val lovligeYtelserIDevGcp =
-        EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS, Ytelse.SYK_SYK)
+        EnumSet.of(Ytelse.OMS_OMP, Ytelse.OMS_OLP, Ytelse.OMS_PSB, Ytelse.OMS_PLS, Ytelse.SYK_SYK, Ytelse.SUP_UFF)
 
     fun lovligeYtelser(environment: Environment): EnumSet<Ytelse> =
         if (environment.activeProfiles.contains("prod-gcp")) {
