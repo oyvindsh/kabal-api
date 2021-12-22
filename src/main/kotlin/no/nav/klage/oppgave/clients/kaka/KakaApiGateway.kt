@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.clients.kaka
 
+import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.oppgave.clients.kaka.model.request.SaksdataInput
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.exceptions.InvalidProperty
@@ -42,19 +43,22 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
     }
 
     private fun Klagebehandling.toSaksdataInput(): SaksdataInput {
+        val vedtaksinstansEnhet = Enhet.values().find { it.navn == avsenderEnhetFoersteinstans }
+        val tilknyttetEnhet = Enhet.values().find { it.navn == tildeling?.enhet!! }
+
         return SaksdataInput(
             sakenGjelder = sakenGjelder.partId.value,
             sakstype = type.id,
             ytelseId = ytelse.id,
             mottattKlageinstans = mottattKlageinstans.toLocalDate(),
-            vedtaksinstansEnhet = avsenderEnhetFoersteinstans,
+            vedtaksinstansEnhet = vedtaksinstansEnhet!!.id,
             mottattVedtaksinstans = mottattFoersteinstans,
             utfall = vedtak.utfall!!.id,
             registreringshjemler = vedtak.hjemler.map { it.id },
             kvalitetsvurderingId = kakaKvalitetsvurderingId!!,
             avsluttetAvSaksbehandler = avsluttetAvSaksbehandler!!,
             utfoerendeSaksbehandler = tildeling?.saksbehandlerident!!,
-            tilknyttetEnhet = tildeling?.enhet!!
+            tilknyttetEnhet = tilknyttetEnhet!!.id
         )
     }
 }
