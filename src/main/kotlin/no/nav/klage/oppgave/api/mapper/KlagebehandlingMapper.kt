@@ -78,6 +78,7 @@ class KlagebehandlingMapper(
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandler = berikSaksbehandler(klagebehandling.tildeling?.saksbehandlerident),
+            tildeltSaksbehandlerEnhet = klagebehandling.tildeling?.enhet,
             medunderskriverident = klagebehandling.medunderskriver?.saksbehandlerident,
             medunderskriver = berikSaksbehandler(klagebehandling.medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
