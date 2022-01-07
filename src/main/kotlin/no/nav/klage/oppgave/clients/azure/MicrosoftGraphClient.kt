@@ -25,7 +25,7 @@ class MicrosoftGraphClient(
         private val secureLogger = getSecureLogger()
 
         private const val userSelect =
-            "onPremisesSamAccountName,displayName,givenName,surname,mail,officeLocation,userPrincipalName,id,jobTitle"
+            "onPremisesSamAccountName,displayName,givenName,surname,mail,officeLocation,userPrincipalName,id,jobTitle,streetAddress"
 
         private const val slimUserSelect = "userPrincipalName,onPremisesSamAccountName,displayName"
 

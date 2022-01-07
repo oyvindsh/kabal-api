@@ -122,7 +122,10 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(ex, createProblem(ex), request)
 
     @ExceptionHandler
-    fun handleDuplicateOversendelse(ex: DuplicateOversendelseException, request: NativeWebRequest): ResponseEntity<Problem> =
+    fun handleDuplicateOversendelse(
+        ex: DuplicateOversendelseException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
         create(Status.CONFLICT, ex, request)
 
     @ExceptionHandler
@@ -147,11 +150,19 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.NOT_FOUND, ex, request)
 
     @ExceptionHandler
+    fun handleEnhetNotFoundForSaksbehandlerException(
+        ex: EnhetNotFoundForSaksbehandlerException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.INTERNAL_SERVER_ERROR, ex, request)
+
+    @ExceptionHandler
     fun handleSectionedValidationErrorWithDetailsException(
         ex: SectionedValidationErrorWithDetailsException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(ex, createSectionedValidationProblem(ex), request)
+
 
     private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
         return Problem.builder()

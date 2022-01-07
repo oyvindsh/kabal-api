@@ -1,11 +1,14 @@
 package no.nav.klage.oppgave.clients.azure
 
+import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerPersonligInfo
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerRolle
+import no.nav.klage.oppgave.exceptions.EnhetNotFoundForSaksbehandlerException
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
+import no.nav.klage.kodeverk.Enhet as KodeverkEnhet
 
 @Service
 class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient) : AzureGateway {
@@ -49,7 +52,8 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
             data.givenName,
             data.surname,
             data.displayName,
-            data.mail
+            data.mail,
+            mapToEnhet(data.streetAddress),
         )
     }
 
@@ -66,7 +70,8 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
             data.givenName,
             data.surname,
             data.displayName,
-            data.mail
+            data.mail,
+            mapToEnhet(data.streetAddress),
         )
     }
 
@@ -89,5 +94,9 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
             throw e
         }
 
+    private fun mapToEnhet(enhetNr: String): Enhet =
+        KodeverkEnhet.values().find { it.navn == enhetNr }
+            ?.let { Enhet(it.navn, it.beskrivelse) }
+            ?: throw EnhetNotFoundForSaksbehandlerException("Enhet ikke funnet med enhetNr $enhetNr")
 
 }
