@@ -13,9 +13,11 @@ import javax.persistence.*
 class Vedtak(
     @Id
     val id: UUID = UUID.randomUUID(),
+    //Skal overføres til neste delbehandling.
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     var utfall: Utfall? = null,
+    //Registreringshjemler. Overføres til neste delbehandling.
     @ElementCollection(targetClass = Registreringshjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "vedtak_hjemmel",
@@ -29,10 +31,14 @@ class Vedtak(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
+    //Overføres ikke. Innstillingsbrev fra første delbehandling vil dukke oppe i saksdokumenter-lista.
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
+    //Vent med vurdering. Mulig det skal være draft på tvers av delbehandlinger.
     @Column(name = "smart_editor_id")
     var smartEditorId: String? = null,
+
+    //Legg til journalpostId på resultat-dokument, returnert fra kabal-document.
 ) {
     override fun toString(): String {
         return "Vedtak(id=$id, " +

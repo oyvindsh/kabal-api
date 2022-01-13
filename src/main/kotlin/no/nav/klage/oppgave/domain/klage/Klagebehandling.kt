@@ -38,23 +38,38 @@ class Klagebehandling(
     val sakFagsystem: Fagsystem? = null,
     @Column(name = "sak_fagsak_id")
     val sakFagsakId: String? = null,
+    //Umulig å vite innsendt-dato.
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
+    //Brukes ikke i anke
     @Column(name = "dato_mottatt_foersteinstans")
     val mottattFoersteinstans: LocalDate,
+
+    //Mulig at identen ikke brukes. Sjekk om dette kan droppes.
     @Column(name = "avsender_saksbehandlerident_foersteinstans")
     val avsenderSaksbehandleridentFoersteinstans: String? = null,
+    //Vises i GUI.
     @Column(name = "avsender_enhet_foersteinstans")
     val avsenderEnhetFoersteinstans: String,
+
+    //Settes automatisk i klage, må kunne justeres i anke. Bør også representeres i delbehandling. Må gjøres entydig i anke, hører antageligvis ikke hjemme i felles klasse.
     @Column(name = "dato_mottatt_klageinstans")
     val mottattKlageinstans: LocalDateTime,
+
+    //Teknisk avsluttet, når alle prosesser er gjennomførte. Bør muligens heller utledes av status på delbehandlinger.
     @Column(name = "dato_behandling_avsluttet")
     var avsluttet: LocalDateTime? = null,
+
+    //Bør være i delbehandling
     @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
     var avsluttetAvSaksbehandler: LocalDateTime? = null,
+
     //TODO: Trenger denne være nullable? Den blir da alltid satt i createKlagebehandlingFromMottak?
+    //Litt usikkert om dette hører mest hjemme her eller på delbehandling.
     @Column(name = "frist")
     var frist: LocalDate? = null,
+
+    //Hører hjemme på delbehandling
     @Embedded
     @AttributeOverrides(
         value = [
@@ -63,9 +78,11 @@ class Klagebehandling(
         ]
     )
     var medunderskriver: MedunderskriverTildeling? = null,
+    //Hører hjemme på delbehandling
     @Column(name = "medunderskriverflyt_id")
     @Convert(converter = MedunderskriverflytConverter::class)
     var medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
+    //Hører hjemme på delbehandling, men her er det mer usikkerhet enn for medunderskriver. Litt om pragmatikken, bør se hva som er enklest å få til.
     @Embedded
     @AttributeOverrides(
         value = [
@@ -75,20 +92,25 @@ class Klagebehandling(
         ]
     )
     var tildeling: Tildeling? = null,
+    //Hører hjemme på delbehandling, men her er det mer usikkerhet enn for medunderskriver
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
     val tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
+    //Hører hjemme på delbehandling
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
     val medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
+    //Hovedbehandling
     @Column(name = "mottak_id")
     val mottakId: UUID,
+    //Skal være en kvalitetsvurdering per hovedbehandling, derfor er dette riktig sted.
     @Column(name = "kaka_kvalitetsvurdering_id", nullable = true)
     var kakaKvalitetsvurderingId: UUID? = null,
+    //Dette er søkehjemler, input fra førsteinstans. For anker bør vel dette være samme detaljnivået som i registreringshjemler? Blir det da ulike typer for klage og anke? Må ta diskusjonen videre.
     @ElementCollection(targetClass = Hjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "klagebehandling_hjemmel",
@@ -98,9 +120,12 @@ class Klagebehandling(
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
     val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    //Her går vi mot en løsning der en behandling har flere delbehandlinger, som nok er bedre begrep enn vedtak.
+    //Trenger en markering av hvilken delbehandling som er den gjeldende.
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "vedtak_id", referencedColumnName = "id")
     val vedtak: Vedtak,
+    //Liste med dokumenter fra Joark. De dokumentene saksbehandler krysser av for havner her. Bør være i delbehandling. Kopierer fra forrige når ny delbehandling opprettes.
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "klagebehandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
@@ -110,9 +135,11 @@ class Klagebehandling(
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
     var modified: LocalDateTime = LocalDateTime.now(),
+    //Kommer fra innsending
     @Column(name = "kildesystem")
     @Convert(converter = FagsystemConverter::class)
     val kildesystem: Fagsystem,
+    //Kommer fra innsending
     @Column(name = "kommentar_fra_foersteinstans")
     val kommentarFraFoersteinstans: String? = null
 ) {
