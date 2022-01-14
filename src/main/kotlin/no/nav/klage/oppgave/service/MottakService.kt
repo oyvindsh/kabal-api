@@ -13,7 +13,7 @@ import no.nav.klage.oppgave.domain.kodeverk.LovligeYtelser
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
-import no.nav.klage.oppgave.repositories.EnhetRepository
+import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -30,7 +30,7 @@ class MottakService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
-    private val enhetRepository: EnhetRepository,
+    private val azureGateway: AzureGateway,
     private val meterRegistry: MeterRegistry
 ) {
 
@@ -119,10 +119,10 @@ class MottakService(
         }
     }
 
-    private fun validateSaksbehandler(saksbehandlerident: String, enhet: String) {
-        if (enhetRepository.getAnsatteIEnhet(enhet).none { it.equals(saksbehandlerident, ignoreCase = true) }) {
+    private fun validateSaksbehandler(saksbehandlerident: String, enhetNr: String) {
+        if (azureGateway.getPersonligDataOmSaksbehandlerMedIdent(saksbehandlerident).enhet.enhetId != enhetNr) {
             //throw OversendtKlageNotValidException("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
-            logger.warn("$saksbehandlerident er ikke saksbehandler i enhet $enhet")
+            logger.warn("$saksbehandlerident er ikke saksbehandler i enhet $enhetNr")
         }
     }
 
