@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients.azure
 
 import no.nav.klage.oppgave.domain.saksbehandler.Enhet
+import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerIdent
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerPersonligInfo
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerRolle
 import no.nav.klage.oppgave.exceptions.EnhetNotFoundForSaksbehandlerException
@@ -21,6 +22,10 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
 
     override fun getRolleIder(ident: String): List<String> {
         return getRollerForSaksbehandlerMedIdent(ident).map { it.id }
+    }
+
+    override fun getAnsatteIEnhet(enhetNr: String): List<SaksbehandlerIdent> {
+        return microsoftGraphClient.getEnhetensAnsattesNavIdents(enhetNr).map { SaksbehandlerIdent(it) }
     }
 
     override fun getGroupMembersNavIdents(groupid: String): List<String> =

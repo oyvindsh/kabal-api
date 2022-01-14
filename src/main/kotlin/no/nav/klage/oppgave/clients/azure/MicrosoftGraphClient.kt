@@ -137,6 +137,28 @@ class MicrosoftGraphClient(
             .mapNotNull { it.onPremisesSamAccountName }
     }
 
+    @Retryable
+    @Cacheable(CacheWithJCacheConfiguration.ANSATTE_I_ENHET_CACHE)
+    fun getEnhetensAnsattesNavIdents(enhetNr: String): List<String> {
+        return microsoftGraphWebClient.get()
+            .uri { uriBuilder ->
+                uriBuilder
+                    .path("/users")
+                    .queryParam("\$filter", "streetAddress in $enhetNr")
+                    .queryParam("\$count", true)
+                    .queryParam("\$top", 500)
+                    .queryParam("\$select", slimUserSelect)
+                    .build()
+            }
+            .header("Authorization", "Bearer ${tokenUtil.getAppAccessTokenWithGraphScope()}")
+            .header("ConsistencyLevel", "eventual")
+            .retrieve()
+            .bodyToMono<AzureSlimUserList>()
+            .block()
+            .let { userList -> userList?.value?.map { it.userPrincipalName } }
+            ?: throw RuntimeException("AzureAD data about authenticated user could not be fetched")
+    }
+
     private fun getGroupsByUserPrincipalName(userPrincipalName: String): List<AzureGroup> {
         val aadAzureGroups: List<AzureGroup> = microsoftGraphWebClient.get()
             .uri { uriBuilder ->

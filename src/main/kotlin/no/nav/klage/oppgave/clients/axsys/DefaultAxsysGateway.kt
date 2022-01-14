@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.gateway.AxsysGateway
 import org.springframework.stereotype.Service
 
 @Service
+@Deprecated("Vi henter data fra Azure for dette nå")
 class DefaultAxsysGateway(
     private val axsysClient: AxsysClient,
     private val tilgangerMapper: TilgangerMapper
@@ -16,7 +17,7 @@ class DefaultAxsysGateway(
         tilgangerMapper.mapTilgangerToEnheter(axsysClient.getTilgangerForSaksbehandler(ident))
             .filter { enhet -> enhet.enhetId in klageenheter.map { it.navn } }
 
-    override fun getSaksbehandlereIEnhet(enhetId: String): List<SaksbehandlerIdent> {
-        return axsysClient.getSaksbehandlereIEnhet(enhetId).map { SaksbehandlerIdent(it.appIdent) }
+    override fun getSaksbehandlereIEnhet(enhetNr: String): List<SaksbehandlerIdent> {
+        return axsysClient.getSaksbehandlereIEnhet(enhetNr).map { SaksbehandlerIdent(it.appIdent) }
     }
 }
