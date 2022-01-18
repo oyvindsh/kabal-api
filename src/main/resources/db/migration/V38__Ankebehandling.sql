@@ -1,7 +1,7 @@
 ALTER TABLE klage.behandling
-    ADD COLUMN dato_vedtak_klageinstans    DATE,
-    ADD COLUMN avsender_enhet_klageinstans TEXT,
-    ADD COLUMN forrige_klagebehandling_id  UUID;
+    ADD COLUMN klage_vedtaks_dato      DATE,
+    ADD COLUMN klage_behandlende_enhet TEXT,
+    ADD COLUMN klage_id                UUID;
 
 CREATE TABLE klage.ankebehandling_registreringshjemmel
 (
