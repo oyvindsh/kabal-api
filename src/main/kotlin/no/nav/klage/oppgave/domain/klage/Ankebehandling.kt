@@ -14,10 +14,13 @@ import javax.persistence.*
 @Entity
 @DiscriminatorValue("anke")
 class Ankebehandling(
-    @Column(name = "dato_vedtak_klageinstans")
-    val datoVedtakKlageinstans: LocalDate,
-    @Column(name = "avsender_enhet_klageinstans")
-    val avsenderEnhetKlageinstans: String,
+    @Column(name = "klage_vedtaks_dato")
+    val klageVedtaksDato: LocalDate,
+    @Column(name = "klage_behandlende_enhet")
+    val klageBehandlendeEnhet: String,
+    //Fins i noen tilfeller, men ikke alle.
+    @Column(name = "klage_id")
+    var klagebehandlingId: UUID? = null,
 
     @ElementCollection(targetClass = Registreringshjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
@@ -32,9 +35,7 @@ class Ankebehandling(
 //    Finn ut hvordan dette skal fungere i anker etter hvert
 //    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
 //    var avsluttetAvSaksbehandler: LocalDateTime? = null,
-    //Fins i noen tilfeller, men ikke alle.
-    @Column(name = "forrige_klagebehandling_id")
-    var klagebehandlingId: UUID? = null,
+
 
     //Common properties between klage/anke
     id: UUID = UUID.randomUUID(),
