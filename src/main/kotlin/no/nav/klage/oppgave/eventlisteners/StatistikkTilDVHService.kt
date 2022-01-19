@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.eventlisteners
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.kodeverk.PartIdType
-import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
+import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
@@ -31,24 +31,25 @@ class StatistikkTilDVHService(
         private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     }
 
-    fun process(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
-        if (shouldSendStats(klagebehandlingEndretEvent.endringslogginnslag)) {
+    fun process(behandlingEndretEvent: BehandlingEndretEvent) {
+        if (shouldSendStats(behandlingEndretEvent.endringslogginnslag)) {
 
-            val klagebehandling = klagebehandlingEndretEvent.klagebehandling
+            //FIXME handle anke
+            val klagebehandling = behandlingEndretEvent.behandling as Klagebehandling
             val eventId = UUID.randomUUID()
 
             val klageStatistikkTilDVH = createKlageStatistikkTilDVH(
                 eventId = eventId,
                 klagebehandling = klagebehandling,
-                klagebehandlingState = getKlagebehandlingState(klagebehandlingEndretEvent.endringslogginnslag)
+                klagebehandlingState = getKlagebehandlingState(behandlingEndretEvent.endringslogginnslag)
             )
 
             kafkaEventRepository.save(
                 KafkaEvent(
                     id = eventId,
-                    klagebehandlingId = klagebehandlingEndretEvent.klagebehandling.id,
-                    kilde = klagebehandlingEndretEvent.klagebehandling.kildesystem.navn,
-                    kildeReferanse = klagebehandlingEndretEvent.klagebehandling.kildeReferanse,
+                    klagebehandlingId = behandlingEndretEvent.behandling.id,
+                    kilde = behandlingEndretEvent.behandling.kildesystem.navn,
+                    kildeReferanse = behandlingEndretEvent.behandling.kildeReferanse,
                     status = UtsendingStatus.IKKE_SENDT,
                     jsonPayload = klageStatistikkTilDVH.toJson(),
                     type = EventType.STATS_DVH
@@ -71,7 +72,7 @@ class StatistikkTilDVHService(
             else -> KlagebehandlingState.UKJENT.also {
                 logger.warn(
                     "unknown state for klagebehandling with id {}",
-                    endringslogginnslag.first().klagebehandlingId
+                    endringslogginnslag.first().behandlingId
                 )
             }
         }
@@ -93,18 +94,18 @@ class StatistikkTilDVHService(
             behandlingStartetKA = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
             behandlingStatus = klagebehandlingState,
             behandlingType = klagebehandling.type.navn,
-            beslutter = klagebehandling.delbehandlinger.first().medunderskriver?.saksbehandlerident,
+            beslutter = klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
             endringstid = funksjoneltEndringstidspunkt,
             hjemmel = klagebehandling.hjemler.map { it.toSearchableString() },
             klager = getPart(klagebehandling.klager.partId.type, klagebehandling.klager.partId.value),
             opprinneligFagsaksystem = klagebehandling.kildesystem.navn,
             overfoertKA = klagebehandling.mottattKlageinstans.toLocalDate(),
-            resultat = klagebehandling.delbehandlinger.first().utfall?.name?.let { ExternalUtfall.valueOf(it).navn },
+            resultat = klagebehandling.currentDelbehandling().utfall?.name?.let { ExternalUtfall.valueOf(it).navn },
             sakenGjelder = getPart(klagebehandling.sakenGjelder.partId.type, klagebehandling.sakenGjelder.partId.value),
             saksbehandler = klagebehandling.tildeling?.saksbehandlerident,
             saksbehandlerEnhet = klagebehandling.tildeling?.enhet,
             tekniskTid = klagebehandling.modified,
-            vedtakId = klagebehandling.delbehandlinger.first().id.toString(),
+            vedtakId = klagebehandling.currentDelbehandling().id.toString(),
             vedtaksdato = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
             ytelseType = "TODO",
         )

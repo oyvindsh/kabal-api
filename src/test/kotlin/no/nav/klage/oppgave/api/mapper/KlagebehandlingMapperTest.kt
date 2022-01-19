@@ -92,11 +92,11 @@ class KlagebehandlingMapperTest {
 
     private fun getKlagebehandlingWithMedunderskriver(): Klagebehandling {
         return getKlagebehandling().apply {
-            delbehandlinger.first().medunderskriver = MedunderskriverTildeling(
+            currentDelbehandling().medunderskriver = MedunderskriverTildeling(
                 MEDUNDERSKRIVER_IDENT,
                 LocalDateTime.now()
             )
-            delbehandlinger.first().medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+            currentDelbehandling().medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
         }
     }
 }

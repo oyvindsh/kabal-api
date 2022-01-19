@@ -170,7 +170,7 @@ class KlagebehandlingVedtakController(
         )
         return SmartEditorIdView(
             smartEditorId = klagebehandlingService.getKlagebehandling(klagebehandlingId)
-                .delbehandlinger.first().smartEditorId
+                .currentDelbehandling().smartEditorId
         )
     }
 

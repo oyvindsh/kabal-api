@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
 import no.nav.klage.oppgave.api.mapper.KlagebehandlingMapper
-import no.nav.klage.oppgave.api.view.KlagebehandlingDetaljerView
+import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -35,11 +35,11 @@ class KlagebehandlingDetaljerController(
     }
 
     @GetMapping("/{id}/detaljer")
-    fun getKlagebehandlingDetaljer(
+    fun getBehandlingDetaljer(
         @PathVariable("id") klagebehandlingId: UUID
-    ): KlagebehandlingDetaljerView {
+    ): BehandlingDetaljerView {
         logKlagebehandlingMethodDetails(
-            "getKlagebehandlingDetaljer",
+            "getBehandlingDetaljer",
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
             klagebehandlingId,
             logger

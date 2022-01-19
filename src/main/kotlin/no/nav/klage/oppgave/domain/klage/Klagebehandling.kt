@@ -130,9 +130,9 @@ class Klagebehandling(
         return when {
             avsluttet != null -> FULLFOERT
             avsluttetAvSaksbehandler != null -> AVSLUTTET_AV_SAKSBEHANDLER
-            delbehandlinger.first().medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> SENDT_TIL_MEDUNDERSKRIVER
-            delbehandlinger.first().medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> RETURNERT_TIL_SAKSBEHANDLER
-            delbehandlinger.first().medunderskriver?.saksbehandlerident != null -> MEDUNDERSKRIVER_VALGT
+            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> SENDT_TIL_MEDUNDERSKRIVER
+            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> RETURNERT_TIL_SAKSBEHANDLER
+            currentDelbehandling().medunderskriver?.saksbehandlerident != null -> MEDUNDERSKRIVER_VALGT
             tildeling?.saksbehandlerident != null -> TILDELT
             tildeling?.saksbehandlerident == null -> IKKE_TILDELT
             else -> UKJENT

@@ -119,7 +119,7 @@ class KlagebehandlingControllerTest {
         } returns klagebehandling
         every { klagebehandlingMapper.mapToMedunderskriverFlytResponse(klagebehandling) } returns MedunderskriverFlytResponse(
             klagebehandling.modified,
-            klagebehandling.delbehandlinger.first().medunderskriverFlyt
+            klagebehandling.currentDelbehandling().medunderskriverFlyt
         )
 
         val input = KlagebehandlingMedunderskriveridentInput(
