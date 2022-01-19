@@ -80,4 +80,9 @@ abstract class Behandling(
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
     open val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
-)
+) {
+    fun currentDelbehandling(): Delbehandling {
+        //TODO anke
+        return delbehandlinger.first()
+    }
+}

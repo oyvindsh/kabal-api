@@ -7,8 +7,8 @@ import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
 import no.nav.klage.oppgave.domain.kafka.KafkaEvent
 import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttet
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
@@ -41,7 +41,7 @@ class KlagebehandlingAvslutningService(
     fun avsluttKlagebehandling(klagebehandlingId: UUID): Klagebehandling {
         val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
 
-        val journalpostId = klagebehandling.delbehandlinger.first().hovedAdressatJournalpostId
+        val journalpostId = klagebehandling.currentDelbehandling().hovedAdressatJournalpostId
 
         val eventId = UUID.randomUUID()
 
@@ -49,9 +49,9 @@ class KlagebehandlingAvslutningService(
             eventId = eventId,
             kildeReferanse = klagebehandling.kildeReferanse,
             kilde = klagebehandling.kildesystem.navn,
-            utfall = ExternalUtfall.valueOf(klagebehandling.delbehandlinger.first().utfall!!.name),
+            utfall = ExternalUtfall.valueOf(klagebehandling.currentDelbehandling().utfall!!.name),
             vedtaksbrevReferanse = journalpostId,
-            kabalReferanse = klagebehandling.delbehandlinger.first().id.toString()
+            kabalReferanse = klagebehandling.currentDelbehandling().id.toString()
         )
 
         kafkaEventRepository.save(

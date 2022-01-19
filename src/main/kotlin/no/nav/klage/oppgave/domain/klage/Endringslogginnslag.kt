@@ -22,7 +22,7 @@ class Endringslogginnslag(
     val fraVerdi: String?,
     @Column(name = "tilverdi")
     val tilVerdi: String?,
-    @Column(name = "klagebehandling_id")
+    @Column(name = "behandling_id")
     val klagebehandlingId: UUID,
     @Id
     val id: UUID = UUID.randomUUID(),
@@ -36,7 +36,7 @@ class Endringslogginnslag(
             felt: Felt,
             fraVerdi: String?,
             tilVerdi: String?,
-            klagebehandlingId: UUID,
+            behandlingId: UUID,
             tidspunkt: LocalDateTime
         ): Endringslogginnslag? {
             if ((fraVerdi == null && tilVerdi == null) || fraVerdi == tilVerdi) {
@@ -54,7 +54,7 @@ class Endringslogginnslag(
                     felt = felt,
                     fraVerdi = fraVerdi,
                     tilVerdi = tilVerdi,
-                    klagebehandlingId = klagebehandlingId,
+                    klagebehandlingId = behandlingId,
                     tidspunkt = tidspunkt
                 )
             }

@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class KlagebehandlingDetaljerView(
+data class BehandlingDetaljerView(
     val id: UUID,
     val klageInnsendtdato: LocalDate?,
     val fraNAVEnhet: String?,
@@ -49,7 +49,8 @@ data class KlagebehandlingDetaljerView(
     val egenAnsatt: Boolean,
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
-    val kvalitetsvurderingId: UUID?
+    val kvalitetsvurderingId: UUID?,
+
 ) {
     data class NavnView(
         val fornavn: String?,

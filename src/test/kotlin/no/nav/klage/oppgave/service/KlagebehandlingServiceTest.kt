@@ -162,8 +162,8 @@ class KlagebehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.delbehandlinger.first().medunderskriver?.saksbehandlerident).isNull()
-            assertThat(result.delbehandlinger.first().medunderskriverHistorikk).hasSize(1)
+            assertThat(result.currentDelbehandling().medunderskriver?.saksbehandlerident).isNull()
+            assertThat(result.currentDelbehandling().medunderskriverHistorikk).hasSize(1)
         }
     }
 
@@ -207,7 +207,7 @@ class KlagebehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.delbehandlinger.first().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
@@ -232,7 +232,7 @@ class KlagebehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assertThat(result.delbehandlinger.first().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
 
         @Test
@@ -261,7 +261,7 @@ class KlagebehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.delbehandlinger.first().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
@@ -291,7 +291,7 @@ class KlagebehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assertThat(result.delbehandlinger.first().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
     }
 
