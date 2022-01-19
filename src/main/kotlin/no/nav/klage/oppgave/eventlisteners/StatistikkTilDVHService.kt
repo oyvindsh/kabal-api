@@ -72,7 +72,7 @@ class StatistikkTilDVHService(
             else -> KlagebehandlingState.UKJENT.also {
                 logger.warn(
                     "unknown state for klagebehandling with id {}",
-                    endringslogginnslag.first().klagebehandlingId
+                    endringslogginnslag.first().behandlingId
                 )
             }
         }
