@@ -27,7 +27,7 @@ class TilgangService(
     }
 
     fun verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
-        if (klagebehandling.avsluttetAvSaksbehandler != null || klagebehandling.avsluttet != null) {
+        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().avsluttet != null) {
             throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
         val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
@@ -40,7 +40,7 @@ class TilgangService(
         ident == klagebehandling.tildeling?.saksbehandlerident
 
     fun verifySystembrukersSkrivetilgang(klagebehandling: Klagebehandling) {
-        if (klagebehandling.avsluttet != null) {
+        if (klagebehandling.currentDelbehandling().avsluttet != null) {
             throw KlagebehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
     }

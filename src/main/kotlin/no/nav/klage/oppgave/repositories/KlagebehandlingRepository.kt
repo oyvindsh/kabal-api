@@ -13,11 +13,11 @@ interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID> {
 
     fun findByMottakId(mottakId: UUID): Klagebehandling?
 
-    fun findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull(): List<Klagebehandling>
+    fun findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull(): List<Klagebehandling>
 
-    fun findByIdAndAvsluttetIsNotNull(id: UUID): Klagebehandling?
+    fun findByIdAndDelbehandlingerAvsluttetIsNotNull(id: UUID): Klagebehandling?
 
-    fun findByAvsluttetIsNotNull(): List<Klagebehandling>
+    fun findByDelbehandlingerAvsluttetIsNotNull(): List<Klagebehandling>
 
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     override fun getOne(id: UUID): Klagebehandling

@@ -31,9 +31,6 @@ class Klagebehandling(
     //Kommer fra innsending
     @Column(name = "kommentar_fra_foersteinstans")
     val kommentarFraFoersteinstans: String? = null,
-    //Bør være i delbehandlinger
-    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
-    var avsluttetAvSaksbehandler: LocalDateTime? = null,
 
     //Common properties between klage/anke
     id: UUID = UUID.randomUUID(),
@@ -49,8 +46,6 @@ class Klagebehandling(
     innsendt: LocalDate? = null,
     //Settes automatisk i klage, må kunne justeres i anke. Bør også representeres i delbehandlinger. Må gjøres entydig i anke, hører antageligvis ikke hjemme i felles klasse.
     mottattKlageinstans: LocalDateTime,
-    //Teknisk avsluttet, når alle prosesser er gjennomførte. Bør muligens heller utledes av status på delbehandlingerer.
-    avsluttet: LocalDateTime? = null,
     //TODO: Trenger denne være nullable? Den blir da alltid satt i createKlagebehandlingFromMottak?
     //Litt usikkert om dette hører mest hjemme her eller på delbehandlinger.
     frist: LocalDate? = null,
@@ -85,7 +80,6 @@ class Klagebehandling(
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,
-    avsluttet = avsluttet,
     innsendt = innsendt,
     sakFagsakId = sakFagsakId,
     sakFagsystem = sakFagsystem,
@@ -121,8 +115,8 @@ class Klagebehandling(
      */
     fun getStatus(): Status {
         return when {
-            avsluttet != null -> FULLFOERT
-            avsluttetAvSaksbehandler != null -> AVSLUTTET_AV_SAKSBEHANDLER
+            currentDelbehandling().avsluttet != null -> FULLFOERT
+            currentDelbehandling().avsluttetAvSaksbehandler != null -> AVSLUTTET_AV_SAKSBEHANDLER
             currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> SENDT_TIL_MEDUNDERSKRIVER
             currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> RETURNERT_TIL_SAKSBEHANDLER
             currentDelbehandling().medunderskriver?.saksbehandlerident != null -> MEDUNDERSKRIVER_VALGT

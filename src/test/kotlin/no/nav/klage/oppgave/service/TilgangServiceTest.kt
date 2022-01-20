@@ -56,10 +56,11 @@ class TilgangServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = UUID.randomUUID(),
-            avsluttet = LocalDateTime.now(),
             avsenderEnhetFoersteinstans = "4100",
             mottattFoersteinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
+            delbehandlinger = setOf(Delbehandling(
+                avsluttet = LocalDateTime.now(),
+            )),
         )
 
         assertThrows<KlagebehandlingAvsluttetException> {
@@ -89,10 +90,11 @@ class TilgangServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = UUID.randomUUID(),
-            avsluttetAvSaksbehandler = LocalDateTime.now(),
             avsenderEnhetFoersteinstans = "4100",
             mottattFoersteinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
+            delbehandlinger = setOf(Delbehandling(
+                avsluttetAvSaksbehandler = LocalDateTime.now(),
+            )),
         )
 
         assertThrows<KlagebehandlingAvsluttetException> {

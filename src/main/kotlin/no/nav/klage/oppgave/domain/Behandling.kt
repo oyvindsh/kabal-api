@@ -60,8 +60,6 @@ abstract class Behandling(
     open var tildeling: Tildeling? = null,
     @Column(name = "frist")
     open var frist: LocalDate? = null,
-    @Column(name = "dato_behandling_avsluttet")
-    open var avsluttet: LocalDateTime? = null,
     @Column(name = "dato_innsendt")
     open val innsendt: LocalDate? = null,
     @Column(name = "sak_fagsak_id")

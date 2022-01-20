@@ -87,11 +87,13 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattFoersteinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling(
-                    medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                    medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
-                ),
-            ))
+                delbehandlinger = setOf(
+                    Delbehandling(
+                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                        medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+                    ),
+                )
+            )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
         }
 
@@ -108,10 +110,12 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattFoersteinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling(
-                    medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                    medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
-                )),
+                delbehandlinger = setOf(
+                    Delbehandling(
+                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                        medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
+                    )
+                ),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.RETURNERT_TIL_SAKSBEHANDLER)
         }
@@ -129,9 +133,11 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattFoersteinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling(
-                    medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                )),
+                delbehandlinger = setOf(
+                    Delbehandling(
+                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                    )
+                ),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.MEDUNDERSKRIVER_VALGT)
         }
@@ -150,9 +156,11 @@ internal class KlagebehandlingTest {
                 tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now()),
                 mottattFoersteinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling(
-                    medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
-                )),
+                delbehandlinger = setOf(
+                    Delbehandling(
+                        medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
+                    )
+                ),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.TILDELT)
         }
@@ -168,12 +176,14 @@ internal class KlagebehandlingTest {
                 mottattKlageinstans = LocalDateTime.now(),
                 ytelse = Ytelse.OMS_OMP,
                 type = Type.KLAGE,
-                avsluttet = LocalDateTime.now(),
                 mottattFoersteinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling(
-                    medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                )),
+                delbehandlinger = setOf(
+                    Delbehandling(
+                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                        avsluttet = LocalDateTime.now(),
+                    )
+                ),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Klagebehandling.Status.FULLFOERT)
         }

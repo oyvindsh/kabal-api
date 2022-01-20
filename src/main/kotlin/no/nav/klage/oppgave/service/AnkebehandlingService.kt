@@ -41,7 +41,6 @@ class AnkebehandlingService(
                 innsendt = mottak.innsendtDato,
                 mottattKlageinstans = mottak.sakMottattKaDato,
                 tildeling = null,
-                avsluttet = null,
                 frist = mottak.generateFrist(),
                 mottakId = mottak.id,
                 delbehandlinger = setOf(Delbehandling()),

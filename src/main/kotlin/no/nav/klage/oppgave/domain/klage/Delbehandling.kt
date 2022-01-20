@@ -63,6 +63,10 @@ class Delbehandling(
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
     val medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
+    @Column(name = "dato_behandling_avsluttet")
+    var avsluttet: LocalDateTime? = null,
+    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
+    var avsluttetAvSaksbehandler: LocalDateTime? = null,
 ) {
     override fun toString(): String {
         return "Delbehandling(id=$id, " +

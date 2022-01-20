@@ -388,7 +388,7 @@ class KlagebehandlingServiceTest {
                 klagebehandling.id,
                 MEDUNDERSKRIVER_IDENT
             )
-            assertThat(result.avsluttetAvSaksbehandler).isNotNull
+            assertThat(result.currentDelbehandling().avsluttetAvSaksbehandler).isNotNull
         }
 
         @Test
@@ -405,7 +405,7 @@ class KlagebehandlingServiceTest {
                 klagebehandling.id,
                 MEDUNDERSKRIVER_IDENT
             )
-            assertThat(result.avsluttetAvSaksbehandler).isNotNull
+            assertThat(result.currentDelbehandling().avsluttetAvSaksbehandler).isNotNull
         }
     }
 
@@ -457,9 +457,9 @@ class KlagebehandlingServiceTest {
                 hjemler = if (hjemler) mutableSetOf(
                     Registreringshjemmel.ANDRE_TRYGDEAVTALER
                 ) else mutableSetOf(),
-                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null
+                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
+                avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
             )),
-            avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
             mottattFoersteinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet"
         )

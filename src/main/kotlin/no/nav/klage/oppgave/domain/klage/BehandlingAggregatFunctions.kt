@@ -170,12 +170,12 @@ object BehandlingAggregatFunctions {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogg)
     }
 
-    fun Klagebehandling.setAvsluttetAvSaksbehandler(
+    fun Behandling.setAvsluttetAvSaksbehandler(
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = avsluttetAvSaksbehandler
+        val gammelVerdi = currentDelbehandling().avsluttetAvSaksbehandler
         val tidspunkt = LocalDateTime.now()
-        avsluttetAvSaksbehandler = tidspunkt
+        currentDelbehandling().avsluttetAvSaksbehandler = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -191,9 +191,9 @@ object BehandlingAggregatFunctions {
     fun Behandling.setAvsluttet(
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = avsluttet
+        val gammelVerdi = currentDelbehandling().avsluttet
         val tidspunkt = LocalDateTime.now()
-        avsluttet = tidspunkt
+        currentDelbehandling().avsluttet = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(

@@ -190,6 +190,6 @@ internal class KlagebehandlingDistribusjonServiceTest {
         klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getOne(klagebehandlingId)
-        assertThat(result.avsluttet).isNotNull
+        assertThat(result.currentDelbehandling().avsluttet).isNotNull
     }
 }

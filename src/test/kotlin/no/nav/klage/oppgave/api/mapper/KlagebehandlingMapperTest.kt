@@ -83,7 +83,6 @@ class KlagebehandlingMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            avsluttet = LocalDateTime.now(),
             avsenderEnhetFoersteinstans = "4100",
             mottattFoersteinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),

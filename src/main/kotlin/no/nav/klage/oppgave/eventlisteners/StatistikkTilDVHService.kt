@@ -111,7 +111,7 @@ class StatistikkTilDVHService(
             saksbehandlerEnhet = klagebehandling.tildeling?.enhet,
             tekniskTid = klagebehandling.modified,
             vedtakId = klagebehandling.currentDelbehandling().id.toString(),
-            vedtaksdato = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
+            vedtaksdato = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
             ytelseType = "TODO",
         )
     }
@@ -124,7 +124,7 @@ class StatistikkTilDVHService(
             BehandlingState.MOTTATT -> klagebehandling.mottattKlageinstans
             BehandlingState.TILDELT_SAKSBEHANDLER -> klagebehandling.tildeling?.tidspunkt
                 ?: throw RuntimeException("tildelt mangler")
-            BehandlingState.AVSLUTTET -> klagebehandling.avsluttetAvSaksbehandler
+            BehandlingState.AVSLUTTET -> klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler
                 ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
             BehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")
