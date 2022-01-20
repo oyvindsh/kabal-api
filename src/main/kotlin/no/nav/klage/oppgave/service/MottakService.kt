@@ -45,22 +45,6 @@ class MottakService(
     }
 
     @Transactional
-    fun createMottakForKlageV1(oversendtKlage: OversendtKlageV1) {
-        secureLogger.debug("Prøver å lagre oversendtKlageV1: {}", oversendtKlage)
-        oversendtKlage.validate()
-
-        val mottak = mottakRepository.save(oversendtKlage.toMottak())
-
-        secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
-        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
-
-        applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
-
-        //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.ytelse.toTema().navn)
-    }
-
-    @Transactional
     fun createMottakForKlageV2(oversendtKlage: OversendtKlageV2) {
         secureLogger.debug("Prøver å lagre oversendtKlageV2: {}", oversendtKlage)
         oversendtKlage.validate()
@@ -91,17 +75,6 @@ class MottakService(
         //TODO: Move to outside of transaction to make sure it went well
         meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.toTema().navn)
 
-    }
-
-    fun OversendtKlageV1.validate() {
-        validateDuplicate(kilde, kildeReferanse)
-        tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-        validatePartId(klager.id)
-        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
-        validateYtelse(ytelse)
-        validateType(type)
-        validateEnhet(avsenderEnhet)
-        validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
     }
 
     fun OversendtKlageV2.validate() {
