@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.*
-import no.nav.klage.oppgave.api.view.HjemmelFraFoersteInstans.Lov.FOLKETRYGDLOVEN
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.service.MottakService
@@ -121,8 +120,8 @@ class MockDataController(
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
-        mottakService.createMottakForKlageV1(
-            OversendtKlageV1(
+        mottakService.createMottakForKlageAnkeV3(
+            OversendtKlageAnkeV3(
                 ytelse = Ytelse.OMS_OMP,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
@@ -138,21 +137,19 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 35)
+                        Hjemmel.FTRL_8_3,
+                        Hjemmel.FTRL_8_20,
+                        Hjemmel.FTRL_8_35,
                     ).shuffled().first()
                 ),
-                avsenderSaksbehandlerIdent = "Z994674",
-                avsenderEnhet = "0104", //NAV Moss
+                forrigeBehandlendeEnhet = "0104", //NAV Moss
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
                         journalpostId
                     )
                 ),
-                mottattFoersteinstans = dato,
+                brukersHenvendelseMottattNavDato = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = KildeFagsystem.AO01
             )
@@ -167,9 +164,9 @@ class MockDataController(
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
-        mottakService.createMottakForKlageV1(
-            OversendtKlageV1(
-                ytelse = Ytelse.OMS_PSB,
+        mottakService.createMottakForKlageAnkeV3(
+            OversendtKlageAnkeV3(
+                ytelse = Ytelse.OMS_OMP,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
@@ -184,21 +181,19 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 35)
+                        Hjemmel.FTRL_8_3,
+                        Hjemmel.FTRL_8_20,
+                        Hjemmel.FTRL_8_35,
                     ).shuffled().first()
                 ),
-                avsenderSaksbehandlerIdent = "Z994674",
-                avsenderEnhet = "0104", //NAV Moss
+                forrigeBehandlendeEnhet = "0104", //NAV Moss
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
                         journalpostId
                     )
                 ),
-                mottattFoersteinstans = dato,
+                brukersHenvendelseMottattNavDato = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = KildeFagsystem.AO01
             )
@@ -213,9 +208,9 @@ class MockDataController(
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
 
-        mottakService.createMottakForKlageV1(
-            OversendtKlageV1(
-                ytelse = Ytelse.OMS_OLP,
+        mottakService.createMottakForKlageAnkeV3(
+            OversendtKlageAnkeV3(
+                ytelse = Ytelse.OMS_OMP,
                 type = Type.KLAGE,
                 klager = OversendtKlager(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr),
@@ -234,21 +229,19 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 4),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 21),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 22),
-                        HjemmelFraFoersteInstans(FOLKETRYGDLOVEN, 8, 35)
+                        Hjemmel.FTRL_8_3,
+                        Hjemmel.FTRL_8_20,
+                        Hjemmel.FTRL_8_35,
                     ).shuffled().first()
                 ),
-                avsenderSaksbehandlerIdent = "Z994674",
-                avsenderEnhet = "0104", //NAV Moss
+                forrigeBehandlendeEnhet = "0104", //NAV Moss
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
                         journalpostId
                     )
                 ),
-                mottattFoersteinstans = dato,
+                brukersHenvendelseMottattNavDato = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = KildeFagsystem.AO01
             )
