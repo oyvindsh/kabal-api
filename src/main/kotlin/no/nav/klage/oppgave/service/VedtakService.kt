@@ -97,7 +97,7 @@ class VedtakService(
         )
 
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
-        if (klagebehandling.avsluttetAvSaksbehandler != null) throw VedtakFinalizedException("Klagebehandlingen er avsluttet")
+        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw VedtakFinalizedException("Klagebehandlingen er avsluttet")
 
         var oppdatertKlagebehandling = if (klagebehandling.currentDelbehandling().dokumentEnhetId == null) {
             createDokumentEnhet(klagebehandling, innloggetIdent)

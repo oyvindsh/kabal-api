@@ -3,13 +3,11 @@ package no.nav.klage.oppgave.service
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
-import no.nav.klage.oppgave.domain.kodeverk.LovligeYtelser
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
@@ -34,7 +32,6 @@ class MottakService(
     private val meterRegistry: MeterRegistry
 ) {
 
-    private val lovligeYtelserIKabal = LovligeYtelser.lovligeYtelser(environment)
     private val lovligeTyperIKabal = LovligeTyper.lovligeTyper(environment)
 
 
@@ -82,7 +79,6 @@ class MottakService(
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
         validatePartId(klager.id)
         sakenGjelder?.run { validatePartId(sakenGjelder.id) }
-        validateYtelse(ytelse)
         validateType(type)
         validateEnhet(avsenderEnhet)
         validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
@@ -93,7 +89,6 @@ class MottakService(
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
         validatePartId(klager.id)
         sakenGjelder?.run { validatePartId(sakenGjelder.id) }
-        validateYtelse(ytelse)
         validateType(type)
         validateEnhet(forrigeBehandlendeEnhet)
     }
@@ -110,12 +105,6 @@ class MottakService(
     private fun validateType(type: Type) {
         if (!lovligeTyperIKabal.contains(type)) {
             throw OversendtKlageNotValidException("Kabal kan ikke motta klager med type $type ennå")
-        }
-    }
-
-    private fun validateYtelse(ytelse: Ytelse) {
-        if (!lovligeYtelserIKabal.contains(ytelse)) {
-            throw OversendtKlageNotValidException("Kabal kan ikke motta klager med ytelse $ytelse ennå")
         }
     }
 

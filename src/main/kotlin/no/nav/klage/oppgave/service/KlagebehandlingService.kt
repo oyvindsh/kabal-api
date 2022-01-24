@@ -121,7 +121,7 @@ class KlagebehandlingService(
     fun findMuligAnkeByPartId(
         partId: String
     ): List<MuligAnke> =
-        klagebehandlingRepository.findByAvsluttetIsNotNull()
+        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
             .filter {
                 it.klager.partId.value == partId &&
                         muligAnkeUtfall.contains(it.currentDelbehandling().utfall)
@@ -132,7 +132,7 @@ class KlagebehandlingService(
         partId: String,
         klagebehandlingId: UUID
     ): MuligAnke? {
-        val klagebehandling = klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
+        val klagebehandling = klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
             klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.currentDelbehandling().utfall)
         ) {
@@ -231,7 +231,6 @@ class KlagebehandlingService(
                 avsenderSaksbehandleridentFoersteinstans = mottak.forrigeSaksbehandlerident,
                 mottattKlageinstans = mottak.sakMottattKaDato,
                 tildeling = null,
-                avsluttet = null,
                 frist = mottak.generateFrist(),
                 mottakId = mottak.id,
                 delbehandlinger = setOf(Delbehandling()),
@@ -362,7 +361,7 @@ class KlagebehandlingService(
 
     @Transactional(readOnly = true)
     fun findKlagebehandlingForDistribusjon(): List<UUID> =
-        klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull().map { it.id }
+        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull().map { it.id }
 
     private fun markerKlagebehandlingSomAvsluttetAvSaksbehandler(
         klagebehandling: Klagebehandling,
@@ -382,7 +381,7 @@ class KlagebehandlingService(
             klagebehandlingId = klagebehandlingId
         )
 
-        if (klagebehandling.avsluttetAvSaksbehandler != null) throw KlagebehandlingFinalizedException("Klagebehandlingen er avsluttet")
+        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw KlagebehandlingFinalizedException("Klagebehandlingen er avsluttet")
 
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateKlagebehandlingBeforeFinalize(klagebehandling)
@@ -461,7 +460,7 @@ class KlagebehandlingService(
         this.ytelse.toTema(),
         this.currentDelbehandling().utfall!!,
         this.innsendt!!,
-        this.avsluttetAvSaksbehandler!!,
+        this.currentDelbehandling().avsluttetAvSaksbehandler!!,
         this.klager.partId.value
     )
 }

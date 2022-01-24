@@ -42,8 +42,6 @@ class Ankebehandling(
     innsendt: LocalDate? = null,
     //Settes automatisk i klage, må kunne justeres i anke. Bør også representeres i delbehandlinger. Må gjøres entydig i anke, hører antageligvis ikke hjemme i felles klasse.
     mottattKlageinstans: LocalDateTime,
-    //Teknisk avsluttet, når alle prosesser er gjennomførte. Bør muligens heller utledes av status på delbehandlingerer.
-    avsluttet: LocalDateTime? = null,
     //TODO: Trenger denne være nullable? Den blir da alltid satt i createKlagebehandlingFromMottak?
     //Litt usikkert om dette hører mest hjemme her eller på delbehandlinger.
     frist: LocalDate? = null,
@@ -77,7 +75,6 @@ class Ankebehandling(
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,
-    avsluttet = avsluttet,
     innsendt = innsendt,
     sakFagsakId = sakFagsakId,
     sakFagsystem = sakFagsystem,

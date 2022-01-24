@@ -57,7 +57,7 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
             utfall = currentDelbehandling().utfall!!.id,
             registreringshjemler = currentDelbehandling().hjemler.map { it.id },
             kvalitetsvurderingId = kakaKvalitetsvurderingId!!,
-            avsluttetAvSaksbehandler = avsluttetAvSaksbehandler!!,
+            avsluttetAvSaksbehandler = currentDelbehandling().avsluttetAvSaksbehandler!!,
             utfoerendeSaksbehandler = tildeling?.saksbehandlerident!!,
             tilknyttetEnhet = tilknyttetEnhet!!.id
         )

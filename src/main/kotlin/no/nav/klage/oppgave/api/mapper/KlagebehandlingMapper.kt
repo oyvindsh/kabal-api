@@ -73,8 +73,8 @@ class KlagebehandlingMapper(
             mottatt = klagebehandling.mottattKlageinstans.toLocalDate(),
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
-            avsluttetAvSaksbehandlerDate = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
-            isAvsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler != null,
+            avsluttetAvSaksbehandlerDate = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
+            isAvsluttetAvSaksbehandler = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandler = berikSaksbehandler(klagebehandling.tildeling?.saksbehandlerident),
@@ -213,7 +213,7 @@ class KlagebehandlingMapper(
     fun mapToKlagebehandlingFullfoertView(klagebehandling: Klagebehandling): KlagebehandlingFullfoertView {
         return KlagebehandlingFullfoertView(
             modified = klagebehandling.modified,
-            isAvsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler != null
+            isAvsluttetAvSaksbehandler = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null
         )
     }
 
@@ -243,4 +243,3 @@ class KlagebehandlingMapper(
         )
     }
 }
-
