@@ -31,8 +31,10 @@ class MottakDokument(
 }
 
 enum class MottakDokumentType {
-    BRUKERS_KLAGE,
+    BRUKERS_SOEKNAD,
     OPPRINNELIG_VEDTAK,
+    BRUKERS_KLAGE,
     OVERSENDELSESBREV,
+    KLAGE_VEDTAK,
     ANNET
 }
