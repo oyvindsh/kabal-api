@@ -22,8 +22,8 @@ class Endringslogginnslag(
     val fraVerdi: String?,
     @Column(name = "tilverdi")
     val tilVerdi: String?,
-    @Column(name = "klagebehandling_id")
-    val klagebehandlingId: UUID,
+    @Column(name = "behandling_id")
+    val behandlingId: UUID,
     @Id
     val id: UUID = UUID.randomUUID(),
     @Column(name = "tidspunkt")
@@ -36,7 +36,7 @@ class Endringslogginnslag(
             felt: Felt,
             fraVerdi: String?,
             tilVerdi: String?,
-            klagebehandlingId: UUID,
+            behandlingId: UUID,
             tidspunkt: LocalDateTime
         ): Endringslogginnslag? {
             if ((fraVerdi == null && tilVerdi == null) || fraVerdi == tilVerdi) {
@@ -54,7 +54,7 @@ class Endringslogginnslag(
                     felt = felt,
                     fraVerdi = fraVerdi,
                     tilVerdi = tilVerdi,
-                    klagebehandlingId = klagebehandlingId,
+                    behandlingId = behandlingId,
                     tidspunkt = tidspunkt
                 )
             }
@@ -79,5 +79,5 @@ enum class Felt {
     KVALITETSAVVIK_OVERSENDELSESBREV, KVALITETSAVVIK_UTREDNING, KVALITETSAVVIK_VEDTAK, KOMMENTAR_OVERSENDELSESBREV,
     UTREDNING_BRA, KOMMENTAR_UTREDNING, VEDTAK_BRA, KOMMENTAR_VEDTAK, AVVIK_STOR_KONSEKVENS, BRUK_SOM_EKSEMPEL_I_OPPLAERING,
     MELLOMLAGER_ID_I_VEDTAK, JOURNALPOST_I_BREVMOTTAKER, VEDTAK_AVSLUTTET_AV_SAKSBEHANDLER, BREVMOTTAKER_FERDIGSTILT_I_JOARK,
-    MEDUNDERSKRIVERFLYT, DOKUMENT_ENHET_ID_I_VEDTAK, SMART_EDITOR_ID
+    MEDUNDERSKRIVERFLYT, DOKUMENT_ENHET_ID_I_VEDTAK, SMART_EDITOR_ID, HOVEDADRESSAT_JOURNALPOST
 }

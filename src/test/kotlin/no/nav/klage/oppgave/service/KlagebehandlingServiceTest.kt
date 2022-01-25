@@ -162,8 +162,8 @@ class KlagebehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assert(result.medunderskriver?.saksbehandlerident == null)
-            assert(result.medunderskriverHistorikk.size == 1)
+            assertThat(result.currentDelbehandling().medunderskriver?.saksbehandlerident).isNull()
+            assertThat(result.currentDelbehandling().medunderskriverHistorikk).hasSize(1)
         }
     }
 
@@ -207,7 +207,7 @@ class KlagebehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assert(result.medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
@@ -232,7 +232,7 @@ class KlagebehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assert(result.medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
 
         @Test
@@ -261,7 +261,7 @@ class KlagebehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assert(result.medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
@@ -291,7 +291,7 @@ class KlagebehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assert(result.medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
     }
 
@@ -388,7 +388,7 @@ class KlagebehandlingServiceTest {
                 klagebehandling.id,
                 MEDUNDERSKRIVER_IDENT
             )
-            assert(result.avsluttetAvSaksbehandler != null)
+            assertThat(result.currentDelbehandling().avsluttetAvSaksbehandler).isNotNull
         }
 
         @Test
@@ -405,7 +405,7 @@ class KlagebehandlingServiceTest {
                 klagebehandling.id,
                 MEDUNDERSKRIVER_IDENT
             )
-            assert(result.avsluttetAvSaksbehandler != null)
+            assertThat(result.currentDelbehandling().avsluttetAvSaksbehandler).isNotNull
         }
     }
 
@@ -422,10 +422,10 @@ class KlagebehandlingServiceTest {
             type = Type.KLAGE,
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             kildeReferanse = "1234234",
-            oversendtKaDato = LocalDateTime.now(),
+            sakMottattKaDato = LocalDateTime.now(),
             kildesystem = Fagsystem.K9,
-            avsenderEnhet = "0101",
-            mottattNavDato = LocalDate.now()
+            forrigeBehandlendeEnhet = "0101",
+            brukersHenvendelseMottattNavDato = LocalDate.now()
         )
 
         mottakRepository.save(mottak)
@@ -448,7 +448,7 @@ class KlagebehandlingServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = mottak.id,
-            vedtak = Vedtak(
+            delbehandlinger = setOf(Delbehandling(
                 utfall = when {
                     trukket -> Utfall.TRUKKET
                     utfall -> Utfall.AVVIST
@@ -457,9 +457,9 @@ class KlagebehandlingServiceTest {
                 hjemler = if (hjemler) mutableSetOf(
                     Registreringshjemmel.ANDRE_TRYGDEAVTALER
                 ) else mutableSetOf(),
-                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null
-            ),
-            avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
+                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
+                avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
+            )),
             mottattFoersteinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet"
         )

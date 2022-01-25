@@ -3,18 +3,19 @@ package no.nav.klage.oppgave.domain.klage
 import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
+import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-object KlagebehandlingAggregatFunctions {
+object BehandlingAggregatFunctions {
 
-    fun Klagebehandling.setTildeling(
+    fun Behandling.setTildeling(
         nyVerdiSaksbehandlerident: String?,
         nyVerdiEnhet: String?,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
+    ): BehandlingEndretEvent {
         val gammelVerdiSaksbehandlerident = tildeling?.saksbehandlerident
         val gammelVerdiEnhet = tildeling?.enhet
         val gammelVerdiTidspunkt = tildeling?.tidspunkt
@@ -46,22 +47,22 @@ object KlagebehandlingAggregatFunctions {
         endringslogg(saksbehandlerident, Felt.TILDELT_ENHET, gammelVerdiEnhet, nyVerdiEnhet, tidspunkt)
             ?.let { endringslogginnslag.add(it) }
 
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Klagebehandling.setMedunderskriverIdentAndMedunderskriverFlyt(
+    fun Behandling.setMedunderskriverIdentAndMedunderskriverFlyt(
         nyVerdiMedunderskriverident: String?,
         nyVerdiMedunderskriverFlyt: MedunderskriverFlyt,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdiMedunderskriverident = medunderskriver?.saksbehandlerident
-        val gammelVerdiMedunderskriverFlyt = medunderskriverFlyt
+    ): BehandlingEndretEvent {
+        val gammelVerdiMedunderskriverident = currentDelbehandling().medunderskriver?.saksbehandlerident
+        val gammelVerdiMedunderskriverFlyt = currentDelbehandling().medunderskriverFlyt
         val tidspunkt = LocalDateTime.now()
-        if (medunderskriver != null) {
-            medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = medunderskriver!!.copy()))
+        if (currentDelbehandling().medunderskriver != null) {
+            currentDelbehandling().medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = currentDelbehandling().medunderskriver!!.copy()))
         }
-        medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
-        medunderskriverFlyt = nyVerdiMedunderskriverFlyt
+        currentDelbehandling().medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
+        currentDelbehandling().medunderskriverFlyt = nyVerdiMedunderskriverFlyt
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
@@ -82,17 +83,17 @@ object KlagebehandlingAggregatFunctions {
             tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Klagebehandling.setMedunderskriverFlyt(
+    fun Behandling.setMedunderskriverFlyt(
         nyMedunderskriverFlyt: MedunderskriverFlyt,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdiMedunderskriverFlyt = medunderskriverFlyt
+    ): BehandlingEndretEvent {
+        val gammelVerdiMedunderskriverFlyt = currentDelbehandling().medunderskriverFlyt
         val tidspunkt = LocalDateTime.now()
 
-        medunderskriverFlyt = nyMedunderskriverFlyt
+        currentDelbehandling().medunderskriverFlyt = nyMedunderskriverFlyt
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
@@ -105,17 +106,17 @@ object KlagebehandlingAggregatFunctions {
             tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogginnslag)
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Klagebehandling.setHjemlerInVedtak(
+    fun Behandling.setHjemlerInVedtak(
         nyVerdi: Set<Registreringshjemmel>,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = vedtak.hjemler
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().hjemler
         val tidspunkt = LocalDateTime.now()
-        vedtak.hjemler = nyVerdi.toMutableSet()
-        vedtak.modified = tidspunkt
+        currentDelbehandling().hjemler = nyVerdi.toMutableSet()
+        currentDelbehandling().modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -125,17 +126,17 @@ object KlagebehandlingAggregatFunctions {
                 nyVerdi.joinToString { it.id },
                 tidspunkt
             )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setUtfallInVedtak(
+    fun Behandling.setUtfallInVedtak(
         nyVerdi: Utfall?,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = vedtak.utfall
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().utfall
         val tidspunkt = LocalDateTime.now()
-        vedtak.utfall = nyVerdi
-        vedtak.modified = tidspunkt
+        currentDelbehandling().utfall = nyVerdi
+        currentDelbehandling().modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -145,17 +146,17 @@ object KlagebehandlingAggregatFunctions {
                 nyVerdi.toString(),
                 tidspunkt
             )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setDokumentEnhetIdInVedtak(
+    fun Behandling.setDokumentEnhetIdInVedtak(
         nyVerdi: UUID?,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = vedtak.dokumentEnhetId
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().dokumentEnhetId
         val tidspunkt = LocalDateTime.now()
-        vedtak.dokumentEnhetId = nyVerdi
-        vedtak.modified = tidspunkt
+        currentDelbehandling().dokumentEnhetId = nyVerdi
+        currentDelbehandling().modified = tidspunkt
         modified = tidspunkt
         val endringslogg = listOfNotNull(
             endringslogg(
@@ -166,15 +167,15 @@ object KlagebehandlingAggregatFunctions {
                 tidspunkt
             )
         )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = endringslogg)
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogg)
     }
 
-    fun Klagebehandling.setAvsluttetAvSaksbehandler(
+    fun Behandling.setAvsluttetAvSaksbehandler(
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = avsluttetAvSaksbehandler
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().avsluttetAvSaksbehandler
         val tidspunkt = LocalDateTime.now()
-        avsluttetAvSaksbehandler = tidspunkt
+        currentDelbehandling().avsluttetAvSaksbehandler = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -184,15 +185,15 @@ object KlagebehandlingAggregatFunctions {
                 tidspunkt.toString(),
                 tidspunkt
             )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setAvsluttet(
+    fun Behandling.setAvsluttet(
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = avsluttet
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().avsluttet
         val tidspunkt = LocalDateTime.now()
-        avsluttet = tidspunkt
+        currentDelbehandling().avsluttet = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -202,13 +203,13 @@ object KlagebehandlingAggregatFunctions {
                 tidspunkt.toString(),
                 tidspunkt
             )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.addSaksdokument(
+    fun Behandling.addSaksdokument(
         saksdokument: Saksdokument,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent? {
+    ): BehandlingEndretEvent? {
         if (saksdokumenter.none { it.journalpostId == saksdokument.journalpostId && it.dokumentInfoId == saksdokument.dokumentInfoId }) {
             val tidspunkt = LocalDateTime.now()
             saksdokumenter.add(saksdokument)
@@ -221,15 +222,15 @@ object KlagebehandlingAggregatFunctions {
                 id,
                 tidspunkt
             )
-            return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+            return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
         }
         return null
     }
 
-    fun Klagebehandling.removeSaksdokument(
+    fun Behandling.removeSaksdokument(
         saksdokument: Saksdokument,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
+    ): BehandlingEndretEvent {
         val tidspunkt = LocalDateTime.now()
         saksdokumenter.removeIf { it.id == saksdokument.id }
         modified = tidspunkt
@@ -241,17 +242,17 @@ object KlagebehandlingAggregatFunctions {
             id,
             tidspunkt
         )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Klagebehandling.setSmartEditorIdInVedtak(
+    fun Behandling.setSmartEditorIdInVedtak(
         nyVerdi: String?,
         saksbehandlerident: String
-    ): KlagebehandlingEndretEvent {
-        val gammelVerdi = vedtak.smartEditorId
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().smartEditorId
         val tidspunkt = LocalDateTime.now()
-        vedtak.smartEditorId = nyVerdi
-        vedtak.modified = tidspunkt
+        currentDelbehandling().smartEditorId = nyVerdi
+        currentDelbehandling().modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -261,10 +262,30 @@ object KlagebehandlingAggregatFunctions {
                 nyVerdi,
                 tidspunkt
             )
-        return KlagebehandlingEndretEvent(klagebehandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    private fun Klagebehandling.endringslogg(
+    fun Behandling.setHovedadressatJournalpostIdInVedtak(
+        nyVerdi: String?,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val gammelVerdi = currentDelbehandling().hovedAdressatJournalpostId
+        val tidspunkt = LocalDateTime.now()
+        currentDelbehandling().hovedAdressatJournalpostId = nyVerdi
+        currentDelbehandling().modified = tidspunkt
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.HOVEDADRESSAT_JOURNALPOST,
+                gammelVerdi,
+                nyVerdi,
+                tidspunkt
+            )
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    private fun Behandling.endringslogg(
         saksbehandlerident: String,
         felt: Felt,
         fraVerdi: String?,

@@ -1,9 +1,9 @@
 package no.nav.klage.oppgave.domain.events
 
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 
-data class KlagebehandlingEndretEvent(
-    val klagebehandling: Klagebehandling,
+data class BehandlingEndretEvent(
+    val behandling: Behandling,
     val endringslogginnslag: List<Endringslogginnslag>
 )

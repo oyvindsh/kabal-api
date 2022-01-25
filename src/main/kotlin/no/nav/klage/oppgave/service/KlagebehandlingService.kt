@@ -7,14 +7,14 @@ import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
-import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
+import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.addSaksdokument
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.removeSaksdokument
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverFlyt
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setMedunderskriverIdentAndMedunderskriverFlyt
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setTildeling
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.addSaksdokument
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.removeSaksdokument
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverIdentAndMedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setTildeling
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.TokenUtil
@@ -121,10 +121,10 @@ class KlagebehandlingService(
     fun findMuligAnkeByPartId(
         partId: String
     ): List<MuligAnke> =
-        klagebehandlingRepository.findByAvsluttetIsNotNull()
+        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
             .filter {
                 it.klager.partId.value == partId &&
-                        muligAnkeUtfall.contains(it.vedtak.utfall)
+                        muligAnkeUtfall.contains(it.currentDelbehandling().utfall)
             }
             .map { it.toMuligAnke() }
 
@@ -132,9 +132,9 @@ class KlagebehandlingService(
         partId: String,
         klagebehandlingId: UUID
     ): MuligAnke? {
-        val klagebehandling = klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
+        val klagebehandling = klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
-            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.vedtak.utfall)
+            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.currentDelbehandling().utfall)
         ) {
             klagebehandling.toMuligAnke()
         } else {
@@ -169,13 +169,13 @@ class KlagebehandlingService(
     ): Klagebehandling {
         val klagebehandling = getKlagebehandling(klagebehandlingId)
 
-        if (klagebehandling.medunderskriver?.saksbehandlerident == null) {
+        if (klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident == null) {
             throw KlagebehandlingManglerMedunderskriverException("Klagebehandlingen har ikke registrert noen medunderskriver")
         }
 
-        if (klagebehandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
+        if (klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
             checkMedunderskriverStatus(klagebehandling)
-            if (klagebehandling.medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
+            if (klagebehandling.currentDelbehandling().medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
                 val event = klagebehandling.setMedunderskriverFlyt(
                     MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
                     utfoerendeSaksbehandlerIdent
@@ -184,7 +184,7 @@ class KlagebehandlingService(
             }
         } else {
             checkSkrivetilgang(klagebehandling)
-            if (klagebehandling.medunderskriverFlyt != MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER) {
+            if (klagebehandling.currentDelbehandling().medunderskriverFlyt != MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER) {
                 val event = klagebehandling.setMedunderskriverFlyt(
                     MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
                     utfoerendeSaksbehandlerIdent
@@ -214,10 +214,6 @@ class KlagebehandlingService(
     }
 
     fun createKlagebehandlingFromMottak(mottak: Mottak) {
-        if (klagebehandlingRepository.findByMottakId(mottak.id) != null) {
-            logger.error("We already have a klagebehandling for mottak ${mottak.id}. This is not supposed to happen.")
-            throw RuntimeException("We already have a klagebehandling for mottak ${mottak.id}")
-        }
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
@@ -230,26 +226,25 @@ class KlagebehandlingService(
                 sakFagsystem = mottak.sakFagsystem,
                 sakFagsakId = mottak.sakFagsakId,
                 innsendt = mottak.innsendtDato,
-                mottattFoersteinstans = mottak.mottattNavDato,
-                avsenderEnhetFoersteinstans = mottak.avsenderEnhet,
-                avsenderSaksbehandleridentFoersteinstans = mottak.avsenderSaksbehandlerident,
-                mottattKlageinstans = mottak.oversendtKaDato,
+                mottattFoersteinstans = mottak.brukersHenvendelseMottattNavDato,
+                avsenderEnhetFoersteinstans = mottak.forrigeBehandlendeEnhet,
+                avsenderSaksbehandleridentFoersteinstans = mottak.forrigeSaksbehandlerident,
+                mottattKlageinstans = mottak.sakMottattKaDato,
                 tildeling = null,
-                avsluttet = null,
                 frist = mottak.generateFrist(),
                 mottakId = mottak.id,
-                vedtak = Vedtak(),
+                delbehandlinger = setOf(Delbehandling()),
+                saksdokumenter = dokumentService.createSaksdokumenterFromJournalpostIdSet(mottak.mottakDokument.map { it.journalpostId }),
                 kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(),
                 hjemler = createHjemmelSetFromMottak(mottak.hjemler),
-                saksdokumenter = createSaksdokumenter(mottak),
                 kildesystem = mottak.kildesystem,
                 kommentarFraFoersteinstans = mottak.kommentar
             )
         )
-        logger.debug("Created behandling ${klagebehandling.id} for mottak ${mottak.id}")
+        logger.debug("Created klagebehandling ${klagebehandling.id} for mottak ${mottak.id}")
         applicationEventPublisher.publishEvent(
-            KlagebehandlingEndretEvent(
-                klagebehandling = klagebehandling,
+            BehandlingEndretEvent(
+                behandling = klagebehandling,
                 endringslogginnslag = emptyList()
             )
         )
@@ -261,25 +256,6 @@ class KlagebehandlingService(
         } else {
             hjemler.map { Hjemmel.of(it.hjemmelId) }.toMutableSet()
         }
-
-
-    private fun Klager.toSakenGjelder() = SakenGjelder(
-        partId = this.partId.copy(),
-        skalMottaKopi = false // Siden denne nå peker på samme som klager trenger ikke brev sendes
-    )
-
-    private fun createSaksdokumenter(mottak: Mottak): MutableSet<Saksdokument> {
-        val saksdokumenter: MutableSet<Saksdokument> = mutableSetOf()
-        mottak.mottakDokument.forEach {
-            //TODO: Mangler å få med MottakDokument.type over i Saksdokument!
-            saksdokumenter.addAll(createSaksdokument(it.journalpostId))
-        }
-        return saksdokumenter
-    }
-
-    private fun createSaksdokument(journalpostId: String) =
-        dokumentService.fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
-            .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
     private fun addDokument(
         klagebehandling: Klagebehandling,
@@ -385,7 +361,7 @@ class KlagebehandlingService(
 
     @Transactional(readOnly = true)
     fun findKlagebehandlingForDistribusjon(): List<UUID> =
-        klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull().map { it.id }
+        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull().map { it.id }
 
     private fun markerKlagebehandlingSomAvsluttetAvSaksbehandler(
         klagebehandling: Klagebehandling,
@@ -405,7 +381,7 @@ class KlagebehandlingService(
             klagebehandlingId = klagebehandlingId
         )
 
-        if (klagebehandling.avsluttetAvSaksbehandler != null) throw KlagebehandlingFinalizedException("Klagebehandlingen er avsluttet")
+        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw KlagebehandlingFinalizedException("Klagebehandlingen er avsluttet")
 
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateKlagebehandlingBeforeFinalize(klagebehandling)
@@ -426,7 +402,7 @@ class KlagebehandlingService(
                 )
             )
         }
-        if (klagebehandling.vedtak.utfall == null) {
+        if (klagebehandling.currentDelbehandling().utfall == null) {
             validationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -434,8 +410,8 @@ class KlagebehandlingService(
                 )
             )
         }
-        if (klagebehandling.vedtak.utfall != Utfall.TRUKKET) {
-            if (klagebehandling.vedtak.hjemler.isEmpty()) {
+        if (klagebehandling.currentDelbehandling().utfall != Utfall.TRUKKET) {
+            if (klagebehandling.currentDelbehandling().hjemler.isEmpty()) {
                 validationErrors.add(
                     InvalidProperty(
                         field = "hjemmel",
@@ -477,14 +453,14 @@ class KlagebehandlingService(
         !(harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling))
 
     private fun harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling: Klagebehandling) =
-        klagebehandling.vedtak.dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(klagebehandling.vedtak.dokumentEnhetId!!)
+        klagebehandling.currentDelbehandling().dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(klagebehandling.currentDelbehandling().dokumentEnhetId!!)
 
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,
         this.ytelse.toTema(),
-        this.vedtak.utfall!!,
+        this.currentDelbehandling().utfall!!,
         this.innsendt!!,
-        this.avsluttetAvSaksbehandler!!,
+        this.currentDelbehandling().avsluttetAvSaksbehandler!!,
         this.klager.partId.value
     )
 }

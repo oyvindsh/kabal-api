@@ -38,7 +38,7 @@ class UnprotectedDataFeederTest {
     fun setup() {
         every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns "H149390"
         every { unleash.isEnabled(any(), any<UnleashContext>()) } returns true
-        every { mottakService.createMottakForKlageV1(any()) } returns Unit
+        every { mottakService.createMottakForKlageAnkeV3(any()) } returns Unit
     }
 
     @Test
@@ -55,19 +55,12 @@ class UnprotectedDataFeederTest {
     @Language("json")
     private val data = """
         {
-          "avsenderEnhet": "4487",
-          "avsenderSaksbehandlerIdent": "E151154",
+          "forrigeBehandlendeEnhet": "4487",
           "fagsak": {
             "fagsakId": "7FH38",
             "fagsystem": "K9"
           },
-          "hjemler": [
-            {
-              "kapittel": 9,
-              "lov": "FOLKETRYGDLOVEN",
-              "paragraf": 5
-            }
-          ],
+          "hjemler": ["FTRL_8_3"],
           "innsendtTilNav": "2020-12-17",
           "kilde": "MANUELL",
           "kildeReferanse": "08097520454",
@@ -77,7 +70,7 @@ class UnprotectedDataFeederTest {
               "verdi": "08097520454"
             }
           },
-          "mottattFoersteinstans": "2020-12-20",
+          "brukersHenvendelseMottattNavDato": "2020-12-20",
           "ytelse": "OMS_OMP",          
           "tilknyttedeJournalposter": [
             {

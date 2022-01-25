@@ -4,12 +4,14 @@ import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.view.VedtakVedleggInput
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
+import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setDokumentEnhetIdInVedtak
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setHjemlerInVedtak
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setHovedadressatJournalpostIdInVedtak
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setSmartEditorIdInVedtak
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setUtfallInVedtak
+import no.nav.klage.oppgave.domain.klage.Delbehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setDokumentEnhetIdInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setHjemlerInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setSmartEditorIdInVedtak
-import no.nav.klage.oppgave.domain.klage.KlagebehandlingAggregatFunctions.setUtfallInVedtak
-import no.nav.klage.oppgave.domain.klage.Vedtak
 import no.nav.klage.oppgave.exceptions.VedtakFinalizedException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -35,8 +37,8 @@ class VedtakService(
     }
 
     @Transactional(readOnly = true)
-    fun getVedtak(klagebehandling: Klagebehandling): Vedtak {
-        return klagebehandling.vedtak
+    fun getVedtak(klagebehandling: Klagebehandling): Delbehandling {
+        return klagebehandling.currentDelbehandling()
     }
 
     fun setUtfall(
@@ -78,8 +80,8 @@ class VedtakService(
         //TODO: Burde man sjekket tilgang til EnhetOgTema, ikke bare enhet?
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
 
-        var oppdatertKlagebehandling = if (klagebehandling.vedtak.dokumentEnhetId != null) {
-            deleteHovedDokument(klagebehandling, klagebehandling.vedtak.dokumentEnhetId!!)
+        var oppdatertKlagebehandling = if (klagebehandling.currentDelbehandling().dokumentEnhetId != null) {
+            deleteHovedDokument(klagebehandling, klagebehandling.currentDelbehandling().dokumentEnhetId!!)
         } else klagebehandling
 
         return oppdatertKlagebehandling
@@ -95,16 +97,16 @@ class VedtakService(
         )
 
         tilgangService.verifyInnloggetSaksbehandlersTilgangTilEnhet(klagebehandling.tildeling!!.enhet!!)
-        if (klagebehandling.avsluttetAvSaksbehandler != null) throw VedtakFinalizedException("Klagebehandlingen er avsluttet")
+        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw VedtakFinalizedException("Klagebehandlingen er avsluttet")
 
-        var oppdatertKlagebehandling = if (klagebehandling.vedtak.dokumentEnhetId == null) {
+        var oppdatertKlagebehandling = if (klagebehandling.currentDelbehandling().dokumentEnhetId == null) {
             createDokumentEnhet(klagebehandling, innloggetIdent)
         } else klagebehandling
 
         oppdatertKlagebehandling =
             uploadHovedDokument(
                 oppdatertKlagebehandling,
-                oppdatertKlagebehandling.vedtak.dokumentEnhetId!!,
+                oppdatertKlagebehandling.currentDelbehandling().dokumentEnhetId!!,
                 input.vedlegg
             )
 
@@ -161,6 +163,22 @@ class VedtakService(
             klagebehandling.setSmartEditorIdInVedtak(smartEditorId, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return klagebehandling
+    }
+
+    fun addHovedadressatJournalpostId(
+        klagebehandlingId: UUID,
+        utfoerendeSaksbehandlerIdent: String,
+        journalpostId: JournalpostId
+    ): Klagebehandling {
+        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(
+            klagebehandlingId
+        )
+
+        val event =
+            klagebehandling.setHovedadressatJournalpostIdInVedtak(journalpostId.value, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return klagebehandling
+
     }
 
     fun deleteSmartEditorId(klagebehandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Klagebehandling {

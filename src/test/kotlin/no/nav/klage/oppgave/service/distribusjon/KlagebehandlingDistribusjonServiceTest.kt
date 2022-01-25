@@ -9,6 +9,7 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
+import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
@@ -131,10 +132,10 @@ internal class KlagebehandlingDistribusjonServiceTest {
         type = Type.KLAGE,
         klager = Klager(partId = PartId(type = PartIdType.PERSON, value = fnr)),
         kildeReferanse = UUID.randomUUID().toString(),
-        oversendtKaDato = LocalDateTime.now(),
+        sakMottattKaDato = LocalDateTime.now(),
         kildesystem = Fagsystem.K9,
-        avsenderEnhet = "0101",
-        mottattNavDato = LocalDate.now()
+        forrigeBehandlendeEnhet = "0101",
+        brukersHenvendelseMottattNavDato = LocalDate.now()
     )
 
     private val klage = Klagebehandling(
@@ -156,11 +157,11 @@ internal class KlagebehandlingDistribusjonServiceTest {
         kildesystem = Fagsystem.K9,
         kildeReferanse = "abc",
         mottakId = mottak.id,
-        vedtak = Vedtak(
+        delbehandlinger = setOf(Delbehandling(
             id = vedtakId,
             utfall = Utfall.MEDHOLD,
             dokumentEnhetId = UUID.randomUUID()
-        ),
+        )),
         avsenderEnhetFoersteinstans = "0101",
         mottattFoersteinstans = LocalDate.now()
     )
@@ -180,8 +181,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
     fun `distribusjon av klagebehandling fører til avsluttet klagebehandling`() {
 
         every { kafkaEventRepository.save(any()) } returns mockk()
-        every { kabalDocumentGateway.fullfoerDokumentEnhet(any()) } returns Unit
-        every { kabalDocumentGateway.getJournalpostIdForHovedadressat(any()) } returns journalpostId
+        every { kabalDocumentGateway.fullfoerDokumentEnhet(any()) } returns JournalpostId(journalpostId)
 
         mottakRepository.save(mottak)
 
@@ -190,6 +190,6 @@ internal class KlagebehandlingDistribusjonServiceTest {
         klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getOne(klagebehandlingId)
-        assertThat(result.avsluttet).isNotNull
+        assertThat(result.currentDelbehandling().avsluttet).isNotNull
     }
 }

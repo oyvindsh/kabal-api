@@ -83,20 +83,19 @@ class KlagebehandlingMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            avsluttet = LocalDateTime.now(),
             avsenderEnhetFoersteinstans = "4100",
             mottattFoersteinstans = LocalDate.now(),
-            vedtak = Vedtak(),
+            delbehandlinger = setOf(Delbehandling()),
         )
     }
 
     private fun getKlagebehandlingWithMedunderskriver(): Klagebehandling {
         return getKlagebehandling().apply {
-            medunderskriver = MedunderskriverTildeling(
+            currentDelbehandling().medunderskriver = MedunderskriverTildeling(
                 MEDUNDERSKRIVER_IDENT,
                 LocalDateTime.now()
             )
-            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+            currentDelbehandling().medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
         }
     }
 }

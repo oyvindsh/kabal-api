@@ -74,7 +74,7 @@ internal class DuplicateOversendelseTest {
             enhet = Enhet("4295", "KA Nord")
         )
 
-        val oversendtKlage = OversendtKlageV1(
+        val oversendtKlage = OversendtKlageV2(
             avsenderEnhet = "4455",
             avsenderSaksbehandlerIdent = saksbehandler,
             innsendtTilNav = LocalDate.now(),
@@ -91,8 +91,8 @@ internal class DuplicateOversendelseTest {
             kildeReferanse = "abc"
         )
 
-        mottakService.createMottakForKlageV1(oversendtKlage)
+        mottakService.createMottakForKlageV2(oversendtKlage)
 
-        assertThrows<DuplicateOversendelseException> { mottakService.createMottakForKlageV1(oversendtKlage) }
+        assertThrows<DuplicateOversendelseException> { mottakService.createMottakForKlageV2(oversendtKlage) }
     }
 }

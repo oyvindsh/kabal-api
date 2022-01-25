@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.eventlisteners
 
-import no.nav.klage.oppgave.domain.events.KlagebehandlingEndretEvent
+import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
@@ -14,8 +14,8 @@ class StatistikkTilDVHEventListener(private val statistikkTilDVHService: Statist
     }
 
     @EventListener
-    fun klagebehandlingEndretEventToDVH(klagebehandlingEndretEvent: KlagebehandlingEndretEvent) {
-        logger.debug("Received KlagebehandlingEndretEvent for klagebehandlingId ${klagebehandlingEndretEvent.klagebehandling.id} in StatistikkTilDVHEventListener")
-        statistikkTilDVHService.process(klagebehandlingEndretEvent)
+    fun klagebehandlingEndretEventToDVH(behandlingEndretEvent: BehandlingEndretEvent) {
+        logger.debug("Received BehandlingEndretEvent for behandlingId ${behandlingEndretEvent.behandling.id} in StatistikkTilDVHEventListener")
+        statistikkTilDVHService.process(behandlingEndretEvent)
     }
 }

@@ -13,11 +13,11 @@ import java.time.LocalDateTime
 import javax.validation.constraints.PastOrPresent
 
 @ApiModel
-data class OversendtKlageV1(
+data class OversendtKlageAnkeV3(
     @ApiModelProperty(
         required = true,
         example = "KLAGE",
-        notes = "Gyldige verdier er KLAGE i både prod og dev"
+        notes = "Gyldige verdier er KLAGE og ANKE"
     )
     val type: Type,
     @ApiModelProperty(
@@ -54,17 +54,20 @@ data class OversendtKlageV1(
         notes = "Hjemler knyttet til klagen",
         required = false
     )
-    val hjemler: List<HjemmelFraFoersteInstans>? = emptyList(),
-    val avsenderSaksbehandlerIdent: String,
-    val avsenderEnhet: String,
+    val hjemler: List<Hjemmel>? = emptyList(),
+    @ApiModelProperty(
+        notes = "ID på enheten som behandlet vedtaket som denne henvendelsen gjelder.",
+        required = true
+    )
+    val forrigeBehandlendeEnhet: String,
     @ApiModelProperty(
         notes = "Liste med relevante journalposter til klagen. Liste kan være tom.",
         required = true
     )
     val tilknyttedeJournalposter: List<OversendtDokumentReferanse> = emptyList(),
-    @field:PastOrPresent(message = "Dato for mottatt førsteinstans må være i fortiden eller i dag")
+    @field:PastOrPresent(message = "Dato for mottatt Nav må være i fortiden eller i dag")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    val mottattFoersteinstans: LocalDate,
+    val brukersHenvendelseMottattNavDato: LocalDate,
     val innsendtTilNav: LocalDate,
     @ApiModelProperty(
         notes = "Kan settes dersom førsteinstans ønsker å overstyre frist",
@@ -76,7 +79,7 @@ data class OversendtKlageV1(
         required = false,
         example = "2020-12-20T00:00"
     )
-    val oversendtKaDato: LocalDateTime? = null,
+    val sakMottattKaDato: LocalDateTime? = null,
     @ApiModelProperty(
         notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
         required = true,
@@ -94,9 +97,11 @@ data class OversendtKlageV1(
         required = false
     )
     val kommentar: String? = null
+
+
 )
 
-fun OversendtKlageV1.toMottak() = Mottak(
+fun OversendtKlageAnkeV3.toMottak() = Mottak(
     type = type,
     klager = klager.toKlagepart(),
     sakenGjelder = sakenGjelder?.toSakenGjelder(),
@@ -105,42 +110,13 @@ fun OversendtKlageV1.toMottak() = Mottak(
     sakFagsakId = fagsak?.fagsakId,
     kildeReferanse = kildeReferanse,
     dvhReferanse = dvhReferanse,
-    hjemler = hjemler?.map { it.toMottakHjemmel() }?.toSet(),
-    avsenderSaksbehandlerident = avsenderSaksbehandlerIdent,
-    avsenderEnhet = avsenderEnhet,
+    hjemler = hjemler?.map { MottakHjemmel(hjemmelId = it.id) }?.toSet(),
+    forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
     mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),
     innsendtDato = innsendtTilNav,
-    mottattNavDato = mottattFoersteinstans,
-    oversendtKaDato = oversendtKaDato ?: LocalDateTime.now(),
+    brukersHenvendelseMottattNavDato = brukersHenvendelseMottattNavDato,
+    sakMottattKaDato = sakMottattKaDato ?: LocalDateTime.now(),
     fristFraFoersteinstans = frist,
     kildesystem = kilde.mapFagsystem(),
-    ytelse = ytelse
+    ytelse = ytelse,
 )
-
-private fun HjemmelFraFoersteInstans.toMottakHjemmel(): MottakHjemmel {
-    if (lov == HjemmelFraFoersteInstans.Lov.FOLKETRYGDLOVEN) {
-        if (kapittel == 9) {
-            when (paragraf) {
-                null -> return MottakHjemmel(hjemmelId = Hjemmel.FTL_9.id)
-                2 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_2.id)
-                3 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_3.id)
-                5 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_5.id)
-                6 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_6.id)
-                8 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_8.id)
-                9 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_9.id)
-                10 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_10.id)
-                11 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_11.id)
-                13 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_13.id)
-                14 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_14.id)
-                15 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_9_15.id)
-            }
-        } else if (kapittel == 22) {
-            when (paragraf) {
-                13 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_22_13.id)
-                15 -> return MottakHjemmel(hjemmelId = Hjemmel.FTRL_22_15.id)
-            }
-        }
-    }
-
-    return MottakHjemmel(hjemmelId = Hjemmel.MANGLER.id)
-}

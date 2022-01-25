@@ -3,13 +3,11 @@ package no.nav.klage.oppgave.service
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
-import no.nav.klage.oppgave.domain.kodeverk.LovligeYtelser
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
@@ -34,7 +32,6 @@ class MottakService(
     private val meterRegistry: MeterRegistry
 ) {
 
-    private val lovligeYtelserIKabal = LovligeYtelser.lovligeYtelser(environment)
     private val lovligeTyperIKabal = LovligeTyper.lovligeTyper(environment)
 
 
@@ -42,22 +39,6 @@ class MottakService(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-    }
-
-    @Transactional
-    fun createMottakForKlageV1(oversendtKlage: OversendtKlageV1) {
-        secureLogger.debug("Prøver å lagre oversendtKlageV1: {}", oversendtKlage)
-        oversendtKlage.validate()
-
-        val mottak = mottakRepository.save(oversendtKlage.toMottak())
-
-        secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
-        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
-
-        applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
-
-        //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.ytelse.toTema().navn)
     }
 
     @Transactional
@@ -76,15 +57,21 @@ class MottakService(
         meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.ytelse.toTema().navn)
     }
 
-    fun OversendtKlageV1.validate() {
-        validateDuplicate(kilde, kildeReferanse)
-        tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-        validatePartId(klager.id)
-        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
-        validateYtelse(ytelse)
-        validateType(type)
-        validateEnhet(avsenderEnhet)
-        validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
+    @Transactional
+    fun createMottakForKlageAnkeV3(oversendtKlageAnke: OversendtKlageAnkeV3) {
+        secureLogger.debug("Prøver å lagre oversendtKlageAnkeV3: {}", oversendtKlageAnke)
+        oversendtKlageAnke.validate()
+
+        val mottak = mottakRepository.save(oversendtKlageAnke.toMottak())
+
+        secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
+        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
+        applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
+
+        //TODO: Move to outside of transaction to make sure it went well
+        meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.toTema().navn)
+
     }
 
     fun OversendtKlageV2.validate() {
@@ -92,10 +79,18 @@ class MottakService(
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
         validatePartId(klager.id)
         sakenGjelder?.run { validatePartId(sakenGjelder.id) }
-        validateYtelse(ytelse)
         validateType(type)
         validateEnhet(avsenderEnhet)
         validateSaksbehandler(avsenderSaksbehandlerIdent, avsenderEnhet)
+    }
+
+    fun OversendtKlageAnkeV3.validate() {
+        validateDuplicate(kilde, kildeReferanse)
+        tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
+        validatePartId(klager.id)
+        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
+        validateType(type)
+        validateEnhet(forrigeBehandlendeEnhet)
     }
 
     private fun validateDuplicate(kildeFagsystem: KildeFagsystem, kildeReferanse: String) {
@@ -112,13 +107,7 @@ class MottakService(
             throw OversendtKlageNotValidException("Kabal kan ikke motta klager med type $type ennå")
         }
     }
-
-    private fun validateYtelse(ytelse: Ytelse) {
-        if (!lovligeYtelserIKabal.contains(ytelse)) {
-            throw OversendtKlageNotValidException("Kabal kan ikke motta klager med ytelse $ytelse ennå")
-        }
-    }
-
+    
     private fun validateSaksbehandler(saksbehandlerident: String, enhetNr: String) {
         if (azureGateway.getPersonligDataOmSaksbehandlerMedIdent(saksbehandlerident).enhet.enhetId != enhetNr) {
             //throw OversendtKlageNotValidException("$saksbehandlerident er ikke saksbehandler i enhet $enhet")

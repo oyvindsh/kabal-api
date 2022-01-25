@@ -1,12 +1,10 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.domain.Behandling
-import no.nav.klage.oppgave.domain.klage.Klagebehandling.Status.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -14,23 +12,21 @@ import javax.persistence.Column
 import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 
-const val KLAGEENHET_PREFIX = "42"
-
 @Entity
-@DiscriminatorValue("klage")
-class Klagebehandling(
-    //Brukes ikke i anke
-    @Column(name = "dato_mottatt_foersteinstans")
-    val mottattFoersteinstans: LocalDate,
-    //Mulig at identen ikke brukes. Sjekk om dette kan droppes.
-    @Column(name = "avsender_saksbehandlerident_foersteinstans")
-    val avsenderSaksbehandleridentFoersteinstans: String? = null,
-    //Vises i GUI.
-    @Column(name = "avsender_enhet_foersteinstans")
-    val avsenderEnhetFoersteinstans: String,
-    //Kommer fra innsending
-    @Column(name = "kommentar_fra_foersteinstans")
-    val kommentarFraFoersteinstans: String? = null,
+@DiscriminatorValue("anke")
+class Ankebehandling(
+    @Column(name = "klage_vedtaks_dato")
+    val klageVedtaksDato: LocalDate? = null,
+    @Column(name = "klage_behandlende_enhet")
+    val klageBehandlendeEnhet: String,
+    //Fins i noen tilfeller, men ikke alle.
+    @Column(name = "klage_id")
+    var klagebehandlingId: UUID? = null,
+
+//    Finn ut hvordan dette skal fungere i anker etter hvert
+//    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
+//    var avsluttetAvSaksbehandler: LocalDateTime? = null,
+
 
     //Common properties between klage/anke
     id: UUID = UUID.randomUUID(),
@@ -55,7 +51,6 @@ class Klagebehandling(
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
     mottakId: UUID,
-    //Skal være en kvalitetsvurdering per hovedbehandling, derfor er dette riktig sted.
     kakaKvalitetsvurderingId: UUID? = null,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
@@ -87,46 +82,5 @@ class Klagebehandling(
     delbehandlinger = delbehandlinger,
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
-) {
-
-    override fun toString(): String {
-        return "Klagebehandling(id=$id, " +
-                "modified=$modified, " +
-                "created=$created)"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Klagebehandling
-
-        if (id != other.id) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-
-    /**
-     * Brukes til ES og statistikk per nå
-     */
-    fun getStatus(): Status {
-        return when {
-            currentDelbehandling().avsluttet != null -> FULLFOERT
-            currentDelbehandling().avsluttetAvSaksbehandler != null -> AVSLUTTET_AV_SAKSBEHANDLER
-            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> SENDT_TIL_MEDUNDERSKRIVER
-            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> RETURNERT_TIL_SAKSBEHANDLER
-            currentDelbehandling().medunderskriver?.saksbehandlerident != null -> MEDUNDERSKRIVER_VALGT
-            tildeling?.saksbehandlerident != null -> TILDELT
-            tildeling?.saksbehandlerident == null -> IKKE_TILDELT
-            else -> UKJENT
-        }
-    }
-
-    enum class Status {
-        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, FULLFOERT, UKJENT
-    }
+)  {
 }
