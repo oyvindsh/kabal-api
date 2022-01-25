@@ -125,4 +125,30 @@ class Ankebehandling(
     enum class Status {
         IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, FULLFOERT, UKJENT
     }
+    /*
+    Mulige utfall av første delbehandling:
+
+    HVIS delbehandling er AVSLUTTET
+     OG utfall er en av denne mengden: {STADFESTELSE, AVVIST, ?DELVIS_MEDHOLD?}
+     DA skal innstillingsbrev sendes til bruker
+       OG status skal settes til PÅ VENT
+       OG Ankebehandlingen får en datoverdi for "ventetid påbegynt"
+       "Ventetid påbegynt" er utledet av datoverdi for delbehandling AVSLUTTET
+
+    HVIS delbehandling er AVSLUTTET
+     OG utfall er en av denne mengden: {TRUKKET, OPPHEVET, MEDHOLD, UGUNST}
+     DA skal infobrev sendes til bruker
+       OG status er AVSLUTTET
+       OG Ankbehandlingen anses som ferdig
+
+    RETUR er ikke aktuelt for anker, skal ikke være et valg for saksbehandler
+
+    SEARCH lager en liste med anker på vent basert på statusen PÅ VENT
+
+    Dette fører til opprettelse av andre delbehandling:
+     - Noen trykker på knappen Gjenåpne
+
+     Situasjonen blir at vi har en ankebehandling med en åpen 2. delbehandling
+
+     */
 }
