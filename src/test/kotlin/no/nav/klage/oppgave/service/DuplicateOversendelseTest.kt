@@ -8,8 +8,10 @@ import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
+import no.nav.klage.oppgave.domain.saksbehandler.Enhet
+import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerPersonligInfo
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
-import no.nav.klage.oppgave.repositories.EnhetRepository
+import no.nav.klage.oppgave.gateway.AzureGateway
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
@@ -49,7 +51,7 @@ internal class DuplicateOversendelseTest {
     lateinit var norg2Client: Norg2Client
 
     @MockkBean(relaxed = true)
-    lateinit var enhetRepository: EnhetRepository
+    lateinit var azureGateway: AzureGateway
 
     @MockkBean(relaxed = true)
     lateinit var meterReqistry: MeterRegistry
@@ -60,7 +62,17 @@ internal class DuplicateOversendelseTest {
     @Test
     fun `duplicate oversendelse throws exception`() {
         val saksbehandler = "Z123456"
-        every { enhetRepository.getAnsatteIEnhet(any()) } returns listOf(saksbehandler)
+        every {
+            azureGateway.getPersonligDataOmSaksbehandlerMedIdent(saksbehandler)
+        } returns SaksbehandlerPersonligInfo(
+            navIdent = saksbehandler,
+            azureId = "Whatever",
+            fornavn = "Test",
+            etternavn = "Saksbehandler",
+            sammensattNavn = "Test Saksbehandler",
+            epost = "test.saksbehandler@trygdeetaten.no",
+            enhet = Enhet("4295", "KA Nord")
+        )
 
         val oversendtKlage = OversendtKlageV2(
             avsenderEnhet = "4455",

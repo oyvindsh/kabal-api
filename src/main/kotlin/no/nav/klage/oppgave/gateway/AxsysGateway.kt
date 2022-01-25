@@ -6,5 +6,5 @@ import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerIdent
 interface AxsysGateway {
 
     fun getEnheterForSaksbehandler(ident: String): List<Enhet>
-    fun getSaksbehandlereIEnhet(enhetId: String): List<SaksbehandlerIdent>
+    fun getSaksbehandlereIEnhet(enhetNr: String): List<SaksbehandlerIdent>
 }
