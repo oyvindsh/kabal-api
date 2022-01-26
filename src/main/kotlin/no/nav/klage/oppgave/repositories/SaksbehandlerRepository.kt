@@ -54,6 +54,9 @@ class SaksbehandlerRepository(
     fun getEnheterForSaksbehandler(ident: String): List<Enhet> =
         listOf(azureGateway.getDataOmInnloggetSaksbehandler().enhet)
 
+    fun getEnhetForSaksbehandler(ident: String): Enhet =
+        azureGateway.getDataOmInnloggetSaksbehandler().enhet
+
     private fun List<Enhet>.berikMedYtelser(): EnheterMedLovligeYtelser {
         return EnheterMedLovligeYtelser(this.map {
             EnhetMedLovligeYtelser(
