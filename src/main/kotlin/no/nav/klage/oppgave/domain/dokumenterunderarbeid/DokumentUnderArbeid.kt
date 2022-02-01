@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.domain.dokumenterunderarbeid
 
+import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -8,9 +9,11 @@ import javax.persistence.*
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "dokument_under_arbeid", schema = "klage")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@DynamicUpdate
 abstract class DokumentUnderArbeid(
     @Id
     var id: UUID,
+    //Innfører denne fordi vi trenger noe som er persistent selv når et dokument bytter fra å være et hoveddokument til å bli et vedlegg eller motsatt, og å bruke id skaper litt krøll i persistence contexten..
     @Column(name = "dokument_id")
     var dokumentId: UUID,
     @Column(name = "mellomlager_id")

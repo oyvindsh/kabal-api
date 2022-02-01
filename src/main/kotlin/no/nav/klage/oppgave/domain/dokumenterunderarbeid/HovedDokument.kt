@@ -58,4 +58,8 @@ open class HovedDokument(
         super.ferdigstillHvisIkkeAlleredeFerdigstilt(naa)
         vedlegg.forEach { it.ferdigstillHvisIkkeAlleredeFerdigstilt(naa) }
     }
+
+    fun findDokumentUnderArbeidByDokumentId(dokumentId: UUID): DokumentUnderArbeid? {
+        return (listOf(this) + this.vedlegg).find { it.dokumentId == dokumentId }
+    }
 }
