@@ -59,6 +59,12 @@ open class HovedDokument(
         vedlegg.forEach { it.ferdigstillHvisIkkeAlleredeFerdigstilt(naa) }
     }
 
+    fun markerFerdigHvisIkkeAlleredeMarkertFerdig() {
+        val naa = LocalDateTime.now()
+        super.markerFerdigHvisIkkeAlleredeMarkertFerdig(naa)
+        vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(naa) }
+    }
+
     fun findDokumentUnderArbeidByDokumentId(dokumentId: UUID): DokumentUnderArbeid? {
         return (listOf(this) + this.vedlegg).find { it.dokumentId == dokumentId }
     }

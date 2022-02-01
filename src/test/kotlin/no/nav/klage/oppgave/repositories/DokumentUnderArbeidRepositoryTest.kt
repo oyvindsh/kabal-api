@@ -52,6 +52,8 @@ class DokumentUnderArbeidRepositoryTest {
             behandlingId = behandlingId,
             dokumentType = DokumentType.VEDTAK,
         )
+        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig()
+        hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt()
         hovedDokumentRepository.save(hovedDokument)
 
         testEntityManager.flush()

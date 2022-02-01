@@ -53,6 +53,13 @@ abstract class DokumentUnderArbeid(
         }
     }
 
+    fun markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt: LocalDateTime) {
+        if (markertFerdig != null) {
+            markertFerdig = tidspunkt
+            modified = tidspunkt
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is DokumentUnderArbeid) return false
