@@ -12,33 +12,33 @@ import javax.persistence.*
 @DynamicUpdate
 abstract class DokumentUnderArbeid(
     @Id
-    var id: UUID,
+    open var id: UUID,
     //Innfører denne fordi vi trenger noe som er persistent selv når et dokument bytter fra å være et hoveddokument til å bli et vedlegg eller motsatt, og å bruke id skaper litt krøll i persistence contexten..
     @Column(name = "dokument_id")
-    var dokumentId: UUID,
+    open var dokumentId: UUID,
     @Column(name = "mellomlager_id")
-    var mellomlagerId: UUID,
+    open var mellomlagerId: UUID,
     @Column(name = "opplastet")
-    var opplastet: LocalDateTime,
+    open var opplastet: LocalDateTime,
     @Column(name = "size")
-    var size: Long,
+    open var size: Long,
     @Column(name = "name")
-    var name: String,
+    open var name: String,
     @Column(name = "smarteditor_id")
-    var smartEditorId: UUID? = null,
+    open var smartEditorId: UUID? = null,
     @Column(name = "behandling_id")
-    var behandlingId: UUID,
+    open var behandlingId: UUID,
     @Column(name = "dokument_type")
     @Convert(converter = DokumentTypeConverter::class)
-    var dokumentType: DokumentType,
+    open var dokumentType: DokumentType,
     @Column(name = "created")
-    var created: LocalDateTime = LocalDateTime.now(),
+    open var created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
-    var modified: LocalDateTime = LocalDateTime.now(),
+    open var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "markert_ferdig")
-    var markertFerdig: LocalDateTime? = null,
+    open var markertFerdig: LocalDateTime? = null,
     @Column(name = "ferdigstilt")
-    var ferdigstilt: LocalDateTime? = null,
+    open var ferdigstilt: LocalDateTime? = null,
 
     ) {
     companion object {

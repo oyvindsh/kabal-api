@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.dokumenterunderarbeid
 
 import org.hibernate.annotations.BatchSize
+import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
@@ -9,6 +10,7 @@ import javax.persistence.*
 
 @Entity
 @DiscriminatorValue(DokumentUnderArbeid.HOVED_DOKUMENT)
+@DynamicUpdate
 open class HovedDokument(
     id: UUID = UUID.randomUUID(),
     dokumentId: UUID = UUID.randomUUID(),
@@ -28,8 +30,8 @@ open class HovedDokument(
     @JoinColumn(name = "parent_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
-    var vedlegg: MutableList<Vedlegg> = mutableListOf(),
-    var dokumentEnhetId: UUID? = null,
+    open var vedlegg: MutableList<Vedlegg> = mutableListOf(),
+    open var dokumentEnhetId: UUID? = null,
 ) : DokumentUnderArbeid(
     id = id,
     dokumentId = dokumentId,

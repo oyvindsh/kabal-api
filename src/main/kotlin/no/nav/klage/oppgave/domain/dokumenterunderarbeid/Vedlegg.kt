@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.domain.dokumenterunderarbeid
 
+import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.DiscriminatorValue
@@ -7,6 +8,7 @@ import javax.persistence.Entity
 
 @Entity
 @DiscriminatorValue(DokumentUnderArbeid.VEDLEGG)
+@DynamicUpdate
 open class Vedlegg(
     id: UUID = UUID.randomUUID(),
     dokumentId: UUID = UUID.randomUUID(),
