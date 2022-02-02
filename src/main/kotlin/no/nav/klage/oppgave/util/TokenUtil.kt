@@ -125,4 +125,12 @@ class TokenUtil(
     private fun getClaim(name: String) =
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
             .jwtTokenClaims?.getStringClaim(name)
+
+    fun getAppAccessTokenWithKabalFileApiScope(): String {
+        return ""
+    }
+
+    fun getSaksbehandlerAccessTokenWithSmartEditorScope(): String {
+        return ""
+    }
 }

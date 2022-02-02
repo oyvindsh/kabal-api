@@ -4,7 +4,7 @@ CREATE TABLE klage.dokument_under_arbeid
     dokument_id       UUID      NOT NULL,
     type              TEXT      NOT NULL,
     dokument_type     TEXT      NOT NULL,
-    mellomlager_id    UUID      NOT NULL,
+    mellomlager_id    TEXT      NOT NULL,
     opplastet         TIMESTAMP NOT NULL,
     size              BIGINT    NOT NULL,
     name              TEXT      NOT NULL,

@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.domain.dokumenterunderarbeid
+package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import no.nav.klage.oppgave.domain.kodeverk.Kode
 import javax.persistence.AttributeConverter

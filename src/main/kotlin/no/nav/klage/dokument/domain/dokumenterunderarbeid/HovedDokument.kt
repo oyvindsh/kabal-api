@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.domain.dokumenterunderarbeid
+package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
@@ -12,9 +12,9 @@ import javax.persistence.*
 @DiscriminatorValue(DokumentUnderArbeid.HOVED_DOKUMENT)
 @DynamicUpdate
 open class HovedDokument(
-    id: UUID = UUID.randomUUID(),
-    dokumentId: UUID = UUID.randomUUID(),
-    mellomlagerId: UUID,
+    id: DokumentId = DokumentId(UUID.randomUUID()),
+    persistentDokumentId: PersistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
+    mellomlagerId: String,
     opplastet: LocalDateTime,
     size: Long,
     name: String,
@@ -34,7 +34,7 @@ open class HovedDokument(
     open var dokumentEnhetId: UUID? = null,
 ) : DokumentUnderArbeid(
     id = id,
-    dokumentId = dokumentId,
+    persistentDokumentId = persistentDokumentId,
     mellomlagerId = mellomlagerId,
     opplastet = opplastet,
     size = size,
@@ -45,7 +45,7 @@ open class HovedDokument(
 ) {
     fun toVedlegg(): Vedlegg =
         Vedlegg(
-            dokumentId = dokumentId,
+            persistentDokumentId = persistentDokumentId,
             mellomlagerId = mellomlagerId,
             opplastet = opplastet,
             size = size,
@@ -67,7 +67,7 @@ open class HovedDokument(
         vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(naa) }
     }
 
-    fun findDokumentUnderArbeidByDokumentId(dokumentId: UUID): DokumentUnderArbeid? {
-        return (listOf(this) + this.vedlegg).find { it.dokumentId == dokumentId }
+    fun findDokumentUnderArbeidByPersistentDokumentId(persistentDokumentId: PersistentDokumentId): DokumentUnderArbeid? {
+        return (listOf(this) + this.vedlegg).find { it.persistentDokumentId == persistentDokumentId }
     }
 }

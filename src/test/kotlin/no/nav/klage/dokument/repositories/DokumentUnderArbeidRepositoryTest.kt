@@ -1,9 +1,9 @@
-package no.nav.klage.oppgave.repositories
+package no.nav.klage.dokument.repositories
 
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.Vedlegg
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
-import no.nav.klage.oppgave.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.oppgave.domain.dokumenterunderarbeid.HovedDokument
-import no.nav.klage.oppgave.domain.dokumenterunderarbeid.Vedlegg
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,7 +45,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val behandlingId = UUID.randomUUID()
         val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -115,7 +115,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val behandlingId = UUID.randomUUID()
         val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -130,7 +130,7 @@ class DokumentUnderArbeidRepositoryTest {
         val byId = hovedDokumentRepository.getById(hovedDokument.id)
         byId.vedlegg.add(
             Vedlegg(
-                mellomlagerId = UUID.randomUUID(),
+                mellomlagerId = UUID.randomUUID().toString(),
                 opplastet = LocalDateTime.now(),
                 size = 1001,
                 name = "Vedtak.pdf",
@@ -151,7 +151,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val behandlingId = UUID.randomUUID()
         val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -165,7 +165,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val byId = hovedDokumentRepository.getById(hovedDokument.id)
         val vedlegg = Vedlegg(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -177,7 +177,7 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId2 = hovedDokumentRepository.findByVedleggDokumentId(vedlegg.dokumentId)
+        val byId2 = hovedDokumentRepository.findByVedleggPersistentDokumentId(vedlegg.persistentDokumentId)
         assertThat(byId2).isEqualTo(hovedDokument)
         assertThat(byId2.vedlegg).hasSize(1)
         assertThat(byId2.vedlegg.first()).isEqualTo(vedlegg)
@@ -188,7 +188,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val behandlingId = UUID.randomUUID()
         val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -203,7 +203,7 @@ class DokumentUnderArbeidRepositoryTest {
         val byId = hovedDokumentRepository.getById(hovedDokument.id)
         byId.vedlegg.add(
             Vedlegg(
-                mellomlagerId = UUID.randomUUID(),
+                mellomlagerId = UUID.randomUUID().toString(),
                 opplastet = LocalDateTime.now(),
                 size = 1001,
                 name = "Vedtak.pdf",
@@ -234,7 +234,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val behandlingId = UUID.randomUUID()
         val hovedDokument1 = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -244,7 +244,7 @@ class DokumentUnderArbeidRepositoryTest {
         hovedDokumentRepository.save(hovedDokument1)
 
         val hovedDokument2 = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -267,17 +267,17 @@ class DokumentUnderArbeidRepositoryTest {
 
         val byId3 = hovedDokumentRepository.getById(hovedDokument1.id)
         assertThat(byId3.vedlegg).hasSize(1)
-        assertThat(byId3.vedlegg.first().dokumentId).isEqualTo(nyttVedlegg.dokumentId)
+        assertThat(byId3.vedlegg.first().persistentDokumentId).isEqualTo(nyttVedlegg.persistentDokumentId)
     }
 
     @Test
     fun `documents with unknown type can be found and edited`() {
 
         val behandlingId = UUID.randomUUID()
-        val nyMellomlagerId = UUID.randomUUID()
+        val nyMellomlagerId = UUID.randomUUID().toString()
 
         val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -285,7 +285,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.VEDTAK,
         )
         val vedlegg = Vedlegg(
-            mellomlagerId = UUID.randomUUID(),
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
@@ -300,7 +300,9 @@ class DokumentUnderArbeidRepositoryTest {
 
 
         val hovedDokumentet =
-            hovedDokumentRepository.findDokumentUnderArbeidByDokumentIdOrVedleggDokumentId(hovedDokument.dokumentId)
+            hovedDokumentRepository.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(
+                hovedDokument.persistentDokumentId
+            )
         assertThat(hovedDokumentet).isNotNull
         hovedDokumentet!!.mellomlagerId = nyMellomlagerId
 
@@ -308,7 +310,7 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.clear()
 
         val vedlegget =
-            hovedDokumentRepository.findDokumentUnderArbeidByDokumentIdOrVedleggDokumentId(vedlegg.dokumentId)
+            hovedDokumentRepository.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(vedlegg.persistentDokumentId)
         assertThat(vedlegget).isNotNull
         vedlegget!!.mellomlagerId = nyMellomlagerId
 

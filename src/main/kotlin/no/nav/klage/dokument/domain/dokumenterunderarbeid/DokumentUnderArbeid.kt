@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.domain.dokumenterunderarbeid
+package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
@@ -11,13 +11,13 @@ import javax.persistence.*
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @DynamicUpdate
 abstract class DokumentUnderArbeid(
-    @Id
-    open var id: UUID,
+    @EmbeddedId
+    open var id: DokumentId,
     //Innfører denne fordi vi trenger noe som er persistent selv når et dokument bytter fra å være et hoveddokument til å bli et vedlegg eller motsatt, og å bruke id skaper litt krøll i persistence contexten..
-    @Column(name = "dokument_id")
-    open var dokumentId: UUID,
+    @Embedded
+    open var persistentDokumentId: PersistentDokumentId,
     @Column(name = "mellomlager_id")
-    open var mellomlagerId: UUID,
+    open var mellomlagerId: String,
     @Column(name = "opplastet")
     open var opplastet: LocalDateTime,
     @Column(name = "size")

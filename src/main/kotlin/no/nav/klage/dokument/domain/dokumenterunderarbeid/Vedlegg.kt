@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.domain.dokumenterunderarbeid
+package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
@@ -10,9 +10,9 @@ import javax.persistence.Entity
 @DiscriminatorValue(DokumentUnderArbeid.VEDLEGG)
 @DynamicUpdate
 open class Vedlegg(
-    id: UUID = UUID.randomUUID(),
-    dokumentId: UUID = UUID.randomUUID(),
-    mellomlagerId: UUID,
+    id: DokumentId = DokumentId(UUID.randomUUID()),
+    persistentDokumentId: PersistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
+    mellomlagerId: String,
     opplastet: LocalDateTime,
     size: Long,
     name: String,
@@ -21,7 +21,7 @@ open class Vedlegg(
     dokumentType: DokumentType,
 ) : DokumentUnderArbeid(
     id = id,
-    dokumentId = dokumentId,
+    persistentDokumentId = persistentDokumentId,
     mellomlagerId = mellomlagerId,
     opplastet = opplastet,
     size = size,
@@ -32,7 +32,7 @@ open class Vedlegg(
 ) {
     fun toHovedDokument(): HovedDokument =
         HovedDokument(
-            dokumentId = dokumentId,
+            persistentDokumentId = persistentDokumentId,
             mellomlagerId = mellomlagerId,
             opplastet = opplastet,
             size = size,
