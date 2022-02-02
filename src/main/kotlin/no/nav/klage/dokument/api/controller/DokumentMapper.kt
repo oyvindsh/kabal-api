@@ -28,6 +28,7 @@ class DokumentMapper {
             dokumentTypeId = hovedDokument.dokumentType.id,
             opplastet = hovedDokument.opplastet,
             isSmartDokument = hovedDokument.smartEditorId != null,
+            isMarkertAvsluttet = hovedDokument.markertFerdig != null,
             vedlegg = hovedDokument.vedlegg.map { mapToVedleggView(it) }
         )
     }
@@ -39,6 +40,7 @@ class DokumentMapper {
             dokumentTypeId = vedlegg.dokumentType.id,
             opplastet = vedlegg.opplastet,
             isSmartDokument = vedlegg.smartEditorId != null,
+            isMarkertAvsluttet = vedlegg.markertFerdig != null,
         )
     }
 

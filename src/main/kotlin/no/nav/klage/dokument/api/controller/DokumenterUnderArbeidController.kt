@@ -129,8 +129,10 @@ class DokumentUnderArbeidController(
     }
 
     @PostMapping("/{hoveddokumentid}/ferdigstill")
-    fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(hovedDokumentId: UUID) {
+    fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(hovedDokumentId: UUID): HovedDokumentView {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        val hovedDokument = dokumentService.finnOgMarkerFerdigHovedDokument(PersistentDokumentId(hovedDokumentId))
+        return dokumentMapper.mapToHovedDokumentView(
+            dokumentService.finnOgMarkerFerdigHovedDokument(PersistentDokumentId(hovedDokumentId), ident)
+        )
     }
 }

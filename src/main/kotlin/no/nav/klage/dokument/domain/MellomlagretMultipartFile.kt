@@ -4,11 +4,10 @@ import no.nav.klage.oppgave.util.getLogger
 import org.springframework.web.multipart.MultipartFile
 import java.io.*
 
-class MellomlagretMultipartFile(
-    private val mellomlagretDokument: MellomlagretDokument,
-) : MultipartFile {
+class MellomlagretMultipartFile(private val mellomlagretDokument: MellomlagretDokument) : MultipartFile {
 
     companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
     }
 

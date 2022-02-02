@@ -1,7 +1,7 @@
 package no.nav.klage.dokument.clients.smarteditorapi
 
 import brave.Tracer
-import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
 import no.nav.klage.dokument.domain.SmartEditorDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.oppgave.util.TokenUtil
@@ -36,7 +36,7 @@ class SmartEditorClient(
     }
 
     @Retryable
-    fun getDocumentAsPDF(smartEditorId: UUID): MellomlagretDokument {
+    fun getDocumentAsPDF(smartEditorId: UUID): SmartEditorDokument {
 
         val document = smartEditorWebClient.get()
             .uri { uriBuilder ->
@@ -52,10 +52,14 @@ class SmartEditorClient(
                     val header: MutableList<String> = response.headers().header("Content-Disposition")
                     header.forEach { logger.debug("Content-Disposition header: $it") }
                     response.bodyToMono<ByteArray>().map {
-                        MellomlagretDokument(
-                            content = it,
-                            title = "vedtak.pdf", //TODO: Get from header,
-                            contentType = MediaType.valueOf(Tika().detect(it)) //TODO Fra header?
+                        SmartEditorDokument(
+                            smartEditorId = smartEditorId,
+                            mellomlagretDokument =
+                            OpplastetMellomlagretDokument(
+                                content = it,
+                                title = "vedtak.pdf", //TODO: Get from header,
+                                contentType = MediaType.valueOf(Tika().detect(it)) //TODO Fra header?
+                            )
                         )
                     }
                 } else {

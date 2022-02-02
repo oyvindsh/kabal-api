@@ -2,8 +2,8 @@ package no.nav.klage.dokument.service
 
 
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
-import no.nav.klage.dokument.domain.IMellomlagretDokument
 import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -19,7 +19,7 @@ class MellomlagerService(
         private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
     }
 
-    fun uploadDocument(dokument: IMellomlagretDokument): String =
+    fun uploadDocument(dokument: MellomlagretDokument): String =
         fileApiClient.uploadDocument(
             dokument.content,
             dokument.title
@@ -32,7 +32,7 @@ class MellomlagerService(
         )
 
     fun getUploadedDocument(mellomlagerId: String): MellomlagretDokument =
-        MellomlagretDokument(
+        OpplastetMellomlagretDokument(
             getFileNameFromMellomlagerId(mellomlagerId),
             fileApiClient.getDocument(mellomlagerId),
             standardMediaTypeInGCS
@@ -42,7 +42,7 @@ class MellomlagerService(
         fileApiClient.deleteDocument(mellomlagerId)
 
     fun getUploadedDocumentAsSystemUser(mellomlagerId: String): MellomlagretDokument =
-        MellomlagretDokument(
+        OpplastetMellomlagretDokument(
             getFileNameFromMellomlagerId(mellomlagerId),
             fileApiClient.getDocument(mellomlagerId, true),
             standardMediaTypeInGCS

@@ -13,7 +13,7 @@ import org.apache.tika.Tika
 import org.springframework.http.MediaType
 import org.springframework.util.unit.DataSize
 
-class AttachmentValidatorService(
+class MellomlagretDokumentValidatorService(
     private val clamAvClient: ClamAvClient,
     private val maxAttachmentSize: DataSize
 ) {

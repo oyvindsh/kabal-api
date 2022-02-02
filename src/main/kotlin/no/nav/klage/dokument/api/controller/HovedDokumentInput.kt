@@ -11,6 +11,7 @@ interface DokumentView {
     val dokumentTypeId: String
     val opplastet: LocalDateTime
     val isSmartDokument: Boolean
+    val isMarkertAvsluttet: Boolean
 }
 
 data class HovedDokumentView(
@@ -19,6 +20,7 @@ data class HovedDokumentView(
     override val dokumentTypeId: String,
     override val opplastet: LocalDateTime,
     override val isSmartDokument: Boolean,
+    override val isMarkertAvsluttet: Boolean,
     val vedlegg: List<VedleggView>,
 ) : DokumentView
 
@@ -28,6 +30,7 @@ data class VedleggView(
     override val dokumentTypeId: String,
     override val opplastet: LocalDateTime,
     override val isSmartDokument: Boolean,
+    override val isMarkertAvsluttet: Boolean,
 ) : DokumentView
 
 data class PersistentDokumentIdInput(val id: UUID)

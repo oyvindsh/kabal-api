@@ -21,14 +21,17 @@ import javax.transaction.Transactional
 @Transactional
 class DokumentService(
     private val hovedDokumentRepository: HovedDokumentRepository,
-    private val attachmentValidator: AttachmentValidatorService,
+    private val attachmentValidator: MellomlagretDokumentValidatorService,
     private val mellomlagerService: MellomlagerService,
     private val smartEditorClient: SmartEditorClient,
     private val behandlingService: BehandlingService,
     private val dokumentEnhetService: KabalDocumentGateway,
 ) {
 
-    fun finnOgMarkerFerdigHovedDokument(hovedDokumentPersistentDokumentId: PersistentDokumentId): HovedDokument {
+    fun finnOgMarkerFerdigHovedDokument(
+        hovedDokumentPersistentDokumentId: PersistentDokumentId,
+        ident: String
+    ): HovedDokument {
         return hovedDokumentRepository.findByPersistentDokumentId(hovedDokumentPersistentDokumentId)
             ?.apply { markerFerdigHvisIkkeAlleredeMarkertFerdig() }
             ?: throw DokumentValidationException("Dokument ikke funnet")
@@ -66,7 +69,7 @@ class DokumentService(
                     name = smartEditorDokument.title,
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
-                    smartEditorId = smartEditorDokument.id,
+                    smartEditorId = smartEditorDokument.smartEditorId,
                     vedlegg = mutableListOf(),
                 )
             )
