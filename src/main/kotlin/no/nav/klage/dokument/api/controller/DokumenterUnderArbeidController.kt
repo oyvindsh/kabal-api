@@ -62,7 +62,7 @@ class DokumentUnderArbeidController(
             )
         )
     }
-    
+
     //TODO: Har hoppet over endepunkter for å oppdatere/erstatte dokumentet
 
     @ResponseBody
@@ -90,54 +90,35 @@ class DokumentUnderArbeidController(
         )
     }
 
-    /*
-    @PostMapping("/{dokumentEnhetId}/vedlegg")
+    @PostMapping("/{dokumentId}/vedlegg")
     fun kobleVedlegg(
-        @PathVariable("dokumentEnhetId") dokumentEnhetId: UUID,
-        @RequestBody input: DokumentEnhetIdInput
-    ): DokumentEnhetView {
-        logger.debug("Kall mottatt på kobleVedlegg for $dokumentEnhetId")
-        return dokumentEnhetMapper.mapToDokumentEnhetView(
-            dokumentEnhetService.kobleVedlegg(
-                dokumentEnhetId = dokumentEnhetId,
-                dokumentEnhetSomSkalBliVedleggId = input.id,
+        @PathVariable("dokumentId") persistentDokumentId: UUID,
+        @RequestBody input: PersistentDokumentIdInput
+    ): HovedDokumentView {
+        logger.debug("Kall mottatt på kobleVedlegg for $persistentDokumentId")
+        return dokumentMapper.mapToHovedDokumentView(
+            dokumentService.kobleVedlegg(
+                persistentDokumentId = PersistentDokumentId(persistentDokumentId),
+                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(input.id),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         )
     }
 
-    @DeleteMapping("/{dokumentEnhetId}/vedlegg/{vedleggId}")
+    @DeleteMapping("/{dokumentPersistentId}/vedlegg/{dokumentPersistentIdVedlegg}")
     fun fristillVedlegg(
-        @PathVariable("dokumentEnhetId") dokumentEnhetId: UUID,
-        @PathVariable("vedleggId") vedleggId: UUID,
-    ): DokumentEnhetView {
-        logger.debug("Kall mottatt på fristillVedlegg for $dokumentEnhetId og $vedleggId")
-        return dokumentEnhetMapper.mapToDokumentEnhetView(
-            dokumentEnhetService.fristillVedlegg(
-                dokumentEnhetId = dokumentEnhetId,
-                vedleggId = vedleggId,
+        @PathVariable("dokumentId") persistentDokumentId: UUID,
+        @PathVariable("dokumentIdVedlegg") persistentDokumentIdVedlegg: UUID,
+    ): HovedDokumentView {
+        logger.debug("Kall mottatt på fristillVedlegg for $persistentDokumentId og $persistentDokumentIdVedlegg")
+        return dokumentMapper.mapToHovedDokumentView(
+            dokumentService.frikobleVedlegg(
+                persistentDokumentId = PersistentDokumentId(persistentDokumentId),
+                persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentIdVedlegg),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         )
     }
-
-    @ResponseBody
-    @GetMapping("/{dokumentEnhetId}/vedlegg/{vedleggId}")
-    fun getVedlegg(
-        @PathVariable("dokumentEnhetId") dokumentEnhetId: UUID,
-        @PathVariable("vedleggId") vedleggId: UUID,
-    ): ResponseEntity<ByteArray> {
-        logger.debug("Kall mottatt på getVedlegg for $dokumentEnhetId og $vedleggId")
-        return dokumentEnhetMapper.mapToByteArray(
-            dokumentEnhetService.hentMellomlagretVedlegg(
-                dokumentEnhetId = dokumentEnhetId,
-                vedleggId = vedleggId,
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
-        )
-    }
-
-     */
 
     @GetMapping
     fun findHovedDokumenter(

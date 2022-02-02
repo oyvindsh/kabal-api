@@ -179,7 +179,7 @@ class DokumentUnderArbeidRepositoryTest {
 
         val byId2 = hovedDokumentRepository.findByVedleggPersistentDokumentId(vedlegg.persistentDokumentId)
         assertThat(byId2).isEqualTo(hovedDokument)
-        assertThat(byId2.vedlegg).hasSize(1)
+        assertThat(byId2!!.vedlegg).hasSize(1)
         assertThat(byId2.vedlegg.first()).isEqualTo(vedlegg)
     }
 

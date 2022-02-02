@@ -30,7 +30,8 @@ class DokumentService(
 
     fun finnOgMarkerFerdigHovedDokument(hovedDokumentPersistentDokumentId: PersistentDokumentId): HovedDokument {
         return hovedDokumentRepository.findByPersistentDokumentId(hovedDokumentPersistentDokumentId)
-            .apply { markerFerdigHvisIkkeAlleredeMarkertFerdig() }
+            ?.apply { markerFerdigHvisIkkeAlleredeMarkertFerdig() }
+            ?: throw DokumentValidationException("Dokument ikke funnet")
     }
 
     fun opprettOgMellomlagreNyttHoveddokument(
@@ -94,10 +95,32 @@ class DokumentService(
     }
 
     fun slettDokument(persistentDokumentId: PersistentDokumentId, innloggetIdent: String) {
-        TODO("Not yet implemented")
-        //Sjekke om det er markertSomFerdigstilt
-        //Hvis hoveddokument, sjekk om det har vedlegg
-        
+        val hovedDokument: HovedDokument? = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
+        if (hovedDokument != null) {
+
+            if (hovedDokument.erMarkertFerdig()) {
+                throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
+            }
+            if (hovedDokument.harVedlegg()) {
+                throw DokumentValidationException("Kan ikke slette DokumentEnhet med vedlegg")
+            }
+            hovedDokumentRepository.delete(hovedDokument)
+        } else {
+            val hovedDokumentMedVedlegg =
+                hovedDokumentRepository.findByVedleggPersistentDokumentId(persistentDokumentId)
+                    ?: throw DokumentValidationException("Dokument ikke funnet")
+            if (hovedDokumentMedVedlegg.erMarkertFerdig()) {
+                throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
+            }
+            if (hovedDokumentMedVedlegg.harVedlegg()) {
+                throw DokumentValidationException("Kan ikke slette DokumentEnhet med vedlegg")
+
+            }
+            val vedlegg = hovedDokumentMedVedlegg.findDokumentUnderArbeidByPersistentDokumentId(persistentDokumentId)
+                ?: throw DokumentValidationException("Dokument ikke funnet")
+            hovedDokumentMedVedlegg.vedlegg.remove(vedlegg)
+        }
+
     }
 
     fun findHovedDokumenter(behandlingId: UUID): List<HovedDokument> {
@@ -125,5 +148,50 @@ class DokumentService(
             val ferdigstiltDokumentEnhet = dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = dokumentEnhetId)
             //Feiler det får vi en 500..
         }
+    }
+
+    fun kobleVedlegg(
+        persistentDokumentId: PersistentDokumentId,
+        persistentDokumentIdHovedDokumentSomSkalBliVedlegg: PersistentDokumentId,
+        innloggetIdent: String
+    ): HovedDokument {
+        val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
+            ?: throw DokumentValidationException("Dokument ikke funnet")
+        if (hovedDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
+        }
+
+        val hovedDokumentSomSkalBliVedlegg =
+            hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentIdHovedDokumentSomSkalBliVedlegg)
+                ?: throw DokumentValidationException("Dokument ikke funnet")
+        if (hovedDokumentSomSkalBliVedlegg.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
+        }
+        if (hovedDokumentSomSkalBliVedlegg.harVedlegg()) {
+            throw DokumentValidationException("Et dokument som selv har vedlegg kan ikke bli et vedlegg")
+        }
+
+        hovedDokument.vedlegg.add(hovedDokumentSomSkalBliVedlegg.toVedlegg())
+        hovedDokumentRepository.delete(hovedDokumentSomSkalBliVedlegg)
+        return hovedDokument
+    }
+
+    fun frikobleVedlegg(
+        persistentDokumentId: PersistentDokumentId,
+        persistentDokumentIdVedlegg: PersistentDokumentId,
+        innloggetIdent: String
+    ): HovedDokument {
+        val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
+            ?: throw DokumentValidationException("Dokument ikke funnet")
+        if (hovedDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke frikoble et dokument som er ferdigstilt")
+        }
+
+        val vedlegg =
+            hovedDokument.findVedleggByPersistentDokumentId(persistentDokumentIdVedlegg)
+                ?: throw DokumentValidationException("Dokument ikke funnet")
+
+        hovedDokument.vedlegg.remove(vedlegg)
+        return hovedDokumentRepository.save(vedlegg.toHovedDokument())
     }
 }

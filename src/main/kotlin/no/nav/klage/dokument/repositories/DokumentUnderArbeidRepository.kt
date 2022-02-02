@@ -23,25 +23,25 @@ import java.util.*
 interface HovedDokumentRepository : //BaseDokumentUnderArbeidRepository<HovedDokument>,
     JpaRepository<HovedDokument, DokumentId> {
     fun findByBehandlingId(behandlingId: UUID): List<HovedDokument>
-    fun findByPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument
+    fun findByPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument?
     fun findByPersistentDokumentIdOrVedleggPersistentDokumentId(
         persistentDokumentId: PersistentDokumentId,
         vedleggPersistentDokumentId: PersistentDokumentId
-    ): HovedDokument
+    ): HovedDokument?
 
-    fun findByVedleggPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument
-    fun findByVedleggId(id: DokumentId): HovedDokument
+    fun findByVedleggPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument?
+    fun findByVedleggId(id: DokumentId): HovedDokument?
     fun findByMarkertFerdigNotNullAndFerdigstiltNull(): List<HovedDokument>
 }
 
-fun HovedDokumentRepository.findByPersistentDokumentIdOrVedleggPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument =
+fun HovedDokumentRepository.findByPersistentDokumentIdOrVedleggPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument? =
     this.findByPersistentDokumentIdOrVedleggPersistentDokumentId(persistentDokumentId, persistentDokumentId)
 
 fun HovedDokumentRepository.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(
     persistentDokumentId: PersistentDokumentId
 ): DokumentUnderArbeid? =
     this.findByPersistentDokumentIdOrVedleggPersistentDokumentId(persistentDokumentId, persistentDokumentId)
-        .findDokumentUnderArbeidByPersistentDokumentId(persistentDokumentId)
+        ?.findDokumentUnderArbeidByPersistentDokumentId(persistentDokumentId)
 
 fun HovedDokumentRepository.getDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(
     persistentDokumentId: PersistentDokumentId

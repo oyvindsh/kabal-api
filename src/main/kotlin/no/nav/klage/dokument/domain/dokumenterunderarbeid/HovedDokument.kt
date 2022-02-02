@@ -70,4 +70,16 @@ open class HovedDokument(
     fun findDokumentUnderArbeidByPersistentDokumentId(persistentDokumentId: PersistentDokumentId): DokumentUnderArbeid? {
         return (listOf(this) + this.vedlegg).find { it.persistentDokumentId == persistentDokumentId }
     }
+
+    fun findVedleggByPersistentDokumentId(persistentDokumentId: PersistentDokumentId): Vedlegg? {
+        return vedlegg.find { it.persistentDokumentId == persistentDokumentId }
+    }
+
+    fun harVedlegg(): Boolean {
+        return vedlegg.isNotEmpty()
+    }
+
+    fun erMarkertFerdig(): Boolean {
+        return markertFerdig != null
+    }
 }

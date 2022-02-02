@@ -88,7 +88,7 @@ internal class DokumentUnderArbeidControllerTest {
 
         val hovedDokumentView = objectMapper.readValue(json, HovedDokumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
-        assertThat(hovedDokumentView.dokumentType).isEqualTo(DokumentType.VEDTAK.id)
+        assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.VEDTAK.id)
     }
 
     @Test
@@ -130,6 +130,6 @@ internal class DokumentUnderArbeidControllerTest {
 
         val hovedDokumentView = objectMapper.readValue(json, HovedDokumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
-        assertThat(hovedDokumentView.dokumentType).isEqualTo(DokumentType.VEDTAK.id)
+        assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.VEDTAK.id)
     }
 }
