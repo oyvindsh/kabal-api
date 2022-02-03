@@ -50,7 +50,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig()
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt()
@@ -120,7 +120,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokumentRepository.save(hovedDokument)
 
@@ -135,7 +135,7 @@ class DokumentUnderArbeidRepositoryTest {
                 size = 1001,
                 name = "Vedtak.pdf",
                 behandlingId = behandlingId,
-                dokumentType = DokumentType.VEDTAK,
+                dokumentType = DokumentType.BREV,
             )
         )
 
@@ -156,7 +156,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokumentRepository.save(hovedDokument)
 
@@ -170,7 +170,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         byId.vedlegg.add(vedlegg)
 
@@ -193,7 +193,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokumentRepository.save(hovedDokument)
 
@@ -208,7 +208,7 @@ class DokumentUnderArbeidRepositoryTest {
                 size = 1001,
                 name = "Vedtak.pdf",
                 behandlingId = behandlingId,
-                dokumentType = DokumentType.VEDTAK,
+                dokumentType = DokumentType.BREV,
             )
         )
 
@@ -216,7 +216,8 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.clear()
 
         val byId2 = hovedDokumentRepository.getById(hovedDokument.id)
-        val hovedDokumentFraTidligereVedlegg = byId2.vedlegg.removeAt(0).toHovedDokument()
+        val vedlegg = byId2.vedlegg.removeAt(0)
+        val hovedDokumentFraTidligereVedlegg = vedlegg.toHovedDokument()
         hovedDokumentRepository.save(hovedDokumentFraTidligereVedlegg)
 
         testEntityManager.flush()
@@ -239,7 +240,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokumentRepository.save(hovedDokument1)
 
@@ -249,7 +250,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokumentRepository.save(hovedDokument2)
 
@@ -258,9 +259,10 @@ class DokumentUnderArbeidRepositoryTest {
 
         val byId1 = hovedDokumentRepository.getById(hovedDokument1.id)
         val byId2 = hovedDokumentRepository.getById(hovedDokument2.id)
+
+        hovedDokumentRepository.delete(byId2)
         val nyttVedlegg = byId2.toVedlegg()
         byId1.vedlegg.add(nyttVedlegg)
-        hovedDokumentRepository.delete(hovedDokument2)
 
         testEntityManager.flush()
         testEntityManager.clear()
@@ -282,7 +284,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         val vedlegg = Vedlegg(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -290,7 +292,7 @@ class DokumentUnderArbeidRepositoryTest {
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
         )
         hovedDokument.vedlegg.add(vedlegg)
         hovedDokumentRepository.save(hovedDokument)

@@ -7,7 +7,7 @@ import javax.persistence.Embeddable
 
 @Embeddable
 data class PersistentDokumentId(
-    @Column(name = "dokument_id")
+    @Column(name = "persistent_dokument_id")
     open var persistentDokumentId: UUID,
 ) : Serializable
 

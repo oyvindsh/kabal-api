@@ -142,7 +142,7 @@ class DokumentUnderArbeidController(
             .map { dokumentMapper.mapToHovedDokumentView(it) }
     }
 
-    @GetMapping
+    @GetMapping("/smart")
     fun findSmartDokumenter(
         @RequestParam("eksternReferanse") eksternReferanse: UUID,
     ): List<DokumentView> {

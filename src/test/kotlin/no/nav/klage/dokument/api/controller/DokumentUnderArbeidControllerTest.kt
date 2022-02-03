@@ -48,10 +48,7 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createAndUploadHoveddokument() {
 
-        val hovedDokumentInput = HovedDokumentInput(
-            dokumentType = DokumentType.VEDTAK.id,
-            eksternReferanse = UUID.randomUUID(),
-        )
+        val hovedDokumentInput = HovedDokumentInput(eksternReferanse = UUID.randomUUID())
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
@@ -69,7 +66,7 @@ internal class DokumentUnderArbeidControllerTest {
             name = "vedtak.pdf",
             behandlingId = hovedDokumentInput.eksternReferanse,
             smartEditorId = null,
-            dokumentType = DokumentType.of(hovedDokumentInput.dokumentType),
+            dokumentType = DokumentType.BREV,
         )
 
 
@@ -88,16 +85,13 @@ internal class DokumentUnderArbeidControllerTest {
 
         val hovedDokumentView = objectMapper.readValue(json, HovedDokumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
-        assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.VEDTAK.id)
+        assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.BREV.id)
     }
 
     @Test
     fun createSmartEditorHoveddokument() {
 
-        val hovedDokumentInput = HovedDokumentInput(
-            dokumentType = DokumentType.VEDTAK.id,
-            eksternReferanse = UUID.randomUUID(),
-        )
+        val hovedDokumentInput = HovedDokumentInput(eksternReferanse = UUID.randomUUID())
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
@@ -115,7 +109,7 @@ internal class DokumentUnderArbeidControllerTest {
             name = "vedtak.pdf",
             behandlingId = hovedDokumentInput.eksternReferanse,
             smartEditorId = UUID.randomUUID(),
-            dokumentType = DokumentType.of(hovedDokumentInput.dokumentType),
+            dokumentType = DokumentType.BREV,
         )
 
 
@@ -130,6 +124,6 @@ internal class DokumentUnderArbeidControllerTest {
 
         val hovedDokumentView = objectMapper.readValue(json, HovedDokumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
-        assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.VEDTAK.id)
+        assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.BREV.id)
     }
 }

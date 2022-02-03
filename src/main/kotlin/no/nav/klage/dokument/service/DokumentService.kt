@@ -130,29 +130,6 @@ class DokumentService(
         return hovedDokumentRepository.findByBehandlingId(behandlingId)
     }
 
-    //Denne kan kjøres asynkront vha en scheduled task. Er ikke ferdig koda
-    fun ferdigstillMarkerteHovedDokumenter() {
-
-        val liste = hovedDokumentRepository.findByMarkertFerdigNotNullAndFerdigstiltNull()
-        liste.forEach {
-            val hovedDokument = it
-
-            val behandling = behandlingService.getBehandling(hovedDokument.behandlingId)
-            //TODO: Ønsker meg egentlig en måte å gjøre alt det følgende i en swung..
-            val dokumentEnhetId = dokumentEnhetService.createDokumentEnhet(behandling)
-            val mellomlagretDokument =
-                hentMellomlagretDokumentSomSystembruker(hovedDokument.persistentDokumentId) //Må gjøres som systembruker
-            val multipartFile =
-                MellomlagretMultipartFile(mellomlagretDokument)
-            dokumentEnhetService.uploadHovedDokument(dokumentEnhetId, multipartFile)
-            //TODO: Må også uploade vedlegg
-
-
-            val ferdigstiltDokumentEnhet = dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = dokumentEnhetId)
-            //Feiler det får vi en 500..
-        }
-    }
-
     fun kobleVedlegg(
         persistentDokumentId: PersistentDokumentId,
         persistentDokumentIdHovedDokumentSomSkalBliVedlegg: PersistentDokumentId,
@@ -176,9 +153,9 @@ class DokumentService(
         if (hovedDokumentSomSkalBliVedlegg.harVedlegg()) {
             throw DokumentValidationException("Et dokument som selv har vedlegg kan ikke bli et vedlegg")
         }
-
-        hovedDokument.vedlegg.add(hovedDokumentSomSkalBliVedlegg.toVedlegg())
+        
         hovedDokumentRepository.delete(hovedDokumentSomSkalBliVedlegg)
+        hovedDokument.vedlegg.add(hovedDokumentSomSkalBliVedlegg.toVedlegg())
         return hovedDokument
     }
 
@@ -215,5 +192,28 @@ class DokumentService(
         }
         hovedDokument.dokumentType = dokumentType
         return hovedDokument
+    }
+
+    //Denne kan kjøres asynkront vha en scheduled task. Er ikke ferdig koda
+    fun ferdigstillMarkerteHovedDokumenter() {
+
+        val liste = hovedDokumentRepository.findByMarkertFerdigNotNullAndFerdigstiltNull()
+        liste.forEach {
+            val hovedDokument = it
+
+            val behandling = behandlingService.getBehandling(hovedDokument.behandlingId)
+            //TODO: Ønsker meg egentlig en måte å gjøre alt det følgende i en swung..
+            val dokumentEnhetId = dokumentEnhetService.createDokumentEnhet(behandling)
+            val mellomlagretDokument =
+                hentMellomlagretDokumentSomSystembruker(hovedDokument.persistentDokumentId) //Må gjøres som systembruker
+            val multipartFile =
+                MellomlagretMultipartFile(mellomlagretDokument)
+            dokumentEnhetService.uploadHovedDokument(dokumentEnhetId, multipartFile)
+            //TODO: Må også uploade vedlegg
+
+
+            val ferdigstiltDokumentEnhet = dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = dokumentEnhetId)
+            //Feiler det får vi en 500..
+        }
     }
 }
