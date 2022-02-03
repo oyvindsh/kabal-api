@@ -7,8 +7,9 @@ import javax.persistence.Converter
 
 enum class DokumentType(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
 
-    VEDTAK("1", "Vedtak", "Vedtak"),
-    ANNET("2", "Annet", "Annet")
+    BREV("1", "Brev", "Brev"),
+    NOTAT("2", "Notat", "Notat"),
+    VEDLEGG("3", "Vedlegg", "Vedlegg")
     ;
 
     override fun toString(): String {

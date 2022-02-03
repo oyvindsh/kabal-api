@@ -3,7 +3,7 @@ package no.nav.klage.dokument.api.controller
 import java.time.LocalDateTime
 import java.util.*
 
-data class HovedDokumentInput(val dokumentType: String, val eksternReferanse: UUID)
+data class HovedDokumentInput(val eksternReferanse: UUID)
 
 interface DokumentView {
     val id: UUID
@@ -34,3 +34,5 @@ data class VedleggView(
 ) : DokumentView
 
 data class PersistentDokumentIdInput(val id: UUID)
+
+data class DokumentTypeInput(val dokumentTypeId: String)

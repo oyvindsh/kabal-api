@@ -38,11 +38,11 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToHovedDokumentView(
             dokumentService.opprettOgMellomlagreNyttHoveddokument(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                dokumentType = DokumentType.of(body.dokumentType),
+                dokumentType = DokumentType.BREV,
                 behandlingId = body.eksternReferanse,
                 opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(
                     input.file,
-                    DokumentType.of(body.dokumentType)
+                    DokumentType.BREV //TODO Dette gir ikke mening lenger
                 ),
             )
         )
@@ -56,9 +56,22 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToHovedDokumentView(
             dokumentService.opprettOgMellomlagreNyttHoveddokument(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                dokumentType = DokumentType.of(body.dokumentType),
+                dokumentType = DokumentType.BREV,
                 behandlingId = body.eksternReferanse,
                 opplastetFil = null,
+            )
+        )
+    }
+
+    @PutMapping("/{dokumentId}/dokumenttype")
+    fun endreDokumentType(
+        @PathVariable("dokumentId") dokumentId: UUID,
+        @RequestBody input: DokumentTypeInput
+    ): HovedDokumentView {
+        return dokumentMapper.mapToHovedDokumentView(
+            dokumentService.updateDokumentType(
+                persistentDokumentId = PersistentDokumentId(dokumentId),
+                dokumentType = DokumentType.of(input.dokumentTypeId)
             )
         )
     }
@@ -124,15 +137,28 @@ class DokumentUnderArbeidController(
     fun findHovedDokumenter(
         @RequestParam("eksternReferanse") eksternReferanse: UUID,
     ): List<HovedDokumentView> {
-        return dokumentService.findHovedDokumenter(eksternReferanse)
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
+        return dokumentService.findHovedDokumenter(behandlingId = eksternReferanse, ident = ident)
             .map { dokumentMapper.mapToHovedDokumentView(it) }
+    }
+
+    @GetMapping
+    fun findSmartDokumenter(
+        @RequestParam("eksternReferanse") eksternReferanse: UUID,
+    ): List<DokumentView> {
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
+        return dokumentService.findSmartDokumenter(behandlingId = eksternReferanse, ident = ident)
+            .map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @PostMapping("/{hoveddokumentid}/ferdigstill")
     fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(hovedDokumentId: UUID): HovedDokumentView {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.finnOgMarkerFerdigHovedDokument(PersistentDokumentId(hovedDokumentId), ident)
+            dokumentService.finnOgMarkerFerdigHovedDokument(
+                hovedDokumentPersistentDokumentId = PersistentDokumentId(hovedDokumentId),
+                ident = ident
+            )
         )
     }
 }

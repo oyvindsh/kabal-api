@@ -1,6 +1,7 @@
 package no.nav.klage.dokument.api.controller
 
 import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.Vedlegg
 import org.springframework.http.HttpHeaders
@@ -44,5 +45,14 @@ class DokumentMapper {
         )
     }
 
-
+    fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
+        return VedleggView(
+            id = dokumentUnderArbeid.persistentDokumentId.persistentDokumentId,
+            tittel = dokumentUnderArbeid.name,
+            dokumentTypeId = dokumentUnderArbeid.dokumentType.id,
+            opplastet = dokumentUnderArbeid.opplastet,
+            isSmartDokument = dokumentUnderArbeid.smartEditorId != null,
+            isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
+        )
+    }
 }

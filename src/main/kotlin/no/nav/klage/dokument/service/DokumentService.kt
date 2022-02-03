@@ -126,7 +126,7 @@ class DokumentService(
 
     }
 
-    fun findHovedDokumenter(behandlingId: UUID): List<HovedDokument> {
+    fun findHovedDokumenter(behandlingId: UUID, ident: String): List<HovedDokument> {
         return hovedDokumentRepository.findByBehandlingId(behandlingId)
     }
 
@@ -170,6 +170,9 @@ class DokumentService(
         if (hovedDokumentSomSkalBliVedlegg.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
         }
+        if (hovedDokumentSomSkalBliVedlegg.dokumentType != DokumentType.VEDLEGG) {
+            throw DokumentValidationException("Kan ikke koble et dokument ikke er et vedlegg")
+        }
         if (hovedDokumentSomSkalBliVedlegg.harVedlegg()) {
             throw DokumentValidationException("Et dokument som selv har vedlegg kan ikke bli et vedlegg")
         }
@@ -195,6 +198,22 @@ class DokumentService(
                 ?: throw DokumentValidationException("Dokument ikke funnet")
 
         hovedDokument.vedlegg.remove(vedlegg)
-        return hovedDokumentRepository.save(vedlegg.toHovedDokument())
+        return hovedDokumentRepository.save(vedlegg.toHovedDokument()) //TODO: Skal vi endre på dokumenttypen?
+    }
+
+    fun findSmartDokumenter(behandlingId: UUID, ident: String): List<DokumentUnderArbeid> {
+        return hovedDokumentRepository.findByBehandlingId(behandlingId).flatMap { it.vedlegg + it }
+            .filter { it.smartEditorId != null }
+    }
+
+    fun updateDokumentType(persistentDokumentId: PersistentDokumentId, dokumentType: DokumentType): HovedDokument {
+        //Skal ikke kunne endre dokumentType på vedlegg, så jeg spør her bare etter hoveddokumenter
+        val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
+            ?: throw DokumentValidationException("Dokument ikke funnet")
+        if (hovedDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
+        }
+        hovedDokument.dokumentType = dokumentType
+        return hovedDokument
     }
 }
