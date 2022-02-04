@@ -63,6 +63,12 @@ class TokenUtil(
         return response.accessToken
     }
 
+    fun getAppAccessTokenWithKabalFileApiScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["kabal-file-api-maskintilmaskin"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getSaksbehandlerAccessTokenWithKabalDocumentScope(): String {
         val clientProperties = clientConfigurationProperties.registration["kabal-document-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
@@ -132,11 +138,4 @@ class TokenUtil(
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD)
             .jwtTokenClaims?.getStringClaim(name)
 
-    fun getAppAccessTokenWithKabalFileApiScope(): String {
-        return ""
-    }
-
-    fun getSaksbehandlerAccessTokenWithSmartEditorScope(): String {
-        return ""
-    }
 }
