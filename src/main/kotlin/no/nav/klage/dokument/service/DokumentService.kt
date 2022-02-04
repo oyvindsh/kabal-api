@@ -281,7 +281,7 @@ class DokumentService(
                 ?: throw DokumentValidationException("Dokument ikke funnet")
 
         hovedDokument.vedlegg.remove(vedlegg)
-        return hovedDokumentRepository.save(vedlegg.toHovedDokument()) //TODO: Skal vi endre på dokumenttypen?
+        return hovedDokumentRepository.save(vedlegg.toHovedDokument())
     }
 
     fun findHovedDokumenter(behandlingId: UUID, ident: String): SortedSet<HovedDokument> {

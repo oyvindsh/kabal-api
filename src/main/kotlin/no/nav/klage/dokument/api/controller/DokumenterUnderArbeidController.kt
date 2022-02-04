@@ -43,10 +43,7 @@ class DokumentUnderArbeidController(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 dokumentType = DokumentType.BREV,
                 behandlingId = body.eksternReferanse,
-                opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(
-                    input.file,
-                    DokumentType.BREV //TODO Dette gir ikke mening lenger
-                ),
+                opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(input.file),
                 json = null,
             )
         )
