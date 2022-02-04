@@ -95,4 +95,41 @@ abstract class Behandling(
         //TODO anke
         return delbehandlinger.first()
     }
+
+    var avsluttetAvSaksbehandler: LocalDateTime?
+        get() {
+            return currentDelbehandling().avsluttetAvSaksbehandler
+        }
+        set(avsluttetAvSaksbehandler) {
+            currentDelbehandling().avsluttetAvSaksbehandler = avsluttetAvSaksbehandler
+        }
+
+    var avsluttet: LocalDateTime?
+        get() {
+            return currentDelbehandling().avsluttet
+        }
+        set(avsluttet) {
+            currentDelbehandling().avsluttet = avsluttet
+        }
+
+    /**
+     * Brukes til ES og statistikk per nå
+     */
+    fun getStatus(): Status {
+        return when {
+            avsluttet != null -> Status.FULLFOERT
+            avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
+            vent != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
+            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> Status.SENDT_TIL_MEDUNDERSKRIVER
+            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> Status.RETURNERT_TIL_SAKSBEHANDLER
+            currentDelbehandling().medunderskriver?.saksbehandlerident != null -> Status.MEDUNDERSKRIVER_VALGT
+            tildeling?.saksbehandlerident != null -> Status.TILDELT
+            tildeling?.saksbehandlerident == null -> Status.IKKE_TILDELT
+            else -> Status.UKJENT
+        }
+    }
+
+    enum class Status {
+        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT
+    }
 }
