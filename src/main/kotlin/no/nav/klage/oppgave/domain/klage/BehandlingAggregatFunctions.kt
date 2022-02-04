@@ -123,7 +123,7 @@ object BehandlingAggregatFunctions {
 
         endringslogg(
             saksbehandlerident,
-            Felt.MEDUNDERSKRIVERFLYT,
+            Felt.SATT_PAA_VENT,
             gammelSattPaaVent.toString(),
             nyVerdi.toString(),
             tidspunkt
