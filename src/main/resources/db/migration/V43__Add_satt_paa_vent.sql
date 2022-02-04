@@ -1,2 +1,2 @@
 ALTER TABLE klage.behandling
-    ADD COLUMN satt_paa_vent DATE;
+    ADD COLUMN satt_paa_vent TIMESTAMP;
