@@ -1,4 +1,4 @@
-package no.nav.klage.dokument.api.controller
+package no.nav.klage.dokument.api.mapper
 
 import no.nav.klage.dokument.domain.MellomlagretDokument
 import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument

@@ -2,6 +2,9 @@ package no.nav.klage.dokument.api.controller
 
 
 import io.swagger.annotations.Api
+import no.nav.klage.dokument.api.mapper.DokumentInputMapper
+import no.nav.klage.dokument.api.mapper.DokumentMapper
+import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
 import no.nav.klage.dokument.service.DokumentService
@@ -44,13 +47,14 @@ class DokumentUnderArbeidController(
                     input.file,
                     DokumentType.BREV //TODO Dette gir ikke mening lenger
                 ),
+                json = null,
             )
         )
     }
 
     @PostMapping("/hoveddokumenter/smart")
     fun createSmartHoveddokument(
-        @RequestBody body: HovedDokumentInput,
+        @RequestBody body: SmartHovedDokumentInput,
     ): HovedDokumentView {
         logger.debug("Kall mottatt på createSmartHoveddokument")
         return dokumentMapper.mapToHovedDokumentView(
@@ -59,6 +63,7 @@ class DokumentUnderArbeidController(
                 dokumentType = DokumentType.BREV,
                 behandlingId = body.eksternReferanse,
                 opplastetFil = null,
+                json = body.json,
             )
         )
     }
@@ -70,6 +75,7 @@ class DokumentUnderArbeidController(
     ): HovedDokumentView {
         return dokumentMapper.mapToHovedDokumentView(
             dokumentService.updateDokumentType(
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 persistentDokumentId = PersistentDokumentId(dokumentId),
                 dokumentType = DokumentType.of(input.dokumentTypeId)
             )

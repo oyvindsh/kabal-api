@@ -75,6 +75,10 @@ abstract class DokumentUnderArbeid(
     override fun compareTo(other: DokumentUnderArbeid): Int {
         return this.created.compareTo(other.created)
     }
+
+    fun erMarkertFerdig(): Boolean {
+        return markertFerdig != null
+    }
 }
 
 

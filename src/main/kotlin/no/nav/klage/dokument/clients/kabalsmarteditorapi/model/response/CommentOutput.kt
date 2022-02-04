@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.response
+package no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response
 
 import java.time.LocalDateTime
 import java.util.*

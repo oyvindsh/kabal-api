@@ -1,9 +1,7 @@
-package no.nav.klage.dokument.api.controller
+package no.nav.klage.dokument.api.view
 
 import java.time.LocalDateTime
 import java.util.*
-
-data class HovedDokumentInput(val eksternReferanse: UUID)
 
 interface DokumentView {
     val id: UUID
@@ -32,7 +30,3 @@ data class VedleggView(
     override val isSmartDokument: Boolean,
     override val isMarkertAvsluttet: Boolean,
 ) : DokumentView
-
-data class PersistentDokumentIdInput(val id: UUID)
-
-data class DokumentTypeInput(val dokumentTypeId: String)

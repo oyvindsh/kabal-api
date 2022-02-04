@@ -5,6 +5,11 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
+import no.nav.klage.dokument.api.mapper.DokumentInputMapper
+import no.nav.klage.dokument.api.mapper.DokumentMapper
+import no.nav.klage.dokument.api.view.HovedDokumentInput
+import no.nav.klage.dokument.api.view.HovedDokumentView
+import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
@@ -57,6 +62,7 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
                 any(),
+                any(),
             )
         } returns HovedDokument(
             persistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
@@ -91,11 +97,13 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createSmartEditorHoveddokument() {
 
-        val hovedDokumentInput = HovedDokumentInput(eksternReferanse = UUID.randomUUID())
+        val smartHovedDokumentInput =
+            SmartHovedDokumentInput(eksternReferanse = UUID.randomUUID(), "{ \"json\": \"is cool\" }")
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
             dokumentService.opprettOgMellomlagreNyttHoveddokument(
+                any(),
                 any(),
                 any(),
                 any(),
@@ -107,7 +115,7 @@ internal class DokumentUnderArbeidControllerTest {
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "vedtak.pdf",
-            behandlingId = hovedDokumentInput.eksternReferanse,
+            behandlingId = smartHovedDokumentInput.eksternReferanse,
             smartEditorId = UUID.randomUUID(),
             dokumentType = DokumentType.BREV,
         )
@@ -115,7 +123,7 @@ internal class DokumentUnderArbeidControllerTest {
 
         val json = mockMvc.perform(
             MockMvcRequestBuilders.post("/dokumenter/hoveddokumenter/smart")
-                .content(objectMapper.writeValueAsString(hovedDokumentInput))
+                .content(objectMapper.writeValueAsString(smartHovedDokumentInput))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())

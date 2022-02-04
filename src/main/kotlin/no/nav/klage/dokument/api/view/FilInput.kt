@@ -1,4 +1,4 @@
-package no.nav.klage.dokument.api.controller
+package no.nav.klage.dokument.api.view
 
 import org.springframework.web.multipart.MultipartFile
 

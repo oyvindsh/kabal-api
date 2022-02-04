@@ -83,8 +83,4 @@ open class HovedDokument(
     fun harVedlegg(): Boolean {
         return vedlegg.isNotEmpty()
     }
-
-    fun erMarkertFerdig(): Boolean {
-        return markertFerdig != null
-    }
 }

@@ -1,5 +1,8 @@
-package no.nav.klage.dokument.api.controller
+package no.nav.klage.dokument.api.mapper
 
+import no.nav.klage.dokument.api.view.DokumentView
+import no.nav.klage.dokument.api.view.HovedDokumentView
+import no.nav.klage.dokument.api.view.VedleggView
 import no.nav.klage.dokument.domain.MellomlagretDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument

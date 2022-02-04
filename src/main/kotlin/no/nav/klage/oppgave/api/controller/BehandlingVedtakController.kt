@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.controller
 
 import io.swagger.annotations.Api
+import no.nav.klage.dokument.api.view.SmartEditorIdView
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
