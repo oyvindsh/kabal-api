@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients.kabaldocument
 
 import brave.Tracer
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.DokumentEnhetInput
+import no.nav.klage.oppgave.clients.kabaldocument.model.request.DokumentEnhetWithDokumentreferanserInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.FilInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetFullfoerOutput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetOutput
@@ -33,6 +34,23 @@ class KabalDocumentClient(
     ): DokumentEnhetOutput {
         return kabalDocumentWebClient.post()
             .uri { it.path("/dokumentenheter").build() }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalDocumentScope()}"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(input)
+            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
+            .retrieve()
+            .bodyToMono<DokumentEnhetOutput>()
+            .block() ?: throw RuntimeException("Dokumentenhet could not be created")
+    }
+
+    fun createDokumentEnhetWithDokumentreferanser(
+        input: DokumentEnhetWithDokumentreferanserInput
+    ): DokumentEnhetOutput {
+        return kabalDocumentWebClient.post()
+            .uri { it.path("/meddokumentreferanser").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalDocumentScope()}"
