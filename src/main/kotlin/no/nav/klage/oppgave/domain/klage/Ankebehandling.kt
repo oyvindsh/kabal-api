@@ -59,6 +59,7 @@ class Ankebehandling(
     delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    sattPaaVent: LocalDateTime? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -82,6 +83,7 @@ class Ankebehandling(
     delbehandlinger = delbehandlinger,
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
+    sattPaaVent = sattPaaVent,
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +
