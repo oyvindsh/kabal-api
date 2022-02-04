@@ -52,14 +52,14 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
             sakstype = type.id,
             ytelseId = ytelse.id,
             mottattKlageinstans = mottattKlageinstans.toLocalDate(),
-            vedtaksinstansEnhet = vedtaksinstansEnhet!!.id,
+            vedtaksinstansEnhet = vedtaksinstansEnhet!!.navn,
             mottattVedtaksinstans = mottattFoersteinstans,
             utfall = currentDelbehandling().utfall!!.id,
             registreringshjemler = currentDelbehandling().hjemler.map { it.id },
             kvalitetsvurderingId = kakaKvalitetsvurderingId!!,
             avsluttetAvSaksbehandler = currentDelbehandling().avsluttetAvSaksbehandler!!,
             utfoerendeSaksbehandler = tildeling?.saksbehandlerident!!,
-            tilknyttetEnhet = tilknyttetEnhet!!.id
+            tilknyttetEnhet = tilknyttetEnhet!!.navn
         )
     }
 }
