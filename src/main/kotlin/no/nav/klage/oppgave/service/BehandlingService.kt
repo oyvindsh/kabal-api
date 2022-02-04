@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.addSaksdoku
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverIdentAndMedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setTildeling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.BehandlingManglerMedunderskriverException
@@ -54,6 +55,22 @@ class BehandlingService(
             )
         applicationEventPublisher.publishEvent(event)
         return behandling
+    }
+
+    fun setSattPaaVent(
+        behandlingId: UUID,
+        setNull: Boolean = false,
+        utfoerendeSaksbehandlerIdent: String
+    ): LocalDateTime {
+        val behandling = getBehandlingForUpdate(behandlingId, true)
+        val nyVerdi = if (setNull) null else LocalDateTime.now()
+        val event =
+            behandling.setSattPaaVent(
+                nyVerdi,
+                utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandling.modified
     }
 
     fun setMedunderskriverIdentAndMedunderskriverFlyt(

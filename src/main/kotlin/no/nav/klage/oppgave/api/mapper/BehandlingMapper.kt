@@ -111,7 +111,8 @@ class BehandlingMapper(
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
-            kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId
+            kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
+            sattPaaVent = klagebehandling.sattPaaVent,
         )
     }
 
@@ -183,7 +184,8 @@ class BehandlingMapper(
             egenAnsatt = erEgenAnsatt,
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
-            kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId
+            kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
+            sattPaaVent = ankebehandling.sattPaaVent,
         )
     }
 
