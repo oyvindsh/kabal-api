@@ -8,11 +8,14 @@ import no.nav.klage.dokument.repositories.HovedDokumentRepository
 import no.nav.klage.dokument.repositories.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId
 import no.nav.klage.dokument.repositories.getDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
+import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
+import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
@@ -21,7 +24,6 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
-import no.nav.klage.oppgave.service.DokumentService as KabalDokumentService
 
 @Service
 @Transactional
@@ -33,8 +35,9 @@ class DokumentService(
     private val behandlingService: BehandlingService,
     private val dokumentEnhetService: KabalDocumentGateway,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val kabalDokumentService: KabalDokumentService,
-) {
+    private val safClient: SafGraphQlClient,
+
+    ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -314,9 +317,12 @@ class DokumentService(
     fun ferdigstillDokumentEnhet(hovedDokumentId: DokumentId) {
         val hovedDokument = hovedDokumentRepository.getById(hovedDokumentId)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
-        val saksdokument =
-            dokumentEnhetService.ferdigstillDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
-        if (saksdokument != null) {
+        val journalpostId =
+            dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
+
+        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId.value)
+        val saksdokumenter = journalpost.mapToSaksdokumenter()
+        saksdokumenter.forEach { saksdokument ->
             val saksbehandlerIdent =
                 behandling.tildelingHistorikk.maxByOrNull { it.tildeling.tidspunkt }?.tildeling?.saksbehandlerident
                     ?: "SYSTEMBRUKER" //TODO: Er dette innafor? Burde vi evt lagre ident i HovedDokument, så vi kan hente det derfra?
@@ -402,4 +408,15 @@ class DokumentService(
             )
         }
     }
+
+    private fun Journalpost?.mapToSaksdokumenter(): List<Saksdokument> {
+        return this?.dokumenter?.map {
+            Saksdokument(
+                journalpostId = this.journalpostId,
+                dokumentInfoId = it.dokumentInfoId
+            )
+        } ?: emptyList()
+    }
 }
+
+

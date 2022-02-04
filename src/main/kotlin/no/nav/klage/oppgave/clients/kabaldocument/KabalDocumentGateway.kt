@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.DokumentInnhold
 import no.nav.klage.oppgave.domain.DokumentInnholdOgTittel
 import no.nav.klage.oppgave.domain.DokumentMetadata
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -87,12 +86,12 @@ class KabalDocumentGateway(
     fun deleteHovedDokument(dokumentEnhetId: UUID): LocalDateTime =
         kabalDocumentClient.deleteHovedDokument(dokumentEnhetId).modified
 
-    @Deprecated("Vi må skrive bort hele det gamle opplegget")
     fun fullfoerDokumentEnhet(dokumentEnhetId: UUID): JournalpostId =
         kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
             it.rolle == Rolle.HOVEDADRESSAT
         }.journalpostId
 
+    /*
     fun ferdigstillDokumentEnhet(dokumentEnhetId: UUID): Saksdokument =
         kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
             it.rolle == Rolle.HOVEDADRESSAT
@@ -103,6 +102,7 @@ class KabalDocumentGateway(
             )
         }
 
+    */
 
     fun isHovedDokumentUploaded(dokumentEnhetId: UUID): Boolean {
         return getMetadataOmHovedDokument(dokumentEnhetId) != null
