@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.FilInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
@@ -7,6 +8,7 @@ import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.DokumentInnhold
 import no.nav.klage.oppgave.domain.DokumentInnholdOgTittel
 import no.nav.klage.oppgave.domain.DokumentMetadata
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -33,6 +35,17 @@ class KabalDocumentGateway(
         return UUID.fromString(
             kabalDocumentClient.createDokumentEnhet(
                 kabalDocumentMapper.mapBehandlingToDokumentEnhetInput(behandling)
+            ).id
+        )
+    }
+
+    fun createKomplettDokumentEnhet(
+        behandling: Behandling,
+        hovedDokument: HovedDokument,
+    ): UUID {
+        return UUID.fromString(
+            kabalDocumentClient.createDokumentEnhetWithDokumentreferanser(
+                kabalDocumentMapper.mapBehandlingToDokumentEnhetWithDokumentreferanser(behandling, hovedDokument)
             ).id
         )
     }
@@ -74,10 +87,22 @@ class KabalDocumentGateway(
     fun deleteHovedDokument(dokumentEnhetId: UUID): LocalDateTime =
         kabalDocumentClient.deleteHovedDokument(dokumentEnhetId).modified
 
+    @Deprecated("Vi må skrive bort hele det gamle opplegget")
     fun fullfoerDokumentEnhet(dokumentEnhetId: UUID): JournalpostId =
         kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
             it.rolle == Rolle.HOVEDADRESSAT
         }.journalpostId
+
+    fun ferdigstillDokumentEnhet(dokumentEnhetId: UUID): Saksdokument =
+        kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
+            it.rolle == Rolle.HOVEDADRESSAT
+        }.let {
+            Saksdokument(
+                journalpostId = it.journalpostId.value,
+                dokumentInfoId = "TODO" //it.dokumentinfoId, //TODO: Trenger denne!
+            )
+        }
+
 
     fun isHovedDokumentUploaded(dokumentEnhetId: UUID): Boolean {
         return getMetadataOmHovedDokument(dokumentEnhetId) != null

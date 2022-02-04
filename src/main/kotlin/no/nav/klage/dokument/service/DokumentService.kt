@@ -2,11 +2,7 @@ package no.nav.klage.dokument.service
 
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.MellomlagretDokument
-import no.nav.klage.dokument.domain.MellomlagretMultipartFile
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.*
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.repositories.HovedDokumentRepository
 import no.nav.klage.dokument.repositories.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId
@@ -14,14 +10,18 @@ import no.nav.klage.dokument.repositories.getDokumentUnderArbeidByPersistentDoku
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
+import no.nav.klage.oppgave.service.DokumentService as KabalDokumentService
 
 @Service
 @Transactional
@@ -33,7 +33,13 @@ class DokumentService(
     private val behandlingService: BehandlingService,
     private val dokumentEnhetService: KabalDocumentGateway,
     private val applicationEventPublisher: ApplicationEventPublisher,
+    private val kabalDokumentService: KabalDokumentService,
 ) {
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+        private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
+    }
 
     fun finnOgMarkerFerdigHovedDokument(
         hovedDokumentPersistentDokumentId: PersistentDokumentId,
@@ -294,27 +300,30 @@ class DokumentService(
     }
 
     //Denne kan kjøres asynkront vha en scheduled task. Er ikke ferdig koda
-    fun ferdigstillMarkerteHovedDokumenter() {
+    fun opprettDokumentEnhet(hovedDokumentId: DokumentId) {
 
-        val liste = hovedDokumentRepository.findByMarkertFerdigNotNullAndFerdigstiltNull()
-        liste.forEach {
-            val hovedDokument = it
-
+        val hovedDokument = hovedDokumentRepository.getById(hovedDokumentId)
+        if (hovedDokument.dokumentEnhetId == null) {
             //TODO: Løp gjennom og refresh alle smarteditor-dokumenter
-            val behandling = behandlingService.getBehandling(hovedDokument.behandlingId)
-            //TODO: Ønsker meg egentlig en måte å gjøre alt det følgende i en swung..
-            val dokumentEnhetId = dokumentEnhetService.createDokumentEnhet(behandling)
-            val mellomlagretDokument =
-                hentMellomlagretDokumentSomSystembruker(hovedDokument.persistentDokumentId) //Må gjøres som systembruker
-            val multipartFile =
-                MellomlagretMultipartFile(mellomlagretDokument)
-            dokumentEnhetService.uploadHovedDokument(dokumentEnhetId, multipartFile)
-            //TODO: Må også uploade vedlegg
-
-
-            val ferdigstiltDokumentEnhet = dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = dokumentEnhetId)
-            //Feiler det får vi en 500..
+            val behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
+            val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(behandling, hovedDokument)
+            hovedDokument.dokumentEnhetId = dokumentEnhetId
         }
+    }
+
+    fun ferdigstillDokumentEnhet(hovedDokumentId: DokumentId) {
+        val hovedDokument = hovedDokumentRepository.getById(hovedDokumentId)
+        val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
+        val saksdokument =
+            dokumentEnhetService.ferdigstillDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
+        if (saksdokument != null) {
+            val saksbehandlerIdent =
+                behandling.tildelingHistorikk.maxByOrNull { it.tildeling.tidspunkt }?.tildeling?.saksbehandlerident
+                    ?: "SYSTEMBRUKER" //TODO: Er dette innafor? Burde vi evt lagre ident i HovedDokument, så vi kan hente det derfra?
+            behandling.addSaksdokument(saksdokument, saksbehandlerIdent)
+                ?.also { applicationEventPublisher.publishEvent(it) }
+        }
+        hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt()
     }
 
     fun getSmartEditorId(persistentDokumentId: PersistentDokumentId, readOnly: Boolean): UUID {

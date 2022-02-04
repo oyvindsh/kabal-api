@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
@@ -54,6 +56,46 @@ class KabalDocumentMapper(
                     value = behandling.id.toString()
                 )
             )
+        )
+    }
+
+    fun mapBehandlingToDokumentEnhetWithDokumentreferanser(
+        behandling: Behandling,
+        hovedDokument: HovedDokument
+    ): DokumentEnhetWithDokumentreferanserInput {
+        return DokumentEnhetWithDokumentreferanserInput(
+            brevMottakere = mapBrevMottakere(behandling),
+            journalfoeringData = JournalfoeringDataInput(
+                sakenGjelder = PartIdInput(
+                    partIdTypeId = behandling.sakenGjelder.partId.type.id,
+                    value = behandling.sakenGjelder.partId.value
+                ),
+                temaId = behandling.ytelse.toTema().id,
+                sakFagsakId = behandling.sakFagsakId,
+                sakFagsystemId = behandling.sakFagsystem?.id,
+                kildeReferanse = behandling.id.toString(),
+                enhet = behandling.tildeling!!.enhet!!,
+                behandlingstema = BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS,
+                tittel = BREV_TITTEL,
+                brevKode = BREVKODE,
+                tilleggsopplysning = TilleggsopplysningInput(
+                    key = KLAGEBEHANDLING_ID_KEY,
+                    value = behandling.id.toString()
+                )
+            ),
+            dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
+                hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
+                vedlegg = hovedDokument.vedlegg.map { mapDokumentUnderArbeidToDokumentReferanse(it) }
+            )
+        )
+    }
+
+    private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
+        return DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
+            mellomlagerId = dokument.mellomlagerId,
+            opplastet = dokument.opplastet,
+            size = dokument.size,
+            name = dokument.name,
         )
     }
 
@@ -113,4 +155,6 @@ class KabalDocumentMapper(
         } else {
             eregClient.hentOrganisasjon(partId.value)?.navn?.navnelinje1
         }
+
+
 }
