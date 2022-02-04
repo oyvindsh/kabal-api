@@ -22,7 +22,7 @@ import java.util.*
 @Transactional
 interface HovedDokumentRepository : //BaseDokumentUnderArbeidRepository<HovedDokument>,
     JpaRepository<HovedDokument, DokumentId> {
-    fun findByBehandlingId(behandlingId: UUID): List<HovedDokument>
+    fun findByBehandlingIdOrderByCreated(behandlingId: UUID): SortedSet<HovedDokument>
     fun findByPersistentDokumentId(persistentDokumentId: PersistentDokumentId): HovedDokument?
     fun findByPersistentDokumentIdOrVedleggPersistentDokumentId(
         persistentDokumentId: PersistentDokumentId,

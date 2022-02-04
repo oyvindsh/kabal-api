@@ -1,12 +1,11 @@
 package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
-import org.hibernate.annotations.BatchSize
-import org.hibernate.annotations.DynamicUpdate
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
+import org.hibernate.annotations.*
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Entity
 
 @Entity
 @DiscriminatorValue(DokumentUnderArbeid.HOVED_DOKUMENT)
@@ -21,6 +20,8 @@ open class HovedDokument(
     smartEditorId: UUID? = null,
     behandlingId: UUID,
     dokumentType: DokumentType,
+    created: LocalDateTime = LocalDateTime.now(),
+    modified: LocalDateTime = LocalDateTime.now(),
     @OneToMany(
         cascade = [CascadeType.ALL],
         targetEntity = Vedlegg::class,
@@ -30,9 +31,11 @@ open class HovedDokument(
     @JoinColumn(name = "parent_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 100)
-    open var vedlegg: MutableList<Vedlegg> = mutableListOf(),
+    @SortNatural
+    open var vedlegg: SortedSet<Vedlegg> = sortedSetOf(),
     open var dokumentEnhetId: UUID? = null,
-) : DokumentUnderArbeid(
+
+    ) : DokumentUnderArbeid(
     id = id,
     persistentDokumentId = persistentDokumentId,
     mellomlagerId = mellomlagerId,
@@ -42,6 +45,8 @@ open class HovedDokument(
     smartEditorId = smartEditorId,
     behandlingId = behandlingId,
     dokumentType = dokumentType,
+    created = created,
+    modified = modified,
 ) {
     fun toVedlegg(): Vedlegg =
         Vedlegg(

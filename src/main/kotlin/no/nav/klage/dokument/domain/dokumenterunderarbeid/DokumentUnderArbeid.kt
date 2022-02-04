@@ -39,8 +39,7 @@ abstract class DokumentUnderArbeid(
     open var markertFerdig: LocalDateTime? = null,
     @Column(name = "ferdigstilt")
     open var ferdigstilt: LocalDateTime? = null,
-
-    ) {
+) : Comparable<DokumentUnderArbeid> {
     companion object {
         const val HOVED_DOKUMENT = "hoved"
         const val VEDLEGG = "vedlegg"
@@ -73,6 +72,9 @@ abstract class DokumentUnderArbeid(
         return id.hashCode()
     }
 
+    override fun compareTo(other: DokumentUnderArbeid): Int {
+        return this.created.compareTo(other.created)
+    }
 }
 
 

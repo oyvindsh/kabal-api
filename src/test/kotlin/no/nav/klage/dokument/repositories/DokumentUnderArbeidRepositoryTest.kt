@@ -216,7 +216,8 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.clear()
 
         val byId2 = hovedDokumentRepository.getById(hovedDokument.id)
-        val vedlegg = byId2.vedlegg.removeAt(0)
+        val vedlegg = byId2.vedlegg.first()
+        byId2.vedlegg.remove(vedlegg)
         val hovedDokumentFraTidligereVedlegg = vedlegg.toHovedDokument()
         hovedDokumentRepository.save(hovedDokumentFraTidligereVedlegg)
 
@@ -322,7 +323,91 @@ class DokumentUnderArbeidRepositoryTest {
         val byId = hovedDokumentRepository.getById(hovedDokument.id)
         assertThat(byId.mellomlagerId).isEqualTo(nyMellomlagerId)
         assertThat(byId.vedlegg.first().mellomlagerId).isEqualTo(nyMellomlagerId)
-
-
     }
+
+
+    @Test
+    fun `documents are sorted correctly`() {
+
+        val behandlingId = UUID.randomUUID()
+
+        val hovedDokument1 = HovedDokument(
+            mellomlagerId = UUID.randomUUID().toString(),
+            opplastet = LocalDateTime.now(),
+            size = 1001,
+            name = "Vedtak.pdf",
+            behandlingId = behandlingId,
+            dokumentType = DokumentType.BREV,
+            created = LocalDateTime.now().minusDays(1)
+        )
+        val vedlegg1 = Vedlegg(
+            mellomlagerId = UUID.randomUUID().toString(),
+            opplastet = LocalDateTime.now(),
+            size = 1001,
+            name = "Vedtak.pdf",
+            behandlingId = behandlingId,
+            dokumentType = DokumentType.BREV,
+            created = LocalDateTime.now().minusDays(2)
+        )
+        val vedlegg2 = Vedlegg(
+            mellomlagerId = UUID.randomUUID().toString(),
+            opplastet = LocalDateTime.now(),
+            size = 1001,
+            name = "Vedtak.pdf",
+            behandlingId = behandlingId,
+            dokumentType = DokumentType.BREV,
+            created = LocalDateTime.now().minusDays(5)
+        )
+
+        val hovedDokument2 = HovedDokument(
+            mellomlagerId = UUID.randomUUID().toString(),
+            opplastet = LocalDateTime.now(),
+            size = 1001,
+            name = "Vedtak.pdf",
+            behandlingId = behandlingId,
+            dokumentType = DokumentType.BREV,
+            created = LocalDateTime.now().minusDays(3)
+        )
+
+        val hovedDokument3 = HovedDokument(
+            mellomlagerId = UUID.randomUUID().toString(),
+            opplastet = LocalDateTime.now(),
+            size = 1001,
+            name = "Vedtak.pdf",
+            behandlingId = behandlingId,
+            dokumentType = DokumentType.BREV,
+            created = LocalDateTime.now().plusDays(3)
+        )
+        hovedDokument1.vedlegg.add(vedlegg1)
+        hovedDokument1.vedlegg.add(vedlegg2)
+        assertThat(hovedDokument1.vedlegg.first()).isEqualTo(vedlegg2)
+        assertThat(sortedSetOf(hovedDokument1, hovedDokument2, hovedDokument3)).containsExactly(
+            hovedDokument2,
+            hovedDokument1,
+            hovedDokument3
+        )
+
+
+        hovedDokumentRepository.save(hovedDokument1)
+        hovedDokumentRepository.save(hovedDokument2)
+        hovedDokumentRepository.save(hovedDokument3)
+
+        assertThat(hovedDokument1.vedlegg.first()).isEqualTo(vedlegg2)
+        assertThat(sortedSetOf(hovedDokument1, hovedDokument2, hovedDokument3)).containsExactly(
+            hovedDokument2,
+            hovedDokument1,
+            hovedDokument3
+        )
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        assertThat(hovedDokumentRepository.findByBehandlingIdOrderByCreated(behandlingId)).containsExactly(
+            hovedDokument2,
+            hovedDokument1,
+            hovedDokument3
+        )
+        assertThat(hovedDokumentRepository.getById(hovedDokument1.id).vedlegg.first()).isEqualTo(vedlegg2)
+    }
+
 }

@@ -1,6 +1,6 @@
 package no.nav.klage.dokument.clients.clamav
 
-import org.slf4j.LoggerFactory
+import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -8,7 +8,10 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class ClamAvClient(private val clamAvWebClient: WebClient) {
 
-    private val logger = LoggerFactory.getLogger(ClamAvClient::class.java)
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        private val logger = getLogger(javaClass.enclosingClass)
+    }
 
     fun scan(file: ByteArray): Boolean {
         logger.debug("Scanning document")

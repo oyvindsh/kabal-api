@@ -55,7 +55,6 @@ class DokumentService(
                     name = opplastetFil.title,
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
-                    vedlegg = mutableListOf(),
                 )
             )
         } else {
@@ -70,12 +69,20 @@ class DokumentService(
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                     smartEditorId = smartEditorDokument.smartEditorId,
-                    vedlegg = mutableListOf(),
                 )
             )
         }
+    }
 
-
+    fun updateDokumentType(persistentDokumentId: PersistentDokumentId, dokumentType: DokumentType): HovedDokument {
+        //Skal ikke kunne endre dokumentType på vedlegg, så jeg spør her bare etter hoveddokumenter
+        val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
+            ?: throw DokumentValidationException("Dokument ikke funnet")
+        if (hovedDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
+        }
+        hovedDokument.dokumentType = dokumentType
+        return hovedDokument
     }
 
     fun hentMellomlagretDokument(
@@ -126,10 +133,6 @@ class DokumentService(
 
     }
 
-    fun findHovedDokumenter(behandlingId: UUID, ident: String): List<HovedDokument> {
-        return hovedDokumentRepository.findByBehandlingId(behandlingId)
-    }
-
     fun kobleVedlegg(
         persistentDokumentId: PersistentDokumentId,
         persistentDokumentIdHovedDokumentSomSkalBliVedlegg: PersistentDokumentId,
@@ -153,7 +156,7 @@ class DokumentService(
         if (hovedDokumentSomSkalBliVedlegg.harVedlegg()) {
             throw DokumentValidationException("Et dokument som selv har vedlegg kan ikke bli et vedlegg")
         }
-        
+
         hovedDokumentRepository.delete(hovedDokumentSomSkalBliVedlegg)
         hovedDokument.vedlegg.add(hovedDokumentSomSkalBliVedlegg.toVedlegg())
         return hovedDokument
@@ -178,20 +181,13 @@ class DokumentService(
         return hovedDokumentRepository.save(vedlegg.toHovedDokument()) //TODO: Skal vi endre på dokumenttypen?
     }
 
-    fun findSmartDokumenter(behandlingId: UUID, ident: String): List<DokumentUnderArbeid> {
-        return hovedDokumentRepository.findByBehandlingId(behandlingId).flatMap { it.vedlegg + it }
-            .filter { it.smartEditorId != null }
+    fun findHovedDokumenter(behandlingId: UUID, ident: String): SortedSet<HovedDokument> {
+        return hovedDokumentRepository.findByBehandlingIdOrderByCreated(behandlingId)
     }
 
-    fun updateDokumentType(persistentDokumentId: PersistentDokumentId, dokumentType: DokumentType): HovedDokument {
-        //Skal ikke kunne endre dokumentType på vedlegg, så jeg spør her bare etter hoveddokumenter
-        val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
-            ?: throw DokumentValidationException("Dokument ikke funnet")
-        if (hovedDokument.erMarkertFerdig()) {
-            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
-        }
-        hovedDokument.dokumentType = dokumentType
-        return hovedDokument
+    fun findSmartDokumenter(behandlingId: UUID, ident: String): List<DokumentUnderArbeid> {
+        return hovedDokumentRepository.findByBehandlingIdOrderByCreated(behandlingId).flatMap { it.vedlegg + it }
+            .filter { it.smartEditorId != null }
     }
 
     //Denne kan kjøres asynkront vha en scheduled task. Er ikke ferdig koda

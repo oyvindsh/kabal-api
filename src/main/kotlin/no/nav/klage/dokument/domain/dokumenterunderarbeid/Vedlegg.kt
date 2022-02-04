@@ -19,6 +19,8 @@ open class Vedlegg(
     smartEditorId: UUID? = null,
     behandlingId: UUID,
     dokumentType: DokumentType,
+    created: LocalDateTime = LocalDateTime.now(),
+    modified: LocalDateTime = LocalDateTime.now(),
 ) : DokumentUnderArbeid(
     id = id,
     persistentDokumentId = persistentDokumentId,
@@ -28,7 +30,9 @@ open class Vedlegg(
     name = name,
     smartEditorId = smartEditorId,
     behandlingId = behandlingId,
-    dokumentType = dokumentType
+    dokumentType = dokumentType,
+    created = created,
+    modified = modified,
 ) {
     fun toHovedDokument(): HovedDokument =
         HovedDokument(
@@ -40,7 +44,7 @@ open class Vedlegg(
             smartEditorId = smartEditorId,
             behandlingId = behandlingId,
             dokumentType = dokumentType,
-            vedlegg = mutableListOf(),
+            vedlegg = sortedSetOf(),
         )
 
 }
