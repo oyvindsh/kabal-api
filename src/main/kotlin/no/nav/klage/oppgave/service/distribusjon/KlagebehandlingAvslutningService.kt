@@ -3,10 +3,7 @@ package no.nav.klage.oppgave.service.distribusjon
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
-import no.nav.klage.oppgave.domain.kafka.EventType
-import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
-import no.nav.klage.oppgave.domain.kafka.KafkaEvent
-import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
+import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
@@ -53,7 +50,6 @@ class KlagebehandlingAvslutningService(
             vedtaksbrevReferanse = journalpostId,
             kabalReferanse = klagebehandling.currentDelbehandling().id.toString()
         )
-
         kafkaEventRepository.save(
             KafkaEvent(
                 id = eventId,
@@ -62,6 +58,30 @@ class KlagebehandlingAvslutningService(
                 kildeReferanse = klagebehandling.kildeReferanse,
                 jsonPayload = vedtakFattet.toJson(),
                 type = EventType.KLAGE_VEDTAK
+            )
+        )
+
+        val behandlingEventId = UUID.randomUUID()
+        val behandlingEvent = KlageAnkeEvent(
+            eventId = behandlingEventId,
+            kildeReferanse = klagebehandling.kildeReferanse,
+            kilde = klagebehandling.kildesystem.navn,
+            kabalReferanse = klagebehandling.currentDelbehandling().id.toString(),
+            detaljer = KlageAnkeEventDetaljer(
+                behandlingAvsluttet = BehandlingAvsluttetDetaljer(
+                    utfall = ExternalUtfall.valueOf(klagebehandling.currentDelbehandling().utfall!!.name),
+                    journalpostReferanser = listOfNotNull(journalpostId) //TODO: Må endres når dokumenter i arbeid branchen merges inn og tas i bruk
+                )
+            )
+        )
+        kafkaEventRepository.save(
+            KafkaEvent(
+                id = behandlingEventId,
+                klagebehandlingId = klagebehandlingId,
+                kilde = klagebehandling.kildesystem.navn,
+                kildeReferanse = klagebehandling.kildeReferanse,
+                jsonPayload = behandlingEvent.toJson(),
+                type = EventType.BEHANDLING_EVENT
             )
         )
 

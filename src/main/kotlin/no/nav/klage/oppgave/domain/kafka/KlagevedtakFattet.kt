@@ -15,3 +15,4 @@ data class KlagevedtakFattet(
     /** Per i dag, delbehandling_id */
     val kabalReferanse: String
 )
+

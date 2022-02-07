@@ -28,6 +28,9 @@ class KafkaDispatcher(
     @Value("\${VEDTAK_FATTET_TOPIC}")
     lateinit var vedtakTopic: String
 
+    @Value("BEHANDLING_EVENTS_TOPIC}")
+    lateinit var behandlingEventTopic: String
+
     fun dispatchEventsToKafka(type: EventType, utsendingStatusList: List<UtsendingStatus>) {
         logger.debug("dispatchUnsentEventsToKafka for type: $type, and statuses: $utsendingStatusList")
         kafkaEventRepository.getAllByStatusInAndTypeIsLikeOrderByCreated(utsendingStatusList, type)
@@ -54,5 +57,6 @@ class KafkaDispatcher(
         when (this) {
             EventType.KLAGE_VEDTAK -> vedtakTopic
             EventType.STATS_DVH -> dvhTopic
+            EventType.BEHANDLING_EVENT -> behandlingEventTopic
         }
 }
