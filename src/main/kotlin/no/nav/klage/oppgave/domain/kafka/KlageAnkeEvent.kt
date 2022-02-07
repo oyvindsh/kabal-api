@@ -7,10 +7,15 @@ data class KlageAnkeEvent(
     val kildeReferanse: String,
     val kilde: String,
     val kabalReferanse: String,
-    val detaljer: KlageAnkeEventDetaljer
+    val type: KlageAnkeEventType,
+    val detaljer: BehandlingDetaljer,
 )
 
-data class KlageAnkeEventDetaljer(
+enum class KlageAnkeEventType {
+    KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_AVSLUTTET
+}
+
+data class BehandlingDetaljer(
     val klagebehandlingAvsluttet: KlagebehandlingAvsluttetDetaljer? = null,
     val ankebehandlingAvsluttet: AnkebehandlingAvsluttetDetaljer? = null,
 )
