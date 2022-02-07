@@ -1,12 +1,10 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.domain.Behandling
-import no.nav.klage.oppgave.domain.klage.Ankebehandling.Status.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -86,7 +84,7 @@ class Ankebehandling(
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
-)  {
+) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +
                 "modified=$modified, " +
@@ -108,25 +106,6 @@ class Ankebehandling(
         return id.hashCode()
     }
 
-    /**
-     * Brukes til ES og statistikk per nå
-     */
-    fun getStatus(): Status {
-        return when {
-            currentDelbehandling().avsluttet != null -> Status.FULLFOERT
-            currentDelbehandling().avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
-            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> Status.SENDT_TIL_MEDUNDERSKRIVER
-            currentDelbehandling().medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> RETURNERT_TIL_SAKSBEHANDLER
-            currentDelbehandling().medunderskriver?.saksbehandlerident != null -> MEDUNDERSKRIVER_VALGT
-            tildeling?.saksbehandlerident != null -> TILDELT
-            tildeling?.saksbehandlerident == null -> IKKE_TILDELT
-            else -> UKJENT
-        }
-    }
-
-    enum class Status {
-        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, FULLFOERT, UKJENT
-    }
     /*
     Mulige utfall av første delbehandling:
 
