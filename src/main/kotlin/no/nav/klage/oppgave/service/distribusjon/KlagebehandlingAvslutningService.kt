@@ -68,7 +68,7 @@ class KlagebehandlingAvslutningService(
             kilde = klagebehandling.kildesystem.navn,
             kabalReferanse = klagebehandling.currentDelbehandling().id.toString(),
             detaljer = KlageAnkeEventDetaljer(
-                behandlingAvsluttet = BehandlingAvsluttetDetaljer(
+                klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
                     utfall = ExternalUtfall.valueOf(klagebehandling.currentDelbehandling().utfall!!.name),
                     journalpostReferanser = listOfNotNull(journalpostId) //TODO: Må endres når dokumenter i arbeid branchen merges inn og tas i bruk
                 )

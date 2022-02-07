@@ -11,10 +11,16 @@ data class KlageAnkeEvent(
 )
 
 data class KlageAnkeEventDetaljer(
-    val behandlingAvsluttet: BehandlingAvsluttetDetaljer?,
+    val klagebehandlingAvsluttet: KlagebehandlingAvsluttetDetaljer? = null,
+    val ankebehandlingAvsluttet: AnkebehandlingAvsluttetDetaljer? = null,
 )
 
-data class BehandlingAvsluttetDetaljer(
+data class KlagebehandlingAvsluttetDetaljer(
+    val utfall: ExternalUtfall,
+    val journalpostReferanser: List<String>,
+)
+
+data class AnkebehandlingAvsluttetDetaljer(
     val utfall: ExternalUtfall,
     val journalpostReferanser: List<String>,
 )
