@@ -79,6 +79,10 @@ abstract class DokumentUnderArbeid(
     fun erMarkertFerdig(): Boolean {
         return markertFerdig != null
     }
+
+    fun erFerdigstilt(): Boolean {
+        return ferdigstilt != null
+    }
 }
 
 

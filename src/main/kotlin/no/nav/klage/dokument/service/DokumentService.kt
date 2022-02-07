@@ -19,7 +19,6 @@ import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -41,16 +40,27 @@ class DokumentService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
     }
 
     fun finnOgMarkerFerdigHovedDokument(
         hovedDokumentPersistentDokumentId: PersistentDokumentId,
         ident: String
     ): HovedDokument {
-        return hovedDokumentRepository.findByPersistentDokumentId(hovedDokumentPersistentDokumentId)
-            ?.apply { markerFerdigHvisIkkeAlleredeMarkertFerdig() }
+        val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(hovedDokumentPersistentDokumentId)
             ?: throw DokumentValidationException("Dokument ikke funnet")
+
+        //Sjekker tilgang på behandlingsnivå:
+        val behandling = behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
+
+        if (hovedDokument.erFerdigstilt()) {
+            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
+        }
+
+        if (hovedDokument.dokumentType == DokumentType.VEDLEGG) {
+            throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
+        }
+
+        return hovedDokument.apply { markerFerdigHvisIkkeAlleredeMarkertFerdig() }
     }
 
     fun opprettOgMellomlagreNyttHoveddokument(

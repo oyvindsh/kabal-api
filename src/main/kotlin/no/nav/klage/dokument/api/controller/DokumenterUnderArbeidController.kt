@@ -41,7 +41,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToHovedDokumentView(
             dokumentService.opprettOgMellomlagreNyttHoveddokument(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                dokumentType = DokumentType.BREV,
+                dokumentType = DokumentType.VEDTAK,
                 behandlingId = body.eksternReferanse,
                 opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(input.file),
                 json = null,
@@ -57,7 +57,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToHovedDokumentView(
             dokumentService.opprettOgMellomlagreNyttHoveddokument(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                dokumentType = DokumentType.BREV,
+                dokumentType = DokumentType.VEDTAK,
                 behandlingId = body.eksternReferanse,
                 opplastetFil = null,
                 json = body.json,

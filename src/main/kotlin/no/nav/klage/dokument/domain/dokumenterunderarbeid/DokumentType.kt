@@ -9,7 +9,8 @@ enum class DokumentType(override val id: String, override val navn: String, over
 
     BREV("1", "Brev", "Brev"),
     NOTAT("2", "Notat", "Notat"),
-    VEDLEGG("3", "Vedlegg", "Vedlegg")
+    VEDLEGG("3", "Vedlegg", "Vedlegg"),
+    VEDTAK("4", "Vedtak", "Vedtak")
     ;
 
     override fun toString(): String {
