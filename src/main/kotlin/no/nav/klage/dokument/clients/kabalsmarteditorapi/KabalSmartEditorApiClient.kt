@@ -1,9 +1,9 @@
-package no.nav.klage.oppgave.clients.kabalsmarteditorapi
+package no.nav.klage.dokument.clients.kabalsmarteditorapi
 
 import brave.Tracer
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.request.CommentInput
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.response.CommentOutput
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.response.DocumentOutput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpHeaders

@@ -1,16 +1,17 @@
-package no.nav.klage.oppgave.api.controller
+package no.nav.klage.dokument.api.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.request.CommentInput
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.response.CommentOutput
-import no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.response.DocumentOutput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
+import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -20,24 +21,14 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 @RequestMapping("/smarteditor/documents")
 class SmartEditorController(
-    private val kabalSmartEditorApiClient: KabalSmartEditorApiClient
-) {
+    private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
+    private val dokumentUnderArbeidService: DokumentUnderArbeidService
 
+) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-    }
-
-    @ApiOperation(
-        value = "Create document",
-        notes = "Create document"
-    )
-    @PostMapping
-    fun createDocument(
-        @RequestBody jsonInput: String
-    ): DocumentOutput {
-        return kabalSmartEditorApiClient.createDocument(jsonInput)
     }
 
     @ApiOperation(
@@ -49,7 +40,12 @@ class SmartEditorController(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody jsonInput: String
     ): DocumentOutput {
-        return kabalSmartEditorApiClient.updateDocument(documentId, jsonInput)
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                persistentDokumentId = PersistentDokumentId(documentId),
+                readOnly = false
+            )
+        return kabalSmartEditorApiClient.updateDocument(smartEditorId, jsonInput)
     }
 
     @ApiOperation(
@@ -58,17 +54,12 @@ class SmartEditorController(
     )
     @GetMapping("/{documentId}")
     fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentOutput {
-        return kabalSmartEditorApiClient.getDocument(documentId)
-    }
-
-    @ApiOperation(
-        value = "Delete document",
-        notes = "Delete document"
-    )
-    @DeleteMapping("/{documentId}")
-    fun deleteDocument(@PathVariable("documentId") documentId: UUID) {
-        return kabalSmartEditorApiClient.deleteDocument(documentId)
-
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                persistentDokumentId = PersistentDokumentId(documentId),
+                readOnly = true
+            )
+        return kabalSmartEditorApiClient.getDocument(smartEditorId)
     }
 
     @ApiOperation(
@@ -80,7 +71,13 @@ class SmartEditorController(
         @PathVariable("documentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
     ): CommentOutput {
-        return kabalSmartEditorApiClient.createcomment(documentId, commentInput)
+        //TODO: Skal hvem som helst få kommentere?
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                persistentDokumentId = PersistentDokumentId(documentId),
+                readOnly = true
+            )
+        return kabalSmartEditorApiClient.createcomment(smartEditorId, commentInput)
     }
 
     @ApiOperation(
@@ -91,7 +88,12 @@ class SmartEditorController(
     fun getAllCommentsWithPossibleThreads(
         @PathVariable("documentId") documentId: UUID
     ): List<CommentOutput> {
-        return kabalSmartEditorApiClient.getAllCommentsWithPossibleThreads(documentId)
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                persistentDokumentId = PersistentDokumentId(documentId),
+                readOnly = true
+            )
+        return kabalSmartEditorApiClient.getAllCommentsWithPossibleThreads(smartEditorId)
     }
 
     @ApiOperation(
@@ -104,7 +106,13 @@ class SmartEditorController(
         @PathVariable("commentId") commentId: UUID,
         @RequestBody commentInput: CommentInput,
     ): CommentOutput {
-        return kabalSmartEditorApiClient.replyToComment(documentId, commentId, commentInput)
+        //TODO: Skal hvem som helst få kommentere?
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                persistentDokumentId = PersistentDokumentId(documentId),
+                readOnly = true
+            )
+        return kabalSmartEditorApiClient.replyToComment(smartEditorId, commentId, commentInput)
     }
 
     @ApiOperation(
@@ -116,18 +124,11 @@ class SmartEditorController(
         @PathVariable("documentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
     ): CommentOutput {
-        return kabalSmartEditorApiClient.getCommentWithPossibleThread(documentId, commentId)
-    }
-
-    @ApiOperation(
-        value = "Generate PDF",
-        notes = "Generate PDF"
-    )
-    @ResponseBody
-    @GetMapping("/{documentId}/pdf")
-    fun getDocumentAsPDF(
-        @PathVariable("documentId") documentId: UUID
-    ): ResponseEntity<ByteArray> {
-        return kabalSmartEditorApiClient.getDocumentAsPDF(documentId)
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                persistentDokumentId = PersistentDokumentId(documentId),
+                readOnly = true
+            )
+        return kabalSmartEditorApiClient.getCommentWithPossibleThread(smartEditorId, commentId)
     }
 }

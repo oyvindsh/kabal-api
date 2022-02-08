@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.exceptions
+package no.nav.klage.dokument.exceptions
 
 class AttachmentTooLargeException(override val message: String = "TOO_LARGE") : RuntimeException() {
     @Synchronized

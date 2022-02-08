@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave
+package no.nav.klage
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration

@@ -54,6 +54,7 @@ data class BehandlingDetaljerView(
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
     val kvalitetsvurderingId: UUID?,
+    val isPossibleToUseDokumentUnderArbeid: Boolean = false,
     val sattPaaVent: LocalDateTime? = null,
 ) {
     data class NavnView(

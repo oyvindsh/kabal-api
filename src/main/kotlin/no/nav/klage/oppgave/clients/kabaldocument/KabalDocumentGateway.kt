@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.FilInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
@@ -33,6 +34,17 @@ class KabalDocumentGateway(
         return UUID.fromString(
             kabalDocumentClient.createDokumentEnhet(
                 kabalDocumentMapper.mapBehandlingToDokumentEnhetInput(behandling)
+            ).id
+        )
+    }
+
+    fun createKomplettDokumentEnhet(
+        behandling: Behandling,
+        hovedDokument: HovedDokument,
+    ): UUID {
+        return UUID.fromString(
+            kabalDocumentClient.createDokumentEnhetWithDokumentreferanser(
+                kabalDocumentMapper.mapBehandlingToDokumentEnhetWithDokumentreferanser(behandling, hovedDokument)
             ).id
         )
     }
@@ -78,6 +90,19 @@ class KabalDocumentGateway(
         kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
             it.rolle == Rolle.HOVEDADRESSAT
         }.journalpostId
+
+    /*
+    fun ferdigstillDokumentEnhet(dokumentEnhetId: UUID): Saksdokument =
+        kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
+            it.rolle == Rolle.HOVEDADRESSAT
+        }.let {
+            Saksdokument(
+                journalpostId = it.journalpostId.value,
+                dokumentInfoId = "TODO" //it.dokumentinfoId, //TODO: Trenger denne!
+            )
+        }
+
+    */
 
     fun isHovedDokumentUploaded(dokumentEnhetId: UUID): Boolean {
         return getMetadataOmHovedDokument(dokumentEnhetId) != null
