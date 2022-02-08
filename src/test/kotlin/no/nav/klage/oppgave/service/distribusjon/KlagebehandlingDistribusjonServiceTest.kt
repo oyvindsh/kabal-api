@@ -157,20 +157,22 @@ internal class KlagebehandlingDistribusjonServiceTest {
         kildesystem = Fagsystem.K9,
         kildeReferanse = "abc",
         mottakId = mottak.id,
-        delbehandlinger = setOf(Delbehandling(
-            id = vedtakId,
-            utfall = Utfall.MEDHOLD,
-            dokumentEnhetId = UUID.randomUUID()
-        )),
+        delbehandlinger = setOf(
+            Delbehandling(
+                id = vedtakId,
+                utfall = Utfall.MEDHOLD,
+                dokumentEnhetId = UUID.randomUUID()
+            )
+        ),
         avsenderEnhetFoersteinstans = "0101",
-        mottattFoersteinstans = LocalDate.now()
+        mottattFoersteinstans = LocalDate.now(),
     )
 
     @Test
     fun `save klagebehandling`() {
         mottakRepository.save(mottak)
 
-        klagebehandlingRepository.save(klage)
+        klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
         klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
@@ -185,7 +187,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         mottakRepository.save(mottak)
 
-        klagebehandlingRepository.save(klage)
+        klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
         klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
 
