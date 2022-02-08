@@ -109,6 +109,29 @@ object BehandlingAggregatFunctions {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
+    fun Behandling.setSattPaaVent(
+        nyVerdi: LocalDateTime?,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val gammelSattPaaVent = sattPaaVent
+        val tidspunkt = LocalDateTime.now()
+
+        sattPaaVent = nyVerdi
+        modified = tidspunkt
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        endringslogg(
+            saksbehandlerident,
+            Felt.SATT_PAA_VENT,
+            gammelSattPaaVent.toString(),
+            nyVerdi.toString(),
+            tidspunkt
+        )?.let { endringslogginnslag.add(it) }
+
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
+    }
+
     fun Behandling.setHjemlerInVedtak(
         nyVerdi: Set<Registreringshjemmel>,
         saksbehandlerident: String

@@ -109,7 +109,8 @@ class BehandlingMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
             kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
-            isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null
+            isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
+            sattPaaVent = klagebehandling.sattPaaVent,
         )
     }
 
@@ -182,7 +183,8 @@ class BehandlingMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
             kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
-            isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null
+            isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
+            sattPaaVent = ankebehandling.sattPaaVent,
         )
     }
 

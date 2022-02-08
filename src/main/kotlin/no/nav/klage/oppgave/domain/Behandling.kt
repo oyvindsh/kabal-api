@@ -90,9 +90,56 @@ abstract class Behandling(
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
     open val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    @Column(name = "satt_paa_vent")
+    open var sattPaaVent: LocalDateTime? = null,
 ) {
     fun currentDelbehandling(): Delbehandling {
         //TODO anke
         return delbehandlinger.first()
+    }
+
+    var avsluttetAvSaksbehandler: LocalDateTime?
+        get() = currentDelbehandling().avsluttetAvSaksbehandler
+        set(avsluttetAvSaksbehandler) {
+            currentDelbehandling().avsluttetAvSaksbehandler = avsluttetAvSaksbehandler
+        }
+
+    var avsluttet: LocalDateTime?
+        get() = currentDelbehandling().avsluttet
+        set(avsluttet) {
+            currentDelbehandling().avsluttet = avsluttet
+        }
+
+    var medunderskriver: MedunderskriverTildeling?
+        get() = currentDelbehandling().medunderskriver
+        set(medunderskriver) {
+            currentDelbehandling().medunderskriver = medunderskriver
+        }
+
+    var medunderskriverFlyt: MedunderskriverFlyt
+        get() = currentDelbehandling().medunderskriverFlyt
+        set(medunderskriverFlyt) {
+            currentDelbehandling().medunderskriverFlyt = medunderskriverFlyt
+        }
+
+    /**
+     * Brukes til ES og statistikk per nå
+     */
+    fun getStatus(): Status {
+        return when {
+            avsluttet != null -> Status.FULLFOERT
+            avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
+            sattPaaVent != null -> Status.SATT_PAA_VENT
+            medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> Status.SENDT_TIL_MEDUNDERSKRIVER
+            medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> Status.RETURNERT_TIL_SAKSBEHANDLER
+            medunderskriver?.saksbehandlerident != null -> Status.MEDUNDERSKRIVER_VALGT
+            tildeling?.saksbehandlerident != null -> Status.TILDELT
+            tildeling?.saksbehandlerident == null -> Status.IKKE_TILDELT
+            else -> Status.UKJENT
+        }
+    }
+
+    enum class Status {
+        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT
     }
 }
