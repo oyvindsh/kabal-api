@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients.kabalsmarteditorapi.model.request
+package no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request
 
 data class CommentInput(
     val text: String,

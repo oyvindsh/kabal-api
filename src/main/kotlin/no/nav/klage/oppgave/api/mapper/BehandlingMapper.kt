@@ -15,7 +15,6 @@ import no.nav.klage.oppgave.domain.DokumentMetadata
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -32,14 +31,12 @@ class BehandlingMapper(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val secureLogger = getSecureLogger()
     }
 
     fun mapBehandlingToBehandlingDetaljerView(behandling: Behandling): BehandlingDetaljerView {
-        if (behandling.type == Type.KLAGE) {
-            return mapKlagebehandlingToBehandlingDetaljerView(behandling as Klagebehandling)
-        } else {
-            return mapAnkebehandlingToBehandlingDetaljerView(behandling as Ankebehandling)
+        return when (behandling.type) {
+            Type.KLAGE -> mapKlagebehandlingToBehandlingDetaljerView(behandling as Klagebehandling)
+            Type.ANKE -> mapAnkebehandlingToBehandlingDetaljerView(behandling as Ankebehandling)
         }
     }
 
@@ -112,6 +109,7 @@ class BehandlingMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
             kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
+            isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
         )
     }
@@ -138,9 +136,6 @@ class BehandlingMapper(
             fraNAVEnhetNavn = forrigeEnhetNavn,
             forrigeNAVEnhet = ankebehandling.klageBehandlendeEnhet,
             forrigeNAVEnhetNavn = forrigeEnhetNavn,
-            fraSaksbehandlerident = null,
-            forrigeSaksbehandlerident = null,
-            forrigeVedtaksDato = ankebehandling.klageVedtaksDato,
             mottattFoersteinstans = null,
             sakenGjelder = ankebehandling.sakenGjelder.mapToView(),
             klager = ankebehandling.klager.mapToView(),
@@ -173,6 +168,9 @@ class BehandlingMapper(
             hjemler = ankebehandling.hjemler.map { it.id },
             modified = ankebehandling.modified,
             created = ankebehandling.created,
+            fraSaksbehandlerident = null,
+            forrigeSaksbehandlerident = null,
+            forrigeVedtaksDato = ankebehandling.klageVedtaksDato,
             resultat = ankebehandling.currentDelbehandling().mapToVedtakView(),
             kommentarFraFoersteinstans = null,
             tilknyttedeDokumenter = ankebehandling.saksdokumenter.map {
@@ -185,6 +183,7 @@ class BehandlingMapper(
             fortrolig = erFortrolig,
             strengtFortrolig = erStrengtFortrolig,
             kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
+            isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
         )
     }

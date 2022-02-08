@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.api.view
+package no.nav.klage.dokument.api.view
 
 data class SmartEditorIdView(
     val smartEditorId: String?

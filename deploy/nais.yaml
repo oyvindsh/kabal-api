@@ -99,6 +99,9 @@ spec:
       rules:
         - application: kabal-document
         - application: kaka-api
+        - application: kabal-file-api
+        - application: clamav
+          namespace: clamav
       external:
       {{#each externalHosts}}
         - host: {{host}}

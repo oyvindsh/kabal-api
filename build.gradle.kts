@@ -15,6 +15,10 @@ val archunitVersion = "0.22.0"
 val kotlinXmlBuilderVersion = "1.7.3"
 val logbackSyslog4jVersion = "1.0.0"
 val jacksonJsonschemaVersion = "1.0.39"
+val pdfboxVersion = "2.0.19"
+val tikaVersion = "1.24.1"
+val verapdfVersion = "1.18.8"
+
 
 //val githubUser: String by project
 //val githubPassword: String by project
@@ -80,6 +84,11 @@ dependencies {
     implementation("org.springframework.retry:spring-retry:$springRetryVersion")
     implementation("no.finn.unleash:unleash-client-java:$unleashVersion")
     implementation("org.zalando:problem-spring-web-starter:$problemSpringWebStartVersion")
+
+    implementation("org.verapdf:validation-model:$verapdfVersion")
+    implementation("org.apache.pdfbox:pdfbox:$pdfboxVersion")
+    implementation("org.apache.tika:tika-core:$tikaVersion")
+
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage")

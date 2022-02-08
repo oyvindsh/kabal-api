@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.config.problem
 
+import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
@@ -163,6 +164,12 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     ): ResponseEntity<Problem> =
         create(ex, createSectionedValidationProblem(ex), request)
 
+    @ExceptionHandler
+    fun handleDokumentValidationException(
+        ex: DokumentValidationException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(Status.BAD_REQUEST, ex, request)
 
     private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
         return Problem.builder()

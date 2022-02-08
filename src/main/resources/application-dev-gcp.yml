@@ -43,3 +43,5 @@ ROLE_ADMIN: a9f5ef81-4e81-42e8-b368-0273071b64b9
 
 INFLUX_HOST: influx-klage-nav-dev.aivencloud.com
 INFLUX_PORT: 26482
+
+CLAM_AV_URL: http://clamav.clamav/scan
