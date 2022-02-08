@@ -7,7 +7,7 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
-import no.nav.klage.dokument.service.DokumentService
+import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -21,7 +21,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 @RequestMapping("/dokumenter")
 class DokumentUnderArbeidController(
-    private val dokumentService: DokumentService,
+    private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
     private val dokumentMapper: DokumentMapper,
     private val dokumenInputMapper: DokumentInputMapper,
@@ -39,7 +39,7 @@ class DokumentUnderArbeidController(
     ): HovedDokumentView {
         logger.debug("Kall mottatt på createAndUploadHoveddokument")
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.opprettOgMellomlagreNyttHoveddokument(
+            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 dokumentType = DokumentType.VEDTAK,
                 behandlingId = body.eksternReferanse,
@@ -55,7 +55,7 @@ class DokumentUnderArbeidController(
     ): HovedDokumentView {
         logger.debug("Kall mottatt på createSmartHoveddokument")
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.opprettOgMellomlagreNyttHoveddokument(
+            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 dokumentType = DokumentType.VEDTAK,
                 behandlingId = body.eksternReferanse,
@@ -71,7 +71,7 @@ class DokumentUnderArbeidController(
         @RequestBody input: DokumentTypeInput
     ): HovedDokumentView {
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.updateDokumentType(
+            dokumentUnderArbeidService.updateDokumentType(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 persistentDokumentId = PersistentDokumentId(dokumentId),
                 dokumentType = DokumentType.of(input.dokumentTypeId)
@@ -88,7 +88,7 @@ class DokumentUnderArbeidController(
     ): ResponseEntity<ByteArray> {
         logger.debug("Kall mottatt på getPdf for $dokumentId")
         return dokumentMapper.mapToByteArray(
-            dokumentService.hentMellomlagretDokument(
+            dokumentUnderArbeidService.hentMellomlagretDokument(
                 persistentDokumentId = PersistentDokumentId(dokumentId),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
@@ -100,7 +100,7 @@ class DokumentUnderArbeidController(
         @PathVariable("dokumentId") dokumentId: UUID,
     ) {
         logger.debug("Kall mottatt på deleteDokument for $dokumentId")
-        dokumentService.slettDokument(
+        dokumentUnderArbeidService.slettDokument(
             persistentDokumentId = PersistentDokumentId(dokumentId),
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
@@ -113,7 +113,7 @@ class DokumentUnderArbeidController(
     ): HovedDokumentView {
         logger.debug("Kall mottatt på kobleVedlegg for $persistentDokumentId")
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.kobleVedlegg(
+            dokumentUnderArbeidService.kobleVedlegg(
                 persistentDokumentId = PersistentDokumentId(persistentDokumentId),
                 persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(input.id),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -128,7 +128,7 @@ class DokumentUnderArbeidController(
     ): HovedDokumentView {
         logger.debug("Kall mottatt på fristillVedlegg for $persistentDokumentId og $persistentDokumentIdVedlegg")
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.frikobleVedlegg(
+            dokumentUnderArbeidService.frikobleVedlegg(
                 persistentDokumentId = PersistentDokumentId(persistentDokumentId),
                 persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentIdVedlegg),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -141,7 +141,7 @@ class DokumentUnderArbeidController(
         @RequestParam("eksternReferanse") eksternReferanse: UUID,
     ): List<HovedDokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentService.findHovedDokumenter(behandlingId = eksternReferanse, ident = ident)
+        return dokumentUnderArbeidService.findHovedDokumenter(behandlingId = eksternReferanse, ident = ident)
             .map { dokumentMapper.mapToHovedDokumentView(it) }
     }
 
@@ -150,7 +150,7 @@ class DokumentUnderArbeidController(
         @RequestParam("eksternReferanse") eksternReferanse: UUID,
     ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentService.findSmartDokumenter(behandlingId = eksternReferanse, ident = ident)
+        return dokumentUnderArbeidService.findSmartDokumenter(behandlingId = eksternReferanse, ident = ident)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 
@@ -158,7 +158,7 @@ class DokumentUnderArbeidController(
     fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(hovedDokumentId: UUID): HovedDokumentView {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         return dokumentMapper.mapToHovedDokumentView(
-            dokumentService.finnOgMarkerFerdigHovedDokument(
+            dokumentUnderArbeidService.finnOgMarkerFerdigHovedDokument(
                 hovedDokumentPersistentDokumentId = PersistentDokumentId(hovedDokumentId),
                 ident = ident
             )

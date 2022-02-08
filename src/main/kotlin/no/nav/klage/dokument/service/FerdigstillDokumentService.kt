@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class FerdigstillDokumentService(
-    private val dokumentService: DokumentService,
+    private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val hovedDokumentRepository: HovedDokumentRepository,
 ) {
     companion object {
@@ -25,9 +25,9 @@ class FerdigstillDokumentService(
             hovedDokumentRepository.findByMarkertFerdigNotNullAndFerdigstiltNull()
         hovedDokumenter.forEach {
             if (it.dokumentEnhetId == null) {
-                dokumentService.opprettDokumentEnhet(it.id)
+                dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
             }
-            dokumentService.ferdigstillDokumentEnhet(it.id)
+            dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
         }
     }
 }

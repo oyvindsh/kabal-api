@@ -26,7 +26,7 @@ import javax.transaction.Transactional
 
 @Service
 @Transactional
-class DokumentService(
+class DokumentUnderArbeidService(
     private val hovedDokumentRepository: HovedDokumentRepository,
     private val attachmentValidator: MellomlagretDokumentValidatorService,
     private val mellomlagerService: MellomlagerService,

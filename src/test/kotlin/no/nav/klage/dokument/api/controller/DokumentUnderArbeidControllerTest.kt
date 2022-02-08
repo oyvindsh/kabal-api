@@ -13,7 +13,7 @@ import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
-import no.nav.klage.dokument.service.DokumentService
+import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -37,7 +37,7 @@ internal class DokumentUnderArbeidControllerTest {
     private lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository
 
     @MockkBean
-    private lateinit var dokumentService: DokumentService
+    private lateinit var dokumentUnderArbeidService: DokumentUnderArbeidService
 
     @SpykBean
     private lateinit var dokumentMapper: DokumentMapper
@@ -57,7 +57,7 @@ internal class DokumentUnderArbeidControllerTest {
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
-            dokumentService.opprettOgMellomlagreNyttHoveddokument(
+            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 any(),
                 any(),
                 any(),
@@ -102,7 +102,7 @@ internal class DokumentUnderArbeidControllerTest {
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
-            dokumentService.opprettOgMellomlagreNyttHoveddokument(
+            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 any(),
                 any(),
                 any(),
