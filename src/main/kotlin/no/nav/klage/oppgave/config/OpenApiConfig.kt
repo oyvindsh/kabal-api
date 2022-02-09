@@ -32,7 +32,10 @@ class OpenApiConfig {
             .pathMapping("/")
             .groupName("internal")
             .genericModelSubstitutes(ResponseEntity::class.java)
-            .tags(Tag("kabal-api", "API for saksbehandlere ved klageinstansen"))
+            .tags(
+                Tag("kabal-api", "API for saksbehandlere ved klageinstansen"),
+                Tag("kabal-api-dokument", "API for dokumenter under arbeid for saksbehandlere ved klageinstansen")
+            )
     }
 
 }
