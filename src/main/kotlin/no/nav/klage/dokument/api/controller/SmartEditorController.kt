@@ -17,7 +17,7 @@ import java.util.*
 
 
 @RestController
-@Api(tags = ["kabal-api-dokument"])
+@Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 @RequestMapping("/smarteditor/documents")
 class SmartEditorController(

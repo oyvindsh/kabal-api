@@ -12,6 +12,18 @@ import springfox.documentation.spring.web.plugins.Docket
 class OpenApiConfig {
 
     @Bean
+    fun apiInternal(): Docket {
+        return Docket(DocumentationType.OAS_30)
+            .select()
+            .paths(regex(".*api.*"))
+            .build()
+            .pathMapping("/")
+            .groupName("internal")
+            .genericModelSubstitutes(ResponseEntity::class.java)
+            .tags(Tag("kabal-api", "API for saksbehandlere ved klageinstansen"))
+    }
+    
+    @Bean
     fun apiExternal(): Docket {
         return Docket(DocumentationType.OAS_30)
             .select()
@@ -23,19 +35,5 @@ class OpenApiConfig {
             .tags(Tag("kabal-api-external", "Eksternt api for Kabal"))
     }
 
-    @Bean
-    fun apiInternal(): Docket {
-        return Docket(DocumentationType.OAS_30)
-            .select()
-            .paths(regex(".*api.*"))
-            .build()
-            .pathMapping("/")
-            .groupName("internal")
-            .genericModelSubstitutes(ResponseEntity::class.java)
-            .tags(
-                Tag("kabal-api", "API for saksbehandlere ved klageinstansen"),
-                Tag("kabal-api-dokument", "API for dokumenter under arbeid for saksbehandlere ved klageinstansen")
-            )
-    }
 
 }
