@@ -7,7 +7,6 @@ import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
 import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
-import no.nav.klage.dokument.api.view.HovedDokumentInput
 import no.nav.klage.dokument.api.view.HovedDokumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
@@ -53,7 +52,7 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createAndUploadHoveddokument() {
 
-        val hovedDokumentInput = HovedDokumentInput(eksternReferanse = UUID.randomUUID())
+        val behandlingId = UUID.randomUUID()
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
@@ -70,7 +69,7 @@ internal class DokumentUnderArbeidControllerTest {
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "vedtak.pdf",
-            behandlingId = hovedDokumentInput.eksternReferanse,
+            behandlingId = behandlingId,
             smartEditorId = null,
             dokumentType = DokumentType.BREV,
         )
@@ -80,9 +79,8 @@ internal class DokumentUnderArbeidControllerTest {
             MockMultipartFile("file", "file-name.pdf", "application/pdf", "whatever".toByteArray())
 
         val json = mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/dokumenter/hoveddokumenter/fil")
+            MockMvcRequestBuilders.multipart("/behandlinger/$behandlingId/dokumenter/hoveddokumenter/fil")
                 .file(file)
-                .content(objectMapper.writeValueAsString(hovedDokumentInput))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())
@@ -97,8 +95,9 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createSmartEditorHoveddokument() {
 
+        val behandlingId = UUID.randomUUID()
         val smartHovedDokumentInput =
-            SmartHovedDokumentInput(eksternReferanse = UUID.randomUUID(), "{ \"json\": \"is cool\" }")
+            SmartHovedDokumentInput("{ \"json\": \"is cool\" }")
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
@@ -115,14 +114,14 @@ internal class DokumentUnderArbeidControllerTest {
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "vedtak.pdf",
-            behandlingId = smartHovedDokumentInput.eksternReferanse,
+            behandlingId = behandlingId,
             smartEditorId = UUID.randomUUID(),
             dokumentType = DokumentType.BREV,
         )
 
 
         val json = mockMvc.perform(
-            MockMvcRequestBuilders.post("/dokumenter/hoveddokumenter/smart")
+            MockMvcRequestBuilders.post("/behandlinger/$behandlingId/dokumenter/hoveddokumenter/smart")
                 .content(objectMapper.writeValueAsString(smartHovedDokumentInput))
                 .contentType(MediaType.APPLICATION_JSON)
         )

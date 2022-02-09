@@ -43,6 +43,7 @@ class DokumentUnderArbeidService(
     }
 
     fun finnOgMarkerFerdigHovedDokument(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         hovedDokumentPersistentDokumentId: PersistentDokumentId,
         ident: String
     ): HovedDokument {
@@ -64,11 +65,11 @@ class DokumentUnderArbeidService(
     }
 
     fun opprettOgMellomlagreNyttHoveddokument(
-        innloggetIdent: String,
-        dokumentType: DokumentType,
         behandlingId: UUID,
+        dokumentType: DokumentType,
         opplastetFil: MellomlagretDokument?,
         json: String?,
+        innloggetIdent: String,
     ): HovedDokument {
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
@@ -126,9 +127,10 @@ class DokumentUnderArbeidService(
     }
 
     fun updateDokumentType(
-        innloggetIdent: String,
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         persistentDokumentId: PersistentDokumentId,
-        dokumentType: DokumentType
+        dokumentType: DokumentType,
+        innloggetIdent: String
     ): HovedDokument {
 
         //Skal ikke kunne endre dokumentType på vedlegg, så jeg spør her bare etter hoveddokumenter
@@ -155,6 +157,7 @@ class DokumentUnderArbeidService(
     }
 
     fun hentMellomlagretDokument(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         persistentDokumentId: PersistentDokumentId,
         innloggetIdent: String
     ): MellomlagretDokument {
@@ -172,15 +175,11 @@ class DokumentUnderArbeidService(
         return mellomlagerService.getUploadedDocument(dokument.mellomlagerId)
     }
 
-    fun hentMellomlagretDokumentSomSystembruker(persistentDokumentId: PersistentDokumentId): MellomlagretDokument {
-        val dokument: DokumentUnderArbeid =
-            hovedDokumentRepository.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(
-                persistentDokumentId
-            ) ?: throw DokumentValidationException("Dokument ikke funnet")
-        return mellomlagerService.getUploadedDocumentAsSystemUser(dokument.mellomlagerId)
-    }
-
-    fun slettDokument(persistentDokumentId: PersistentDokumentId, innloggetIdent: String) {
+    fun slettDokument(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+        persistentDokumentId: PersistentDokumentId,
+        innloggetIdent: String
+    ) {
         val hovedDokument: HovedDokument? = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
         if (hovedDokument != null) {
 
@@ -240,6 +239,7 @@ class DokumentUnderArbeidService(
     }
 
     fun kobleVedlegg(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         persistentDokumentId: PersistentDokumentId,
         persistentDokumentIdHovedDokumentSomSkalBliVedlegg: PersistentDokumentId,
         innloggetIdent: String
@@ -274,11 +274,36 @@ class DokumentUnderArbeidService(
     }
 
     fun frikobleVedlegg(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         persistentDokumentId: PersistentDokumentId,
         persistentDokumentIdVedlegg: PersistentDokumentId,
         innloggetIdent: String
     ): HovedDokument {
         val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
+            ?: throw DokumentValidationException("Dokument ikke funnet")
+
+        //Sjekker tilgang på behandlingsnivå:
+        behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
+        //TODO: Skal det lages endringslogg på dette??
+
+        if (hovedDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke frikoble et dokument som er ferdigstilt")
+        }
+
+        val vedlegg =
+            hovedDokument.findVedleggByPersistentDokumentId(persistentDokumentIdVedlegg)
+                ?: throw DokumentValidationException("Dokument ikke funnet")
+
+        hovedDokument.vedlegg.remove(vedlegg)
+        return hovedDokumentRepository.save(vedlegg.toHovedDokument())
+    }
+
+    fun frikobleVedlegg(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+        persistentDokumentIdVedlegg: PersistentDokumentId,
+        innloggetIdent: String
+    ): HovedDokument {
+        val hovedDokument = hovedDokumentRepository.findByVedleggPersistentDokumentId(persistentDokumentIdVedlegg)
             ?: throw DokumentValidationException("Dokument ikke funnet")
 
         //Sjekker tilgang på behandlingsnivå:
