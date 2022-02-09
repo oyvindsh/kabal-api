@@ -83,4 +83,28 @@ open class HovedDokument(
     fun harVedlegg(): Boolean {
         return vedlegg.isNotEmpty()
     }
+
+    fun toDokumenterMedParentReferanse(): List<DokumentMedParentReferanse> {
+        return listOf(toDokumentMedParentReferanse()) + vedlegg.map { it.toDokumentMedParentReferanse(this.persistentDokumentId) }
+    }
+
+    fun toDokumentMedParentReferanse(): DokumentMedParentReferanse {
+        return DokumentMedParentReferanse(
+            id = id,
+            persistentDokumentId = persistentDokumentId,
+            mellomlagerId = mellomlagerId,
+            opplastet = opplastet,
+            size = size,
+            name = name,
+            smartEditorId = smartEditorId,
+            behandlingId = behandlingId,
+            dokumentType = dokumentType,
+            created = created,
+            modified = modified,
+            markertFerdig = markertFerdig,
+            ferdigstilt = ferdigstilt,
+            dokumentEnhetId = dokumentEnhetId,
+            parentId = null,
+        )
+    }
 }

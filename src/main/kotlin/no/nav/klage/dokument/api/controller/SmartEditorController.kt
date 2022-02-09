@@ -19,7 +19,7 @@ import java.util.*
 @RestController
 @Api(tags = ["kabal-api-dokumenter"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping("/smarteditor/documents")
+@RequestMapping("/behandlinger/{behandlingId}/dokumenter/smarteditor/{dokumentId}")
 class SmartEditorController(
     private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
     private val dokumentUnderArbeidService: DokumentUnderArbeidService
@@ -35,9 +35,9 @@ class SmartEditorController(
         value = "Update document",
         notes = "Update document"
     )
-    @PutMapping("/{documentId}")
+    @PutMapping
     fun updateDocument(
-        @PathVariable("documentId") documentId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
         @RequestBody jsonInput: String
     ): DocumentOutput {
         val smartEditorId =
@@ -52,8 +52,8 @@ class SmartEditorController(
         value = "Get document",
         notes = "Get document"
     )
-    @GetMapping("/{documentId}")
-    fun getDocument(@PathVariable("documentId") documentId: UUID): DocumentOutput {
+    @GetMapping
+    fun getDocument(@PathVariable("dokumentId") documentId: UUID): DocumentOutput {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
                 persistentDokumentId = PersistentDokumentId(documentId),
@@ -66,9 +66,9 @@ class SmartEditorController(
         value = "Create comment for a given document",
         notes = "Create comment for a given document"
     )
-    @PostMapping("/{documentId}/comments")
+    @PostMapping("/comments")
     fun createComment(
-        @PathVariable("documentId") documentId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
     ): CommentOutput {
         //TODO: Skal hvem som helst få kommentere?
@@ -84,9 +84,9 @@ class SmartEditorController(
         value = "Get all comments for a given document",
         notes = "Get all comments for a given document"
     )
-    @GetMapping("/{documentId}/comments")
+    @GetMapping("/comments")
     fun getAllCommentsWithPossibleThreads(
-        @PathVariable("documentId") documentId: UUID
+        @PathVariable("dokumentId") documentId: UUID
     ): List<CommentOutput> {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
@@ -100,9 +100,9 @@ class SmartEditorController(
         value = "Reply to a given comment",
         notes = "Reply to a given comment"
     )
-    @PostMapping("/{documentId}/comments/{commentId}/replies")
+    @PostMapping("/comments/{commentId}/replies")
     fun replyToComment(
-        @PathVariable("documentId") documentId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
         @RequestBody commentInput: CommentInput,
     ): CommentOutput {
@@ -119,9 +119,9 @@ class SmartEditorController(
         value = "Get a given comment",
         notes = "Get a given comment"
     )
-    @GetMapping("/{documentId}/comments/{commentId}")
+    @GetMapping("/comments/{commentId}")
     fun getCommentWithPossibleThread(
-        @PathVariable("documentId") documentId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
     ): CommentOutput {
         val smartEditorId =
