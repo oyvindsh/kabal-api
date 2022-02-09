@@ -121,7 +121,7 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @DeleteMapping("/{dokumentPersistentId}/vedlegg/{dokumentPersistentIdVedlegg}")
+    @DeleteMapping("/{dokumentId}/vedlegg/{dokumentIdVedlegg}")
     fun fristillVedlegg(
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @PathVariable("dokumentIdVedlegg") persistentDokumentIdVedlegg: UUID,
