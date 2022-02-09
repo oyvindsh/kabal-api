@@ -33,7 +33,7 @@ class OpenApiConfig {
             .apis(RequestHandlerSelectors.basePackage(DokumentUnderArbeidController::class.java.packageName))
             .build()
             .pathMapping("/")
-            .groupName("internal")
+            .groupName("internal-documents")
             .genericModelSubstitutes(ResponseEntity::class.java)
             .tags(Tag("kabal-api-dokumenter", "API for dokumenthåndtering for saksbehandlere ved klageinstansen"))
     }
