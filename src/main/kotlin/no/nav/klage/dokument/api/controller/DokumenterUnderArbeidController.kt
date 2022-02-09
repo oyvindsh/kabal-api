@@ -32,13 +32,13 @@ class DokumentUnderArbeidController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/hoveddokumenter/fil")
+    @PostMapping("/fil")
     fun createAndUploadHoveddokument(
         @PathVariable("behandlingId") behandlingId: UUID,
         @ModelAttribute input: FilInput
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på createAndUploadHoveddokument")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.VEDTAK,
@@ -49,13 +49,13 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @PostMapping("/hoveddokumenter/smart")
+    @PostMapping("/smart")
     fun createSmartHoveddokument(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody body: SmartHovedDokumentInput,
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på createSmartHoveddokument")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.VEDTAK,
@@ -71,8 +71,8 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
         @RequestBody input: DokumentTypeInput
-    ): HovedDokumentView {
-        return dokumentMapper.mapToHovedDokumentView(
+    ): DokumentView {
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.updateDokumentType(
                 behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(dokumentId),
@@ -118,7 +118,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @RequestBody input: OptionalPersistentDokumentIdInput
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
         val hovedDokument = if (input.dokumentId == null) {
             dokumentUnderArbeidService.frikobleVedlegg(
@@ -134,7 +134,7 @@ class DokumentUnderArbeidController(
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         }
-        return dokumentMapper.mapToHovedDokumentView(hovedDokument)
+        return dokumentMapper.mapToDokumentView(hovedDokument)
     }
 
     @PostMapping("/{dokumentId}/vedlegg")
@@ -142,9 +142,9 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @RequestBody input: PersistentDokumentIdInput
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på kobleVedlegg for $persistentDokumentId")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.kobleVedlegg(
                 behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(persistentDokumentId),
@@ -159,9 +159,9 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @PathVariable("dokumentIdVedlegg") persistentDokumentIdVedlegg: UUID,
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på fristillVedlegg for $persistentDokumentId og $persistentDokumentIdVedlegg")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.frikobleVedlegg(
                 behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(persistentDokumentId),
@@ -174,10 +174,10 @@ class DokumentUnderArbeidController(
     @GetMapping
     fun findHovedDokumenter(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): List<HovedDokumentView> {
+    ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         return dokumentUnderArbeidService.findHovedDokumenter(behandlingId = behandlingId, ident = ident)
-            .map { dokumentMapper.mapToHovedDokumentView(it) }
+            .map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @GetMapping("/smart")
@@ -193,9 +193,9 @@ class DokumentUnderArbeidController(
     fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentid") dokumentId: UUID
-    ): HovedDokumentView {
+    ): DokumentView {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.finnOgMarkerFerdigHovedDokument(
                 behandlingId = behandlingId,
                 hovedDokumentPersistentDokumentId = PersistentDokumentId(dokumentId),
