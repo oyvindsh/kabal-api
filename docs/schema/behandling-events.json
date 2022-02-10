@@ -1,0 +1,155 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Behandling Event",
+  "type": "object",
+  "description": "Kafka-melding som sendes ut når ulike hendelser har skjedd i en behandling i klageinstansen.",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unik id for eventen som sendte vedtaket fra Kabal. Kan brukes for å oppnå idempotens på mottakersiden."
+    },
+    "kildeReferanse": {
+      "type": "string",
+      "description": "Ekstern id for klage. Skal stemme overens med id sendt inn."
+    },
+    "kilde": {
+      "type": "string",
+      "description": "Kilden som sendte inn klagen/anken. Skal stemme overens med kilde sendt inn."
+    },
+    "kabalReferanse": {
+      "type": "string",
+      "description": "Intern referanse fra kabal. Kan i fremtiden brukes for å hente data om vedtak fra Kabal (se Swagger doc)"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "KLAGEBEHANDLING_AVSLUTTET",
+        "ANKEBEHANDLING_OPPRETTET",
+        "ANKEBEHANDLING_AVSLUTTET"
+      ],
+      "description": "Typen event som har skjedd. Matcher et av feltene i BehandlingDetaljer, typen her vil vise hvilket felt som ikke er null. Kan og vil utvides med flere verdier på sikt."
+    },
+    "detaljer": {
+      "$ref": "#/definitions/BehandlingDetaljer"
+    }
+  },
+  "required": [
+    "eventId",
+    "kildeReferanse",
+    "kilde",
+    "kabalReferanse",
+    "type",
+    "detaljer"
+  ],
+  "definitions": {
+    "BehandlingDetaljer": {
+      "type": "object",
+      "description": "En wrapper for detaljer om den spesifikke typen event som har skjedd. Alle feltene er nullable, men ett felt vil være non-null hver gang. (Tenk xs:choice..)",
+      "additionalProperties": false,
+      "properties": {
+        "klagebehandlingAvsluttet": {
+          "$ref": "#/definitions/KlagebehandlingAvsluttetDetaljer"
+        },
+        "ankebehandlingOpprettet": {
+          "$ref": "#/definitions/AnkebehandlingOpprettetDetaljer"
+        },
+        "ankebehandlingAvsluttet": {
+          "$ref": "#/definitions/AnkebehandlingAvsluttetDetaljer"
+        }
+      }
+    },
+    "KlagebehandlingAvsluttetDetaljer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "avsluttet": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "utfall": {
+          "type": "string",
+          "enum": [
+            "TRUKKET",
+            "RETUR",
+            "OPPHEVET",
+            "MEDHOLD",
+            "DELVIS_MEDHOLD",
+            "STADFESTELSE",
+            "UGUNST",
+            "AVVIST"
+          ],
+          "description": "Utfallet av behandlingen."
+        },
+        "journalpostReferanser": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JournalpostIder til dokumenter som er journalført i behandlingen. Inkluderer alle vedtak og andre typer dokumenter som er direkte knyttet til utfallet, ekskluderer mer generelle brev som er sendt til bruker."
+        }
+      },
+      "required": [
+        "avsluttet",
+        "utfall",
+        "journalpostReferanser"
+      ]
+    },
+    "AnkebehandlingOpprettetDetaljer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mottattKlageinstans": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": [
+        "mottattKlageinstans"
+      ]
+    },
+    "AnkebehandlingAvsluttetDetaljer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "avsluttet": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "utfall": {
+          "type": "string",
+          "enum": [
+            "TRUKKET",
+            "RETUR",
+            "OPPHEVET",
+            "MEDHOLD",
+            "DELVIS_MEDHOLD",
+            "STADFESTELSE",
+            "UGUNST",
+            "AVVIST"
+          ],
+          "description": "Utfallet av behandlingen."
+        },
+        "journalpostReferanser": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "JournalpostIder til dokumenter som er journalført i behandlingen. Inkluderer alle vedtak og andre typer dokumenter som er direkte knyttet til utfallet, ekskluderer mer generelle brev som er sendt til bruker."
+        }
+      },
+      "required": [
+        "avsluttet",
+        "utfall",
+        "journalpostReferanser"
+      ]
+    }
+  }
+}
