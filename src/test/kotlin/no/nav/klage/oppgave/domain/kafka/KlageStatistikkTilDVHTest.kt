@@ -5,13 +5,16 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig
 import com.kjetland.jackson.jsonSchema.JsonSchemaDraft
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 internal class KlageStatistikkTilDVHTest {
 
-    //@Test
+    @Test
+    @Disabled
     fun createJsonSchema() {
         val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
 

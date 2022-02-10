@@ -53,7 +53,6 @@ class KlagebehandlingAvslutningService(
             vedtaksbrevReferanse = journalpostId,
             kabalReferanse = klagebehandling.currentDelbehandling().id.toString()
         )
-
         kafkaEventRepository.save(
             KafkaEvent(
                 id = eventId,
@@ -64,6 +63,35 @@ class KlagebehandlingAvslutningService(
                 type = EventType.KLAGE_VEDTAK
             )
         )
+
+        /*
+        //TODO: Venter med dette til konsumentene er klare, og så switcher vi fra gammel til ny topic
+        val behandlingEventId = UUID.randomUUID()
+        val behandlingEvent = BehandlingEvent(
+            eventId = behandlingEventId,
+            kildeReferanse = klagebehandling.kildeReferanse,
+            kilde = klagebehandling.kildesystem.navn,
+            kabalReferanse = klagebehandling.currentDelbehandling().id.toString(),
+            type = BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET,
+            detaljer = BehandlingDetaljer(
+                klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
+                    avsluttet = klagebehandling.avsluttetAvSaksbehandler!!,
+                    utfall = ExternalUtfall.valueOf(klagebehandling.currentDelbehandling().utfall!!.name),
+                    journalpostReferanser = listOfNotNull(journalpostId) //TODO: Må endres når dokumenter i arbeid branchen merges inn og tas i bruk
+                )
+            )
+        )
+        kafkaEventRepository.save(
+            KafkaEvent(
+                id = behandlingEventId,
+                klagebehandlingId = klagebehandlingId,
+                kilde = klagebehandling.kildesystem.navn,
+                kildeReferanse = klagebehandling.kildeReferanse,
+                jsonPayload = behandlingEvent.toJson(),
+                type = EventType.BEHANDLING_EVENT
+            )
+        )
+        */
 
         val event = klagebehandling.setAvsluttet(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
