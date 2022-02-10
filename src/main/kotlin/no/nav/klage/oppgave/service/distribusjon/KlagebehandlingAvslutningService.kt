@@ -3,7 +3,10 @@ package no.nav.klage.oppgave.service.distribusjon
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
-import no.nav.klage.oppgave.domain.kafka.*
+import no.nav.klage.oppgave.domain.kafka.EventType
+import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
+import no.nav.klage.oppgave.domain.kafka.KafkaEvent
+import no.nav.klage.oppgave.domain.kafka.KlagevedtakFattet
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttet
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
@@ -61,6 +64,8 @@ class KlagebehandlingAvslutningService(
             )
         )
 
+        /*
+        //TODO: Venter med dette til konsumentene er klare, og så switcher vi fra gammel til ny topic
         val behandlingEventId = UUID.randomUUID()
         val behandlingEvent = BehandlingEvent(
             eventId = behandlingEventId,
@@ -86,6 +91,7 @@ class KlagebehandlingAvslutningService(
                 type = EventType.BEHANDLING_EVENT
             )
         )
+        */
 
         val event = klagebehandling.setAvsluttet(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
