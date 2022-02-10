@@ -47,4 +47,23 @@ open class Vedlegg(
             vedlegg = sortedSetOf(),
         )
 
+    fun toDokumentMedParentReferanse(parentId: PersistentDokumentId): DokumentMedParentReferanse {
+        return DokumentMedParentReferanse(
+            id = id,
+            persistentDokumentId = persistentDokumentId,
+            mellomlagerId = mellomlagerId,
+            opplastet = opplastet,
+            size = size,
+            name = name,
+            smartEditorId = smartEditorId,
+            behandlingId = behandlingId,
+            dokumentType = dokumentType,
+            created = created,
+            modified = modified,
+            markertFerdig = markertFerdig,
+            ferdigstilt = ferdigstilt,
+            dokumentEnhetId = null,
+            parentId = parentId,
+        )
+    }
 }

@@ -7,11 +7,11 @@ import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
 import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
-import no.nav.klage.dokument.api.view.HovedDokumentInput
-import no.nav.klage.dokument.api.view.HovedDokumentView
+import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentMedParentReferanse
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -53,7 +53,7 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createAndUploadHoveddokument() {
 
-        val hovedDokumentInput = HovedDokumentInput(eksternReferanse = UUID.randomUUID())
+        val behandlingId = UUID.randomUUID()
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
@@ -64,15 +64,22 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
             )
-        } returns HovedDokument(
+        } returns DokumentMedParentReferanse(
             persistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
             mellomlagerId = "mellomlagerId",
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "vedtak.pdf",
-            behandlingId = hovedDokumentInput.eksternReferanse,
+            behandlingId = behandlingId,
             smartEditorId = null,
             dokumentType = DokumentType.BREV,
+            markertFerdig = null,
+            ferdigstilt = null,
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            dokumentEnhetId = null,
+            parentId = null,
+            id = DokumentId(UUID.randomUUID())
         )
 
 
@@ -80,16 +87,15 @@ internal class DokumentUnderArbeidControllerTest {
             MockMultipartFile("file", "file-name.pdf", "application/pdf", "whatever".toByteArray())
 
         val json = mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/dokumenter/hoveddokumenter/fil")
+            MockMvcRequestBuilders.multipart("/behandlinger/$behandlingId/dokumenter/fil")
                 .file(file)
-                .content(objectMapper.writeValueAsString(hovedDokumentInput))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn().response.contentAsString
 
-        val hovedDokumentView = objectMapper.readValue(json, HovedDokumentView::class.java)
+        val hovedDokumentView = objectMapper.readValue(json, DokumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
         assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.BREV.id)
     }
@@ -97,8 +103,9 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createSmartEditorHoveddokument() {
 
+        val behandlingId = UUID.randomUUID()
         val smartHovedDokumentInput =
-            SmartHovedDokumentInput(eksternReferanse = UUID.randomUUID(), "{ \"json\": \"is cool\" }")
+            SmartHovedDokumentInput("{ \"json\": \"is cool\" }")
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
@@ -109,20 +116,27 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
             )
-        } returns HovedDokument(
+        } returns DokumentMedParentReferanse(
             persistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
             mellomlagerId = "mellomlagerId",
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "vedtak.pdf",
-            behandlingId = smartHovedDokumentInput.eksternReferanse,
+            behandlingId = behandlingId,
             smartEditorId = UUID.randomUUID(),
             dokumentType = DokumentType.BREV,
+            markertFerdig = null,
+            ferdigstilt = null,
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            dokumentEnhetId = null,
+            parentId = null,
+            id = DokumentId(UUID.randomUUID())
         )
 
 
         val json = mockMvc.perform(
-            MockMvcRequestBuilders.post("/dokumenter/hoveddokumenter/smart")
+            MockMvcRequestBuilders.post("/behandlinger/$behandlingId/dokumenter/smart")
                 .content(objectMapper.writeValueAsString(smartHovedDokumentInput))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -130,7 +144,7 @@ internal class DokumentUnderArbeidControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn().response.contentAsString
 
-        val hovedDokumentView = objectMapper.readValue(json, HovedDokumentView::class.java)
+        val hovedDokumentView = objectMapper.readValue(json, DokumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
         assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.BREV.id)
     }

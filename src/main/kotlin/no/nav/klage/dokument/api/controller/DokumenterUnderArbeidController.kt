@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@Api(tags = ["kabal-document"])
+@Api(tags = ["kabal-api-dokumenter"])
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
-@RequestMapping("/dokumenter")
+@RequestMapping("/behandlinger/{behandlingId}/dokumenter")
 class DokumentUnderArbeidController(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
@@ -32,49 +32,52 @@ class DokumentUnderArbeidController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/hoveddokumenter/fil")
+    @PostMapping("/fil")
     fun createAndUploadHoveddokument(
-        @RequestBody body: HovedDokumentInput,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @ModelAttribute input: FilInput
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på createAndUploadHoveddokument")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+                behandlingId = behandlingId,
                 dokumentType = DokumentType.VEDTAK,
-                behandlingId = body.eksternReferanse,
                 opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(input.file),
                 json = null,
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             )
         )
     }
 
-    @PostMapping("/hoveddokumenter/smart")
+    @PostMapping("/smart")
     fun createSmartHoveddokument(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody body: SmartHovedDokumentInput,
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på createSmartHoveddokument")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+                behandlingId = behandlingId,
                 dokumentType = DokumentType.VEDTAK,
-                behandlingId = body.eksternReferanse,
                 opplastetFil = null,
                 json = body.json,
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             )
         )
     }
 
     @PutMapping("/{dokumentId}/dokumenttype")
     fun endreDokumentType(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
         @RequestBody input: DokumentTypeInput
-    ): HovedDokumentView {
-        return dokumentMapper.mapToHovedDokumentView(
+    ): DokumentView {
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.updateDokumentType(
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+                behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(dokumentId),
-                dokumentType = DokumentType.of(input.dokumentTypeId)
+                dokumentType = DokumentType.of(input.dokumentTypeId),
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         )
     }
@@ -84,11 +87,13 @@ class DokumentUnderArbeidController(
     @ResponseBody
     @GetMapping("/{dokumentId}/pdf")
     fun getPdf(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
     ): ResponseEntity<ByteArray> {
         logger.debug("Kall mottatt på getPdf for $dokumentId")
         return dokumentMapper.mapToByteArray(
             dokumentUnderArbeidService.hentMellomlagretDokument(
+                behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(dokumentId),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
@@ -97,38 +102,68 @@ class DokumentUnderArbeidController(
 
     @DeleteMapping("/{dokumentId}")
     fun deleteDokument(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
     ) {
         logger.debug("Kall mottatt på deleteDokument for $dokumentId")
         dokumentUnderArbeidService.slettDokument(
+            behandlingId = behandlingId,
             persistentDokumentId = PersistentDokumentId(dokumentId),
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
     }
 
+    @PutMapping("/{dokumentId}/parent")
+    fun kobleEllerFrikobleVedlegg(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") persistentDokumentId: UUID,
+        @RequestBody input: OptionalPersistentDokumentIdInput
+    ): DokumentView {
+        logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
+        val hovedDokument = if (input.dokumentId == null) {
+            dokumentUnderArbeidService.frikobleVedlegg(
+                behandlingId = behandlingId,
+                persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentId),
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            )
+        } else {
+            dokumentUnderArbeidService.kobleVedlegg(
+                behandlingId = behandlingId,
+                persistentDokumentId = PersistentDokumentId(input.dokumentId),
+                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(persistentDokumentId),
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            )
+        }
+        return dokumentMapper.mapToDokumentView(hovedDokument)
+    }
+
     @PostMapping("/{dokumentId}/vedlegg")
     fun kobleVedlegg(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @RequestBody input: PersistentDokumentIdInput
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på kobleVedlegg for $persistentDokumentId")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.kobleVedlegg(
+                behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(persistentDokumentId),
-                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(input.id),
+                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(input.dokumentId),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         )
     }
 
-    @DeleteMapping("/{dokumentPersistentId}/vedlegg/{dokumentPersistentIdVedlegg}")
+    @DeleteMapping("/{dokumentId}/vedlegg/{dokumentIdVedlegg}")
     fun fristillVedlegg(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @PathVariable("dokumentIdVedlegg") persistentDokumentIdVedlegg: UUID,
-    ): HovedDokumentView {
+    ): DokumentView {
         logger.debug("Kall mottatt på fristillVedlegg for $persistentDokumentId og $persistentDokumentIdVedlegg")
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.frikobleVedlegg(
+                behandlingId = behandlingId,
                 persistentDokumentId = PersistentDokumentId(persistentDokumentId),
                 persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentIdVedlegg),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -138,28 +173,32 @@ class DokumentUnderArbeidController(
 
     @GetMapping
     fun findHovedDokumenter(
-        @RequestParam("eksternReferanse") eksternReferanse: UUID,
-    ): List<HovedDokumentView> {
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findHovedDokumenter(behandlingId = eksternReferanse, ident = ident)
-            .map { dokumentMapper.mapToHovedDokumentView(it) }
+        return dokumentUnderArbeidService.findHovedDokumenter(behandlingId = behandlingId, ident = ident)
+            .map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @GetMapping("/smart")
     fun findSmartDokumenter(
-        @RequestParam("eksternReferanse") eksternReferanse: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findSmartDokumenter(behandlingId = eksternReferanse, ident = ident)
+        return dokumentUnderArbeidService.findSmartDokumenter(behandlingId = behandlingId, ident = ident)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 
-    @PostMapping("/{hoveddokumentid}/ferdigstill")
-    fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(hovedDokumentId: UUID): HovedDokumentView {
+    @PostMapping("/{dokumentid}/ferdigstill")
+    fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentid") dokumentId: UUID
+    ): DokumentView {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentMapper.mapToHovedDokumentView(
+        return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.finnOgMarkerFerdigHovedDokument(
-                hovedDokumentPersistentDokumentId = PersistentDokumentId(hovedDokumentId),
+                behandlingId = behandlingId,
+                hovedDokumentPersistentDokumentId = PersistentDokumentId(dokumentId),
                 ident = ident
             )
         )
