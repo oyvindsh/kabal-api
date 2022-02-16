@@ -65,10 +65,8 @@
       "additionalProperties": false,
       "properties": {
         "avsluttet": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
+          "type": "string",
+          "format": "date-time"
         },
         "utfall": {
           "type": "string",
@@ -103,10 +101,8 @@
       "additionalProperties": false,
       "properties": {
         "mottattKlageinstans": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
+          "type": "string",
+          "format": "date-time"
         }
       },
       "required": [
@@ -118,10 +114,8 @@
       "additionalProperties": false,
       "properties": {
         "avsluttet": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
+          "type": "string",
+          "format": "date-time"
         },
         "utfall": {
           "type": "string",
