@@ -66,9 +66,7 @@
       "properties": {
         "avsluttet": {
           "type": "string",
-          "items": {
-            "type": "integer"
-          }
+          "format": "date-time"
         },
         "utfall": {
           "type": "string",
@@ -85,8 +83,10 @@
           "description": "Utfallet av behandlingen."
         },
         "journalpostReferanser": {
-          "type": "string",
-          "format": "date",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "description": "JournalpostIder til dokumenter som er journalført i behandlingen. Inkluderer alle vedtak og andre typer dokumenter som er direkte knyttet til utfallet, ekskluderer mer generelle brev som er sendt til bruker."
         }
       },
@@ -102,7 +102,7 @@
       "properties": {
         "mottattKlageinstans": {
           "type": "string",
-          "format": "date"
+          "format": "date-time"
         }
       },
       "required": [
@@ -115,7 +115,7 @@
       "properties": {
         "avsluttet": {
           "type": "string",
-          "format": "date"
+          "format": "date-time"
         },
         "utfall": {
           "type": "string",

@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.domain.kafka.*
@@ -29,6 +30,8 @@ class KlagebehandlingAvslutningService(
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
         private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
+        private val objectMapperBehandlingEvents = ObjectMapper().registerModule(JavaTimeModule()).configure(
+            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
         const val SYSTEM_JOURNALFOERENDE_ENHET = "9999"
 
@@ -81,7 +84,7 @@ class KlagebehandlingAvslutningService(
                 klagebehandlingId = klagebehandlingId,
                 kilde = klagebehandling.kildesystem.navn,
                 kildeReferanse = klagebehandling.kildeReferanse,
-                jsonPayload = behandlingEvent.toJson(),
+                jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
                 type = EventType.BEHANDLING_EVENT
             )
         )
