@@ -28,7 +28,7 @@ class KafkaDispatcher(
     @Value("\${VEDTAK_FATTET_TOPIC}")
     lateinit var vedtakTopic: String
 
-    @Value("BEHANDLING_EVENTS_TOPIC}")
+    @Value("\${BEHANDLING_EVENTS_TOPIC}")
     lateinit var behandlingEventTopic: String
 
     fun dispatchEventsToKafka(type: EventType, utsendingStatusList: List<UtsendingStatus>) {
