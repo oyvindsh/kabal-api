@@ -60,4 +60,14 @@ class KlagebehandlingSchedulerService(
             utsendingStatusList = listOf(IKKE_SENDT, FEILET)
         )
     }
+
+    @Scheduled(fixedDelay = 240000, initialDelay = 420000)
+    @SchedulerLock(name = "dispatchUnsentBehandlingEventsToKafka")
+    fun dispatchUnsentBehandlingEventToKafka() {
+        logger.debug("dispatchUnsentBehandlingEventToKafka is called by scheduler")
+        kafkaDispatcher.dispatchEventsToKafka(
+            type = EventType.BEHANDLING_EVENT,
+            utsendingStatusList = listOf(IKKE_SENDT, FEILET)
+        )
+    }
 }
