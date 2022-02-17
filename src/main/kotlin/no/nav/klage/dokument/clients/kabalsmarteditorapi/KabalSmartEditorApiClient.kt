@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -160,7 +159,7 @@ class KabalSmartEditorApiClient(
 
     fun getDocumentAsPDF(
         documentId: UUID
-    ): ResponseEntity<ByteArray> {
+    ): ByteArray {
         return kabalSmartEditorApiWebClient.get()
             .uri { it.path("/documents/$documentId/pdf").build() }
             .header(
@@ -169,7 +168,10 @@ class KabalSmartEditorApiClient(
             )
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
-            .bodyToMono<ResponseEntity<ByteArray>>()
+            .toEntity(ByteArray::class.java)
+            .map {
+                it.body ?: throw RuntimeException("Could not get PDF data")
+            }
             .block() ?: throw RuntimeException("Document PDF could not be retrieved")
     }
 }
