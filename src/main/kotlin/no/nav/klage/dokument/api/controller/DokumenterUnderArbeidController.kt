@@ -38,14 +38,15 @@ class DokumentUnderArbeidController(
         @ModelAttribute input: FilInput
     ): DokumentView {
         logger.debug("Kall mottatt på createAndUploadHoveddokument")
+        val opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(input.file, input.tittel, DokumentType.VEDTAK)
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.VEDTAK,
-                opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(input.file),
+                opplastetFil = opplastetFil,
                 json = null,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                tittel = input.tittel
+                tittel = opplastetFil.title,
             )
         )
     }
@@ -63,7 +64,7 @@ class DokumentUnderArbeidController(
                 opplastetFil = null,
                 json = body.json,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                tittel = body.tittel
+                tittel = body.tittel ?: DokumentType.VEDTAK.defaultFilnavn,
             )
         )
     }

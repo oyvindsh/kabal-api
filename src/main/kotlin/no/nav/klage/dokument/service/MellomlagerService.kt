@@ -25,6 +25,12 @@ class MellomlagerService(
             dokument.title
         )
 
+    fun uploadByteArray(tittel: String, content: ByteArray): String =
+        fileApiClient.uploadDocument(
+            content,
+            tittel,
+        )
+
     fun uploadMultipartFile(file: MultipartFile): String =
         fileApiClient.uploadDocument(
             file.bytes,
@@ -54,5 +60,12 @@ class MellomlagerService(
     fun uploadDocumentAsSystemUser(file: MultipartFile): String =
         fileApiClient.uploadDocument(file.bytes, file.name, true)
 
+    fun updateTittel(mellomlagerId: String, title: String) : String {
+        //TODO: Hvordan oppdaterer man egentlig noe i fillageret? Må det gamle slettes?
+        val mellomlagretDokument = getUploadedDocument(mellomlagerId)
+        return uploadByteArray(title, mellomlagretDokument.content)
+    }
+
     private fun getFileNameFromMellomlagerId(mellomlagerId: String): String = mellomlagerId.substring(36)
+
 }

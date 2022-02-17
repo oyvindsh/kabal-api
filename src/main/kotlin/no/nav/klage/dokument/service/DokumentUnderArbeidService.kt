@@ -48,7 +48,7 @@ class DokumentUnderArbeidService(
         opplastetFil: MellomlagretDokument?,
         json: String?,
         innloggetIdent: String,
-        tittel: String?,
+        tittel: String,
     ): DokumentMedParentReferanse {
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
@@ -61,7 +61,7 @@ class DokumentUnderArbeidService(
                     mellomlagerId = mellomlagerId,
                     opplastet = LocalDateTime.now(),
                     size = opplastetFil.content.size.toLong(),
-                    name = tittel ?: opplastetFil.title,
+                    name = tittel,
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                 )
@@ -81,13 +81,14 @@ class DokumentUnderArbeidService(
             }
             val (smartEditorDokument, opplastet) =
                 smartEditorApiGateway.createDocument(json, dokumentType, innloggetIdent)
-            val mellomlagerId = mellomlagerService.uploadDocument(smartEditorDokument)
+            //TODO: smartEditorDokument har bogus tittel, ble ikke sendt med i kallet til smartEditorApi
+            val mellomlagerId = mellomlagerService.uploadByteArray(tittel, smartEditorDokument.content)
             val hovedDokument = hovedDokumentRepository.save(
                 HovedDokument(
                     mellomlagerId = mellomlagerId,
                     opplastet = opplastet,
                     size = smartEditorDokument.content.size.toLong(),
-                    name = tittel ?: "filnavn.pdf",
+                    name = tittel,
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                     smartEditorId = smartEditorDokument.smartEditorId,
@@ -111,6 +112,8 @@ class DokumentUnderArbeidService(
         dokumentType: DokumentType,
         innloggetIdent: String
     ): DokumentMedParentReferanse {
+
+        //TODO: Skal en endring i dokumentType medføre en endring i tittel også?
 
         //Skal ikke kunne endre dokumentType på vedlegg, så jeg spør her bare etter hoveddokumenter
         val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
@@ -151,6 +154,9 @@ class DokumentUnderArbeidService(
                 throw DokumentValidationException("Kan ikke endre tittel på et dokument som er ferdigstilt")
             }
 
+            val mellomlagerId = mellomlagerService.updateTittel(hovedDokument.mellomlagerId, dokumentTitle)
+            hovedDokument.mellomlagerId = mellomlagerId
+
             val oldValue = hovedDokument.name
             hovedDokument.name = dokumentTitle
             behandling.publishEndringsloggEvent(
@@ -178,6 +184,9 @@ class DokumentUnderArbeidService(
                 ?: throw DokumentValidationException("Dokument ikke funnet")
 
             vedlegg = vedlegg as Vedlegg
+
+            val mellomlagerId = mellomlagerService.updateTittel(vedlegg.mellomlagerId, dokumentTitle)
+            vedlegg.mellomlagerId = mellomlagerId
 
             val oldValue = vedlegg.name
             vedlegg.name = dokumentTitle
@@ -213,6 +222,11 @@ class DokumentUnderArbeidService(
         }
 
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig()
+
+        //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
+        mellomlagreNyVersjonAvSmartEditorDokument(hovedDokument)
+        hovedDokument.vedlegg.forEach { mellomlagreNyVersjonAvSmartEditorDokument(it) }
+
         behandling.publishEndringsloggEvent(
             saksbehandlerident = ident,
             felt = Felt.DOKUMENT_UNDER_ARBEID_MARKERT_FERDIG,
@@ -239,7 +253,7 @@ class DokumentUnderArbeidService(
         behandlingService.getBehandling(dokument.behandlingId)
 
         if (dokument.isStaleSmartEditorDokument()) {
-            mellomlagreSmartEditorDokument(dokument.smartEditorId!!)
+            mellomlagreNyVersjonAvSmartEditorDokument(dokument)
         }
         return mellomlagerService.getUploadedDocument(dokument.mellomlagerId)
     }
@@ -415,7 +429,7 @@ class DokumentUnderArbeidService(
 
         val hovedDokument = hovedDokumentRepository.getById(hovedDokumentId)
         if (hovedDokument.dokumentEnhetId == null) {
-            //TODO: Løp gjennom og refresh alle smarteditor-dokumenter
+            //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
             val behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
             val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(behandling, hovedDokument)
             hovedDokument.dokumentEnhetId = dokumentEnhetId
@@ -457,8 +471,11 @@ class DokumentUnderArbeidService(
             ?: throw DokumentValidationException("${persistentDokumentId.persistentDokumentId} er ikke et smarteditor dokument")
     }
 
-    private fun mellomlagreSmartEditorDokument(smartEditorId: UUID) {
-        mellomlagerService.uploadDocument(smartEditorApiGateway.getDocumentAsPDF(smartEditorId))
+    private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid) {
+        //TODO: Må man rydde etter seg i mellomlageret?
+        val mellomlagerId = mellomlagerService.uploadDocument(smartEditorApiGateway.getDocumentAsPDF(dokument.smartEditorId!!))
+        dokument.mellomlagerId = mellomlagerId
+        dokument.opplastet = LocalDateTime.now()
     }
 
     private fun DokumentUnderArbeid.isStaleSmartEditorDokument() =

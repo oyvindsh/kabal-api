@@ -5,12 +5,12 @@ import javax.persistence.AttributeConverter
 import javax.persistence.Converter
 
 
-enum class DokumentType(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
+enum class DokumentType(override val id: String, override val navn: String, override val beskrivelse: String, val defaultFilnavn: String) : Kode {
 
-    BREV("1", "Brev", "Brev"),
-    NOTAT("2", "Notat", "Notat"),
-    VEDLEGG("3", "Vedlegg", "Vedlegg"),
-    VEDTAK("4", "Vedtak", "Vedtak")
+    BREV("1", "Brev", "Brev", "brev.pdf"),
+    NOTAT("2", "Notat", "Notat", "notat.pdf"),
+    VEDLEGG("3", "Vedlegg", "Vedlegg", "vedlegg.pdf"),
+    VEDTAK("4", "Vedtak", "Vedtak", "vedtaksbrev.pdf")
     ;
 
     override fun toString(): String {
