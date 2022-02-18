@@ -2,7 +2,7 @@ package no.nav.klage.dokument.api.mapper
 
 import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.domain.MellomlagretDokument
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentMedParentReferanse
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,15 +21,15 @@ class DokumentMapper {
             HttpStatus.OK
         )
 
-    fun mapToDokumentView(dokumentMedParentReferanse: DokumentMedParentReferanse): DokumentView {
+    fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         return DokumentView(
-            id = dokumentMedParentReferanse.persistentDokumentId.persistentDokumentId,
-            tittel = dokumentMedParentReferanse.name,
-            dokumentTypeId = dokumentMedParentReferanse.dokumentType.id,
-            opplastet = dokumentMedParentReferanse.opplastet,
-            isSmartDokument = dokumentMedParentReferanse.smartEditorId != null,
-            isMarkertAvsluttet = dokumentMedParentReferanse.markertFerdig != null,
-            parent = dokumentMedParentReferanse.parentId?.persistentDokumentId,
+            id = dokumentUnderArbeid.id.id,
+            tittel = dokumentUnderArbeid.name,
+            dokumentTypeId = dokumentUnderArbeid.dokumentType.id,
+            opplastet = dokumentUnderArbeid.opplastet,
+            isSmartDokument = dokumentUnderArbeid.smartEditorId != null,
+            isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
+            parent = dokumentUnderArbeid.parentId?.id,
         )
     }
 }

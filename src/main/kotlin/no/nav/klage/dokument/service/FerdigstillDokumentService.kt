@@ -1,7 +1,7 @@
 package no.nav.klage.dokument.service
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import no.nav.klage.dokument.repositories.HovedDokumentRepository
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Scheduled
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 @Service
 class FerdigstillDokumentService(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
-    private val hovedDokumentRepository: HovedDokumentRepository,
+    private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -22,7 +22,7 @@ class FerdigstillDokumentService(
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
         val hovedDokumenter =
-            hovedDokumentRepository.findByMarkertFerdigNotNullAndFerdigstiltNull()
+            dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
         hovedDokumenter.forEach {
             if (it.dokumentEnhetId == null) {
                 dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
