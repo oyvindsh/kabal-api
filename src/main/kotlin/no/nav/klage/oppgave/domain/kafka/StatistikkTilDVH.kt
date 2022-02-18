@@ -15,11 +15,11 @@ const val DATE_FORMAT = "yyyy-MM-dd"
 
 /**
  * Brukes av DVH
- * KlageKvalitetStatistikk er en hendelse i en Sak, knyttet til en konkret behandlingstype (eks. søknad, revurdering, endring, klage).
+ * StatistikkTilDVH er en hendelse i en Sak, knyttet til en konkret behandlingstype (eks. søknad, revurdering, endring, klage).
  * Vi sender dette typisk ved mottak, tildeling og fullføring.
  */
 @JsonSchemaTitle("SaksbehandlingKA")
-data class KlageStatistikkTilDVH(
+data class StatistikkTilDVH(
 
     /** Kan brukes til idempotency av konsumenter */
     @JsonSchemaDescription("Unik id for denne forsendelsen/eventen.")
@@ -71,7 +71,7 @@ data class KlageStatistikkTilDVH(
     @JsonSchemaDescription("Den som sendt inn klagen.")
     val klager: Part,
 
-    @JsonSchemaDescription("F.eks. Foreldrepenger. Kodeverk.")
+    @JsonSchemaDescription("Vedtaksinstans. F.eks. Foreldrepenger. Kodeverk.")
     val opprinneligFagsaksystem: String,
 
     @JsonFormat(
@@ -121,14 +121,13 @@ data class KlageStatistikkTilDVH(
     val vedtaksdato: LocalDate?,
 
     @JsonSchemaDescription("Angir på hvilken versjon av kildekoden JSON stringen er generert på bakgrunn av.")
+    //TODO find version?
     val versjon: Int = 1,
 
     //TODO Fyll ut når kabal-api får tilgang til det
     @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH. TODO.")
     val ytelseType: String,
 
-    @JsonSchemaDescription("Kvalitetsvurdering av arbeid gjort i 1. instans.")
-    val kvalitetsvurdering: Kvalitetsvurdering? = null
 ) {
     data class Part(
         val verdi: String,
@@ -137,95 +136,6 @@ data class KlageStatistikkTilDVH(
 
     enum class PartIdType {
         PERSON, VIRKSOMHET
-    }
-
-    data class Kvalitetsvurdering(
-        @JsonSchemaDescription("Er kvaliteten på oversendelsebrevet bra?")
-        val kvalitetOversendelsesbrevBra: Boolean?,
-        @JsonSchemaDescription("Mulige kvalitetsavvik i forsendelsesbrevet.")
-        val kvalitetsavvikOversendelsesbrev: Set<KvalitetsavvikOversendelsesbrev>? = emptySet(),
-        @JsonSchemaDescription("Er kvaliteten på utredning bra?")
-        val kvalitetUtredningBra: Boolean?,
-        @JsonSchemaDescription("Mulige kvalitetsavvik i utredningen.")
-        val kvalitetsavvikUtredning: Set<KvalitetsavvikUtredning>? = emptySet(),
-        @JsonSchemaDescription("Er kvaliteten på vedtaket bra?")
-        val kvalitetVedtaketBra: Boolean?,
-        @JsonSchemaDescription("Mulige kvalitetsavvik i vedtaket.")
-        val kvalitetsavvikVedtak: Set<KvalitetsavvikVedtak>? = emptySet(),
-        @JsonSchemaDescription("Har avviket stor konsekvens for bruker?")
-        val avvikStorKonsekvens: Boolean?,
-    ) {
-        enum class KvalitetsavvikOversendelsesbrev(
-            val id: Int,
-            val beskrivelse: String
-        ) {
-            OVERSITTET_KLAGEFRIST_IKKE_KOMMENTERT(
-                1,
-                "Oversittet klagefrist er ikke kommentert"
-            ),
-            HOVEDINNHOLDET_IKKE_GJENGITT(
-                2,
-                "Hovedinnholdet i klagen er ikke gjengitt"
-            ),
-            MANGLER_BEGRUNNELSE(
-                3,
-                "Mangler begrunnelse for hvorfor vedtaket opprettholdes/hvorfor klager ikke oppfyller villkår"
-            ),
-            KLAGERS_ANFOERSLER_IKKE_TILSTREKKELIG_KOMMENTERT(
-                4,
-                "Klagers anførsler er ikke tilstrekkelig kommentert/imøtegått"
-            ),
-            MANGLER_KONKLUSJON(5, "Mangler konklusjon");
-        }
-
-        enum class KvalitetsavvikUtredning(
-            val id: Int,
-            val beskrivelse: String
-        ) {
-            MANGELFULL_UTREDNING_AV_MEDISINSKE_FORHOLD(
-                1,
-                "Mangelfull utredning av medisinske forhold "
-            ),
-            MANGELFULL_UTREDNING_AV_ARBEIDSFORHOLD(
-                2,
-                "Mangelfull utredning av arbeids- og inntektsforhold"
-            ),
-            MANGELFULL_UTREDNING_AV_UTENLANDSPROBLEMATIKK(
-                3,
-                "Mangelfull utredning av EØS/utlandsproblematikk"
-            ),
-            MANGELFULL_BRUK_AV_ROL(
-                4,
-                "Mangelfull bruk av rådgivende lege"
-            ),
-            MANGELFULL_UTREDNING_ANDRE_FORHOLD(
-                5,
-                "Mangelfull utredning av andre aktuelle forhold i saken"
-            );
-        }
-
-        enum class KvalitetsavvikVedtak(
-            val id: Int,
-            val beskrivelse: String
-        ) {
-            IKKE_BRUKT_RIKTIGE_HJEMLER(
-                1,
-                "Det er ikke brukt riktig hjemmel/er"
-            ),
-            INNHOLDET_I_RETTSREGLENE_IKKE_TILSTREKKELIG_BESKREVET(
-                2,
-                "Innholdet i rettsreglene er ikke tilstrekkelig beskrevet"
-            ),
-            VURDERING_AV_BEVIS_ER_MANGELFULL(
-                3,
-                "Vurderingen av faktum/bevisvurderingen er mangelfull"
-            ),
-            BEGRUNNELSE_IKKE_TILSTREKKELIG_KONKRET_OG_INDVIDUELL(
-                4,
-                "Begrunnelsen er ikke tilstrekkelig konkret og individuell"
-            ),
-            FORMIDLING_IKKE_TYDELIG(5, "Formidlingen er ikke tydelig");
-        }
     }
 }
 

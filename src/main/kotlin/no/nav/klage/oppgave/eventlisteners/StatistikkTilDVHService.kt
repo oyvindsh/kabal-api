@@ -3,14 +3,12 @@ package no.nav.klage.oppgave.eventlisteners
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.kodeverk.PartIdType
-import no.nav.klage.kodeverk.Type
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
-import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -21,7 +19,6 @@ import java.util.*
 @Service
 @Transactional
 class StatistikkTilDVHService(
-    private val mottakRepository: MottakRepository,
     private val kafkaEventRepository: KafkaEventRepository
 ) {
 
@@ -34,97 +31,100 @@ class StatistikkTilDVHService(
 
     fun process(behandlingEndretEvent: BehandlingEndretEvent) {
         if (shouldSendStats(behandlingEndretEvent.endringslogginnslag)) {
-
-            //FIXME handle anke
-
             val behandling = behandlingEndretEvent.behandling
-            if (behandling.type == Type.KLAGE) {
-                val eventId = UUID.randomUUID()
 
-                val klageStatistikkTilDVH = createKlageStatistikkTilDVH(
-                    eventId = eventId,
-                    klagebehandling = behandling as Klagebehandling,
-                    behandlingState = getKlagebehandlingState(behandlingEndretEvent.endringslogginnslag)
+            val eventId = UUID.randomUUID()
+            val statistikkTilDVH = createStatistikkTilDVH(
+                eventId = eventId,
+                behandling = behandling,
+                behandlingState = getBehandlingState(behandlingEndretEvent.endringslogginnslag)
+            )
+
+            kafkaEventRepository.save(
+                KafkaEvent(
+                    id = eventId,
+                    klagebehandlingId = behandlingEndretEvent.behandling.id,
+                    kilde = behandlingEndretEvent.behandling.kildesystem.navn,
+                    kildeReferanse = behandlingEndretEvent.behandling.kildeReferanse,
+                    status = UtsendingStatus.IKKE_SENDT,
+                    jsonPayload = statistikkTilDVH.toJson(),
+                    type = EventType.STATS_DVH
                 )
-
-                kafkaEventRepository.save(
-                    KafkaEvent(
-                        id = eventId,
-                        klagebehandlingId = behandlingEndretEvent.behandling.id,
-                        kilde = behandlingEndretEvent.behandling.kildesystem.navn,
-                        kildeReferanse = behandlingEndretEvent.behandling.kildeReferanse,
-                        status = UtsendingStatus.IKKE_SENDT,
-                        jsonPayload = klageStatistikkTilDVH.toJson(),
-                        type = EventType.STATS_DVH
-                    )
-                )
-            }
-
+            )
         }
     }
 
-    private fun KlageStatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
+    private fun StatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
 
     private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
         endringslogginnslag.isEmpty() ||
                 endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER }
 
-    private fun getKlagebehandlingState(endringslogginnslag: List<Endringslogginnslag>): BehandlingState {
+    private fun getBehandlingState(endringslogginnslag: List<Endringslogginnslag>): BehandlingState {
         return when {
             endringslogginnslag.isEmpty() -> BehandlingState.MOTTATT
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> BehandlingState.TILDELT_SAKSBEHANDLER
             endringslogginnslag.any { it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER } -> BehandlingState.AVSLUTTET
             else -> BehandlingState.UKJENT.also {
                 logger.warn(
-                    "unknown state for klagebehandling with id {}",
+                    "unknown state for behandling with id {}",
                     endringslogginnslag.first().behandlingId
                 )
             }
         }
     }
 
-    private fun createKlageStatistikkTilDVH(
+    private fun createStatistikkTilDVH(
         eventId: UUID,
-        klagebehandling: Klagebehandling,
+        behandling: Behandling,
         behandlingState: BehandlingState
-    ): KlageStatistikkTilDVH {
-
+    ): StatistikkTilDVH {
         val funksjoneltEndringstidspunkt =
-            getFunksjoneltEndringstidspunkt(klagebehandling, behandlingState)
+            getFunksjoneltEndringstidspunkt(behandling, behandlingState)
 
-        return KlageStatistikkTilDVH(
+        val resultat = getResultat(behandling)
+
+        return StatistikkTilDVH(
             eventId = eventId,
-            behandlingId = klagebehandling.dvhReferanse ?: klagebehandling.kildeReferanse,
-            behandlingIdKabal = klagebehandling.id.toString(),
-            behandlingStartetKA = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
+            behandlingId = behandling.dvhReferanse ?: behandling.kildeReferanse,
+            behandlingIdKabal = behandling.id.toString(),
+            behandlingStartetKA = behandling.tildeling?.tidspunkt?.toLocalDate(),
             behandlingStatus = behandlingState,
-            behandlingType = klagebehandling.type.navn,
-            beslutter = klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
+            behandlingType = behandling.type.navn,
+            beslutter = behandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
             endringstid = funksjoneltEndringstidspunkt,
-            hjemmel = klagebehandling.hjemler.map { it.toSearchableString() },
-            klager = getPart(klagebehandling.klager.partId.type, klagebehandling.klager.partId.value),
-            opprinneligFagsaksystem = klagebehandling.kildesystem.navn,
-            overfoertKA = klagebehandling.mottattKlageinstans.toLocalDate(),
-            resultat = klagebehandling.currentDelbehandling().utfall?.name?.let { ExternalUtfall.valueOf(it).navn },
-            sakenGjelder = getPart(klagebehandling.sakenGjelder.partId.type, klagebehandling.sakenGjelder.partId.value),
-            saksbehandler = klagebehandling.tildeling?.saksbehandlerident,
-            saksbehandlerEnhet = klagebehandling.tildeling?.enhet,
-            tekniskTid = klagebehandling.modified,
-            vedtakId = klagebehandling.currentDelbehandling().id.toString(),
-            vedtaksdato = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
+            hjemmel = behandling.hjemler.map { it.toSearchableString() },
+            klager = getPart(behandling.klager.partId.type, behandling.klager.partId.value),
+            opprinneligFagsaksystem = behandling.kildesystem.navn,
+            overfoertKA = behandling.mottattKlageinstans.toLocalDate(),
+            resultat = resultat,
+            sakenGjelder = getPart(behandling.sakenGjelder.partId.type, behandling.sakenGjelder.partId.value),
+            saksbehandler = behandling.tildeling?.saksbehandlerident,
+            saksbehandlerEnhet = behandling.tildeling?.enhet,
+            tekniskTid = behandling.modified,
+            vedtakId = behandling.currentDelbehandling().id.toString(),
+            vedtaksdato = behandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
             ytelseType = "TODO",
         )
     }
 
+    //Resultat should only be relevant if avsluttetAvSaksbehandler
+    private fun getResultat(behandling: Behandling): String? =
+        if (behandling.avsluttetAvSaksbehandler != null) {
+            behandling.currentDelbehandling().utfall?.name?.let { ExternalUtfall.valueOf(it).navn }
+        } else {
+            null
+        }
+
     private fun getFunksjoneltEndringstidspunkt(
-        klagebehandling: Klagebehandling,
+        behandling: Behandling,
         behandlingState: BehandlingState
     ): LocalDateTime {
         return when (behandlingState) {
-            BehandlingState.MOTTATT -> klagebehandling.mottattKlageinstans
-            BehandlingState.TILDELT_SAKSBEHANDLER -> klagebehandling.tildeling?.tidspunkt
+            BehandlingState.MOTTATT -> behandling.mottattKlageinstans
+            BehandlingState.TILDELT_SAKSBEHANDLER -> behandling.tildeling?.tidspunkt
                 ?: throw RuntimeException("tildelt mangler")
-            BehandlingState.AVSLUTTET -> klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler
+            BehandlingState.AVSLUTTET -> behandling.currentDelbehandling().avsluttetAvSaksbehandler
                 ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
             BehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")
@@ -136,15 +136,15 @@ class StatistikkTilDVHService(
     private fun getPart(type: PartIdType, value: String) =
         when (type) {
             PartIdType.PERSON -> {
-                KlageStatistikkTilDVH.Part(
+                StatistikkTilDVH.Part(
                     verdi = value,
-                    type = KlageStatistikkTilDVH.PartIdType.PERSON
+                    type = StatistikkTilDVH.PartIdType.PERSON
                 )
             }
             PartIdType.VIRKSOMHET -> {
-                KlageStatistikkTilDVH.Part(
+                StatistikkTilDVH.Part(
                     verdi = value,
-                    type = KlageStatistikkTilDVH.PartIdType.VIRKSOMHET
+                    type = StatistikkTilDVH.PartIdType.VIRKSOMHET
                 )
             }
         }
