@@ -10,9 +10,8 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentMedParentReferanse
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -65,8 +64,7 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
             )
-        } returns DokumentMedParentReferanse(
-            persistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
+        } returns DokumentUnderArbeid(
             mellomlagerId = "mellomlagerId",
             opplastet = LocalDateTime.now(),
             size = 1001,
@@ -118,8 +116,7 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
             )
-        } returns DokumentMedParentReferanse(
-            persistentDokumentId = PersistentDokumentId(UUID.randomUUID()),
+        } returns DokumentUnderArbeid(
             mellomlagerId = "mellomlagerId",
             opplastet = LocalDateTime.now(),
             size = 1001,

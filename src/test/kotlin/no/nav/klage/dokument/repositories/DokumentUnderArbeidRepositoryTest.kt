@@ -1,8 +1,7 @@
 package no.nav.klage.dokument.repositories
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.Vedlegg
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -31,298 +30,143 @@ class DokumentUnderArbeidRepositoryTest {
     @Autowired
     lateinit var testEntityManager: TestEntityManager
 
-    //@Autowired
-    //lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
-
     @Autowired
-    lateinit var hovedDokumentRepository: HovedDokumentRepository
-
-    //@Autowired
-    //lateinit var vedleggRepository: VedleggRepository
+    lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
 
     @Test
     fun `persist hoveddokument works`() {
 
         val behandlingId = UUID.randomUUID()
-        val hovedDokument = HovedDokument(
+        val hovedDokument = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
+            smartEditorId = null
         )
-        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig()
-        hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt()
-        hovedDokumentRepository.save(hovedDokument)
+        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now())
+        hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(LocalDateTime.now())
+        dokumentUnderArbeidRepository.save(hovedDokument)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId = hovedDokumentRepository.getById(hovedDokument.id)
+        val byId = dokumentUnderArbeidRepository.getById(hovedDokument.id)
         assertThat(byId).isEqualTo(hovedDokument)
     }
 
-    /*
+
     @Test
-    fun `hoveddokument can be persisted by dokumentUnderArbeidRepository and retrieved by hovedDokumentRepository`() {
+    fun `hoveddokument can have vedlegg`() {
 
         val behandlingId = UUID.randomUUID()
-        val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
+        val hovedDokument = DokumentUnderArbeid(
+            mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
+            dokumentType = DokumentType.BREV,
+            smartEditorId = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId = hovedDokumentRepository.getById(hovedDokument.id)
-        assertThat(byId).isEqualTo(hovedDokument)
-    }
-
-     */
-
-    /*
-    @Test
-    fun `hoveddokument can be persisted by hovedDokumentRepository and retrieved by dokumentUnderArbeidRepository`() {
-
-        val behandlingId = UUID.randomUUID()
-        val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.VEDTAK,
-        )
-        hovedDokumentRepository.save(hovedDokument)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId = dokumentUnderArbeidRepository.findById(hovedDokument.id).get()
-        assertThat(byId).isEqualTo(hovedDokument)
-    }
-     */
-
-    @Test
-    fun `hoveddokument can have vedlegg`() {
-
-        val behandlingId = UUID.randomUUID()
-        val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID().toString(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.BREV,
-        )
-        hovedDokumentRepository.save(hovedDokument)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId = hovedDokumentRepository.getById(hovedDokument.id)
-        byId.vedlegg.add(
-            Vedlegg(
+        dokumentUnderArbeidRepository.save(
+            DokumentUnderArbeid(
                 mellomlagerId = UUID.randomUUID().toString(),
                 opplastet = LocalDateTime.now(),
                 size = 1001,
                 name = "Vedtak.pdf",
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.BREV,
+                smartEditorId = null,
+                parentId = hovedDokument.id
             )
         )
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId2 = hovedDokumentRepository.getById(hovedDokument.id)
-        assertThat(byId2.vedlegg).hasSize(1)
-    }
-
-    @Test
-    fun `HovedDokument can be queried by vedlegg`() {
-
-        val behandlingId = UUID.randomUUID()
-        val hovedDokument = HovedDokument(
-            mellomlagerId = UUID.randomUUID().toString(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.BREV,
-        )
-        hovedDokumentRepository.save(hovedDokument)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId = hovedDokumentRepository.getById(hovedDokument.id)
-        val vedlegg = Vedlegg(
-            mellomlagerId = UUID.randomUUID().toString(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.BREV,
-        )
-        byId.vedlegg.add(vedlegg)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId2 = hovedDokumentRepository.findByVedleggPersistentDokumentId(vedlegg.persistentDokumentId)
-        assertThat(byId2).isEqualTo(hovedDokument)
-        assertThat(byId2!!.vedlegg).hasSize(1)
-        assertThat(byId2.vedlegg.first()).isEqualTo(vedlegg)
+        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
+        assertThat(vedlegg).hasSize(1)
     }
 
     @Test
     fun `vedlegg can be unlinked`() {
 
         val behandlingId = UUID.randomUUID()
-        val hovedDokument = HovedDokument(
+        val hovedDokument = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
+            smartEditorId = null,
         )
-        hovedDokumentRepository.save(hovedDokument)
+        dokumentUnderArbeidRepository.save(hovedDokument)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId = hovedDokumentRepository.getById(hovedDokument.id)
-        byId.vedlegg.add(
-            Vedlegg(
+
+        dokumentUnderArbeidRepository.save(
+            DokumentUnderArbeid(
                 mellomlagerId = UUID.randomUUID().toString(),
                 opplastet = LocalDateTime.now(),
                 size = 1001,
                 name = "Vedtak.pdf",
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.BREV,
+                smartEditorId = null,
+                parentId = hovedDokument.id
             )
         )
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId2 = hovedDokumentRepository.getById(hovedDokument.id)
-        val vedlegg = byId2.vedlegg.first()
-        byId2.vedlegg.remove(vedlegg)
-        val hovedDokumentFraTidligereVedlegg = vedlegg.toHovedDokument()
-        hovedDokumentRepository.save(hovedDokumentFraTidligereVedlegg)
-
+        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id).first()
+        vedlegg.parentId = null
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId3 = hovedDokumentRepository.getById(hovedDokument.id)
-        assertThat(byId3.vedlegg).hasSize(0)
-
-        val byId4 = hovedDokumentRepository.getById(hovedDokumentFraTidligereVedlegg.id)
-        assertThat(byId4).isEqualTo(hovedDokumentFraTidligereVedlegg)
+        assertThat(dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)).hasSize(0)
     }
 
     @Test
-    fun `two hoveddokument can be linked`() {
-
-        val behandlingId = UUID.randomUUID()
-        val hovedDokument1 = HovedDokument(
-            mellomlagerId = UUID.randomUUID().toString(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.BREV,
-        )
-        hovedDokumentRepository.save(hovedDokument1)
-
-        val hovedDokument2 = HovedDokument(
-            mellomlagerId = UUID.randomUUID().toString(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.BREV,
-        )
-        hovedDokumentRepository.save(hovedDokument2)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId1 = hovedDokumentRepository.getById(hovedDokument1.id)
-        val byId2 = hovedDokumentRepository.getById(hovedDokument2.id)
-
-        hovedDokumentRepository.delete(byId2)
-        val nyttVedlegg = byId2.toVedlegg()
-        byId1.vedlegg.add(nyttVedlegg)
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId3 = hovedDokumentRepository.getById(hovedDokument1.id)
-        assertThat(byId3.vedlegg).hasSize(1)
-        assertThat(byId3.vedlegg.first().persistentDokumentId).isEqualTo(nyttVedlegg.persistentDokumentId)
-    }
-
-    @Test
-    fun `documents with unknown type can be found and edited`() {
+    fun `documents can be found and edited`() {
 
         val behandlingId = UUID.randomUUID()
         val nyMellomlagerId = UUID.randomUUID().toString()
 
-        val hovedDokument = HovedDokument(
+        val hovedDokument = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
+            smartEditorId = null
         )
-        val vedlegg = Vedlegg(
-            mellomlagerId = UUID.randomUUID().toString(),
-            opplastet = LocalDateTime.now(),
-            size = 1001,
-            name = "Vedtak.pdf",
-            behandlingId = behandlingId,
-            dokumentType = DokumentType.BREV,
-        )
-        hovedDokument.vedlegg.add(vedlegg)
-        hovedDokumentRepository.save(hovedDokument)
+        dokumentUnderArbeidRepository.save(hovedDokument)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-
-        val hovedDokumentet =
-            hovedDokumentRepository.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(
-                hovedDokument.persistentDokumentId
-            )
+        val hovedDokumentet = dokumentUnderArbeidRepository.getById(hovedDokument.id)
         assertThat(hovedDokumentet).isNotNull
-        hovedDokumentet!!.mellomlagerId = nyMellomlagerId
+        hovedDokumentet.mellomlagerId = nyMellomlagerId
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val vedlegget =
-            hovedDokumentRepository.findDokumentUnderArbeidByPersistentDokumentIdOrVedleggPersistentDokumentId(vedlegg.persistentDokumentId)
-        assertThat(vedlegget).isNotNull
-        vedlegget!!.mellomlagerId = nyMellomlagerId
-
-        testEntityManager.flush()
-        testEntityManager.clear()
-
-        val byId = hovedDokumentRepository.getById(hovedDokument.id)
-        assertThat(byId.mellomlagerId).isEqualTo(nyMellomlagerId)
-        assertThat(byId.vedlegg.first().mellomlagerId).isEqualTo(nyMellomlagerId)
+        assertThat(dokumentUnderArbeidRepository.getById(hovedDokument.id).mellomlagerId).isEqualTo(nyMellomlagerId)
     }
 
 
@@ -331,83 +175,76 @@ class DokumentUnderArbeidRepositoryTest {
 
         val behandlingId = UUID.randomUUID()
 
-        val hovedDokument1 = HovedDokument(
+        val hovedDokument1 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            created = LocalDateTime.now().minusDays(1)
+            created = LocalDateTime.now().minusDays(1),
+            smartEditorId = null
         )
-        val vedlegg1 = Vedlegg(
+        val vedlegg1 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            created = LocalDateTime.now().minusDays(2)
+            created = LocalDateTime.now().minusDays(2),
+            smartEditorId = null,
+            parentId = hovedDokument1.id
         )
-        val vedlegg2 = Vedlegg(
+        val vedlegg2 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            created = LocalDateTime.now().minusDays(5)
+            created = LocalDateTime.now().minusDays(5),
+            smartEditorId = null,
+            parentId = hovedDokument1.id
         )
 
-        val hovedDokument2 = HovedDokument(
+        val hovedDokument2 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            created = LocalDateTime.now().minusDays(3)
+            created = LocalDateTime.now().minusDays(3),
+            smartEditorId = null
         )
 
-        val hovedDokument3 = HovedDokument(
+        val hovedDokument3 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
             opplastet = LocalDateTime.now(),
             size = 1001,
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            created = LocalDateTime.now().plusDays(3)
+            created = LocalDateTime.now().plusDays(3),
+            smartEditorId = null
         )
-        hovedDokument1.vedlegg.add(vedlegg1)
-        hovedDokument1.vedlegg.add(vedlegg2)
-        assertThat(hovedDokument1.vedlegg.first()).isEqualTo(vedlegg2)
-        assertThat(sortedSetOf(hovedDokument1, hovedDokument2, hovedDokument3)).containsExactly(
-            hovedDokument2,
-            hovedDokument1,
-            hovedDokument3
-        )
-
-
-        hovedDokumentRepository.save(hovedDokument1)
-        hovedDokumentRepository.save(hovedDokument2)
-        hovedDokumentRepository.save(hovedDokument3)
-
-        assertThat(hovedDokument1.vedlegg.first()).isEqualTo(vedlegg2)
-        assertThat(sortedSetOf(hovedDokument1, hovedDokument2, hovedDokument3)).containsExactly(
-            hovedDokument2,
-            hovedDokument1,
-            hovedDokument3
-        )
+        dokumentUnderArbeidRepository.save(hovedDokument1)
+        dokumentUnderArbeidRepository.save(vedlegg1)
+        dokumentUnderArbeidRepository.save(vedlegg2)
+        dokumentUnderArbeidRepository.save(hovedDokument2)
+        dokumentUnderArbeidRepository.save(hovedDokument3)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(hovedDokumentRepository.findByBehandlingIdOrderByCreated(behandlingId)).containsExactly(
+        assertThat(dokumentUnderArbeidRepository.findByBehandlingIdOrderByCreated(behandlingId)).containsExactly(
+            vedlegg2,
             hovedDokument2,
+            vedlegg1,
             hovedDokument1,
             hovedDokument3
         )
-        assertThat(hovedDokumentRepository.getById(hovedDokument1.id).vedlegg.first()).isEqualTo(vedlegg2)
     }
 
 }

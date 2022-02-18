@@ -6,16 +6,11 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "dokument_under_arbeid", schema = "klage")
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @DynamicUpdate
-abstract class DokumentUnderArbeid(
+open class DokumentUnderArbeid(
     @EmbeddedId
-    open var id: DokumentId,
-    //Innfører denne fordi vi trenger noe som er persistent selv når et dokument bytter fra å være et hoveddokument til å bli et vedlegg eller motsatt, og å bruke id skaper litt krøll i persistence contexten..
-    @Embedded
-    open var persistentDokumentId: PersistentDokumentId,
+    open var id: DokumentId = DokumentId(UUID.randomUUID()),
     @Column(name = "mellomlager_id")
     open var mellomlagerId: String,
     @Column(name = "opplastet")
@@ -25,7 +20,7 @@ abstract class DokumentUnderArbeid(
     @Column(name = "name")
     open var name: String,
     @Column(name = "smarteditor_id")
-    open var smartEditorId: UUID? = null,
+    open var smartEditorId: UUID?,
     @Column(name = "behandling_id")
     open var behandlingId: UUID,
     @Column(name = "dokument_type")
@@ -39,10 +34,45 @@ abstract class DokumentUnderArbeid(
     open var markertFerdig: LocalDateTime? = null,
     @Column(name = "ferdigstilt")
     open var ferdigstilt: LocalDateTime? = null,
+    @Column(name = "dokument_enhet_id")
+    open var dokumentEnhetId: UUID? = null,
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "id", column = Column(name = "parent_id"))
+        ]
+    )
+    open var parentId: DokumentId? = null,
 ) : Comparable<DokumentUnderArbeid> {
-    companion object {
-        const val HOVED_DOKUMENT = "hoved"
-        const val VEDLEGG = "vedlegg"
+
+    override fun compareTo(other: DokumentUnderArbeid): Int =
+        created.compareTo(other.created)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DokumentUnderArbeid
+
+        if (id.id != other.id.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.id.hashCode()
+    }
+
+    override fun toString(): String {
+        return "DokumentUnderArbeid(id=$id)"
+    }
+
+    fun erMarkertFerdig(): Boolean {
+        return markertFerdig != null
+    }
+
+    fun erFerdigstilt(): Boolean {
+        return ferdigstilt != null
     }
 
     fun ferdigstillHvisIkkeAlleredeFerdigstilt(tidspunkt: LocalDateTime) {
@@ -59,30 +89,4 @@ abstract class DokumentUnderArbeid(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DokumentUnderArbeid) return false
-
-        if (id != other.id) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-
-    override fun compareTo(other: DokumentUnderArbeid): Int {
-        return this.created.compareTo(other.created)
-    }
-
-    fun erMarkertFerdig(): Boolean {
-        return markertFerdig != null
-    }
-
-    fun erFerdigstilt(): Boolean {
-        return ferdigstilt != null
-    }
 }
-
-

@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-internal class KlageStatistikkTilDVHTest {
+internal class StatistikkTilDVHTest {
 
     @Test
     @Disabled
@@ -21,11 +21,11 @@ internal class KlageStatistikkTilDVHTest {
         val config = JsonSchemaConfig.vanillaJsonSchemaDraft4().withJsonSchemaDraft(JsonSchemaDraft.DRAFT_07)
 
         val schemaGen = JsonSchemaGenerator(objectMapper, config)
-        val jsonSchema = schemaGen.generateJsonSchema(KlageStatistikkTilDVH::class.java)
+        val jsonSchema = schemaGen.generateJsonSchema(StatistikkTilDVH::class.java)
 
         println(objectMapper.writeValueAsString(jsonSchema))
 
-        val klageStatistikkTilDVH = KlageStatistikkTilDVH(
+        val statistikkTilDVH = StatistikkTilDVH(
             eventId = UUID.randomUUID(),
             ansvarligEnhetKode = "kode",
             ansvarligEnhetType = "type",
@@ -38,11 +38,11 @@ internal class KlageStatistikkTilDVHTest {
             beslutter = "beslutter",
             endringstid = LocalDateTime.now(),
             hjemmel = listOf("8-14"),
-            klager = KlageStatistikkTilDVH.Part(verdi = "8005138513", KlageStatistikkTilDVH.PartIdType.VIRKSOMHET),
+            klager = StatistikkTilDVH.Part(verdi = "8005138513", StatistikkTilDVH.PartIdType.VIRKSOMHET),
             opprinneligFagsaksystem = "K9Sak",
             overfoertKA = LocalDate.now(),
             resultat = "resultatet",
-            sakenGjelder = KlageStatistikkTilDVH.Part(verdi = "20127529618", KlageStatistikkTilDVH.PartIdType.PERSON),
+            sakenGjelder = StatistikkTilDVH.Part(verdi = "20127529618", StatistikkTilDVH.PartIdType.PERSON),
             saksbehandler = "Z405060",
             saksbehandlerEnhet = "4291",
             tekniskTid = LocalDateTime.now(),
@@ -52,7 +52,7 @@ internal class KlageStatistikkTilDVHTest {
             ytelseType = "OMS"
         )
 
-        println(objectMapper.writeValueAsString(klageStatistikkTilDVH))
+        println(objectMapper.writeValueAsString(statistikkTilDVH))
     }
 
 }

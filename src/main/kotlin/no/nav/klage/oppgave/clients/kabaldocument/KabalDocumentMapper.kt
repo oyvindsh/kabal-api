@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.HovedDokument
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
@@ -15,6 +14,7 @@ import no.nav.klage.oppgave.domain.klage.SakenGjelder
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class KabalDocumentMapper(
@@ -61,7 +61,8 @@ class KabalDocumentMapper(
 
     fun mapBehandlingToDokumentEnhetWithDokumentreferanser(
         behandling: Behandling,
-        hovedDokument: HovedDokument
+        hovedDokument: DokumentUnderArbeid,
+        vedlegg: SortedSet<DokumentUnderArbeid>
     ): DokumentEnhetWithDokumentreferanserInput {
         return DokumentEnhetWithDokumentreferanserInput(
             brevMottakere = mapBrevMottakere(behandling),
@@ -85,7 +86,7 @@ class KabalDocumentMapper(
             ),
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
-                vedlegg = hovedDokument.vedlegg.map { mapDokumentUnderArbeidToDokumentReferanse(it) }
+                vedlegg = vedlegg.map { mapDokumentUnderArbeidToDokumentReferanse(it) }
             )
         )
     }

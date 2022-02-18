@@ -5,8 +5,8 @@ import io.swagger.annotations.Api
 import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.PersistentDokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -78,7 +78,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.updateDokumentType(
                 behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(dokumentId),
+                dokumentId = DokumentId(dokumentId),
                 dokumentType = DokumentType.of(input.dokumentTypeId),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
@@ -97,7 +97,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToByteArray(
             dokumentUnderArbeidService.hentMellomlagretDokument(
                 behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(dokumentId),
+                dokumentId = DokumentId(dokumentId),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         )
@@ -111,7 +111,7 @@ class DokumentUnderArbeidController(
         logger.debug("Kall mottatt på deleteDokument for $dokumentId")
         dokumentUnderArbeidService.slettDokument(
             behandlingId = behandlingId,
-            persistentDokumentId = PersistentDokumentId(dokumentId),
+            dokumentId = DokumentId(dokumentId),
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
     }
@@ -123,55 +123,28 @@ class DokumentUnderArbeidController(
         @RequestBody input: OptionalPersistentDokumentIdInput
     ): DokumentView {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
-        val hovedDokument = if (input.dokumentId == null) {
-            dokumentUnderArbeidService.frikobleVedlegg(
-                behandlingId = behandlingId,
-                persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentId),
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
-        } else {
-            dokumentUnderArbeidService.kobleVedlegg(
-                behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(input.dokumentId),
-                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(persistentDokumentId),
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
+        try {
+
+
+            val hovedDokument = if (input.dokumentId == null) {
+                dokumentUnderArbeidService.frikobleVedlegg(
+                    behandlingId = behandlingId,
+                    dokumentId = DokumentId(persistentDokumentId),
+                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                )
+            } else {
+                dokumentUnderArbeidService.kobleVedlegg(
+                    behandlingId = behandlingId,
+                    dokumentId = DokumentId(input.dokumentId),
+                    dokumentIdHovedDokumentSomSkalBliVedlegg = DokumentId(persistentDokumentId),
+                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                )
+            }
+            return dokumentMapper.mapToDokumentView(hovedDokument)
+        } catch (e: Exception) {
+            logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
+            throw e
         }
-        return dokumentMapper.mapToDokumentView(hovedDokument)
-    }
-
-    @PostMapping("/{dokumentId}/vedlegg")
-    fun kobleVedlegg(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @PathVariable("dokumentId") persistentDokumentId: UUID,
-        @RequestBody input: PersistentDokumentIdInput
-    ): DokumentView {
-        logger.debug("Kall mottatt på kobleVedlegg for $persistentDokumentId")
-        return dokumentMapper.mapToDokumentView(
-            dokumentUnderArbeidService.kobleVedlegg(
-                behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(persistentDokumentId),
-                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(input.dokumentId),
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
-        )
-    }
-
-    @DeleteMapping("/{dokumentId}/vedlegg/{dokumentIdVedlegg}")
-    fun fristillVedlegg(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @PathVariable("dokumentId") persistentDokumentId: UUID,
-        @PathVariable("dokumentIdVedlegg") persistentDokumentIdVedlegg: UUID,
-    ): DokumentView {
-        logger.debug("Kall mottatt på fristillVedlegg for $persistentDokumentId og $persistentDokumentIdVedlegg")
-        return dokumentMapper.mapToDokumentView(
-            dokumentUnderArbeidService.frikobleVedlegg(
-                behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(persistentDokumentId),
-                persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentIdVedlegg),
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
-        )
     }
 
     @GetMapping
@@ -179,7 +152,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findHovedDokumenter(behandlingId = behandlingId, ident = ident)
+        return dokumentUnderArbeidService.findDokumenter(behandlingId = behandlingId, ident = ident)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 
@@ -201,7 +174,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.finnOgMarkerFerdigHovedDokument(
                 behandlingId = behandlingId,
-                hovedDokumentPersistentDokumentId = PersistentDokumentId(dokumentId),
+                dokumentId = DokumentId(dokumentId),
                 ident = ident
             )
         )
@@ -217,7 +190,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.updateDokumentTitle(
                 behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(dokumentId),
+                dokumentId = DokumentId(dokumentId),
                 dokumentTitle = input.title,
                 innloggetIdent = ident,
             )
