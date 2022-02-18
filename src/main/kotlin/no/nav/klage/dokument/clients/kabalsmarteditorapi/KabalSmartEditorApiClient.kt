@@ -86,7 +86,7 @@ class KabalSmartEditorApiClient(
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Unit>()
-            .block() ?: throw RuntimeException("Document could not be deleted")
+            .block()
     }
 
     fun createcomment(
