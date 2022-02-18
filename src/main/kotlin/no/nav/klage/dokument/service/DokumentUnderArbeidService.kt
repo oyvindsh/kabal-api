@@ -47,7 +47,7 @@ class DokumentUnderArbeidService(
         opplastetFil: MellomlagretDokument?,
         json: String?,
         innloggetIdent: String,
-        tittel: String?,
+        tittel: String,
     ): DokumentUnderArbeid {
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
@@ -60,7 +60,7 @@ class DokumentUnderArbeidService(
                     mellomlagerId = mellomlagerId,
                     opplastet = LocalDateTime.now(),
                     size = opplastetFil.content.size.toLong(),
-                    name = tittel ?: opplastetFil.title,
+                    name = tittel,
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                     smartEditorId = null,
@@ -81,13 +81,14 @@ class DokumentUnderArbeidService(
             }
             val (smartEditorDokument, opplastet) =
                 smartEditorApiGateway.createDocument(json, dokumentType, innloggetIdent)
-            val mellomlagerId = mellomlagerService.uploadDocument(smartEditorDokument)
+            //TODO: smartEditorDokument har bogus tittel, ble ikke sendt med i kallet til smartEditorApi
+            val mellomlagerId = mellomlagerService.uploadByteArray(tittel, smartEditorDokument.content)
             val hovedDokument = dokumentUnderArbeidRepository.save(
                 DokumentUnderArbeid(
                     mellomlagerId = mellomlagerId,
                     opplastet = opplastet,
                     size = smartEditorDokument.content.size.toLong(),
-                    name = tittel ?: "filnavn.pdf",
+                    name = tittel,
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                     smartEditorId = smartEditorDokument.smartEditorId,
@@ -153,6 +154,9 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke endre tittel på et dokument som er ferdigstilt")
         }
 
+        val mellomlagerId = mellomlagerService.updateTittel(dokument.mellomlagerId, dokumentTitle)
+        dokument.mellomlagerId = mellomlagerId
+
         val oldValue = dokument.name
         dokument.name = dokumentTitle
         behandling.publishEndringsloggEvent(
@@ -189,6 +193,10 @@ class DokumentUnderArbeidService(
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(now)
         vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(now) }
 
+        //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
+        mellomlagreNyVersjonAvSmartEditorDokument(hovedDokument)
+        vedlegg.forEach { mellomlagreNyVersjonAvSmartEditorDokument(it) }
+
         behandling.publishEndringsloggEvent(
             saksbehandlerident = ident,
             felt = Felt.DOKUMENT_UNDER_ARBEID_MARKERT_FERDIG,
@@ -213,7 +221,7 @@ class DokumentUnderArbeidService(
         behandlingService.getBehandling(dokument.behandlingId)
 
         if (dokument.isStaleSmartEditorDokument()) {
-            mellomlagreSmartEditorDokument(dokument.smartEditorId!!)
+            mellomlagreNyVersjonAvSmartEditorDokument(dokument)
         }
         return mellomlagerService.getUploadedDocument(dokument.mellomlagerId)
     }
@@ -320,7 +328,7 @@ class DokumentUnderArbeidService(
         val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.dokumentEnhetId == null) {
-            //TODO: Løp gjennom og refresh alle smarteditor-dokumenter
+            //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
             val behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
             val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(behandling, hovedDokument, vedlegg)
             hovedDokument.dokumentEnhetId = dokumentEnhetId
@@ -364,8 +372,13 @@ class DokumentUnderArbeidService(
             ?: throw DokumentValidationException("${dokumentId.id} er ikke et smarteditor dokument")
     }
 
-    private fun mellomlagreSmartEditorDokument(smartEditorId: UUID) {
-        mellomlagerService.uploadDocument(smartEditorApiGateway.getDocumentAsPDF(smartEditorId))
+    private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid) {
+        val mellomlagerId =
+            mellomlagerService.uploadDocument(smartEditorApiGateway.getDocumentAsPDF(dokument.smartEditorId!!))
+        //Sletter gammelt:
+        mellomlagerService.deleteDocument(dokument.mellomlagerId)
+        dokument.mellomlagerId = mellomlagerId
+        dokument.opplastet = LocalDateTime.now()
     }
 
     private fun DokumentUnderArbeid.isStaleSmartEditorDokument() =
