@@ -122,21 +122,28 @@ class DokumentUnderArbeidController(
         @RequestBody input: OptionalPersistentDokumentIdInput
     ): DokumentView {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
-        val hovedDokument = if (input.dokumentId == null) {
-            dokumentUnderArbeidService.frikobleVedlegg(
-                behandlingId = behandlingId,
-                persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentId),
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
-        } else {
-            dokumentUnderArbeidService.kobleVedlegg(
-                behandlingId = behandlingId,
-                persistentDokumentId = PersistentDokumentId(input.dokumentId),
-                persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(persistentDokumentId),
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            )
+        try {
+
+
+            val hovedDokument = if (input.dokumentId == null) {
+                dokumentUnderArbeidService.frikobleVedlegg(
+                    behandlingId = behandlingId,
+                    persistentDokumentIdVedlegg = PersistentDokumentId(persistentDokumentId),
+                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                )
+            } else {
+                dokumentUnderArbeidService.kobleVedlegg(
+                    behandlingId = behandlingId,
+                    persistentDokumentId = PersistentDokumentId(input.dokumentId),
+                    persistentDokumentIdHovedDokumentSomSkalBliVedlegg = PersistentDokumentId(persistentDokumentId),
+                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                )
+            }
+            return dokumentMapper.mapToDokumentView(hovedDokument)
+        } catch (e: Exception) {
+            logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
+            throw e
         }
-        return dokumentMapper.mapToDokumentView(hovedDokument)
     }
 
     @PostMapping("/{dokumentId}/vedlegg")

@@ -314,7 +314,7 @@ class DokumentUnderArbeidService(
         innloggetIdent: String
     ): DokumentMedParentReferanse {
         val hovedDokument = hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentId)
-            ?: throw DokumentValidationException("Dokument ikke funnet")
+            ?: throw DokumentValidationException("Hoveddokument som skal få nytt vedlegg ikke funnet")
 
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
@@ -326,7 +326,7 @@ class DokumentUnderArbeidService(
 
         val hovedDokumentSomSkalBliVedlegg =
             hovedDokumentRepository.findByPersistentDokumentId(persistentDokumentIdHovedDokumentSomSkalBliVedlegg)
-                ?: throw DokumentValidationException("Dokument ikke funnet")
+                ?: throw DokumentValidationException("Hoveddokument som skal bli vedlegg ikke funnet")
         if (hovedDokumentSomSkalBliVedlegg.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
         }
