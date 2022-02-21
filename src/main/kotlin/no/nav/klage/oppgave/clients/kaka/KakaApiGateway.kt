@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients.kaka
 
 import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.oppgave.clients.kaka.model.request.SaksdataInput
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.exceptions.InvalidProperty
 import no.nav.klage.oppgave.util.getLogger
@@ -29,12 +30,12 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         kakaApiClient.finalizeKlagebehandling(klagebehandling.toSaksdataInput())
     }
 
-    fun getValidationErrors(klagebehandling: Klagebehandling): List<InvalidProperty> {
+    fun getValidationErrors(behandling: Behandling): List<InvalidProperty> {
         logger.debug("Getting kvalitetsvurdering validation errors")
         return kakaApiClient.getValidationErrors(
-            klagebehandling.kakaKvalitetsvurderingId!!,
-            klagebehandling.ytelse.id,
-            klagebehandling.type.id
+            behandling.kakaKvalitetsvurderingId!!,
+            behandling.ytelse.id,
+            behandling.type.id
         ).validationErrors.map {
             InvalidProperty(
                 field = it.field,

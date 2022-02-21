@@ -293,10 +293,10 @@ class BehandlingMapper(
         )
     }
 
-    fun mapToKlagebehandlingFullfoertView(klagebehandling: Klagebehandling): KlagebehandlingFullfoertView {
-        return KlagebehandlingFullfoertView(
-            modified = klagebehandling.modified,
-            isAvsluttetAvSaksbehandler = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null
+    fun mapToKlagebehandlingFullfoertView(behandling: Behandling): BehandlingFullfoertView {
+        return BehandlingFullfoertView(
+            modified = behandling.modified,
+            isAvsluttetAvSaksbehandler = behandling.currentDelbehandling().avsluttetAvSaksbehandler != null
         )
     }
 

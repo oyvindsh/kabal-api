@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
-import no.nav.klage.oppgave.api.view.KlagebehandlingFullfoertView
+import no.nav.klage.oppgave.api.view.BehandlingFullfoertView
 import no.nav.klage.oppgave.api.view.ValidationPassedResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.exceptions.FeatureNotEnabledException
@@ -35,7 +35,7 @@ class KlagebehandlingController(
     @PostMapping("/{id}/fullfoer")
     fun fullfoerKlagebehandling(
         @PathVariable("id") klagebehandlingId: UUID
-    ): KlagebehandlingFullfoertView {
+    ): BehandlingFullfoertView {
         logKlagebehandlingMethodDetails(
             ::fullfoerKlagebehandling.name,
             innloggetSaksbehandlerRepository.getInnloggetIdent(),

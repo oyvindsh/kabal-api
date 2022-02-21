@@ -4,6 +4,7 @@ import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
@@ -169,7 +170,7 @@ class KlagebehandlingService(
             klagebehandlingId = klagebehandlingId
         )
 
-        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw KlagebehandlingFinalizedException("Klagebehandlingen er avsluttet")
+        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw BehandlingFinalizedException("Klagebehandlingen er avsluttet")
 
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateKlagebehandlingBeforeFinalize(klagebehandling)
@@ -178,11 +179,11 @@ class KlagebehandlingService(
         return markerKlagebehandlingSomAvsluttetAvSaksbehandler(klagebehandling, innloggetIdent)
     }
 
-    fun validateKlagebehandlingBeforeFinalize(klagebehandling: Klagebehandling) {
+    fun validateKlagebehandlingBeforeFinalize(behandling: Behandling) {
         val validationErrors = mutableListOf<InvalidProperty>()
         val sectionList = mutableListOf<ValidationSection>()
 
-        if (harIkkeLagretVedtaksdokument(klagebehandling)) {
+        if (harIkkeLagretVedtaksdokument(behandling)) {
             validationErrors.add(
                 InvalidProperty(
                     field = "vedtaksdokument",
@@ -190,7 +191,7 @@ class KlagebehandlingService(
                 )
             )
         }
-        if (klagebehandling.currentDelbehandling().utfall == null) {
+        if (behandling.currentDelbehandling().utfall == null) {
             validationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -198,8 +199,8 @@ class KlagebehandlingService(
                 )
             )
         }
-        if (klagebehandling.currentDelbehandling().utfall != Utfall.TRUKKET) {
-            if (klagebehandling.currentDelbehandling().hjemler.isEmpty()) {
+        if (behandling.currentDelbehandling().utfall != Utfall.TRUKKET) {
+            if (behandling.currentDelbehandling().hjemler.isEmpty()) {
                 validationErrors.add(
                     InvalidProperty(
                         field = "hjemmel",
@@ -218,7 +219,7 @@ class KlagebehandlingService(
             )
         }
 
-        val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(klagebehandling)
+        val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
 
         if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
             sectionList.add(
@@ -237,11 +238,11 @@ class KlagebehandlingService(
         }
     }
 
-    private fun harIkkeLagretVedtaksdokument(klagebehandling: Klagebehandling) =
-        !(harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling))
+    private fun harIkkeLagretVedtaksdokument(behandling: Behandling) =
+        !(harLastetOppHovedDokumentTilDokumentEnhet(behandling))
 
-    private fun harLastetOppHovedDokumentTilDokumentEnhet(klagebehandling: Klagebehandling) =
-        klagebehandling.currentDelbehandling().dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(klagebehandling.currentDelbehandling().dokumentEnhetId!!)
+    private fun harLastetOppHovedDokumentTilDokumentEnhet(behandling: Behandling) =
+        behandling.currentDelbehandling().dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(behandling.currentDelbehandling().dokumentEnhetId!!)
 
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,

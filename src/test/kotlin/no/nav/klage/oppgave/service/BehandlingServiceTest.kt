@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.ninjasquad.springmockk.MockkBean
 import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -75,6 +76,9 @@ class BehandlingServiceTest {
     lateinit var saksbehandlerRepository: SaksbehandlerRepository
 
     @MockkBean
+    lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
+
+    @MockkBean
     lateinit var kakaApiGateway: KakaApiGateway
 
     @MockkBean
@@ -93,7 +97,8 @@ class BehandlingServiceTest {
             tilgangService,
             applicationEventPublisher,
             kakaApiGateway,
-            dokumentService
+            dokumentService,
+            dokumentUnderArbeidRepository,
         )
     }
 

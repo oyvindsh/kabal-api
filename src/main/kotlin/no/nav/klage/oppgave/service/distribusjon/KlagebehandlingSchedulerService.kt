@@ -25,6 +25,7 @@ class KlagebehandlingSchedulerService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    //TODO handle new version
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
     @SchedulerLock(name = "distribuerVedtak")
     fun distribuerVedtak() {

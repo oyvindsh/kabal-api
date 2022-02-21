@@ -14,7 +14,7 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
-import no.nav.klage.oppgave.exceptions.KlagebehandlingFinalizedException
+import no.nav.klage.oppgave.exceptions.BehandlingFinalizedException
 import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
@@ -144,7 +144,7 @@ class KlagebehandlingServiceTest {
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
 
-            assertThrows<KlagebehandlingFinalizedException> {
+            assertThrows<BehandlingFinalizedException> {
                 klagebehandlingService.ferdigstillKlagebehandling(
                     klagebehandling.id,
                     SAKSBEHANDLER_IDENT

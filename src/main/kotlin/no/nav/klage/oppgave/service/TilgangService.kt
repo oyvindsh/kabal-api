@@ -78,6 +78,7 @@ class TilgangService(
         }
     }
 
+    //Trenger vi denne?
     fun verifyInnloggetSaksbehandlersTilgangTilYtelse(ytelse: Ytelse) {
         if (!innloggetSaksbehandlerRepository.harTilgangTilYtelse(ytelse)) {
             throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse")
