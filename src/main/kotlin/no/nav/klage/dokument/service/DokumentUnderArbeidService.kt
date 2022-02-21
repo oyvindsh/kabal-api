@@ -194,8 +194,14 @@ class DokumentUnderArbeidService(
         vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(now) }
 
         //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
-        mellomlagreNyVersjonAvSmartEditorDokument(hovedDokument)
-        vedlegg.forEach { mellomlagreNyVersjonAvSmartEditorDokument(it) }
+        if (hovedDokument.smartEditorId != null) {
+            mellomlagreNyVersjonAvSmartEditorDokument(hovedDokument)
+        }
+        vedlegg.forEach {
+            if (it.smartEditorId != null) {
+                mellomlagreNyVersjonAvSmartEditorDokument(it)
+            }
+        }
 
         behandling.publishEndringsloggEvent(
             saksbehandlerident = ident,
