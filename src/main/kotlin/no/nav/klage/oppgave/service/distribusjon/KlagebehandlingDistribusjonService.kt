@@ -32,7 +32,7 @@ class KlagebehandlingDistribusjonService(
             val klagebehandling =
                 klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
 
-            logger.debug("Distribuerer dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
+//            logger.debug("Distribuerer dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
             try {
 //                val hovedadressatJournalpostId = kabalDocumentGateway.fullfoerDokumentEnhet(klagebehandling.currentDelbehandling().dokumentEnhetId!!)
 //
