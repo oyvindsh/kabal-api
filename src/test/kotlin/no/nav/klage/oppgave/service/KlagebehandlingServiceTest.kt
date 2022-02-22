@@ -152,22 +152,22 @@ class KlagebehandlingServiceTest {
             }
         }
 
-//        @Test
-//        fun `Forsøk på avslutting av klagebehandling som ikke har mellomlagret dokument skal ikke lykkes`() {
-//            val klagebehandling = simpleInsert(false)
-//            every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
-//            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-//            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
-//            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
-//            every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
-//
-//            assertThrows<SectionedValidationErrorWithDetailsException> {
-//                klagebehandlingService.ferdigstillKlagebehandling(
-//                    klagebehandling.id,
-//                    SAKSBEHANDLER_IDENT
-//                )
-//            }
-//        }
+        @Test
+        fun `Forsøk på avslutting av klagebehandling som ikke har mellomlagret dokument skal ikke lykkes`() {
+            val klagebehandling = simpleInsert(false)
+            every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) } returns Unit
+            every { kakaApiGateway.getValidationErrors(klagebehandling) } returns emptyList()
+
+            assertThrows<SectionedValidationErrorWithDetailsException> {
+                klagebehandlingService.ferdigstillKlagebehandling(
+                    klagebehandling.id,
+                    SAKSBEHANDLER_IDENT
+                )
+            }
+        }
 
         @Test
         fun `Forsøk på avslutting av klagebehandling som ikke har utfall skal ikke lykkes`() {

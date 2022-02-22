@@ -183,14 +183,14 @@ class KlagebehandlingService(
         val validationErrors = mutableListOf<InvalidProperty>()
         val sectionList = mutableListOf<ValidationSection>()
 
-//        if (harIkkeLagretVedtaksdokument(behandling)) {
-//            validationErrors.add(
-//                InvalidProperty(
-//                    field = "vedtaksdokument",
-//                    reason = "Mangler vedtaksdokument"
-//                )
-//            )
-//        }
+        if (harIkkeLagretVedtaksdokument(behandling)) {
+            validationErrors.add(
+                InvalidProperty(
+                    field = "vedtaksdokument",
+                    reason = "Mangler vedtaksdokument"
+                )
+            )
+        }
         if (behandling.currentDelbehandling().utfall == null) {
             validationErrors.add(
                 InvalidProperty(
