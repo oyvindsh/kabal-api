@@ -34,15 +34,15 @@ class KlagebehandlingDistribusjonService(
 
             logger.debug("Distribuerer dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
             try {
-                val hovedadressatJournalpostId = kabalDocumentGateway.fullfoerDokumentEnhet(klagebehandling.currentDelbehandling().dokumentEnhetId!!)
-
-                vedtakService.addHovedadressatJournalpostId(
-                    klagebehandlingId = klagebehandlingId,
-                    utfoerendeSaksbehandlerIdent =  SYSTEMBRUKER,
-                    journalpostId = hovedadressatJournalpostId
-                )
-
-                logger.debug("Distribuerte dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
+//                val hovedadressatJournalpostId = kabalDocumentGateway.fullfoerDokumentEnhet(klagebehandling.currentDelbehandling().dokumentEnhetId!!)
+//
+//                vedtakService.addHovedadressatJournalpostId(
+//                    klagebehandlingId = klagebehandlingId,
+//                    utfoerendeSaksbehandlerIdent =  SYSTEMBRUKER,
+//                    journalpostId = hovedadressatJournalpostId
+//                )
+//
+//                logger.debug("Distribuerte dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
                 avsluttKlagebehandling(klagebehandling.id)
             } catch (e: Exception) {
                 logger.error(
