@@ -67,7 +67,7 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PostMapping("/{id}/fullfoer")
+    @PostMapping("/{id}/fullfoer2")
     fun fullfoerBehandling(
         @PathVariable("id") klagebehandlingId: UUID
     ): BehandlingFullfoertView {
