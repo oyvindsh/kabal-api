@@ -18,7 +18,7 @@ class FerdigstillDokumentService(
         private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
     }
 
-    @Scheduled(fixedDelay = 240000, initialDelay = 240000)
+    @Scheduled(fixedDelay = 60000, initialDelay = 30000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
         val hovedDokumenter =
