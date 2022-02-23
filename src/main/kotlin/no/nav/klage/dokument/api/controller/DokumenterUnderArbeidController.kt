@@ -14,7 +14,10 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import java.time.Duration
 import java.util.*
+import kotlin.concurrent.timer
 
 @RestController
 @Api(tags = ["kabal-api-dokumenter"])
@@ -152,7 +155,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findDokumenter(behandlingId = behandlingId, ident = ident)
+        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId, ident = ident)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 
@@ -178,6 +181,38 @@ class DokumentUnderArbeidController(
                 ident = ident
             )
         )
+    }
+
+    @GetMapping("/events")
+    fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID): SseEmitter {
+        logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
+        val emitter = SseEmitter(Duration.ofHours(20).toMillis())
+
+        val currentStateDocuments = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
+        timer(period = Duration.ofSeconds(15).toMillis()) {
+            try {
+                val documents = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
+
+                documents.retainAll { it.id !in currentStateDocuments.map { f -> f.id } }
+
+                documents.forEach {
+                    val builder = SseEmitter.event()
+                        .id(it.id.id.toString())
+                        .name("finished")
+                        .data(it.id.id.toString())
+                        .build()
+                    emitter.send(builder)
+                    currentStateDocuments += it
+                }
+
+            } catch (e: Exception) {
+                logger.error("Failed polling. Stopping timer.", e)
+                emitter.completeWithError(e)
+                this.cancel()
+            }
+        }
+        return emitter
     }
 
     @PutMapping("/{dokumentid}/tittel")
