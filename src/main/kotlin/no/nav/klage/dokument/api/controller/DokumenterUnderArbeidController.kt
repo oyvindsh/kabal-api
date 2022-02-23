@@ -189,6 +189,13 @@ class DokumentUnderArbeidController(
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         val emitter = SseEmitter(Duration.ofHours(20).toMillis())
 
+        val builder = SseEmitter.event()
+            .id("firstId")
+            .name("ping")
+            .data("pong")
+            .build()
+        emitter.send(builder)
+
         val currentStateDocuments = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
         timer(period = Duration.ofSeconds(15).toMillis()) {
             try {
