@@ -12,6 +12,7 @@ import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
@@ -183,7 +184,7 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @GetMapping("/events")
+    @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID): SseEmitter {
         logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -193,6 +194,7 @@ class DokumentUnderArbeidController(
             .id("firstId")
             .name("ping")
             .data("pong")
+            .reconnectTime(0)
             .build()
         emitter.send(builder)
 

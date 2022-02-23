@@ -23,11 +23,15 @@ class FerdigstillDokumentService(
     fun ferdigstillHovedDokumenter() {
         val hovedDokumenter =
             dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
-        hovedDokumenter.forEach {
-            if (it.dokumentEnhetId == null) {
-                dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
+        for (it in hovedDokumenter) {
+            try {
+                if (it.dokumentEnhetId == null) {
+                    dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
+                }
+                dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
+            } catch (e: Exception) {
+                logger.error("could not ferdigstillHovedDokumenter with dokumentEnhetId: ${it.dokumentEnhetId}")
             }
-            dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
         }
     }
 }
