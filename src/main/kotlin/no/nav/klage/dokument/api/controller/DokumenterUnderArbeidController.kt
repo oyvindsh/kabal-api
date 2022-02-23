@@ -195,7 +195,6 @@ class DokumentUnderArbeidController(
             .name("ping")
             .data("pong")
             .reconnectTime(0)
-            .build()
         emitter.send(builder)
 
         val currentStateDocuments = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
@@ -210,7 +209,6 @@ class DokumentUnderArbeidController(
                         .id(it.id.id.toString())
                         .name("finished")
                         .data(it.id.id.toString())
-                        .build()
                     emitter.send(builder)
                     currentStateDocuments += it
                 }
