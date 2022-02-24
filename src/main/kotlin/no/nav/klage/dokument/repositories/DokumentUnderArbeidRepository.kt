@@ -9,11 +9,13 @@ import java.util.*
 @Transactional
 interface DokumentUnderArbeidRepository : JpaRepository<DokumentUnderArbeid, DokumentId> {
 
-    fun findByBehandlingIdOrderByCreated(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
+    fun findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 
     fun findByBehandlingIdAndSmartEditorIdNotNullOrderByCreated(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 
     fun findByParentIdOrderByCreated(dokumentId: DokumentId): SortedSet<DokumentUnderArbeid>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<DokumentUnderArbeid>
+
+    fun findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 }

@@ -7,14 +7,20 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import java.time.Duration
 import java.util.*
+import kotlin.concurrent.timer
 
 @RestController
 @Api(tags = ["kabal-api-dokumenter"])
@@ -25,6 +31,7 @@ class DokumentUnderArbeidController(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
     private val dokumentMapper: DokumentMapper,
     private val dokumenInputMapper: DokumentInputMapper,
+    private val behandlingService: BehandlingService,
 ) {
 
     companion object {
@@ -152,7 +159,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findDokumenter(behandlingId = behandlingId, ident = ident)
+        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId, ident = ident)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 
@@ -178,6 +185,48 @@ class DokumentUnderArbeidController(
                 ident = ident
             )
         )
+    }
+
+    @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID): SseEmitter {
+        logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
+
+        //Sjekker tilgang på behandlingsnivå
+        behandlingService.getBehandling(behandlingId)
+
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
+        val emitter = SseEmitter(Duration.ofHours(20).toMillis())
+
+        val initial = SseEmitter.event()
+            .id("firstId")
+            .name("ping")
+            .data("pong")
+            .reconnectTime(200)
+        emitter.send(initial)
+
+        val currentStateDocuments = mutableListOf<DokumentUnderArbeid>()
+        timer(period = Duration.ofSeconds(15).toMillis()) {
+            try {
+                val documents = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
+
+                documents.retainAll { it.id !in currentStateDocuments.map { f -> f.id } }
+
+                documents.forEach {
+                    val builder = SseEmitter.event()
+                        .id(it.id.id.toString())
+                        .name("finished")
+                        .data(it.id.id.toString())
+                    emitter.send(builder)
+                    currentStateDocuments += it
+                }
+
+            } catch (e: Exception) {
+                logger.error("Failed polling. Stopping timer.", e)
+                emitter.completeWithError(e)
+                this.cancel()
+            }
+        }
+        return emitter
     }
 
     @PutMapping("/{dokumentid}/tittel")
