@@ -70,9 +70,9 @@ class BehandlingService(
         val validationErrors = mutableListOf<InvalidProperty>()
         val sectionList = mutableListOf<ValidationSection>()
 
-        val dokumenterUnderArbeid = dokumentUnderArbeidRepository.findByBehandlingIdOrderByCreated(behandling.id)
+        val unfinishedDocuments = dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNotNull(behandling.id)
 
-        if (dokumenterUnderArbeid.any { it.markertFerdig == null }) {
+        if (unfinishedDocuments.isNotEmpty()) {
             validationErrors.add(
                 InvalidProperty(
                     field = "dokument",
