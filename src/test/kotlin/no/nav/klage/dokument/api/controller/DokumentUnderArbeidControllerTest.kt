@@ -12,6 +12,7 @@ import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
@@ -35,6 +36,9 @@ internal class DokumentUnderArbeidControllerTest {
 
     @MockkBean
     private lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository
+
+    @MockkBean
+    private lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
 
     @MockkBean
     private lateinit var behandlingService: BehandlingService

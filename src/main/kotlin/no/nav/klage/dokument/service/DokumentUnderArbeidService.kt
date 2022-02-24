@@ -322,8 +322,8 @@ class DokumentUnderArbeidService(
         return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId)
     }
 
-    fun findFinishedDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
-        return dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId)
+    fun findFinishedDokumenterAfterDateTime(behandlingId: UUID, fromDateTime: LocalDateTime): SortedSet<DokumentUnderArbeid> {
+        return dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingIdAndFerdigstiltAfter(behandlingId, fromDateTime)
     }
 
     fun findSmartDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {

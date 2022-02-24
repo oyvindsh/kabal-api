@@ -7,19 +7,20 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.time.Duration
+import java.time.LocalDateTime
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 import kotlin.concurrent.timer
 
 @RestController
@@ -29,6 +30,7 @@ import kotlin.concurrent.timer
 class DokumentUnderArbeidController(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
+    private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val dokumentMapper: DokumentMapper,
     private val dokumenInputMapper: DokumentInputMapper,
     private val behandlingService: BehandlingService,
@@ -187,37 +189,43 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID): SseEmitter {
+    @GetMapping("/events")
+    fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID, request: HttpServletRequest): SseEmitter {
         logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
 
         //Sjekker tilgang på behandlingsnivå
         behandlingService.getBehandling(behandlingId)
 
-        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         val emitter = SseEmitter(Duration.ofHours(20).toMillis())
 
         val initial = SseEmitter.event()
-            .id("firstId")
-            .name("ping")
-            .data("pong")
             .reconnectTime(200)
         emitter.send(initial)
 
-        val currentStateDocuments = mutableListOf<DokumentUnderArbeid>()
+        val lastEventId = request.getHeader("last-event-id")
+
+        var lastFinishedDocumentDateTime = if (lastEventId != null) {
+            dokumentUnderArbeidRepository.findById(DokumentId(UUID.fromString(lastEventId))).get().ferdigstilt!!
+        } else {
+            LocalDateTime.now()
+        }
+
         timer(period = Duration.ofSeconds(15).toMillis()) {
             try {
-                val documents = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
+                val documents = dokumentUnderArbeidService.findFinishedDokumenterAfterDateTime(
+                    behandlingId = behandlingId,
+                    fromDateTime = lastFinishedDocumentDateTime
+                )
 
-                documents.retainAll { it.id !in currentStateDocuments.map { f -> f.id } }
+                lastFinishedDocumentDateTime = documents.maxOf { it.ferdigstilt!! }
 
                 documents.forEach {
                     val builder = SseEmitter.event()
-                        .id(it.id.id.toString())
                         .name("finished")
                         .data(it.id.id.toString())
+                        .reconnectTime(200)
+                        .id(it.id.id.toString())
                     emitter.send(builder)
-                    currentStateDocuments += it
                 }
 
             } catch (e: Exception) {
