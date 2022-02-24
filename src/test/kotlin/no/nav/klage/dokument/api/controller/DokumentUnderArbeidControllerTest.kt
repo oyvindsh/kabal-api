@@ -14,6 +14,7 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.BehandlingService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +35,9 @@ internal class DokumentUnderArbeidControllerTest {
 
     @MockkBean
     private lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository
+
+    @MockkBean
+    private lateinit var behandlingService: BehandlingService
 
     @MockkBean
     private lateinit var dokumentUnderArbeidService: DokumentUnderArbeidService
