@@ -334,7 +334,6 @@ class DokumentUnderArbeidService(
     }
 
     fun opprettDokumentEnhet(hovedDokumentId: DokumentId) {
-
         val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.dokumentEnhetId == null) {
