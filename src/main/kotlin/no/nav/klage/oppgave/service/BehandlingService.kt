@@ -71,7 +71,7 @@ class BehandlingService(
         val sectionList = mutableListOf<ValidationSection>()
 
         val unfinishedDocuments =
-            dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNotNull(behandling.id)
+            dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(behandling.id)
 
         if (unfinishedDocuments.isNotEmpty()) {
             validationErrors.add(

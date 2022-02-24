@@ -12,7 +12,7 @@ interface DokumentUnderArbeidRepository : JpaRepository<DokumentUnderArbeid, Dok
 
     fun findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 
-    fun findByBehandlingIdAndMarkertFerdigIsNotNull(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
+    fun findByBehandlingIdAndMarkertFerdigIsNull(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 
     fun findByBehandlingIdAndSmartEditorIdNotNullOrderByCreated(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 
