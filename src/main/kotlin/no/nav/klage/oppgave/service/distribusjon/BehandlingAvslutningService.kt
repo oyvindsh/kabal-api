@@ -3,12 +3,14 @@ package no.nav.klage.oppgave.service.distribusjon
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttet
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
-import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.ApplicationEventPublisher
@@ -18,9 +20,10 @@ import java.util.*
 
 @Service
 @Transactional
-class KlagebehandlingAvslutningService(
+class BehandlingAvslutningService(
     private val kafkaEventRepository: KafkaEventRepository,
-    private val klagebehandlingService: KlagebehandlingService,
+    private val behandlingService: BehandlingService,
+    private val dokumenterUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val kabalDocumentGateway: KabalDocumentGateway
 ) {
@@ -31,34 +34,54 @@ class KlagebehandlingAvslutningService(
         private val secureLogger = getSecureLogger()
         private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
         private val objectMapperBehandlingEvents = ObjectMapper().registerModule(JavaTimeModule()).configure(
-            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false
+        );
         const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
         const val SYSTEM_JOURNALFOERENDE_ENHET = "9999"
 
     }
 
     @Transactional
-    fun avsluttKlagebehandling(klagebehandlingId: UUID): Klagebehandling {
-        val klagebehandling = klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
+    fun avsluttBehandling(behandlingId: UUID): Behandling {
+        val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
 
-        val journalpostId = klagebehandling.currentDelbehandling().hovedAdressatJournalpostId
+        //new way of handling documents
+        val hoveddokumenter =
+            dokumenterUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
+                behandlingId
+            )
+
+        //Support old way
+        val journalpostId =
+            if (hoveddokumenter.isEmpty()) {
+                behandling.currentDelbehandling().hovedAdressatJournalpostId
+            } else {
+                hoveddokumenter.find {
+                    it.dokumentType in listOf(
+                        DokumentType.VEDTAK,
+                        DokumentType.BESLUTNING
+                    )
+                }
+                //We don't have access to journalpostId in the new document model
+                null
+            }
 
         val eventId = UUID.randomUUID()
 
         val vedtakFattet = KlagevedtakFattet(
             eventId = eventId,
-            kildeReferanse = klagebehandling.kildeReferanse,
-            kilde = klagebehandling.kildesystem.navn,
-            utfall = ExternalUtfall.valueOf(klagebehandling.currentDelbehandling().utfall!!.name),
+            kildeReferanse = behandling.kildeReferanse,
+            kilde = behandling.kildesystem.navn,
+            utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
             vedtaksbrevReferanse = journalpostId,
-            kabalReferanse = klagebehandling.currentDelbehandling().id.toString()
+            kabalReferanse = behandling.currentDelbehandling().id.toString()
         )
         kafkaEventRepository.save(
             KafkaEvent(
                 id = UUID.randomUUID(),
-                klagebehandlingId = klagebehandlingId,
-                kilde = klagebehandling.kildesystem.navn,
-                kildeReferanse = klagebehandling.kildeReferanse,
+                klagebehandlingId = behandlingId,
+                kilde = behandling.kildesystem.navn,
+                kildeReferanse = behandling.kildeReferanse,
                 jsonPayload = vedtakFattet.toJson(),
                 type = EventType.KLAGE_VEDTAK
             )
@@ -66,14 +89,14 @@ class KlagebehandlingAvslutningService(
 
         val behandlingEvent = BehandlingEvent(
             eventId = eventId,
-            kildeReferanse = klagebehandling.kildeReferanse,
-            kilde = klagebehandling.kildesystem.navn,
-            kabalReferanse = klagebehandling.currentDelbehandling().id.toString(),
+            kildeReferanse = behandling.kildeReferanse,
+            kilde = behandling.kildesystem.navn,
+            kabalReferanse = behandling.currentDelbehandling().id.toString(),
             type = BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET,
             detaljer = BehandlingDetaljer(
                 klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
-                    avsluttet = klagebehandling.avsluttetAvSaksbehandler!!,
-                    utfall = ExternalUtfall.valueOf(klagebehandling.currentDelbehandling().utfall!!.name),
+                    avsluttet = behandling.avsluttetAvSaksbehandler!!,
+                    utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
                     journalpostReferanser = listOfNotNull(journalpostId) //TODO: Må endres når dokumenter i arbeid branchen merges inn og tas i bruk
                 )
             )
@@ -81,18 +104,18 @@ class KlagebehandlingAvslutningService(
         kafkaEventRepository.save(
             KafkaEvent(
                 id = UUID.randomUUID(),
-                klagebehandlingId = klagebehandlingId,
-                kilde = klagebehandling.kildesystem.navn,
-                kildeReferanse = klagebehandling.kildeReferanse,
+                klagebehandlingId = behandlingId,
+                kilde = behandling.kildesystem.navn,
+                kildeReferanse = behandling.kildeReferanse,
                 jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
                 type = EventType.BEHANDLING_EVENT
             )
         )
 
-        val event = klagebehandling.setAvsluttet(SYSTEMBRUKER)
+        val event = behandling.setAvsluttet(SYSTEMBRUKER)
         applicationEventPublisher.publishEvent(event)
 
-        return klagebehandling
+        return behandling
     }
 
     private fun Any.toJson(): String = objectMapper.writeValueAsString(this)

@@ -25,9 +25,9 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         return id
     }
 
-    fun finalizeKlagebehandling(klagebehandling: Klagebehandling) {
+    fun finalizeKlagebehandling(behandling: Behandling) {
         logger.debug("Sending saksdata to Kaka because klagebehandling is finished.")
-        kakaApiClient.finalizeKlagebehandling(klagebehandling.toSaksdataInput())
+        kakaApiClient.finalizeKlagebehandling(behandling.toSaksdataInput())
     }
 
     fun getValidationErrors(behandling: Behandling): List<InvalidProperty> {
@@ -44,8 +44,9 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         }
     }
 
-    private fun Klagebehandling.toSaksdataInput(): SaksdataInput {
-        val vedtaksinstansEnhet = Enhet.values().find { it.navn == avsenderEnhetFoersteinstans }
+    private fun Behandling.toSaksdataInput(): SaksdataInput {
+        val vedtaksinstansEnhet =
+            if (this is Klagebehandling) Enhet.values().find { it.navn == avsenderEnhetFoersteinstans } else null
         val tilknyttetEnhet = Enhet.values().find { it.navn == tildeling?.enhet!! }
 
         return SaksdataInput(
@@ -53,8 +54,8 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
             sakstype = type.id,
             ytelseId = ytelse.id,
             mottattKlageinstans = mottattKlageinstans.toLocalDate(),
-            vedtaksinstansEnhet = vedtaksinstansEnhet!!.navn,
-            mottattVedtaksinstans = mottattFoersteinstans,
+            vedtaksinstansEnhet = vedtaksinstansEnhet?.navn,
+            mottattVedtaksinstans = if (this is Klagebehandling) mottattFoersteinstans else null,
             utfall = currentDelbehandling().utfall!!.id,
             registreringshjemler = currentDelbehandling().hjemler.map { it.id },
             kvalitetsvurderingId = kakaKvalitetsvurderingId!!,

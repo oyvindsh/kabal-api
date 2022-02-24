@@ -14,7 +14,7 @@ import java.util.*
 @Transactional
 class KlagebehandlingDistribusjonService(
     private val klagebehandlingService: KlagebehandlingService,
-    private val klagebehandlingAvslutningService: KlagebehandlingAvslutningService,
+    private val behandlingAvslutningService: BehandlingAvslutningService,
     private val kabalDocumentGateway: KabalDocumentGateway,
     private val vedtakService: VedtakService
 ) {
@@ -27,38 +27,44 @@ class KlagebehandlingDistribusjonService(
     }
 
     @Transactional(propagation = Propagation.NEVER)
-    fun distribuerKlagebehandling(klagebehandlingId: UUID) {
+    fun distribuerKlagebehandling(behandlingId: UUID) {
         try {
-            val klagebehandling =
-                klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(klagebehandlingId)
+            val behandling =
+                klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(behandlingId)
 
-            logger.debug("Distribuerer dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
-            try {
-                val hovedadressatJournalpostId = kabalDocumentGateway.fullfoerDokumentEnhet(klagebehandling.currentDelbehandling().dokumentEnhetId!!)
+            //if old way of handling documents
+            if (behandling.currentDelbehandling().dokumentEnhetId != null) {
+                logger.debug("Distribuerer dokument med dokumentEnhetId ${behandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${behandling.id}")
+                try {
+                    val hovedadressatJournalpostId = kabalDocumentGateway.fullfoerDokumentEnhet(behandling.currentDelbehandling().dokumentEnhetId!!)
 
-                vedtakService.addHovedadressatJournalpostId(
-                    klagebehandlingId = klagebehandlingId,
-                    utfoerendeSaksbehandlerIdent =  SYSTEMBRUKER,
-                    journalpostId = hovedadressatJournalpostId
-                )
+                    vedtakService.addHovedadressatJournalpostId(
+                        klagebehandlingId = behandlingId,
+                        utfoerendeSaksbehandlerIdent = SYSTEMBRUKER,
+                        journalpostId = hovedadressatJournalpostId
+                    )
 
-                logger.debug("Distribuerte dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}")
-                avsluttKlagebehandling(klagebehandling.id)
-            } catch (e: Exception) {
-                logger.error(
-                    "Fikk ikke distribuert dokument med dokumentEnhetId ${klagebehandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${klagebehandling.id}",
-                    e
-                )
+                    logger.debug("Distribuerte dokument med dokumentEnhetId ${behandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${behandling.id}")
+                    avsluttKlagebehandling(behandling.id)
+                } catch (e: Exception) {
+                    logger.error(
+                        "Fikk ikke distribuert dokument med dokumentEnhetId ${behandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${behandling.id}",
+                        e
+                    )
+                }
             }
 
+            //TODO new way
+
+
         } catch (e: Exception) {
-            logger.error("Feilet under distribuering av klagebehandling $klagebehandlingId", e)
+            logger.error("Feilet under distribuering av klagebehandling $behandlingId", e)
         }
     }
 
     private fun avsluttKlagebehandling(klagebehandlingId: UUID) {
         logger.debug("Alle vedtak i klagebehandling $klagebehandlingId er ferdig distribuert, så vi markerer klagebehandlingen som avsluttet")
-        klagebehandlingAvslutningService.avsluttKlagebehandling(klagebehandlingId)
+        behandlingAvslutningService.avsluttBehandling(klagebehandlingId)
     }
 }
 

@@ -352,6 +352,9 @@ class DokumentUnderArbeidService(
             dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
 
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId.value)
+
+        //TODO should also store journalpostId/dokumentInfoId in dokumentUnderArbeid
+
         val saksdokumenter = journalpost.mapToSaksdokumenter()
         saksdokumenter.forEach { saksdokument ->
             val saksbehandlerIdent =

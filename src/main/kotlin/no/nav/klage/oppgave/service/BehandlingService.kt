@@ -70,7 +70,8 @@ class BehandlingService(
         val validationErrors = mutableListOf<InvalidProperty>()
         val sectionList = mutableListOf<ValidationSection>()
 
-        val unfinishedDocuments = dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNotNull(behandling.id)
+        val unfinishedDocuments =
+            dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNotNull(behandling.id)
 
         if (unfinishedDocuments.isNotEmpty()) {
             validationErrors.add(
@@ -384,4 +385,10 @@ class BehandlingService(
         behandlingRepository.findById(behandlingId)
             .orElseThrow { BehandlingNotFoundException("Behandling med id $behandlingId ikke funnet") }
             .also { checkLeseTilgang(it) }
+
+    @Transactional(readOnly = true)
+    fun findBehandlingerForDistribusjon(): List<UUID> =
+        behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull()
+            .map { it.id }
+
 }

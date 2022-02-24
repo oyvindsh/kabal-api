@@ -12,13 +12,15 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
 @Api(tags = ["kabal-api"])
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping("/klagebehandlinger")
 class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
@@ -29,7 +31,7 @@ class BehandlingController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/{behandlingId}/sattpaavent")
+    @PostMapping("/klagebehandlinger/{behandlingId}/sattpaavent")
     fun setSattPaaVent(
         @ApiParam(value = "Id til en behandling")
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -48,7 +50,7 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @DeleteMapping("/{behandlingId}/sattpaavent")
+    @DeleteMapping("/klagebehandlinger/{behandlingId}/sattpaavent")
     fun deleteSattPaaVent(
         @ApiParam(value = "Id til en behandling")
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -67,7 +69,7 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PostMapping("/{id}/fullfoer2")
+    @PostMapping("/behandlinger/{id}/fullfoer")
     fun fullfoerBehandling(
         @PathVariable("id") klagebehandlingId: UUID
     ): BehandlingFullfoertView {

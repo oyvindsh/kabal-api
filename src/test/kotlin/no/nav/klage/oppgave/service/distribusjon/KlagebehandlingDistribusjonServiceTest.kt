@@ -120,7 +120,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
     lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
 
     @SpykBean
-    lateinit var klagebehandlingAvslutningService: KlagebehandlingAvslutningService
+    lateinit var behandlingAvslutningService: BehandlingAvslutningService
 
     @SpykBean
     lateinit var vedtakService: VedtakService
