@@ -323,9 +323,6 @@ class DokumentUnderArbeidService(
     }
 
     fun findFinishedDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
-        //Sjekker tilgang på behandlingsnivå:
-//        behandlingService.getBehandling(behandlingId)
-
         return dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId)
     }
 

@@ -11,6 +11,7 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.MediaType
@@ -30,6 +31,7 @@ class DokumentUnderArbeidController(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
     private val dokumentMapper: DokumentMapper,
     private val dokumenInputMapper: DokumentInputMapper,
+    private val behandlingService: BehandlingService,
 ) {
 
     companion object {
@@ -188,15 +190,19 @@ class DokumentUnderArbeidController(
     @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID): SseEmitter {
         logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
+
+        //Sjekker tilgang på behandlingsnivå
+        behandlingService.getBehandling(behandlingId)
+
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         val emitter = SseEmitter(Duration.ofHours(20).toMillis())
 
-        val first = SseEmitter.event()
+        val initial = SseEmitter.event()
             .id("firstId")
             .name("ping")
             .data("pong")
-            .reconnectTime(0)
-        emitter.send(first)
+            .reconnectTime(200)
+        emitter.send(initial)
 
         val currentStateDocuments = mutableListOf<DokumentUnderArbeid>()
         timer(period = Duration.ofSeconds(15).toMillis()) {
