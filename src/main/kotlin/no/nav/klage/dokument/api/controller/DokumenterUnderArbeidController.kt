@@ -7,6 +7,7 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
@@ -190,14 +191,14 @@ class DokumentUnderArbeidController(
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         val emitter = SseEmitter(Duration.ofHours(20).toMillis())
 
-        val builder = SseEmitter.event()
+        val first = SseEmitter.event()
             .id("firstId")
             .name("ping")
             .data("pong")
             .reconnectTime(0)
-        emitter.send(builder)
+        emitter.send(first)
 
-        val currentStateDocuments = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
+        val currentStateDocuments = mutableListOf<DokumentUnderArbeid>()
         timer(period = Duration.ofSeconds(15).toMillis()) {
             try {
                 val documents = dokumentUnderArbeidService.findFinishedDokumenter(behandlingId, ident).toMutableList()
