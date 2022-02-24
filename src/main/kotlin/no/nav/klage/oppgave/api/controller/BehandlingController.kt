@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.BehandlingEditedView
 import no.nav.klage.oppgave.api.view.BehandlingFullfoertView
+import no.nav.klage.oppgave.api.view.ValidationPassedResponse
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
@@ -12,10 +13,7 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
@@ -71,19 +69,42 @@ class BehandlingController(
 
     @PostMapping("/behandlinger/{id}/fullfoer")
     fun fullfoerBehandling(
-        @PathVariable("id") klagebehandlingId: UUID
+        @PathVariable("id") behandlingId: UUID
     ): BehandlingFullfoertView {
         logKlagebehandlingMethodDetails(
             ::fullfoerBehandling.name,
             innloggetSaksbehandlerRepository.getInnloggetIdent(),
-            klagebehandlingId,
+            behandlingId,
             logger
         )
 
         val klagebehandling = behandlingService.ferdigstillBehandling(
-            klagebehandlingId,
+            behandlingId,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
         return behandlingMapper.mapToKlagebehandlingFullfoertView(klagebehandling)
+    }
+
+    /**
+     * Valgfri validering før innsending/fullføring.
+     * Gjøres uansett ved fullføring av behandlingen.
+     */
+    @GetMapping("/behandlinger/{id}/validate")
+    fun validate(
+        @PathVariable("id") behandlingId: UUID
+    ): ValidationPassedResponse {
+        logKlagebehandlingMethodDetails(
+            ::validate.name,
+            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        behandlingService.validateBehandlingBeforeFinalize(
+            behandlingService.getBehandling(
+                behandlingId
+            )
+        )
+        return ValidationPassedResponse()
     }
 }
