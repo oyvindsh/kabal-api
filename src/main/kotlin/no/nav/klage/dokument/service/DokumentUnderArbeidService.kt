@@ -315,11 +315,15 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
+    fun findDokumenterNotFinished(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 
-        return dokumentUnderArbeidRepository.findByBehandlingIdOrderByCreated(behandlingId)
+        return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId)
+    }
+
+    fun findFinishedDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
+        return dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId)
     }
 
     fun findSmartDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
@@ -330,7 +334,6 @@ class DokumentUnderArbeidService(
     }
 
     fun opprettDokumentEnhet(hovedDokumentId: DokumentId) {
-
         val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.dokumentEnhetId == null) {

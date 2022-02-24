@@ -3,7 +3,7 @@ package no.nav.klage.dokument.service
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.oppgave.util.getLogger
-import org.springframework.http.MediaType
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
@@ -15,19 +15,27 @@ class FerdigstillDokumentService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
+        private val secureLogger = getSecureLogger()
     }
 
-    @Scheduled(fixedDelay = 240000, initialDelay = 240000)
+    @Scheduled(fixedDelay = 60000, initialDelay = 180000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
         val hovedDokumenter =
             dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
-        hovedDokumenter.forEach {
-            if (it.dokumentEnhetId == null) {
-                dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
+        for (it in hovedDokumenter) {
+            try {
+                if (it.dokumentEnhetId == null) {
+                    dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
+                }
+                dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
+            } catch (e: Exception) {
+                logger.error("Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${it.dokumentEnhetId}. See secure logs.")
+                secureLogger.error(
+                    "Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${it.dokumentEnhetId}",
+                    e
+                )
             }
-            dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
         }
     }
 }
