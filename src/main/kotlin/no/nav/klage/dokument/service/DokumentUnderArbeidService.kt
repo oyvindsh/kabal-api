@@ -323,6 +323,7 @@ class DokumentUnderArbeidService(
     }
 
     fun findFinishedDokumenterAfterDateTime(behandlingId: UUID, fromDateTime: LocalDateTime): SortedSet<DokumentUnderArbeid> {
+        logger.debug("findFinishedDokumenterAfterDateTime: behandlingId $behandlingId, fromDateTime: $fromDateTime")
         return dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingIdAndFerdigstiltAfter(behandlingId, fromDateTime)
     }
 
