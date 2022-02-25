@@ -21,16 +21,13 @@ class FerdigstillDokumentService(
     @Scheduled(fixedDelay = 20000, initialDelay = 30000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
-        val hovedDokumenter =
+        val hovedDokumenterIkkeFerdigstilte =
             dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
-        for (it in hovedDokumenter) {
+        for (it in hovedDokumenterIkkeFerdigstilte) {
             try {
                 if (it.dokumentEnhetId == null) {
-                    logger.debug("ferdigstillHovedDokumenter: no dokumentEnhetId. Creating for behandling ${it.behandlingId}")
                     dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
-                    logger.debug("ferdigstillHovedDokumenter: Done creating dokumentEnhetId (${it.dokumentEnhetId}). Behandling ${it.behandlingId}")
                 }
-                logger.debug("ferdigstillHovedDokumenter: Has dokumentEnhetId ${it.dokumentEnhetId}. Will try to ferdigstillDokumentEnhet. Behandling ${it.behandlingId}")
                 dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
             } catch (e: Exception) {
                 logger.error("Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${it.dokumentEnhetId}. See secure logs.")

@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service.distribusjon
 
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.service.VedtakService
@@ -16,7 +17,8 @@ class KlagebehandlingDistribusjonService(
     private val klagebehandlingService: KlagebehandlingService,
     private val behandlingAvslutningService: BehandlingAvslutningService,
     private val kabalDocumentGateway: KabalDocumentGateway,
-    private val vedtakService: VedtakService
+    private val vedtakService: VedtakService,
+    private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
 ) {
 
     companion object {
@@ -32,11 +34,12 @@ class KlagebehandlingDistribusjonService(
             val behandling =
                 klagebehandlingService.getKlagebehandlingForUpdateBySystembruker(behandlingId)
 
-            //if old way of handling documents
+            //Old way of handling documents
             if (behandling.currentDelbehandling().dokumentEnhetId != null) {
                 logger.debug("Distribuerer dokument med dokumentEnhetId ${behandling.currentDelbehandling().dokumentEnhetId!!} for klagebehandling ${behandling.id}")
                 try {
-                    val hovedadressatJournalpostId = kabalDocumentGateway.fullfoerDokumentEnhet(behandling.currentDelbehandling().dokumentEnhetId!!)
+                    val hovedadressatJournalpostId =
+                        kabalDocumentGateway.fullfoerDokumentEnhet(behandling.currentDelbehandling().dokumentEnhetId!!)
 
                     vedtakService.addHovedadressatJournalpostId(
                         klagebehandlingId = behandlingId,
@@ -52,10 +55,17 @@ class KlagebehandlingDistribusjonService(
                         e
                     )
                 }
+            } else {
+                //New way
+                val hovedDokumenterIkkeFerdigstilte =
+                    dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
+                if (hovedDokumenterIkkeFerdigstilte.isNotEmpty()) {
+                    logger.warn("Kunne ikke avslutte behandling $behandlingId fordi noen dokumenter mangler ferdigstilling. Prøver på nytt.")
+                    return
+                }
+
+                avsluttKlagebehandling(behandling.id)
             }
-
-            //TODO new way
-
 
         } catch (e: Exception) {
             logger.error("Feilet under distribuering av behandling $behandlingId", e)

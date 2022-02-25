@@ -45,7 +45,7 @@ class BehandlingAvslutningService(
     fun avsluttBehandling(behandlingId: UUID): Behandling {
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
 
-        //new way of handling documents
+        //New way of handling documents
         val hoveddokumenter =
             dokumenterUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
                 behandlingId
@@ -62,7 +62,7 @@ class BehandlingAvslutningService(
                         DokumentType.BESLUTNING
                     )
                 }
-                //We don't have access to journalpostId in the new document model
+                //TODO: We don't have access to journalpostId in the new document model
                 null
             }
 
