@@ -207,10 +207,10 @@ class DokumentUnderArbeidController(
         var lastFinishedDocumentDateTime = if (lastEventId != null) {
             dokumentUnderArbeidRepository.findById(DokumentId(UUID.fromString(lastEventId))).get().ferdigstilt!!
         } else {
-            LocalDateTime.now().minusMinutes(4)
+            LocalDateTime.now().minusHours(4)
         }
 
-        timer(period = Duration.ofSeconds(15).toMillis()) {
+        timer(period = Duration.ofSeconds(5).toMillis()) {
             try {
                 val documents = dokumentUnderArbeidService.findFinishedDokumenterAfterDateTime(
                     behandlingId = behandlingId,
