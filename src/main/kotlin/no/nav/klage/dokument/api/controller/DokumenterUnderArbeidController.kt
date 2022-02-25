@@ -190,7 +190,11 @@ class DokumentUnderArbeidController(
     }
 
     @GetMapping("/events")
-    fun documentEvents(@PathVariable("behandlingId") behandlingId: UUID, request: HttpServletRequest): SseEmitter {
+    fun documentEvents(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestParam("lastEventIdInput", required = false) lastEventIdInput: UUID?,
+        request: HttpServletRequest,
+    ): SseEmitter {
         logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
 
         //Sjekker tilgang på behandlingsnivå
@@ -202,15 +206,19 @@ class DokumentUnderArbeidController(
             .reconnectTime(200)
         emitter.send(initial)
 
-        val lastEventId = request.getHeader("last-event-id")
-
-        var lastFinishedDocumentDateTime = if (lastEventId != null) {
-            dokumentUnderArbeidRepository.findById(DokumentId(UUID.fromString(lastEventId))).get().ferdigstilt!!
+        val lastEventId = if (request.getHeader("last-event-id") != null) {
+            UUID.fromString(request.getHeader("last-event-id"))
         } else {
-            LocalDateTime.now().minusHours(4)
+            lastEventIdInput
         }
 
-        timer(period = Duration.ofSeconds(5).toMillis()) {
+        var lastFinishedDocumentDateTime = if (lastEventId != null) {
+            dokumentUnderArbeidRepository.findById(DokumentId(lastEventId)).get().ferdigstilt!!
+        } else {
+            LocalDateTime.now().minusMinutes(10)
+        }
+
+        timer(period = Duration.ofSeconds(15).toMillis()) {
             try {
                 val documents = dokumentUnderArbeidService.findFinishedDokumenterAfterDateTime(
                     behandlingId = behandlingId,
