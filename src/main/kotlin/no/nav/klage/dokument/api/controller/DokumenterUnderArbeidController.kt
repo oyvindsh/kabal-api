@@ -206,8 +206,10 @@ class DokumentUnderArbeidController(
             .reconnectTime(200)
         emitter.send(initial)
 
-        val lastEventId = if (request.getHeader("last-event-id") != null) {
-            UUID.fromString(request.getHeader("last-event-id"))
+        //Try header first
+        val lastEventIdHeaderName = "last-event-id"
+        val lastEventId = if (request.getHeader(lastEventIdHeaderName) != null) {
+            UUID.fromString(request.getHeader(lastEventIdHeaderName))
         } else {
             lastEventIdInput
         }
