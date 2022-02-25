@@ -217,7 +217,9 @@ class DokumentUnderArbeidController(
                     fromDateTime = lastFinishedDocumentDateTime
                 )
 
-                lastFinishedDocumentDateTime = documents.maxOf { it.ferdigstilt!! }
+                if (documents.isNotEmpty()) {
+                    lastFinishedDocumentDateTime = documents.maxOf { it.ferdigstilt!! }
+                }
 
                 documents.forEach {
                     val builder = SseEmitter.event()
