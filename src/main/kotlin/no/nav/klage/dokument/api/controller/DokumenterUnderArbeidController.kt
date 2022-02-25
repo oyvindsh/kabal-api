@@ -207,7 +207,7 @@ class DokumentUnderArbeidController(
         var lastFinishedDocumentDateTime = if (lastEventId != null) {
             dokumentUnderArbeidRepository.findById(DokumentId(UUID.fromString(lastEventId))).get().ferdigstilt!!
         } else {
-            LocalDateTime.now()
+            LocalDateTime.now().minusMinutes(4)
         }
 
         timer(period = Duration.ofSeconds(15).toMillis()) {

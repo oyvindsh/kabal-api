@@ -58,7 +58,7 @@ class KlagebehandlingDistribusjonService(
 
 
         } catch (e: Exception) {
-            logger.error("Feilet under distribuering av klagebehandling $behandlingId", e)
+            logger.error("Feilet under distribuering av behandling $behandlingId", e)
         }
     }
 

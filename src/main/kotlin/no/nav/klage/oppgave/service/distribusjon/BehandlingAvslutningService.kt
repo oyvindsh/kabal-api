@@ -51,7 +51,7 @@ class BehandlingAvslutningService(
                 behandlingId
             )
 
-        //Support old way
+        //Support old and new way
         val journalpostId =
             if (hoveddokumenter.isEmpty()) {
                 behandling.currentDelbehandling().hovedAdressatJournalpostId
