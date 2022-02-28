@@ -293,7 +293,7 @@ class BehandlingMapper(
         )
     }
 
-    fun mapToKlagebehandlingFullfoertView(behandling: Behandling): BehandlingFullfoertView {
+    fun mapToBehandlingFullfoertView(behandling: Behandling): BehandlingFullfoertView {
         return BehandlingFullfoertView(
             modified = behandling.modified,
             isAvsluttetAvSaksbehandler = behandling.currentDelbehandling().avsluttetAvSaksbehandler != null

@@ -82,7 +82,7 @@ class BehandlingController(
             behandlingId,
             innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
-        return behandlingMapper.mapToKlagebehandlingFullfoertView(klagebehandling)
+        return behandlingMapper.mapToBehandlingFullfoertView(klagebehandling)
     }
 
     /**

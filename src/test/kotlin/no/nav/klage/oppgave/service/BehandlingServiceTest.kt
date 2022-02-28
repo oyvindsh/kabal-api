@@ -14,16 +14,15 @@ import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
+import no.nav.klage.oppgave.exceptions.BehandlingFinalizedException
 import no.nav.klage.oppgave.exceptions.BehandlingManglerMedunderskriverException
+import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -290,6 +289,84 @@ class BehandlingServiceTest {
         }
     }
 
+    @Nested
+    inner class FerdigstillBehandling {
+        @Test
+        fun `Forsøk på ferdigstilling av behandling som allerede er avsluttet av saksbehandler skal ikke lykkes`() {
+            val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
+            every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
+
+            assertThrows<BehandlingFinalizedException> {
+                behandlingService.ferdigstillBehandling(
+                    behandling.id,
+                    SAKSBEHANDLER_IDENT
+                )
+            }
+        }
+    }
+
+    //TODO: Har hentet disse fra KlagebehandlingServiceTest. Gå gjennom og tilpass testene til valideringen.
+    @Nested
+    inner class ValidateBehandlingBeforeFinalize {
+        @Test
+        @Disabled
+        fun `Forsøk på avslutting av behandling som ikke har utfall skal ikke lykkes`() {
+            val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = false)
+            every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
+//            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            assertThrows<SectionedValidationErrorWithDetailsException> {
+                behandlingService.validateBehandlingBeforeFinalize(behandling)
+            }
+        }
+
+        @Test
+        @Disabled
+        fun `Forsøk på avslutting av behandling som ikke har hjemler skal ikke lykkes`() {
+            val behandling =
+                simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = true, hjemler = false)
+            every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
+//            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            assertThrows<SectionedValidationErrorWithDetailsException> {
+                behandlingService.validateBehandlingBeforeFinalize(behandling)
+            }
+        }
+
+        @Test
+        @Disabled
+        fun `Forsøk på avslutting av behandling som er trukket og som ikke har hjemler skal lykkes`() {
+            val behandling = simpleInsert(
+                dokumentEnhetId = true,
+                fullfoert = false,
+                utfall = true,
+                hjemler = false,
+                trukket = true
+            )
+            every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
+            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
+//            every { kabalDocumentGateway.isHovedDokumentUploaded(DOKUMENTENHET_ID) } returns true
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            val result = behandlingService.validateBehandlingBeforeFinalize(behandling)
+
+//            assertThat(result.currentDelbehandling().avsluttetAvSaksbehandler).isNotNull
+        }
+    }
+
     private fun simpleInsert(
         dokumentEnhetId: Boolean = false,
         fullfoert: Boolean = false,
@@ -330,18 +407,20 @@ class BehandlingServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = mottak.id,
-            delbehandlinger = setOf(Delbehandling(
-                utfall = when {
-                    trukket -> Utfall.TRUKKET
-                    utfall -> Utfall.AVVIST
-                    else -> null
-                },
-                hjemler = if (hjemler) mutableSetOf(
-                    Registreringshjemmel.ANDRE_TRYGDEAVTALER
-                ) else mutableSetOf(),
-                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
-                avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
-            )),
+            delbehandlinger = setOf(
+                Delbehandling(
+                    utfall = when {
+                        trukket -> Utfall.TRUKKET
+                        utfall -> Utfall.AVVIST
+                        else -> null
+                    },
+                    hjemler = if (hjemler) mutableSetOf(
+                        Registreringshjemmel.ANDRE_TRYGDEAVTALER
+                    ) else mutableSetOf(),
+                    dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
+                    avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
+                )
+            ),
             mottattFoersteinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet"
         )
