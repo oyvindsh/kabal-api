@@ -18,7 +18,7 @@ class FerdigstillDokumentService(
         private val secureLogger = getSecureLogger()
     }
 
-    @Scheduled(fixedDelay = 20000, initialDelay = 30000)
+    @Scheduled(fixedDelay = 45000, initialDelay = 120000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
         val hovedDokumenterIkkeFerdigstilte =
