@@ -220,7 +220,7 @@ class DokumentUnderArbeidController(
             LocalDateTime.now().minusMinutes(10)
         }
 
-        timer(period = Duration.ofSeconds(15).toMillis()) {
+        timer(period = Duration.ofSeconds(30).toMillis()) {
             try {
                 val documents = dokumentUnderArbeidService.findFinishedDokumenterAfterDateTime(
                     behandlingId = behandlingId,
