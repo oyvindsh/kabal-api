@@ -25,9 +25,9 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         return id
     }
 
-    fun finalizeKlagebehandling(behandling: Behandling) {
-        logger.debug("Sending saksdata to Kaka because klagebehandling is finished.")
-        kakaApiClient.finalizeKlagebehandling(behandling.toSaksdataInput())
+    fun finalizeBehandling(behandling: Behandling) {
+        logger.debug("Sending saksdata to Kaka because behandling is finished.")
+        kakaApiClient.finalizeBehandling(behandling.toSaksdataInput())
     }
 
     fun getValidationErrors(behandling: Behandling): List<InvalidProperty> {

@@ -25,20 +25,19 @@ class KlagebehandlingSchedulerService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    //TODO WIP handle both versions of document handling
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
-    @SchedulerLock(name = "distribuerVedtak")
-    fun distribuerVedtak() {
-        logger.debug("distribuerVedtak is called by scheduler")
-        val behandlingIdList: List<UUID> = behandlingService.findBehandlingerForDistribusjon()
+    @SchedulerLock(name = "avsluttBehandling")
+    fun avsluttBehandling() {
+        logger.debug("avsluttBehandling is called by scheduler")
+        val behandlingIdList: List<UUID> = behandlingService.findBehandlingerForAvslutning()
 
         behandlingIdList.forEach { behandlingId ->
-            kakaApiGateway.finalizeKlagebehandling(
+            kakaApiGateway.finalizeBehandling(
                 behandlingService.getBehandlingForReadWithoutCheckForAccess(
                     behandlingId
                 )
             )
-            klagebehandlingDistribusjonService.distribuerKlagebehandling(behandlingId)
+            klagebehandlingDistribusjonService.avsluttBehandling(behandlingId)
         }
     }
 

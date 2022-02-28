@@ -178,7 +178,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
-        klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
+        klagebehandlingDistribusjonService.avsluttBehandling(klagebehandlingId)
 
         klagebehandlingRepository.findByIdOrNull(klagebehandlingId) ?: throw NullPointerException()
     }
@@ -193,7 +193,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
-        klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
+        klagebehandlingDistribusjonService.avsluttBehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getOne(klagebehandlingId)
         assertThat(result.currentDelbehandling().avsluttet).isNotNull

@@ -387,7 +387,7 @@ class BehandlingService(
             .also { checkLeseTilgang(it) }
 
     @Transactional(readOnly = true)
-    fun findBehandlingerForDistribusjon(): List<UUID> =
+    fun findBehandlingerForAvslutning(): List<UUID> =
         behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull()
             .map { it.id }
 
