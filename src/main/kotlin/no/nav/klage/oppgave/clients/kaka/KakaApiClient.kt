@@ -36,7 +36,7 @@ class KakaApiClient(
             .block() ?: throw RuntimeException("Kvalitetsvurdering could not be created")
     }
 
-    fun finalizeKlagebehandling(saksdataInput: SaksdataInput): KakaOutput {
+    fun finalizeBehandling(saksdataInput: SaksdataInput): KakaOutput {
         return kakaApiWebClient.post()
             .uri { it.path("/kabal/saksdata").build() }
             .header(

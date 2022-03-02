@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.api.view
 
 import java.time.LocalDateTime
 
-data class KlagebehandlingFullfoertView(
+data class BehandlingFullfoertView(
     val modified: LocalDateTime,
     val isAvsluttetAvSaksbehandler: Boolean
 )

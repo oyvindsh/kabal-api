@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.eventlisteners
 
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.service.AnkebehandlingService
@@ -22,7 +23,7 @@ class CreateBehandlingFromMottakEventListener(
     }
 
     @EventListener
-    fun createBehandling(mottakLagretEvent: MottakLagretEvent) {
+    fun createBehandling(mottakLagretEvent: MottakLagretEvent): Behandling {
         logger.debug("Received MottakLagretEvent for mottak ${mottakLagretEvent.mottak.id} in CreateKlagebehandlingFromMottakEventListener")
         val mottakId = mottakLagretEvent.mottak.id
         if (behandlingRepository.findByMottakId(mottakId) != null) {
@@ -30,7 +31,7 @@ class CreateBehandlingFromMottakEventListener(
             throw RuntimeException("We already have a behandling for mottak $mottakId")
         }
 
-        if (mottakLagretEvent.mottak.type == Type.KLAGE) {
+        return if (mottakLagretEvent.mottak.type == Type.KLAGE) {
             klagebehandlingService.createKlagebehandlingFromMottak(mottakLagretEvent.mottak)
         } else {
             ankebehandlingService.createAnkebehandlingFromMottak(mottakLagretEvent.mottak)

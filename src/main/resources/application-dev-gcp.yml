@@ -45,3 +45,6 @@ INFLUX_HOST: influx-klage-nav-dev.aivencloud.com
 INFLUX_PORT: 26482
 
 CLAM_AV_URL: http://clamav.clamav/scan
+
+FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS: 6000
+EVENT_DELAY_SECONDS: 5

@@ -3,6 +3,9 @@ package no.nav.klage.oppgave.service
 import com.ninjasquad.springmockk.MockkBean
 import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -13,7 +16,9 @@ import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
+import no.nav.klage.oppgave.exceptions.BehandlingFinalizedException
 import no.nav.klage.oppgave.exceptions.BehandlingManglerMedunderskriverException
+import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
@@ -34,6 +39,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
+import java.util.Collections.emptySortedSet
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -75,6 +81,9 @@ class BehandlingServiceTest {
     lateinit var saksbehandlerRepository: SaksbehandlerRepository
 
     @MockkBean
+    lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
+
+    @MockkBean
     lateinit var kakaApiGateway: KakaApiGateway
 
     @MockkBean
@@ -93,7 +102,8 @@ class BehandlingServiceTest {
             tilgangService,
             applicationEventPublisher,
             kakaApiGateway,
-            dokumentService
+            dokumentService,
+            dokumentUnderArbeidRepository,
         )
     }
 
@@ -285,6 +295,93 @@ class BehandlingServiceTest {
         }
     }
 
+    @Test
+    fun `Forsøk på ferdigstilling av behandling som allerede er avsluttet av saksbehandler skal ikke lykkes`() {
+        val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
+        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
+
+        assertThrows<BehandlingFinalizedException> {
+            behandlingService.ferdigstillBehandling(
+                behandling.id,
+                SAKSBEHANDLER_IDENT
+            )
+        }
+    }
+
+    @Nested
+    inner class ValidateBehandlingBeforeFinalize {
+
+        @Test
+        fun `Forsøk på avslutting av behandling som har uferdige dokumenter skal ikke lykkes`() {
+            val behandling = simpleInsert()
+            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns
+                    sortedSetOf(
+                        DokumentUnderArbeid(
+                            mellomlagerId = "",
+                            opplastet = LocalDateTime.now(),
+                            size = 0,
+                            name = "",
+                            smartEditorId = null,
+                            behandlingId = UUID.randomUUID(),
+                            dokumentType = DokumentType.VEDTAK,
+                            created = LocalDateTime.now(),
+                            modified = LocalDateTime.now(),
+                            markertFerdig = null,
+                            ferdigstilt = null,
+                            dokumentEnhetId = null,
+                            parentId = null
+                        )
+                    )
+
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            assertThrows<SectionedValidationErrorWithDetailsException> {
+                behandlingService.validateBehandlingBeforeFinalize(behandling)
+            }
+        }
+
+        @Test
+        fun `Forsøk på avslutting av behandling som ikke har utfall skal ikke lykkes`() {
+            val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = false)
+            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            assertThrows<SectionedValidationErrorWithDetailsException> {
+                behandlingService.validateBehandlingBeforeFinalize(behandling)
+            }
+        }
+
+        @Test
+        fun `Forsøk på avslutting av behandling som ikke har hjemler skal ikke lykkes`() {
+            val behandling =
+                simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = true, hjemler = false)
+            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            assertThrows<SectionedValidationErrorWithDetailsException> {
+                behandlingService.validateBehandlingBeforeFinalize(behandling)
+            }
+        }
+
+        @Test
+        fun `Forsøk på avslutting av behandling som er trukket og som ikke har hjemler skal lykkes`() {
+            val behandling = simpleInsert(
+                dokumentEnhetId = true,
+                fullfoert = false,
+                utfall = true,
+                hjemler = false,
+                trukket = true
+            )
+            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
+            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+
+            behandlingService.validateBehandlingBeforeFinalize(behandling)
+        }
+    }
+
     private fun simpleInsert(
         dokumentEnhetId: Boolean = false,
         fullfoert: Boolean = false,
@@ -325,18 +422,20 @@ class BehandlingServiceTest {
             kildesystem = Fagsystem.K9,
             kildeReferanse = "abc",
             mottakId = mottak.id,
-            delbehandlinger = setOf(Delbehandling(
-                utfall = when {
-                    trukket -> Utfall.TRUKKET
-                    utfall -> Utfall.AVVIST
-                    else -> null
-                },
-                hjemler = if (hjemler) mutableSetOf(
-                    Registreringshjemmel.ANDRE_TRYGDEAVTALER
-                ) else mutableSetOf(),
-                dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
-                avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
-            )),
+            delbehandlinger = setOf(
+                Delbehandling(
+                    utfall = when {
+                        trukket -> Utfall.TRUKKET
+                        utfall -> Utfall.AVVIST
+                        else -> null
+                    },
+                    hjemler = if (hjemler) mutableSetOf(
+                        Registreringshjemmel.ANDRE_TRYGDEAVTALER
+                    ) else mutableSetOf(),
+                    dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
+                    avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
+                )
+            ),
             mottattFoersteinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet"
         )

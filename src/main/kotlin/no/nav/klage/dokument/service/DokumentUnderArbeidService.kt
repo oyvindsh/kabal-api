@@ -322,8 +322,13 @@ class DokumentUnderArbeidService(
         return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId)
     }
 
-    fun findFinishedDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
-        return dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId)
+    fun findFinishedDokumenterAfterDateTime(behandlingId: UUID, fromDateTime: LocalDateTime): SortedSet<DokumentUnderArbeid> {
+        val data =
+            dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingIdAndFerdigstiltAfter(
+                behandlingId,
+                fromDateTime
+            )
+        return data
     }
 
     fun findSmartDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
@@ -352,6 +357,9 @@ class DokumentUnderArbeidService(
             dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
 
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId.value)
+
+        //TODO should also store journalpostId/dokumentInfoId in dokumentUnderArbeid
+
         val saksdokumenter = journalpost.mapToSaksdokumenter()
         saksdokumenter.forEach { saksdokument ->
             val saksbehandlerIdent =

@@ -94,7 +94,6 @@ abstract class Behandling(
     open var sattPaaVent: LocalDateTime? = null,
 ) {
     fun currentDelbehandling(): Delbehandling {
-        //TODO anke
         return delbehandlinger.first()
     }
 

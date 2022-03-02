@@ -10,6 +10,8 @@ interface BehandlingRepository : JpaRepository<Behandling, UUID> {
 
     fun findByMottakId(mottakId: UUID): Behandling?
 
+    fun findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull(): List<Behandling>
+
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     override fun getOne(id: UUID): Behandling
 }

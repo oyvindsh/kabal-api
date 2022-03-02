@@ -1,19 +1,21 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.removeSaksdokument
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverIdentAndMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setTildeling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
-import no.nav.klage.oppgave.exceptions.BehandlingManglerMedunderskriverException
-import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
+import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
@@ -30,10 +32,101 @@ class BehandlingService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val kakaApiGateway: KakaApiGateway,
     private val dokumentService: DokumentService,
+    private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+
+    fun ferdigstillBehandling(
+        behandlingId: UUID,
+        innloggetIdent: String
+    ): Behandling {
+        val behandling = getBehandlingForUpdate(
+            behandlingId = behandlingId
+        )
+
+        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw BehandlingFinalizedException("Behandlingen er avsluttet")
+
+        //Forretningsmessige krav før vedtak kan ferdigstilles
+        validateBehandlingBeforeFinalize(behandling)
+
+        //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
+        return markerBehandlingSomAvsluttetAvSaksbehandler(behandling, innloggetIdent)
+    }
+
+    private fun markerBehandlingSomAvsluttetAvSaksbehandler(
+        behandling: Behandling,
+        innloggetIdent: String
+    ): Behandling {
+        val event = behandling.setAvsluttetAvSaksbehandler(innloggetIdent)
+        applicationEventPublisher.publishEvent(event)
+        return behandling
+    }
+
+    fun validateBehandlingBeforeFinalize(behandling: Behandling) {
+        val validationErrors = mutableListOf<InvalidProperty>()
+        val sectionList = mutableListOf<ValidationSection>()
+
+        val unfinishedDocuments =
+            dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(behandling.id)
+
+        if (unfinishedDocuments.isNotEmpty()) {
+            validationErrors.add(
+                InvalidProperty(
+                    field = "dokument",
+                    reason = "Alle dokumenter er ikke ferdigstilt"
+                )
+            )
+        }
+
+        if (behandling.currentDelbehandling().utfall == null) {
+            validationErrors.add(
+                InvalidProperty(
+                    field = "utfall",
+                    reason = "Utfall er ikke satt på vedtak"
+                )
+            )
+        }
+        if (behandling.currentDelbehandling().utfall != Utfall.TRUKKET) {
+            if (behandling.currentDelbehandling().hjemler.isEmpty()) {
+                validationErrors.add(
+                    InvalidProperty(
+                        field = "hjemmel",
+                        reason = "Hjemmel er ikke satt på vedtak"
+                    )
+                )
+            }
+        }
+
+        if (validationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "behandling",
+                    properties = validationErrors
+                )
+            )
+        }
+
+        val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
+
+        if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "kvalitetsvurdering",
+                    properties = kvalitetsvurderingValidationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = sectionList
+            )
+        }
     }
 
     fun assignBehandling(
@@ -292,4 +385,10 @@ class BehandlingService(
         behandlingRepository.findById(behandlingId)
             .orElseThrow { BehandlingNotFoundException("Behandling med id $behandlingId ikke funnet") }
             .also { checkLeseTilgang(it) }
+
+    @Transactional(readOnly = true)
+    fun findBehandlingerForAvslutning(): List<UUID> =
+        behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull()
+            .map { it.id }
+
 }

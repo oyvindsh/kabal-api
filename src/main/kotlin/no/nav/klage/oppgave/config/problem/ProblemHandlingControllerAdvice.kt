@@ -137,8 +137,8 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
-    fun handleKlagebehandlingFinalizedException(
-        ex: KlagebehandlingFinalizedException,
+    fun handleBehandlingFinalizedException(
+        ex: BehandlingFinalizedException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
         create(Status.BAD_REQUEST, ex, request)

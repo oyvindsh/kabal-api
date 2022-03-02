@@ -18,12 +18,12 @@ class FerdigstillDokumentService(
         private val secureLogger = getSecureLogger()
     }
 
-    @Scheduled(fixedDelay = 60000, initialDelay = 180000)
+    @Scheduled(fixedDelayString = "\${FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS}", initialDelay = 120000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
-        val hovedDokumenter =
+        val hovedDokumenterIkkeFerdigstilte =
             dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
-        for (it in hovedDokumenter) {
+        for (it in hovedDokumenterIkkeFerdigstilte) {
             try {
                 if (it.dokumentEnhetId == null) {
                     dokumentUnderArbeidService.opprettDokumentEnhet(it.id)

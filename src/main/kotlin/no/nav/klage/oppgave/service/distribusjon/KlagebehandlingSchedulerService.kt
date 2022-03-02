@@ -5,8 +5,8 @@ import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.FEILET
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.IKKE_SENDT
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.KafkaDispatcher
-import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import java.util.*
 
 @Service
 class KlagebehandlingSchedulerService(
-    private val klagebehandlingService: KlagebehandlingService,
+    private val behandlingService: BehandlingService,
     private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService,
     private val kafkaDispatcher: KafkaDispatcher,
     private val kakaApiGateway: KakaApiGateway
@@ -26,18 +26,18 @@ class KlagebehandlingSchedulerService(
     }
 
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
-    @SchedulerLock(name = "distribuerVedtak")
-    fun distribuerVedtak() {
-        logger.debug("distribuerVedtak is called by scheduler")
-        val klagebehandlingIdList: List<UUID> = klagebehandlingService.findKlagebehandlingForDistribusjon()
+    @SchedulerLock(name = "avsluttBehandling")
+    fun avsluttBehandling() {
+        logger.debug("avsluttBehandling is called by scheduler")
+        val behandlingIdList: List<UUID> = behandlingService.findBehandlingerForAvslutning()
 
-        klagebehandlingIdList.forEach { klagebehandlingId ->
-            kakaApiGateway.finalizeKlagebehandling(
-                klagebehandlingService.getKlagebehandlingForReadWithoutCheckForAccess(
-                    klagebehandlingId
+        behandlingIdList.forEach { behandlingId ->
+            kakaApiGateway.finalizeBehandling(
+                behandlingService.getBehandlingForReadWithoutCheckForAccess(
+                    behandlingId
                 )
             )
-            klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
+            klagebehandlingDistribusjonService.avsluttBehandling(behandlingId)
         }
     }
 

@@ -13,8 +13,6 @@ interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID> {
 
     fun findByMottakId(mottakId: UUID): Klagebehandling?
 
-    fun findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull(): List<Klagebehandling>
-
     fun findByIdAndDelbehandlingerAvsluttetIsNotNull(id: UUID): Klagebehandling?
 
     fun findByDelbehandlingerAvsluttetIsNotNull(): List<Klagebehandling>

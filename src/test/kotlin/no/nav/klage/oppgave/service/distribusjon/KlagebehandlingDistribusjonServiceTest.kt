@@ -5,6 +5,7 @@ import com.ninjasquad.springmockk.MockkBean
 import com.ninjasquad.springmockk.SpykBean
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -115,8 +116,11 @@ internal class KlagebehandlingDistribusjonServiceTest {
     @MockkBean(relaxed = true)
     lateinit var kafkaEventRepository: KafkaEventRepository
 
+    @MockkBean(relaxed = true)
+    lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
+
     @SpykBean
-    lateinit var klagebehandlingAvslutningService: KlagebehandlingAvslutningService
+    lateinit var behandlingAvslutningService: BehandlingAvslutningService
 
     @SpykBean
     lateinit var vedtakService: VedtakService
@@ -174,7 +178,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
-        klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
+        klagebehandlingDistribusjonService.avsluttBehandling(klagebehandlingId)
 
         klagebehandlingRepository.findByIdOrNull(klagebehandlingId) ?: throw NullPointerException()
     }
@@ -189,7 +193,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
-        klagebehandlingDistribusjonService.distribuerKlagebehandling(klagebehandlingId)
+        klagebehandlingDistribusjonService.avsluttBehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getOne(klagebehandlingId)
         assertThat(result.currentDelbehandling().avsluttet).isNotNull

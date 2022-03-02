@@ -286,17 +286,10 @@ class BehandlingMapper(
             null
         }
 
-    fun mapToVedleggEditedView(behandling: Behandling): VedleggEditedView {
-        return VedleggEditedView(
-            behandling.modified,
-            file = getVedleggView(behandling.currentDelbehandling().dokumentEnhetId),
-        )
-    }
-
-    fun mapToKlagebehandlingFullfoertView(klagebehandling: Klagebehandling): KlagebehandlingFullfoertView {
-        return KlagebehandlingFullfoertView(
-            modified = klagebehandling.modified,
-            isAvsluttetAvSaksbehandler = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null
+    fun mapToBehandlingFullfoertView(behandling: Behandling): BehandlingFullfoertView {
+        return BehandlingFullfoertView(
+            modified = behandling.modified,
+            isAvsluttetAvSaksbehandler = behandling.currentDelbehandling().avsluttetAvSaksbehandler != null
         )
     }
 

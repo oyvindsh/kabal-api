@@ -26,7 +26,7 @@ class SaksdokumentNotFoundException(msg: String) : RuntimeException(msg)
 
 class VedtakFinalizedException(msg: String) : RuntimeException(msg)
 
-class KlagebehandlingFinalizedException(msg: String) : RuntimeException(msg)
+class BehandlingFinalizedException(msg: String) : RuntimeException(msg)
 
 open class ValidationException(msg: String) : RuntimeException(msg)
 
