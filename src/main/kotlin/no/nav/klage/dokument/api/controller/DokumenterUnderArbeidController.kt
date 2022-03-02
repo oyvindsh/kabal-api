@@ -14,6 +14,7 @@ import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
@@ -34,6 +35,7 @@ class DokumentUnderArbeidController(
     private val dokumentMapper: DokumentMapper,
     private val dokumenInputMapper: DokumentInputMapper,
     private val behandlingService: BehandlingService,
+    @Value("\${EVENT_DELAY_SECONDS}") private val eventDelay: Long,
 ) {
 
     companion object {
@@ -220,7 +222,7 @@ class DokumentUnderArbeidController(
             LocalDateTime.now().minusMinutes(10)
         }
 
-        timer(period = Duration.ofSeconds(30).toMillis()) {
+        timer(period = Duration.ofSeconds(eventDelay).toMillis()) {
             try {
                 val documents = dokumentUnderArbeidService.findFinishedDokumenterAfterDateTime(
                     behandlingId = behandlingId,
