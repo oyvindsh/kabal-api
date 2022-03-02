@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.time.Year
 import java.util.*
 
 @Profile("dev-gcp")
@@ -192,14 +193,14 @@ class MockDataController(
         val journalpostId = dollyDoc.journalpost
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
 
-        val dato = LocalDate.of(2020, (1..12).random(), (1..28).random())
+        val dato = LocalDate.of(Year.now().value - 1, (1..12).random(), (1..28).random())
 
         val randomYtelse = listOf(
             Ytelse.SYK_SYK,
-            Ytelse.OMS_OLP,
-            Ytelse.OMS_OMP,
-            Ytelse.OMS_PLS,
-            Ytelse.OMS_PSB
+//            Ytelse.OMS_OLP,
+//            Ytelse.OMS_OMP,
+//            Ytelse.OMS_PLS,
+//            Ytelse.OMS_PSB
         ).random()
 
         val randomHjemmelList = if (randomYtelse == Ytelse.SYK_SYK) {
