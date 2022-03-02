@@ -27,7 +27,7 @@ class AnkebehandlingService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun createAnkebehandlingFromMottak(mottak: Mottak) {
+    fun createAnkebehandlingFromMottak(mottak: Mottak): Ankebehandling {
         val ankebehandling = ankebehandlingRepository.save(
             Ankebehandling(
                 klager = mottak.klager.copy(),
@@ -58,6 +58,7 @@ class AnkebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
+        return ankebehandling
     }
 
     private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =

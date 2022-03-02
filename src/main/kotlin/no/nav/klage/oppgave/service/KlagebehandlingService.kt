@@ -58,7 +58,7 @@ class KlagebehandlingService(
         }
     }
 
-    fun createKlagebehandlingFromMottak(mottak: Mottak) {
+    fun createKlagebehandlingFromMottak(mottak: Mottak): Klagebehandling {
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
@@ -93,6 +93,7 @@ class KlagebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
+        return klagebehandling
     }
 
     private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =

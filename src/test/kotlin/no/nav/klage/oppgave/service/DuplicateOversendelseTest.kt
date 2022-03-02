@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerPersonligInfo
+import no.nav.klage.oppgave.eventlisteners.CreateBehandlingFromMottakEventListener
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.gateway.AzureGateway
 import org.junit.jupiter.api.MethodOrderer
@@ -46,6 +47,9 @@ internal class DuplicateOversendelseTest {
 
     @MockkBean(relaxed = true)
     lateinit var dokumentService: DokumentService
+
+    @MockkBean(relaxed = true)
+    lateinit var createBehandlingFromMottakEventListener: CreateBehandlingFromMottakEventListener
 
     @MockkBean(relaxed = true)
     lateinit var norg2Client: Norg2Client

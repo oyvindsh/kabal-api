@@ -6,8 +6,10 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.config.incrementMottattKlage
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
+import no.nav.klage.oppgave.eventlisteners.CreateBehandlingFromMottakEventListener
 import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
@@ -29,7 +31,8 @@ class MottakService(
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
     private val azureGateway: AzureGateway,
-    private val meterRegistry: MeterRegistry
+    private val meterRegistry: MeterRegistry,
+    private val createBehandlingFromMottakEventListener: CreateBehandlingFromMottakEventListener,
 ) {
 
     private val lovligeTyperIKabal = LovligeTyper.lovligeTyper(environment)
@@ -72,6 +75,19 @@ class MottakService(
         //TODO: Move to outside of transaction to make sure it went well
         meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.toTema().navn)
 
+    }
+
+    @Transactional
+    fun createMottakForKlageAnkeV3ForE2ETests(oversendtKlageAnke: OversendtKlageAnkeV3): Behandling {
+        secureLogger.debug("Prøver å lagre oversendtKlageAnkeV3 for E2E-tests: {}", oversendtKlageAnke)
+        oversendtKlageAnke.validate()
+
+        val mottak = mottakRepository.save(oversendtKlageAnke.toMottak())
+
+        secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
+        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
+        return createBehandlingFromMottakEventListener.createBehandling(MottakLagretEvent(mottak))
     }
 
     fun OversendtKlageV2.validate() {
