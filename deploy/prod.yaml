@@ -19,6 +19,12 @@ inboundApplications:
   - application: k9-klage
     namespace: k9saksbehandling
     cluster: prod-fss
+  - application: su-se-bakover
+    namespace: supstonad
+    cluster: prod-fss
+  - application: fpsak
+    namespace: teamforeldrepenger
+    cluster: prod-fss
 springProfile: prod-gcp
 tenant: nav.no
 db_tier: db-custom-4-15360
