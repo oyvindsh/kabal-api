@@ -164,17 +164,24 @@ class MockDataController(
 
     @Unprotected
     @PostMapping("/randomklage")
-    fun sendInnRandomKlage(): UUID {
+    fun sendInnRandomKlage(): MockDataResponse {
         return createKlanke(Type.KLAGE)
     }
 
     @Unprotected
     @PostMapping("/randomanke")
-    fun sendInnRandomAnke(): UUID {
+    fun sendInnRandomAnke(): MockDataResponse {
         return createKlanke(Type.ANKE)
     }
 
-    private fun createKlanke(type: Type): UUID {
+    data class MockDataResponse(
+        val id: UUID,
+        val typeId: String,
+        val ytelseId: String,
+        val hjemmelId: String,
+    )
+
+    private fun createKlanke(type: Type): MockDataResponse {
         val dollyDoc = listOf(
             SyntheticWithDoc("02446701749", "510534792"),
             SyntheticWithDoc("29437117843", "510534815"),
@@ -228,7 +235,7 @@ class MockDataController(
             )
         }
 
-        return mottakService.createMottakForKlageAnkeV3ForE2ETests(
+        val behandling = mottakService.createMottakForKlageAnkeV3ForE2ETests(
             OversendtKlageAnkeV3(
                 ytelse = randomYtelse,
                 type = type,
@@ -256,7 +263,14 @@ class MockDataController(
                 innsendtTilNav = dato.minusDays(3),
                 kilde = KildeFagsystem.AO01,
             )
-        ).id
+        )
+
+        return MockDataResponse(
+            id = behandling.id,
+            typeId = behandling.type.id,
+            ytelseId = behandling.ytelse.id,
+            hjemmelId = behandling.hjemler.first().id
+        )
     }
 
     private fun randomMottakDokumentType() = listOf(
