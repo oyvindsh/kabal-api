@@ -22,6 +22,9 @@ inboundApplications:
   - application: su-se-bakover
     namespace: supstonad
     cluster: dev-fss
+  - application: fpsak
+    namespace: teamforeldrepenger
+    cluster: dev-fss
 springProfile: dev-gcp
 tenant: trygdeetaten.no
 db_tier: db-custom-1-3840
