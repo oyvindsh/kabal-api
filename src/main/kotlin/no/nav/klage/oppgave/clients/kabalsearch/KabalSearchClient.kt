@@ -25,6 +25,6 @@ class KabalSearchClient(
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Void>()
-            .block() ?: throw RuntimeException("Behandling could not be deleted")
+            .block()
     }
 }
