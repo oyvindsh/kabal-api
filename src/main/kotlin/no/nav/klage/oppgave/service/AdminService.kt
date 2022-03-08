@@ -1,6 +1,9 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.oppgave.clients.kabalsearch.KabalSearchClient
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
@@ -11,12 +14,16 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class AdminService(
     private val kafkaDispatcher: KafkaDispatcher,
     private val behandlingRepository: BehandlingRepository,
-    private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer
+    private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
+    private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer,
+    private val fileApiClient: FileApiClient,
+    private val kabalSearchClient: KabalSearchClient,
 ) {
 
     companion object {
@@ -35,6 +42,7 @@ class AdminService(
             behandlingPage.content.map { behandling ->
                 try {
                     if (behandling.type == Type.KLAGE) {
+                        //TODO are both in use?
                         behandlingEndretKafkaProducer.sendKlageEndretV1(behandling as Klagebehandling)
                         behandlingEndretKafkaProducer.sendKlageEndretV2(behandling)
                     } else {
@@ -47,6 +55,23 @@ class AdminService(
 
             pageable = behandlingPage.nextPageable()
         } while (pageable.isPaged)
+    }
+
+    /** only for use in dev */
+    fun deleteBehandlingInDev(behandlingId: UUID) {
+        val dokumenterUnderBehandling = dokumentUnderArbeidRepository.findByBehandlingId(behandlingId)
+
+        dokumenterUnderBehandling.forEach { dub ->
+            fileApiClient.deleteDocument(id = dub.mellomlagerId, systemUser = true)
+        }
+
+        dokumentUnderArbeidRepository.deleteAll(dokumenterUnderBehandling)
+        behandlingRepository.deleteById(behandlingId)
+
+        //Delete in elastic
+        kabalSearchClient.deleteBehandling(behandlingId)
+
+        //Delete in dokumentarkiv? Probably not necessary. They clean up when they need to.
     }
 
     fun resendToDVH() {

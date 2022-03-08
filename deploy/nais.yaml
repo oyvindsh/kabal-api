@@ -97,6 +97,7 @@ spec:
       {{/each}}
     outbound:
       rules:
+        - application: kabal-search
         - application: kabal-document
         - application: kabal-smart-editor-api
         - application: kaka-api
