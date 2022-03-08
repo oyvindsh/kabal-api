@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.BehandlingRepository
+import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -24,6 +25,7 @@ class AdminService(
     private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer,
     private val fileApiClient: FileApiClient,
     private val kabalSearchClient: KabalSearchClient,
+    private val endringsloggRepository: EndringsloggRepository,
 ) {
 
     companion object {
@@ -66,6 +68,9 @@ class AdminService(
         }
 
         dokumentUnderArbeidRepository.deleteAll(dokumenterUnderBehandling)
+
+        endringsloggRepository.deleteAll(endringsloggRepository.findByBehandlingIdOrderByTidspunktDesc(behandlingId))
+
         behandlingRepository.deleteById(behandlingId)
 
         //Delete in elastic
