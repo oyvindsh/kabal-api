@@ -35,21 +35,25 @@ class CacheWithJCacheConfiguration(private val environment: Environment) : JCach
 
     override fun customize(cacheManager: CacheManager) {
         cacheKeys.forEach { cacheName ->
-            cacheManager.createCache(cacheName, cacheConfiguration())
+            //Always cache for a long time.
+            if (cacheName == ENHET_CACHE) {
+                cacheManager.createCache(cacheName, cacheConfiguration(Duration(TimeUnit.HOURS, 8L)))
+            }
+            cacheManager.createCache(cacheName, cacheConfiguration(standardDuration()))
         }
     }
 
-    private fun cacheConfiguration() =
+    private fun cacheConfiguration(duration: Duration) =
         MutableConfiguration<Any, Any>()
-            .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration(TimeUnit.MINUTES, duration())))
+            .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(duration))
             .setStoreByValue(false)
             .setStatisticsEnabled(true)
 
-    private fun duration() =
+    private fun standardDuration() =
         if (environment.activeProfiles.contains("prod-gcp")) {
-            480L
+            Duration(TimeUnit.HOURS, 8L)
         } else {
-            10L
+            Duration(TimeUnit.MINUTES, 10L)
         }
 
 }
