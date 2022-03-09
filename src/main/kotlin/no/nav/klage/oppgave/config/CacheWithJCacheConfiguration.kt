@@ -38,8 +38,9 @@ class CacheWithJCacheConfiguration(private val environment: Environment) : JCach
             //Always cache for a long time.
             if (cacheName == ENHET_CACHE) {
                 cacheManager.createCache(cacheName, cacheConfiguration(Duration(TimeUnit.HOURS, 8L)))
+            } else {
+                cacheManager.createCache(cacheName, cacheConfiguration(standardDuration()))
             }
-            cacheManager.createCache(cacheName, cacheConfiguration(standardDuration()))
         }
     }
 
