@@ -229,6 +229,9 @@ KABAL_SMART_EDITOR_API_APP_NAME: kabal-smart-editor-api
 KAKA_API_BASE_URL: http://kaka-api
 KAKA_API_APP_NAME: kaka-api
 
+KABAL_SEARCH_BASE_URL: http://kabal-search
+KABAL_SEARCH_APP_NAME: kabal-search
+
 KABAL_FILE_API_BASE_URL: http://kabal-file-api
 KABAL_FILE_API_APP_NAME: kabal-file-api
 

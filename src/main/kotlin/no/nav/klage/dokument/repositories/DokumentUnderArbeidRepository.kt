@@ -10,6 +10,8 @@ import java.util.*
 @Transactional
 interface DokumentUnderArbeidRepository : JpaRepository<DokumentUnderArbeid, DokumentId> {
 
+    fun findByBehandlingId(behandlingId: UUID): Set<DokumentUnderArbeid>
+
     fun findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId: UUID): SortedSet<DokumentUnderArbeid>
 
     fun findByBehandlingIdAndMarkertFerdigIsNull(behandlingId: UUID): SortedSet<DokumentUnderArbeid>

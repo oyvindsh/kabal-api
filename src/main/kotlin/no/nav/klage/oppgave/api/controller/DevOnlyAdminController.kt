@@ -10,6 +10,7 @@ import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @Profile("dev-gcp")
 @RestController
@@ -25,7 +26,7 @@ class DevOnlyAdminController(
     }
 
     @Unprotected
-    @GetMapping("/internal/elasticadmin/nuke", produces = ["application/json"])
+    @GetMapping("/internal/kafkaadmin/refill", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
     fun resetElasticIndex() {
         try {
@@ -33,6 +34,19 @@ class DevOnlyAdminController(
             adminService.syncKafkaWithDb()
         } catch (e: Exception) {
             logger.warn("Failed to resync db with Kafka")
+            throw e
+        }
+    }
+
+    @Unprotected
+    @DeleteMapping("/internal/behandlinger/{id}", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun deleteBehandling(@PathVariable("id") behandlingId: UUID,) {
+        try {
+            logger.info("Delete behandling i dev")
+            adminService.deleteBehandlingInDev(behandlingId)
+        } catch (e: Exception) {
+            logger.warn("Failed to delete behandling i dev")
             throw e
         }
     }
