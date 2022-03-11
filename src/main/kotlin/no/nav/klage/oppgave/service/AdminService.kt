@@ -59,10 +59,15 @@ class AdminService(
 
     /** only for use in dev */
     fun deleteBehandlingInDev(behandlingId: UUID) {
+        logger.debug("Delete test data in dev: attempt to delete behandling with id $behandlingId")
         val dokumenterUnderBehandling = dokumentUnderArbeidRepository.findByBehandlingId(behandlingId)
 
-        dokumenterUnderBehandling.forEach { dub ->
-            fileApiClient.deleteDocument(id = dub.mellomlagerId, systemUser = true)
+        for (dub in dokumenterUnderBehandling) {
+            try {
+                fileApiClient.deleteDocument(id = dub.mellomlagerId, systemUser = true)
+            } catch (e: Exception) {
+                logger.warn("Delete test data in dev: Could not delete from file api")
+            }
         }
 
         dokumentUnderArbeidRepository.deleteAll(dokumenterUnderBehandling)
