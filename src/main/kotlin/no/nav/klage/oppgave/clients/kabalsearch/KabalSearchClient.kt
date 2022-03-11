@@ -21,7 +21,7 @@ class KabalSearchClient(
         behandlingId: UUID
     ) {
         kabalSearchWebClient.delete()
-            .uri { it.path("/internal/behandling/{id}").build(behandlingId.toString()) }
+            .uri { it.path("/internal/behandlinger/{id}").build(behandlingId.toString()) }
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Void>()
