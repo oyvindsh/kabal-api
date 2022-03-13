@@ -38,7 +38,7 @@ Dokumentasjon fra nais: https://security.labs.nais.io/pages/guide/api-kall/maski
 POST <kabal-api-url>/oversendelse/klage <oversendt-klage-json>
 ```
 
-- DEV-url: `https://kabal-api.dev.nav.no`
+- DEV-url: `https://kabal-api.dev.intern.nav.no`
 - PROD-url: `https://kabal-api.intern.nav.no`
 
 [OpenAPI/Swagger doc for å sende over klager](https://kabal-api.dev.intern.nav.no/swagger-ui/?urls.primaryName=external#/) (husk naisdevice)
