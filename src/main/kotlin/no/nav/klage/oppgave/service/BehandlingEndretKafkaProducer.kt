@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class BehandlingEndretKafkaProducer(
@@ -59,6 +60,20 @@ class BehandlingEndretKafkaProducer(
                 "Could not send anke endret to Kafka. Need to resend ankebehandling ${ankebehandling.id} manually. Check secure logs for more information."
             logger.error(errorMessage)
             secureLogger.error("Could not send ankebehandling ${ankebehandling.id} endret to Kafka", it)
+        }
+    }
+
+    fun sendBehandlingDeleted(behandlingId: UUID) {
+        logger.debug("Sending null message (for delete) to Kafka topic: {}", topicV2)
+        runCatching {
+            val result = aivenKafkaTemplate.send(topicV2, behandlingId.toString(), null).get()
+            logger.info("Behandling deleted sent to Kafka")
+            secureLogger.debug("Behandling deleted sent to Kafka ($result)")
+        }.onFailure {
+            val errorMessage =
+                "Could not send klage deleted to Kafka. Need to resend behandling $behandlingId manually. Check secure logs for more information."
+            logger.error(errorMessage)
+            secureLogger.error(errorMessage, it)
         }
     }
 

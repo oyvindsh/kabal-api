@@ -76,8 +76,8 @@ class AdminService(
 
         behandlingRepository.deleteById(behandlingId)
 
-        //Delete in elastic
-        kabalSearchClient.deleteBehandling(behandlingId)
+        //Delete in search
+        behandlingEndretKafkaProducer.sendBehandlingDeleted(behandlingId)
 
         //Delete in dokumentarkiv? Probably not necessary. They clean up when they need to.
     }
