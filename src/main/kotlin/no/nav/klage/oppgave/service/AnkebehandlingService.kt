@@ -71,7 +71,7 @@ class AnkebehandlingService(
             val klagebehandlingDokumenter = klagebehandling.saksdokumenter
 
             logger.debug("Adding saksdokumenter from klagebehandling ${mottak.forrigeBehandlingId} to ankebehandling ${ankebehandling.id}")
-            klagebehandlingDokumenter.forEach{
+            klagebehandlingDokumenter.forEach {
                 behandlingService.connectDokumentToBehandling(
                     behandlingId = ankebehandling.id,
                     journalpostId = it.journalpostId,
