@@ -48,19 +48,23 @@ class FileApiClient(
             tokenUtil.getSaksbehandlerAccessTokenWithKabalFileApiScope()
         }
 
-        val deletedInGCS = fileWebClient
-            .delete()
-            .uri("/document/$id")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
-            .retrieve()
-            .bodyToMono<Boolean>()
-            .block()
+        try {
+            val deletedInGCS = fileWebClient
+                .delete()
+                .uri { it.path("/document/{id}").build(id) }
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
+                .retrieve()
+                .bodyToMono<Boolean>()
+                .block()
 
-        if (deletedInGCS == true) {
-            logger.debug("Document successfully deleted in file store.")
-        } else {
-            logger.warn("Could not successfully delete document in file store.")
+            if (deletedInGCS == true) {
+                logger.debug("Document successfully deleted in file store.")
+            } else {
+                logger.warn("Could not successfully delete document in file store.")
+            }
+        } catch (e: Exception) {
+            logger.error("Could not delete document ($id) from kabal-file-api", e)
         }
     }
 
