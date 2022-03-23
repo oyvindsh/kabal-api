@@ -50,7 +50,7 @@ class FileApiClient(
 
         val deletedInGCS = fileWebClient
             .delete()
-            .uri("/document/$id")
+            .uri { it.path("/document/{id}").build(id) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
             .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
