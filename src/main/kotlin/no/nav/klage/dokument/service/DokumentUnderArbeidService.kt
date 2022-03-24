@@ -2,6 +2,7 @@ package no.nav.klage.dokument.service
 
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
@@ -19,6 +20,7 @@ import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -155,9 +157,6 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke endre tittel på et dokument som er ferdigstilt")
         }
 
-        val mellomlagerId = mellomlagerService.updateTittel(dokument.mellomlagerId, dokumentTitle)
-        dokument.mellomlagerId = mellomlagerId
-
         val oldValue = dokument.name
         dokument.name = dokumentTitle
         behandling.publishEndringsloggEvent(
@@ -254,7 +253,12 @@ class DokumentUnderArbeidService(
         if (dokument.isStaleSmartEditorDokument()) {
             mellomlagreNyVersjonAvSmartEditorDokument(dokument)
         }
-        return mellomlagerService.getUploadedDocument(dokument.mellomlagerId)
+
+        return OpplastetMellomlagretDokument(
+            title = dokument.name,
+            content = mellomlagerService.getUploadedDocument(dokument.mellomlagerId),
+            contentType = MediaType.APPLICATION_PDF
+        )
     }
 
     fun slettDokument(
