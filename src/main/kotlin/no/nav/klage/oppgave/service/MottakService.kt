@@ -157,7 +157,7 @@ class MottakService(
         sakenGjelder?.run { validatePartId(sakenGjelder.id) }
         validateDateNotInFuture(brukersHenvendelseMottattNavDato, ::brukersHenvendelseMottattNavDato.name)
         validateDateNotInFuture(innsendtTilNav, ::innsendtTilNav.name)
-        validateOptionalDateTimeNotInFuture(sakMottattKaDato, ::sakMottattKaDato.name)
+        validateDateNotInFuture(sakMottattKaDato, ::sakMottattKaDato.name)
         validateKildeReferanse(kildeReferanse)
         validateEnhet(forrigeBehandlendeEnhet)
     }
@@ -181,7 +181,7 @@ class MottakService(
             throw OversendtKlageNotValidException("$parameterName kan ikke være i fremtiden, innsendt dato var $inputDateTime.")
     }
 
-    private fun validateDateNotInFuture(inputDate: LocalDate, parameterName: String) {
+    private fun validateDateNotInFuture(inputDate: LocalDate?, parameterName: String) {
         if (LocalDate.now().isBefore(inputDate))
             throw OversendtKlageNotValidException("$parameterName kan ikke være i fremtiden, innsendt dato var $inputDate.")
     }

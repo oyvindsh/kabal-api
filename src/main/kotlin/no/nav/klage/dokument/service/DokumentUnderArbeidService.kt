@@ -409,9 +409,7 @@ class DokumentUnderArbeidService(
     }
 
     fun getSmartEditorId(dokumentId: DokumentId, readOnly: Boolean): UUID {
-        val dokumentUnderArbeid =
-            dokumentUnderArbeidRepository.getById(dokumentId)
-                ?: throw DokumentValidationException("Dokument ikke funnet")
+        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         if (readOnly) {

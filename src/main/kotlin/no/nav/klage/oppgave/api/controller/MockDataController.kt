@@ -259,7 +259,7 @@ class MockDataController(
                     )
                 ),
                 brukersHenvendelseMottattNavDato = dato,
-                sakMottattKaDato = dato.atStartOfDay(),
+                sakMottattKaDato = dato,
                 innsendtTilNav = dato.minusDays(3),
                 kilde = KildeFagsystem.AO01,
             )
