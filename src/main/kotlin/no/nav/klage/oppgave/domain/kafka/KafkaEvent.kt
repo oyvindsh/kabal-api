@@ -9,8 +9,8 @@ import javax.persistence.*
 class KafkaEvent(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "klagebehandling_id")
-    val klagebehandlingId: UUID,
+    @Column(name = "behandling_id")
+    val behandlingId: UUID,
     @Column(name = "kilde_referanse")
     val kildeReferanse: String,
     @Column(name = "kilde")
@@ -43,7 +43,7 @@ class KafkaEvent(
     override fun hashCode(): Int = id.hashCode()
 
     override fun toString(): String {
-        return "KafkaEvent(id=$id, klagebehandlingId=$klagebehandlingId, kildeReferanse='$kildeReferanse', kilde='$kilde', status=$status, jsonPayload='$jsonPayload', errorMessage=$errorMessage, created=$created, type=$type)"
+        return "KafkaEvent(id=$id, behandlingId=$behandlingId, kildeReferanse='$kildeReferanse', kilde='$kilde', status=$status, jsonPayload='$jsonPayload', errorMessage=$errorMessage, created=$created, type=$type)"
     }
 
 }

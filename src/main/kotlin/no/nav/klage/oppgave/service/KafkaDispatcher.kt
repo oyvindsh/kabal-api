@@ -38,7 +38,7 @@ class KafkaDispatcher(
                 runCatching {
                     kafkaProducer.publishToKafkaTopic(
                         topic = type.toTopic(),
-                        klagebehandlingId = event.klagebehandlingId,
+                        klagebehandlingId = event.behandlingId,
                         json = event.jsonPayload
                     )
                 }.onFailure {
