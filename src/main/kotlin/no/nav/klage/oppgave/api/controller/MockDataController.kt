@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.hjemmel.ytelseTilHjemler
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
@@ -10,6 +11,7 @@ import no.nav.klage.oppgave.service.MottakService
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
@@ -164,14 +166,18 @@ class MockDataController(
 
     @Unprotected
     @PostMapping("/randomklage")
-    fun sendInnRandomKlage(): MockDataResponse {
-        return createKlanke(Type.KLAGE)
+    fun sendInnRandomKlage(
+        @RequestBody(required = false) input: MockInput? = null
+    ): MockDataResponse {
+        return createKlanke(Type.KLAGE, input)
     }
 
     @Unprotected
     @PostMapping("/randomanke")
-    fun sendInnRandomAnke(): MockDataResponse {
-        return createKlanke(Type.ANKE)
+    fun sendInnRandomAnke(
+        @RequestBody(required = false) input: MockInput? = null
+    ): MockDataResponse {
+        return createKlanke(Type.ANKE, input)
     }
 
     data class MockDataResponse(
@@ -181,7 +187,7 @@ class MockDataController(
         val hjemmelId: String,
     )
 
-    private fun createKlanke(type: Type): MockDataResponse {
+    private fun createKlanke(type: Type, input: MockInput?): MockDataResponse {
         val dollyDoc = listOf(
             SyntheticWithDoc("02446701749", "510534792"),
             SyntheticWithDoc("29437117843", "510534815"),
@@ -202,55 +208,28 @@ class MockDataController(
 
         val dato = LocalDate.of(Year.now().value - 1, (1..12).random(), (1..28).random())
 
-        val randomYtelse = listOf(
-            Ytelse.SYK_SYK,
-//            Ytelse.OMS_OLP,
-//            Ytelse.OMS_OMP,
-//            Ytelse.OMS_PLS,
-//            Ytelse.OMS_PSB
-        ).random()
+        val randomYtelse = if (input == null) Ytelse.SYK_SYK else input.ytelse ?: ytelseTilHjemler.keys.random()
+        val klager = input?.klager ?: OversendtKlager(
+            id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
+        )
 
-        val randomHjemmelList = if (randomYtelse == Ytelse.SYK_SYK) {
-            listOf(
-                listOf(
-                    Hjemmel.FTRL_8_2,
-                    Hjemmel.FTRL_8_3,
-                    Hjemmel.FTRL_8_4,
-                    Hjemmel.FTRL_8_8,
-                    Hjemmel.FTRL_8_13,
-                )
-                    .random()
-            )
-        } else {
-            listOf(
-                listOf(
-                    Hjemmel.FTRL_8_13,
-                    Hjemmel.FTRL_9_2,
-                    Hjemmel.FTRL_9_3,
-                    Hjemmel.FTRL_9_11,
-                    Hjemmel.FTRL_9_14,
-                    Hjemmel.FTRL_22_13
-                )
-                    .random()
-            )
-        }
+        val sakenGjelder = input?.sakenGjelder
 
         val behandling = mottakService.createMottakForKlageAnkeV3ForE2ETests(
             OversendtKlageAnkeV3(
                 ytelse = randomYtelse,
                 type = type,
-                klager = OversendtKlager(
-                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
-                ),
+                klager = klager,
                 fagsak = journalpost?.sak?.let {
                     OversendtSak(
                         fagsakId = it.fagsakId ?: "UKJENT",
                         fagsystem = KildeFagsystem.AO01
                     )
                 },
+                sakenGjelder = sakenGjelder,
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
-                hjemler = randomHjemmelList,
+                hjemler = listOf(ytelseTilHjemler[randomYtelse]!!.random()),
                 forrigeBehandlendeEnhet = "4295", //NAV Klageinstans nord
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
@@ -283,5 +262,11 @@ class MockDataController(
     data class SyntheticWithDoc(
         val fnr: String,
         val journalpost: String
+    )
+
+    data class MockInput(
+        val ytelse: Ytelse?,
+        val klager: OversendtKlager?,
+        val sakenGjelder: OversendtSakenGjelder?,
     )
 }
