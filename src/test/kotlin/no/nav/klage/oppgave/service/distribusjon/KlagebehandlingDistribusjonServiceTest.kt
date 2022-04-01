@@ -87,10 +87,6 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         @MockkBean(relaxed = true)
         lateinit var tokenUtil: TokenUtil
-
-        @MockkBean(relaxed = true)
-        lateinit var vedtakKafkaProducer: VedtakKafkaProducer
-
     }
 
     //@Autowired

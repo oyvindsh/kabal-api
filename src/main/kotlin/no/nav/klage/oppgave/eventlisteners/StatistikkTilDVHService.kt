@@ -43,7 +43,7 @@ class StatistikkTilDVHService(
             kafkaEventRepository.save(
                 KafkaEvent(
                     id = eventId,
-                    klagebehandlingId = behandlingEndretEvent.behandling.id,
+                    behandlingId = behandlingEndretEvent.behandling.id,
                     kilde = behandlingEndretEvent.behandling.kildesystem.navn,
                     kildeReferanse = behandlingEndretEvent.behandling.kildeReferanse,
                     status = UtsendingStatus.IKKE_SENDT,

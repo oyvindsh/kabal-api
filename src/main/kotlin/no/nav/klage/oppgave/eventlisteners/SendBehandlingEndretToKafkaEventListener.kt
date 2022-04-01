@@ -25,12 +25,13 @@ class SendBehandlingEndretToKafkaEventListener(private val behandlingEndretKafka
     fun indexKlagebehandling(behandlingEndretEvent: BehandlingEndretEvent) {
         logger.debug("Received BehandlingEndretEvent for behandlingId ${behandlingEndretEvent.behandling.id}")
 
-        if (behandlingEndretEvent.behandling.type == Type.KLAGE) {
-            behandlingEndretKafkaProducer.sendKlageEndretV2(behandlingEndretEvent.behandling as Klagebehandling)
-        } else {
-            behandlingEndretKafkaProducer.sendAnkeEndretV2(behandlingEndretEvent.behandling as Ankebehandling)
+        when (behandlingEndretEvent.behandling.type) {
+            Type.KLAGE -> {
+                behandlingEndretKafkaProducer.sendKlageEndretV2(behandlingEndretEvent.behandling as Klagebehandling)
+            }
+            Type.ANKE -> {
+                behandlingEndretKafkaProducer.sendAnkeEndretV2(behandlingEndretEvent.behandling as Ankebehandling)
+            }
         }
-
-
     }
 }

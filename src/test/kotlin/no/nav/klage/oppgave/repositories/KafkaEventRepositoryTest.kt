@@ -39,7 +39,7 @@ class KafkaEventRepositoryTest {
         val event = KafkaEvent(
             kildeReferanse = "TEST",
             kilde = "TEST",
-            klagebehandlingId = UUID.randomUUID(),
+            behandlingId = UUID.randomUUID(),
             status = IKKE_SENDT,
             jsonPayload = "{}",
             type = EventType.STATS_DVH
@@ -58,7 +58,7 @@ class KafkaEventRepositoryTest {
             KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
-                klagebehandlingId = UUID.randomUUID(),
+                behandlingId = UUID.randomUUID(),
                 status = IKKE_SENDT,
                 jsonPayload = "{}",
                 type = EventType.STATS_DVH
@@ -68,7 +68,7 @@ class KafkaEventRepositoryTest {
         val oldestKafkaEvent = KafkaEvent(
             kildeReferanse = "TEST",
             kilde = "TEST",
-            klagebehandlingId = UUID.randomUUID(),
+            behandlingId = UUID.randomUUID(),
             status = FEILET,
             jsonPayload = "{}",
             type = EventType.STATS_DVH,
@@ -83,7 +83,7 @@ class KafkaEventRepositoryTest {
             KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
-                klagebehandlingId = UUID.randomUUID(),
+                behandlingId = UUID.randomUUID(),
                 status = FEILET,
                 jsonPayload = "{}",
                 type = EventType.KLAGE_VEDTAK
@@ -95,7 +95,7 @@ class KafkaEventRepositoryTest {
             KafkaEvent(
                 kildeReferanse = "TEST",
                 kilde = "TEST",
-                klagebehandlingId = UUID.randomUUID(),
+                behandlingId = UUID.randomUUID(),
                 status = SENDT,
                 jsonPayload = "{}",
                 type = EventType.STATS_DVH

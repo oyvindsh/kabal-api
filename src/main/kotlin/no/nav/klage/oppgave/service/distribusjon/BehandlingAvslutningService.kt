@@ -4,9 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
+import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.*
+import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.ANKEBEHANDLING_AVSLUTTET
+import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttet
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.service.BehandlingService
@@ -40,7 +44,25 @@ class BehandlingAvslutningService(
     }
 
     @Transactional
-    fun avsluttBehandling(behandlingId: UUID): Behandling {
+    fun avsluttBehandling(behandlingId: UUID) {
+        try {
+            val hovedDokumenterIkkeFerdigstilte =
+                dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
+            if (hovedDokumenterIkkeFerdigstilte.isNotEmpty()) {
+                logger.warn("Kunne ikke avslutte behandling $behandlingId fordi noen dokumenter mangler ferdigstilling. Prøver på nytt senere.")
+                return
+            }
+
+            logger.debug("Alle vedtak i behandling $behandlingId er ferdigstilt, så vi markerer behandlingen som avsluttet")
+            privateAvsluttBehandling(behandlingId)
+
+        } catch (e: Exception) {
+            logger.error("Feilet under avslutning av behandling $behandlingId. Se mer i secure log")
+            secureLogger.error("Feilet under avslutning av behandling $behandlingId", e)
+        }
+    }
+
+    private fun privateAvsluttBehandling(behandlingId: UUID): Behandling {
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
 
         val hoveddokumenter =
@@ -53,47 +75,21 @@ class BehandlingAvslutningService(
                 )
             }
 
-        val eventId = UUID.randomUUID()
-
-        val vedtakFattet = KlagevedtakFattet(
-            eventId = eventId,
-            kildeReferanse = behandling.kildeReferanse,
-            kilde = behandling.kildesystem.navn,
-            utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
-            vedtaksbrevReferanse = null,
-            kabalReferanse = behandling.currentDelbehandling().id.toString()
-        )
-        kafkaEventRepository.save(
-            KafkaEvent(
-                id = UUID.randomUUID(),
-                klagebehandlingId = behandlingId,
-                kilde = behandling.kildesystem.navn,
-                kildeReferanse = behandling.kildeReferanse,
-                jsonPayload = vedtakFattet.toJson(),
-                type = EventType.KLAGE_VEDTAK
-            )
-        )
-
         val behandlingEvent = BehandlingEvent(
-            eventId = eventId,
+            eventId = UUID.randomUUID(),
             kildeReferanse = behandling.kildeReferanse,
             kilde = behandling.kildesystem.navn,
             kabalReferanse = behandling.currentDelbehandling().id.toString(),
-            //TODO: sjekk behandlingstype, spesifiser anke når det er tilfellet
-            type = BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET,
-            detaljer = BehandlingDetaljer(
-                klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
-                    avsluttet = behandling.avsluttetAvSaksbehandler!!,
-                    utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
-                    journalpostReferanser = hoveddokumenter.mapNotNull{ it.journalpostId }
-                )
-            )
+            type = when (behandling.type) {
+                Type.KLAGE -> KLAGEBEHANDLING_AVSLUTTET
+                Type.ANKE -> ANKEBEHANDLING_AVSLUTTET
+            },
+            detaljer = getBehandlingDetaljer(behandling, hoveddokumenter)
         )
-
         kafkaEventRepository.save(
             KafkaEvent(
                 id = UUID.randomUUID(),
-                klagebehandlingId = behandlingId,
+                behandlingId = behandlingId,
                 kilde = behandling.kildesystem.navn,
                 kildeReferanse = behandling.kildeReferanse,
                 jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
@@ -107,6 +103,29 @@ class BehandlingAvslutningService(
         return behandling
     }
 
-    private fun Any.toJson(): String = objectMapper.writeValueAsString(this)
-
+    private fun getBehandlingDetaljer(
+        behandling: Behandling,
+        hoveddokumenter: List<DokumentUnderArbeid>
+    ): BehandlingDetaljer {
+        when (behandling.type) {
+            Type.KLAGE -> {
+                return BehandlingDetaljer(
+                    klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
+                        avsluttet = behandling.avsluttetAvSaksbehandler!!,
+                        utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
+                        journalpostReferanser = hoveddokumenter.mapNotNull { it.journalpostId }
+                    )
+                )
+            }
+            Type.ANKE -> {
+                return BehandlingDetaljer(
+                    ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
+                        avsluttet = behandling.avsluttetAvSaksbehandler!!,
+                        utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
+                        journalpostReferanser = hoveddokumenter.mapNotNull { it.journalpostId }
+                    )
+                )
+            }
+        }
+    }
 }

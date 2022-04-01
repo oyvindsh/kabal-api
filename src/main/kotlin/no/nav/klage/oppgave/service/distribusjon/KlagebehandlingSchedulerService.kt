@@ -15,7 +15,7 @@ import java.util.*
 @Service
 class KlagebehandlingSchedulerService(
     private val behandlingService: BehandlingService,
-    private val klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService,
+    private val behandlingAvslutningService: BehandlingAvslutningService,
     private val kafkaDispatcher: KafkaDispatcher,
     private val kakaApiGateway: KakaApiGateway
 ) {
@@ -37,7 +37,7 @@ class KlagebehandlingSchedulerService(
                     behandlingId
                 )
             )
-            klagebehandlingDistribusjonService.avsluttBehandling(behandlingId)
+            behandlingAvslutningService.avsluttBehandling(behandlingId)
         }
     }
 
