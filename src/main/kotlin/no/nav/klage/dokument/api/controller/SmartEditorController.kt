@@ -1,19 +1,27 @@
 package no.nav.klage.dokument.api.controller
 
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
+import no.nav.klage.dokument.domain.PatchEvent
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
+import no.nav.klage.dokument.service.SmartDocumentEventListener
+import no.nav.klage.dokument.util.JsonPatch
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import java.time.Duration
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 
 @RestController
@@ -22,9 +30,10 @@ import java.util.*
 @RequestMapping("/behandlinger/{behandlingId}/dokumenter/smarteditor/{dokumentId}")
 class SmartEditorController(
     private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
-    private val dokumentUnderArbeidService: DokumentUnderArbeidService
+    private val dokumentUnderArbeidService: DokumentUnderArbeidService,
+    private val smartDocumentEventListener: SmartDocumentEventListener,
 
-) {
+    ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -130,5 +139,63 @@ class SmartEditorController(
                 readOnly = true
             )
         return kabalSmartEditorApiClient.getCommentWithPossibleThread(smartEditorId, commentId)
+    }
+
+    @GetMapping("/events")
+    fun commentEvents(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
+        @RequestParam("lastEventIdInput", required = false) lastEventIdInput: UUID?,
+        request: HttpServletRequest,
+    ): SseEmitter {
+        logger.debug("/events")
+
+        val emitter = SseEmitter(Duration.ofHours(20).toMillis())
+
+        val initial = SseEmitter.event()
+            .reconnectTime(200)
+        emitter.send(initial)
+
+        //Try header first
+        val lastEventIdHeaderName = "last-event-id"
+        val lastEventId = if (request.getHeader(lastEventIdHeaderName) != null) {
+            UUID.fromString(request.getHeader(lastEventIdHeaderName))
+        } else {
+            lastEventIdInput
+        }
+
+        smartDocumentEventListener.subscribeToDocumentChanges(documentId = documentId, emitter = emitter)
+
+        return emitter
+    }
+
+    @ApiOperation(
+        value = "Patch document",
+        notes = "Patch document"
+    )
+    @PatchMapping
+    fun patchDocument(
+        @PathVariable("dokumentId") documentId: UUID,
+        @RequestBody jsonInput: String
+    ) {
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                dokumentId = DokumentId(documentId),
+                readOnly = false
+            )
+
+        val smartDocument = kabalSmartEditorApiClient.getDocument(smartEditorId)
+
+        val arrayNode = jacksonObjectMapper().readTree(jsonInput) as ArrayNode
+        val result = JsonPatch.apply(arrayNode, jacksonObjectMapper().readTree(smartDocument.json))
+
+        kabalSmartEditorApiClient.updateDocument(smartEditorId, result.toString())
+
+        smartDocumentEventListener.handlePatchEvent(
+            PatchEvent(
+                documentId = documentId,
+                json = jsonInput,
+            )
+        )
     }
 }
