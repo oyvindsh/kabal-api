@@ -186,8 +186,8 @@ class SmartEditorController(
 
         val smartDocument = kabalSmartEditorApiClient.getDocument(smartEditorId)
 
-        val arrayNode = jacksonObjectMapper().readTree(jsonInput) as ArrayNode
-        val result = JsonPatch.apply(arrayNode, jacksonObjectMapper().readTree(smartDocument.json))
+        val rootNode = jacksonObjectMapper().readTree(jsonInput)
+        val result = JsonPatch.apply(rootNode["patch"] as ArrayNode, jacksonObjectMapper().readTree(smartDocument.json))
 
         kabalSmartEditorApiClient.updateDocument(smartEditorId, result.toString())
 
