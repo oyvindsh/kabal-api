@@ -8,5 +8,8 @@ config:
   retentionHours: 48
 acl:
   - team: klage
+    application: kabal-api
+    access: read
+  - team: klage
     application: klage-kafka-manager
     access: read

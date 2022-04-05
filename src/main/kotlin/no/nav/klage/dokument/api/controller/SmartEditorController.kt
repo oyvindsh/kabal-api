@@ -184,7 +184,7 @@ class SmartEditorController(
     fun patchDocument(
         @PathVariable("dokumentId") documentId: UUID,
         @RequestBody jsonInput: String
-    ) {
+    ): Map<String, Long>  {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
                 dokumentId = DokumentId(documentId),
@@ -198,12 +198,15 @@ class SmartEditorController(
 
         kabalSmartEditorApiClient.updateDocument(smartEditorId, result.toString())
 
-        smartDocumentEventListener.handlePatchEvent(
-            PatchEvent(
-                documentId = documentId,
-                json = jsonInput,
-                patchVersion = DocumentPatchStore.getLastPatchVersion(documentId) + 1
-            )
+        val patchEvent = PatchEvent(
+            documentId = documentId,
+            json = jsonInput,
+            patchVersion = DocumentPatchStore.getLastPatchVersion(documentId) + 1
         )
+        smartDocumentEventListener.handlePatchEvent(
+            patchEvent
+        )
+
+        return mapOf("patchVersion" to patchEvent.patchVersion)
     }
 }
