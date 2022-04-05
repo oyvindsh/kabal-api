@@ -107,7 +107,7 @@ class SmartDocumentEventListener(
                         .name("patch")
                         .data(patchEvent.json)
                         .reconnectTime(200)
-                        .id("someId")
+                        .id(patchEvent.patchVersion.toString())
                     emitter.send(builder)
                 } catch (e: Exception) {
                     logger.error("Failed emitting patch. Removing subscriber.", e)

@@ -148,7 +148,7 @@ class SmartEditorController(
     fun documentEvents(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") documentId: UUID,
-        @RequestParam("lastEventIdInput", required = false) lastEventIdInput: Long?,
+        @RequestParam("lastEventId", required = false) lastEventIdInput: Long?,
         request: HttpServletRequest,
     ): SseEmitter {
         logger.debug("/events")
