@@ -79,7 +79,28 @@ class MottakService(
         secureLogger.debug("Prøver å lagre oversendtKlageAnkeV3: {}", oversendtKlageAnke)
         oversendtKlageAnke.validate()
 
-        val mottak = mottakRepository.save(oversendtKlageAnke.toMottak())
+        val mottak =
+            if (oversendtKlageAnke.type == Type.ANKE) {
+                val previousHandledKlage =
+                    klagebehandlingRepository.findByKildeReferanseAndYtelse(
+                        oversendtKlageAnke.kildeReferanse,
+                        oversendtKlageAnke.ytelse
+                    )
+                if (previousHandledKlage != null) {
+                    logger.debug("Fant tidligere behandlet klage i Kabal, med id ${previousHandledKlage.id}")
+                    if (oversendtKlageAnke.dvhReferanse != previousHandledKlage.dvhReferanse) {
+                        val message =
+                            "Tidligere behandlet klage har annen dvhReferanse enn innsendt anke."
+                        logger.warn(message)
+                        throw OversendtKlageNotValidException(message)
+                    }
+                    mottakRepository.save(oversendtKlageAnke.toMottak(previousHandledKlage.id))
+                } else {
+                    mottakRepository.save(oversendtKlageAnke.toMottak())
+                }
+            } else {
+                mottakRepository.save(oversendtKlageAnke.toMottak())
+            }
 
         secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
