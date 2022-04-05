@@ -7,5 +7,6 @@ data class DocumentOutput(
     val id: UUID,
     val json: String,
     val created: LocalDateTime,
-    val modified: LocalDateTime
+    val modified: LocalDateTime,
+    var patchVersion: Long? = null,
 )

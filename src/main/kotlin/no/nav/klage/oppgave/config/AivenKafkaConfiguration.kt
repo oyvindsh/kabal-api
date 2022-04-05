@@ -18,7 +18,9 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.listener.ContainerProperties
+import org.springframework.kafka.listener.SeekToCurrentErrorHandler
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+import org.springframework.util.backoff.FixedBackOff
 import java.time.Duration
 
 @Configuration
@@ -89,9 +91,43 @@ class AivenKafkaConfiguration(
         ) + commonConfig()
     }
 
+    private fun smartdocumentPatchEventsConsumerProps(): Map<String, Any> {
+        return mapOf(
+            ConsumerConfig.GROUP_ID_CONFIG to "kabal-api",
+            ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
+            ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
+            ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to ErrorHandlingDeserializer::class.java,
+            ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to ErrorHandlingDeserializer::class.java,
+            "spring.deserializer.key.delegate.class" to StringDeserializer::class.java,
+            "spring.deserializer.value.delegate.class" to StringDeserializer::class.java
+        ) + commonConfig()
+    }
+
     @Bean
     fun egenAnsattFinder(): PartitionFinder<String, String> {
         return PartitionFinder(egenAnsattConsumerFactory())
+    }
+
+    @Bean
+    fun smartdocumentPatchEventsConsumerFactory(): ConsumerFactory<String, String> {
+        return DefaultKafkaConsumerFactory(smartdocumentPatchEventsConsumerProps())
+    }
+
+    @Bean
+    fun smartdocumentPatchEventsKafkaListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<String, String> {
+        val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
+        factory.consumerFactory = smartdocumentPatchEventsConsumerFactory()
+
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.RECORD
+        factory.setErrorHandler(SeekToCurrentErrorHandler(FixedBackOff(1000L, 3L)))
+        factory.containerProperties.idleEventInterval = 3000L
+
+        //Retry consumer/listener even if authorization fails at first
+        factory.setContainerCustomizer { container ->
+            container.containerProperties.authorizationExceptionRetryInterval = Duration.ofSeconds(10L)
+        }
+
+        return factory
     }
 
     //Common

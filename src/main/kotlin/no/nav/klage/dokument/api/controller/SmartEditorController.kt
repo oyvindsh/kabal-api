@@ -10,6 +10,7 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentO
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.PatchEvent
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
+import no.nav.klage.dokument.service.DocumentPatchStore
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.dokument.service.SmartDocumentEventListener
 import no.nav.klage.dokument.util.JsonPatch
@@ -68,7 +69,9 @@ class SmartEditorController(
                 dokumentId = DokumentId(documentId),
                 readOnly = true
             )
-        return kabalSmartEditorApiClient.getDocument(smartEditorId)
+        val document = kabalSmartEditorApiClient.getDocument(smartEditorId)
+        document.patchVersion = DocumentPatchStore.getLastPatchVersion(documentId)
+        return document
     }
 
     @ApiOperation(
@@ -142,10 +145,10 @@ class SmartEditorController(
     }
 
     @GetMapping("/events")
-    fun commentEvents(
+    fun documentEvents(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") documentId: UUID,
-        @RequestParam("lastEventIdInput", required = false) lastEventIdInput: UUID?,
+        @RequestParam("lastEventIdInput", required = false) lastEventIdInput: Long?,
         request: HttpServletRequest,
     ): SseEmitter {
         logger.debug("/events")
@@ -159,12 +162,16 @@ class SmartEditorController(
         //Try header first
         val lastEventIdHeaderName = "last-event-id"
         val lastEventId = if (request.getHeader(lastEventIdHeaderName) != null) {
-            UUID.fromString(request.getHeader(lastEventIdHeaderName))
+            request.getHeader(lastEventIdHeaderName).toLong()
         } else {
-            lastEventIdInput
+            lastEventIdInput ?: DocumentPatchStore.getLastPatchVersion(documentId)
         }
-
-        smartDocumentEventListener.subscribeToDocumentChanges(documentId = documentId, emitter = emitter)
+        //Subscribe to changes in this document
+        smartDocumentEventListener.subscribeToDocumentChanges(
+            documentId = documentId,
+            patchVersion = lastEventId,
+            emitter = emitter,
+        )
 
         return emitter
     }
@@ -195,6 +202,7 @@ class SmartEditorController(
             PatchEvent(
                 documentId = documentId,
                 json = jsonInput,
+                patchVersion = DocumentPatchStore.getLastPatchVersion(documentId) + 1
             )
         )
     }
