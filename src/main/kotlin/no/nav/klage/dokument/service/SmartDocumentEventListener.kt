@@ -49,6 +49,7 @@ class SmartDocumentEventListener(
     }
 
     fun handlePatchEvent(patchEvent: PatchEvent) {
+        DocumentPatchStore.addPatchEvent(patchEvent.documentId, patchEvent)
         sendSmarteditorDocumentEvent(patchEvent)
     }
 
