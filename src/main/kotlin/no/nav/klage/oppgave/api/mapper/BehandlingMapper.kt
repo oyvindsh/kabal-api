@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.mapper
 
 
+import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
@@ -88,6 +89,7 @@ class BehandlingMapper(
             kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
             isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
+            brevmottakere = klagebehandling.mapToBrevmottakerViewList(),
         )
     }
 
@@ -140,6 +142,7 @@ class BehandlingMapper(
             kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
             isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
+            brevmottakere = ankebehandling.mapToBrevmottakerViewList(),
         )
     }
 
@@ -277,4 +280,60 @@ class BehandlingMapper(
             medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt
         )
     }
+
+    private fun Behandling.mapToBrevmottakerViewList(): List<BrevmottakerView> {
+        val brevmottakere = mutableListOf<BrevmottakerView>()
+        if (klager.prosessfullmektig != null) {
+            brevmottakere.add(
+                klager.prosessfullmektig!!.getBrevmottakerView()
+            )
+            if (klager.prosessfullmektig!!.skalPartenMottaKopi) {
+                brevmottakere.add(
+                    klager.getBrevmottakerView()
+                )
+            }
+        } else {
+            brevmottakere.add(
+                klager.getBrevmottakerView()
+            )
+        }
+        if (sakenGjelder.partId != klager.partId && sakenGjelder.skalMottaKopi) {
+            brevmottakere.add(
+                sakenGjelder.getBrevmottakerView()
+            )
+        }
+
+        return brevmottakere
+    }
+
+    private fun Klager.getBrevmottakerView() =
+        BrevmottakerView(
+            partId = partId.value,
+            partIdType = partId.type.name,
+            navn = partId.getNavn(),
+            rolle = BrevmottakerRolle.KLAGER,
+        )
+
+    private fun SakenGjelder.getBrevmottakerView() =
+        BrevmottakerView(
+            partId = partId.value,
+            partIdType = partId.type.name,
+            navn = partId.getNavn(),
+            rolle = BrevmottakerRolle.SAKEN_GJELDER,
+        )
+
+    private fun Prosessfullmektig.getBrevmottakerView() =
+        BrevmottakerView(
+            partId = partId.value,
+            partIdType = partId.type.name,
+            navn = partId.getNavn(),
+            rolle = BrevmottakerRolle.PROSESSFULLMEKTIG,
+        )
+
+    private fun PartId.getNavn(): String? =
+        if (type == PartIdType.PERSON) {
+            pdlFacade.getPersonInfo(value).settSammenNavn()
+        } else {
+            eregClient.hentOrganisasjon(value)?.navn?.navnelinje1
+        }
 }
