@@ -12,6 +12,7 @@ import no.nav.klage.dokument.domain.PatchEvent
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DocumentPatchStore
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
+import no.nav.klage.dokument.service.EditorPatchStore
 import no.nav.klage.dokument.service.SmartDocumentEventListener
 import no.nav.klage.dokument.util.JsonPatch
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -208,5 +209,62 @@ class SmartEditorController(
         )
 
         return mapOf("patchVersion" to patchEvent.patchVersion)
+    }
+
+    @GetMapping("/editors/{editorPath}")
+    fun slateEvents(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
+        @PathVariable("editorPath") editorPath: String,
+        @RequestParam("lastEventId", required = false) lastEventIdInput: Long?,
+        request: HttpServletRequest,
+    ): SseEmitter {
+        logger.debug("/editors/$editorPath")
+
+        val emitter = SseEmitter(Duration.ofHours(20).toMillis())
+
+        val initial = SseEmitter.event()
+            .reconnectTime(200)
+        emitter.send(initial)
+
+        //Try header first
+        val lastEventIdHeaderName = "last-event-id"
+        val lastEventId = if (request.getHeader(lastEventIdHeaderName) != null) {
+            request.getHeader(lastEventIdHeaderName).toLong()
+        } else {
+            lastEventIdInput ?: EditorPatchStore.getLastOperationVersion(documentId, editorPath)
+        }
+        //Subscribe to changes in editor path
+        smartDocumentEventListener.subscribeToEditorChanges(
+            documentId = documentId,
+            editorPath = editorPath,
+            operationVersion = lastEventId,
+            emitter = emitter,
+        )
+
+        return emitter
+    }
+
+    @ApiOperation(
+        value = "Patch editor",
+        notes = "Patch editor"
+    )
+    @PatchMapping("/editors/{editorPath}")
+    fun patchEditor(
+        @PathVariable("dokumentId") documentId: UUID,
+        @PathVariable("editorPath") editorPath: String,
+        @RequestBody jsonInput: String
+    ): Map<String, Long>  {
+        val patchEvent = PatchEvent(
+            documentId = documentId,
+            editorPath = editorPath,
+            json = jsonInput,
+            patchVersion = EditorPatchStore.getLastOperationVersion(documentId, editorPath) + 1
+        )
+        smartDocumentEventListener.handleEditorPatchEvent(
+            patchEvent
+        )
+
+        return mapOf("operationVersion" to patchEvent.patchVersion)
     }
 }

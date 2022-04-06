@@ -28,9 +28,9 @@ class SmartDocumentEventListener(
     }
 
     fun subscribeToDocumentChanges(documentId: UUID, patchVersion: Long, emitter: SseEmitter) {
-        SubscriberStore.addSubscriber(documentId, emitter)
+        DocumentSubscriberStore.addSubscriber(documentId, emitter)
 
-        //initital for new subscribers
+        //initial for new subscribers
         try {
             DocumentPatchStore.getPatchEvents(documentId = documentId, patchVersion = patchVersion)
                 .forEach { patchEvent ->
@@ -44,12 +44,49 @@ class SmartDocumentEventListener(
         } catch (e: Exception) {
             logger.error("Failed emitting patch. Removing subscriber.", e)
             emitter.completeWithError(e)
-            SubscriberStore.removeSubscriber(documentId, emitter)
+            DocumentSubscriberStore.removeSubscriber(documentId, emitter)
+        }
+    }
+
+    fun subscribeToEditorChanges(documentId: UUID, editorPath: String, operationVersion: Long, emitter: SseEmitter) {
+        EditorPatchSubscriberStore.addSubscriber(documentId, editorPath, emitter)
+
+        //initial for new subscribers
+        try {
+            EditorPatchStore.getPatchEvents(
+                documentId = documentId,
+                editorPath = editorPath,
+                operationVersion = operationVersion
+            )
+                .forEach { patchEvent ->
+                    val builder = SseEmitter.event()
+                        .name("operation")
+                        .data(patchEvent.json)
+                        .reconnectTime(200)
+                        .id(patchEvent.patchVersion.toString())
+                    emitter.send(builder)
+                }
+        } catch (e: Exception) {
+            logger.error("Failed emitting editor patch. Removing subscriber.", e)
+            emitter.completeWithError(e)
+            EditorPatchSubscriberStore.removeSubscriber(
+                documentId = documentId,
+                editorPath = editorPath,
+                sseEmitter = emitter
+            )
         }
     }
 
     fun handlePatchEvent(patchEvent: PatchEvent) {
         DocumentPatchStore.addPatchEvent(patchEvent.documentId, patchEvent)
+        sendSmarteditorDocumentEvent(patchEvent)
+    }
+
+    fun handleEditorPatchEvent(patchEvent: PatchEvent) {
+        EditorPatchStore.addPatchEvent(
+            documentId = patchEvent.documentId,
+            patchEvent = patchEvent
+        )
         sendSmarteditorDocumentEvent(patchEvent)
     }
 
@@ -93,28 +130,59 @@ class SmartDocumentEventListener(
 
             val patchEvent = jacksonObjectMapper().readValue(record.value(), PatchEvent::class.java)
 
-            if (!DocumentPatchStore.containsPatchEvent(
-                    documentId = UUID.fromString(documentId),
-                    patchEvent = patchEvent
-                )
-            ) {
-                DocumentPatchStore.addPatchEvent(documentId = UUID.fromString(documentId), patchEvent = patchEvent)
-            }
+            if (patchEvent.editorPath != null) {
+                if (!EditorPatchStore.containsPatchEvent(
+                        documentId = UUID.fromString(documentId),
+                        patchEvent = patchEvent
+                    )
+                ) {
+                    EditorPatchStore.addPatchEvent(documentId = UUID.fromString(documentId), patchEvent = patchEvent)
+                }
 
-            SubscriberStore.getSubcribers(patchEvent.documentId).forEach { emitter ->
-                try {
-                    val builder = SseEmitter.event()
-                        .name("patch")
-                        .data(patchEvent.json)
-                        .reconnectTime(200)
-                        .id(patchEvent.patchVersion.toString())
-                    emitter.send(builder)
-                } catch (e: Exception) {
-                    logger.error("Failed emitting patch. Removing subscriber.", e)
-                    emitter.completeWithError(e)
-                    SubscriberStore.removeSubscriber(patchEvent.documentId, emitter)
+                EditorPatchSubscriberStore.getSubcribers(patchEvent.documentId, patchEvent.editorPath)
+                    .forEach { emitter ->
+                        try {
+                            val builder = SseEmitter.event()
+                                .name("operation")
+                                .data(patchEvent.json)
+                                .reconnectTime(200)
+                                .id(patchEvent.patchVersion.toString())
+                            emitter.send(builder)
+                        } catch (e: Exception) {
+                            logger.error("Failed emitting patch. Removing subscriber.", e)
+                            emitter.completeWithError(e)
+                            EditorPatchSubscriberStore.removeSubscriber(
+                                patchEvent.documentId,
+                                patchEvent.editorPath,
+                                emitter
+                            )
+                        }
+                    }
+            } else {
+                if (!DocumentPatchStore.containsPatchEvent(
+                        documentId = UUID.fromString(documentId),
+                        patchEvent = patchEvent
+                    )
+                ) {
+                    DocumentPatchStore.addPatchEvent(documentId = UUID.fromString(documentId), patchEvent = patchEvent)
+                }
+
+                DocumentSubscriberStore.getSubcribers(patchEvent.documentId).forEach { emitter ->
+                    try {
+                        val builder = SseEmitter.event()
+                            .name("patch")
+                            .data(patchEvent.json)
+                            .reconnectTime(200)
+                            .id(patchEvent.patchVersion.toString())
+                        emitter.send(builder)
+                    } catch (e: Exception) {
+                        logger.error("Failed emitting patch. Removing subscriber.", e)
+                        emitter.completeWithError(e)
+                        DocumentSubscriberStore.removeSubscriber(patchEvent.documentId, emitter)
+                    }
                 }
             }
+
 
         }.onFailure {
             secureLogger.error("Failed to process patch record", it)
@@ -123,7 +191,7 @@ class SmartDocumentEventListener(
     }
 }
 
-object SubscriberStore {
+object DocumentSubscriberStore {
     private val store: MutableMap<UUID, MutableList<SseEmitter>> = mutableMapOf()
 
     fun addSubscriber(documentId: UUID, sseEmitter: SseEmitter) {
@@ -140,6 +208,63 @@ object SubscriberStore {
 
     fun getSubcribers(documentId: UUID): List<SseEmitter> {
         return store[documentId] ?: emptyList()
+    }
+}
+
+object EditorPatchSubscriberStore {
+    private val store: MutableMap<Pair<UUID, String>, MutableList<SseEmitter>> = mutableMapOf()
+
+    fun addSubscriber(documentId: UUID, editorPath: String, sseEmitter: SseEmitter) {
+        if (store.containsKey(documentId to editorPath)) {
+            store[documentId to editorPath]?.plusAssign(sseEmitter)
+        } else {
+            store[documentId to editorPath] = mutableListOf(sseEmitter)
+        }
+    }
+
+    fun removeSubscriber(documentId: UUID, editorPath: String, sseEmitter: SseEmitter) {
+        store[documentId to editorPath]?.remove(sseEmitter)
+    }
+
+    fun getSubcribers(documentId: UUID, editorPath: String): List<SseEmitter> {
+        return store[documentId to editorPath] ?: emptyList()
+    }
+}
+
+object EditorPatchStore {
+    private val store: MutableMap<Pair<UUID, String>, MutableList<PatchEvent>> = mutableMapOf()
+
+    fun addPatchEvent(documentId: UUID, patchEvent: PatchEvent) {
+        if (store.containsKey(documentId to patchEvent.editorPath)) {
+            store[documentId to patchEvent.editorPath]?.plusAssign(patchEvent)
+        } else {
+            store[documentId to patchEvent.editorPath!!] = mutableListOf(patchEvent)
+        }
+    }
+
+    fun containsPatchEvent(documentId: UUID, patchEvent: PatchEvent): Boolean {
+        return store[documentId to patchEvent.editorPath]?.any { it.patchVersion == patchEvent.patchVersion } ?: false
+    }
+
+    fun getPatchEvents(documentId: UUID, editorPath: String, operationVersion: Long): List<PatchEvent> {
+        return if (store.containsKey(documentId to editorPath)) {
+            val sortedList = store[documentId to editorPath]!!.sortedBy { it.patchVersion }
+            val index = sortedList.indexOfFirst { it.patchVersion == operationVersion }
+            if (index == sortedList.lastIndex) {
+                return emptyList()
+            }
+            sortedList.subList(fromIndex = index, toIndex = sortedList.size)
+        } else {
+            emptyList()
+        }
+    }
+
+    fun getLastOperationVersion(documentId: UUID, editorPath: String): Long {
+        return if (store.containsKey(documentId to editorPath)) {
+            store[documentId to editorPath]!!.maxOf { it.patchVersion }
+        } else {
+            0
+        }
     }
 }
 
