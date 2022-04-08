@@ -50,6 +50,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("javax.cache:cache-api")
     implementation("org.ehcache:ehcache")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -62,6 +63,13 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.micrometer:micrometer-registry-influx")
     implementation("ch.qos.logback:logback-classic")
+
+    implementation("org.openjdk.nashorn:nashorn-core:15.3")
+    implementation("org.graalvm.js:js-scriptengine:21.1.0")
+
+    implementation("org.graalvm.sdk:graal-sdk:21.1.0")
+    implementation("org.graalvm.truffle:truffle-api:21.1.0")
+    implementation("org.graalvm.js:js:21.1.0")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
