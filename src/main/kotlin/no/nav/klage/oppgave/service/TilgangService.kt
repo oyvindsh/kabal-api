@@ -27,6 +27,7 @@ class TilgangService(
         private val securelogger = getSecureLogger()
     }
 
+    //TODO: Denne brukes bare i tester, rydd opp ved anledning.
     fun verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
         if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
@@ -78,7 +79,10 @@ class TilgangService(
         }
     }
 
-    fun verifyInnloggetSaksbehandlerErMedunderskriver(behandling: Behandling) {
+    fun verifyInnloggetSaksbehandlerErMedunderskriverAndNotFinalized(behandling: Behandling) {
+        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null || behandling.currentDelbehandling().avsluttet != null) {
+            throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
+        }
         val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
         if (ident != behandling.currentDelbehandling().medunderskriver?.saksbehandlerident) {
             throw MissingTilgangException("Innlogget saksbehandler er ikke medunderskriver")
