@@ -10,3 +10,6 @@ acl:
   - team: klage
     application: kabal-search
     access: read
+  - team: klage
+    application: klage-kafka-manager
+    access: read
