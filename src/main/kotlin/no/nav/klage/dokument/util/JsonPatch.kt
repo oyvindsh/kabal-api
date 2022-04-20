@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
  * A simple (one class) implementation of
  * [RFC 6902 JSON Patch](https://tools.ietf.org/html/rfc6902) using Jackson.
  *
+ * But also some modifications while working on Slate operations. WIP.
  *
  * This class just applies a patch to a JSON document, nothing fancy like diffs
  * or patch generation.
@@ -79,6 +80,27 @@ object JsonPatch {
             }
             "remove" -> {
                 return remove(doc, path)
+            }
+            "remove_text" -> {
+                val text =
+                    operation.get("text")?.textValue() ?: throw IllegalArgumentException("Missing \"text\" property")
+                val offset =
+                    operation.get("offset")?.intValue() ?: throw IllegalArgumentException("Missing \"offset\" property")
+                return removeText(doc, path, text, offset)
+            }
+            "set_node" -> {
+                val properties =
+                    operation.get("properties") ?: error("Missing \"properties\" property")
+                val newProperties =
+                    operation.get("newProperties") ?: error("Missing \"newProperties\" property")
+                return setNode(doc, path, properties, newProperties)
+            }
+            "split_node" -> {
+                val position =
+                    operation.get("position").intValue()
+                val properties =
+                    operation.get("properties") ?: error("Missing \"newProperties\" property")
+                return splitNode(doc, path, position, properties)
             }
             "replace" -> {
                 val value = operation.get("value") ?: throw IllegalArgumentException("Missing \"value\" property")
@@ -214,6 +236,76 @@ object JsonPatch {
         } else {
             throw IllegalArgumentException("Invalid \"path\" property: $path")
         }
+        return doc
+    }
+
+    internal fun removeText(doc: JsonNode, path: String, text: String, offset: Int): JsonNode {
+        if (text.isEmpty()) {
+            return doc
+        }
+
+        val lastPathIndex = path.lastIndexOf('/')
+        val parent = if (lastPathIndex == 0) {
+            doc
+        } else {
+            doc.at(path)
+        } as ObjectNode
+
+        val originalText = parent["text"].asText()
+        val before = originalText.substring(0, offset)
+        val after = originalText.substring(offset + text.length)
+
+        parent.put("text", before + after)
+
+        return doc
+    }
+
+    internal fun setNode(
+        doc: JsonNode,
+        path: String,
+        properties: JsonNode,
+        newProperties: JsonNode
+    ): JsonNode {
+        val lastPathIndex = path.lastIndexOf('/')
+        val node = if (lastPathIndex == 0) {
+            error("Cannot set properties on the root node")
+        } else {
+            doc.at(path)
+        } as ObjectNode
+
+        newProperties.fields().forEach { (key, value) ->
+            if (value == null) {
+                node.remove(key)
+            } else {
+                node.set(key, value)
+            }
+        }
+
+        // properties that were previously defined, but are now missing, must be deleted
+        properties.fields().forEach { (key, value) ->
+            if (!newProperties.has(key)) {
+                node.remove(key)
+            }
+        }
+
+        return doc
+    }
+
+    internal fun splitNode(
+        doc: JsonNode,
+        path: String,
+        position: Int,
+        properties: JsonNode,
+    ): JsonNode {
+        val lastPathIndex = path.lastIndexOf('/')
+        val node = if (lastPathIndex == 0) {
+            error("Cannot split on the root node")
+        } else {
+            doc.at(path)
+        } as ObjectNode
+
+        //TODO
+
         return doc
     }
 
