@@ -44,8 +44,8 @@ import java.util.*
 
 
 @ActiveProfiles("local")
-@Import(KlagebehandlingDistribusjonServiceTest.MyTestConfiguration::class)
-@SpringBootTest(classes = [KlagebehandlingService::class, KlagebehandlingDistribusjonService::class, VedtakService::class, BehandlingService::class])
+@Import(BehandlingAvslutningServiceTest.MyTestConfiguration::class)
+@SpringBootTest(classes = [KlagebehandlingService::class, BehandlingAvslutningService::class, VedtakService::class, BehandlingService::class])
 @EnableJpaRepositories(basePackages = ["no.nav.klage.oppgave.repositories"])
 @EntityScan("no.nav.klage.oppgave.domain")
 @AutoConfigureDataJpa
@@ -53,7 +53,7 @@ import java.util.*
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 //@AutoConfigureTestEntityManager
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-internal class KlagebehandlingDistribusjonServiceTest {
+internal class BehandlingAvslutningServiceTest {
 
     companion object {
         @Container
@@ -98,9 +98,6 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
     @Autowired
     lateinit var mottakRepository: MottakRepository
-
-    @SpykBean
-    lateinit var klagebehandlingDistribusjonService: KlagebehandlingDistribusjonService
 
     private val klagebehandlingId = UUID.randomUUID()
 
@@ -174,7 +171,7 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
-        klagebehandlingDistribusjonService.avsluttBehandling(klagebehandlingId)
+        behandlingAvslutningService.avsluttBehandling(klagebehandlingId)
 
         klagebehandlingRepository.findByIdOrNull(klagebehandlingId) ?: throw NullPointerException()
     }
@@ -189,9 +186,9 @@ internal class KlagebehandlingDistribusjonServiceTest {
 
         klagebehandlingRepository.save(klage.apply { this.avsluttetAvSaksbehandler = LocalDateTime.now() })
 
-        klagebehandlingDistribusjonService.avsluttBehandling(klagebehandlingId)
+        behandlingAvslutningService.avsluttBehandling(klagebehandlingId)
 
-        val result = klagebehandlingRepository.getOne(klagebehandlingId)
+        val result = klagebehandlingRepository.getById(klagebehandlingId)
         assertThat(result.currentDelbehandling().avsluttet).isNotNull
     }
 }
