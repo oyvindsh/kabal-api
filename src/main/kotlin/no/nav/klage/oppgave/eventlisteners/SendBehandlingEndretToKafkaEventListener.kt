@@ -1,11 +1,13 @@
 package no.nav.klage.oppgave.eventlisteners
 
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.service.BehandlingEndretKafkaProducer
 import no.nav.klage.oppgave.util.getLogger
+import org.hibernate.Hibernate
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import org.springframework.transaction.event.TransactionPhase
@@ -24,14 +26,18 @@ class SendBehandlingEndretToKafkaEventListener(private val behandlingEndretKafka
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun indexKlagebehandling(behandlingEndretEvent: BehandlingEndretEvent) {
         logger.debug("Received BehandlingEndretEvent for behandlingId ${behandlingEndretEvent.behandling.id}")
-
-        when (behandlingEndretEvent.behandling.type) {
-            Type.KLAGE -> {
-                behandlingEndretKafkaProducer.sendKlageEndretV2(behandlingEndretEvent.behandling as Klagebehandling)
+        val behandling = Hibernate.unproxy(behandlingEndretEvent.behandling) as Behandling
+        try {
+            when (behandling.type) {
+                Type.KLAGE -> {
+                    behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
+                }
+                Type.ANKE -> {
+                    behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
+                }
             }
-            Type.ANKE -> {
-                behandlingEndretKafkaProducer.sendAnkeEndretV2(behandlingEndretEvent.behandling as Ankebehandling)
-            }
+        } catch (e: Exception) {
+            logger.error("could not index behandling with id ${behandlingEndretEvent.behandling.id}", e)
         }
     }
 }
