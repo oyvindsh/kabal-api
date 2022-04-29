@@ -477,7 +477,7 @@ class BehandlingService(
         val behandling = behandlingRepository.findById(behandlingId).get()
         if (!(medunderskriverHasTheSmartEditorAccess(behandling, utfoerendeSaksbehandlerIdent) ||
             saksbehandlerHasTheSmartEditorAccess(behandling, utfoerendeSaksbehandlerIdent))) {
-            throw MissingTilgangException("Not assigned")
+            throw MissingTilgangException("Not assigned to write to document")
         }
     }
 
