@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.MedunderskriverFlyt
+import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.oppgave.api.view.DokumenterResponse
@@ -273,9 +274,9 @@ class BehandlingService(
             }
         } else {
             checkSkrivetilgang(behandling)
-            if (behandling.currentDelbehandling().medunderskriverFlyt != MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER) {
+            if (behandling.currentDelbehandling().medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER) {
                 val event = behandling.setMedunderskriverFlyt(
-                    MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+                    OVERSENDT_TIL_MEDUNDERSKRIVER,
                     utfoerendeSaksbehandlerIdent
                 )
                 applicationEventPublisher.publishEvent(event)
@@ -471,6 +472,26 @@ class BehandlingService(
         return behandling
     }
 
+    @Transactional(readOnly = true)
+    fun verifyWriteAccessForSmartEditorDocument(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String) {
+        val behandling = behandlingRepository.findById(behandlingId).get()
+        if (!(medunderskriverHasTheSmartEditorAccess(behandling, utfoerendeSaksbehandlerIdent) ||
+            saksbehandlerHasTheSmartEditorAccess(behandling, utfoerendeSaksbehandlerIdent))) {
+            throw MissingTilgangException("Not assigned to write to document")
+        }
+    }
+
+    private fun saksbehandlerHasTheSmartEditorAccess(
+        behandling: Behandling,
+        utfoerendeSaksbehandlerIdent: String
+    ) = (behandling.currentDelbehandling().medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER &&
+            behandling.tildeling?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
+
+    private fun medunderskriverHasTheSmartEditorAccess(
+        behandling: Behandling,
+        utfoerendeSaksbehandlerIdent: String
+    ) = (behandling.currentDelbehandling().medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER &&
+                behandling.currentDelbehandling().medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
 
     @Transactional(readOnly = true)
     fun getBehandling(behandlingId: UUID): Behandling =

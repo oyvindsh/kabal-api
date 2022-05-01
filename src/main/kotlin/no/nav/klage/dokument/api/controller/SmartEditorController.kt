@@ -9,6 +9,8 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.Document
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -22,9 +24,11 @@ import java.util.*
 @RequestMapping("/behandlinger/{behandlingId}/dokumenter/smarteditor/{dokumentId}")
 class SmartEditorController(
     private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
-    private val dokumentUnderArbeidService: DokumentUnderArbeidService
+    private val dokumentUnderArbeidService: DokumentUnderArbeidService,
+    private val behandlingService: BehandlingService,
+    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
 
-) {
+    ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -37,6 +41,7 @@ class SmartEditorController(
     )
     @PutMapping
     fun updateDocument(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") documentId: UUID,
         @RequestBody jsonInput: String
     ): DocumentOutput {
@@ -45,6 +50,12 @@ class SmartEditorController(
                 dokumentId = DokumentId(documentId),
                 readOnly = false
             )
+
+        behandlingService.verifyWriteAccessForSmartEditorDocument(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+
         return kabalSmartEditorApiClient.updateDocument(smartEditorId, jsonInput)
     }
 
@@ -68,6 +79,7 @@ class SmartEditorController(
     )
     @PostMapping("/comments")
     fun createComment(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
     ): CommentOutput {
@@ -77,6 +89,12 @@ class SmartEditorController(
                 dokumentId = DokumentId(documentId),
                 readOnly = true
             )
+
+        behandlingService.verifyWriteAccessForSmartEditorDocument(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+
         return kabalSmartEditorApiClient.createcomment(smartEditorId, commentInput)
     }
 
@@ -102,6 +120,7 @@ class SmartEditorController(
     )
     @PostMapping("/comments/{commentId}/replies")
     fun replyToComment(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID,
         @RequestBody commentInput: CommentInput,
@@ -112,6 +131,12 @@ class SmartEditorController(
                 dokumentId = DokumentId(documentId),
                 readOnly = true
             )
+
+        behandlingService.verifyWriteAccessForSmartEditorDocument(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+
         return kabalSmartEditorApiClient.replyToComment(smartEditorId, commentId, commentInput)
     }
 
