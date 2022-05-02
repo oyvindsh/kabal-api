@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.config
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.config.MeterFilter
 import io.micrometer.influx.InfluxMeterRegistry
-import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer
 import org.springframework.context.annotation.Bean
@@ -20,15 +19,6 @@ class MetricsConfiguration {
     }
 
     @Bean
-    fun prometheusMetricsCustomization(): MeterRegistryCustomizer<PrometheusMeterRegistry>? {
-        return MeterRegistryCustomizer<PrometheusMeterRegistry> { registry ->
-            registry.config().meterFilter(
-                MeterFilter.denyNameStartsWith("funksjonell")
-            )
-        }
-    }
-
-    @Bean
     fun influxMetricsCustomization(): MeterRegistryCustomizer<InfluxMeterRegistry>? {
         return MeterRegistryCustomizer<InfluxMeterRegistry> { registry ->
             registry.config().meterFilter(
@@ -38,6 +28,6 @@ class MetricsConfiguration {
     }
 }
 
-fun MeterRegistry.incrementMottattKlage(kildesystem: String, tema: String) {
-    counter(MetricsConfiguration.MOTTATT_KLAGE, "kildesystem", kildesystem, "tema", tema).increment()
+fun MeterRegistry.incrementMottattKlage(kildesystem: String, ytelse: String) {
+    counter(MetricsConfiguration.MOTTATT_KLAGE, "kildesystem", kildesystem, "ytelse", ytelse).increment()
 }

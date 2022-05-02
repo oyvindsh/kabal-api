@@ -74,7 +74,7 @@ class MottakService(
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
 
         //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.ytelse.toTema().navn)
+        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.ytelse.navn)
     }
 
     @Transactional
@@ -89,7 +89,7 @@ class MottakService(
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
 
         //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.toTema().navn)
+        meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.navn)
 
     }
 
