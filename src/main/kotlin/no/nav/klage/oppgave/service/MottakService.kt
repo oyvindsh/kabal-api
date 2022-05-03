@@ -90,7 +90,6 @@ class MottakService(
 
         //TODO: Move to outside of transaction to make sure it went well
         meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.navn)
-
     }
 
     @Transactional
@@ -101,6 +100,8 @@ class MottakService(
 
         secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlageAnkeV3: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
+        meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.navn)
 
         return createBehandlingFromMottakEventListener.createBehandling(MottakLagretEvent(mottak))
     }
