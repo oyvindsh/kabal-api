@@ -40,7 +40,4 @@ ROLE_KLAGE_EGEN_ANSATT: b14cf640-30bc-4420-b34c-26488c15e71e
 
 ROLE_ADMIN: cd78b8e8-73a3-4fb6-8234-7bebb5e5b9e9
 
-INFLUX_HOST: influx-klage-nav-prod.aivencloud.com
-INFLUX_PORT: 26482
-
 CLAM_AV_URL: http://clamav.clamav/scan

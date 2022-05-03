@@ -119,7 +119,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
         kildesystem = kildesystem.mapToSkjemaV2(),
-        saksdokumenter = listOf(),
+        saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = delbehandlinger.let { vedtak ->
             BehandlingSkjemaV2.Vedtak(
                 utfall = vedtak.first().utfall?.mapToSkjemaV2(),
@@ -132,6 +132,13 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
     )
 }
 
+private fun Set<Saksdokument>.mapToSkjemaV2(): List<BehandlingSkjemaV2.Dokument> =
+    map {
+        BehandlingSkjemaV2.Dokument(
+            journalpostId = it.journalpostId,
+            dokumentInfoId = it.dokumentInfoId
+        )
+    }
 
 fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
 
@@ -160,7 +167,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
         kildesystem = kildesystem.mapToSkjemaV2(),
-        saksdokumenter = listOf(),
+        saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = delbehandlinger.let { vedtak ->
             BehandlingSkjemaV2.Vedtak(
                 utfall = vedtak.first().utfall?.mapToSkjemaV2(),

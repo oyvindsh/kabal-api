@@ -8,7 +8,6 @@ externalHosts:
   - host: kafka-schema-registry.nais-q.adeo.no
   - host: saf.dev-fss-pub.nais.io
   - host: pdl-api.dev-fss-pub.nais.io
-  - host: influx-klage-nav-dev.aivencloud.com
     ports:
       - name: https
         port: 26482
