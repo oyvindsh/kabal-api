@@ -85,8 +85,6 @@
         <logger name="no.nav.security.token.support.spring.validation.interceptor.JwtTokenHandlerInterceptor"
                 level="warning"/>
 
-        <logger name="io.micrometer.influx" level="debug"/>
-
     </springProfile>
 
     <logger name="no.nav.klage" level="debug"/>

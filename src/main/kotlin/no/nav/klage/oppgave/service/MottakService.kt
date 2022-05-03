@@ -10,7 +10,7 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.config.incrementMottattKlage
+import no.nav.klage.oppgave.config.incrementMottattKlageAnke
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
@@ -74,7 +74,7 @@ class MottakService(
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
 
         //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlage(oversendtKlage.kilde.name, oversendtKlage.ytelse.navn)
+        meterRegistry.incrementMottattKlageAnke(oversendtKlage.kilde, oversendtKlage.ytelse, oversendtKlage.type)
     }
 
     @Transactional
@@ -89,7 +89,7 @@ class MottakService(
         applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
 
         //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.navn)
+        meterRegistry.incrementMottattKlageAnke(oversendtKlageAnke.kilde, oversendtKlageAnke.ytelse, oversendtKlageAnke.type)
     }
 
     @Transactional
@@ -101,7 +101,7 @@ class MottakService(
         secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlageAnkeV3: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
 
-        meterRegistry.incrementMottattKlage(oversendtKlageAnke.kilde.name, oversendtKlageAnke.ytelse.navn)
+        meterRegistry.incrementMottattKlageAnke(oversendtKlageAnke.kilde, oversendtKlageAnke.ytelse, oversendtKlageAnke.type)
 
         return createBehandlingFromMottakEventListener.createBehandling(MottakLagretEvent(mottak))
     }

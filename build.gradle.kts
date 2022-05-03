@@ -60,7 +60,6 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.micrometer:micrometer-registry-influx")
     implementation("ch.qos.logback:logback-classic")
 
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")

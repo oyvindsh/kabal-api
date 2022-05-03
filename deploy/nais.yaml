@@ -127,7 +127,6 @@ spec:
     - secret: axsys
     - secret: elastic
     - secret: ereg
-    - secret: influx
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{springProfile}}
