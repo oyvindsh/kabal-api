@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.clients.kaka.model.response.KakaOutput
 import no.nav.klage.oppgave.clients.kaka.model.response.ValidationErrors
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -20,6 +21,7 @@ class KakaApiClient(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     fun createKvalitetsvurdering(): KakaOutput {
@@ -37,7 +39,8 @@ class KakaApiClient(
     }
 
     fun finalizeBehandling(saksdataInput: SaksdataInput): KakaOutput {
-        return kakaApiWebClient.post()
+        secureLogger.debug("About to call /kabal/saksdata with: $saksdataInput")
+        val kakaOutput = kakaApiWebClient.post()
             .uri { it.path("/kabal/saksdata").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
@@ -48,6 +51,8 @@ class KakaApiClient(
             .retrieve()
             .bodyToMono<KakaOutput>()
             .block() ?: throw RuntimeException("Saksdata could not be created")
+
+        return kakaOutput
     }
 
     fun getValidationErrors(kvalitetsvurderingId: UUID, ytelseId: String, typeId: String): ValidationErrors {
