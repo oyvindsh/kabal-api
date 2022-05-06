@@ -46,19 +46,24 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
     }
 
     private fun Behandling.toSaksdataInput(): SaksdataInput {
+        secureLogger.debug("toSaksdataInput. Behandling: $this")
+
         val vedtaksinstansEnhet =
             when (this) {
                 is Klagebehandling -> {
-                    Enhet.values().find { it.navn == avsenderEnhetFoersteinstans }
+                    secureLogger.debug("isKlagebehandling. avsenderEnhetFoersteinstans = $avsenderEnhetFoersteinstans, behandling=$this")
+                    val foundEnhet = Enhet.values().find { it.navn == avsenderEnhetFoersteinstans }
+                    secureLogger.debug("foundEnhet is now $foundEnhet for behandlingId ${this.id}")
+                    foundEnhet
                 }
                 is Ankebehandling -> {
                     Enhet.values().find { it.navn == klageBehandlendeEnhet }
                 }
-
                 else -> {
                     throw RuntimeException("Wrong behandling type")
                 }
             }
+        secureLogger.debug("vedtaksinstansEnhet is now $vedtaksinstansEnhet for behandlingId ${this.id}")
         val tilknyttetEnhet = Enhet.values().find { it.navn == tildeling?.enhet!! }
 
         return SaksdataInput(
