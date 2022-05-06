@@ -51,10 +51,12 @@ class SmartEditorController(
                 readOnly = false
             )
 
+        /* FE checks this for now. Need a better solution to handle concurrent writes. CRDT is mentioned.
         behandlingService.verifyWriteAccessForSmartEditorDocument(
             behandlingId = behandlingId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
+        */
 
         return kabalSmartEditorApiClient.updateDocument(smartEditorId, jsonInput)
     }
@@ -90,10 +92,12 @@ class SmartEditorController(
                 readOnly = true
             )
 
+        /*    
         behandlingService.verifyWriteAccessForSmartEditorDocument(
             behandlingId = behandlingId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
+        */
 
         return kabalSmartEditorApiClient.createcomment(smartEditorId, commentInput)
     }
@@ -132,10 +136,12 @@ class SmartEditorController(
                 readOnly = true
             )
 
+        /*    
         behandlingService.verifyWriteAccessForSmartEditorDocument(
             behandlingId = behandlingId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
         )
+        */
 
         return kabalSmartEditorApiClient.replyToComment(smartEditorId, commentId, commentInput)
     }
