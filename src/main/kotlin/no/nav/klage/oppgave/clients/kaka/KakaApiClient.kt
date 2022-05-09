@@ -39,8 +39,7 @@ class KakaApiClient(
     }
 
     fun finalizeBehandling(saksdataInput: SaksdataInput): KakaOutput {
-        secureLogger.debug("About to call /kabal/saksdata with: $saksdataInput")
-        val kakaOutput = kakaApiWebClient.post()
+        return kakaApiWebClient.post()
             .uri { it.path("/kabal/saksdata").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
@@ -51,8 +50,6 @@ class KakaApiClient(
             .retrieve()
             .bodyToMono<KakaOutput>()
             .block() ?: throw RuntimeException("Saksdata could not be created")
-
-        return kakaOutput
     }
 
     fun getValidationErrors(kvalitetsvurderingId: UUID, ytelseId: String, typeId: String): ValidationErrors {
