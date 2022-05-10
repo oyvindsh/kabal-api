@@ -231,7 +231,7 @@ class MockDataController(
                 dvhReferanse = input?.dvhReferanse,
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(ytelseTilHjemler[randomYtelse]!!.random()),
-                forrigeBehandlendeEnhet = "4295", //NAV Klageinstans nord
+                forrigeBehandlendeEnhet = input?.forrigeBehandlendeEnhet ?: "4295", //NAV Klageinstans nord
                 tilknyttedeJournalposter = listOf(
                     OversendtDokumentReferanse(
                         randomMottakDokumentType(),
@@ -271,5 +271,6 @@ class MockDataController(
         val sakenGjelder: OversendtSakenGjelder?,
         val kildeReferanse: String?,
         val dvhReferanse: String?,
+        val forrigeBehandlendeEnhet: String?,
     )
 }
