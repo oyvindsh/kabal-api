@@ -5,6 +5,7 @@ import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.kodeverk.Utfall
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.Behandling
@@ -12,6 +13,7 @@ import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setAvsluttetAvSaksbehandler
+import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setInnsendingshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMedunderskriverIdentAndMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingAggregatFunctions.setMottattKlageinstans
@@ -231,6 +233,26 @@ class BehandlingService(
         if (behandling is Klagebehandling) {
             val event =
                 behandling.setMottattVedtaksinstans(date, utfoerendeSaksbehandlerIdent)
+            applicationEventPublisher.publishEvent(event)
+            return behandling.modified
+        } else throw IllegalOperation("Dette feltet kan bare settes i klagesaker")
+    }
+
+    fun setInnsendingshjemler(
+        behandlingId: UUID,
+        hjemler: List<String>,
+        utfoerendeSaksbehandlerIdent: String
+    ): LocalDateTime {
+        val behandling = getBehandlingForUpdate(
+            behandlingId
+        )
+
+        if (behandling is Klagebehandling) {
+            val event =
+                behandling.setInnsendingshjemler(
+                    hjemler.map { Hjemmel.of(it) }.toMutableSet(),
+                    utfoerendeSaksbehandlerIdent
+                )
             applicationEventPublisher.publishEvent(event)
             return behandling.modified
         } else throw IllegalOperation("Dette feltet kan bare settes i klagesaker")

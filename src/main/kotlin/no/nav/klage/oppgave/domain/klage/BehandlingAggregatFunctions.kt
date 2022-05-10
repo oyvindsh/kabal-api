@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Utfall
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
@@ -143,6 +144,25 @@ object BehandlingAggregatFunctions {
             endringslogg(
                 saksbehandlerident,
                 Felt.DATO_MOTTATT_KLAGEINSTANS,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Behandling.setInnsendingshjemler(
+        nyVerdi: MutableSet<Hjemmel>,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val gammelVerdi = hjemler
+        val tidspunkt = LocalDateTime.now()
+        hjemler = nyVerdi
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.HJEMMEL,
                 gammelVerdi.toString(),
                 nyVerdi.toString(),
                 tidspunkt

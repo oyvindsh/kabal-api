@@ -3,10 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiParam
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
-import no.nav.klage.oppgave.api.view.BehandlingDateInput
-import no.nav.klage.oppgave.api.view.BehandlingEditedView
-import no.nav.klage.oppgave.api.view.BehandlingFullfoertView
-import no.nav.klage.oppgave.api.view.ValidationPassedResponse
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
@@ -151,5 +148,26 @@ class BehandlingController(
             )
         )
         return ValidationPassedResponse()
+    }
+
+    @PutMapping("/behandlinger/{id}/innsendingshjemler")
+    fun setInnsendingshjemler(
+        @PathVariable("id") behandlingId: UUID,
+        @RequestBody input: InnsendingshjemlerInput,
+    ): BehandlingEditedView {
+        logBehandlingMethodDetails(
+            ::setInnsendingshjemler.name,
+            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        val modified = behandlingService.setInnsendingshjemler(
+            behandlingId = behandlingId,
+            hjemler = input.hjemler,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        )
+
+        return BehandlingEditedView(modified = modified)
     }
 }
