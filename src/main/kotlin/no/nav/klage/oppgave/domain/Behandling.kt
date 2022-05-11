@@ -89,7 +89,7 @@ abstract class Behandling(
     )
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
-    open val hjemler: MutableSet<Hjemmel> = mutableSetOf(),
+    open var hjemler: MutableSet<Hjemmel> = mutableSetOf(),
     @Column(name = "satt_paa_vent")
     open var sattPaaVent: LocalDateTime? = null,
 ) {
