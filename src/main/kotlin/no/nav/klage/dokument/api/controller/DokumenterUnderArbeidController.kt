@@ -252,7 +252,7 @@ class DokumentUnderArbeidController(
                 }
 
             } catch (e: Exception) {
-                logger.error("Failed polling. Stopping timer.", e)
+                logger.warn("Failed polling. Stopping timer.", e)
                 emitter.completeWithError(e)
                 this.cancel()
             }
