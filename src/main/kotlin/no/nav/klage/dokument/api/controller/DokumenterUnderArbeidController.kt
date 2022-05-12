@@ -15,6 +15,7 @@ import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -199,7 +200,7 @@ class DokumentUnderArbeidController(
         )
     }
 
-
+    @Unprotected
     @GetMapping("/events")
     fun documentEvents(
         @PathVariable("behandlingId") behandlingId: UUID,
