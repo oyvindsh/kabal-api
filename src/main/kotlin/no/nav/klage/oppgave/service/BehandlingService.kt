@@ -247,15 +247,13 @@ class BehandlingService(
             behandlingId
         )
 
-        if (behandling is Klagebehandling) {
-            val event =
-                behandling.setInnsendingshjemler(
-                    hjemler.map { Hjemmel.of(it) }.toMutableSet(),
-                    utfoerendeSaksbehandlerIdent
-                )
-            applicationEventPublisher.publishEvent(event)
-            return behandling.modified
-        } else throw IllegalOperation("Dette feltet kan bare settes i klagesaker")
+        val event =
+            behandling.setInnsendingshjemler(
+                hjemler.map { Hjemmel.of(it) }.toMutableSet(),
+                utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandling.modified
     }
 
     fun setMedunderskriverIdentAndMedunderskriverFlyt(
