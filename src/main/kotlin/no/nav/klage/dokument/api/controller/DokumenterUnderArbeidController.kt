@@ -209,9 +209,6 @@ class DokumentUnderArbeidController(
     ): SseEmitter {
         logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
 
-        //Sjekker tilgang på behandlingsnivå
-        behandlingService.getBehandling(behandlingId)
-
         val emitter = SseEmitter(Duration.ofHours(20).toMillis())
 
         val initial = SseEmitter.event()
