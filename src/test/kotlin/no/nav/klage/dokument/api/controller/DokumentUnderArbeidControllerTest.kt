@@ -9,6 +9,7 @@ import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentType
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
@@ -30,7 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.LocalDateTime
 import java.util.*
 
-@WebMvcTest(DokumentUnderArbeidController::class)
+@WebMvcTest(DokumentUnderArbeidController::class, SmartEditorController::class)
 @ActiveProfiles("local")
 internal class DokumentUnderArbeidControllerTest {
 
@@ -42,6 +43,9 @@ internal class DokumentUnderArbeidControllerTest {
 
     @MockkBean
     private lateinit var behandlingService: BehandlingService
+
+    @MockkBean
+    private lateinit var kabalSmartEditorApiClient: KabalSmartEditorApiClient
 
     @MockkBean
     private lateinit var dokumentUnderArbeidService: DokumentUnderArbeidService
@@ -109,10 +113,13 @@ internal class DokumentUnderArbeidControllerTest {
 
     @Test
     fun createSmartEditorHoveddokument() {
-
         val behandlingId = UUID.randomUUID()
         val smartHovedDokumentInput =
-            SmartHovedDokumentInput("{ \"json\": \"is cool\" }", "Tittel")
+            SmartHovedDokumentInput(
+                json = null,
+                content = jacksonObjectMapper().readTree("{ \"json\": \"is cool\" }"),
+                tittel = "Tittel"
+            )
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
