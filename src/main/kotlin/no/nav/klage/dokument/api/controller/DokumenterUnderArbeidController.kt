@@ -12,7 +12,6 @@ import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
-import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -36,7 +35,6 @@ class DokumentUnderArbeidController(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val dokumentMapper: DokumentMapper,
     private val dokumenInputMapper: DokumentInputMapper,
-    private val behandlingService: BehandlingService,
     @Value("\${EVENT_DELAY_SECONDS}") private val eventDelay: Long,
 ) {
 
@@ -60,24 +58,6 @@ class DokumentUnderArbeidController(
                 json = null,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = opplastetFil.title,
-            )
-        )
-    }
-
-    @PostMapping("/smart")
-    fun createSmartHoveddokument(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody body: SmartHovedDokumentInput,
-    ): DokumentView {
-        logger.debug("Kall mottatt på createSmartHoveddokument")
-        return dokumentMapper.mapToDokumentView(
-            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
-                behandlingId = behandlingId,
-                dokumentType = if (body.dokumentTypeId != null) DokumentType.of(body.dokumentTypeId) else DokumentType.VEDTAK,
-                opplastetFil = null,
-                json = body.json,
-                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-                tittel = body.tittel ?: DokumentType.VEDTAK.defaultFilnavn,
             )
         )
     }
@@ -166,15 +146,6 @@ class DokumentUnderArbeidController(
     ): List<DokumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId, ident = ident)
-            .map { dokumentMapper.mapToDokumentView(it) }
-    }
-
-    @GetMapping("/smart")
-    fun findSmartDokumenter(
-        @PathVariable("behandlingId") behandlingId: UUID,
-    ): List<DokumentView> {
-        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findSmartDokumenter(behandlingId = behandlingId, ident = ident)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 
