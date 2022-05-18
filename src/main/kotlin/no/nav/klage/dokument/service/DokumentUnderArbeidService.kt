@@ -53,6 +53,7 @@ class DokumentUnderArbeidService(
         dokumentType: DokumentType,
         opplastetFil: MellomlagretDokument?,
         json: String?,
+        smartEditorTemplateId: String?,
         innloggetIdent: String,
         tittel: String,
     ): DokumentUnderArbeid {
@@ -71,6 +72,7 @@ class DokumentUnderArbeidService(
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                     smartEditorId = null,
+                    smartEditorTemplateId = null,
                 )
             )
             behandling.publishEndringsloggEvent(
@@ -99,6 +101,7 @@ class DokumentUnderArbeidService(
                     dokumentType = dokumentType,
                     behandlingId = behandlingId,
                     smartEditorId = smartEditorDokument.smartEditorId,
+                    smartEditorTemplateId = smartEditorTemplateId,
                 )
             )
             behandling.publishEndringsloggEvent(

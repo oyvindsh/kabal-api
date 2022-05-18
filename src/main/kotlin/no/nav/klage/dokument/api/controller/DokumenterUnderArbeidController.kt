@@ -56,6 +56,7 @@ class DokumentUnderArbeidController(
                 dokumentType = DokumentType.VEDTAK,
                 opplastetFil = opplastetFil,
                 json = null,
+                smartEditorTemplateId = null,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = opplastetFil.title,
             )
