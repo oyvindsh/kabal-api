@@ -325,6 +325,7 @@ class BehandlingServiceTest {
                             size = 0,
                             name = "",
                             smartEditorId = null,
+                            smartEditorTemplateId = null,
                             behandlingId = UUID.randomUUID(),
                             dokumentType = DokumentType.VEDTAK,
                             created = LocalDateTime.now(),

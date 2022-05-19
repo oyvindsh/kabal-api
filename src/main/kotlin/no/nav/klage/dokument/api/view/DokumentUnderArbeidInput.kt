@@ -1,16 +1,16 @@
 package no.nav.klage.dokument.api.view
 
+import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
 
-data class HovedDokumentInput(val eksternReferanse: UUID)
-
 data class SmartHovedDokumentInput(
-    val json: String,
+    val json: String?,
+    //will replace json property
+    val content: JsonNode?,
+    val templateId: String?,
     val tittel: String?,
     val dokumentTypeId: String? = null
 )
-
-data class PersistentDokumentIdInput(val dokumentId: UUID)
 
 data class OptionalPersistentDokumentIdInput(val dokumentId: UUID?)
 
