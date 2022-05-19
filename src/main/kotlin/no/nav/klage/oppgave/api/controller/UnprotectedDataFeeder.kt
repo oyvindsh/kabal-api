@@ -23,7 +23,7 @@ class UnprotectedDataFeeder(
 
     @Unprotected
     @PostMapping("/internal/manualfeed")
-    fun sendInnKlageV1(
+    fun sendInnKlageV3(
         @Valid @RequestBody oversendtKlage: OversendtKlageAnkeV3
     ) {
         logger.warn("Data manually fed to Kabal through unprotected endpoint")

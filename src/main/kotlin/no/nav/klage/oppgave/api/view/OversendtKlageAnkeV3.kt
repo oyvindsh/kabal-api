@@ -76,12 +76,18 @@ data class OversendtKlageAnkeV3(
     )
     val frist: LocalDate? = null,
     @ApiModelProperty(
-        notes = "Kan settes for å overstyre når KA mottok klage/anke.",
+        notes = "Deprecated. Bruk sakMottattKaTidspunkt i stedet. Kan settes for å overstyre når KA mottok klage/anke.",
         required = false,
         example = "2020-12-20"
     )
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val sakMottattKaDato: LocalDate? = null,
+    @ApiModelProperty(
+        notes = "Kan settes for å overstyre når KA mottok klage/anke.",
+        required = false,
+        example = "2020-12-20T00:00"
+    )
+    val sakMottattKaTidspunkt: LocalDateTime? = null,
     @ApiModelProperty(
         notes = "Legges ved melding ut fra KA på Kafka, brukes for filtrering",
         required = true,
@@ -116,7 +122,11 @@ fun OversendtKlageAnkeV3.toMottak(forrigeBehandlingId: UUID? = null) = Mottak(
     mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),
     innsendtDato = innsendtTilNav,
     brukersHenvendelseMottattNavDato = brukersHenvendelseMottattNavDato,
-    sakMottattKaDato = if (sakMottattKaDato != null) sakMottattKaDato.atStartOfDay() else LocalDateTime.now(),
+    sakMottattKaDato = when {
+        sakMottattKaTidspunkt != null -> sakMottattKaTidspunkt
+        sakMottattKaDato != null -> sakMottattKaDato.atStartOfDay()
+        else -> LocalDateTime.now()
+    },
     fristFraFoersteinstans = frist,
     kildesystem = kilde.mapFagsystem(),
     ytelse = ytelse,

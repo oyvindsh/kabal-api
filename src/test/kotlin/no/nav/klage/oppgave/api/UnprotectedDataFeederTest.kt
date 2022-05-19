@@ -79,6 +79,7 @@ class UnprotectedDataFeederTest {
             }
           ],
           "oversendtKaDato": "2020-12-20T00:00",
+          "sakMottattKaTidspunkt": "2020-12-20T00:00",
           "type": "KLAGE"
         }
     """.trimIndent()
