@@ -44,7 +44,8 @@ class DokumentUnderArbeidRepositoryTest {
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            smartEditorId = null
+            smartEditorId = null,
+            smartEditorTemplateId = null,
         )
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now())
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(LocalDateTime.now())
@@ -70,6 +71,7 @@ class DokumentUnderArbeidRepositoryTest {
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
             smartEditorId = null,
+            smartEditorTemplateId = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -85,6 +87,7 @@ class DokumentUnderArbeidRepositoryTest {
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.BREV,
                 smartEditorId = null,
+                smartEditorTemplateId = null,
                 parentId = hovedDokument.id
             )
         )
@@ -108,6 +111,7 @@ class DokumentUnderArbeidRepositoryTest {
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
             smartEditorId = null,
+            smartEditorTemplateId = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -124,6 +128,7 @@ class DokumentUnderArbeidRepositoryTest {
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.BREV,
                 smartEditorId = null,
+                smartEditorTemplateId = null,
                 parentId = hovedDokument.id
             )
         )
@@ -152,7 +157,8 @@ class DokumentUnderArbeidRepositoryTest {
             name = "Vedtak.pdf",
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
-            smartEditorId = null
+            smartEditorId = null,
+            smartEditorTemplateId = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -183,7 +189,8 @@ class DokumentUnderArbeidRepositoryTest {
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
             created = LocalDateTime.now().minusDays(1),
-            smartEditorId = null
+            smartEditorId = null,
+            smartEditorTemplateId = null,
         )
         val vedlegg1 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -194,6 +201,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.BREV,
             created = LocalDateTime.now().minusDays(2),
             smartEditorId = null,
+            smartEditorTemplateId = null,
             parentId = hovedDokument1.id
         )
         val vedlegg2 = DokumentUnderArbeid(
@@ -205,6 +213,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.BREV,
             created = LocalDateTime.now().minusDays(5),
             smartEditorId = null,
+            smartEditorTemplateId = null,
             parentId = hovedDokument1.id
         )
 
@@ -216,7 +225,8 @@ class DokumentUnderArbeidRepositoryTest {
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
             created = LocalDateTime.now().minusDays(3),
-            smartEditorId = null
+            smartEditorId = null,
+            smartEditorTemplateId = null,
         )
 
         val hovedDokument3 = DokumentUnderArbeid(
@@ -227,7 +237,8 @@ class DokumentUnderArbeidRepositoryTest {
             behandlingId = behandlingId,
             dokumentType = DokumentType.BREV,
             created = LocalDateTime.now().plusDays(3),
-            smartEditorId = null
+            smartEditorId = null,
+            smartEditorTemplateId = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument1)
         dokumentUnderArbeidRepository.save(vedlegg1)

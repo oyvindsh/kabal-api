@@ -75,6 +75,7 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
                 any(),
+                any(),
             )
         } returns DokumentUnderArbeid(
             mellomlagerId = "mellomlagerId",
@@ -83,6 +84,7 @@ internal class DokumentUnderArbeidControllerTest {
             name = "vedtak.pdf",
             behandlingId = behandlingId,
             smartEditorId = null,
+            smartEditorTemplateId = null,
             dokumentType = DokumentType.BREV,
             markertFerdig = null,
             ferdigstilt = null,
@@ -118,12 +120,14 @@ internal class DokumentUnderArbeidControllerTest {
             SmartHovedDokumentInput(
                 json = null,
                 content = jacksonObjectMapper().readTree("{ \"json\": \"is cool\" }"),
-                tittel = "Tittel"
+                tittel = "Tittel",
+                templateId = "template",
             )
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
+                any(),
                 any(),
                 any(),
                 any(),
@@ -138,6 +142,7 @@ internal class DokumentUnderArbeidControllerTest {
             name = "vedtak.pdf",
             behandlingId = behandlingId,
             smartEditorId = UUID.randomUUID(),
+            smartEditorTemplateId = "template",
             dokumentType = DokumentType.BREV,
             markertFerdig = null,
             ferdigstilt = null,

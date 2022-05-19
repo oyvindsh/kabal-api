@@ -52,6 +52,7 @@ class SmartEditorController(
                 dokumentType = if (body.dokumentTypeId != null) DokumentType.of(body.dokumentTypeId) else DokumentType.VEDTAK,
                 opplastetFil = null,
                 json = if (body.content != null && !body.content.isNull) body.content.toString() else body.json,
+                smartEditorTemplateId = body.templateId,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = body.tittel ?: DokumentType.VEDTAK.defaultFilnavn,
             )

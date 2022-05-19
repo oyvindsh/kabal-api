@@ -28,6 +28,7 @@ class DokumentMapper {
             dokumentTypeId = dokumentUnderArbeid.dokumentType.id,
             opplastet = dokumentUnderArbeid.opplastet,
             isSmartDokument = dokumentUnderArbeid.smartEditorId != null,
+            templateId = dokumentUnderArbeid.smartEditorTemplateId,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
             parent = dokumentUnderArbeid.parentId?.id,
         )
