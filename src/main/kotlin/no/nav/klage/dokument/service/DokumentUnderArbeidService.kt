@@ -54,6 +54,7 @@ class DokumentUnderArbeidService(
         opplastetFil: MellomlagretDokument?,
         json: String?,
         smartEditorTemplateId: String?,
+        smartEditorVersion: Int?,
         innloggetIdent: String,
         tittel: String,
     ): DokumentUnderArbeid {
@@ -73,6 +74,7 @@ class DokumentUnderArbeidService(
                     behandlingId = behandlingId,
                     smartEditorId = null,
                     smartEditorTemplateId = null,
+                    smartEditorVersion = null,
                 )
             )
             behandling.publishEndringsloggEvent(
@@ -89,7 +91,12 @@ class DokumentUnderArbeidService(
                 throw DokumentValidationException("Ingen json angitt")
             }
             val (smartEditorDokument, opplastet) =
-                smartEditorApiGateway.createDocument(json, dokumentType, innloggetIdent, tittel)
+                smartEditorApiGateway.createDocument(
+                    json = json,
+                    dokumentType = dokumentType,
+                    innloggetIdent = innloggetIdent,
+                    documentTitle = tittel
+                )
             //TODO: smartEditorDokument har bogus tittel, ble ikke sendt med i kallet til smartEditorApi
             val mellomlagerId = mellomlagerService.uploadByteArray(tittel, smartEditorDokument.content)
             val hovedDokument = dokumentUnderArbeidRepository.save(
@@ -102,6 +109,7 @@ class DokumentUnderArbeidService(
                     behandlingId = behandlingId,
                     smartEditorId = smartEditorDokument.smartEditorId,
                     smartEditorTemplateId = smartEditorTemplateId,
+                    smartEditorVersion = smartEditorVersion,
                 )
             )
             behandling.publishEndringsloggEvent(
@@ -171,6 +179,70 @@ class DokumentUnderArbeidService(
             felt = Felt.DOKUMENT_UNDER_ARBEID_NAME,
             fraVerdi = oldValue,
             tilVerdi = dokument.name,
+            tidspunkt = LocalDateTime.now(),
+            dokumentId = dokument.id,
+        )
+        return dokument
+    }
+
+    fun updateSmartEditorVersion(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+        dokumentId: DokumentId,
+        version: Int,
+        innloggetIdent: String
+    ): DokumentUnderArbeid {
+        val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
+
+        if (dokument.smartEditorVersion == version) {
+            return dokument
+        }
+
+        //Sjekker tilgang på behandlingsnivå:
+        val behandling = behandlingService.getBehandlingForUpdate(dokument.behandlingId)
+
+        if (dokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke endre smartEditorVersion på et dokument som er ferdigstilt")
+        }
+
+        val oldValue = dokument.smartEditorVersion
+        dokument.smartEditorVersion = version
+        behandling.publishEndringsloggEvent(
+            saksbehandlerident = innloggetIdent,
+            felt = Felt.SMARTDOKUMENT_VERSION,
+            fraVerdi = oldValue?.toString(),
+            tilVerdi = dokument.smartEditorVersion?.toString(),
+            tidspunkt = LocalDateTime.now(),
+            dokumentId = dokument.id,
+        )
+        return dokument
+    }
+
+    fun updateSmartEditorTemplateId(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+        dokumentId: DokumentId,
+        templateId: String,
+        innloggetIdent: String
+    ): DokumentUnderArbeid {
+        val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
+
+        if (dokument.smartEditorTemplateId == templateId) {
+            return dokument
+        }
+
+        //Sjekker tilgang på behandlingsnivå:
+        val behandling = behandlingService.getBehandlingForUpdate(dokument.behandlingId)
+
+        if (dokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke endre smartEditorTemplateId på et dokument som er ferdigstilt")
+        }
+
+        val oldValue = dokument.smartEditorTemplateId
+        dokument.smartEditorTemplateId = templateId
+        behandling.publishEndringsloggEvent(
+            saksbehandlerident = innloggetIdent,
+            felt = Felt.SMARTDOKUMENT_TEMPLATE_ID,
+            fraVerdi = oldValue,
+            tilVerdi = dokument.smartEditorTemplateId,
             tidspunkt = LocalDateTime.now(),
             dokumentId = dokument.id,
         )

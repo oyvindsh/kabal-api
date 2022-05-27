@@ -6,6 +6,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DokumentView
+import no.nav.klage.dokument.api.view.PatchSmartHovedDokumentInput
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
@@ -53,6 +54,7 @@ class SmartEditorController(
                 opplastetFil = null,
                 json = if (body.content != null && !body.content.isNull) body.content.toString() else body.json,
                 smartEditorTemplateId = body.templateId,
+                smartEditorVersion = body.version,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = body.tittel ?: DokumentType.VEDTAK.defaultFilnavn,
             )
@@ -86,6 +88,45 @@ class SmartEditorController(
 
         val updatedDocument = kabalSmartEditorApiClient.updateDocument(smartEditorId, jsonInput.toString())
         updatedDocument.content = jacksonObjectMapper().readTree(updatedDocument.json)
+        return updatedDocument
+    }
+
+    @ApiOperation(
+        value = "Update document",
+        notes = "Update document"
+    )
+    @PatchMapping("/{dokumentId}")
+    fun patchDocument(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") documentId: UUID,
+        @RequestBody input: PatchSmartHovedDokumentInput,
+    ): DocumentOutput {
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                dokumentId = DokumentId(documentId),
+                readOnly = false
+            )
+
+        if (input.templateId != null) {
+            dokumentUnderArbeidService.updateSmartEditorTemplateId(
+                behandlingId = behandlingId,
+                dokumentId = DokumentId(id = documentId),
+                templateId = input.templateId,
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            )
+        }
+
+        val dokumentUnderArbeid = dokumentUnderArbeidService.updateSmartEditorVersion(
+            behandlingId = behandlingId,
+            dokumentId = DokumentId(id = documentId),
+            version = input.version,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        )
+
+        val updatedDocument = kabalSmartEditorApiClient.updateDocument(smartEditorId, input.content.toString())
+        updatedDocument.content = jacksonObjectMapper().readTree(updatedDocument.json)
+        updatedDocument.templateId = dokumentUnderArbeid.smartEditorTemplateId
+        updatedDocument.version = dokumentUnderArbeid.smartEditorVersion
         return updatedDocument
     }
 

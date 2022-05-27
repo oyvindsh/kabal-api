@@ -8,6 +8,8 @@ data class DocumentOutput(
     val id: UUID,
     val json: String?,
     var content: JsonNode?,
+    var templateId: String?,
+    var version: Int?,
     val created: LocalDateTime,
     val modified: LocalDateTime
 )

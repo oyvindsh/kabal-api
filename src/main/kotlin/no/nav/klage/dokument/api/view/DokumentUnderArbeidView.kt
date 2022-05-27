@@ -10,6 +10,7 @@ data class DokumentView(
     val opplastet: LocalDateTime,
     val isSmartDokument: Boolean,
     val templateId: String?,
+    val version: Int?,
     val isMarkertAvsluttet: Boolean,
     val parent: UUID?,
 )
