@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
 
 data class SmartHovedDokumentInput(
-    val json: String?,
-    //will replace json property
     val content: JsonNode?,
     val templateId: String?,
     val tittel: String?,

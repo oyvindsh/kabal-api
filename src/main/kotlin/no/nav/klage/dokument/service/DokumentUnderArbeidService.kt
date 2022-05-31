@@ -124,6 +124,8 @@ class DokumentUnderArbeidService(
         }
     }
 
+    fun getDokumentUnderArbeid(dokumentId: DokumentId) = dokumentUnderArbeidRepository.getById(dokumentId)
+
     fun updateDokumentType(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: DokumentId,
