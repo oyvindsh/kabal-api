@@ -458,11 +458,13 @@ class DokumentUnderArbeidService(
         return data
     }
 
-    fun findSmartDokumenter(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
+    fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 
-        return dokumentUnderArbeidRepository.findByBehandlingIdAndSmartEditorIdNotNullOrderByCreated(behandlingId)
+        return dokumentUnderArbeidRepository.findByBehandlingIdAndSmartEditorIdNotNullAndMarkertFerdigIsNullOrderByCreated(
+            behandlingId
+        )
     }
 
     fun opprettDokumentEnhet(hovedDokumentId: DokumentId) {

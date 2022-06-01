@@ -74,7 +74,7 @@ class SmartEditorController(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<SmartEditorDocumentView> {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findSmartDokumenter(behandlingId = behandlingId, ident = ident)
+        return dokumentUnderArbeidService.getSmartDokumenterUnderArbeid(behandlingId = behandlingId, ident = ident)
             .map {
                 val smartEditorId =
                     dokumentUnderArbeidService.getSmartEditorId(
