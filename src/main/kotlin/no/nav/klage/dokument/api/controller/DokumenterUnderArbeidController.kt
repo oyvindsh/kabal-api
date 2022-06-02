@@ -57,6 +57,7 @@ class DokumentUnderArbeidController(
                 opplastetFil = opplastetFil,
                 json = null,
                 smartEditorTemplateId = null,
+                smartEditorVersion = null,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = opplastetFil.title,
             )

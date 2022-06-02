@@ -27,6 +27,8 @@ open class DokumentUnderArbeid(
     open var smartEditorId: UUID?,
     @Column(name = "smarteditor_template_id")
     open var smartEditorTemplateId: String?,
+    @Column(name = "smarteditor_version")
+    open var smartEditorVersion: Int?,
     @Column(name = "behandling_id")
     open var behandlingId: UUID,
     @Column(name = "dokument_type")

@@ -1,6 +1,9 @@
 package no.nav.klage.dokument.api.mapper
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.api.view.DokumentView
+import no.nav.klage.dokument.api.view.SmartEditorDocumentView
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.MellomlagretDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import org.springframework.http.HttpHeaders
@@ -29,8 +32,26 @@ class DokumentMapper {
             opplastet = dokumentUnderArbeid.opplastet,
             isSmartDokument = dokumentUnderArbeid.smartEditorId != null,
             templateId = dokumentUnderArbeid.smartEditorTemplateId,
+            version = dokumentUnderArbeid.smartEditorVersion,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
             parent = dokumentUnderArbeid.parentId?.id,
+        )
+    }
+
+    fun mapToSmartEditorDocumentView(
+        dokumentUnderArbeid: DokumentUnderArbeid,
+        smartEditorDocument: DocumentOutput,
+    ): SmartEditorDocumentView {
+        return SmartEditorDocumentView(
+            id = dokumentUnderArbeid.id.id,
+            tittel = dokumentUnderArbeid.name,
+            dokumentTypeId = dokumentUnderArbeid.dokumentType.id,
+            templateId = dokumentUnderArbeid.smartEditorTemplateId,
+            version = dokumentUnderArbeid.smartEditorVersion,
+            parent = dokumentUnderArbeid.parentId?.id,
+            content = jacksonObjectMapper().readTree(smartEditorDocument.json),
+            created = smartEditorDocument.created,
+            modified = smartEditorDocument.modified,
         )
     }
 }

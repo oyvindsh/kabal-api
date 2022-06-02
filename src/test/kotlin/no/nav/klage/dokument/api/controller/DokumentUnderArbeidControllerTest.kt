@@ -8,8 +8,10 @@ import io.mockk.every
 import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DokumentView
+import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
@@ -76,6 +78,7 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
                 any(),
+                any(),
             )
         } returns DokumentUnderArbeid(
             mellomlagerId = "mellomlagerId",
@@ -85,6 +88,7 @@ internal class DokumentUnderArbeidControllerTest {
             behandlingId = behandlingId,
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
             dokumentType = DokumentType.BREV,
             markertFerdig = null,
             ferdigstilt = null,
@@ -116,17 +120,27 @@ internal class DokumentUnderArbeidControllerTest {
     @Test
     fun createSmartEditorHoveddokument() {
         val behandlingId = UUID.randomUUID()
+        val smartEditorDocumentId = UUID.randomUUID()
+
         val smartHovedDokumentInput =
             SmartHovedDokumentInput(
-                json = null,
                 content = jacksonObjectMapper().readTree("{ \"json\": \"is cool\" }"),
                 tittel = "Tittel",
                 templateId = "template",
+                version = 1,
             )
 
+        every { dokumentUnderArbeidService.getSmartEditorId(any(), any()) } returns smartEditorDocumentId
+        every { kabalSmartEditorApiClient.getDocument(smartEditorDocumentId) } returns DocumentOutput(
+            id = smartEditorDocumentId,
+            json = smartHovedDokumentInput.content.toString(),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+        )
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
+                any(),
                 any(),
                 any(),
                 any(),
@@ -143,6 +157,7 @@ internal class DokumentUnderArbeidControllerTest {
             behandlingId = behandlingId,
             smartEditorId = UUID.randomUUID(),
             smartEditorTemplateId = "template",
+            smartEditorVersion = 1,
             dokumentType = DokumentType.BREV,
             markertFerdig = null,
             ferdigstilt = null,
@@ -155,7 +170,7 @@ internal class DokumentUnderArbeidControllerTest {
 
 
         val json = mockMvc.perform(
-            MockMvcRequestBuilders.post("/behandlinger/$behandlingId/dokumenter/smart")
+            MockMvcRequestBuilders.post("/behandlinger/$behandlingId/smartdokumenter")
                 .content(objectMapper.writeValueAsString(smartHovedDokumentInput))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -163,7 +178,7 @@ internal class DokumentUnderArbeidControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn().response.contentAsString
 
-        val hovedDokumentView = objectMapper.readValue(json, DokumentView::class.java)
+        val hovedDokumentView = objectMapper.readValue(json, SmartEditorDocumentView::class.java)
         assertThat(hovedDokumentView).isNotNull
         assertThat(hovedDokumentView.dokumentTypeId).isEqualTo(DokumentType.BREV.id)
     }

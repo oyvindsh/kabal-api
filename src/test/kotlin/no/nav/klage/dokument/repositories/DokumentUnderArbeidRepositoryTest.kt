@@ -46,6 +46,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.BREV,
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now())
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(LocalDateTime.now())
@@ -72,6 +73,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.BREV,
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -88,6 +90,7 @@ class DokumentUnderArbeidRepositoryTest {
                 dokumentType = DokumentType.BREV,
                 smartEditorId = null,
                 smartEditorTemplateId = null,
+                smartEditorVersion = null,
                 parentId = hovedDokument.id
             )
         )
@@ -112,6 +115,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.BREV,
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -129,6 +133,7 @@ class DokumentUnderArbeidRepositoryTest {
                 dokumentType = DokumentType.BREV,
                 smartEditorId = null,
                 smartEditorTemplateId = null,
+                smartEditorVersion = null,
                 parentId = hovedDokument.id
             )
         )
@@ -159,6 +164,7 @@ class DokumentUnderArbeidRepositoryTest {
             dokumentType = DokumentType.BREV,
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -191,6 +197,7 @@ class DokumentUnderArbeidRepositoryTest {
             created = LocalDateTime.now().minusDays(1),
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
         val vedlegg1 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -202,6 +209,7 @@ class DokumentUnderArbeidRepositoryTest {
             created = LocalDateTime.now().minusDays(2),
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
             parentId = hovedDokument1.id
         )
         val vedlegg2 = DokumentUnderArbeid(
@@ -214,6 +222,7 @@ class DokumentUnderArbeidRepositoryTest {
             created = LocalDateTime.now().minusDays(5),
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
             parentId = hovedDokument1.id
         )
 
@@ -227,6 +236,7 @@ class DokumentUnderArbeidRepositoryTest {
             created = LocalDateTime.now().minusDays(3),
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
 
         val hovedDokument3 = DokumentUnderArbeid(
@@ -239,6 +249,7 @@ class DokumentUnderArbeidRepositoryTest {
             created = LocalDateTime.now().plusDays(3),
             smartEditorId = null,
             smartEditorTemplateId = null,
+            smartEditorVersion = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument1)
         dokumentUnderArbeidRepository.save(vedlegg1)
