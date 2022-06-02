@@ -196,6 +196,7 @@ class DokumentUnderArbeidService(
         val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
 
         if (dokument.smartEditorVersion == version) {
+            logger.warn("smartEditorVersion was already set to $version. Was this an error? Returning.")
             return dokument
         }
 
