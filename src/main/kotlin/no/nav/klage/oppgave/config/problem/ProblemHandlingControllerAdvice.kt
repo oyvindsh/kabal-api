@@ -14,6 +14,7 @@ import org.zalando.problem.Status
 import org.zalando.problem.ThrowableProblem
 import org.zalando.problem.spring.web.advice.AdviceTrait
 import org.zalando.problem.spring.web.advice.ProblemHandling
+import javax.servlet.http.HttpServletRequest
 
 @ControllerAdvice
 class ProblemHandlingControllerAdvice : OurOwnExceptionAdviceTrait, ProblemHandling
@@ -23,6 +24,32 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+    @ExceptionHandler
+    fun catchISE(
+        ex: IllegalStateException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> {
+        logger.debug("catching IllegalStateException", ex)
+        try {
+            val nativeRequest = request.nativeRequest
+
+            if (nativeRequest is HttpServletRequest) {
+                logger.debug("dispatcherType = " + nativeRequest.dispatcherType?.name)
+
+                logger.debug("path = " + nativeRequest.pathInfo)
+                logger.debug("requestURI = " + nativeRequest.requestURI)
+
+                if (nativeRequest.isAsyncStarted) {
+                    logger.debug("asyncContext = " + nativeRequest.asyncContext)
+                }
+            }
+        } catch (e: Exception) {
+            logger.warn("problems with handling ISE", e)
+        }
+
+        return create(Status.INTERNAL_SERVER_ERROR, ex, request)
     }
 
     @ExceptionHandler
