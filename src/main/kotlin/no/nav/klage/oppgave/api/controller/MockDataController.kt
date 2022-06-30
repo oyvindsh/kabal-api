@@ -31,95 +31,22 @@ class MockDataController(
     @Unprotected
     @PostMapping("/kode6")
     fun createKode6Person() {
-        val fnr = "15436621822" // ÅPENHJERTIG SAKS
-        val journalpostId = "510534811"
-        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
-        val dato = LocalDate.of(2020, 1, 13)
-
-        mottakService.createMottakForKlageAnkeV3(
-            OversendtKlageAnkeV3(
-                ytelse = Ytelse.OMS_OMP,
-                type = Type.KLAGE,
-                klager = OversendtKlager(
-                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
-                ),
-                fagsak = journalpost?.sak?.let {
-                    OversendtSak(
-                        fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = KildeFagsystem.AO01
-                    )
-                },
-                kildeReferanse = UUID.randomUUID().toString(),
-                innsynUrl = "https://nav.no",
-                hjemler = listOf(
-                    listOf(
-                        Hjemmel.FTRL_8_3,
-                        Hjemmel.FTRL_8_20,
-                        Hjemmel.FTRL_8_35,
-                    ).shuffled().first()
-                ),
-                forrigeBehandlendeEnhet = "0104", //NAV Moss
-                tilknyttedeJournalposter = listOf(
-                    OversendtDokumentReferanse(
-                        randomMottakDokumentType(),
-                        journalpostId
-                    )
-                ),
-                brukersHenvendelseMottattNavDato = dato,
-                innsendtTilNav = dato.minusDays(3),
-                kilde = KildeFagsystem.AO01
-            )
-        )
+        createKlagebehandlingForASpecificPerson("15436621822") // ÅPENHJERTIG SAKS
     }
 
     @Unprotected
     @PostMapping("/kode7")
     fun createKode7Person() {
-        val fnr = "28107122119" // GOD STAFFELI
-        val journalpostId = "510534809"
-        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
-        val dato = LocalDate.of(2020, 1, 13)
-
-        mottakService.createMottakForKlageAnkeV3(
-            OversendtKlageAnkeV3(
-                ytelse = Ytelse.OMS_OMP,
-                type = Type.KLAGE,
-                klager = OversendtKlager(
-                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
-                ),
-                fagsak = journalpost?.sak?.let {
-                    OversendtSak(
-                        fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = KildeFagsystem.AO01
-                    )
-                },
-                kildeReferanse = UUID.randomUUID().toString(),
-                innsynUrl = "https://nav.no",
-                hjemler = listOf(
-                    listOf(
-                        Hjemmel.FTRL_8_3,
-                        Hjemmel.FTRL_8_20,
-                        Hjemmel.FTRL_8_35,
-                    ).shuffled().first()
-                ),
-                forrigeBehandlendeEnhet = "0104", //NAV Moss
-                tilknyttedeJournalposter = listOf(
-                    OversendtDokumentReferanse(
-                        randomMottakDokumentType(),
-                        journalpostId
-                    )
-                ),
-                brukersHenvendelseMottattNavDato = dato,
-                innsendtTilNav = dato.minusDays(3),
-                kilde = KildeFagsystem.AO01
-            )
-        )
+        createKlagebehandlingForASpecificPerson("28107122119") // GOD STAFFELI
     }
 
     @Unprotected
     @PostMapping("/egenansatt")
     fun createEgenAnsattBehandling() {
-        val fnr = "29468230052" // Gjensidig Strømpebukse
+        createKlagebehandlingForASpecificPerson("29468230052") // Gjensidig Strømpebukse)
+    }
+
+    fun createKlagebehandlingForASpecificPerson(fnr: String) {
         val journalpostId = "510534809"
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2022, 1, 13)
@@ -187,9 +114,7 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        Hjemmel.FTRL_8_3,
-                        Hjemmel.FTRL_8_20,
-                        Hjemmel.FTRL_8_35,
+                        Hjemmel.FTRL_9_10,
                     ).shuffled().first()
                 ),
                 forrigeBehandlendeEnhet = "0104", //NAV Moss
