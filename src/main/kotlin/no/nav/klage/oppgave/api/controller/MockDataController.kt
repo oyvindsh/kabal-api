@@ -141,9 +141,7 @@ class MockDataController(
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
                     listOf(
-                        Hjemmel.FTRL_8_3,
-                        Hjemmel.FTRL_8_20,
-                        Hjemmel.FTRL_8_35,
+                        Hjemmel.FTRL_9_10,
                     ).shuffled().first()
                 ),
                 forrigeBehandlendeEnhet = "0104", //NAV Moss
