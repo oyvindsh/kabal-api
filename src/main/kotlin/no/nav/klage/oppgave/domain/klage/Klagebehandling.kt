@@ -29,6 +29,10 @@ class Klagebehandling(
     //Kommer fra innsending
     @Column(name = "kommentar_fra_foersteinstans")
     val kommentarFraFoersteinstans: String? = null,
+    @Column(name = "mottak_id")
+    val mottakId: UUID,
+    @Column(name = "dato_innsendt")
+    val innsendt: LocalDate? = null,
 
     //Common properties between klage/anke
     id: UUID = UUID.randomUUID(),
@@ -40,8 +44,6 @@ class Klagebehandling(
     dvhReferanse: String? = null,
     sakFagsystem: Fagsystem? = null,
     sakFagsakId: String? = null,
-    //Umulig å vite innsendt-dato.
-    innsendt: LocalDate? = null,
     //Settes automatisk i klage, må kunne justeres i anke. Bør også representeres i delbehandlinger. Må gjøres entydig i anke, hører antageligvis ikke hjemme i felles klasse.
     mottattKlageinstans: LocalDateTime,
     //TODO: Trenger denne være nullable? Den blir da alltid satt i createKlagebehandlingFromMottak?
@@ -52,7 +54,6 @@ class Klagebehandling(
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
-    mottakId: UUID,
     //Skal være en kvalitetsvurdering per hovedbehandling, derfor er dette riktig sted.
     kakaKvalitetsvurderingId: UUID? = null,
     created: LocalDateTime = LocalDateTime.now(),
@@ -71,7 +72,6 @@ class Klagebehandling(
     type = type,
     kildeReferanse = kildeReferanse,
     mottattKlageinstans = mottattKlageinstans,
-    mottakId = mottakId,
     kildesystem = kildesystem,
     modified = modified,
     created = created,
@@ -79,7 +79,6 @@ class Klagebehandling(
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,
-    innsendt = innsendt,
     sakFagsakId = sakFagsakId,
     sakFagsystem = sakFagsystem,
     dvhReferanse = dvhReferanse,

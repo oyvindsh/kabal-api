@@ -35,6 +35,7 @@ class SendBehandlingEndretToKafkaEventListener(private val behandlingEndretKafka
                 Type.ANKE -> {
                     behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
                 }
+                Type.ANKE_I_TRYGDERETTEN -> TODO()
             }
         } catch (e: Exception) {
             logger.error("could not index behandling with id ${behandlingEndretEvent.behandling.id}", e)
