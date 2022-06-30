@@ -220,7 +220,7 @@ class MottakService(
     }
 
     private fun validateDateNotInFuture(inputDate: LocalDate?, parameterName: String) {
-        if (LocalDate.now().isBefore(inputDate))
+        if (inputDate != null && LocalDate.now().isBefore(inputDate))
             throw OversendtKlageNotValidException("$parameterName kan ikke være i fremtiden, innsendt dato var $inputDate.")
     }
 
