@@ -158,33 +158,6 @@ class DokumentMapper {
     //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
     fun mapJournalpostToDokumentReferanse(
         journalpost: Journalpost,
-        klagebehandling: Klagebehandling
-    ): DokumentReferanse {
-
-        val hoveddokument = journalpost.dokumenter?.firstOrNull()
-            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
-
-        val dokumentReferanse = DokumentReferanse(
-            tittel = hoveddokument.tittel,
-            tema = Tema.fromNavn(journalpost.tema?.name).id,
-            registrert = journalpost.datoOpprettet.toLocalDate(),
-            dokumentInfoId = hoveddokument.dokumentInfoId,
-            journalpostId = journalpost.journalpostId,
-            harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
-            valgt = klagebehandling.saksdokumenter.containsDokument(
-                journalpost.journalpostId,
-                hoveddokument.dokumentInfoId
-            )
-        )
-
-        dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost, klagebehandling))
-
-        return dokumentReferanse
-    }
-
-    //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
-    fun mapJournalpostToDokumentReferanse(
-        journalpost: Journalpost,
         behandling: Behandling
     ): DokumentReferanse {
 

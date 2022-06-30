@@ -38,6 +38,7 @@ class BehandlingMapper(
         return when (behandling.type) {
             Type.KLAGE -> mapKlagebehandlingToBehandlingDetaljerView(behandling as Klagebehandling)
             Type.ANKE -> mapAnkebehandlingToBehandlingDetaljerView(behandling as Ankebehandling)
+            Type.ANKE_I_TRYGDERETTEN -> TODO()
         }
     }
 

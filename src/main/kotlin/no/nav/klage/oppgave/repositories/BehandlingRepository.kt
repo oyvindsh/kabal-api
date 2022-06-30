@@ -8,7 +8,7 @@ import javax.persistence.LockModeType
 
 interface BehandlingRepository : JpaRepository<Behandling, UUID> {
 
-    fun findByMottakId(mottakId: UUID): Behandling?
+//    fun findByMottakId(mottakId: UUID): Behandling?
 
     fun findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull(): List<Behandling>
 
