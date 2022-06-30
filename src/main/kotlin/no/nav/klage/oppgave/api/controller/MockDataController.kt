@@ -117,6 +117,50 @@ class MockDataController(
     }
 
     @Unprotected
+    @PostMapping("/egenansatt")
+    fun createEgenAnsattBehandling() {
+        val fnr = "29468230052" // Gjensidig Strømpebukse
+        val journalpostId = "510534809"
+        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
+        val dato = LocalDate.of(2022, 1, 13)
+
+        mottakService.createMottakForKlageAnkeV3(
+            OversendtKlageAnkeV3(
+                ytelse = Ytelse.OMS_OMP,
+                type = Type.KLAGE,
+                klager = OversendtKlager(
+                    id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
+                ),
+                fagsak = journalpost?.sak?.let {
+                    OversendtSak(
+                        fagsakId = it.fagsakId ?: "UKJENT",
+                        fagsystem = KildeFagsystem.AO01
+                    )
+                },
+                kildeReferanse = UUID.randomUUID().toString(),
+                innsynUrl = "https://nav.no",
+                hjemler = listOf(
+                    listOf(
+                        Hjemmel.FTRL_8_3,
+                        Hjemmel.FTRL_8_20,
+                        Hjemmel.FTRL_8_35,
+                    ).shuffled().first()
+                ),
+                forrigeBehandlendeEnhet = "0104", //NAV Moss
+                tilknyttedeJournalposter = listOf(
+                    OversendtDokumentReferanse(
+                        randomMottakDokumentType(),
+                        journalpostId
+                    )
+                ),
+                brukersHenvendelseMottattNavDato = dato,
+                innsendtTilNav = dato.minusDays(3),
+                kilde = KildeFagsystem.AO01
+            )
+        )
+    }
+
+    @Unprotected
     @PostMapping("/fullmakt")
     fun createPersonWithFullmakt() {
         val fnr = "17117323862" // SNILL VEPS
