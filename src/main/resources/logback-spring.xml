@@ -82,7 +82,9 @@
 
         <logger name="org.springframework.data.convert.CustomConversions" level="error"/>
 
-        <logger name="no.nav.security.token.support" level="debug"/>
+        <logger name="no.nav.security.token.support" level="debug" additivity="false">
+            <appender-ref ref="secureJson"/>
+        </logger>
 
     </springProfile>
 
