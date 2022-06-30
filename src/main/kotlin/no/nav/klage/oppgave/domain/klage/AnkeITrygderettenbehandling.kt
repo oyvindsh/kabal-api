@@ -13,26 +13,14 @@ import javax.persistence.DiscriminatorValue
 import javax.persistence.Entity
 
 @Entity
-@DiscriminatorValue("anke")
-class Ankebehandling(
-    @Column(name = "klage_vedtaks_dato")
-    val klageVedtaksDato: LocalDate? = null,
-    @Column(name = "klage_behandlende_enhet")
-    val klageBehandlendeEnhet: String,
-    //Fins i noen tilfeller, men ikke alle.
-    @Column(name = "klage_id")
-    var klagebehandlingId: UUID? = null,
-    @Column(name = "mottak_id")
-    val mottakId: UUID,
-    @Column(name = "dato_innsendt")
-    val innsendt: LocalDate? = null,
+@DiscriminatorValue("anke_i_trygderetten")
+class AnkeITrygderettenbehandling(
+    @Column(name = "sendt_til_trygderetten")
+    var sendtTilTrygderetten: LocalDateTime? = null,
+    @Column(name = "kjennelse_mottatt")
+    var kjennelseMottatt: LocalDateTime? = null,
 
-//    Finn ut hvordan dette skal fungere i anker etter hvert
-//    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
-//    var avsluttetAvSaksbehandler: LocalDateTime? = null,
-
-
-    //Common properties between klage/anke
+    //Common properties
     id: UUID = UUID.randomUUID(),
     klager: Klager,
     sakenGjelder: SakenGjelder,
@@ -94,7 +82,7 @@ class Ankebehandling(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Ankebehandling
+        other as AnkeITrygderettenbehandling
 
         if (id != other.id) return false
 

@@ -43,10 +43,10 @@ class AdminService(
 
             behandlingPage.content.map { behandling ->
                 try {
-                    if (behandling.type == Type.KLAGE) {
-                        behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
-                    } else {
-                        behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
+                    when (behandling.type) {
+                        Type.KLAGE -> behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
+                        Type.ANKE -> behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
+                        Type.ANKE_I_TRYGDERETTEN -> TODO()
                     }
                 } catch (e: Exception) {
                     logger.warn("Exception during send to Kafka", e)

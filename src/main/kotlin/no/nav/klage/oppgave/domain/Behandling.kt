@@ -33,8 +33,7 @@ abstract class Behandling(
     open val kildeReferanse: String,
     @Column(name = "dato_mottatt_klageinstans")
     open var mottattKlageinstans: LocalDateTime,
-    @Column(name = "mottak_id")
-    open val mottakId: UUID,
+    //Remove duplicate
     @Column(name = "kildesystem")
     @Convert(converter = FagsystemConverter::class)
     open val kildesystem: Fagsystem,
@@ -60,10 +59,9 @@ abstract class Behandling(
     open var tildeling: Tildeling? = null,
     @Column(name = "frist")
     open var frist: LocalDate? = null,
-    @Column(name = "dato_innsendt")
-    open val innsendt: LocalDate? = null,
     @Column(name = "sak_fagsak_id")
     open val sakFagsakId: String? = null,
+    //Remove duplicate
     @Column(name = "sak_fagsystem")
     @Convert(converter = FagsystemConverter::class)
     open val sakFagsystem: Fagsystem? = null,

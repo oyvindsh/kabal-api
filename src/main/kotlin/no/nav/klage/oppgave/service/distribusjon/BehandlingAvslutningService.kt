@@ -83,6 +83,7 @@ class BehandlingAvslutningService(
             type = when (behandling.type) {
                 Type.KLAGE -> KLAGEBEHANDLING_AVSLUTTET
                 Type.ANKE -> ANKEBEHANDLING_AVSLUTTET
+                Type.ANKE_I_TRYGDERETTEN -> TODO()
             },
             detaljer = getBehandlingDetaljer(behandling, hoveddokumenter)
         )
@@ -107,9 +108,9 @@ class BehandlingAvslutningService(
         behandling: Behandling,
         hoveddokumenter: List<DokumentUnderArbeid>
     ): BehandlingDetaljer {
-        when (behandling.type) {
+        return when (behandling.type) {
             Type.KLAGE -> {
-                return BehandlingDetaljer(
+                BehandlingDetaljer(
                     klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
                         utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
@@ -118,7 +119,7 @@ class BehandlingAvslutningService(
                 )
             }
             Type.ANKE -> {
-                return BehandlingDetaljer(
+                BehandlingDetaljer(
                     ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
                         utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
@@ -126,6 +127,7 @@ class BehandlingAvslutningService(
                     )
                 )
             }
+            Type.ANKE_I_TRYGDERETTEN -> TODO()
         }
     }
 }
