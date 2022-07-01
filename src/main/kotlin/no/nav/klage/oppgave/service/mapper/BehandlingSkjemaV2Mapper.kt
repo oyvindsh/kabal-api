@@ -180,6 +180,41 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
     )
 }
 
+fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
+
+    return BehandlingSkjemaV2(
+        id = id.toString(),
+        klager = klager.mapToSkjemaV2(),
+        klagersProsessfullmektig = klager.prosessfullmektig?.mapToSkjemaV2(),
+        sakenGjelder = sakenGjelder.mapToSkjemaV2(),
+        tema = ytelse.toTema().mapToSkjemaV2(),
+        ytelse = ytelse.mapToSkjemaV2(),
+        type = type.mapToSkjemaV2(),
+        kildeReferanse = kildeReferanse,
+        sakFagsystem = sakFagsystem?.mapToSkjemaV2(),
+        sakFagsakId = sakFagsakId,
+        sakMottattKaDato = mottattKlageinstans,
+        avsluttetAvSaksbehandlerTidspunkt = currentDelbehandling().avsluttetAvSaksbehandler,
+        avsluttetTidspunkt = currentDelbehandling().avsluttet,
+        fristDato = frist,
+        gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
+        medunderskriver = currentDelbehandling().medunderskriver?.mapToSkjemaV2(),
+        medunderskriverFlytStatus = currentDelbehandling().medunderskriverFlyt.mapToSkjemaV2(),
+        hjemler = hjemler.map { it.mapToSkjemaV2() },
+        opprettetTidspunkt = created,
+        sistEndretTidspunkt = modified,
+        kildesystem = kildesystem.mapToSkjemaV2(),
+        saksdokumenter = saksdokumenter.mapToSkjemaV2(),
+        vedtak = delbehandlinger.let { vedtak ->
+            BehandlingSkjemaV2.Vedtak(
+                utfall = vedtak.first().utfall?.mapToSkjemaV2(),
+                hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
+            )
+        },
+        status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name)
+    )
+}
+
 data class BehandlingSkjemaV2(
     val id: String,
     val klager: PersonEllerOrganisasjon,
@@ -191,12 +226,12 @@ data class BehandlingSkjemaV2(
     val kildeReferanse: String,
     val sakFagsystem: Kode?,
     val sakFagsakId: String?,
-    val innsendtDato: LocalDate?,
+    val innsendtDato: LocalDate? = null,
     val mottattFoersteinstansDato: LocalDate? = null,
     //Nytt navn på avsenderSaksbehandlerFoersteinstans, legger til null som default. Brukes kun til klagebehandling.
     val forrigeSaksbehandler: Saksbehandler? = null,
     //Nytt navn på avsenderEnhetFoersteinstans
-    val forrigeBehandlendeEnhet: Enhet?,
+    val forrigeBehandlendeEnhet: Enhet? = null,
     //Nytt felt, brukes kun til ankebehandling.
     val forrigeVedtaksDato: LocalDate? = null,
     //Nytt navn på mottattKlageinstansTidspunkt
