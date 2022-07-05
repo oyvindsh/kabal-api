@@ -68,6 +68,10 @@
             <appender-ref ref="secureJson"/>
         </logger>
 
+        <logger name="org.springframework.web.servlet.DispatcherServlet" level="trace">
+            <appender-ref ref="secureJson"/>
+        </logger>
+
         <logger name="org.zalando" level="info" additivity="false">
             <appender-ref ref="secureJson"/>
         </logger>
