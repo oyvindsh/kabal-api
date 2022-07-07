@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
-@Profile("dev-gcp")
+@Profile("dev-gcp", "local")
 @RestController
 class UnprotectedDataFeeder(
     private val mottakService: MottakService,
