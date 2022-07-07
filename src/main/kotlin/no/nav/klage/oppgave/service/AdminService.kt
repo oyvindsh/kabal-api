@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.clients.kabalsearch.KabalSearchClient
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
+import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -44,9 +45,12 @@ class AdminService(
             behandlingPage.content.map { behandling ->
                 try {
                     when (behandling.type) {
-                        Type.KLAGE -> behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
-                        Type.ANKE -> behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
-                        Type.ANKE_I_TRYGDERETTEN -> TODO()
+                        Type.KLAGE ->
+                            behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
+                        Type.ANKE ->
+                            behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
+                        Type.ANKE_I_TRYGDERETTEN ->
+                            behandlingEndretKafkaProducer.sendAnkeITrygderettenEndretV2(behandling as AnkeITrygderettenbehandling)
                     }
                 } catch (e: Exception) {
                     logger.warn("Exception during send to Kafka", e)

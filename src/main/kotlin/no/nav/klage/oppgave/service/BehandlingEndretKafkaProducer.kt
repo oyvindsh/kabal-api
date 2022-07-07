@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.service.mapper.BehandlingSkjemaV2
@@ -60,6 +61,27 @@ class BehandlingEndretKafkaProducer(
                 "Could not send anke endret to Kafka. Need to resend ankebehandling ${ankebehandling.id} manually. Check secure logs for more information."
             logger.error(errorMessage)
             secureLogger.error("Could not send ankebehandling ${ankebehandling.id} endret to Kafka", it)
+        }
+    }
+
+    fun sendAnkeITrygderettenEndretV2(ankeITrygderettenbehandling: AnkeITrygderettenbehandling) {
+        logger.debug("Sending to Kafka topic: {}", topicV2)
+        runCatching {
+            val result = aivenKafkaTemplate.send(
+                topicV2,
+                ankeITrygderettenbehandling.id.toString(),
+                ankeITrygderettenbehandling.mapToSkjemaV2().toJson()
+            ).get()
+            logger.info("Anke i trygderetten endret sent to Kafka")
+            secureLogger.debug("Anke i trygderetten endret for ankebehandling ${ankeITrygderettenbehandling.id} sent to kafka ($result)")
+        }.onFailure {
+            val errorMessage =
+                "Could not send anke i trygderetten endret to Kafka. Need to resend ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id} manually. Check secure logs for more information."
+            logger.error(errorMessage)
+            secureLogger.error(
+                "Could not send ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id} endret to Kafka",
+                it
+            )
         }
     }
 

@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.eventlisteners
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
+import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.service.BehandlingEndretKafkaProducer
@@ -29,13 +30,12 @@ class SendBehandlingEndretToKafkaEventListener(private val behandlingEndretKafka
         val behandling = Hibernate.unproxy(behandlingEndretEvent.behandling) as Behandling
         try {
             when (behandling.type) {
-                Type.KLAGE -> {
+                Type.KLAGE ->
                     behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
-                }
-                Type.ANKE -> {
+                Type.ANKE ->
                     behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
-                }
-                Type.ANKE_I_TRYGDERETTEN -> TODO()
+                Type.ANKE_I_TRYGDERETTEN ->
+                    behandlingEndretKafkaProducer.sendAnkeITrygderettenEndretV2(behandling as AnkeITrygderettenbehandling)
             }
         } catch (e: Exception) {
             logger.error("could not index behandling with id ${behandlingEndretEvent.behandling.id}", e)
