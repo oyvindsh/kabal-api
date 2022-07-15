@@ -212,6 +212,8 @@ UNLEASH_URL: https://unleash.nais.io/api/
 EGENANSATT_KAFKA_TOPIC: nom.skjermede-personer-v1
 PDL_PERSON_KAFKA_TOPIC: aapen-person-pdl-dokument-v1
 
+INTERNAL_EVENT_TOPIC: klage.internal-events.v1
+
 SERVICE_USER_PASSWORD: itest
 
 KABAL_DOCUMENT_BASE_URL: http://kabal-document
@@ -230,4 +232,3 @@ KABAL_FILE_API_BASE_URL: http://kabal-file-api
 KABAL_FILE_API_APP_NAME: kabal-file-api
 
 FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS: 30000
-EVENT_DELAY_SECONDS: 15
