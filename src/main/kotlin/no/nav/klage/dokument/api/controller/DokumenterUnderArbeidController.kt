@@ -1,29 +1,29 @@
 package no.nav.klage.dokument.api.controller
 
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.annotations.Api
 import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
+import no.nav.klage.dokument.domain.Event
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
-import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.oppgave.clients.events.KafkaEventClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import reactor.core.publisher.Flux
 import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
 import javax.servlet.http.HttpServletRequest
-import kotlin.concurrent.timer
 
 @RestController
 @Api(tags = ["kabal-api-dokumenter"])
@@ -32,10 +32,9 @@ import kotlin.concurrent.timer
 class DokumentUnderArbeidController(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
-    private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val dokumentMapper: DokumentMapper,
-    private val dokumenInputMapper: DokumentInputMapper,
-    @Value("\${EVENT_DELAY_SECONDS}") private val eventDelay: Long,
+    private val dokumentInputMapper: DokumentInputMapper,
+    private val kafkaEventClient: KafkaEventClient,
 ) {
 
     companion object {
@@ -49,7 +48,7 @@ class DokumentUnderArbeidController(
         @ModelAttribute input: FilInput
     ): DokumentView {
         logger.debug("Kall mottatt på createAndUploadHoveddokument")
-        val opplastetFil = dokumenInputMapper.mapToMellomlagretDokument(
+        val opplastetFil = dokumentInputMapper.mapToMellomlagretDokument(
             multipartFile = input.file,
             tittel = input.tittel,
             dokumentType = DokumentType.VEDTAK
@@ -118,8 +117,6 @@ class DokumentUnderArbeidController(
     ): DokumentView {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
         try {
-
-
             val hovedDokument = if (input.dokumentId == null) {
                 dokumentUnderArbeidService.frikobleVedlegg(
                     behandlingId = behandlingId,
@@ -172,62 +169,51 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @Unprotected
-    @GetMapping("/events")
+    //Old event stuff. Clients should read from EventController instead, and this can be deleted.
+    @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun documentEvents(
-        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: String,
         @RequestParam("lastEventIdInput", required = false) lastEventIdInput: UUID?,
         request: HttpServletRequest,
-    ): SseEmitter {
+    ): Flux<ServerSentEvent<String>> {
         logger.debug("Kall mottatt på documentEvents for behandlingId $behandlingId")
 
-        val emitter = SseEmitter(Duration.ofHours(20).toMillis())
+        //https://docs.spring.io/spring-framework/docs/current/reference/html/web.html#mvc-ann-async-disconnects
+        val heartbeatStream: Flux<ServerSentEvent<String>> = Flux.interval(Duration.ofSeconds(10))
+            .takeWhile { true }
+            .map { tick -> toHeartBeatServerSentEvent(tick) }
 
-        val initial = SseEmitter.event()
-            .reconnectTime(200)
-        emitter.send(initial)
+        return kafkaEventClient.getEventPublisher()
+            .mapNotNull { event -> jsonToEvent(event.data()) }
+            .filter { Objects.nonNull(it) }
+            .filter { it.behandlingId == behandlingId && it.name == "finished" }
+            .mapNotNull { eventToServerSentEvent(it) }
+            .mergeWith(heartbeatStream)
+    }
 
-        //Try header first
-        val lastEventIdHeaderName = "last-event-id"
-        val lastEventId = if (request.getHeader(lastEventIdHeaderName) != null) {
-            UUID.fromString(request.getHeader(lastEventIdHeaderName))
-        } else {
-            lastEventIdInput
-        }
+    private fun toHeartBeatServerSentEvent(tick: Long): ServerSentEvent<String> {
+        return eventToServerSentEvent(
+            Event(
+                behandlingId = "",
+                id = "",
+                name = "heartbeat-event-$tick",
+                data = ""
+            )
+        )
+    }
 
-        var lastFinishedDocumentDateTime = if (lastEventId != null) {
-            dokumentUnderArbeidRepository.findById(DokumentId(lastEventId)).get().ferdigstilt!!
-        } else {
-            LocalDateTime.now().minusMinutes(10)
-        }
+    private fun eventToServerSentEvent(event: Event): ServerSentEvent<String> {
+        return ServerSentEvent.builder<String>()
+            .id(event.id)
+            .event(event.name)
+            .data(event.data)
+            .build()
+    }
 
-        timer(period = Duration.ofSeconds(eventDelay).toMillis()) {
-            try {
-                val documents = dokumentUnderArbeidService.findFinishedDokumenterAfterDateTime(
-                    behandlingId = behandlingId,
-                    fromDateTime = lastFinishedDocumentDateTime
-                )
-
-                if (documents.isNotEmpty()) {
-                    lastFinishedDocumentDateTime = documents.maxOf { it.ferdigstilt!! }
-                }
-
-                documents.forEach {
-                    val builder = SseEmitter.event()
-                        .name("finished")
-                        .data(it.id.id.toString())
-                        .reconnectTime(200)
-                        .id(it.id.id.toString())
-                    emitter.send(builder)
-                }
-
-            } catch (e: Exception) {
-                logger.warn("Failed polling. Stopping timer.", e)
-                emitter.completeWithError(e)
-                this.cancel()
-            }
-        }
-        return emitter
+    private fun jsonToEvent(json: String?): Event {
+        val event = jacksonObjectMapper().readValue(json, Event::class.java)
+        logger.debug("Received event from Kafka: {}", event)
+        return event
     }
 
     @PutMapping("/{dokumentid}/tittel")

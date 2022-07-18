@@ -1,5 +1,10 @@
 package no.nav.klage.oppgave.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.klage.dokument.domain.Event
+import no.nav.klage.oppgave.api.mapper.MeldingMapper
 import no.nav.klage.oppgave.domain.klage.Melding
 import no.nav.klage.oppgave.exceptions.MeldingNotFoundException
 import no.nav.klage.oppgave.repositories.MeldingRepository
@@ -13,12 +18,16 @@ import javax.persistence.EntityNotFoundException
 @Service
 @Transactional
 class MeldingService(
-    private val meldingRepository: MeldingRepository
+    private val meldingRepository: MeldingRepository,
+    private val kafkaInternalEventService: KafkaInternalEventService,
+    private val meldingMapper: MeldingMapper,
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+
+        val objectMapper: ObjectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     }
 
     fun addMelding(
@@ -34,7 +43,9 @@ class MeldingService(
                 saksbehandlerident = innloggetIdent,
                 created = LocalDateTime.now()
             )
-        )
+        ).also {
+            publishInternalEvent(melding = it, type = "message_added")
+        }
     }
 
     fun deleteMelding(
@@ -49,6 +60,8 @@ class MeldingService(
             meldingRepository.delete(melding)
 
             logger.debug("melding ($meldingId) deleted by $innloggetIdent")
+
+            publishInternalEvent(melding = melding, type = "message_deleted")
         } catch (enfe: EntityNotFoundException) {
             throw MeldingNotFoundException("couldn't find melding with id $meldingId")
         }
@@ -70,6 +83,8 @@ class MeldingService(
             meldingRepository.save(melding)
             logger.debug("melding ($meldingId) modified by $innloggetIdent")
 
+            publishInternalEvent(melding = melding, type = "message_modified")
+
             return melding
         } catch (enfe: EntityNotFoundException) {
             throw MeldingNotFoundException("couldn't find melding with id $meldingId")
@@ -85,5 +100,16 @@ class MeldingService(
                 "saksbehandler ($innloggetIdent) is not the author of melding (${melding.id}), and is not allowed to delete it."
             )
         }
+    }
+
+    private fun publishInternalEvent(melding: Melding, type: String) {
+        kafkaInternalEventService.publishEvent(
+            Event(
+                behandlingId = melding.behandlingId.toString(),
+                name = type,
+                id = melding.id.toString(),
+                data = objectMapper.writeValueAsString(meldingMapper.toMeldingView(melding)),
+            )
+        )
     }
 }
