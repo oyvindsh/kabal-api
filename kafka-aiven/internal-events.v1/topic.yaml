@@ -17,6 +17,6 @@ spec:
       access: readwrite
   {{#each acl}}
     - team: {{team}}
-  application: {{application}}
-  access: {{access}}
+      application: {{application}}
+      access: {{access}}
   {{/each}}
