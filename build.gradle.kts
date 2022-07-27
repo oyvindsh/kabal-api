@@ -15,7 +15,7 @@ val archunitVersion = "0.22.0"
 val kotlinXmlBuilderVersion = "1.7.3"
 val logbackSyslog4jVersion = "1.0.0"
 val jacksonJsonschemaVersion = "1.0.39"
-val pdfboxVersion = "2.0.19"
+val pdfboxVersion = "2.0.26"
 val tikaVersion = "2.4.1"
 val verapdfVersion = "1.18.8"
 
