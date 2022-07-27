@@ -5,6 +5,7 @@ on:
       - main
     paths-ignore:
       - 'kafka-aiven/**'
+      - '.github/dependabot.yml'
 
 env:
   IMAGE: ghcr.io/${{ github.repository }}/kabal-api:${{ github.sha }}
