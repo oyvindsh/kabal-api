@@ -8,9 +8,9 @@ import no.nav.klage.oppgave.api.view.BehandlingEditedView
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.DokumentService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -26,7 +26,7 @@ import java.util.*
 @RequestMapping("/klagebehandlinger")
 class BehandlingDokumentController(
     private val behandlingService: BehandlingService,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val dokumentService: DokumentService
 ) {
 
@@ -107,7 +107,7 @@ class BehandlingDokumentController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setTilknyttetDokument.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -115,7 +115,7 @@ class BehandlingDokumentController(
             behandlingId = behandlingId,
             journalpostId = input.journalpostId,
             dokumentInfoId = input.dokumentInfoId,
-            saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            saksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return BehandlingEditedView(modified = modified)
     }
@@ -128,7 +128,7 @@ class BehandlingDokumentController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::removeTilknyttetDokument.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -136,7 +136,7 @@ class BehandlingDokumentController(
             behandlingId = behandlingId,
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId,
-            saksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            saksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return BehandlingEditedView(modified)
     }

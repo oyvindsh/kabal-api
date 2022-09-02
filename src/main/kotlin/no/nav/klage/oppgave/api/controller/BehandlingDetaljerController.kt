@@ -5,8 +5,8 @@ import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.AuditLogEvent
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.AuditLogger
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
@@ -25,7 +25,7 @@ import java.util.*
 class BehandlingDetaljerController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val auditLogger: AuditLogger
 ) {
 
@@ -40,7 +40,7 @@ class BehandlingDetaljerController(
     ): BehandlingDetaljerView {
         logBehandlingMethodDetails(
             ::getBehandlingDetaljer.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -50,7 +50,7 @@ class BehandlingDetaljerController(
         ).also {
             auditLogger.log(
                 AuditLogEvent(
-                    navIdent = innloggetSaksbehandlerRepository.getInnloggetIdent(),
+                    navIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                     personFnr = it.sakenGjelder.person?.foedselsnummer
                 )
             )

@@ -5,7 +5,7 @@ import io.mockk.every
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
 import no.nav.klage.oppgave.api.controller.FeatureToggleController
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -30,11 +30,11 @@ class FeatureToggleControllerTest {
     lateinit var unleash: Unleash
 
     @MockkBean
-    lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerService
 
     @BeforeEach
     fun setup() {
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns "H149390"
+        every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "H149390"
         every { unleash.isEnabled(any(), any<UnleashContext>()) } returns true
     }
 

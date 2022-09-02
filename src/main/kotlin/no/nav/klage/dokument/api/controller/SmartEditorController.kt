@@ -13,7 +13,7 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -29,7 +29,7 @@ class SmartEditorController(
     private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val dokumentMapper: DokumentMapper,
-    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
 
     ) {
     companion object {

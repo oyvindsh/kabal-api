@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service
 class TilgangService(
     private val pdlFacade: PdlFacade,
     private val egenAnsattService: EgenAnsattService,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val saksbehandlerRepository: SaksbehandlerRepository
 ) {
 
@@ -32,7 +31,7 @@ class TilgangService(
         if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
-        val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         if (!saksbehandlerHarSkrivetilgang(klagebehandling, ident)) {
             throw MissingTilgangException("Kun tildelt saksbehandler kan endre klagebehandlingen")
         }
@@ -42,7 +41,7 @@ class TilgangService(
         if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null || behandling.currentDelbehandling().avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
-        val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         if (!saksbehandlerHarSkrivetilgang(behandling, ident)) {
             throw MissingTilgangException("Kun tildelt saksbehandler kan endre klagebehandlingen")
         }
@@ -74,7 +73,7 @@ class TilgangService(
 
     //Trenger vi denne?
     fun verifyInnloggetSaksbehandlersTilgangTilYtelse(ytelse: Ytelse) {
-        if (!innloggetSaksbehandlerRepository.harTilgangTilYtelse(ytelse)) {
+        if (!innloggetSaksbehandlerService.harTilgangTilYtelse(ytelse)) {
             throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse")
         }
     }
@@ -83,20 +82,20 @@ class TilgangService(
         if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null || behandling.currentDelbehandling().avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
-        val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         if (ident != behandling.currentDelbehandling().medunderskriver?.saksbehandlerident) {
             throw MissingTilgangException("Innlogget saksbehandler er ikke medunderskriver")
         }
     }
 
     fun harInnloggetSaksbehandlerTilgangTil(fnr: String): Boolean {
-        val ident = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         return verifiserTilgangTilPersonForSaksbehandler(
             fnr = fnr,
             ident = ident,
-            kanBehandleStrengtFortrolig = { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() },
-            kanBehandleFortrolig = { innloggetSaksbehandlerRepository.kanBehandleFortrolig() },
-            kanBehandleEgenAnsatt = { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() },
+            kanBehandleStrengtFortrolig = { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() },
+            kanBehandleFortrolig = { innloggetSaksbehandlerService.kanBehandleFortrolig() },
+            kanBehandleEgenAnsatt = { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() },
         )
     }
 

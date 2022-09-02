@@ -12,8 +12,8 @@ import no.nav.klage.oppgave.api.view.BehandlingMedunderskriveridentInput
 import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,7 +43,7 @@ class BehandlingMedunderskriverControllerTest {
     lateinit var behandlingMapper: BehandlingMapper
 
     @MockkBean
-    lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerService
 
     private val klagebehandlingId = UUID.randomUUID()
 
@@ -83,7 +83,7 @@ class BehandlingMedunderskriverControllerTest {
 
     @BeforeEach
     fun setup() {
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns "B54321"
+        every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "B54321"
     }
 
     @Test

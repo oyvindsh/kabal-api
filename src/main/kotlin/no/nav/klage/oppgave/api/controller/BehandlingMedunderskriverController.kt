@@ -9,8 +9,8 @@ import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
 import no.nav.klage.oppgave.api.view.MedunderskriverFlytView
 import no.nav.klage.oppgave.api.view.MedunderskriverView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -24,7 +24,7 @@ import java.util.*
 @RequestMapping("/klagebehandlinger")
 class BehandlingMedunderskriverController(
     private val behandlingMapper: BehandlingMapper,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val behandlingService: BehandlingService,
 ) {
 
@@ -40,14 +40,14 @@ class BehandlingMedunderskriverController(
     ): MedunderskriverFlytResponse {
         logBehandlingMethodDetails(
             ::putMedunderskriverident.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
         val behandling = behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
             behandlingId,
             input.medunderskriverident,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+            innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
     }
@@ -63,14 +63,14 @@ class BehandlingMedunderskriverController(
     ): MedunderskriverFlytResponse {
         logKlagebehandlingMethodDetails(
             ::switchMedunderskriverFlyt.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
 
         val behandling = behandlingService.switchMedunderskriverFlyt(
             behandlingId,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+            innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
     }
@@ -81,7 +81,7 @@ class BehandlingMedunderskriverController(
     ): MedunderskriverView {
         logBehandlingMethodDetails(
             ::getMedunderskriver.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -95,7 +95,7 @@ class BehandlingMedunderskriverController(
     ): MedunderskriverFlytView {
         logBehandlingMethodDetails(
             ::getMedunderskriverFlyt.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )

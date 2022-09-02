@@ -1,11 +1,11 @@
 package no.nav.klage.oppgave.service.unleash
 
 import no.finn.unleash.strategy.Strategy
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import org.springframework.stereotype.Component
 
 @Component
-class ByUserStrategy(private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository) : Strategy {
+class ByUserStrategy(private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService) : Strategy {
 
     companion object {
         const val PARAM = "user"
@@ -20,7 +20,7 @@ class ByUserStrategy(private val innloggetSaksbehandlerRepository: InnloggetSaks
         parameters?.get(PARAM)?.split(',')
 
     private fun isCurrentUserEnabled(ident: String): Boolean {
-        return ident == innloggetSaksbehandlerRepository.getInnloggetIdent()
+        return ident == innloggetSaksbehandlerService.getInnloggetIdent()
     }
 
 }

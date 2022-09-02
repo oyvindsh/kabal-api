@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -20,7 +20,7 @@ import java.util.*
 class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -34,14 +34,14 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setSattPaaVent.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
         val modified = behandlingService.setSattPaaVent(
             behandlingId = behandlingId,
             setNull = false,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return BehandlingEditedView(modified = modified)
     }
@@ -53,14 +53,14 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::deleteSattPaaVent.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
         val modified = behandlingService.setSattPaaVent(
             behandlingId = behandlingId,
             setNull = true,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return BehandlingEditedView(modified = modified)
     }
@@ -71,14 +71,14 @@ class BehandlingController(
     ): BehandlingFullfoertView {
         logKlagebehandlingMethodDetails(
             ::fullfoerBehandling.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
 
         val klagebehandling = behandlingService.ferdigstillBehandling(
             behandlingId,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+            innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return behandlingMapper.mapToBehandlingFullfoertView(klagebehandling)
     }
@@ -91,7 +91,7 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setMottattKlageinstans.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -99,7 +99,7 @@ class BehandlingController(
         val modified = behandlingService.setMottattKlageinstans(
             behandlingId = behandlingId,
             date = input.date.atStartOfDay(),
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)
@@ -112,7 +112,7 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setMottattVedtaksinstans.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -120,7 +120,7 @@ class BehandlingController(
         val modified = behandlingService.setMottattVedtaksinstans(
             behandlingId = behandlingId,
             date = input.date,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)
@@ -133,7 +133,7 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setSendtTilTrygderetten.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -141,7 +141,7 @@ class BehandlingController(
         val modified = behandlingService.setSendtTilTrygderetten(
             behandlingId = behandlingId,
             date = input.date.atStartOfDay(),
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)
@@ -154,7 +154,7 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setKjennelseMottatt.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -162,7 +162,7 @@ class BehandlingController(
         val modified = behandlingService.setKjennelseMottatt(
             behandlingId = behandlingId,
             date = input.date.atStartOfDay(),
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)
@@ -175,7 +175,7 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setFrist.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -183,7 +183,7 @@ class BehandlingController(
         val modified = behandlingService.setFrist(
             behandlingId = behandlingId,
             frist = input.date,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)
@@ -199,7 +199,7 @@ class BehandlingController(
     ): ValidationPassedResponse {
         logKlagebehandlingMethodDetails(
             ::validate.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -219,7 +219,7 @@ class BehandlingController(
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setInnsendingshjemler.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -227,7 +227,7 @@ class BehandlingController(
         val modified = behandlingService.setInnsendingshjemler(
             behandlingId = behandlingId,
             hjemler = input.hjemler,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)

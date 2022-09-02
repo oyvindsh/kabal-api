@@ -4,8 +4,8 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.gateway.AzureGateway
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.AdminService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class AdminController(
     private val adminService: AdminService,
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val eregClient: EregClient,
     private val azureGateway: AzureGateway,
 ) {
@@ -62,7 +62,7 @@ class AdminController(
     }
 
     private fun krevAdminTilgang() {
-        if (!innloggetSaksbehandlerRepository.erAdmin()) {
+        if (!innloggetSaksbehandlerService.erAdmin()) {
             throw MissingTilgangException("Not an admin")
         }
     }

@@ -13,7 +13,7 @@ import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.MediaType
@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("/behandlinger/{behandlingId}/dokumenter")
 class DokumentUnderArbeidController(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
-    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val dokumentMapper: DokumentMapper,
     private val dokumentInputMapper: DokumentInputMapper,
     private val kafkaEventClient: KafkaEventClient,

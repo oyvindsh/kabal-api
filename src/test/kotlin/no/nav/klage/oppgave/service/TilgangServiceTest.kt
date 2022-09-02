@@ -14,7 +14,6 @@ import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -29,12 +28,12 @@ class TilgangServiceTest {
 
     private val egenAnsattService: EgenAnsattService = mockk()
 
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository = mockk()
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService = mockk()
 
     private val saksbehandlerRepository: SaksbehandlerRepository = mockk()
 
     private val tilgangService =
-        TilgangService(pdlFacade, egenAnsattService, innloggetSaksbehandlerRepository, saksbehandlerRepository)
+        TilgangService(pdlFacade, egenAnsattService, innloggetSaksbehandlerService, saksbehandlerRepository)
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet`() {
@@ -134,7 +133,7 @@ class TilgangServiceTest {
             delbehandlinger = setOf(Delbehandling()),
         )
 
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z654321")
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z654321")
 
         assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }
     }
@@ -164,7 +163,7 @@ class TilgangServiceTest {
             delbehandlinger = setOf(Delbehandling()),
         )
 
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z654321")
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z654321")
 
         assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }
     }
@@ -195,7 +194,7 @@ class TilgangServiceTest {
             delbehandlinger = setOf(Delbehandling()),
         )
 
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
 
         assertThat(tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage)).isEqualTo(Unit)
     }
@@ -215,9 +214,9 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() }.returns(false)
-        every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleFortrolig() }.returns(false)
+        every { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() }.returns(false)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(false)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
@@ -237,8 +236,8 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() }.returns(false)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(false)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
@@ -258,8 +257,8 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() }.returns(false)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(false)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(true)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
@@ -279,8 +278,8 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() }.returns(true)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(true)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(true)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(true)
     }
@@ -300,10 +299,10 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() }.returns(false)
-        every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() }.returns(true)
-        every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(false)
+        every { innloggetSaksbehandlerService.kanBehandleFortrolig() }.returns(true)
+        every { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() }.returns(false)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(false)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(true)
     }
@@ -323,10 +322,10 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() }.returns(false)
-        every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() }.returns(false)
-        every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(true)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(false)
+        every { innloggetSaksbehandlerService.kanBehandleFortrolig() }.returns(false)
+        every { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() }.returns(true)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(false)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(false)
     }
@@ -346,10 +345,10 @@ class TilgangServiceTest {
             )
         )
 
-        every { innloggetSaksbehandlerRepository.kanBehandleEgenAnsatt() }.returns(false)
-        every { innloggetSaksbehandlerRepository.kanBehandleFortrolig() }.returns(true)
-        every { innloggetSaksbehandlerRepository.kanBehandleStrengtFortrolig() }.returns(false)
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() }.returns("Z123456")
+        every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(false)
+        every { innloggetSaksbehandlerService.kanBehandleFortrolig() }.returns(true)
+        every { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() }.returns(false)
+        every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
         every { egenAnsattService.erEgenAnsatt(any()) }.returns(true)
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(true)
     }

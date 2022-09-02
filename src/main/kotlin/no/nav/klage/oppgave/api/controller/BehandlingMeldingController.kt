@@ -7,8 +7,8 @@ import no.nav.klage.oppgave.api.view.MeldingInput
 import no.nav.klage.oppgave.api.view.MeldingModified
 import no.nav.klage.oppgave.api.view.MeldingView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.MeldingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
@@ -22,7 +22,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 @RequestMapping("/klagebehandlinger")
 class BehandlingMeldingController(
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val meldingService: MeldingService,
     private val meldingMapper: MeldingMapper,
     private val behandlingService: BehandlingService,
@@ -43,7 +43,7 @@ class BehandlingMeldingController(
         @PathVariable("id") behandlingId: UUID,
         @RequestBody input: MeldingInput
     ): MeldingView {
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         logBehandlingMethodDetails(
             ::addMelding.name,
             innloggetIdent,
@@ -70,7 +70,7 @@ class BehandlingMeldingController(
     fun getMeldinger(
         @PathVariable("id") behandlingId: UUID
     ): List<MeldingView> {
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         logBehandlingMethodDetails(
             ::getMeldinger.name,
             innloggetIdent,
@@ -92,7 +92,7 @@ class BehandlingMeldingController(
         @PathVariable("id") behandlingId: UUID,
         @PathVariable("meldingId") meldingId: UUID
     ) {
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         logBehandlingMethodDetails(
             ::deleteMelding.name,
             innloggetIdent,
@@ -119,7 +119,7 @@ class BehandlingMeldingController(
         @PathVariable("meldingId") meldingId: UUID,
         @RequestBody input: MeldingInput
     ): MeldingModified {
-        val innloggetIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+        val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         logBehandlingMethodDetails(
             ::modifyMelding.name,
             innloggetIdent,

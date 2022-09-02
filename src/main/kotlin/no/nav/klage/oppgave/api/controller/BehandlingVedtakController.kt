@@ -7,7 +7,7 @@ import no.nav.klage.oppgave.api.view.VedtakEditedView
 import no.nav.klage.oppgave.api.view.VedtakHjemlerInput
 import no.nav.klage.oppgave.api.view.VedtakUtfallInput
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.VedtakService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
@@ -20,7 +20,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 @RequestMapping("/klagebehandlinger")
 class BehandlingVedtakController(
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val vedtakService: VedtakService
 ) {
 
@@ -36,7 +36,7 @@ class BehandlingVedtakController(
     ): VedtakEditedView {
         logBehandlingMethodDetails(
             ::setUtfall.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -44,7 +44,7 @@ class BehandlingVedtakController(
             vedtakService.setUtfall(
                 behandlingId,
                 input.utfall?.let { Utfall.of(it) },
-                innloggetSaksbehandlerRepository.getInnloggetIdent()
+                innloggetSaksbehandlerService.getInnloggetIdent()
             ).modified
         )
     }
@@ -56,7 +56,7 @@ class BehandlingVedtakController(
     ): VedtakEditedView {
         logBehandlingMethodDetails(
             ::setHjemler.name,
-            innloggetSaksbehandlerRepository.getInnloggetIdent(),
+            innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
@@ -64,7 +64,7 @@ class BehandlingVedtakController(
             vedtakService.setHjemler(
                 behandlingId = behandlingId,
                 hjemler = input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
-                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerRepository.getInnloggetIdent()
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             ).modified
         )
     }

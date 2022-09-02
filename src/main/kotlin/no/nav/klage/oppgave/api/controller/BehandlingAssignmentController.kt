@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.view.Saksbehandlertildeling
 import no.nav.klage.oppgave.api.view.TildelingEditedView
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -18,7 +18,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 @RequestMapping("/ansatte")
 class BehandlingAssignmentController(
-    private val innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val saksbehandlerService: SaksbehandlerService,
     private val behandlingService: BehandlingService
 ) {
@@ -42,7 +42,7 @@ class BehandlingAssignmentController(
             behandlingId,
             saksbehandlertildeling.navIdent,
             saksbehandlerService.getEnhetForSaksbehandler(saksbehandlertildeling.navIdent).enhetId,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+            innloggetSaksbehandlerService.getInnloggetIdent()
         )
         return TildelingEditedView(
             behandling.modified,
@@ -62,7 +62,7 @@ class BehandlingAssignmentController(
             behandlingId,
             null,
             null,
-            innloggetSaksbehandlerRepository.getInnloggetIdent()
+            innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return TildelingEditedView(

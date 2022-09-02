@@ -5,8 +5,8 @@ import io.mockk.every
 import no.finn.unleash.Unleash
 import no.finn.unleash.UnleashContext
 import no.nav.klage.oppgave.api.controller.UnprotectedDataFeeder
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.AnkeITrygderettenbehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.MottakService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +30,7 @@ class UnprotectedDataFeederTest {
     lateinit var unleash: Unleash
 
     @MockkBean
-    lateinit var innloggetSaksbehandlerRepository: InnloggetSaksbehandlerRepository
+    lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerService
 
     @MockkBean
     lateinit var mottakService: MottakService
@@ -40,7 +40,7 @@ class UnprotectedDataFeederTest {
 
     @BeforeEach
     fun setup() {
-        every { innloggetSaksbehandlerRepository.getInnloggetIdent() } returns "H149390"
+        every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "H149390"
         every { unleash.isEnabled(any(), any<UnleashContext>()) } returns true
         every { mottakService.createMottakForKlageAnkeV3(any()) } returns Unit
     }

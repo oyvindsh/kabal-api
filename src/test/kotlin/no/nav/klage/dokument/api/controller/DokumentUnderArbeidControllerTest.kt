@@ -18,8 +18,8 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
-import no.nav.klage.oppgave.repositories.InnloggetSaksbehandlerRepository
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,7 +39,7 @@ import java.util.*
 internal class DokumentUnderArbeidControllerTest {
 
     @MockkBean
-    private lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerRepository
+    private lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerService
 
     @MockkBean
     private lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
