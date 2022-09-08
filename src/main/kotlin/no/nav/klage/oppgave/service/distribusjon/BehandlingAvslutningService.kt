@@ -68,10 +68,12 @@ class BehandlingAvslutningService(
 
     private fun privateAvsluttBehandling(behandlingId: UUID): Behandling {
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
-
+        logger.debug("Sjekker om anken skal til trygderetten eller ikke. $behandling")
         if (behandling is Ankebehandling && behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
+            logger.debug("Anken sendes til trygderetten. Oppretter AnkeITrygderettenbehandling.")
             createAnkeITrygderettenbehandling(behandling)
         } else {
+            logger.debug("Anken skulle ikke til trygderetten.")
             val hoveddokumenter =
                 dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
                     behandlingId
