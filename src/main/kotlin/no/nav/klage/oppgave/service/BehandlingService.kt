@@ -115,7 +115,7 @@ class BehandlingService(
         }
 
         //TODO: Create test for invalid utfall when such are added
-        if (!typeTilUtfall[behandling.type]!!.contains(behandling.currentDelbehandling().utfall)) {
+        if (behandling.currentDelbehandling().utfall !in typeTilUtfall[behandling.type]!!) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -134,15 +134,17 @@ class BehandlingService(
                 )
             }
 
-            val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
+            if (behandling !is AnkeITrygderettenbehandling) {
+                val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
 
-            if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
-                sectionList.add(
-                    ValidationSection(
-                        section = "kvalitetsvurdering",
-                        properties = kvalitetsvurderingValidationErrors
+                if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
+                    sectionList.add(
+                        ValidationSection(
+                            section = "kvalitetsvurdering",
+                            properties = kvalitetsvurderingValidationErrors
+                        )
                     )
-                )
+                }
             }
         }
 
@@ -164,6 +166,37 @@ class BehandlingService(
                     reason = "Denne datoen kan ikke være i fremtiden."
                 )
             )
+        }
+
+        if (behandling is AnkeITrygderettenbehandling) {
+            if (behandling.sendtTilTrygderetten == null) {
+                behandlingValidationErrors.add(
+                    InvalidProperty(
+                        field = "sendtTilTrygderetten",
+                        reason = "Denne datoen må være satt."
+                    )
+                )
+            }
+
+            if (behandling.kjennelseMottatt == null) {
+                behandlingValidationErrors.add(
+                    InvalidProperty(
+                        field = "kjennelseMottatt",
+                        reason = "Denne datoen må være satt."
+                    )
+                )
+            }
+
+            if (behandling.sendtTilTrygderetten != null && behandling.kjennelseMottatt != null
+                && behandling.sendtTilTrygderetten!!.isAfter(behandling.kjennelseMottatt)
+            ) {
+                behandlingValidationErrors.add(
+                    InvalidProperty(
+                        field = "sendtTilTrygderetten",
+                        reason = "Sendt til Trygderetten må være før Kjennelse mottatt."
+                    )
+                )
+            }
         }
 
         if (behandlingValidationErrors.isNotEmpty()) {
