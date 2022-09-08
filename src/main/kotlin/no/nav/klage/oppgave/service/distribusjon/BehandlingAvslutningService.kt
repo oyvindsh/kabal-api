@@ -11,7 +11,6 @@ import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.ANKEBEHANDLING_AVSLUTTET
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET
-import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttet
 import no.nav.klage.oppgave.domain.klage.createAnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
@@ -68,12 +67,10 @@ class BehandlingAvslutningService(
 
     private fun privateAvsluttBehandling(behandlingId: UUID): Behandling {
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
-        logger.debug("Sjekker om anken skal til trygderetten eller ikke. $behandling")
-        if (behandling is Ankebehandling && behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
+        if (behandling.type == Type.ANKE && behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
             logger.debug("Anken sendes til trygderetten. Oppretter AnkeITrygderettenbehandling.")
             createAnkeITrygderettenbehandling(behandling)
         } else {
-            logger.debug("Anken skulle ikke til trygderetten.")
             val hoveddokumenter =
                 dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
                     behandlingId
