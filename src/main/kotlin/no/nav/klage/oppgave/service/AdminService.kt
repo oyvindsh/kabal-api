@@ -112,9 +112,18 @@ class AdminService(
         val ankebehandlingerWithouthAnkeITrygderetten =
             candidates.filter { it.kildeReferanse !in existingAnkeITrygderettenBehandlingKildereferanse }
 
-        logger.debug("Antall manglkende ankeITrygderetten: {}", ankebehandlingerWithouthAnkeITrygderetten.size)
+        val ankebehandlingerWithAnkeITrygderetten =
+            candidates.filter { it.kildeReferanse in existingAnkeITrygderettenBehandlingKildereferanse }
+
+        logger.debug("Antall manglende ankeITrygderetten: {}", ankebehandlingerWithouthAnkeITrygderetten.size)
+        logger.debug("Antall opprettede ankeITrygderetten: {}", ankebehandlingerWithAnkeITrygderetten.size)
+
         ankebehandlingerWithouthAnkeITrygderetten.forEach {
-            logger.debug("ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} ")
+            logger.debug("Mangler: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} ")
+        }
+
+        ankebehandlingerWithAnkeITrygderetten.forEach {
+            logger.debug("Fins: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} ")
         }
     }
 }
