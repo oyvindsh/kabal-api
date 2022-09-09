@@ -106,14 +106,14 @@ class AdminService(
         val candidates =
             ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
 
-        val existingAnkeITrygderettenBehandlingKildereferanse =
-            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse }
+        val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem =
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
 
         val ankebehandlingerWithouthAnkeITrygderetten =
-            candidates.filter { it.kildeReferanse !in existingAnkeITrygderettenBehandlingKildereferanse }
+            candidates.filter { it.kildeReferanse to it.sakFagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
 
         val ankebehandlingerWithAnkeITrygderetten =
-            candidates.filter { it.kildeReferanse in existingAnkeITrygderettenBehandlingKildereferanse }
+            candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
 
         logger.debug("Antall manglende ankeITrygderetten: {}", ankebehandlingerWithouthAnkeITrygderetten.size)
         logger.debug("Antall opprettede ankeITrygderetten: {}", ankebehandlingerWithAnkeITrygderetten.size)
