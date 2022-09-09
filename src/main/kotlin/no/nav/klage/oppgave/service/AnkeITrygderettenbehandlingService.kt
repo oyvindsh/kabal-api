@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.domain.klage.Delbehandling
+import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -74,13 +75,18 @@ class AnkeITrygderettenbehandlingService(
         }
 
         input.saksdokumenter.forEach {
-            behandlingService.connectDokumentToBehandling(
-                behandlingId = ankeITrygderettenbehandling.id,
-                journalpostId = it.journalpostId,
-                dokumentInfoId = it.dokumentInfoId,
-                saksbehandlerIdent = SYSTEMBRUKER,
-                systemUserContext = true,
-            )
+            try {
+                behandlingService.connectDokumentToBehandling(
+                    behandlingId = ankeITrygderettenbehandling.id,
+                    journalpostId = it.journalpostId,
+                    dokumentInfoId = it.dokumentInfoId,
+                    saksbehandlerIdent = SYSTEMBRUKER,
+                    systemUserContext = true,
+                )
+            } catch (exception: JournalpostNotFoundException) {
+                logger.warn("Journalpost with id ${it.journalpostId} not found. Skipping document..")
+            }
+
         }
 
         applicationEventPublisher.publishEvent(

@@ -11,6 +11,7 @@ import java.util.*
 
 @Profile("dev-gcp")
 @RestController
+@RequestMapping("/dev")
 class DevOnlyAdminController(
     private val adminService: AdminService,
     private val unleash: Unleash
@@ -48,7 +49,7 @@ class DevOnlyAdminController(
     }
 
     @Unprotected
-    @PostMapping("/dev/internal/generatemissingankeitrygderetten", produces = ["application/json"])
+    @PostMapping("/internal/generatemissingankeitrygderetten", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
     fun generateMissingAnkeITrygderetten() {
         logger.debug("generateMissingAnkeITrygderetten is called")
