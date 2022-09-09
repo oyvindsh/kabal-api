@@ -48,7 +48,7 @@ class DevOnlyAdminController(
     }
 
     @Unprotected
-    @PostMapping("/internal/generatemissingankeitrygderetten", produces = ["application/json"])
+    @PostMapping("/dev/internal/generatemissingankeitrygderetten", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
     fun generateMissingAnkeITrygderetten() {
         logger.debug("generateMissingAnkeITrygderetten is called")
