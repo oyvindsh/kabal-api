@@ -47,7 +47,7 @@ class DevOnlyAdminController(
         }
     }
 
-
+    @Unprotected
     @PostMapping("/internal/generatemissingankeitrygderetten", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
     fun generateMissingAnkeITrygderetten() {
