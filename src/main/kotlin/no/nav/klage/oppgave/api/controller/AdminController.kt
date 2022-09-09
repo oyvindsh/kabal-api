@@ -61,6 +61,20 @@ class AdminController(
         }
     }
 
+    @PostMapping("/internal/generatemissingankeitrygderetten", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun generateMissingAnkeITrygderetten() {
+        logger.debug("generateMissingAnkeITrygderetten is called")
+        krevAdminTilgang()
+
+        try {
+            adminService.generateMissingAnkeITrygderetten()
+        } catch (e: Exception) {
+            logger.warn("Failed to generate missing AnkeITrygderetten", e)
+            throw e
+        }
+    }
+
     private fun krevAdminTilgang() {
         if (!innloggetSaksbehandlerService.erAdmin()) {
             throw MissingTilgangException("Not an admin")

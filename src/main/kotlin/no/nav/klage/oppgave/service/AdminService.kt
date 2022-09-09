@@ -3,13 +3,9 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
-import no.nav.klage.oppgave.clients.kabalsearch.KabalSearchClient
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
-import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
-import no.nav.klage.oppgave.domain.klage.Ankebehandling
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.utfallToTrygderetten
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -30,7 +26,7 @@ class AdminService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer,
     private val fileApiClient: FileApiClient,
-    private val kabalSearchClient: KabalSearchClient,
+    private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val endringsloggRepository: EndringsloggRepository,
 ) {
 
@@ -118,15 +114,36 @@ class AdminService(
         val ankebehandlingerWithAnkeITrygderetten =
             candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
 
-        logger.debug("Antall manglende ankeITrygderetten: {}", ankebehandlingerWithouthAnkeITrygderetten.size)
-        logger.debug("Antall opprettede ankeITrygderetten: {}", ankebehandlingerWithAnkeITrygderetten.size)
+        var logString = ""
+
+        logString += "Antall kandidater blant Ankebehandlinger: ${candidates.size} \n"
+
+        logString += "Antall manglende ankeITrygderetten: ${ankebehandlingerWithouthAnkeITrygderetten.size} \n"
+        logString += "Antall opprettede ankeITrygderetten: ${ankebehandlingerWithAnkeITrygderetten.size} \n\n"
 
         ankebehandlingerWithouthAnkeITrygderetten.forEach {
-            logger.debug("Mangler: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} ")
+            logString += "Mangler: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} \n"
+            ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(
+                it.createAnkeITrygderettenbehandlingInput()
+            )
         }
 
         ankebehandlingerWithAnkeITrygderetten.forEach {
-            logger.debug("Fins: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} ")
+            logString += "Finnes fra før: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} \n"
         }
+
+        val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter =
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
+
+        val ankebehandlingerWithouthAnkeITrygderettenAfter =
+            candidates.filter { it.kildeReferanse to it.sakFagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
+
+        val ankebehandlingerWithAnkeITrygderettenAfter =
+            candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
+
+        logString += "Antall manglende ankeITrygderetten etter operasjonen: ${ankebehandlingerWithouthAnkeITrygderettenAfter.size} \n"
+        logString += "Antall opprettede ankeITrygderetten etter operasjonen: ${ankebehandlingerWithAnkeITrygderettenAfter.size} \n"
+
+        logger.debug(logString)
     }
 }
