@@ -90,6 +90,8 @@ class Delbehandling(
     }
 
     fun shouldBeSentToTrygderetten(): Boolean {
-        return utfall in setOf(Utfall.DELVIS_MEDHOLD, Utfall.STADFESTELSE, Utfall.AVVIST)
+        return utfall in utfallToTrygderetten
     }
 }
+
+val utfallToTrygderetten = setOf(Utfall.DELVIS_MEDHOLD, Utfall.STADFESTELSE, Utfall.AVVIST)

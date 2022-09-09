@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.utfallToTrygderetten
 import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -104,7 +105,9 @@ class AdminService(
         logger.debug("Attempting generate missing AnkeITrygderettenBehandling")
 
         val candidates =
-            ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
+            ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndDelbehandlingerUtfallIn(
+                utfallToTrygderetten
+            )
 
         val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem =
             ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
