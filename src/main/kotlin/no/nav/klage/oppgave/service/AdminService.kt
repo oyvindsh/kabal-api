@@ -9,6 +9,8 @@ import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
+import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -22,6 +24,8 @@ import java.util.*
 class AdminService(
     private val kafkaDispatcher: KafkaDispatcher,
     private val behandlingRepository: BehandlingRepository,
+    private val ankebehandlingRepository: AnkebehandlingRepository,
+    private val ankeITrygderettenbehandlingRepository: AnkeITrygderettenbehandlingRepository,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer,
     private val fileApiClient: FileApiClient,
@@ -47,8 +51,10 @@ class AdminService(
                     when (behandling.type) {
                         Type.KLAGE ->
                             behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
+
                         Type.ANKE ->
                             behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
+
                         Type.ANKE_I_TRYGDERETTEN ->
                             behandlingEndretKafkaProducer.sendAnkeITrygderettenEndretV2(behandling as AnkeITrygderettenbehandling)
                     }
@@ -92,5 +98,23 @@ class AdminService(
             EventType.STATS_DVH,
             listOf(UtsendingStatus.IKKE_SENDT, UtsendingStatus.FEILET, UtsendingStatus.SENDT)
         )
+    }
+
+    fun generateMissingAnkeITrygderetten() {
+        logger.debug("Attempting generate missing AnkeITrygderettenBehandling")
+
+        val candidates =
+            ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
+
+        val existingAnkeITrygderettenBehandlingKildereferanse =
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse }
+
+        val ankebehandlingerWithouthAnkeITrygderetten =
+            candidates.filter { it.kildeReferanse !in existingAnkeITrygderettenBehandlingKildereferanse }
+
+        logger.debug("Antall manglkende ankeITrygderetten: {}", ankebehandlingerWithouthAnkeITrygderetten.size)
+        ankebehandlingerWithouthAnkeITrygderetten.forEach {
+            logger.debug("ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} ")
+        }
     }
 }
