@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.util.*
+import javax.transaction.Transactional
 
 @Service
 class AdminService(
@@ -97,6 +98,7 @@ class AdminService(
         )
     }
 
+    @Transactional
     fun generateMissingAnkeITrygderetten() {
         logger.debug("Attempting generate missing AnkeITrygderettenBehandling")
 
