@@ -78,5 +78,6 @@ fun OversendtAnkeITrygderettenV1.createAnkeITrygderettenbehandlingInput(inputDoc
         saksdokumenter = inputDocuments,
         innsendingsHjemler = hjemler,
         sendtTilTrygderetten = sendtTilTrygderetten,
+        ankebehandlingUtfall = null,
     )
 }

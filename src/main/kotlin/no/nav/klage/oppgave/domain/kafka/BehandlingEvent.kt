@@ -35,8 +35,8 @@ data class AnkebehandlingOpprettetDetaljer(
 )
 
 data class AnkeITrygderettenbehandlingOpprettetDetaljer(
-    //TODO: Sjekk om 1. instans trenger mer info
     val opprettet: LocalDateTime,
+    val utfall: ExternalUtfall?,
 )
 
 data class AnkebehandlingAvsluttetDetaljer(

@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.util.*
-import javax.transaction.Transactional
 
 @Service
 class AdminService(
@@ -98,7 +97,6 @@ class AdminService(
         )
     }
 
-    @Transactional
     fun generateMissingAnkeITrygderetten() {
         logger.debug("Attempting generate missing AnkeITrygderettenBehandling")
 
@@ -124,10 +122,17 @@ class AdminService(
         logString += "Antall opprettede ankeITrygderetten: ${ankebehandlingerWithAnkeITrygderetten.size} \n\n"
 
         ankebehandlingerWithouthAnkeITrygderetten.forEach {
-            logString += "Mangler: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} \n"
-            ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(
-                it.createAnkeITrygderettenbehandlingInput()
-            )
+            try {
+                ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(
+                    it.createAnkeITrygderettenbehandlingInput()
+                )
+                logString += "Mangler: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} \n"
+            } catch (e: Exception) {
+                logger.warn(
+                    "Klarte ikke å opprette ankeITrygderettenbehandling basert på ankebehandling ${it.id}. Undersøk!",
+                    e
+                )
+            }
         }
 
         ankebehandlingerWithAnkeITrygderetten.forEach {
