@@ -53,7 +53,7 @@ class AnkeITrygderettenbehandlingService(
                 mottattKlageinstans = input.sakMottattKlageinstans,
                 tildeling = null,
                 delbehandlinger = setOf(Delbehandling()),
-                hjemler = if (input.innsendingsHjemler == null || input.innsendingsHjemler.isEmpty()) {
+                hjemler = if (input.innsendingsHjemler.isNullOrEmpty()) {
                     mutableSetOf(Hjemmel.MANGLER)
                 } else {
                     input.innsendingsHjemler
@@ -101,9 +101,7 @@ class AnkeITrygderettenbehandlingService(
                 ankeITrygderettenbehandlingOpprettetDetaljer =
                 AnkeITrygderettenbehandlingOpprettetDetaljer(
                     opprettet = ankeITrygderettenbehandling.created,
-                    utfall = if (input.ankebehandlingUtfall != null) {
-                        ExternalUtfall.valueOf(input.ankebehandlingUtfall.name)
-                    } else null,
+                    utfall = input.ankebehandlingUtfall,
                 )
             )
         )

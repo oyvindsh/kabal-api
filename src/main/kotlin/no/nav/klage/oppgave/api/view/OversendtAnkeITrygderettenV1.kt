@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import java.time.LocalDateTime
@@ -62,6 +63,12 @@ data class OversendtAnkeITrygderettenV1(
         example = "2020-12-20T00:00"
     )
     val sendtTilTrygderetten: LocalDateTime,
+    @Schema(
+        description = "Utfall på ankebehandlingen som førte til oversendelse til Trygderetten",
+        required = true,
+        example = "STADFESTELSE"
+    )
+    val utfall: ExternalUtfall,
 )
 
 fun OversendtAnkeITrygderettenV1.createAnkeITrygderettenbehandlingInput(inputDocuments: MutableSet<Saksdokument>): AnkeITrygderettenbehandlingInput {
@@ -78,6 +85,6 @@ fun OversendtAnkeITrygderettenV1.createAnkeITrygderettenbehandlingInput(inputDoc
         saksdokumenter = inputDocuments,
         innsendingsHjemler = hjemler,
         sendtTilTrygderetten = sendtTilTrygderetten,
-        ankebehandlingUtfall = null,
+        ankebehandlingUtfall = utfall,
     )
 }

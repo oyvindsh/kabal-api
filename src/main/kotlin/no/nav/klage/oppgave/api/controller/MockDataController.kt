@@ -8,8 +8,10 @@ import no.nav.klage.kodeverk.hjemmel.ytelseTilHjemler
 import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemler
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
+import no.nav.klage.oppgave.domain.klage.utfallToTrygderetten
 import no.nav.klage.oppgave.service.AnkeITrygderettenbehandlingService
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.security.token.support.core.api.Unprotected
@@ -252,7 +254,7 @@ class MockDataController(
                         innsendingsHjemler = mutableSetOf(ytelseTilHjemler[randomYtelse]!!.random()),
                         sendtTilTrygderetten = LocalDateTime.now(),
                         registreringsHjemmelSet = mutableSetOf(ytelseTilRegistreringshjemler[randomYtelse]!!.random()),
-                        ankebehandlingUtfall = null,
+                        ankebehandlingUtfall = ExternalUtfall.valueOf(utfallToTrygderetten.random().name),
                     )
                 )
             }

@@ -2,11 +2,11 @@ package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
 import java.time.LocalDateTime
 
 data class AnkeITrygderettenbehandlingInput(
@@ -23,7 +23,7 @@ data class AnkeITrygderettenbehandlingInput(
     val innsendingsHjemler: Set<Hjemmel>?,
     val sendtTilTrygderetten: LocalDateTime,
     val registreringsHjemmelSet: Set<Registreringshjemmel>? = null,
-    val ankebehandlingUtfall: Utfall?,
+    val ankebehandlingUtfall: ExternalUtfall,
 )
 
 fun Behandling.createAnkeITrygderettenbehandlingInput(sendtTilTrygderetten: LocalDateTime? = null): AnkeITrygderettenbehandlingInput {
@@ -41,6 +41,6 @@ fun Behandling.createAnkeITrygderettenbehandlingInput(sendtTilTrygderetten: Loca
         innsendingsHjemler = hjemler,
         sendtTilTrygderetten = sendtTilTrygderetten ?: LocalDateTime.now(),
         registreringsHjemmelSet = currentDelbehandling().hjemler,
-        ankebehandlingUtfall = currentDelbehandling().utfall,
+        ankebehandlingUtfall = ExternalUtfall.valueOf(currentDelbehandling().utfall!!.name),
     )
 }

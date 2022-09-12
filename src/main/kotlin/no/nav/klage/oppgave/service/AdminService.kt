@@ -119,7 +119,7 @@ class AdminService(
         logString += "Antall kandidater blant Ankebehandlinger: ${candidates.size} \n"
 
         logString += "Antall manglende ankeITrygderetten: ${ankebehandlingerWithouthAnkeITrygderetten.size} \n"
-        logString += "Antall opprettede ankeITrygderetten: ${ankebehandlingerWithAnkeITrygderetten.size} \n\n"
+        logString += "Antall tidligere opprettede ankeITrygderetten: ${ankebehandlingerWithAnkeITrygderetten.size} \n\n"
 
         ankebehandlingerWithouthAnkeITrygderetten.forEach {
             try {
