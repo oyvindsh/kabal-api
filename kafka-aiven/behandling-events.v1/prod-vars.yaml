@@ -16,6 +16,9 @@ acl:
   - team: teamforeldrepenger
     application: fpsak
     access: read
+  - team: teamfamilie
+    application: familie-klage
+    access: read
   - team: klage
     application: klage-kafka-manager
     access: read

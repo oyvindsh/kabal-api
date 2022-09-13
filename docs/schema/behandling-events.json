@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Behandling Event",
   "type": "object",
-  "description": "Kafka-melding som sendes ut når ulike hendelser har skjedd i en behandling i klageinstansen.",
   "additionalProperties": false,
   "properties": {
     "eventId": {
