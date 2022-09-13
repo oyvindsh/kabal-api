@@ -45,9 +45,8 @@ data class OversendtKlageAnkeV3(
     )
     val dvhReferanse: String? = null,
     @Schema(
-        description = "Url tilbake til kildesystem for innsyn i sak",
+        description = "Ikke i bruk",
         required = false,
-        example = "https://k9-sak.adeo.no/behandling/12345678"
     )
     val innsynUrl: String? = null,
     @Schema(
