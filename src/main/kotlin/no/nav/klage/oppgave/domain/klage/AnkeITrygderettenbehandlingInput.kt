@@ -26,7 +26,7 @@ data class AnkeITrygderettenbehandlingInput(
     val ankebehandlingUtfall: ExternalUtfall,
 )
 
-fun Behandling.createAnkeITrygderettenbehandlingInput(sendtTilTrygderetten: LocalDateTime? = null): AnkeITrygderettenbehandlingInput {
+fun Behandling.createAnkeITrygderettenbehandlingInput(): AnkeITrygderettenbehandlingInput {
     return AnkeITrygderettenbehandlingInput(
         klager = klager,
         sakenGjelder = sakenGjelder,
@@ -39,7 +39,7 @@ fun Behandling.createAnkeITrygderettenbehandlingInput(sendtTilTrygderetten: Loca
         sakMottattKlageinstans = mottattKlageinstans,
         saksdokumenter = saksdokumenter,
         innsendingsHjemler = hjemler,
-        sendtTilTrygderetten = sendtTilTrygderetten ?: LocalDateTime.now(),
+        sendtTilTrygderetten = currentDelbehandling().avsluttetAvSaksbehandler!!,
         registreringsHjemmelSet = currentDelbehandling().hjemler,
         ankebehandlingUtfall = ExternalUtfall.valueOf(currentDelbehandling().utfall!!.name),
     )
