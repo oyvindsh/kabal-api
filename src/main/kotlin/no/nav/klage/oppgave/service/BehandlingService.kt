@@ -166,15 +166,6 @@ class BehandlingService(
         }
 
         if (behandling is AnkeITrygderettenbehandling) {
-            if (behandling.sendtTilTrygderetten == null) {
-                behandlingValidationErrors.add(
-                    InvalidProperty(
-                        field = "sendtTilTrygderetten",
-                        reason = "Denne datoen må være satt."
-                    )
-                )
-            }
-
             if (behandling.kjennelseMottatt == null) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -184,8 +175,8 @@ class BehandlingService(
                 )
             }
 
-            if (behandling.sendtTilTrygderetten != null && behandling.kjennelseMottatt != null
-                && behandling.sendtTilTrygderetten!!.isAfter(behandling.kjennelseMottatt)
+            if (behandling.kjennelseMottatt != null
+                && behandling.sendtTilTrygderetten.isAfter(behandling.kjennelseMottatt)
             ) {
                 behandlingValidationErrors.add(
                     InvalidProperty(

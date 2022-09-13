@@ -26,7 +26,8 @@
       "enum": [
         "KLAGEBEHANDLING_AVSLUTTET",
         "ANKEBEHANDLING_OPPRETTET",
-        "ANKEBEHANDLING_AVSLUTTET"
+        "ANKEBEHANDLING_AVSLUTTET",
+        "ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET"
       ],
       "description": "Typen event som har skjedd. Matcher et av feltene i BehandlingDetaljer, typen her vil vise hvilket felt som ikke er null. Kan og vil utvides med flere verdier på sikt."
     },
@@ -45,7 +46,6 @@
   "definitions": {
     "BehandlingDetaljer": {
       "type": "object",
-      "description": "En wrapper for detaljer om den spesifikke typen event som har skjedd. Alle feltene er nullable, men ett felt vil være non-null hver gang. (Tenk xs:choice..)",
       "additionalProperties": false,
       "properties": {
         "klagebehandlingAvsluttet": {
@@ -56,6 +56,9 @@
         },
         "ankebehandlingAvsluttet": {
           "$ref": "#/definitions/AnkebehandlingAvsluttetDetaljer"
+        },
+        "ankeITrygderettenbehandlingOpprettet": {
+          "$ref": "#/definitions/AnkeITrygderettenbehandlingOpprettetDetaljer"
         }
       }
     },
@@ -142,6 +145,33 @@
         "avsluttet",
         "utfall",
         "journalpostReferanser"
+      ]
+    },
+    "AnkeITrygderettenbehandlingOpprettetDetaljer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sendtTilTrygderetten": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "utfall": {
+          "type": "string",
+          "enum": [
+            "TRUKKET",
+            "RETUR",
+            "OPPHEVET",
+            "MEDHOLD",
+            "DELVIS_MEDHOLD",
+            "STADFESTELSE",
+            "UGUNST",
+            "AVVIST"
+          ],
+          "description": "Utfallet av behandlingen."
+        }
+      },
+      "required": [
+        "sendtTilTrygderetten"
       ]
     }
   }

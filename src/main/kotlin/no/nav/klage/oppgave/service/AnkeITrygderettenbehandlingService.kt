@@ -100,7 +100,7 @@ class AnkeITrygderettenbehandlingService(
             detaljer = BehandlingDetaljer(
                 ankeITrygderettenbehandlingOpprettet =
                 AnkeITrygderettenbehandlingOpprettetDetaljer(
-                    opprettet = ankeITrygderettenbehandling.created,
+                    sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
                     utfall = input.ankebehandlingUtfall,
                 )
             )

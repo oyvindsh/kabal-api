@@ -16,7 +16,7 @@ import javax.persistence.Entity
 @DiscriminatorValue("anke_i_trygderetten")
 class AnkeITrygderettenbehandling(
     @Column(name = "sendt_til_trygderetten")
-    var sendtTilTrygderetten: LocalDateTime? = null,
+    var sendtTilTrygderetten: LocalDateTime,
     @Column(name = "kjennelse_mottatt")
     var kjennelseMottatt: LocalDateTime? = null,
 
