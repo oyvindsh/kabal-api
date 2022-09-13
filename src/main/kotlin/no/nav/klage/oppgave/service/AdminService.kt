@@ -3,12 +3,11 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
-import no.nav.klage.oppgave.clients.kabalsearch.KabalSearchClient
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
-import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
-import no.nav.klage.oppgave.domain.klage.Ankebehandling
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
+import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -22,10 +21,12 @@ import java.util.*
 class AdminService(
     private val kafkaDispatcher: KafkaDispatcher,
     private val behandlingRepository: BehandlingRepository,
+    private val ankebehandlingRepository: AnkebehandlingRepository,
+    private val ankeITrygderettenbehandlingRepository: AnkeITrygderettenbehandlingRepository,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer,
     private val fileApiClient: FileApiClient,
-    private val kabalSearchClient: KabalSearchClient,
+    private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val endringsloggRepository: EndringsloggRepository,
 ) {
 
@@ -47,8 +48,10 @@ class AdminService(
                     when (behandling.type) {
                         Type.KLAGE ->
                             behandlingEndretKafkaProducer.sendKlageEndretV2(behandling as Klagebehandling)
+
                         Type.ANKE ->
                             behandlingEndretKafkaProducer.sendAnkeEndretV2(behandling as Ankebehandling)
+
                         Type.ANKE_I_TRYGDERETTEN ->
                             behandlingEndretKafkaProducer.sendAnkeITrygderettenEndretV2(behandling as AnkeITrygderettenbehandling)
                     }
@@ -92,5 +95,62 @@ class AdminService(
             EventType.STATS_DVH,
             listOf(UtsendingStatus.IKKE_SENDT, UtsendingStatus.FEILET, UtsendingStatus.SENDT)
         )
+    }
+
+    fun generateMissingAnkeITrygderetten() {
+        logger.debug("Attempting generate missing AnkeITrygderettenBehandling")
+
+        val candidates =
+            ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndDelbehandlingerUtfallIn(
+                utfallToTrygderetten
+            )
+
+        val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem =
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
+
+        val ankebehandlingerWithouthAnkeITrygderetten =
+            candidates.filter { it.kildeReferanse to it.sakFagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
+
+        val ankebehandlingerWithAnkeITrygderetten =
+            candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
+
+        var logString = ""
+
+        logString += "Antall kandidater blant Ankebehandlinger: ${candidates.size} \n"
+
+        logString += "Antall manglende ankeITrygderetten: ${ankebehandlingerWithouthAnkeITrygderetten.size} \n"
+        logString += "Antall tidligere opprettede ankeITrygderetten: ${ankebehandlingerWithAnkeITrygderetten.size} \n\n"
+
+        ankebehandlingerWithouthAnkeITrygderetten.forEach {
+            try {
+                ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(
+                    it.createAnkeITrygderettenbehandlingInput()
+                )
+                logString += "Mangler: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} \n"
+            } catch (e: Exception) {
+                logger.warn(
+                    "Klarte ikke å opprette ankeITrygderettenbehandling basert på ankebehandling ${it.id}. Undersøk!",
+                    e
+                )
+            }
+        }
+
+        ankebehandlingerWithAnkeITrygderetten.forEach {
+            logString += "Finnes fra før: ankeBehandlingId: ${it.id},  kildeReferanse: ${it.kildeReferanse} \n"
+        }
+
+        val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter =
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
+
+        val ankebehandlingerWithouthAnkeITrygderettenAfter =
+            candidates.filter { it.kildeReferanse to it.sakFagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
+
+        val ankebehandlingerWithAnkeITrygderettenAfter =
+            candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
+
+        logString += "Antall manglende ankeITrygderetten etter operasjonen: ${ankebehandlingerWithouthAnkeITrygderettenAfter.size} \n"
+        logString += "Antall opprettede ankeITrygderetten etter operasjonen: ${ankebehandlingerWithAnkeITrygderettenAfter.size} \n"
+
+        logger.debug(logString)
     }
 }

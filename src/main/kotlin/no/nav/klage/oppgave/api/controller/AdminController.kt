@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class AdminController(
     private val adminService: AdminService,
@@ -57,6 +56,20 @@ class AdminController(
             adminService.resendToDVH()
         } catch (e: Exception) {
             logger.warn("Failed to resend to DVH", e)
+            throw e
+        }
+    }
+
+    @PostMapping("/internal/generatemissingankeitrygderetten", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun generateMissingAnkeITrygderetten() {
+        logger.debug("generateMissingAnkeITrygderetten is called")
+        krevAdminTilgang()
+
+        try {
+            adminService.generateMissingAnkeITrygderetten()
+        } catch (e: Exception) {
+            logger.warn("Failed to generate missing AnkeITrygderetten", e)
             throw e
         }
     }

@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
 import java.time.LocalDateTime
 
 data class AnkeITrygderettenbehandlingInput(
@@ -22,9 +23,10 @@ data class AnkeITrygderettenbehandlingInput(
     val innsendingsHjemler: Set<Hjemmel>?,
     val sendtTilTrygderetten: LocalDateTime,
     val registreringsHjemmelSet: Set<Registreringshjemmel>? = null,
+    val ankebehandlingUtfall: ExternalUtfall,
 )
 
-fun Behandling.createAnkeITrygderettenbehandlingInput(sendtTilTrygderetten: LocalDateTime? = null): AnkeITrygderettenbehandlingInput {
+fun Behandling.createAnkeITrygderettenbehandlingInput(): AnkeITrygderettenbehandlingInput {
     return AnkeITrygderettenbehandlingInput(
         klager = klager,
         sakenGjelder = sakenGjelder,
@@ -37,7 +39,8 @@ fun Behandling.createAnkeITrygderettenbehandlingInput(sendtTilTrygderetten: Loca
         sakMottattKlageinstans = mottattKlageinstans,
         saksdokumenter = saksdokumenter,
         innsendingsHjemler = hjemler,
-        sendtTilTrygderetten = sendtTilTrygderetten ?: LocalDateTime.now(),
-        registreringsHjemmelSet = currentDelbehandling().hjemler
+        sendtTilTrygderetten = currentDelbehandling().avsluttetAvSaksbehandler!!,
+        registreringsHjemmelSet = currentDelbehandling().hjemler,
+        ankebehandlingUtfall = ExternalUtfall.valueOf(currentDelbehandling().utfall!!.name),
     )
 }

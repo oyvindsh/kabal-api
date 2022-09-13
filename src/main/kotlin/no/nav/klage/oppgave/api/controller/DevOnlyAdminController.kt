@@ -46,4 +46,18 @@ class DevOnlyAdminController(
             throw e
         }
     }
+
+    @Unprotected
+    @PostMapping("/internal/generatemissingankeitrygderettendev", produces = ["application/json"])
+    @ResponseStatus(HttpStatus.OK)
+    fun generateMissingAnkeITrygderetten() {
+        logger.debug("generateMissingAnkeITrygderetten is called in dev")
+
+        try {
+            adminService.generateMissingAnkeITrygderetten()
+        } catch (e: Exception) {
+            logger.warn("Failed to generate missing AnkeITrygderetten", e)
+            throw e
+        }
+    }
 }

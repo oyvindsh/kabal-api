@@ -12,14 +12,16 @@ data class BehandlingEvent(
     val detaljer: BehandlingDetaljer,
 )
 
+//TODO: Vurder å renske ut ANKEBEHANDLING_OPPRETTET
 enum class BehandlingEventType {
-    KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_OPPRETTET, ANKEBEHANDLING_AVSLUTTET
+    KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_OPPRETTET, ANKEBEHANDLING_AVSLUTTET, ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET
 }
 
 data class BehandlingDetaljer(
     val klagebehandlingAvsluttet: KlagebehandlingAvsluttetDetaljer? = null,
     val ankebehandlingOpprettet: AnkebehandlingOpprettetDetaljer? = null,
     val ankebehandlingAvsluttet: AnkebehandlingAvsluttetDetaljer? = null,
+    val ankeITrygderettenbehandlingOpprettet: AnkeITrygderettenbehandlingOpprettetDetaljer? = null,
 )
 
 data class KlagebehandlingAvsluttetDetaljer(
@@ -31,6 +33,11 @@ data class KlagebehandlingAvsluttetDetaljer(
 
 data class AnkebehandlingOpprettetDetaljer(
     val mottattKlageinstans: LocalDateTime
+)
+
+data class AnkeITrygderettenbehandlingOpprettetDetaljer(
+    val sendtTilTrygderetten: LocalDateTime,
+    val utfall: ExternalUtfall?,
 )
 
 data class AnkebehandlingAvsluttetDetaljer(

@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service.distribusjon
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.FEILET
@@ -29,15 +30,17 @@ class KlagebehandlingSchedulerService(
     @SchedulerLock(name = "avsluttBehandling")
     fun avsluttBehandling() {
         logger.debug("avsluttBehandling is called by scheduler")
-        val behandlingIdList: List<UUID> = behandlingService.findBehandlingerForAvslutning()
+        val behandlingIdList: List<Pair<UUID, Type>> = behandlingService.findBehandlingerForAvslutning()
 
-        behandlingIdList.forEach { behandlingId ->
-            kakaApiGateway.finalizeBehandling(
-                behandlingService.getBehandlingForReadWithoutCheckForAccess(
-                    behandlingId
+        behandlingIdList.forEach { (id, type) ->
+            if (type != Type.ANKE_I_TRYGDERETTEN) {
+                kakaApiGateway.finalizeBehandling(
+                    behandlingService.getBehandlingForReadWithoutCheckForAccess(
+                        id
+                    )
                 )
-            )
-            behandlingAvslutningService.avsluttBehandling(behandlingId)
+            }
+            behandlingAvslutningService.avsluttBehandling(id)
         }
     }
 

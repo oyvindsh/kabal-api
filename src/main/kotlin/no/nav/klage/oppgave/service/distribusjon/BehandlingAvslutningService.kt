@@ -67,43 +67,42 @@ class BehandlingAvslutningService(
 
     private fun privateAvsluttBehandling(behandlingId: UUID): Behandling {
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
+        if (behandling.type == Type.ANKE && behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
+            logger.debug("Anken sendes til trygderetten. Oppretter AnkeITrygderettenbehandling.")
+            createAnkeITrygderettenbehandling(behandling)
+        } else {
+            val hoveddokumenter =
+                dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
+                    behandlingId
+                ).filter {
+                    it.dokumentType in listOf(
+                        DokumentType.VEDTAK,
+                        DokumentType.BESLUTNING
+                    )
+                }
 
-        val hoveddokumenter =
-            dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
-                behandlingId
-            ).filter {
-                it.dokumentType in listOf(
-                    DokumentType.VEDTAK,
-                    DokumentType.BESLUTNING
-                )
-            }
-
-        val behandlingEvent = BehandlingEvent(
-            eventId = UUID.randomUUID(),
-            kildeReferanse = behandling.kildeReferanse,
-            kilde = behandling.sakFagsystem.navn,
-            kabalReferanse = behandling.currentDelbehandling().id.toString(),
-            type = when (behandling.type) {
-                Type.KLAGE -> KLAGEBEHANDLING_AVSLUTTET
-                Type.ANKE -> ANKEBEHANDLING_AVSLUTTET
-                Type.ANKE_I_TRYGDERETTEN -> TODO()
-            },
-            detaljer = getBehandlingDetaljer(behandling, hoveddokumenter)
-        )
-        kafkaEventRepository.save(
-            KafkaEvent(
-                id = UUID.randomUUID(),
-                behandlingId = behandlingId,
-                kilde = behandling.sakFagsystem.navn,
+            val behandlingEvent = BehandlingEvent(
+                eventId = UUID.randomUUID(),
                 kildeReferanse = behandling.kildeReferanse,
-                jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
-                type = EventType.BEHANDLING_EVENT
+                kilde = behandling.sakFagsystem.navn,
+                kabalReferanse = behandling.currentDelbehandling().id.toString(),
+                type = when (behandling.type) {
+                    Type.KLAGE -> KLAGEBEHANDLING_AVSLUTTET
+                    Type.ANKE -> ANKEBEHANDLING_AVSLUTTET
+                    Type.ANKE_I_TRYGDERETTEN -> ANKEBEHANDLING_AVSLUTTET
+                },
+                detaljer = getBehandlingDetaljer(behandling, hoveddokumenter)
             )
-        )
-
-        if (behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
-            //TODO: Legg inn når FE er klar til å vise disse.
-            //createAnkeITrygderettenbehandling(behandling)
+            kafkaEventRepository.save(
+                KafkaEvent(
+                    id = UUID.randomUUID(),
+                    behandlingId = behandlingId,
+                    kilde = behandling.sakFagsystem.navn,
+                    kildeReferanse = behandling.kildeReferanse,
+                    jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
+                    type = EventType.BEHANDLING_EVENT
+                )
+            )
         }
 
         val event = behandling.setAvsluttet(SYSTEMBRUKER)
@@ -133,6 +132,7 @@ class BehandlingAvslutningService(
                     )
                 )
             }
+
             Type.ANKE -> {
                 BehandlingDetaljer(
                     ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
@@ -142,7 +142,17 @@ class BehandlingAvslutningService(
                     )
                 )
             }
-            Type.ANKE_I_TRYGDERETTEN -> TODO()
+
+            Type.ANKE_I_TRYGDERETTEN -> {
+                BehandlingDetaljer(
+                    ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
+                        avsluttet = behandling.avsluttetAvSaksbehandler!!,
+                        //TODO: Se på utfallsliste når vi har den endelige for ankeITrygderetten
+                        utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
+                        journalpostReferanser = hoveddokumenter.mapNotNull { it.journalpostId }
+                    )
+                )
+            }
         }
     }
 }
