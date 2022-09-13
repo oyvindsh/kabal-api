@@ -13,14 +13,14 @@ data class BehandlingEvent(
 )
 
 enum class BehandlingEventType {
-    KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_OPPRETTET, ANKEBEHANDLING_AVSLUTTET, ANKE_I_TRYGDERETTEN_OPPRETTET
+    KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_OPPRETTET, ANKEBEHANDLING_AVSLUTTET, ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET
 }
 
 data class BehandlingDetaljer(
     val klagebehandlingAvsluttet: KlagebehandlingAvsluttetDetaljer? = null,
     val ankebehandlingOpprettet: AnkebehandlingOpprettetDetaljer? = null,
     val ankebehandlingAvsluttet: AnkebehandlingAvsluttetDetaljer? = null,
-    val ankeITrygderettenbehandlingOpprettetDetaljer: AnkeITrygderettenbehandlingOpprettetDetaljer? = null,
+    val ankeITrygderettenbehandlingOpprettet: AnkeITrygderettenbehandlingOpprettetDetaljer? = null,
 )
 
 data class KlagebehandlingAvsluttetDetaljer(

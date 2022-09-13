@@ -96,9 +96,9 @@ class AnkeITrygderettenbehandlingService(
             kildeReferanse = ankeITrygderettenbehandling.kildeReferanse,
             kilde = ankeITrygderettenbehandling.sakFagsystem.navn,
             kabalReferanse = ankeITrygderettenbehandling.currentDelbehandling().id.toString(),
-            type = BehandlingEventType.ANKE_I_TRYGDERETTEN_OPPRETTET,
+            type = BehandlingEventType.ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET,
             detaljer = BehandlingDetaljer(
-                ankeITrygderettenbehandlingOpprettetDetaljer =
+                ankeITrygderettenbehandlingOpprettet =
                 AnkeITrygderettenbehandlingOpprettetDetaljer(
                     opprettet = ankeITrygderettenbehandling.created,
                     utfall = input.ankebehandlingUtfall,

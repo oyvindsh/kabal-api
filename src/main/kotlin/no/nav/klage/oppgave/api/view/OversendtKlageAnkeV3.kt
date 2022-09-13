@@ -67,6 +67,7 @@ data class OversendtKlageAnkeV3(
     val tilknyttedeJournalposter: List<OversendtDokumentReferanse> = emptyList(),
     @field:PastOrPresent(message = "Dato for mottatt Nav må være i fortiden eller i dag")
     @field:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    //TODO: Undersøk forskjellen på brukersHenvendelseMottattNavDato og innsendtTilNav nærmere.
     val brukersHenvendelseMottattNavDato: LocalDate,
     val innsendtTilNav: LocalDate,
     @Schema(
