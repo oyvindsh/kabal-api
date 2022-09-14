@@ -477,7 +477,7 @@ class DokumentUnderArbeidService(
         )
     }
 
-    fun opprettDokumentEnhet(hovedDokumentId: DokumentId) {
+    fun opprettDokumentEnhet(hovedDokumentId: DokumentId): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.dokumentEnhetId == null) {
@@ -486,9 +486,10 @@ class DokumentUnderArbeidService(
             val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(behandling, hovedDokument, vedlegg)
             hovedDokument.dokumentEnhetId = dokumentEnhetId
         }
+        return hovedDokument
     }
 
-    fun ferdigstillDokumentEnhet(hovedDokumentId: DokumentId) {
+    fun ferdigstillDokumentEnhet(hovedDokumentId: DokumentId): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
@@ -519,6 +520,8 @@ class DokumentUnderArbeidService(
         val now = LocalDateTime.now()
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
         vedlegg.forEach { it.ferdigstillHvisIkkeAlleredeFerdigstilt(now) }
+
+        return hovedDokument
     }
 
     fun getSmartEditorId(dokumentId: DokumentId, readOnly: Boolean): UUID {

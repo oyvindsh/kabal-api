@@ -39,6 +39,7 @@ class FerdigstillDokumentService(
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @SchedulerLock(name = "ferdigstillDokumenter")
     fun listenToFerdigstilteDokumenterAvSaksbehandler(dokumentFerdigstiltAvSaksbehandler: DokumentFerdigstiltAvSaksbehandler) {
         logger.debug("listenToFerdigstilteDokumenterAvSaksbehandler called")
         val dua = Hibernate.unproxy(dokumentFerdigstiltAvSaksbehandler.dokumentUnderArbeid) as DokumentUnderArbeid
@@ -46,26 +47,27 @@ class FerdigstillDokumentService(
     }
 
     private fun ferdigstill(it: DokumentUnderArbeid) {
+        var updatedDokument = it
         try {
-            if (it.dokumentEnhetId == null) {
-                dokumentUnderArbeidService.opprettDokumentEnhet(it.id)
+            if (updatedDokument.dokumentEnhetId == null) {
+                updatedDokument = dokumentUnderArbeidService.opprettDokumentEnhet(updatedDokument.id)
             }
-            dokumentUnderArbeidService.ferdigstillDokumentEnhet(it.id)
+            updatedDokument = dokumentUnderArbeidService.ferdigstillDokumentEnhet(updatedDokument.id)
 
             //Send to all subscribers. If this fails, it's not the end of the world.
             kafkaInternalEventService.publishEvent(
                 Event(
-                    behandlingId = it.behandlingId.toString(),
+                    behandlingId = updatedDokument.behandlingId.toString(),
                     name = "finished",
-                    id = it.id.id.toString(),
-                    data = it.id.id.toString(),
+                    id = updatedDokument.id.id.toString(),
+                    data = updatedDokument.id.id.toString(),
                 )
             )
 
         } catch (e: Exception) {
-            logger.error("Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${it.dokumentEnhetId}. See secure logs.")
+            logger.error("Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${updatedDokument.dokumentEnhetId}. See secure logs.")
             secureLogger.error(
-                "Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${it.dokumentEnhetId}",
+                "Could not 'ferdigstillHovedDokumenter' with dokumentEnhetId: ${updatedDokument.dokumentEnhetId}",
                 e
             )
         }
