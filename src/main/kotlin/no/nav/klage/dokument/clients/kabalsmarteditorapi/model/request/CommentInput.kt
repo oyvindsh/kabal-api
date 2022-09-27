@@ -9,3 +9,7 @@ data class CommentInput(
         val ident: String
     )
 }
+
+data class ModifyCommentInput(
+    val text: String,
+)

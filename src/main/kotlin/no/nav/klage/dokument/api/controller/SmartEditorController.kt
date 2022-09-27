@@ -8,6 +8,7 @@ import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.ModifyCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
@@ -165,7 +166,30 @@ class SmartEditorController(
                 readOnly = true
             )
 
-        return kabalSmartEditorApiClient.createcomment(smartEditorId, commentInput)
+        return kabalSmartEditorApiClient.createComment(smartEditorId, commentInput)
+    }
+
+    @Operation(
+        summary = "Modify comment for a given document",
+        description = "Modify comment for a given document"
+    )
+    @PatchMapping("/{dokumentId}/comments/{commentId}")
+    fun modifyComment(
+        @PathVariable("dokumentId") documentId: UUID,
+        @PathVariable("commentId") commentId: UUID,
+        @RequestBody modifyCommentInput: ModifyCommentInput
+    ): CommentOutput {
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                dokumentId = DokumentId(documentId),
+                readOnly = true
+            )
+
+        return kabalSmartEditorApiClient.modifyComment(
+            documentId = smartEditorId,
+            commentId = commentId,
+            input = modifyCommentInput
+        )
     }
 
     @Operation(
@@ -220,5 +244,22 @@ class SmartEditorController(
                 readOnly = true
             )
         return kabalSmartEditorApiClient.getCommentWithPossibleThread(smartEditorId, commentId)
+    }
+
+    @Operation(
+        summary = "Delete a given comment (includes possible thread)",
+        description = "Delete a given comment (includes possible thread)"
+    )
+    @DeleteMapping("/{dokumentId}/comments/{commentId}")
+    fun deleteCommentWithPossibleThread(
+        @PathVariable("dokumentId") documentId: UUID,
+        @PathVariable("commentId") commentId: UUID
+    ) {
+        val smartEditorId =
+            dokumentUnderArbeidService.getSmartEditorId(
+                dokumentId = DokumentId(documentId),
+                readOnly = true
+            )
+        kabalSmartEditorApiClient.deleteCommentWithPossibleThread(documentId = smartEditorId, commentId = commentId)
     }
 }
