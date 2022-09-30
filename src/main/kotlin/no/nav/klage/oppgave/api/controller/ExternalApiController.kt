@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.oppgave.api.view.OversendtAnkeITrygderettenV1
 import no.nav.klage.oppgave.api.view.OversendtKlageAnkeV3
 import no.nav.klage.oppgave.api.view.OversendtKlageV2
 import no.nav.klage.oppgave.config.SecurityConfiguration
@@ -58,17 +57,5 @@ class ExternalApiController(
         @Valid @RequestBody oversendtKlageAnke: OversendtKlageAnkeV3
     ) {
         mottakService.createMottakForKlageAnkeV3(oversendtKlageAnke)
-    }
-
-    @Operation(
-        summary = "Send inn anker i trygderetten til Kabal",
-        description = "Endepunkt for å registrere anker som allerede har blitt oversendt til Trygderetten i Kabal"
-    )
-    @PostMapping("/ankeritrygderetten")
-    fun sendInnAnkeITrygderettenV1(
-        @Valid @RequestBody oversendtAnkeITrygderetten: OversendtAnkeITrygderettenV1
-    ) {
-        secureLogger.debug("Ankeitrygderetten data $oversendtAnkeITrygderetten sent to Kabal")
-        ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(oversendtAnkeITrygderetten)
     }
 }

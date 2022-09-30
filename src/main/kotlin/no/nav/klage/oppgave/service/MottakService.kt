@@ -141,6 +141,7 @@ class MottakService(
                         mottakRepository.save(oversendtKlageAnke.toMottak())
                     }
                 }
+
                 Type.ANKE_I_TRYGDERETTEN -> TODO()
             }
         return mottak
@@ -209,37 +210,6 @@ class MottakService(
         validateDateNotInFuture(sakMottattKaDato, ::sakMottattKaDato.name)
         validateKildeReferanse(kildeReferanse)
         validateEnhet(forrigeBehandlendeEnhet)
-    }
-
-    fun validateAnkeITrygderettenV1(input: OversendtAnkeITrygderettenV1) {
-        validateYtelseAndHjemler(input.ytelse, input.hjemler)
-        validatePartId(input.klager.id)
-        input.tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-        input.sakenGjelder?.run { validatePartId(input.sakenGjelder.id) }
-        validateOptionalDateTimeNotInFuture(
-            input.sakMottattKaTidspunkt,
-            OversendtAnkeITrygderettenV1::sakMottattKaTidspunkt.name
-        )
-        validateOptionalDateTimeNotInFuture(
-            input.sendtTilTrygderetten,
-            OversendtAnkeITrygderettenV1::sendtTilTrygderetten.name
-        )
-        validateKildeReferanse(input.kildeReferanse)
-        if (input.dvhReferanse != null && input.dvhReferanse.isBlank()) {
-            throw OversendtKlageNotValidException("DVHReferanse kan ikke være en tom streng.")
-        }
-
-        if (behandlingRepository.existsBySakFagsystemAndKildeReferanseAndType(
-                input.fagsak.fagsystem.mapFagsystem(),
-                input.kildeReferanse,
-                Type.ANKE_I_TRYGDERETTEN
-            )
-        ) {
-            val message =
-                "Kunne ikke lagre oversendelse grunnet duplikat: kilde ${input.fagsak.fagsystem.name} og kildereferanse: ${input.kildeReferanse}"
-            logger.warn(message)
-            throw DuplicateOversendelseException(message)
-        }
     }
 
     private fun validateDuplicate(sakFagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
@@ -324,6 +294,7 @@ class MottakService(
                     throw OversendtKlageNotValidException("Organisasjonen fins ikke i Ereg")
                 }
             }
+
             OversendtPartIdType.PERSON -> {
                 if (!isValidFnrOrDnr(partId.verdi)) {
                     throw OversendtKlageNotValidException("Ugyldig fødselsnummer")

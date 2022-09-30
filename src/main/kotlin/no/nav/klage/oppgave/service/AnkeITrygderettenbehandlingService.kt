@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.oppgave.api.view.OversendtAnkeITrygderettenV1
-import no.nav.klage.oppgave.api.view.createAnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
@@ -117,14 +115,5 @@ class AnkeITrygderettenbehandlingService(
         )
 
         return ankeITrygderettenbehandling
-    }
-
-    fun createAnkeITrygderettenbehandling(input: OversendtAnkeITrygderettenV1) {
-        mottakService.validateAnkeITrygderettenV1(input)
-        val inputDocuments =
-            dokumentService.createSaksdokumenterFromJournalpostIdSet(input.tilknyttedeJournalposter.map { it.journalpostId })
-        createAnkeITrygderettenbehandling(
-            input.createAnkeITrygderettenbehandlingInput(inputDocuments)
-        )
     }
 }
