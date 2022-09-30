@@ -94,4 +94,11 @@ class Delbehandling(
     }
 }
 
-val utfallToTrygderetten = setOf(Utfall.DELVIS_MEDHOLD, Utfall.STADFESTELSE, Utfall.AVVIST)
+//TODO: Fjern avvist og stadfestelse når FE er oppdatert
+val utfallToTrygderetten = setOf(
+    Utfall.DELVIS_MEDHOLD,
+    Utfall.STADFESTELSE,
+    Utfall.AVVIST,
+    Utfall.INNSTILLING_AVVIST,
+    Utfall.INNSTILLING_STADFESTELSE
+)
