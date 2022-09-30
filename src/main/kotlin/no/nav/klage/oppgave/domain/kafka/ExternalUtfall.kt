@@ -8,5 +8,8 @@ enum class ExternalUtfall(val navn: String) {
     DELVIS_MEDHOLD("Delvis medhold"),
     STADFESTELSE("Stadfestelse"),
     UGUNST("Ugunst (Ugyldig)"),
-    AVVIST("Avvist");
+    AVVIST("Avvist"),
+    INNSTILLING_STADFESTELSE("Innstilling: Stadfestelse"),
+    INNSTILLING_AVVIST("Innstilling: Avvist"),
+    ;
 }
