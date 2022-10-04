@@ -232,4 +232,25 @@ class BehandlingController(
 
         return BehandlingEditedView(modified = modified)
     }
+
+    @PutMapping("/behandlinger/{id}/fullmektig")
+    fun setFullmektig(
+        @PathVariable("id") behandlingId: UUID,
+        @RequestBody input: FullmektigInput,
+    ): BehandlingEditedView {
+        logBehandlingMethodDetails(
+            ::setFullmektig.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        val modified = behandlingService.setFullmektig(
+            behandlingId = behandlingId,
+            identifikator = input.identifikator,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        )
+
+        return BehandlingEditedView(modified = modified)
+    }
 }

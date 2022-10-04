@@ -1,12 +1,9 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
-import no.nav.klage.kodeverk.MedunderskriverFlyt
+import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
-import no.nav.klage.kodeverk.Tema
-import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.kodeverk.typeTilUtfall
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.Behandling
@@ -17,6 +14,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttetAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFrist
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setInnsendingshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlyt
@@ -27,6 +25,8 @@ import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtak
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.isValidFnrOrDnr
+import no.nav.klage.oppgave.util.isValidOrgnr
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -336,6 +336,54 @@ class BehandlingService(
         val event =
             behandling.setInnsendingshjemler(
                 hjemler.map { Hjemmel.of(it) }.toSet(),
+                utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandling.modified
+    }
+
+    fun setFullmektig(
+        behandlingId: UUID,
+        identifikator: String?,
+        utfoerendeSaksbehandlerIdent: String
+    ): LocalDateTime {
+        val behandling = getBehandlingForUpdate(
+            behandlingId
+        )
+
+        val partId: PartId? = if (identifikator == null) {
+            null
+        } else {
+            when (identifikator.length) {
+                11 -> {
+                    if (isValidFnrOrDnr(identifikator)) {
+                        PartId(
+                            type = PartIdType.PERSON,
+                            value = identifikator
+                        )
+                    } else {
+                        throw ValidationException("identifier is not a valid fødselsnummer")
+                    }
+                }
+                9 -> {
+                    if (isValidOrgnr(identifikator)) {
+                        PartId(
+                            type = PartIdType.VIRKSOMHET,
+                            value = identifikator
+                        )
+                    } else {
+                        throw ValidationException("identifier is not a valid organisasjonsnummer")
+                    }
+                }
+                else -> {
+                    throw ValidationException("identifier is not a valid. Unknown type.")
+                }
+            }
+        }
+
+        val event =
+            behandling.setFullmektig(
+                partId,
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
