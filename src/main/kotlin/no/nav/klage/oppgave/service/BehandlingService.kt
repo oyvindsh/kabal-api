@@ -354,31 +354,7 @@ class BehandlingService(
         val partId: PartId? = if (identifikator == null) {
             null
         } else {
-            when (identifikator.length) {
-                11 -> {
-                    if (isValidFnrOrDnr(identifikator)) {
-                        PartId(
-                            type = PartIdType.PERSON,
-                            value = identifikator
-                        )
-                    } else {
-                        throw ValidationException("identifier is not a valid fødselsnummer")
-                    }
-                }
-                9 -> {
-                    if (isValidOrgnr(identifikator)) {
-                        PartId(
-                            type = PartIdType.VIRKSOMHET,
-                            value = identifikator
-                        )
-                    } else {
-                        throw ValidationException("identifier is not a valid organisasjonsnummer")
-                    }
-                }
-                else -> {
-                    throw ValidationException("identifier is not a valid. Unknown type.")
-                }
-            }
+            getPartIdFromIdentifikator(identifikator)
         }
 
         val event =
@@ -389,6 +365,33 @@ class BehandlingService(
         applicationEventPublisher.publishEvent(event)
         return behandling.modified
     }
+
+    fun getPartIdFromIdentifikator(identifikator: String): PartId =
+        when (identifikator.length) {
+            11 -> {
+                if (isValidFnrOrDnr(identifikator)) {
+                    PartId(
+                        type = PartIdType.PERSON,
+                        value = identifikator
+                    )
+                } else {
+                    throw ValidationException("identifier is not a valid fødselsnummer")
+                }
+            }
+            9 -> {
+                if (isValidOrgnr(identifikator)) {
+                    PartId(
+                        type = PartIdType.VIRKSOMHET,
+                        value = identifikator
+                    )
+                } else {
+                    throw ValidationException("identifier is not a valid organisasjonsnummer")
+                }
+            }
+            else -> {
+                throw ValidationException("identifier is not a valid. Unknown type.")
+            }
+        }
 
     fun setMedunderskriverIdentAndMedunderskriverFlyt(
         behandlingId: UUID,
