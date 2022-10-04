@@ -99,3 +99,6 @@ val utfallToTrygderetten = setOf(
     Utfall.INNSTILLING_AVVIST,
     Utfall.INNSTILLING_STADFESTELSE
 )
+
+val noRegistringshjemmelNeeded = listOf(Utfall.TRUKKET, Utfall.RETUR)
+val noKvalitetsvurderingNeeded = listOf(Utfall.TRUKKET, Utfall.RETUR, Utfall.UGUNST)

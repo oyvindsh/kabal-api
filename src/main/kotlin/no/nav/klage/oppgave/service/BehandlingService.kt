@@ -1,16 +1,18 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
-import no.nav.klage.kodeverk.*
+import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.typeTilUtfall
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.Behandling
-import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setKjennelseMottatt
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setSendtTilTrygderetten
-import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttetAvSaksbehandler
@@ -21,9 +23,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIde
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtaksinstans
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -121,7 +121,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.currentDelbehandling().utfall != Utfall.TRUKKET) {
+        if (behandling.currentDelbehandling().utfall !in noRegistringshjemmelNeeded) {
             if (behandling.currentDelbehandling().hjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -130,18 +130,18 @@ class BehandlingService(
                     )
                 )
             }
+        }
 
-            if (behandling !is AnkeITrygderettenbehandling) {
-                val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
+        if (behandling !is AnkeITrygderettenbehandling && behandling.currentDelbehandling().utfall !in noKvalitetsvurderingNeeded) {
+            val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
 
-                if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
-                    sectionList.add(
-                        ValidationSection(
-                            section = "kvalitetsvurdering",
-                            properties = kvalitetsvurderingValidationErrors
-                        )
+            if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
+                sectionList.add(
+                    ValidationSection(
+                        section = "kvalitetsvurdering",
+                        properties = kvalitetsvurderingValidationErrors
                     )
-                }
+                )
             }
         }
 
