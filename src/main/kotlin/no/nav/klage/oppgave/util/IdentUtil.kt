@@ -28,7 +28,7 @@ private val ORGNR_VEKTER = intArrayOf(3, 2, 7, 6, 5, 4, 3, 2)
 
 fun isValidOrgnr(orgnr: String): Boolean {
     return if (orgnr.isEmpty()) {
-        true
+        false
     } else {
         var sum = 0
         for (i in 0..7) {
