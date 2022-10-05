@@ -271,14 +271,15 @@ class DokumentUnderArbeidService(
     private fun updateJournalposter(
         behandlingId: UUID,
         dokumentId: DokumentId,
-        journalpostIdList: Set<DokumentUnderArbeidJournalpostId>
+        journalpostIdSet: Set<DokumentUnderArbeidJournalpostId>
     ): DokumentUnderArbeid {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
 
         val oldValue = dokument.journalposter
-        dokument.journalposter = journalpostIdList
+        dokument.journalposter.clear()
+        dokument.journalposter.addAll(journalpostIdSet)
 
         behandling.publishEndringsloggEvent(
             saksbehandlerident = SYSTEMBRUKER,

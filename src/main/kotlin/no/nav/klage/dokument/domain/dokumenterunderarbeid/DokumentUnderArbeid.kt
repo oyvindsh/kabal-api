@@ -67,7 +67,7 @@ open class DokumentUnderArbeid(
     @JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
-    open var journalposter: Set<DokumentUnderArbeidJournalpostId> = emptySet(),
+    open val journalposter: MutableSet<DokumentUnderArbeidJournalpostId> = mutableSetOf(),
 ) : Comparable<DokumentUnderArbeid> {
 
     override fun compareTo(other: DokumentUnderArbeid): Int =
