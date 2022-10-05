@@ -10,7 +10,6 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
-import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.BrevmottakerWithJoarkAndDokDistInfo
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
@@ -192,7 +191,6 @@ internal class BehandlingAvslutningServiceTest {
                     value = fnr
                 ),
                 navn = null,
-                rolle = Rolle.HOVEDADRESSAT,
                 journalpostId = JournalpostId(value = journalpostId),
                 dokdistReferanse = null
             )
