@@ -4,7 +4,10 @@ import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.BrevmottakertypeConverter
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.DokumentTypeConverter
+import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -44,8 +47,6 @@ open class DokumentUnderArbeid(
     open var ferdigstilt: LocalDateTime? = null,
     @Column(name = "dokument_enhet_id")
     open var dokumentEnhetId: UUID? = null,
-    @Column(name = "journalpost_id")
-    open var journalpostId: String? = null,
     @ElementCollection(targetClass = Brevmottakertype::class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "dokument_under_arbeid_brevmottaker_type",
@@ -62,6 +63,11 @@ open class DokumentUnderArbeid(
         ]
     )
     open var parentId: DokumentId? = null,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 5)
+    open var journalposter: Set<DokumentUnderArbeidJournalpostId> = emptySet(),
 ) : Comparable<DokumentUnderArbeid> {
 
     override fun compareTo(other: DokumentUnderArbeid): Int =

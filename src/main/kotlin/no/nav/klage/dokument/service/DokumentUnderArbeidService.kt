@@ -5,12 +5,12 @@ import no.nav.klage.dokument.domain.MellomlagretDokument
 import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJournalpostId
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
-import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.Behandling
@@ -268,23 +268,23 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
-    private fun updateJournalpostId(
+    private fun updateJournalposter(
         behandlingId: UUID,
         dokumentId: DokumentId,
-        journalpostId: String
+        journalpostIdList: Set<DokumentUnderArbeidJournalpostId>
     ): DokumentUnderArbeid {
-        val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
 
-        val oldValue = dokument.journalpostId
-        dokument.journalpostId = journalpostId
+        val oldValue = dokument.journalposter
+        dokument.journalposter = journalpostIdList
 
         behandling.publishEndringsloggEvent(
             saksbehandlerident = SYSTEMBRUKER,
             felt = Felt.DOKUMENT_UNDER_ARBEID_JOURNALPOST_ID,
-            fraVerdi = oldValue,
-            tilVerdi = dokument.journalpostId,
+            fraVerdi = oldValue.joinToString { it.journalpostId },
+            tilVerdi = dokument.journalposter.joinToString { it.journalpostId },
             tidspunkt = LocalDateTime.now(),
             dokumentId = dokument.id,
         )
@@ -507,15 +507,11 @@ class DokumentUnderArbeidService(
             }
         }
 
-        var hovedJournalpostId = documentInfoList.firstOrNull {
-            it.rolle == Rolle.HOVEDADRESSAT
-        }?.journalpostId
-
-        if (hovedJournalpostId == null) {
-            hovedJournalpostId = documentInfoList.first().journalpostId
-        }
-
-        updateJournalpostId(behandling.id, hovedDokumentId, hovedJournalpostId.value)
+        updateJournalposter(
+            behandling.id,
+            hovedDokumentId,
+            HashSet(documentInfoList.map { DokumentUnderArbeidJournalpostId(journalpostId = it.journalpostId.value) })
+        )
 
         val now = LocalDateTime.now()
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
