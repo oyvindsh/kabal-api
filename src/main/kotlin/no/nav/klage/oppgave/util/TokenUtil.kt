@@ -111,6 +111,12 @@ class TokenUtil(
         return response.accessToken
     }
 
+    fun getSkjermedeAccessToken(): String {
+        val clientProperties = clientConfigurationProperties.registration["skjermede-maskintilmaskin"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getStsSystembrukerToken(): String = stsClient.oidcToken()
 
     fun getAccessTokenFrontendSent(): String =
