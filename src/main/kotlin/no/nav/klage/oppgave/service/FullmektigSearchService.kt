@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.exceptions.FullmektigNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -41,22 +40,25 @@ class FullmektigSearchService(
                         )
                     } else {
                         secureLogger.warn("Saksbehandler does not have access to view person")
-                        throw FullmektigNotFoundException("Fullmektig with identifier $identifikator not found")
+                        BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
                     }
                 } catch (e: Exception) {
-                    throw FullmektigNotFoundException("Fullmektig with identifier $identifikator not found")
+                    BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
                 }
             }
             PartIdType.VIRKSOMHET -> {
                 val organisasjon = eregClient.hentOrganisasjon(identifikator)
-                    ?: throw FullmektigNotFoundException("Fullmektig with identifier $identifikator not found")
-                BehandlingDetaljerView.ProsessfullmektigView(
-                    virksomhet = BehandlingDetaljerView.VirksomhetView(
-                        virksomhetsnummer = organisasjon.organisasjonsnummer,
-                        navn = organisasjon.navn.sammensattNavn()
-                    ),
-                    person = null,
-                )
+                if (organisasjon == null) {
+                    BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
+                } else {
+                    BehandlingDetaljerView.ProsessfullmektigView(
+                        virksomhet = BehandlingDetaljerView.VirksomhetView(
+                            virksomhetsnummer = organisasjon.organisasjonsnummer,
+                            navn = organisasjon.navn.sammensattNavn()
+                        ),
+                        person = null,
+                    )
+                }
             }
         }
 }

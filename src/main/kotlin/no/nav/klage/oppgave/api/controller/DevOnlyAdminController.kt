@@ -72,4 +72,17 @@ class DevOnlyAdminController(
     ): BehandlingDetaljerView.ProsessfullmektigView {
         return fullmektigSearchService.searchFullmektig(identifikator = input.identifikator, skipAccessControl = true)
     }
+
+    @Unprotected
+    @PostMapping("/internal/isskjermetdev")
+    @ResponseStatus(HttpStatus.OK)
+    fun isSkjermet(
+        @RequestBody input: Fnr
+    ) {
+        logger.debug("isSkjermet in dev is called")
+
+        adminService.isSkjermet(input.fnr)
+    }
+
+    data class Fnr(val fnr: String)
 }

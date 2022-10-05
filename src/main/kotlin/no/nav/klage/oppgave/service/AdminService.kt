@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.oppgave.clients.skjermede.SkjermedeApiClient
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.*
@@ -11,6 +12,7 @@ import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.EndringsloggRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -28,6 +30,7 @@ class AdminService(
     private val fileApiClient: FileApiClient,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val endringsloggRepository: EndringsloggRepository,
+    private val skjermedeApiClient: SkjermedeApiClient
 ) {
 
     companion object {
@@ -35,6 +38,7 @@ class AdminService(
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     fun syncKafkaWithDb() {
@@ -152,5 +156,16 @@ class AdminService(
         logString += "Antall opprettede ankeITrygderetten etter operasjonen: ${ankebehandlingerWithAnkeITrygderettenAfter.size} \n"
 
         logger.debug(logString)
+    }
+
+    fun isSkjermet(fnr: String) {
+        try {
+            logger.debug("isSkjermet called")
+            val isSkjermet = skjermedeApiClient.isSkjermet(fnr)
+
+            secureLogger.debug("isSkjermet: {} for fnr {}", isSkjermet, fnr)
+        } catch (e: Exception) {
+            secureLogger.error("isSkjermet failed for fnr $fnr", e)
+        }
     }
 }
