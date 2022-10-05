@@ -1,7 +1,10 @@
 package no.nav.klage.oppgave.api.controller
 
 import no.finn.unleash.Unleash
+import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
+import no.nav.klage.oppgave.api.view.SearchFullmektigInput
 import no.nav.klage.oppgave.service.AdminService
+import no.nav.klage.oppgave.service.FullmektigSearchService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.context.annotation.Profile
@@ -13,7 +16,8 @@ import java.util.*
 @RestController
 class DevOnlyAdminController(
     private val adminService: AdminService,
-    private val unleash: Unleash
+    private val unleash: Unleash,
+    private val fullmektigSearchService: FullmektigSearchService,
 ) {
 
     companion object {
@@ -59,5 +63,13 @@ class DevOnlyAdminController(
             logger.warn("Failed to generate missing AnkeITrygderetten", e)
             throw e
         }
+    }
+
+    @Unprotected
+    @PostMapping("/internal/searchfullmektig")
+    fun searchFullmektig(
+        @RequestBody input: SearchFullmektigInput,
+    ): BehandlingDetaljerView.ProsessfullmektigView {
+        return fullmektigSearchService.searchFullmektig(identifikator = input.identifikator, skipAccessControl = true)
     }
 }

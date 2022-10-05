@@ -22,7 +22,7 @@ data class Klager(
 
         ]
     )
-    val prosessfullmektig: Prosessfullmektig? = null
+    var prosessfullmektig: Prosessfullmektig? = null
 ) {
     fun erPerson() = partId.type == PartIdType.PERSON
 

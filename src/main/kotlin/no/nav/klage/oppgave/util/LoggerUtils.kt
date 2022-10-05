@@ -27,3 +27,11 @@ fun logBehandlingMethodDetails(methodName: String, innloggetIdent: String, behan
         behandlingId
     )
 }
+
+fun logMethodDetails(methodName: String, innloggetIdent: String, logger: Logger) {
+    logger.debug(
+        "{} is requested by ident {}",
+        methodName,
+        innloggetIdent,
+    )
+}

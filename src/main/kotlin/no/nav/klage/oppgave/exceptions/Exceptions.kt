@@ -62,4 +62,6 @@ class BehandlingManglerTildelingException(msg: String) : RuntimeException(msg)
 
 class EnhetNotFoundForSaksbehandlerException(msg: String) : RuntimeException(msg)
 
+class FullmektigNotFoundException(msg: String) : RuntimeException(msg)
+
 class IllegalOperation(msg: String) : RuntimeException(msg)

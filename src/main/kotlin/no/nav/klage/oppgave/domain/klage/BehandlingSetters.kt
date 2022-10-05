@@ -190,6 +190,29 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
+    fun Behandling.setFullmektig(
+        nyVerdi: PartId?,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val gammelVerdi = hjemler
+        val tidspunkt = LocalDateTime.now()
+        if (nyVerdi == null) {
+            klager.prosessfullmektig = null
+        } else {
+            klager.prosessfullmektig = Prosessfullmektig(partId = nyVerdi, skalPartenMottaKopi = false)
+        }
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.FULLMEKTIG,
+                gammelVerdi.toString(),
+                nyVerdi.toString(),
+                tidspunkt
+            )
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
     fun Behandling.setHjemlerInVedtak(
         nyVerdi: Set<Registreringshjemmel>,
         saksbehandlerident: String
