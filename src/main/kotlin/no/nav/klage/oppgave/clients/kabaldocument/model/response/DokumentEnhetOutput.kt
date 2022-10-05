@@ -1,7 +1,9 @@
 package no.nav.klage.oppgave.clients.kabaldocument.model.response
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDateTime
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class DokumentEnhetOutput(
     val id: String,
     val eier: String,
@@ -12,5 +14,4 @@ data class DokumentEnhetOutput(
     val brevMottakerDistribusjoner: List<BrevmottakerDistribusjonOutput>,
     val avsluttet: LocalDateTime?,
     val modified: LocalDateTime,
-    val journalpostIdHovedadressat: String?
 )
