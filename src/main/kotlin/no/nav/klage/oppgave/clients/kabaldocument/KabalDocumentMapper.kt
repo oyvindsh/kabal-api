@@ -76,33 +76,21 @@ class KabalDocumentMapper(
         behandling: Behandling,
         brevMottakertyper: MutableSet<Brevmottakertype>
     ): List<BrevmottakerInput> {
-        val brevmottakere = mutableListOf<BrevmottakerInput>()
-        if (behandling.klager.prosessfullmektig != null) {
-            if (brevMottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
-                brevmottakere.add(
-                    mapPartIdToBrevmottakerInput(
-                        behandling.klager.prosessfullmektig!!.partId,
-                    )
-                )
-            }
-            if (behandling.klager.prosessfullmektig!!.skalPartenMottaKopi &&
-                brevMottakertyper.contains(Brevmottakertype.KLAGER)
-            ) {
-                brevmottakere.add(mapPartIdToBrevmottakerInput(behandling.klager.partId))
-            }
-        } else {
-            if (brevMottakertyper.contains(Brevmottakertype.KLAGER)) {
-                brevmottakere.add(mapPartIdToBrevmottakerInput(behandling.klager.partId))
-            }
-        }
-        if (behandling.sakenGjelder.partId != behandling.klager.partId &&
-            behandling.sakenGjelder.skalMottaKopi &&
-            brevMottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)
-        ) {
-            brevmottakere.add(mapPartIdToBrevmottakerInput(behandling.sakenGjelder.partId))
+        val brevmottakerPartIds = mutableSetOf<PartId>()
+
+        if (brevMottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
+            brevmottakerPartIds.add(behandling.klager.prosessfullmektig!!.partId)
         }
 
-        return brevmottakere
+        if (brevMottakertyper.contains(Brevmottakertype.KLAGER)) {
+            brevmottakerPartIds.add(behandling.klager.partId)
+        }
+
+        if (brevMottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)) {
+            brevmottakerPartIds.add(behandling.sakenGjelder.partId)
+        }
+
+        return brevmottakerPartIds.map { mapPartIdToBrevmottakerInput(it) }
     }
 
     private fun mapPartIdToBrevmottakerInput(partId: PartId) =

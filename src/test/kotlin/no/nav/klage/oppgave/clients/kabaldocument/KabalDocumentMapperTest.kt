@@ -34,8 +34,6 @@ class KabalDocumentMapperTest {
     private val pdlFacade = mockk<PdlFacade>()
     private val eregClient = mockk<EregClient>()
     private val mapper = KabalDocumentMapper(pdlFacade, eregClient)
-    private val brevmottakertyper =
-        mutableSetOf(Brevmottakertype.SAKEN_GJELDER, Brevmottakertype.KLAGER, Brevmottakertype.PROSESSFULLMEKTIG)
 
     @BeforeAll
     fun setup() {
@@ -59,7 +57,10 @@ class KabalDocumentMapperTest {
 
 
     @Test
-    fun `klager og sakenGjelder er samme person`() {
+    fun `klager og sakenGjelder er samme person, kun en utsending`() {
+        val brevmottakertyper =
+            mutableSetOf(Brevmottakertype.SAKEN_GJELDER, Brevmottakertype.KLAGER)
+
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
             kildeReferanse = "abc",
@@ -95,7 +96,10 @@ class KabalDocumentMapperTest {
     }
 
     @Test
-    fun `klager og sakenGjelder er ikke samme person, sakenGjelder skal ikke ha kopi`() {
+    fun `klager og sakenGjelder er ikke samme person, begge skal motta brev`() {
+        val brevmottakertyper =
+            mutableSetOf(Brevmottakertype.SAKEN_GJELDER, Brevmottakertype.KLAGER)
+
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
             kildeReferanse = "abc",
@@ -118,6 +122,10 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
+            ),
+            BrevmottakerInput(
+                partId = PartIdInput("PERSON", fnr2),
+                navn = "fornavn etternavn",
             )
         )
 
@@ -132,12 +140,15 @@ class KabalDocumentMapperTest {
     }
 
     @Test
-    fun `klager og sakengjelder er ikke samme person, sakenGjelder skal ha kopi`() {
+    fun `klager og sakenGjelder er ikke samme person, bare klager skal motta brev`() {
+        val brevmottakertyper =
+            mutableSetOf(Brevmottakertype.KLAGER)
+
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
             kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
-            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr2), true),
+            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr2), false),
             mottakId = UUID.randomUUID(),
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
@@ -156,11 +167,6 @@ class KabalDocumentMapperTest {
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
             ),
-
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr2),
-                navn = "fornavn etternavn",
-            )
         )
 
         assertThat(
@@ -174,208 +180,14 @@ class KabalDocumentMapperTest {
     }
 
     @Test
-    fun `klager er prosessfullmektig, parten skal ikke motta kopi`() {
-        val klagebehandling = Klagebehandling(
-            sakFagsystem = Fagsystem.AO01,
-            kildeReferanse = "abc",
-            klager = Klager(
-                PartId(PartIdType.PERSON, fnr),
-                prosessfullmektig = Prosessfullmektig(
-                    PartId(
-                        PartIdType.PERSON,
-                        fnr2
-                    ),
-                    skalPartenMottaKopi = false
-                )
-            ),
-            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
-            mottakId = UUID.randomUUID(),
-            mottattKlageinstans = LocalDateTime.now(),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-        )
-
-        val fasitMottakere = setOf(
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr2),
-                navn = "fornavn etternavn",
-            )
-        )
-
-        assertThat(
-            mapper.mapBrevmottakere(
-                klagebehandling as Behandling,
-                brevmottakertyper
-            )
-        ).containsExactlyInAnyOrderElementsOf(
-            fasitMottakere
-        )
-    }
-
-    @Test
-    fun `klager er prosessfullmektig, parten skal motta kopi`() {
-        val klagebehandling = Klagebehandling(
-            sakFagsystem = Fagsystem.AO01,
-            kildeReferanse = "abc",
-            klager = Klager(
-                PartId(PartIdType.PERSON, fnr),
-                prosessfullmektig = Prosessfullmektig(
-                    PartId(
-                        PartIdType.PERSON,
-                        fnr2
-                    ),
-                    skalPartenMottaKopi = true
-                )
-            ),
-            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
-            mottakId = UUID.randomUUID(),
-            mottattKlageinstans = LocalDateTime.now(),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-        )
-
-        val fasitMottakere = setOf(
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr),
-                navn = "fornavn etternavn",
-            ),
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr2),
-                navn = "fornavn etternavn",
-            )
-        )
-
-        assertThat(
-            mapper.mapBrevmottakere(
-                klagebehandling as Behandling,
-                brevmottakertyper
-            )
-        ).containsExactlyInAnyOrderElementsOf(
-            fasitMottakere
-        )
-    }
-
-    @Test
-    fun `klager er prosessfullmektig, parten skal motta kopi, sakenGjelder er en annen, sakenGjelder skal ikke ha kopi`() {
-        val klagebehandling = Klagebehandling(
-            sakFagsystem = Fagsystem.AO01,
-            kildeReferanse = "abc",
-            klager = Klager(
-                PartId(PartIdType.PERSON, fnr),
-                prosessfullmektig = Prosessfullmektig(
-                    PartId(
-                        PartIdType.PERSON,
-                        fnr2
-                    ),
-                    skalPartenMottaKopi = true
-                )
-            ),
-            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr3), false),
-            mottakId = UUID.randomUUID(),
-            mottattKlageinstans = LocalDateTime.now(),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-        )
-
-        val fasitMottakere = setOf(
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr),
-                navn = "fornavn etternavn",
-            ),
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr2),
-                navn = "fornavn etternavn",
-            )
-        )
-
-        assertThat(
-            mapper.mapBrevmottakere(
-                klagebehandling as Behandling,
-                brevmottakertyper
-            )
-        ).containsExactlyInAnyOrderElementsOf(
-            fasitMottakere
-        )
-    }
-
-    @Test
-    fun `klager er prosessfullmektig, parten skal motta kopi, sakenGjelder er en annen, sakenGjelder skal ha kopi`() {
-        val klagebehandling = Klagebehandling(
-            sakFagsystem = Fagsystem.AO01,
-            kildeReferanse = "abc",
-            klager = Klager(
-                PartId(PartIdType.PERSON, fnr),
-                prosessfullmektig = Prosessfullmektig(
-                    PartId(
-                        PartIdType.PERSON,
-                        fnr2
-                    ),
-                    skalPartenMottaKopi = true
-                )
-            ),
-            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr3), true),
-            mottakId = UUID.randomUUID(),
-            mottattKlageinstans = LocalDateTime.now(),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-
+    fun `klager, sakenGjelder og prosessfullmektige er ulike personer, alle skal motta kopi`() {
+        val brevmottakertyper =
+            mutableSetOf(
+                Brevmottakertype.KLAGER,
+                Brevmottakertype.PROSESSFULLMEKTIG,
+                Brevmottakertype.SAKEN_GJELDER,
             )
 
-        val fasitMottakere = setOf(
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr),
-                navn = "fornavn etternavn",
-            ),
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr3),
-                navn = "fornavn etternavn",
-            ),
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr2),
-                navn = "fornavn etternavn",
-            )
-        )
-
-        assertThat(
-            mapper.mapBrevmottakere(
-                klagebehandling as Behandling,
-                brevmottakertyper
-            )
-        ).containsExactlyInAnyOrderElementsOf(
-            fasitMottakere
-        )
-    }
-
-    @Test
-    fun `klager er prosessfullmektig, parten skal ikke motta kopi, sakenGjelder er en annen, sakenGjelder skal ikke ha kopi`() {
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
             kildeReferanse = "abc",
@@ -405,57 +217,15 @@ class KabalDocumentMapperTest {
 
         val fasitMottakere = setOf(
             BrevmottakerInput(
+                partId = PartIdInput("PERSON", fnr),
+                navn = "fornavn etternavn",
+            ),
+            BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-            )
-        )
-
-        assertThat(
-            mapper.mapBrevmottakere(
-                klagebehandling as Behandling,
-                brevmottakertyper
-            )
-        ).containsExactlyInAnyOrderElementsOf(
-            fasitMottakere
-        )
-    }
-
-    @Test
-    fun `klager er prosessfullmektig, parten skal ikke motta kopi, sakenGjelder er en annen, sakenGjelder skal ha kopi`() {
-        val klagebehandling = Klagebehandling(
-            sakFagsystem = Fagsystem.AO01,
-            kildeReferanse = "abc",
-            klager = Klager(
-                PartId(PartIdType.PERSON, fnr),
-                prosessfullmektig = Prosessfullmektig(
-                    PartId(
-                        PartIdType.PERSON,
-                        fnr2
-                    ),
-                    skalPartenMottaKopi = false
-                )
             ),
-            sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr3), true),
-            mottakId = UUID.randomUUID(),
-            mottattKlageinstans = LocalDateTime.now(),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-        )
-
-        val fasitMottakere = setOf(
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr3),
-                navn = "fornavn etternavn",
-            ),
-            BrevmottakerInput(
-                partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
             )
         )

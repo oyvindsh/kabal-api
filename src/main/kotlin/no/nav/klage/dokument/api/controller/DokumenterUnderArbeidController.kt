@@ -151,7 +151,7 @@ class DokumentUnderArbeidController(
     fun idempotentOpprettOgFerdigstillDokumentEnhetFraHovedDokument(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentid") dokumentId: UUID,
-        @RequestBody(required = false) input: FerdigstillDokumentInput?,
+        @RequestBody(required = true) input: FerdigstillDokumentInput,
     ): DokumentView {
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         return dokumentMapper.mapToDokumentView(
@@ -159,12 +159,7 @@ class DokumentUnderArbeidController(
                 behandlingId = behandlingId,
                 dokumentId = DokumentId(dokumentId),
                 ident = ident,
-                brevmottakertyper = input?.brevmottakertyper?.map { Brevmottakertype.of(it) }?.toSet()
-                    ?: setOf(
-                        Brevmottakertype.KLAGER,
-                        Brevmottakertype.SAKEN_GJELDER,
-                        Brevmottakertype.PROSESSFULLMEKTIG
-                    ),
+                brevmottakertyper = input.brevmottakertypeIds.map { Brevmottakertype.of(it) }.toSet(),
             )
         )
     }
