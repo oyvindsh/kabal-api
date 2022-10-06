@@ -299,7 +299,11 @@ class DokumentUnderArbeidService(
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getById(dokumentId)
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+
+        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isEmpty()) {
+            throw DokumentValidationException("Brevmottakere må være satt")
+        }
 
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
