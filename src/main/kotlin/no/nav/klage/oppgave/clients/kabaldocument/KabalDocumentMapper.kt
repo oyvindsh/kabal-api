@@ -4,14 +4,10 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
-import no.nav.klage.oppgave.clients.kabaldocument.model.Rolle
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.*
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.Behandling
-import no.nav.klage.oppgave.domain.klage.Klager
 import no.nav.klage.oppgave.domain.klage.PartId
-import no.nav.klage.oppgave.domain.klage.Prosessfullmektig
-import no.nav.klage.oppgave.domain.klage.SakenGjelder
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -84,51 +80,35 @@ class KabalDocumentMapper(
         if (behandling.klager.prosessfullmektig != null) {
             if (brevMottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
                 brevmottakere.add(
-                    mapProsessfullmektig(
-                        behandling.klager.prosessfullmektig!!,
-                        Rolle.HOVEDADRESSAT.name
+                    mapPartIdToBrevmottakerInput(
+                        behandling.klager.prosessfullmektig!!.partId,
                     )
                 )
             }
             if (behandling.klager.prosessfullmektig!!.skalPartenMottaKopi &&
                 brevMottakertyper.contains(Brevmottakertype.KLAGER)
             ) {
-                brevmottakere.add(mapKlager(behandling.klager, Rolle.KOPIADRESSAT.name))
+                brevmottakere.add(mapPartIdToBrevmottakerInput(behandling.klager.partId))
             }
         } else {
             if (brevMottakertyper.contains(Brevmottakertype.KLAGER)) {
-                brevmottakere.add(mapKlager(behandling.klager, Rolle.HOVEDADRESSAT.name))
+                brevmottakere.add(mapPartIdToBrevmottakerInput(behandling.klager.partId))
             }
         }
         if (behandling.sakenGjelder.partId != behandling.klager.partId &&
             behandling.sakenGjelder.skalMottaKopi &&
             brevMottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)
         ) {
-            brevmottakere.add(mapSakenGjeder(behandling.sakenGjelder, Rolle.KOPIADRESSAT.name))
+            brevmottakere.add(mapPartIdToBrevmottakerInput(behandling.sakenGjelder.partId))
         }
 
         return brevmottakere
     }
 
-    private fun mapKlager(klager: Klager, rolle: String) =
+    private fun mapPartIdToBrevmottakerInput(partId: PartId) =
         BrevmottakerInput(
-            partId = mapPartId(klager.partId),
-            navn = getNavn(klager.partId),
-            rolle = rolle
-        )
-
-    private fun mapSakenGjeder(sakenGjelder: SakenGjelder, rolle: String) =
-        BrevmottakerInput(
-            partId = mapPartId(sakenGjelder.partId),
-            navn = getNavn(sakenGjelder.partId),
-            rolle = rolle
-        )
-
-    private fun mapProsessfullmektig(prosessfullmektig: Prosessfullmektig, rolle: String) =
-        BrevmottakerInput(
-            partId = mapPartId(prosessfullmektig.partId),
-            navn = getNavn(prosessfullmektig.partId),
-            rolle = rolle
+            partId = mapPartId(partId),
+            navn = getNavn(partId),
         )
 
 
@@ -142,7 +122,7 @@ class KabalDocumentMapper(
         if (partId.type == PartIdType.PERSON) {
             pdlFacade.getPersonInfo(partId.value).settSammenNavn()
         } else {
-            eregClient.hentOrganisasjon(partId.value)?.navn?.navnelinje1
+            eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
         }
 
 

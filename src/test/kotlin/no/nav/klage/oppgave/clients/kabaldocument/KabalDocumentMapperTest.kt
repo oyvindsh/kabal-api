@@ -82,7 +82,6 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
         assertThat(
@@ -119,7 +118,6 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 
@@ -157,13 +155,11 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             ),
 
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "KOPIADRESSAT"
             )
         )
 
@@ -210,7 +206,6 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 
@@ -257,12 +252,10 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
-                rolle = "KOPIADRESSAT"
             ),
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 
@@ -309,12 +302,10 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
-                rolle = "KOPIADRESSAT"
             ),
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 
@@ -362,17 +353,14 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr),
                 navn = "fornavn etternavn",
-                rolle = "KOPIADRESSAT"
             ),
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr3),
                 navn = "fornavn etternavn",
-                rolle = "KOPIADRESSAT"
             ),
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 
@@ -419,7 +407,6 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 
@@ -466,12 +453,10 @@ class KabalDocumentMapperTest {
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr3),
                 navn = "fornavn etternavn",
-                rolle = "KOPIADRESSAT"
             ),
             BrevmottakerInput(
                 partId = PartIdInput("PERSON", fnr2),
                 navn = "fornavn etternavn",
-                rolle = "HOVEDADRESSAT"
             )
         )
 

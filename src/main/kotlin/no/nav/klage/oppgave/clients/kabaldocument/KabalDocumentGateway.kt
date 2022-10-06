@@ -52,19 +52,6 @@ class KabalDocumentGateway(
     fun fullfoerDokumentEnhet(dokumentEnhetId: UUID): List<BrevmottakerWithJoarkAndDokDistInfo> =
         kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList
 
-    /*
-    fun ferdigstillDokumentEnhet(dokumentEnhetId: UUID): Saksdokument =
-        kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList.first {
-            it.rolle == Rolle.HOVEDADRESSAT
-        }.let {
-            Saksdokument(
-                journalpostId = it.journalpostId.value,
-                dokumentInfoId = "TODO" //it.dokumentinfoId, //TODO: Trenger denne!
-            )
-        }
-
-    */
-
     fun isHovedDokumentUploaded(dokumentEnhetId: UUID): Boolean {
         return getMetadataOmHovedDokument(dokumentEnhetId) != null
     }
