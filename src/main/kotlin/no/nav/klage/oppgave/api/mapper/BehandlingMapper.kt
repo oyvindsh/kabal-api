@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.api.mapper
 
 
-import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
@@ -92,7 +91,6 @@ class BehandlingMapper(
             kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
             isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
-            brevmottakere = klagebehandling.mapToBrevmottakerViewList(),
         )
     }
 
@@ -146,7 +144,6 @@ class BehandlingMapper(
             kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
             isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
-            brevmottakere = ankebehandling.mapToBrevmottakerViewList(),
         )
     }
 
@@ -198,7 +195,6 @@ class BehandlingMapper(
             kvalitetsvurderingId = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
             isPossibleToUseDokumentUnderArbeid = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankeITrygderettenbehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
-            brevmottakere = ankeITrygderettenbehandling.mapToBrevmottakerViewList(),
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
         )
@@ -358,58 +354,6 @@ class BehandlingMapper(
             medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt
         )
     }
-
-    private fun Behandling.mapToBrevmottakerViewList(): List<BrevmottakerView> {
-        val brevmottakere = mutableListOf<BrevmottakerView>()
-        if (klager.prosessfullmektig != null) {
-            brevmottakere.add(
-                klager.prosessfullmektig!!.getBrevmottakerView()
-            )
-            if (klager.prosessfullmektig!!.skalPartenMottaKopi) {
-                brevmottakere.add(
-                    klager.getBrevmottakerView()
-                )
-            }
-        } else {
-            brevmottakere.add(
-                klager.getBrevmottakerView()
-            )
-        }
-        if (sakenGjelder.partId != klager.partId && sakenGjelder.skalMottaKopi) {
-            brevmottakere.add(
-                sakenGjelder.getBrevmottakerView()
-            )
-        }
-
-        return brevmottakere
-    }
-
-    private fun Klager.getBrevmottakerView() =
-        BrevmottakerView(
-            partId = partId.value,
-            partIdType = partId.type.name,
-            navn = partId.getNavn(),
-            rolle = BrevmottakerRolle.KLAGER,
-            brevmottakertype = Brevmottakertype.KLAGER.id,
-        )
-
-    private fun SakenGjelder.getBrevmottakerView() =
-        BrevmottakerView(
-            partId = partId.value,
-            partIdType = partId.type.name,
-            navn = partId.getNavn(),
-            rolle = BrevmottakerRolle.SAKEN_GJELDER,
-            brevmottakertype = Brevmottakertype.SAKEN_GJELDER.id,
-        )
-
-    private fun Prosessfullmektig.getBrevmottakerView() =
-        BrevmottakerView(
-            partId = partId.value,
-            partIdType = partId.type.name,
-            navn = partId.getNavn(),
-            rolle = BrevmottakerRolle.PROSESSFULLMEKTIG,
-            brevmottakertype = Brevmottakertype.PROSESSFULLMEKTIG.id,
-        )
 
     private fun PartId.getNavn(): String? =
         if (type == PartIdType.PERSON) {
