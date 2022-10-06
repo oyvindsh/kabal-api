@@ -122,7 +122,7 @@ class KabalDocumentMapper(
         if (partId.type == PartIdType.PERSON) {
             pdlFacade.getPersonInfo(partId.value).settSammenNavn()
         } else {
-            eregClient.hentOrganisasjon(partId.value)?.navn?.navnelinje1
+            eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
         }
 
 
