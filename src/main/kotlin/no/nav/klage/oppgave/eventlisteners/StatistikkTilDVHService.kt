@@ -3,11 +3,14 @@ package no.nav.klage.oppgave.eventlisteners
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.kodeverk.PartIdType
+import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
+import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
+import no.nav.klage.oppgave.domain.klage.utfallToTrygderetten
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -37,7 +40,7 @@ class StatistikkTilDVHService(
             val statistikkTilDVH = createStatistikkTilDVH(
                 eventId = eventId,
                 behandling = behandling,
-                behandlingState = getBehandlingState(behandlingEndretEvent.endringslogginnslag)
+                behandlingState = getBehandlingState(behandlingEndretEvent)
             )
 
             kafkaEventRepository.save(
@@ -58,13 +61,31 @@ class StatistikkTilDVHService(
 
     private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
         endringslogginnslag.isEmpty() ||
-                endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER }
+                endringslogginnslag.any {
+                    it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
+                            || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                            || it.felt === Felt.KJENNELSE_MOTTATT
+                }
 
-    private fun getBehandlingState(endringslogginnslag: List<Endringslogginnslag>): BehandlingState {
+    private fun getBehandlingState(behandlingEndretEvent: BehandlingEndretEvent): BehandlingState {
+        val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
         return when {
-            endringslogginnslag.isEmpty() -> BehandlingState.MOTTATT
+            endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
+            endringslogginnslag.any {
+                it.felt === Felt.KJENNELSE_MOTTATT
+                        && behandlingEndretEvent.behandling.type == Type.ANKE_I_TRYGDERETTEN
+            } -> BehandlingState.MOTTATT_FRA_TR
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> BehandlingState.TILDELT_SAKSBEHANDLER
-            endringslogginnslag.any { it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER } -> BehandlingState.AVSLUTTET
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                        && behandlingEndretEvent.behandling.type == Type.ANKE
+                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall !in utfallToTrygderetten
+            } -> BehandlingState.AVSLUTTET
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                        && behandlingEndretEvent.behandling.type == Type.ANKE
+                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall in utfallToTrygderetten
+            } -> BehandlingState.SENDT_TIL_TR
             else -> BehandlingState.UKJENT.also {
                 logger.warn(
                     "unknown state for behandling with id {}",
@@ -90,7 +111,7 @@ class StatistikkTilDVHService(
             behandlingIdKabal = behandling.id.toString(),
             behandlingStartetKA = behandling.tildeling?.tidspunkt?.toLocalDate(),
             behandlingStatus = behandlingState,
-            behandlingType = behandling.type.navn,
+            behandlingType = getBehandlingTypeName(behandling.type),
             beslutter = behandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
             endringstid = funksjoneltEndringstidspunkt,
             hjemmel = behandling.hjemler.map { it.toSearchableString() },
@@ -107,6 +128,13 @@ class StatistikkTilDVHService(
             ytelseType = "TODO",
         )
     }
+
+    private fun getBehandlingTypeName(type: Type): String =
+        if (type == Type.ANKE_I_TRYGDERETTEN) {
+            Type.ANKE.navn
+        } else {
+            type.navn
+        }
 
     //Resultat should only be relevant if avsluttetAvSaksbehandler
     private fun getResultat(behandling: Behandling): String? =
@@ -129,6 +157,12 @@ class StatistikkTilDVHService(
             BehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")
                 LocalDateTime.now()
+            }
+            BehandlingState.SENDT_TIL_TR -> behandling.currentDelbehandling().avsluttetAvSaksbehandler
+                ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
+            BehandlingState.MOTTATT_FRA_TR -> {
+                behandling as AnkeITrygderettenbehandling
+                behandling.kjennelseMottatt ?: throw RuntimeException("kjennelseMottatt mangler")
             }
         }
     }
