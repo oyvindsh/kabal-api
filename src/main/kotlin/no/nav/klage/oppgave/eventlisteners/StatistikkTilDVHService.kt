@@ -61,23 +61,30 @@ class StatistikkTilDVHService(
 
     private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
         endringslogginnslag.isEmpty() ||
-                endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER }
+                endringslogginnslag.any {
+                    it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
+                            || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                            || it.felt === Felt.KJENNELSE_MOTTATT
+                }
 
     private fun getBehandlingState(behandlingEndretEvent: BehandlingEndretEvent): BehandlingState {
         val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
         return when {
             endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
-            endringslogginnslag.any { it.felt === Felt.KJENNELSE_MOTTATT
-                    && behandlingEndretEvent.behandling.type == Type.ANKE_I_TRYGDERETTEN
+            endringslogginnslag.any {
+                it.felt === Felt.KJENNELSE_MOTTATT
+                        && behandlingEndretEvent.behandling.type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.MOTTATT_FRA_TR
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> BehandlingState.TILDELT_SAKSBEHANDLER
-            endringslogginnslag.any { it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                    && behandlingEndretEvent.behandling.type == Type.ANKE
-                    && behandlingEndretEvent.behandling.currentDelbehandling().utfall !in utfallToTrygderetten
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                        && behandlingEndretEvent.behandling.type == Type.ANKE
+                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall !in utfallToTrygderetten
             } -> BehandlingState.AVSLUTTET
-            endringslogginnslag.any { it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                    && behandlingEndretEvent.behandling.type == Type.ANKE
-                    && behandlingEndretEvent.behandling.currentDelbehandling().utfall in utfallToTrygderetten
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                        && behandlingEndretEvent.behandling.type == Type.ANKE
+                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall in utfallToTrygderetten
             } -> BehandlingState.SENDT_TIL_TR
             else -> BehandlingState.UKJENT.also {
                 logger.warn(
