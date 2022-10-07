@@ -11,7 +11,7 @@ val springMockkVersion = "3.1.1"
 val springDocVersion = "1.6.11"
 val testContainersVersion = "1.17.5"
 val shedlockVersion = "4.42.0"
-val archunitVersion = "0.23.1"
+val archunitVersion = "1.0.0"
 val kotlinXmlBuilderVersion = "1.8.0"
 val logbackSyslog4jVersion = "1.0.0"
 val jacksonJsonschemaVersion = "1.0.39"
@@ -24,10 +24,11 @@ val verapdfVersion = "1.22.2"
 //val githubPassword: String by project
 
 plugins {
+    val kotlinVersion = "1.7.20"
     id("org.springframework.boot") version "2.7.4"
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.spring") version "1.7.10"
-    kotlin("plugin.jpa") version "1.7.10"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
     idea
 }
 
