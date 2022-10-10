@@ -83,6 +83,10 @@ class StatistikkTilDVHService(
             } -> BehandlingState.AVSLUTTET
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                        && behandlingEndretEvent.behandling.type != Type.ANKE
+            } -> BehandlingState.AVSLUTTET
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
                         && behandlingEndretEvent.behandling.type == Type.ANKE
                         && behandlingEndretEvent.behandling.currentDelbehandling().utfall in utfallToTrygderetten
             } -> BehandlingState.SENDT_TIL_TR
