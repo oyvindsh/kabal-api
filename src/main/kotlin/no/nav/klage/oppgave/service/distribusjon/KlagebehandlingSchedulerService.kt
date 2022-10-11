@@ -26,10 +26,11 @@ class KlagebehandlingSchedulerService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Scheduled(fixedDelay = 240000, initialDelay = 240000)
+    @Scheduled(fixedDelay = 10000, initialDelay = 20000)
     @SchedulerLock(name = "avsluttBehandling")
     fun avsluttBehandling() {
         logger.debug("avsluttBehandling is called by scheduler")
+        //TODO: Vurder om ankebehandling basert på ankeITrygderetten skal opprettes raskere enn etter 4 minutter. Evt: Hvorfor vente 4 minutter?
         val behandlingIdList: List<Pair<UUID, Type>> = behandlingService.findBehandlingerForAvslutning()
 
         behandlingIdList.forEach { (id, type) ->
