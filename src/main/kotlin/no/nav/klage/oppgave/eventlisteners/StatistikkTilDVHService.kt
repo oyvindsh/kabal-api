@@ -33,7 +33,7 @@ class StatistikkTilDVHService(
     }
 
     fun process(behandlingEndretEvent: BehandlingEndretEvent) {
-        if (shouldSendStats(behandlingEndretEvent.endringslogginnslag)) {
+        if (shouldSendStats(behandlingEndretEvent)) {
             val behandling = behandlingEndretEvent.behandling
 
             val eventId = UUID.randomUUID()
@@ -59,9 +59,9 @@ class StatistikkTilDVHService(
 
     private fun StatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
 
-    private fun shouldSendStats(endringslogginnslag: List<Endringslogginnslag>) =
-        endringslogginnslag.isEmpty() ||
-                endringslogginnslag.any {
+    private fun shouldSendStats(behandlingEndretEvent: BehandlingEndretEvent) =
+        (behandlingEndretEvent.endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN) ||
+                behandlingEndretEvent.endringslogginnslag.any {
                     it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                             || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
                             || it.felt === Felt.KJENNELSE_MOTTATT
