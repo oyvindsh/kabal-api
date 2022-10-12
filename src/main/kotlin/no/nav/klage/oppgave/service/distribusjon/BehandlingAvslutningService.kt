@@ -20,6 +20,7 @@ import no.nav.klage.oppgave.service.AnkebehandlingService
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.hibernate.Hibernate
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -77,7 +78,8 @@ class BehandlingAvslutningService(
                 .shouldCreateNewAnkebehandling()
         ) {
             logger.debug("Oppretter ny Ankebehandling basert på AnkeITrygderettenbehandling")
-            createNewAnkebehandlingFromAnkeITrygderettenbehandling(behandling as AnkeITrygderettenbehandling)
+            val ankeITrygderettenbehandling = Hibernate.unproxy(behandling) as AnkeITrygderettenbehandling
+            createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
             //TODO: Skal vi gi infomelding til dvh om TR-resultat her?
         } else {
             val hoveddokumenter =
