@@ -4,6 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
@@ -64,6 +65,8 @@ class StatistikkTilDVHService(
                 behandlingEndretEvent.endringslogginnslag.any {
                     it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                             || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                                && !(behandlingEndretEvent.behandling.type == Type.ANKE_I_TRYGDERETTEN
+                                    && behandlingEndretEvent.behandling.currentDelbehandling().utfall == Utfall.HENVIST)
                             || it.felt === Felt.KJENNELSE_MOTTATT
                 }
 
