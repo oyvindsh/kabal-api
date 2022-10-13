@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,6 +24,7 @@ class DokumentService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
         private val dokumentMapper = DokumentMapper()
     }
 
@@ -40,6 +42,20 @@ class DokumentService(
                     pageSize,
                     previousPageRef
                 )
+
+            //Attempt to track down elusive bug with repeated documents
+            val uniqueJournalposter = dokumentoversiktBruker.journalposter.map { it.journalpostId }.toSet()
+            if (uniqueJournalposter.size != dokumentoversiktBruker.journalposter.size) {
+                secureLogger.error(
+                    "Received list of non unique documents from SAF.\nUnique list: ${
+                        uniqueJournalposter.joinToString()
+                    }. " + "\nFull list: ${
+                        dokumentoversiktBruker.journalposter.joinToString { it.journalpostId }
+                    }" + "\nParams: fnr: ${behandling.sakenGjelder.partId.value}, behandlingId: ${behandling.id}, " +
+                            "temaer: ${temaer.joinToString()}, pageSize: $pageSize, previousPageRef: $previousPageRef"
+                )
+            }
+
             return DokumenterResponse(
                 dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
                     dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, behandling)
