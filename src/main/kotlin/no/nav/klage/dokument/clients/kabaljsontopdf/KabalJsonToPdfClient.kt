@@ -31,7 +31,7 @@ class KabalJsonToPdfClient(
                 val filename = it.headers["filename"]?.first()
                 PDFDocument(
                     filename = filename
-                        ?: "somefilename",//throw RuntimeException("Could not get filename from headers"),
+                        ?: "somefilename",
                     bytes = it.body ?: throw RuntimeException("Could not get PDF data")
                 )
             }
