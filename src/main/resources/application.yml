@@ -230,6 +230,8 @@ KABAL_DOCUMENT_APP_NAME: kabal-document
 KABAL_SMART_EDITOR_API_BASE_URL: http://kabal-smart-editor-api
 KABAL_SMART_EDITOR_API_APP_NAME: kabal-smart-editor-api
 
+KABAL_JSON_TO_PDF_BASE_URL: http://kabal-json-to-pdf
+
 KAKA_API_BASE_URL: http://kaka-api
 KAKA_API_APP_NAME: kaka-api
 
