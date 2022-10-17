@@ -1,11 +1,7 @@
 package no.nav.klage.dokument.clients.kabalsmarteditorapi
 
-import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
-import no.nav.klage.dokument.domain.SmartEditorDokument
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.util.getLogger
-import org.apache.tika.Tika
-import org.springframework.http.MediaType
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -26,19 +22,8 @@ class DefaultKabalSmartEditorApiGateway(private val kabalSmartEditorApiClient: K
     }
 
     @Retryable
-    fun getDocumentAsPDF(smartEditorId: UUID, documentTitle: String): SmartEditorDokument {
-        val responseEntity = kabalSmartEditorApiClient.getDocumentAsPDF(smartEditorId)
-        return responseEntity.let {
-            SmartEditorDokument(
-                smartEditorId = smartEditorId,
-                mellomlagretDokument =
-                OpplastetMellomlagretDokument(
-                    content = it,
-                    title = documentTitle,
-                    contentType = MediaType.valueOf(Tika().detect(it)) //TODO Fra header?
-                )
-            )
-        }
+    fun getDocumentAsJson(smartEditorId: UUID): String {
+        return kabalSmartEditorApiClient.getDocument(smartEditorId).json!!
     }
 
     fun createDocument(

@@ -1,5 +1,6 @@
 package no.nav.klage.dokument.service
 
+import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.MellomlagretDokument
 import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
@@ -37,6 +38,7 @@ class DokumentUnderArbeidService(
     private val attachmentValidator: MellomlagretDokumentValidatorService,
     private val mellomlagerService: MellomlagerService,
     private val smartEditorApiGateway: DefaultKabalSmartEditorApiGateway,
+    private val kabalJsonToPdfClient: KabalJsonToPdfClient,
     private val behandlingService: BehandlingService,
     private val dokumentEnhetService: KabalDocumentGateway,
     private val applicationEventPublisher: ApplicationEventPublisher,
@@ -544,20 +546,20 @@ class DokumentUnderArbeidService(
     }
 
     private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid) {
-        val smartdocument = smartEditorApiGateway.getDocumentAsPDF(
-            dokument.smartEditorId!!,
-            dokument.name
-        )
+        val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
+        val pdfDocument = kabalJsonToPdfClient.getPDFDocument(documentJson)
         val mellomlagerId =
-            mellomlagerService.uploadDocument(
-                smartdocument
+            mellomlagerService.uploadByteArray(
+                tittel = dokument.name,
+                content = pdfDocument.bytes
             )
-        //Sletter gammelt:
+
         if (dokument.mellomlagerId != null) {
             mellomlagerService.deleteDocument(dokument.mellomlagerId!!)
         }
+
         dokument.mellomlagerId = mellomlagerId
-        dokument.size = smartdocument.mellomlagretDokument.content.size.toLong()
+        dokument.size = pdfDocument.bytes.size.toLong()
         dokument.opplastet = LocalDateTime.now()
     }
 
