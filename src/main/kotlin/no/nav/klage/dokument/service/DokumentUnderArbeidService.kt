@@ -295,12 +295,32 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
+    fun validerSmartDokument(
+        dokumentId: DokumentId
+    ) {
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
+        if (hovedDokument.smartEditorId != null) {
+            val documentJson = smartEditorApiGateway.getDocumentAsJson(hovedDokument.smartEditorId!!)
+            kabalJsonToPdfClient.validateJsonDocument(documentJson)
+        }
+        vedlegg.forEach {
+            if (it.smartEditorId != null) {
+                val documentJson = smartEditorApiGateway.getDocumentAsJson(it.smartEditorId!!)
+                kabalJsonToPdfClient.validateJsonDocument(documentJson)
+            }
+        }
+    }
+
+
     fun finnOgMarkerFerdigHovedDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: DokumentId,
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
+        validerSmartDokument(dokumentId)
+
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isEmpty()) {
