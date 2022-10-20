@@ -295,7 +295,7 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
-    fun validerSmartDokument(
+    fun validateSmartDokument(
         dokumentId: DokumentId
     ) {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -324,7 +324,7 @@ class DokumentUnderArbeidService(
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
-        validerSmartDokument(dokumentId)
+        validateSmartDokument(dokumentId)
 
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
