@@ -124,11 +124,19 @@ class AnkebehandlingService(
             )
         }
 
-        //TODO: Undersøk med dvh hva vi skal sende ut i dette tilfellet
         applicationEventPublisher.publishEvent(
             BehandlingEndretEvent(
                 behandling = ankebehandling,
-                endringslogginnslag = emptyList()
+                endringslogginnslag = listOfNotNull(
+                    Endringslogginnslag.endringslogg(
+                        saksbehandlerident = ankeITrygderettenbehandling.tildeling!!.saksbehandlerident,
+                        felt = Felt.ANKEBEHANDLING_OPPRETTET_BASERT_PAA_ANKE_I_TRYGDERETTEN,
+                        fraVerdi = null,
+                        tilVerdi = "Opprettet",
+                        behandlingId = ankebehandling.id,
+                        tidspunkt = ankebehandling.created,
+                    )
+                )
             )
         )
 

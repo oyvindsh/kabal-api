@@ -128,7 +128,7 @@ data class StatistikkTilDVH(
     @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH. TODO.")
     val ytelseType: String,
 
-) {
+    ) {
     data class Part(
         val verdi: String,
         val type: PartIdType
@@ -140,5 +140,5 @@ data class StatistikkTilDVH(
 }
 
 enum class BehandlingState {
-    MOTTATT, TILDELT_SAKSBEHANDLER, AVSLUTTET, UKJENT, SENDT_TIL_TR, MOTTATT_FRA_TR
+    MOTTATT, TILDELT_SAKSBEHANDLER, AVSLUTTET, UKJENT, SENDT_TIL_TR, MOTTATT_FRA_TR, NY_ANKEBEHANDLING_I_KA
 }
