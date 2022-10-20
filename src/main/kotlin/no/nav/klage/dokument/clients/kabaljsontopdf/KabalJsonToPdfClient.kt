@@ -1,6 +1,7 @@
 package no.nav.klage.dokument.clients.kabaljsontopdf
 
 import brave.Tracer
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.domain.PDFDocument
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.oppgave.util.getLogger
@@ -55,7 +56,9 @@ class KabalJsonToPdfClient(
                 { status: HttpStatus -> status.isError },
                 { errorResponse: ClientResponse ->
                     errorResponse.bodyToMono<String>().flatMap { errorBody ->
+                        val parsedError = jacksonObjectMapper().readValue(errorBody, Map::class.java) as Map<String, *>
                         logger.error("Feilet med å validere dokument. Feil: {}", errorBody)
+                        logger.error("Feilet med å validere dokument. Feilforsøk: {}", parsedError["detail"])
                         Mono.error(DokumentValidationException(errorBody))
                     }
                 }
