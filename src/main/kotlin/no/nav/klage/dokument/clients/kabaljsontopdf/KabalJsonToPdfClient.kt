@@ -44,8 +44,7 @@ class KabalJsonToPdfClient(
             .block() ?: throw RuntimeException("PDF could not be created")
     }
 
-    fun validateJsonDocument(json: String) {
-
+    fun validateJsonDocument(json: String): Unit? {
         return kabalJsonToPdfWebClient.post()
             .uri { it.path("/validate").build() }
             .contentType(MediaType.APPLICATION_JSON)
@@ -65,6 +64,6 @@ class KabalJsonToPdfClient(
             )
 
             .bodyToMono<Unit>()
-            .block() ?: throw RuntimeException("Document Json could not be validated")
+            .block()
     }
 }
