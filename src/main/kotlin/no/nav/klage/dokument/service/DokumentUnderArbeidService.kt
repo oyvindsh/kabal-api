@@ -301,12 +301,16 @@ class DokumentUnderArbeidService(
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.smartEditorId != null) {
+            logger.debug("Getting json document, dokumentId: ${hovedDokument.id.id}")
             val documentJson = smartEditorApiGateway.getDocumentAsJson(hovedDokument.smartEditorId!!)
+            logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${hovedDokument.id.id}")
             kabalJsonToPdfClient.validateJsonDocument(documentJson)
         }
         vedlegg.forEach {
             if (it.smartEditorId != null) {
+                logger.debug("Getting json document, dokumentId: ${it.id.id}")
                 val documentJson = smartEditorApiGateway.getDocumentAsJson(it.smartEditorId!!)
+                logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${it.id.id}")
                 kabalJsonToPdfClient.validateJsonDocument(documentJson)
             }
         }

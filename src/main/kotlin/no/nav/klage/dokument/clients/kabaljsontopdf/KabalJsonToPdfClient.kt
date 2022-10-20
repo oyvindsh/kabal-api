@@ -45,7 +45,7 @@ class KabalJsonToPdfClient(
     }
 
     fun validateJsonDocument(json: String) {
-        logger.debug("Validating json document in kabalJsontoPdf.")
+
         return kabalJsonToPdfWebClient.post()
             .uri { it.path("/validate").build() }
             .contentType(MediaType.APPLICATION_JSON)
