@@ -168,7 +168,6 @@ class DokumentUnderArbeidController(
     fun validateDokument(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentid") dokumentId: UUID,
-        @RequestBody(required = true) input: FerdigstillDokumentInput,
     ) {
         dokumentUnderArbeidService.validerSmartDokument(DokumentId(dokumentId))
     }
