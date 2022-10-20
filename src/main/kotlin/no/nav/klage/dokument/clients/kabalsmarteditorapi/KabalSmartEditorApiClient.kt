@@ -192,22 +192,4 @@ class KabalSmartEditorApiClient(
             .bodyToMono<CommentOutput>()
             .block() ?: throw RuntimeException("Comment could not be modified")
     }
-
-    fun getDocumentAsPDF(
-        documentId: UUID
-    ): ByteArray {
-        return kabalSmartEditorApiWebClient.get()
-            .uri { it.path("/documents/$documentId/pdf").build() }
-            .header(
-                HttpHeaders.AUTHORIZATION,
-                "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
-            )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
-            .retrieve()
-            .toEntity(ByteArray::class.java)
-            .map {
-                it.body ?: throw RuntimeException("Could not get PDF data")
-            }
-            .block() ?: throw RuntimeException("Document PDF could not be retrieved")
-    }
 }

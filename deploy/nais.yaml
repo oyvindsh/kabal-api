@@ -102,6 +102,7 @@ spec:
         - application: kabal-smart-editor-api
         - application: kaka-api
         - application: kabal-file-api
+        - application: kabal-json-to-pdf
         - application: clamav
           namespace: clamav
       external:
