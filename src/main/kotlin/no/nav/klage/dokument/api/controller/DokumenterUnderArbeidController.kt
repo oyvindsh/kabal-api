@@ -164,6 +164,14 @@ class DokumentUnderArbeidController(
         )
     }
 
+    @PostMapping("/{dokumentid}/validate")
+    fun validateDokument(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentid") dokumentId: UUID,
+    ) {
+        dokumentUnderArbeidService.validateSmartDokument(DokumentId(dokumentId))
+    }
+
     //Old event stuff. Clients should read from EventController instead, and this can be deleted.
     @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun documentEvents(

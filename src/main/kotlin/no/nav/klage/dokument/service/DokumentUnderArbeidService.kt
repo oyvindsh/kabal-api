@@ -295,12 +295,37 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
+    fun validateSmartDokument(
+        dokumentId: DokumentId
+    ) {
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
+        if (hovedDokument.smartEditorId != null) {
+            validateSingleDocument(hovedDokument)
+        }
+        vedlegg.forEach {
+            if (it.smartEditorId != null) {
+                validateSingleDocument(it)
+            }
+        }
+    }
+
+    private fun validateSingleDocument(dokument: DokumentUnderArbeid) {
+        logger.debug("Getting json document, dokumentId: ${dokument.id.id}")
+        val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
+        logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${dokument.id.id}")
+        kabalJsonToPdfClient.validateJsonDocument(documentJson)
+    }
+
+
     fun finnOgMarkerFerdigHovedDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: DokumentId,
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
+        validateSmartDokument(dokumentId)
+
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isEmpty()) {
