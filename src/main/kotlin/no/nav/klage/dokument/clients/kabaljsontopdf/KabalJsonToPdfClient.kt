@@ -57,9 +57,9 @@ class KabalJsonToPdfClient(
                 { errorResponse: ClientResponse ->
                     errorResponse.bodyToMono<String>().flatMap { errorBody ->
                         val parsedError = jacksonObjectMapper().readValue(errorBody, Map::class.java) as Map<String, *>
-                        logger.error("Feilet med å validere dokument. Feil: {}", errorBody)
-                        logger.error("Feilet med å validere dokument. Feilforsøk: {}", parsedError["detail"])
-                        Mono.error(DokumentValidationException(errorBody))
+                        val parsedErrorDetails = parsedError["detail"].toString()
+                        logger.error("Feilet ved validering av dokument. Feil: {}", errorBody)
+                        Mono.error(DokumentValidationException(parsedErrorDetails))
                     }
                 }
             )
