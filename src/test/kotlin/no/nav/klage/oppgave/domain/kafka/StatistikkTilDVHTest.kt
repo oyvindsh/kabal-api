@@ -46,7 +46,6 @@ internal class StatistikkTilDVHTest {
             saksbehandler = "Z405060",
             saksbehandlerEnhet = "4291",
             tekniskTid = LocalDateTime.now(),
-            vedtakId = "ers-8sdt-80s-89u",
             vedtaksdato = LocalDate.now(),
             versjon = 1,
             ytelseType = "OMS"

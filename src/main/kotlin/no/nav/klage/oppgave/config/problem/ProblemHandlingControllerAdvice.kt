@@ -217,7 +217,14 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         ex: DokumentValidationException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+        create(ex, createDocumentValidationProblem(), request)
+
+    private fun createDocumentValidationProblem(): ThrowableProblem {
+        return Problem.builder()
+            .withStatus(Status.BAD_REQUEST)
+            .with("errors", mapOf("EMPTY_PLACEHOLDERS" to emptyList<String>()))
+            .build()
+    }
 
     private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
         return Problem.builder()
