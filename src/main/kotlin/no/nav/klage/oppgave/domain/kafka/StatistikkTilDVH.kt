@@ -17,6 +17,9 @@ const val DATE_FORMAT = "yyyy-MM-dd"
  * Brukes av DVH
  * StatistikkTilDVH er en hendelse i en Sak, knyttet til en konkret behandlingstype (eks. søknad, revurdering, endring, klage).
  * Vi sender dette typisk ved mottak, tildeling og fullføring.
+ *
+ * Navnendringer her krever at vi sender all data til DVH på nytt med nye navn. Derfor er vi forsiktige med å gjøre slik endringer
+ * da dette blir litt dyrt. Hvis et felt endrer betydning så er det viktig å dokumentere.
  */
 @JsonSchemaTitle("SaksbehandlingKA")
 data class StatistikkTilDVH(
@@ -45,7 +48,7 @@ data class StatistikkTilDVH(
         pattern = DATE_FORMAT
     )
     @JsonSchemaFormat(DATE_FORMAT_LABEL)
-    @JsonSchemaDescription("Når behandlingen startet i KA")
+    @JsonSchemaDescription("Når enhet blir satt i KA")
     val behandlingStartetKA: LocalDate?,
 
     @JsonSchemaDescription("Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt.")
@@ -54,7 +57,7 @@ data class StatistikkTilDVH(
     @JsonSchemaDescription("Kode som beskriver behandlingen, for eksempel, klage, anke, tilbakekreving o.l.")
     val behandlingType: String,
 
-    @JsonSchemaDescription("BrukerIDen til den ansvarlige beslutningstageren for saken. Medunderskriver.")
+    @JsonSchemaDescription("BrukerIDen til ev. medunderskriver.")
     val beslutter: String?,
 
     @JsonFormat(
@@ -109,9 +112,6 @@ data class StatistikkTilDVH(
     @JsonSchemaDescription("Tidspunktet da systemet ble klar over hendelsen. (format:$DATE_TIME_FORMAT). Dette er tidspunkt hendelsen ble endret i systemet. Sammen med funksjonellTid/endringstid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid.")
     val tekniskTid: LocalDateTime,
 
-    @JsonSchemaDescription("Nøkkel til det aktuelle vedtaket da behandlingen blir tilknyttet et slikt. Vedtaket i Kabal.")
-    val vedtakId: String,
-
     @JsonFormat(
         shape = JsonFormat.Shape.STRING,
         pattern = DATE_FORMAT
@@ -124,8 +124,7 @@ data class StatistikkTilDVH(
     //TODO find version?
     val versjon: Int = 1,
 
-    //TODO Fyll ut når kabal-api får tilgang til det
-    @JsonSchemaDescription("Stønaden eller ytelsen saken omhandler. Hva gjelder saken? Kodeverk fra DVH. TODO.")
+    @JsonSchemaDescription("Navnet på ytelsen i Kabal sitt kodeverk")
     val ytelseType: String,
 
     ) {
