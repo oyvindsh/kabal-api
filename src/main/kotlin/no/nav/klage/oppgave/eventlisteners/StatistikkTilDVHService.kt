@@ -4,6 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
@@ -113,12 +114,14 @@ class StatistikkTilDVHService(
             eventId = eventId,
             behandlingId = behandling.dvhReferanse ?: behandling.kildeReferanse,
             behandlingIdKabal = behandling.id.toString(),
+            //Means enhetTildeltDato
             behandlingStartetKA = behandling.tildeling?.tidspunkt?.toLocalDate(),
             behandlingStatus = behandlingState,
             behandlingType = getBehandlingTypeName(behandling.type),
+            //Means medunderskriver
             beslutter = behandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
             endringstid = funksjoneltEndringstidspunkt,
-            hjemmel = behandling.hjemler.map { it.toSearchableString() },
+            hjemmel = behandling.currentDelbehandling().hjemler.map { it.toSearchableString() },
             klager = getPart(behandling.klager.partId.type, behandling.klager.partId.value),
             opprinneligFagsaksystem = behandling.sakFagsystem.navn,
             overfoertKA = behandling.mottattKlageinstans.toLocalDate(),
@@ -127,9 +130,8 @@ class StatistikkTilDVHService(
             saksbehandler = behandling.tildeling?.saksbehandlerident,
             saksbehandlerEnhet = behandling.tildeling?.enhet,
             tekniskTid = behandling.modified,
-            vedtakId = behandling.currentDelbehandling().id.toString(),
             vedtaksdato = behandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
-            ytelseType = "TODO",
+            ytelseType = behandling.ytelse.navn,
         )
     }
 
@@ -186,4 +188,8 @@ class StatistikkTilDVHService(
                 )
             }
         }
+
+    private fun Registreringshjemmel.toSearchableString(): String {
+        return "${lovKilde.navn}-${spesifikasjon}"
+    }
 }
