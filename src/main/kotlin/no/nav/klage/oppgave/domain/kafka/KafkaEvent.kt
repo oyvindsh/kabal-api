@@ -19,7 +19,7 @@ class KafkaEvent(
     @Enumerated(EnumType.STRING)
     var status: UtsendingStatus = UtsendingStatus.IKKE_SENDT,
     @Column(name = "json_payload")
-    val jsonPayload: String,
+    var jsonPayload: String,
     @Column(name = "error_message")
     var errorMessage: String? = null,
     @Column(name = "created")

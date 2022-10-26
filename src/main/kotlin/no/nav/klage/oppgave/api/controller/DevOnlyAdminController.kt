@@ -84,5 +84,18 @@ class DevOnlyAdminController(
         adminService.isSkjermet(input.fnr)
     }
 
+    @Unprotected
+    @PostMapping("/internal/migratedvhevents")
+    fun migrateDvhEvents() {
+        logger.debug("migrateDvhEvents is called")
+
+        try {
+            adminService.migrateDvhEvents()
+        } catch (e: Exception) {
+            logger.warn("Failed to migrate DVH events", e)
+            throw e
+        }
+    }
+
     data class Fnr(val fnr: String)
 }

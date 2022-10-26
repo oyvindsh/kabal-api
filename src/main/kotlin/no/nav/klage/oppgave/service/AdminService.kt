@@ -1,25 +1,29 @@
 package no.nav.klage.oppgave.service
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.clients.skjermede.SkjermedeApiClient
+import no.nav.klage.oppgave.domain.kafka.BehandlingState
 import no.nav.klage.oppgave.domain.kafka.EventType
+import no.nav.klage.oppgave.domain.kafka.StatistikkTilDVH
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
-import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
-import no.nav.klage.oppgave.repositories.BehandlingRepository
-import no.nav.klage.oppgave.repositories.EndringsloggRepository
+import no.nav.klage.oppgave.repositories.*
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
+@Transactional
 class AdminService(
     private val kafkaDispatcher: KafkaDispatcher,
     private val behandlingRepository: BehandlingRepository,
@@ -27,6 +31,7 @@ class AdminService(
     private val ankeITrygderettenbehandlingRepository: AnkeITrygderettenbehandlingRepository,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val behandlingEndretKafkaProducer: BehandlingEndretKafkaProducer,
+    private val kafkaEventRepository: KafkaEventRepository,
     private val fileApiClient: FileApiClient,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val endringsloggRepository: EndringsloggRepository,
@@ -39,6 +44,7 @@ class AdminService(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+        private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     }
 
     fun syncKafkaWithDb() {
@@ -166,6 +172,31 @@ class AdminService(
             secureLogger.debug("isSkjermet: {} for fnr {}", isSkjermet, fnr)
         } catch (e: Exception) {
             secureLogger.error("isSkjermet failed for fnr $fnr", e)
+        }
+    }
+
+    fun migrateDvhEvents() {
+        val events = kafkaEventRepository.getAllByTypeIsLike(EventType.STATS_DVH)
+        val filteredEvents = events.filter {
+            val parsedStatistikkTilDVH = objectMapper.readValue(it.jsonPayload, StatistikkTilDVH::class.java)
+            parsedStatistikkTilDVH.behandlingType == "Anke" &&
+                    parsedStatistikkTilDVH.behandlingStatus == BehandlingState.AVSLUTTET &&
+                    parsedStatistikkTilDVH.resultat in listOf("Stadfestelse", "Delvis medhold", "Avvist") &&
+                    it.created.isBefore(LocalDateTime.of(2022, 10, 23, 0, 0))
+        }
+        logger.debug("Number of candidates: ${filteredEvents.size}")
+
+        filteredEvents.forEach {
+            logger.debug("BEFORE: Modifying kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
+            var parsedStatistikkTilDVH = objectMapper.readValue(it.jsonPayload, StatistikkTilDVH::class.java)
+            parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(behandlingStatus = BehandlingState.SENDT_TIL_TR)
+            if (parsedStatistikkTilDVH.resultat == "Stadfestelse") {
+                parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(resultat = "Innstilling: Stadfestelse")
+            } else if (parsedStatistikkTilDVH.resultat == "Avvist") {
+                parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(resultat = "Innstilling: Avvist")
+            }
+            it.jsonPayload = objectMapper.writeValueAsString(parsedStatistikkTilDVH)
+            logger.debug("AFTER: Modified kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
         }
     }
 }
