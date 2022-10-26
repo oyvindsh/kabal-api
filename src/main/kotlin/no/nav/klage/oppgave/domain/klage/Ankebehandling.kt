@@ -23,7 +23,7 @@ class Ankebehandling(
     @Column(name = "klage_id")
     var klagebehandlingId: UUID? = null,
     @Column(name = "mottak_id")
-    val mottakId: UUID,
+    val mottakId: UUID? = null,
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
 

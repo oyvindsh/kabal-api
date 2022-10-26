@@ -92,7 +92,15 @@ class Delbehandling(
     fun shouldBeSentToTrygderetten(): Boolean {
         return utfall in utfallToTrygderetten
     }
+
+    fun shouldCreateNewAnkebehandling(): Boolean {
+        return utfall in utfallToNewAnkebehandling
+    }
 }
+
+val utfallToNewAnkebehandling = setOf(
+    Utfall.HENVIST
+)
 
 val utfallToTrygderetten = setOf(
     Utfall.DELVIS_MEDHOLD,

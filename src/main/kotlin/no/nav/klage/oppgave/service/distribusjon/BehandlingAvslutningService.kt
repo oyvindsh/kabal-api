@@ -11,13 +11,16 @@ import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.ANKEBEHANDLING_AVSLUTTET
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET
+import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttet
 import no.nav.klage.oppgave.domain.klage.createAnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.service.AnkeITrygderettenbehandlingService
+import no.nav.klage.oppgave.service.AnkebehandlingService
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.hibernate.Hibernate
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,6 +34,7 @@ class BehandlingAvslutningService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
+    private val ankebehandlingService: AnkebehandlingService,
 ) {
 
     companion object {
@@ -70,6 +74,12 @@ class BehandlingAvslutningService(
         if (behandling.type == Type.ANKE && behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
             logger.debug("Anken sendes til trygderetten. Oppretter AnkeITrygderettenbehandling.")
             createAnkeITrygderettenbehandling(behandling)
+        } else if (behandling.type == Type.ANKE_I_TRYGDERETTEN && behandling.currentDelbehandling()
+                .shouldCreateNewAnkebehandling()
+        ) {
+            logger.debug("Oppretter ny Ankebehandling basert på AnkeITrygderettenbehandling")
+            val ankeITrygderettenbehandling = Hibernate.unproxy(behandling) as AnkeITrygderettenbehandling
+            createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
         } else {
             val hoveddokumenter =
                 dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
@@ -109,6 +119,11 @@ class BehandlingAvslutningService(
         applicationEventPublisher.publishEvent(event)
 
         return behandling
+    }
+
+    private fun createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling: AnkeITrygderettenbehandling) {
+        logger.debug("Creating ankebehandling based on behandling with id ${ankeITrygderettenbehandling.id}")
+        ankebehandlingService.createAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
     }
 
     private fun createAnkeITrygderettenbehandling(behandling: Behandling) {

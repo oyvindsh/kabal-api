@@ -1,17 +1,17 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
-import no.nav.klage.oppgave.domain.klage.Ankebehandling
-import no.nav.klage.oppgave.domain.klage.Delbehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.MottakHjemmel
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.Period
 import javax.transaction.Transactional
 
 @Service
@@ -88,6 +88,60 @@ class AnkebehandlingService(
                 endringslogginnslag = emptyList()
             )
         )
+        return ankebehandling
+    }
+
+    fun createAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling: AnkeITrygderettenbehandling): Ankebehandling {
+        val ankebehandling = ankebehandlingRepository.save(
+            Ankebehandling(
+                klager = ankeITrygderettenbehandling.klager.copy(),
+                sakenGjelder = ankeITrygderettenbehandling.sakenGjelder.copy(),
+                ytelse = ankeITrygderettenbehandling.ytelse,
+                type = Type.ANKE,
+                kildeReferanse = ankeITrygderettenbehandling.kildeReferanse,
+                dvhReferanse = ankeITrygderettenbehandling.dvhReferanse,
+                sakFagsystem = ankeITrygderettenbehandling.sakFagsystem,
+                sakFagsakId = ankeITrygderettenbehandling.sakFagsakId,
+                innsendt = ankeITrygderettenbehandling.mottattKlageinstans.toLocalDate(),
+                mottattKlageinstans = ankeITrygderettenbehandling.mottattKlageinstans,
+                tildeling = null,
+                frist = LocalDate.now() + Period.ofWeeks(12),
+                delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(),
+                hjemler = ankeITrygderettenbehandling.hjemler,
+                klageBehandlendeEnhet = ankeITrygderettenbehandling.tildeling?.enhet!!,
+            )
+        )
+        logger.debug("Created ankebehandling ${ankebehandling.id} from ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id}")
+
+        ankeITrygderettenbehandling.saksdokumenter.forEach {
+            behandlingService.connectDokumentToBehandling(
+                behandlingId = ankebehandling.id,
+                journalpostId = it.journalpostId,
+                dokumentInfoId = it.dokumentInfoId,
+                saksbehandlerIdent = SYSTEMBRUKER,
+                systemUserContext = true,
+            )
+        }
+
+        applicationEventPublisher.publishEvent(
+            BehandlingEndretEvent(
+                behandling = ankebehandling,
+                endringslogginnslag = listOfNotNull(
+                    Endringslogginnslag.endringslogg(
+                        saksbehandlerident = ankeITrygderettenbehandling.tildeling!!.saksbehandlerident,
+                        felt = Felt.ANKEBEHANDLING_OPPRETTET_BASERT_PAA_ANKE_I_TRYGDERETTEN,
+                        fraVerdi = null,
+                        tilVerdi = "Opprettet",
+                        behandlingId = ankebehandling.id,
+                        tidspunkt = ankebehandling.created,
+                    )
+                )
+            )
+        )
+
+        //TODO: Undersøk om vi skal sende noen infomelding om at dette har skjedd
+
         return ankebehandling
     }
 

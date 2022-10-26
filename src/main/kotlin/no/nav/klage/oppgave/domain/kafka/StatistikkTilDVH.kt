@@ -127,7 +127,7 @@ data class StatistikkTilDVH(
     @JsonSchemaDescription("Navnet på ytelsen i Kabal sitt kodeverk")
     val ytelseType: String,
 
-) {
+    ) {
     data class Part(
         val verdi: String,
         val type: PartIdType
@@ -139,5 +139,5 @@ data class StatistikkTilDVH(
 }
 
 enum class BehandlingState {
-    MOTTATT, TILDELT_SAKSBEHANDLER, AVSLUTTET, UKJENT, SENDT_TIL_TR, MOTTATT_FRA_TR
+    MOTTATT, TILDELT_SAKSBEHANDLER, AVSLUTTET, UKJENT, SENDT_TIL_TR, MOTTATT_FRA_TR, NY_ANKEBEHANDLING_I_KA
 }

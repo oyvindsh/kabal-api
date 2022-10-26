@@ -26,6 +26,7 @@ class KlagebehandlingSchedulerService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    //TODO: Hvorfor vente 4 minutter?
     @Scheduled(fixedDelay = 240000, initialDelay = 240000)
     @SchedulerLock(name = "avsluttBehandling")
     fun avsluttBehandling() {
