@@ -196,6 +196,7 @@ class AdminService(
                 parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(resultat = "Innstilling: Avvist")
             }
             it.jsonPayload = objectMapper.writeValueAsString(parsedStatistikkTilDVH)
+            it.status = UtsendingStatus.IKKE_SENDT
             logger.debug("AFTER: Modified kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
         }
     }
