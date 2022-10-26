@@ -80,7 +80,6 @@ class BehandlingAvslutningService(
             logger.debug("Oppretter ny Ankebehandling basert på AnkeITrygderettenbehandling")
             val ankeITrygderettenbehandling = Hibernate.unproxy(behandling) as AnkeITrygderettenbehandling
             createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
-            //TODO: Skal vi gi infomelding til dvh om TR-resultat her?
         } else {
             val hoveddokumenter =
                 dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
