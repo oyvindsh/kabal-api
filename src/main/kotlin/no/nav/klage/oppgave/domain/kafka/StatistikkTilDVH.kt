@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.kafka
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaFormat
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle
@@ -22,6 +23,7 @@ const val DATE_FORMAT = "yyyy-MM-dd"
  * da dette blir litt dyrt. Hvis et felt endrer betydning så er det viktig å dokumentere.
  */
 @JsonSchemaTitle("SaksbehandlingKA")
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class StatistikkTilDVH(
 
     /** Kan brukes til idempotency av konsumenter */
