@@ -9,6 +9,7 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.time.LocalDateTime
 
 @Component
 class SafGraphQlClient(
@@ -30,6 +31,7 @@ class SafGraphQlClient(
         pageSize: Int,
         previousPageRef: String? = null
     ): DokumentoversiktBruker {
+        val start = System.currentTimeMillis()
         return runWithTimingAndLogging {
             safWebClient.post()
                 .uri("graphql")
@@ -45,7 +47,14 @@ class SafGraphQlClient(
                 .block()
                 ?.let { logErrorsFromSaf(it, fnr, pageSize, previousPageRef); it }
                 ?.let { failOnErrors(it); it }
-                ?.data!!.dokumentoversiktBruker
+                ?.data!!.dokumentoversiktBruker.also {
+                    logger.debug(
+                        "DokumentoversiktBruker: antall: {}, ms: {}, dato/tid: {}",
+                        it.sideInfo.totaltAntall,
+                        System.currentTimeMillis() - start,
+                        LocalDateTime.now()
+                    )
+                }
         }
     }
 
