@@ -85,7 +85,7 @@ class DevOnlyAdminController(
     }
 
     @Unprotected
-    @PostMapping("/internal/migratedvhevents")
+    @PostMapping("/internal/migratedvh")
     fun migrateDvhEvents() {
         logger.debug("migrateDvhEvents is called")
 
