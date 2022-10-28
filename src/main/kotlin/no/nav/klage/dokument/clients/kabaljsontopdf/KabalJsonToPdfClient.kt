@@ -3,7 +3,7 @@ package no.nav.klage.dokument.clients.kabaljsontopdf
 import brave.Tracer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.domain.PDFDocument
-import no.nav.klage.dokument.exceptions.DokumentValidationException
+import no.nav.klage.dokument.exceptions.JsonDokumentValidationException
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -58,7 +58,7 @@ class KabalJsonToPdfClient(
                         val parsedError = jacksonObjectMapper().readValue(errorBody, Map::class.java) as Map<String, *>
                         val parsedErrorDetails = parsedError["detail"].toString()
                         logger.error("Feilet ved validering av dokument. Feil: {}", errorBody)
-                        Mono.error(DokumentValidationException(parsedErrorDetails))
+                        Mono.error(JsonDokumentValidationException(parsedErrorDetails))
                     }
                 }
             )

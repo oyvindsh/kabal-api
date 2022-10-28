@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.config.problem
 
+import no.nav.klage.dokument.api.view.DocumentValidationResponse
 import no.nav.klage.dokument.exceptions.DokumentValidationException
+import no.nav.klage.dokument.exceptions.JsonDokumentValidationException
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
@@ -217,12 +219,23 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         ex: DokumentValidationException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
-        create(ex, createDocumentValidationProblem(), request)
+        create(Status.BAD_REQUEST, ex, request)
 
-    private fun createDocumentValidationProblem(): ThrowableProblem {
+    @ExceptionHandler
+    fun handleJsonDokumentValidationException(
+        ex: JsonDokumentValidationException,
+        request: NativeWebRequest
+    ): ResponseEntity<Problem> =
+        create(ex, createJsonDocumentValidationProblem(), request)
+
+    private fun createJsonDocumentValidationProblem(): ThrowableProblem {
         return Problem.builder()
             .withStatus(Status.BAD_REQUEST)
-            .with("errors", mapOf("EMPTY_PLACEHOLDERS" to emptyList<String>()))
+            .with("errors", listOf(
+                DocumentValidationResponse.DocumentValidationError(
+                    type = "EMPTY_PLACEHOLDERS"
+                )
+            ))
             .build()
     }
 
