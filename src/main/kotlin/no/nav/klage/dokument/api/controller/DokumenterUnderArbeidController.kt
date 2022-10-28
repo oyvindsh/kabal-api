@@ -8,7 +8,7 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.Event
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
-import no.nav.klage.dokument.exceptions.DokumentValidationException
+import no.nav.klage.dokument.exceptions.JsonDokumentValidationException
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
@@ -173,7 +173,7 @@ class DokumentUnderArbeidController(
         return try {
             dokumentUnderArbeidService.validateSmartDokument(DokumentId(dokumentId))
             DocumentValidationResponse()
-        } catch (dve: DokumentValidationException) {
+        } catch (dve: JsonDokumentValidationException) {
             DocumentValidationResponse(
                 errors = listOf(
                     DocumentValidationResponse.DocumentValidationError(
