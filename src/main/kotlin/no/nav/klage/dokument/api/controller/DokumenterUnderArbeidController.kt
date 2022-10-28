@@ -165,7 +165,7 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @PostMapping("/{dokumentid}/validate")
+    @GetMapping("/{dokumentid}/validate")
     fun validateDokument(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentid") dokumentId: UUID,
