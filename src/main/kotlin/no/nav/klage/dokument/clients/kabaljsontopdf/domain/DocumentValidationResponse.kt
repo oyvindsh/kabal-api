@@ -1,7 +1,6 @@
-package no.nav.klage.dokument.api.view
+package no.nav.klage.dokument.clients.kabaljsontopdf.domain
 
 data class DocumentValidationResponse(
-    val dokumentId: String,
     val errors: List<DocumentValidationError> = emptyList()
 ) {
     data class DocumentValidationError(
