@@ -1,5 +1,6 @@
 package no.nav.klage.dokument.service
 
+import no.nav.klage.dokument.api.view.DocumentValidationResponse
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.MellomlagretDokument
@@ -8,6 +9,7 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJournalpostId
 import no.nav.klage.dokument.exceptions.DokumentValidationException
+import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
@@ -297,26 +299,38 @@ class DokumentUnderArbeidService(
 
     fun validateSmartDokument(
         dokumentId: DokumentId
-    ) {
+    ): List<DocumentValidationResponse> {
+        val documentValidationResults = mutableListOf<DocumentValidationResponse>()
+
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.smartEditorId != null) {
-            validateSingleDocument(hovedDokument)
+            documentValidationResults += validateSingleDocument(hovedDokument)
         }
         vedlegg.forEach {
             if (it.smartEditorId != null) {
-                validateSingleDocument(it)
+                documentValidationResults += validateSingleDocument(it)
             }
         }
+
+        return documentValidationResults
     }
 
-    private fun validateSingleDocument(dokument: DokumentUnderArbeid) {
+    private fun validateSingleDocument(dokument: DokumentUnderArbeid): DocumentValidationResponse {
         logger.debug("Getting json document, dokumentId: ${dokument.id.id}")
         val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
         logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${dokument.id.id}")
-        kabalJsonToPdfClient.validateJsonDocument(documentJson)
+        val response = kabalJsonToPdfClient.validateJsonDocument(documentJson)
+        return DocumentValidationResponse(
+            dokumentId = dokument.id.id.toString(),
+            errors = response.errors.map {
+                DocumentValidationResponse.DocumentValidationError(
+                    type = it.type,
+                    paths = it.paths,
+                )
+            }
+        )
     }
-
 
     fun finnOgMarkerFerdigHovedDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
@@ -324,7 +338,13 @@ class DokumentUnderArbeidService(
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
-        validateSmartDokument(dokumentId)
+        val documentValidationErrors = validateSmartDokument(dokumentId)
+        if (documentValidationErrors.any { it.errors.isNotEmpty() }) {
+            throw JsonToPdfValidationException(
+                msg = "Validation error from json to pdf",
+                errors = documentValidationErrors
+            )
+        }
 
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 

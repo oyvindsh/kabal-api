@@ -1,8 +1,7 @@
 package no.nav.klage.oppgave.config.problem
 
-import no.nav.klage.dokument.api.view.DocumentValidationResponse
 import no.nav.klage.dokument.exceptions.DokumentValidationException
-import no.nav.klage.dokument.exceptions.JsonDokumentValidationException
+import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
@@ -222,20 +221,16 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
         create(Status.BAD_REQUEST, ex, request)
 
     @ExceptionHandler
-    fun handleJsonDokumentValidationException(
-        ex: JsonDokumentValidationException,
+    fun handleJsonToPdfValidationException(
+        ex: JsonToPdfValidationException,
         request: NativeWebRequest
     ): ResponseEntity<Problem> =
-        create(ex, createJsonDocumentValidationProblem(), request)
+        create(ex, createJsonDocumentValidationProblem(ex), request)
 
-    private fun createJsonDocumentValidationProblem(): ThrowableProblem {
+    private fun createJsonDocumentValidationProblem(ex: JsonToPdfValidationException): ThrowableProblem {
         return Problem.builder()
             .withStatus(Status.BAD_REQUEST)
-            .with("errors", listOf(
-                DocumentValidationResponse.DocumentValidationError(
-                    type = "EMPTY_PLACEHOLDERS"
-                )
-            ))
+            .with("dokumenter", ex.errors)
             .build()
     }
 
