@@ -28,6 +28,8 @@ class StatistikkTilDVHService(
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
         private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+
+        const val TR_ENHET = "TR0000"
     }
 
     fun process(behandlingEndretEvent: BehandlingEndretEvent) {
@@ -67,35 +69,40 @@ class StatistikkTilDVHService(
 
     private fun getBehandlingState(behandlingEndretEvent: BehandlingEndretEvent): BehandlingState {
         val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
+        val type = behandlingEndretEvent.behandling.type
+        val utfall = behandlingEndretEvent.behandling.currentDelbehandling().utfall
+
         return when {
-            endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
+            endringslogginnslag.isEmpty() && type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
+
             endringslogginnslag.any {
                 it.felt === Felt.KJENNELSE_MOTTATT
-                        && behandlingEndretEvent.behandling.type == Type.ANKE_I_TRYGDERETTEN
+                        && type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.MOTTATT_FRA_TR
 
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> BehandlingState.TILDELT_SAKSBEHANDLER
+
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                        && behandlingEndretEvent.behandling.type == Type.ANKE
-                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall !in utfallToTrygderetten
+                        && type == Type.ANKE
+                        && utfall !in utfallToTrygderetten
             } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                        && behandlingEndretEvent.behandling.type == Type.ANKE_I_TRYGDERETTEN
-                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall in utfallToNewAnkebehandling
+                        && type == Type.ANKE_I_TRYGDERETTEN
+                        && utfall in utfallToNewAnkebehandling
             } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
 
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                        && behandlingEndretEvent.behandling.type != Type.ANKE
+                        && type != Type.ANKE
             } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                        && behandlingEndretEvent.behandling.type == Type.ANKE
-                        && behandlingEndretEvent.behandling.currentDelbehandling().utfall in utfallToTrygderetten
+                        && type == Type.ANKE
+                        && utfall in utfallToTrygderetten
             } -> BehandlingState.SENDT_TIL_TR
 
             else -> BehandlingState.UKJENT.also {
@@ -104,6 +111,18 @@ class StatistikkTilDVHService(
                     endringslogginnslag.first().behandlingId
                 )
             }
+        }
+    }
+
+    private fun getEnhetInCaseOfTR(behandling: Behandling, behandlingState: BehandlingState): String? {
+        return if (behandling.type == Type.ANKE_I_TRYGDERETTEN && behandlingState in listOf(
+                BehandlingState.AVSLUTTET,
+                BehandlingState.NY_ANKEBEHANDLING_I_KA,
+            )
+        ) {
+            TR_ENHET
+        } else {
+            null
         }
     }
 
@@ -118,6 +137,7 @@ class StatistikkTilDVHService(
             behandlingIdKabal = behandling.id.toString(),
             //Means enhetTildeltDato
             behandlingStartetKA = behandling.tildeling?.tidspunkt?.toLocalDate(),
+            ansvarligEnhetKode = getEnhetInCaseOfTR(behandling, behandlingState),
             behandlingStatus = behandlingState,
             behandlingType = getBehandlingTypeName(behandling.type),
             //Means medunderskriver

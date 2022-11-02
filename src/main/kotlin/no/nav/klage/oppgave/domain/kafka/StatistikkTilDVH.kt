@@ -30,7 +30,7 @@ data class StatistikkTilDVH(
     @JsonSchemaDescription("Unik id for denne forsendelsen/eventen.")
     val eventId: UUID,
 
-    @JsonSchemaDescription("Kode som angir hvilken enhet som er ansvarlig for behandlingen på det gjeldende tidspunktet. Dette begrepet har vi ikke helt i Kabal per nå.")
+    @JsonSchemaDescription("Kode som angir hvilken enhet som er ansvarlig for behandlingen på det gjeldende tidspunktet. Dette vet vi ikke alltid.")
     val ansvarligEnhetKode: String? = null,
 
     @JsonSchemaDescription("Kode som angir hvilken type enhetskode det er snakk om, som oftest NORG.")
