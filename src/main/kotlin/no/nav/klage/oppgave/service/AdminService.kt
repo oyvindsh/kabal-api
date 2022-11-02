@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.StatistikkTilDVH
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.eventlisteners.StatistikkTilDVHService.Companion.TR_ENHET
 import no.nav.klage.oppgave.repositories.*
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -177,24 +178,30 @@ class AdminService(
 
     fun migrateDvhEvents() {
         val events = kafkaEventRepository.getAllByTypeIsLike(EventType.STATS_DVH)
+
         val filteredEvents = events.filter {
             val parsedStatistikkTilDVH = objectMapper.readValue(it.jsonPayload, StatistikkTilDVH::class.java)
             parsedStatistikkTilDVH.behandlingType == "Anke" &&
-                    parsedStatistikkTilDVH.behandlingStatus == BehandlingState.AVSLUTTET &&
-                    parsedStatistikkTilDVH.resultat in listOf("Innstilling: Stadfestelse", "Innstilling: Avvist")
+                    parsedStatistikkTilDVH.behandlingStatus in listOf(
+                BehandlingState.AVSLUTTET,
+                BehandlingState.NY_ANKEBEHANDLING_I_KA
+            )
         }
+
         logger.debug("Number of candidates: ${filteredEvents.size}")
 
         filteredEvents.forEach {
-            logger.debug("BEFORE: Modifying kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
-            var parsedStatistikkTilDVH = objectMapper.readValue(it.jsonPayload, StatistikkTilDVH::class.java)
-            parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(
-                behandlingStatus = BehandlingState.SENDT_TIL_TR,
-                tekniskTid = LocalDateTime.now()
-            )
-            it.jsonPayload = objectMapper.writeValueAsString(parsedStatistikkTilDVH)
-            it.status = UtsendingStatus.IKKE_SENDT
-            logger.debug("AFTER: Modified kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
+            if (ankeITrygderettenbehandlingRepository.existsById(it.behandlingId)) {
+                logger.debug("BEFORE: Modifying kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
+                var parsedStatistikkTilDVH = objectMapper.readValue(it.jsonPayload, StatistikkTilDVH::class.java)
+                parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(
+                    ansvarligEnhetKode = TR_ENHET,
+                    tekniskTid = LocalDateTime.now()
+                )
+                it.jsonPayload = objectMapper.writeValueAsString(parsedStatistikkTilDVH)
+                it.status = UtsendingStatus.IKKE_SENDT
+                logger.debug("AFTER: Modified kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
+            }
         }
     }
 }
