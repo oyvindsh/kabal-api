@@ -5,7 +5,6 @@ import no.nav.klage.kodeverk.klageenhetTilYtelser
 import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeYtelser
 import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeYtelser
-import no.nav.klage.oppgave.gateway.AxsysGateway
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -15,7 +14,6 @@ import kotlin.system.measureTimeMillis
 @Service
 class SaksbehandlerRepository(
     private val azureGateway: AzureGateway,
-    private val axsysGateway: AxsysGateway,
     @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
     @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
     @Value("\${ROLE_KLAGE_LEDER}") private val lederRole: String,

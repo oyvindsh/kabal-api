@@ -13,11 +13,6 @@ OPPGAVE_URL: https://api-gw.oera.no/oppgave/api/v1/oppgaver
 
 EREG_URL: https://api-gw.oera.no/ereg/api
 
-AXSYS_URL: https://api-gw.oera.no/axsys/api/v2
-AXSYS_CLUSTER: prod-fss
-AXSYS_NAMESPACE: org
-AXSYS_APP: axsys
-
 VEDTAK_FATTET_TOPIC: klage.vedtak-fattet.v1
 DVH_STATISTIKK_TOPIC: klage.kabal-statistikk.v1
 BEHANDLING_ENDRET_TOPIC_V2: klage.behandling-endret.v2
