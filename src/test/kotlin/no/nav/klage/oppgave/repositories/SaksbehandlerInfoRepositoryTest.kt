@@ -5,7 +5,6 @@ import io.mockk.mockk
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.domain.saksbehandler.Enhet
 import no.nav.klage.oppgave.domain.saksbehandler.SaksbehandlerPersonligInfo
-import no.nav.klage.oppgave.gateway.AxsysGateway
 import no.nav.klage.oppgave.gateway.AzureGateway
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.Test
@@ -13,11 +12,10 @@ import org.junit.jupiter.api.Test
 
 internal class SaksbehandlerInfoRepositoryTest {
 
-    private val axsysGateway: AxsysGateway = mockk()
     private val msClient: AzureGateway = mockk()
 
     private val repo: SaksbehandlerRepository =
-        SaksbehandlerRepository(msClient, axsysGateway, "", "", "", "", "", "", "")
+        SaksbehandlerRepository(msClient, "", "", "", "", "", "", "")
 
     private fun personligInfo() = SaksbehandlerPersonligInfo(
         navIdent = "Z12345",

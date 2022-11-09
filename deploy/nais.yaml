@@ -125,7 +125,6 @@ spec:
     - secret: slack-url
     - secret: slack-channel-id
     - secret: norg2
-    - secret: axsys
     - secret: elastic
     - secret: ereg
   env:

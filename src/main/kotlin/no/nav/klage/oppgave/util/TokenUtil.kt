@@ -39,12 +39,6 @@ class TokenUtil(
         return response.accessToken
     }
 
-    fun getSaksbehandlerAccessTokenWithAxsysScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["axsys-onbehalfof"]
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
-    }
-
     fun getSaksbehandlerAccessTokenWithOppgaveScope(): String {
         val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
@@ -101,12 +95,6 @@ class TokenUtil(
 
     fun getAppAccessTokenWithGraphScope(): String {
         val clientProperties = clientConfigurationProperties.registration["app"]
-        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
-        return response.accessToken
-    }
-
-    fun getAppAccessTokenWithAxsysScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["axsys-maskintilmaskin"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.accessToken
     }
