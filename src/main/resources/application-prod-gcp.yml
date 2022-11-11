@@ -24,7 +24,6 @@ AIVEN_ES_SCHEME: https
 AIVEN_ES_USE_SSL: true
 
 SAF_BASE_URL: https://saf.prod-fss-pub.nais.io/
-SAF_APP_CLIENT_ID: prod-fss.teamdokumenthandtering.saf
 SAF_SCOPE: prod-fss.teamdokumenthandtering.saf
 
 ROLE_KLAGE_SAKSBEHANDLER: 2b671b60-9650-4839-9139-40999bbb0f71
