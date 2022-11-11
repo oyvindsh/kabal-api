@@ -12,7 +12,8 @@ STS_APIKEY: 789
 PDL_BASE_URL: local
 PDL_APIKEY: 159
 SAF_BASE_URL: local
-SAF_APP_CLIENT_ID: uu-id
+SAF_SCOPE: local
+
 nais:
   cluster:
     name: local
