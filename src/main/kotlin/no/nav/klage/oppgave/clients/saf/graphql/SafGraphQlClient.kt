@@ -69,7 +69,7 @@ class SafGraphQlClient(
     @Retryable
     fun getJournalpostAsSystembruker(journalpostId: String): Journalpost? {
         return runWithTimingAndLogging {
-            val token = tokenUtil.getStsSystembrukerToken()
+            val token = tokenUtil.getAppAccessTokenWithSafScope()
             getJournalpostWithToken(journalpostId, token)
         }
     }

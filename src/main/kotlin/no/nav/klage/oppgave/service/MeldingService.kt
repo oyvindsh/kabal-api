@@ -54,7 +54,7 @@ class MeldingService(
         meldingId: UUID
     ) {
         try {
-            val melding = meldingRepository.getById(meldingId)
+            val melding = meldingRepository.getReferenceById(meldingId)
             validateRightsToModifyMelding(melding, innloggetIdent)
 
             meldingRepository.delete(melding)
@@ -74,7 +74,7 @@ class MeldingService(
         text: String
     ): Melding {
         try {
-            val melding = meldingRepository.getById(meldingId)
+            val melding = meldingRepository.getReferenceById(meldingId)
             validateRightsToModifyMelding(melding, innloggetIdent)
 
             melding.text = text

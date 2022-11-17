@@ -55,7 +55,7 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val byId = dokumentUnderArbeidRepository.getById(hovedDokument.id)
+        val byId = dokumentUnderArbeidRepository.getReferenceById(hovedDokument.id)
         assertThat(byId).isEqualTo(hovedDokument)
     }
 
@@ -171,14 +171,14 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val hovedDokumentet = dokumentUnderArbeidRepository.getById(hovedDokument.id)
+        val hovedDokumentet = dokumentUnderArbeidRepository.getReferenceById(hovedDokument.id)
         assertThat(hovedDokumentet).isNotNull
         hovedDokumentet.mellomlagerId = nyMellomlagerId
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(dokumentUnderArbeidRepository.getById(hovedDokument.id).mellomlagerId).isEqualTo(nyMellomlagerId)
+        assertThat(dokumentUnderArbeidRepository.getReferenceById(hovedDokument.id).mellomlagerId).isEqualTo(nyMellomlagerId)
     }
 
 

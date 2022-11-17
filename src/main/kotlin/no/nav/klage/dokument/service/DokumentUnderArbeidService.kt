@@ -140,7 +140,7 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
-    fun getDokumentUnderArbeid(dokumentId: DokumentId) = dokumentUnderArbeidRepository.getById(dokumentId)
+    fun getDokumentUnderArbeid(dokumentId: DokumentId) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
     fun updateDokumentType(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
@@ -149,7 +149,7 @@ class DokumentUnderArbeidService(
         innloggetIdent: String
     ): DokumentUnderArbeid {
 
-        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(dokumentUnderArbeid.behandlingId)
@@ -184,7 +184,7 @@ class DokumentUnderArbeidService(
         innloggetIdent: String
     ): DokumentUnderArbeid {
 
-        val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(dokument.behandlingId)
@@ -212,7 +212,7 @@ class DokumentUnderArbeidService(
         version: Int,
         innloggetIdent: String
     ): DokumentUnderArbeid {
-        val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         if (dokument.smartEditorVersion == version) {
             logger.warn("smartEditorVersion was already set to $version. Was this an error? Returning.")
@@ -245,7 +245,7 @@ class DokumentUnderArbeidService(
         templateId: String,
         innloggetIdent: String
     ): DokumentUnderArbeid {
-        val dokument = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         if (dokument.smartEditorTemplateId == templateId) {
             return dokument
@@ -409,7 +409,7 @@ class DokumentUnderArbeidService(
         innloggetIdent: String
     ): MellomlagretDokument {
         val dokument =
-            dokumentUnderArbeidRepository.getById(dokumentId)
+            dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(dokument.behandlingId)
@@ -430,7 +430,7 @@ class DokumentUnderArbeidService(
         dokumentId: DokumentId,
         innloggetIdent: String
     ) {
-        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(dokumentUnderArbeid.behandlingId)
@@ -468,7 +468,7 @@ class DokumentUnderArbeidService(
         dokumentIdHovedDokumentSomSkalBliVedlegg: DokumentId,
         innloggetIdent: String
     ): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getById(dokumentId)
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
@@ -479,7 +479,7 @@ class DokumentUnderArbeidService(
         }
 
         val hovedDokumentSomSkalBliVedlegg =
-            dokumentUnderArbeidRepository.getById(dokumentIdHovedDokumentSomSkalBliVedlegg)
+            dokumentUnderArbeidRepository.getReferenceById(dokumentIdHovedDokumentSomSkalBliVedlegg)
 
         if (hovedDokumentSomSkalBliVedlegg.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
@@ -499,7 +499,7 @@ class DokumentUnderArbeidService(
         dokumentId: DokumentId,
         innloggetIdent: String
     ): DokumentUnderArbeid {
-        val vedlegg = dokumentUnderArbeidRepository.getById(dokumentId)
+        val vedlegg = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(vedlegg.behandlingId)
@@ -530,7 +530,7 @@ class DokumentUnderArbeidService(
     }
 
     fun opprettDokumentEnhet(hovedDokumentId: DokumentId): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
@@ -542,7 +542,7 @@ class DokumentUnderArbeidService(
     }
 
     fun ferdigstillDokumentEnhet(hovedDokumentId: DokumentId): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getById(hovedDokumentId)
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
         val documentInfoList =
@@ -573,7 +573,7 @@ class DokumentUnderArbeidService(
     }
 
     fun getSmartEditorId(dokumentId: DokumentId, readOnly: Boolean): UUID {
-        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getById(dokumentId)
+        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
 
         //Sjekker tilgang på behandlingsnivå:

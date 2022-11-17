@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.util
 
-import no.nav.klage.oppgave.clients.sts.StsClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
@@ -12,7 +11,6 @@ class TokenUtil(
     private val clientConfigurationProperties: ClientConfigurationProperties,
     private val oAuth2AccessTokenService: OAuth2AccessTokenService,
     private val tokenValidationContextHolder: TokenValidationContextHolder,
-    private val stsClient: StsClient
 ) {
 
     companion object {
@@ -39,14 +37,14 @@ class TokenUtil(
         return response.accessToken
     }
 
-    fun getSaksbehandlerAccessTokenWithOppgaveScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["oppgave-onbehalfof"]
+    fun getSaksbehandlerAccessTokenWithSafScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["saf-onbehalfof"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.accessToken
     }
 
-    fun getSaksbehandlerAccessTokenWithSafScope(): String {
-        val clientProperties = clientConfigurationProperties.registration["saf-onbehalfof"]
+    fun getAppAccessTokenWithSafScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["saf-maskintilmaskin"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.accessToken
     }
@@ -104,8 +102,6 @@ class TokenUtil(
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
         return response.accessToken
     }
-
-    fun getStsSystembrukerToken(): String = stsClient.oidcToken()
 
     fun getAccessTokenFrontendSent(): String =
         tokenValidationContextHolder.tokenValidationContext.getJwtToken(SecurityConfiguration.ISSUER_AAD).tokenAsString
