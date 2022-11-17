@@ -539,7 +539,7 @@ class BehandlingService(
     fun getBehandlingForUpdateBySystembruker(
         behandlingId: UUID,
     ): Behandling =
-        behandlingRepository.getById(behandlingId)
+        behandlingRepository.getReferenceById(behandlingId)
             .also { checkSkrivetilgangForSystembruker(it) }
 
     private fun checkEnhetOgTemaTilgang(

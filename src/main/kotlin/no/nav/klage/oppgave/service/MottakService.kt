@@ -327,7 +327,7 @@ class MottakService(
             kildeReferanse = kildeReferanse,
             dvhReferanse = dvhReferanse,
             //Dette er søkehjemler, registreringshjemler blir kopiert over i AnkebehandlingService.
-            hjemler = mottakRepository.getById(id).hjemler,
+            hjemler = mottakRepository.getReferenceById(id).hjemler,
             forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
             forrigeBehandlendeEnhet = tildeling!!.enhet!!,
             mottakDokument = innsendtDokument,

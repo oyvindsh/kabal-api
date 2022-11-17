@@ -60,7 +60,7 @@ class AnkebehandlingService(
 
         if (mottak.forrigeBehandlingId != null) {
             logger.debug("Getting registreringshjemler from klagebehandling ${mottak.forrigeBehandlingId} for ankebehandling ${ankebehandling.id}")
-            val klagebehandling = klagebehandlingRepository.getById(mottak.forrigeBehandlingId)
+            val klagebehandling = klagebehandlingRepository.getReferenceById(mottak.forrigeBehandlingId)
             vedtakService.setHjemler(
                 behandlingId = ankebehandling.id,
                 hjemler = klagebehandling.currentDelbehandling().hjemler,

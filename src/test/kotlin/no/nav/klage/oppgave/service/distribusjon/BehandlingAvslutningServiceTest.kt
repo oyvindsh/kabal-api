@@ -202,7 +202,7 @@ internal class BehandlingAvslutningServiceTest {
 
         behandlingAvslutningService.avsluttBehandling(klagebehandlingId)
 
-        val result = klagebehandlingRepository.getById(klagebehandlingId)
+        val result = klagebehandlingRepository.getReferenceById(klagebehandlingId)
         assertThat(result.currentDelbehandling().avsluttet).isNotNull
     }
 }
