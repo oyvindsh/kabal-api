@@ -15,7 +15,17 @@ internal class SaksbehandlerInfoRepositoryTest {
     private val msClient: AzureGateway = mockk()
 
     private val repo: SaksbehandlerRepository =
-        SaksbehandlerRepository(msClient, "", "", "", "", "", "", "")
+        SaksbehandlerRepository(
+            azureGateway = msClient,
+            kabalOppgavestyringAlleEnheter = "",
+            kabalMaltekstredigering = "",
+            kabalSaksbehandling = "",
+            kabalFagtekstredigering = "",
+            kabalOppgavestyringEgenEnhet = "",
+            fortrolig = "",
+            strengtFortrolig = "",
+            egenAnsatt = "",
+        )
 
     private fun personligInfo() = SaksbehandlerPersonligInfo(
         navIdent = "Z12345",
