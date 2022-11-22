@@ -14,13 +14,14 @@ import kotlin.system.measureTimeMillis
 @Service
 class SaksbehandlerRepository(
     private val azureGateway: AzureGateway,
-    @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
-    @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
-    @Value("\${ROLE_KLAGE_LEDER}") private val lederRole: String,
-    @Value("\${ROLE_KLAGE_MERKANTIL}") private val merkantilRole: String,
-    @Value("\${ROLE_KLAGE_FORTROLIG}") private val kanBehandleFortroligRole: String,
-    @Value("\${ROLE_KLAGE_STRENGT_FORTROLIG}") private val kanBehandleStrengtFortroligRole: String,
-    @Value("\${ROLE_KLAGE_EGEN_ANSATT}") private val kanBehandleEgenAnsattRole: String
+    @Value("\${KABAL_OPPGAVESTYRING_ALLE_ENHETER}") private val kabalOppgavestyringAlleEnheter: String,
+    @Value("\${KABAL_MALTEKSTREDIGERING}") private val kabalMaltekstredigering: String,
+    @Value("\${KABAL_SAKSBEHANDLING}") private val kabalSaksbehandling: String,
+    @Value("\${KABAL_FAGTEKSTREDIGERING}") private val kabalFagtekstredigering: String,
+    @Value("\${KABAL_OPPGAVESTYRING_EGEN_ENHET}") private val kabalOppgavestyringEgenEnhet: String,
+    @Value("\${FORTROLIG}") private val fortrolig: String,
+    @Value("\${STRENGT_FORTROLIG}") private val strengtFortrolig: String,
+    @Value("\${EGEN_ANSATT}") private val egenAnsatt: String
 ) {
 
     companion object {
@@ -45,9 +46,6 @@ class SaksbehandlerRepository(
     fun getEnheterMedYtelserForSaksbehandler(ident: String): EnheterMedLovligeYtelser =
         listOf(azureGateway.getDataOmInnloggetSaksbehandler().enhet).berikMedYtelser()
 
-    fun getEnheterForSaksbehandler(ident: String): List<Enhet> =
-        listOf(azureGateway.getDataOmInnloggetSaksbehandler().enhet)
-
     fun getEnhetForSaksbehandler(ident: String): Enhet =
         azureGateway.getDataOmInnloggetSaksbehandler().enhet
 
@@ -62,10 +60,6 @@ class SaksbehandlerRepository(
 
     private fun getYtelserForEnhet(enhet: Enhet): List<Ytelse> =
         klageenhetTilYtelser.filter { it.key.navn == enhet.enhetId }.flatMap { it.value }
-
-    fun getAlleSaksbehandlerIdenter(): List<String> {
-        return azureGateway.getGroupMembersNavIdents(saksbehandlerRole)
-    }
 
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
@@ -84,18 +78,16 @@ class SaksbehandlerRepository(
         return saksbehandlerNameCache
     }
 
-    fun erFagansvarlig(ident: String): Boolean = getRoller(ident).hasRole(fagansvarligRole)
+    fun hasFagtekstredigering(ident: String): Boolean = getRoller(ident).hasRole(kabalFagtekstredigering)
 
-    fun erLeder(ident: String): Boolean = getRoller(ident).hasRole(lederRole)
+    fun hasOppgavestyringEgenEnhet(ident: String): Boolean = getRoller(ident).hasRole(kabalOppgavestyringEgenEnhet)
 
-    fun erSaksbehandler(ident: String): Boolean = getRoller(ident).hasRole(saksbehandlerRole)
-
-    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleFortroligRole)
+    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(fortrolig)
 
     fun kanBehandleStrengtFortrolig(ident: String): Boolean =
-        getRoller(ident).hasRole(kanBehandleStrengtFortroligRole)
+        getRoller(ident).hasRole(strengtFortrolig)
 
-    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(kanBehandleEgenAnsattRole)
+    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(egenAnsatt)
 
     private fun getRoller(ident: String): List<String> = try {
         azureGateway.getRolleIder(ident)
@@ -103,14 +95,6 @@ class SaksbehandlerRepository(
         logger.warn("Failed to retrieve roller for navident $ident, using emptylist instead")
         emptyList()
     }
-
-    fun getSaksbehandlereSomKanBehandleFortrolig(): List<String> =
-        azureGateway.getGroupMembersNavIdents(kanBehandleFortroligRole)
-
-
-    fun getSaksbehandlereSomKanBehandleEgenAnsatt(): List<String> =
-        azureGateway.getGroupMembersNavIdents(kanBehandleEgenAnsattRole)
-
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 

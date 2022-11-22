@@ -24,8 +24,8 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
         return getRollerForSaksbehandlerMedIdent(ident).map { it.id }
     }
 
-    override fun getAnsatteIEnhet(enhetNr: String): List<SaksbehandlerIdent> {
-        return microsoftGraphClient.getEnhetensAnsattesNavIdents(enhetNr).map { SaksbehandlerIdent(it) }
+    override fun getAnsatteIEnhet(enhetId: String): List<SaksbehandlerIdent> {
+        return microsoftGraphClient.getEnhetensAnsattesNavIdents(enhetId).map { SaksbehandlerIdent(it) }
     }
 
     override fun getGroupMembersNavIdents(groupid: String): List<String> =

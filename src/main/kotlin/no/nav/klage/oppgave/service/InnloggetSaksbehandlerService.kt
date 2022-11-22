@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.Ytelse
-import no.nav.klage.oppgave.domain.saksbehandler.Enhet
-import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeYtelser
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.beans.factory.annotation.Value
@@ -12,45 +10,28 @@ import org.springframework.stereotype.Service
 class InnloggetSaksbehandlerService(
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val tokenUtil: TokenUtil,
-    @Value("\${ROLE_KLAGE_SAKSBEHANDLER}") private val saksbehandlerRole: String,
-    @Value("\${ROLE_KLAGE_FAGANSVARLIG}") private val fagansvarligRole: String,
-    @Value("\${ROLE_KLAGE_LEDER}") private val lederRole: String,
-    @Value("\${ROLE_KLAGE_MERKANTIL}") private val merkantilRole: String,
-    @Value("\${ROLE_KLAGE_FORTROLIG}") private val kanBehandleFortroligRole: String,
-    @Value("\${ROLE_KLAGE_STRENGT_FORTROLIG}") private val kanBehandleStrengtFortroligRole: String,
-    @Value("\${ROLE_KLAGE_EGEN_ANSATT}") private val kanBehandleEgenAnsattRole: String,
-    @Value("\${ROLE_ADMIN}") private val adminRole: String
+    @Value("\${KABAL_SAKSBEHANDLING}") private val kabalSaksbehandling: String,
+    @Value("\${KABAL_FAGTEKSTREDIGERING}") private val kabalFagtekstredigering: String,
+    @Value("\${KABAL_OPPGAVESTYRING_EGEN_ENHET}") private val kabalOppgavestyringEgenEnhet: String,
+    @Value("\${FORTROLIG}") private val fortrolig: String,
+    @Value("\${STRENGT_FORTROLIG}") private val strengtFortrolig: String,
+    @Value("\${EGEN_ANSATT}") private val egenAnsatt: String,
+    @Value("\${KABAL_ADMIN}") private val kabalAdmin: String
 ) {
-
-    fun getEnheterMedYtelserForSaksbehandler(): EnheterMedLovligeYtelser =
-        saksbehandlerRepository.getEnheterMedYtelserForSaksbehandler(getInnloggetIdent())
-
-    fun getEnheterForSaksbehandler(): List<Enhet> =
-        saksbehandlerRepository.getEnheterForSaksbehandler(getInnloggetIdent())
 
     fun getInnloggetIdent() = tokenUtil.getIdent()
 
-    fun erAdmin(): Boolean = tokenUtil.getRollerFromToken().hasRole(adminRole)
+    fun isKabalAdmin(): Boolean = tokenUtil.getRollerFromToken().hasRole(kabalAdmin)
 
-    fun erLeder(): Boolean = tokenUtil.getRollerFromToken().hasRole(lederRole)
-
-    fun erFagansvarlig(): Boolean = tokenUtil.getRollerFromToken().hasRole(fagansvarligRole)
-
-    fun erSaksbehandler(): Boolean = tokenUtil.getRollerFromToken().hasRole(saksbehandlerRole)
-
-    fun kanBehandleFortrolig(): Boolean = tokenUtil.getRollerFromToken().hasRole(kanBehandleFortroligRole)
+    fun kanBehandleFortrolig(): Boolean = tokenUtil.getRollerFromToken().hasRole(fortrolig)
 
     fun kanBehandleStrengtFortrolig(): Boolean =
-        tokenUtil.getRollerFromToken().hasRole(kanBehandleStrengtFortroligRole)
+        tokenUtil.getRollerFromToken().hasRole(strengtFortrolig)
 
-    fun kanBehandleEgenAnsatt(): Boolean = tokenUtil.getRollerFromToken().hasRole(kanBehandleEgenAnsattRole)
+    fun kanBehandleEgenAnsatt(): Boolean = tokenUtil.getRollerFromToken().hasRole(egenAnsatt)
 
     fun harTilgangTilYtelse(ytelse: Ytelse): Boolean {
         return saksbehandlerRepository.harTilgangTilYtelse(getInnloggetIdent(), ytelse)
-    }
-
-    fun harTilgangTilEnhetOgYtelse(enhetId: String, ytelse: Ytelse): Boolean {
-        return saksbehandlerRepository.harTilgangTilEnhetOgYtelse(getInnloggetIdent(), enhetId, ytelse)
     }
 
     private fun List<String>.hasRole(role: String) = any { it.contains(role) }

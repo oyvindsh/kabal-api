@@ -101,7 +101,7 @@ class AdminController(
     data class Fnr(val fnr: String)
 
     private fun krevAdminTilgang() {
-        if (!innloggetSaksbehandlerService.erAdmin()) {
+        if (!innloggetSaksbehandlerService.isKabalAdmin()) {
             throw MissingTilgangException("Not an admin")
         }
     }
