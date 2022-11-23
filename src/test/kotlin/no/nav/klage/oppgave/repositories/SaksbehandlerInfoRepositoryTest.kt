@@ -17,14 +17,9 @@ internal class SaksbehandlerInfoRepositoryTest {
     private val repo: SaksbehandlerRepository =
         SaksbehandlerRepository(
             azureGateway = msClient,
-            kabalOppgavestyringAlleEnheter = "",
-            kabalMaltekstredigering = "",
-            kabalSaksbehandling = "",
-            kabalFagtekstredigering = "",
-            kabalOppgavestyringEgenEnhet = "",
-            fortrolig = "",
-            strengtFortrolig = "",
-            egenAnsatt = "",
+            fortroligRoleId = "",
+            strengtFortroligRoleId = "",
+            egenAnsattRoleId = "",
         )
 
     private fun personligInfo() = SaksbehandlerPersonligInfo(

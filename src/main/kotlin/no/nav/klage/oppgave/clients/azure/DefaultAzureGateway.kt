@@ -20,7 +20,7 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
         private val securelogger = getSecureLogger()
     }
 
-    override fun getRolleIder(ident: String): List<String> {
+    override fun getRoleIds(ident: String): List<String> {
         return getRollerForSaksbehandlerMedIdent(ident).map { it.id }
     }
 
