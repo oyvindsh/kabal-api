@@ -14,14 +14,9 @@ import kotlin.system.measureTimeMillis
 @Service
 class SaksbehandlerRepository(
     private val azureGateway: AzureGateway,
-    @Value("\${KABAL_OPPGAVESTYRING_ALLE_ENHETER}") private val kabalOppgavestyringAlleEnheter: String,
-    @Value("\${KABAL_MALTEKSTREDIGERING}") private val kabalMaltekstredigering: String,
-    @Value("\${KABAL_SAKSBEHANDLING}") private val kabalSaksbehandling: String,
-    @Value("\${KABAL_FAGTEKSTREDIGERING}") private val kabalFagtekstredigering: String,
-    @Value("\${KABAL_OPPGAVESTYRING_EGEN_ENHET}") private val kabalOppgavestyringEgenEnhet: String,
-    @Value("\${FORTROLIG}") private val fortrolig: String,
-    @Value("\${STRENGT_FORTROLIG}") private val strengtFortrolig: String,
-    @Value("\${EGEN_ANSATT}") private val egenAnsatt: String
+    @Value("\${FORTROLIG_ROLE_ID}") private val fortroligRoleId: String,
+    @Value("\${STRENGT_FORTROLIG_ROLE_ID}") private val strengtFortroligRoleId: String,
+    @Value("\${EGEN_ANSATT_ROLE_ID}") private val egenAnsattRoleId: String
 ) {
 
     companion object {
@@ -78,25 +73,19 @@ class SaksbehandlerRepository(
         return saksbehandlerNameCache
     }
 
-    fun hasFagtekstredigering(ident: String): Boolean = getRoller(ident).hasRole(kabalFagtekstredigering)
-
-    fun hasOppgavestyringEgenEnhet(ident: String): Boolean = getRoller(ident).hasRole(kabalOppgavestyringEgenEnhet)
-
-    fun kanBehandleFortrolig(ident: String): Boolean = getRoller(ident).hasRole(fortrolig)
+    fun kanBehandleFortrolig(ident: String): Boolean = getRoleIds(ident).contains(fortroligRoleId)
 
     fun kanBehandleStrengtFortrolig(ident: String): Boolean =
-        getRoller(ident).hasRole(strengtFortrolig)
+        getRoleIds(ident).contains(strengtFortroligRoleId)
 
-    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoller(ident).hasRole(egenAnsatt)
+    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoleIds(ident).contains(egenAnsattRoleId)
 
-    private fun getRoller(ident: String): List<String> = try {
-        azureGateway.getRolleIder(ident)
+    private fun getRoleIds(ident: String): List<String> = try {
+        azureGateway.getRoleIds(ident)
     } catch (e: Exception) {
         logger.warn("Failed to retrieve roller for navident $ident, using emptylist instead")
         emptyList()
     }
-
-    private fun List<String>.hasRole(role: String) = any { it.contains(role) }
 
     fun getNameForSaksbehandler(navIdent: String): String {
         return azureGateway.getPersonligDataOmSaksbehandlerMedIdent(navIdent).sammensattNavn
