@@ -4,10 +4,13 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
+import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.FullmektigSearchService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
+import no.nav.klage.oppgave.service.KabalInnstillingerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -24,6 +27,7 @@ class BehandlingController(
     private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val fullmektigSearchService: FullmektigSearchService,
+    private val kabalInnstillingerService: KabalInnstillingerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -268,5 +272,31 @@ class BehandlingController(
         )
 
         return fullmektigSearchService.searchFullmektig(input.identifikator)
+    }
+
+    @GetMapping("/behandlinger/{id}/potentialsaksbehandlere")
+    fun getPotentialSaksbehandlere(
+        @PathVariable("id") behandlingId: UUID,
+    ): Saksbehandlere {
+        logMethodDetails(
+            ::getPotentialSaksbehandlere.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return kabalInnstillingerService.getPotentialSaksbehandlere(behandlingId = behandlingId)
+    }
+
+    @GetMapping("/behandlinger/{id}/potentialmedunderskrivere")
+    fun getPotentialMedunderskrivere(
+        @PathVariable("id") behandlingId: UUID,
+    ): Medunderskrivere {
+        logMethodDetails(
+            ::getPotentialMedunderskrivere.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return kabalInnstillingerService.getPotentialMedunderskrivere(behandlingId = behandlingId)
     }
 }
