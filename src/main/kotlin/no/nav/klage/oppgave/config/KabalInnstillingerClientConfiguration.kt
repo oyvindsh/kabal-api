@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class KabalInstillingerClientConfiguration(
+class KabalInnstillingerClientConfiguration(
     private val webClientBuilder: WebClient.Builder
 ) {
 
@@ -16,7 +16,7 @@ class KabalInstillingerClientConfiguration(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Value("\${KABAL_INSTILLINGER_URL}")
+    @Value("\${KABAL_INNSTILLINGER_BASE_URL}")
     private lateinit var kabalInnstillingerURL: String
 
     @Bean
