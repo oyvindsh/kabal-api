@@ -121,16 +121,16 @@ class BehandlingAssignmentController(
                 fnr = fnr,
                 navn = personInfo.sammensattNavn,
             ),
-            fromSaksbehandler = fromBehandling.tildeling?.let {
+            fromSaksbehandler = fromBehandling.tildeling?.saksbehandlerident?.let {
                 SaksbehandlerView(
-                    navIdent = it.saksbehandlerident!!,
-                    navn = saksbehandlerService.getNameForIdent(it.saksbehandlerident)
+                    navIdent = it,
+                    navn = saksbehandlerService.getNameForIdent(it)
                 )
             },
-            toSaksbehandler = toBehandling.tildeling?.let {
+            toSaksbehandler = toBehandling.tildeling?.saksbehandlerident?.let {
                 SaksbehandlerView(
-                    navIdent = it.saksbehandlerident!!,
-                    navn = saksbehandlerService.getNameForIdent(it.saksbehandlerident)
+                    navIdent = it,
+                    navn = saksbehandlerService.getNameForIdent(it)
                 )
             },
         )
