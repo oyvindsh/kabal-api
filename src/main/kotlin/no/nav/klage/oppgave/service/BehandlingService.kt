@@ -204,7 +204,7 @@ class BehandlingService(
         }
     }
 
-    fun assignBehandling(
+    fun setSaksbehandler(
         behandlingId: UUID,
         tildeltSaksbehandlerIdent: String?,
         enhetId: String?,
@@ -217,9 +217,9 @@ class BehandlingService(
         }
         val event =
             behandling.setTildeling(
-                tildeltSaksbehandlerIdent,
-                enhetId,
-                utfoerendeSaksbehandlerIdent
+                nyVerdiSaksbehandlerident = tildeltSaksbehandlerIdent,
+                nyVerdiEnhet = enhetId,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
         return behandling

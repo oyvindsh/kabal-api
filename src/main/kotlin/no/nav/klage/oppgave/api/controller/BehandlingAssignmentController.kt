@@ -11,10 +11,7 @@ import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
@@ -43,34 +40,54 @@ class BehandlingAssignmentController(
     ): TildelingEditedView {
         logger.debug("assignSaksbehandlerOld is requested for behandling: {}", behandlingId)
 
-        val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
-
-        val behandlingAfterChange = behandlingService.assignBehandling(
+        val behandling = behandlingService.setSaksbehandler(
             behandlingId = behandlingId,
             tildeltSaksbehandlerIdent = saksbehandlertildeling.navIdent,
             enhetId = saksbehandlerService.getEnhetForSaksbehandler(saksbehandlertildeling.navIdent).enhetId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
+        return TildelingEditedView(
+            behandling.modified,
+            behandling.tildeling!!.tidspunkt.toLocalDate()
+        )
     }
 
-    @PostMapping("/behandlinger/{id}/saksbehandlertildeling")
-    fun assignSaksbehandler(
+    @PutMapping("/behandlinger/{id}/saksbehandler")
+    fun setSaksbehandler(
         @Parameter(description = "Id til en behandling")
         @PathVariable("id") behandlingId: UUID,
-        @RequestBody saksbehandlertildeling: Saksbehandlertildeling
-    ): TildelingEditedView {
-        logger.debug("assignSaksbehandler is requested for behandling: {}", behandlingId)
+        @RequestBody saksbehandlerInput: SaksbehandlerInput
+    ): SaksbehandlerModifiedResponse {
+        logger.debug("setSaksbehandler is requested for behandling: {}", behandlingId)
 
-        val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
-
-        val behandlingAfterChange = behandlingService.assignBehandling(
+        val behandling = behandlingService.setSaksbehandler(
             behandlingId = behandlingId,
-            tildeltSaksbehandlerIdent = saksbehandlertildeling.navIdent,
-            enhetId = saksbehandlerService.getEnhetForSaksbehandler(saksbehandlertildeling.navIdent).enhetId,
+            tildeltSaksbehandlerIdent = saksbehandlerInput.navIdent,
+            enhetId = if (saksbehandlerInput.navIdent != null) saksbehandlerService.getEnhetForSaksbehandler(
+                saksbehandlerInput.navIdent
+            ).enhetId else null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
+        return tildelingEditedView(behandling = behandling)
+    }
+
+    @GetMapping("/behandlinger/{id}/saksbehandler")
+    fun getSaksbehandler(
+        @Parameter(description = "Id til en behandling")
+        @PathVariable("id") behandlingId: UUID,
+    ): SaksbehandlerView? {
+        logger.debug("getSaksbehandler is requested for behandling: {}", behandlingId)
+
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        return if (behandling.tildeling?.saksbehandlerident == null) {
+            null
+        } else {
+            SaksbehandlerView(
+                navIdent = behandling.tildeling?.saksbehandlerident!!,
+                navn = saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!),
+            )
+        }
     }
 
     //TODO remove when FE migrated to new endpoint without navident
@@ -83,57 +100,22 @@ class BehandlingAssignmentController(
     ): TildelingEditedView {
         logger.debug("unassignSaksbehandlerOld is requested for behandling: {}", behandlingId)
 
-        val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
-
-        val behandlingAfterChange = behandlingService.assignBehandling(
+        val behandling = behandlingService.setSaksbehandler(
             behandlingId = behandlingId,
             tildeltSaksbehandlerIdent = null,
             enhetId = null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
-    }
-
-    @PostMapping("/behandlinger/{id}/saksbehandlerfradeling")
-    fun unassignSaksbehandler(
-        @Parameter(description = "Id til en behandling")
-        @PathVariable("id") behandlingId: UUID
-    ): TildelingEditedView {
-        logger.debug("unassignSaksbehandler is requested for behandling: {}", behandlingId)
-
-        val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
-
-        val behandlingAfterChange = behandlingService.assignBehandling(
-            behandlingId = behandlingId,
-            tildeltSaksbehandlerIdent = null,
-            enhetId = null,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        return TildelingEditedView(
+            behandling.modified,
+            behandling.tildeling!!.tidspunkt.toLocalDate()
         )
-        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
     }
 
-    private fun tildelingEditedView(fromBehandling: Behandling, toBehandling: Behandling): TildelingEditedView {
-        val fnr = fromBehandling.sakenGjelder.partId.value
-        val personInfo = pdlFacade.getPersonInfo(fnr)
-
-        val tildelingEditedView = TildelingEditedView(
-            person = TildelingEditedView.PersonView(
-                fnr = fnr,
-                navn = personInfo.sammensattNavn,
-            ),
-            fromSaksbehandler = fromBehandling.tildeling?.saksbehandlerident?.let {
-                SaksbehandlerView(
-                    navIdent = it,
-                    navn = saksbehandlerService.getNameForIdent(it)
-                )
-            },
-            toSaksbehandler = toBehandling.tildeling?.saksbehandlerident?.let {
-                SaksbehandlerView(
-                    navIdent = it,
-                    navn = saksbehandlerService.getNameForIdent(it)
-                )
-            },
+    private fun tildelingEditedView(behandling: Behandling): SaksbehandlerModifiedResponse =
+        SaksbehandlerModifiedResponse(
+            navIdent = behandling.tildeling?.saksbehandlerident,
+            navn = if (behandling.tildeling?.saksbehandlerident != null) saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!) else null,
+            modified = behandling.modified,
         )
-        return tildelingEditedView
-    }
 }

@@ -97,8 +97,10 @@ class BehandlingMedunderskriverControllerTest {
             )
         } returns klagebehandling as Behandling
         every { behandlingMapper.mapToMedunderskriverFlytResponse(klagebehandling as Behandling) } returns MedunderskriverFlytResponse(
-            klagebehandling.modified,
-            klagebehandling.currentDelbehandling().medunderskriverFlyt
+            modified = klagebehandling.modified,
+            medunderskriverFlyt =klagebehandling.currentDelbehandling().medunderskriverFlyt,
+            navn = "Ola Nordmann",
+            navIdent = "B54321",
         )
 
         val input = BehandlingMedunderskriveridentInput(

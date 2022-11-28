@@ -1,13 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
-data class TildelingEditedView(
-    val person: PersonView,
-    val fromSaksbehandler: SaksbehandlerView?,
-    val toSaksbehandler: SaksbehandlerView?,
-) {
+import java.time.LocalDate
+import java.time.LocalDateTime
 
-    data class PersonView(
-        val fnr: String,
-        val navn: String?,
-    )
-}
+data class TildelingEditedView(val modified: LocalDateTime, val tildelt: LocalDate)
