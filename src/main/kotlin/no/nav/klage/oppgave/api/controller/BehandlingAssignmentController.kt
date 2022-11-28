@@ -42,13 +42,16 @@ class BehandlingAssignmentController(
         @RequestBody saksbehandlertildeling: Saksbehandlertildeling
     ): TildelingEditedView {
         logger.debug("assignSaksbehandlerOld is requested for behandling: {}", behandlingId)
-        val behandling = behandlingService.assignBehandling(
+
+        val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
+
+        val behandlingAfterChange = behandlingService.assignBehandling(
             behandlingId = behandlingId,
             tildeltSaksbehandlerIdent = saksbehandlertildeling.navIdent,
             enhetId = saksbehandlerService.getEnhetForSaksbehandler(saksbehandlertildeling.navIdent).enhetId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(behandling)
+        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
     }
 
     @PostMapping("/behandlinger/{id}/saksbehandlertildeling")
@@ -58,13 +61,16 @@ class BehandlingAssignmentController(
         @RequestBody saksbehandlertildeling: Saksbehandlertildeling
     ): TildelingEditedView {
         logger.debug("assignSaksbehandler is requested for behandling: {}", behandlingId)
-        val behandling = behandlingService.assignBehandling(
+
+        val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
+
+        val behandlingAfterChange = behandlingService.assignBehandling(
             behandlingId = behandlingId,
             tildeltSaksbehandlerIdent = saksbehandlertildeling.navIdent,
             enhetId = saksbehandlerService.getEnhetForSaksbehandler(saksbehandlertildeling.navIdent).enhetId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(behandling)
+        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
     }
 
     //TODO remove when FE migrated to new endpoint without navident
@@ -79,13 +85,13 @@ class BehandlingAssignmentController(
 
         val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
 
-        behandlingService.assignBehandling(
-            behandlingId,
-            null,
-            null,
-            innloggetSaksbehandlerService.getInnloggetIdent()
+        val behandlingAfterChange = behandlingService.assignBehandling(
+            behandlingId = behandlingId,
+            tildeltSaksbehandlerIdent = null,
+            enhetId = null,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(behandlingBeforeChange)
+        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
     }
 
     @PostMapping("/behandlinger/{id}/saksbehandlerfradeling")
@@ -97,17 +103,17 @@ class BehandlingAssignmentController(
 
         val behandlingBeforeChange = behandlingService.getBehandling(behandlingId)
 
-        behandlingService.assignBehandling(
-            behandlingId,
-            null,
-            null,
-            innloggetSaksbehandlerService.getInnloggetIdent()
+        val behandlingAfterChange = behandlingService.assignBehandling(
+            behandlingId = behandlingId,
+            tildeltSaksbehandlerIdent = null,
+            enhetId = null,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(behandlingBeforeChange)
+        return tildelingEditedView(fromBehandling = behandlingBeforeChange, toBehandling = behandlingAfterChange)
     }
 
-    private fun tildelingEditedView(behandling: Behandling): TildelingEditedView {
-        val fnr = behandling.sakenGjelder.partId.value
+    private fun tildelingEditedView(fromBehandling: Behandling, toBehandling: Behandling): TildelingEditedView {
+        val fnr = fromBehandling.sakenGjelder.partId.value
         val personInfo = pdlFacade.getPersonInfo(fnr)
 
         val tildelingEditedView = TildelingEditedView(
@@ -115,7 +121,13 @@ class BehandlingAssignmentController(
                 fnr = fnr,
                 navn = personInfo.sammensattNavn,
             ),
-            saksbehandler = behandling.tildeling?.let {
+            fromSaksbehandler = fromBehandling.tildeling?.let {
+                SaksbehandlerView(
+                    navIdent = it.saksbehandlerident!!,
+                    navn = saksbehandlerService.getNameForIdent(it.saksbehandlerident)
+                )
+            },
+            toSaksbehandler = toBehandling.tildeling?.let {
                 SaksbehandlerView(
                     navIdent = it.saksbehandlerident!!,
                     navn = saksbehandlerService.getNameForIdent(it.saksbehandlerident)
