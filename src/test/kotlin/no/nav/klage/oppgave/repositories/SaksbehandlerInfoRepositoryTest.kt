@@ -20,6 +20,8 @@ internal class SaksbehandlerInfoRepositoryTest {
             fortroligRoleId = "",
             strengtFortroligRoleId = "",
             egenAnsattRoleId = "",
+            kabalOppgavestyringAlleEnheterRoleId = "",
+            kabalAdminRoleId = "",
         )
 
     private fun personligInfo() = SaksbehandlerPersonligInfo(
