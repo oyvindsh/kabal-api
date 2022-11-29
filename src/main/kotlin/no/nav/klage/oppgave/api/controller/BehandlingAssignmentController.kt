@@ -57,7 +57,7 @@ class BehandlingAssignmentController(
         @Parameter(description = "Id til en behandling")
         @PathVariable("id") behandlingId: UUID,
         @RequestBody saksbehandlerInput: SaksbehandlerInput
-    ): SaksbehandlerModifiedResponse {
+    ): SaksbehandlerViewWrapped {
         logger.debug("setSaksbehandler is requested for behandling: {}", behandlingId)
 
         val behandling = behandlingService.setSaksbehandler(
@@ -68,26 +68,19 @@ class BehandlingAssignmentController(
             ).enhetId else null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return tildelingEditedView(behandling = behandling)
+        return getSaksbehandlerViewWrapped(behandling = behandling)
     }
 
     @GetMapping("/behandlinger/{id}/saksbehandler")
     fun getSaksbehandler(
         @Parameter(description = "Id til en behandling")
         @PathVariable("id") behandlingId: UUID,
-    ): SaksbehandlerView? {
+    ): SaksbehandlerViewWrapped {
         logger.debug("getSaksbehandler is requested for behandling: {}", behandlingId)
 
         val behandling = behandlingService.getBehandling(behandlingId)
 
-        return if (behandling.tildeling?.saksbehandlerident == null) {
-            null
-        } else {
-            SaksbehandlerView(
-                navIdent = behandling.tildeling?.saksbehandlerident!!,
-                navn = saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!),
-            )
-        }
+        return getSaksbehandlerViewWrapped(behandling)
     }
 
     //TODO remove when FE migrated to new endpoint without navident
@@ -112,10 +105,22 @@ class BehandlingAssignmentController(
         )
     }
 
-    private fun tildelingEditedView(behandling: Behandling): SaksbehandlerModifiedResponse =
-        SaksbehandlerModifiedResponse(
-            navIdent = behandling.tildeling?.saksbehandlerident,
-            navn = if (behandling.tildeling?.saksbehandlerident != null) saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!) else null,
+    private fun getSaksbehandlerViewWrapped(behandling: Behandling): SaksbehandlerViewWrapped {
+        return SaksbehandlerViewWrapped(
+            saksbehandler = getSaksbehandlerView(behandling),
             modified = behandling.modified,
         )
+    }
+
+    private fun getSaksbehandlerView(behandling: Behandling): SaksbehandlerView? {
+        val saksbehandlerView = if (behandling.tildeling?.saksbehandlerident == null) {
+            null
+        } else {
+            SaksbehandlerView(
+                navIdent = behandling.tildeling?.saksbehandlerident!!,
+                navn = saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!),
+            )
+        }
+        return saksbehandlerView
+    }
 }

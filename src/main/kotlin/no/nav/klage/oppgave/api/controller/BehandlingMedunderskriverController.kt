@@ -53,7 +53,7 @@ class BehandlingMedunderskriverController(
     fun putMedunderskriver(
         @PathVariable("id") behandlingId: UUID,
         @RequestBody input: SaksbehandlerInput
-    ): MedunderskriverFlytResponse {
+    ): MedunderskriverWrapped {
         logBehandlingMethodDetails(
             ::putMedunderskriverident.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -65,7 +65,7 @@ class BehandlingMedunderskriverController(
             input.navIdent,
             innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
     @Operation(
@@ -94,7 +94,7 @@ class BehandlingMedunderskriverController(
     @GetMapping("/{id}/medunderskriver")
     fun getMedunderskriver(
         @PathVariable("id") behandlingId: UUID
-    ): MedunderskriverView {
+    ): MedunderskriverWrapped {
         logBehandlingMethodDetails(
             ::getMedunderskriver.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -102,9 +102,10 @@ class BehandlingMedunderskriverController(
             logger
         )
         val behandling = behandlingService.getBehandling(behandlingId)
-        return behandlingMapper.mapToMedunderskriverView(behandling)
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
+    //TODO remove when frontend is updated and using /medunderskriver
     @GetMapping("/{id}/medunderskriverflyt")
     fun getMedunderskriverFlyt(
         @PathVariable("id") behandlingId: UUID

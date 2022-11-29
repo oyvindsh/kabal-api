@@ -299,4 +299,19 @@ class BehandlingController(
 
         return kabalInnstillingerService.getPotentialMedunderskrivere(behandlingId = behandlingId)
     }
+
+    @GetMapping("/behandlinger/{id}/sakengjelder")
+    fun getSakenGjelder(
+        @PathVariable("id") behandlingId: UUID,
+    ): SakenGjelderWrapped {
+        logMethodDetails(
+            ::getSakenGjelder.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return behandlingMapper.toSakenGjelderWrapped(
+            behandlingService.getBehandling(behandlingId).sakenGjelder
+        )
+    }
 }

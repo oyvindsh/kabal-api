@@ -9,3 +9,9 @@ data class MedunderskriverFlytResponse (
     val modified: LocalDateTime,
     val medunderskriverFlyt: MedunderskriverFlyt
 )
+
+data class MedunderskriverWrapped (
+    val medunderskriver: SaksbehandlerView?,
+    val modified: LocalDateTime,
+    val medunderskriverFlyt: MedunderskriverFlyt
+)

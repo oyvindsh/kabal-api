@@ -11,8 +11,7 @@ data class SaksbehandlerInput(
     val navIdent: String?,
 )
 
-data class SaksbehandlerModifiedResponse(
-    val navn: String?,
-    val navIdent: String?,
+data class SaksbehandlerViewWrapped(
+    val saksbehandler: SaksbehandlerView?,
     val modified: LocalDateTime,
 )
