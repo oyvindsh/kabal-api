@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.api.mapper
 
 
-import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
@@ -68,10 +67,10 @@ class BehandlingMapper(
             isAvsluttetAvSaksbehandler = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
-            tildeltSaksbehandler = berikSaksbehandler(klagebehandling.tildeling?.saksbehandlerident),
+            tildeltSaksbehandler = getSaksbehandlerView(klagebehandling.tildeling?.saksbehandlerident),
             tildeltSaksbehandlerEnhet = klagebehandling.tildeling?.enhet,
             medunderskriverident = klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
-            medunderskriver = berikSaksbehandler(klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
+            medunderskriver = getSaksbehandlerView(klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = klagebehandling.currentDelbehandling().medunderskriverFlyt,
             datoSendtMedunderskriver = klagebehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
             hjemler = klagebehandling.hjemler.map { it.id },
@@ -118,10 +117,10 @@ class BehandlingMapper(
             isAvsluttetAvSaksbehandler = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
             frist = ankebehandling.frist,
             tildeltSaksbehandlerident = ankebehandling.tildeling?.saksbehandlerident,
-            tildeltSaksbehandler = berikSaksbehandler(ankebehandling.tildeling?.saksbehandlerident),
+            tildeltSaksbehandler = getSaksbehandlerView(ankebehandling.tildeling?.saksbehandlerident),
             tildeltSaksbehandlerEnhet = ankebehandling.tildeling?.enhet,
             medunderskriverident = ankebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
-            medunderskriver = berikSaksbehandler(ankebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
+            medunderskriver = getSaksbehandlerView(ankebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = ankebehandling.currentDelbehandling().medunderskriverFlyt,
             datoSendtMedunderskriver = ankebehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
             hjemler = ankebehandling.hjemler.map { it.id },
@@ -169,10 +168,10 @@ class BehandlingMapper(
             isAvsluttetAvSaksbehandler = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
             frist = ankeITrygderettenbehandling.frist,
             tildeltSaksbehandlerident = ankeITrygderettenbehandling.tildeling?.saksbehandlerident,
-            tildeltSaksbehandler = berikSaksbehandler(ankeITrygderettenbehandling.tildeling?.saksbehandlerident),
+            tildeltSaksbehandler = getSaksbehandlerView(ankeITrygderettenbehandling.tildeling?.saksbehandlerident),
             tildeltSaksbehandlerEnhet = ankeITrygderettenbehandling.tildeling?.enhet,
             medunderskriverident = ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
-            medunderskriver = berikSaksbehandler(ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
+            medunderskriver = getSaksbehandlerView(ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = ankeITrygderettenbehandling.currentDelbehandling().medunderskriverFlyt,
             datoSendtMedunderskriver = ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
             hjemler = ankeITrygderettenbehandling.hjemler.map { it.id },
@@ -200,9 +199,9 @@ class BehandlingMapper(
         )
     }
 
-    private fun berikSaksbehandler(saksbehandlerident: String?): SaksbehandlerView? {
+    private fun getSaksbehandlerView(saksbehandlerident: String?): SaksbehandlerView? {
         return saksbehandlerident?.let {
-            SaksbehandlerView(it, saksbehandlerRepository.getNameForSaksbehandler(it))
+            SaksbehandlerView(navIdent = it, navn = saksbehandlerRepository.getNameForSaksbehandler(it))
         }
     }
 
@@ -338,14 +337,20 @@ class BehandlingMapper(
 
     fun mapToMedunderskriverFlytResponse(behandling: Behandling): MedunderskriverFlytResponse {
         return MedunderskriverFlytResponse(
-            behandling.modified,
-            behandling.currentDelbehandling().medunderskriverFlyt
+            navn = if (behandling.medunderskriver?.saksbehandlerident != null) saksbehandlerRepository.getNameForSaksbehandler(
+                behandling.medunderskriver?.saksbehandlerident!!
+            ) else null,
+            navIdent = behandling.medunderskriver?.saksbehandlerident,
+            modified = behandling.modified,
+            medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt,
         )
     }
 
-    fun mapToMedunderskriverView(behandling: Behandling): MedunderskriverView {
-        return MedunderskriverView(
-            medunderskriver = behandling.currentDelbehandling().medunderskriver?.let { berikSaksbehandler(behandling.currentDelbehandling().medunderskriver!!.saksbehandlerident) }
+    fun mapToMedunderskriverWrapped(behandling: Behandling): MedunderskriverWrapped {
+        return MedunderskriverWrapped(
+            medunderskriver = getSaksbehandlerView(behandling.medunderskriver?.saksbehandlerident),
+            modified = behandling.modified,
+            medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt,
         )
     }
 
@@ -355,10 +360,12 @@ class BehandlingMapper(
         )
     }
 
-    private fun PartId.getNavn(): String? =
-        if (type == PartIdType.PERSON) {
-            pdlFacade.getPersonInfo(value).settSammenNavn()
-        } else {
-            eregClient.hentOrganisasjon(value)?.navn?.navnelinje1
-        }
+    fun toSakenGjelderWrapped(sakenGjelder: SakenGjelder): SakenGjelderWrapped {
+        return SakenGjelderWrapped(
+            sakenGjelder = SakenGjelderWrapped.PersonView(
+                fnr = sakenGjelder.partId.value,
+                navn = pdlFacade.getPersonInfo(sakenGjelder.partId.value).sammensattNavn,
+            ),
+        )
+    }
 }

@@ -49,27 +49,27 @@ class BehandlingMapperTest {
     private val MEDUNDERSKRIVER_NAVN = "MEDUNDERSKRIVER_NAVN"
 
     @Test
-    fun `mapToMedunderskriverView og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt ikke er satt`() {
+    fun `mapToMedunderskriverWrapped og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt ikke er satt`() {
         val klagebehandling = getKlagebehandling()
-        val viewResult = behandlingMapper.mapToMedunderskriverView(klagebehandling)
+        val viewResult = behandlingMapper.mapToMedunderskriverWrapped(klagebehandling)
         val flytViewResult = behandlingMapper.mapToMedunderskriverFlytView(klagebehandling)
 
-        assertThat(viewResult.medunderskriver).isNull()
+        assertThat(viewResult.medunderskriver?.navIdent).isNull()
         assertThat(flytViewResult.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.IKKE_SENDT)
     }
 
     @Test
-    fun `mapToMedunderskriverInfoView og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt er satt`() {
+    fun `mapToMedunderskriverWrapped og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt er satt`() {
         val klagebehandling = getKlagebehandlingWithMedunderskriver()
         every { saksbehandlerRepository.getNameForSaksbehandler(any()) } returns MEDUNDERSKRIVER_NAVN
 
-        val viewResult = behandlingMapper.mapToMedunderskriverView(klagebehandling)
+        val viewResult = behandlingMapper.mapToMedunderskriverWrapped(klagebehandling)
         val flytViewResult = behandlingMapper.mapToMedunderskriverFlytView(klagebehandling)
 
         assertThat(viewResult.medunderskriver).isEqualTo(
             SaksbehandlerView(
-                MEDUNDERSKRIVER_IDENT,
-                MEDUNDERSKRIVER_NAVN
+                navIdent = MEDUNDERSKRIVER_IDENT,
+                navn = MEDUNDERSKRIVER_NAVN
             )
         )
         assertThat(flytViewResult.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)

@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
-import no.nav.klage.oppgave.api.view.BehandlingMedunderskriveridentInput
-import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
-import no.nav.klage.oppgave.api.view.MedunderskriverFlytView
-import no.nav.klage.oppgave.api.view.MedunderskriverView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -52,6 +49,25 @@ class BehandlingMedunderskriverController(
         return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
     }
 
+    @PutMapping("/{id}/medunderskriver")
+    fun putMedunderskriver(
+        @PathVariable("id") behandlingId: UUID,
+        @RequestBody input: SaksbehandlerInput
+    ): MedunderskriverWrapped {
+        logBehandlingMethodDetails(
+            ::putMedunderskriverident.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        val behandling = behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingId,
+            input.navIdent,
+            innloggetSaksbehandlerService.getInnloggetIdent()
+        )
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
+    }
+
     @Operation(
         summary = "Flytter behandlingen mellom saksbehandler og medunderskriver.",
         description = "Flytter fra saksbehandler til medunderskriver dersom saksbehandler utfører, flytter til saksbehandler med returnert-status dersom medunderskriver utfører."
@@ -78,7 +94,7 @@ class BehandlingMedunderskriverController(
     @GetMapping("/{id}/medunderskriver")
     fun getMedunderskriver(
         @PathVariable("id") behandlingId: UUID
-    ): MedunderskriverView {
+    ): MedunderskriverWrapped {
         logBehandlingMethodDetails(
             ::getMedunderskriver.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -86,9 +102,10 @@ class BehandlingMedunderskriverController(
             logger
         )
         val behandling = behandlingService.getBehandling(behandlingId)
-        return behandlingMapper.mapToMedunderskriverView(behandling)
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
+    //TODO remove when frontend is updated and using /medunderskriver
     @GetMapping("/{id}/medunderskriverflyt")
     fun getMedunderskriverFlyt(
         @PathVariable("id") behandlingId: UUID
