@@ -103,9 +103,9 @@ class TilgangService(
         return verifiserTilgangTilPersonForSaksbehandler(
             fnr = fnr,
             ident = ident,
-            kanBehandleStrengtFortrolig = { saksbehandlerRepository.kanBehandleStrengtFortrolig(ident) },
-            kanBehandleFortrolig = { saksbehandlerRepository.kanBehandleFortrolig(ident) },
-            kanBehandleEgenAnsatt = { saksbehandlerRepository.kanBehandleEgenAnsatt(ident) },
+            kanBehandleStrengtFortrolig = { saksbehandlerRepository.hasStrengtFortroligRole(ident) },
+            kanBehandleFortrolig = { saksbehandlerRepository.hasFortroligRole(ident) },
+            kanBehandleEgenAnsatt = { saksbehandlerRepository.hasEgenAnsattRole(ident) },
         )
     }
 
