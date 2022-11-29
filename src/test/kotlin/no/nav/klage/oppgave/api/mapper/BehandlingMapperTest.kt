@@ -49,24 +49,24 @@ class BehandlingMapperTest {
     private val MEDUNDERSKRIVER_NAVN = "MEDUNDERSKRIVER_NAVN"
 
     @Test
-    fun `mapToSaksbehandlerView og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt ikke er satt`() {
+    fun `mapToMedunderskriverView og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt ikke er satt`() {
         val klagebehandling = getKlagebehandling()
-        val viewResult = behandlingMapper.mapToSaksbehandlerView(klagebehandling)
+        val viewResult = behandlingMapper.mapToMedunderskriverView(klagebehandling)
         val flytViewResult = behandlingMapper.mapToMedunderskriverFlytView(klagebehandling)
 
-        assertThat(viewResult?.navIdent).isNull()
+        assertThat(viewResult.medunderskriver?.navIdent).isNull()
         assertThat(flytViewResult.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.IKKE_SENDT)
     }
 
     @Test
-    fun `mapToSaksbehandlerView og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt er satt`() {
+    fun `mapToMedunderskriverView og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt er satt`() {
         val klagebehandling = getKlagebehandlingWithMedunderskriver()
         every { saksbehandlerRepository.getNameForSaksbehandler(any()) } returns MEDUNDERSKRIVER_NAVN
 
-        val viewResult = behandlingMapper.mapToSaksbehandlerView(klagebehandling)
+        val viewResult = behandlingMapper.mapToMedunderskriverView(klagebehandling)
         val flytViewResult = behandlingMapper.mapToMedunderskriverFlytView(klagebehandling)
 
-        assertThat(viewResult).isEqualTo(
+        assertThat(viewResult.medunderskriver).isEqualTo(
             SaksbehandlerView(
                 MEDUNDERSKRIVER_IDENT,
                 MEDUNDERSKRIVER_NAVN

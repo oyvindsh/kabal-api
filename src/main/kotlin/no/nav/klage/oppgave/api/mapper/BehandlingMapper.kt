@@ -347,15 +347,10 @@ class BehandlingMapper(
         )
     }
 
-    fun mapToSaksbehandlerView(behandling: Behandling): SaksbehandlerView? {
-        return if (behandling.medunderskriver?.saksbehandlerident != null) {
-            return SaksbehandlerView(
-                navn = saksbehandlerRepository.getNameForSaksbehandler(behandling.medunderskriver?.saksbehandlerident!!),
-                navIdent = behandling.medunderskriver?.saksbehandlerident!!
-            )
-        } else {
-            null
-        }
+    fun mapToMedunderskriverView(behandling: Behandling): MedunderskriverView {
+        return MedunderskriverView(
+            medunderskriver = behandling.currentDelbehandling().medunderskriver?.let { berikSaksbehandler(behandling.currentDelbehandling().medunderskriver!!.saksbehandlerident) }
+        )
     }
 
     fun mapToMedunderskriverFlytView(behandling: Behandling): MedunderskriverFlytView {

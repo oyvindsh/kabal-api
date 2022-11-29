@@ -94,7 +94,7 @@ class BehandlingMedunderskriverController(
     @GetMapping("/{id}/medunderskriver")
     fun getMedunderskriver(
         @PathVariable("id") behandlingId: UUID
-    ): SaksbehandlerView? {
+    ): MedunderskriverView {
         logBehandlingMethodDetails(
             ::getMedunderskriver.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -102,7 +102,7 @@ class BehandlingMedunderskriverController(
             logger
         )
         val behandling = behandlingService.getBehandling(behandlingId)
-        return behandlingMapper.mapToSaksbehandlerView(behandling)
+        return behandlingMapper.mapToMedunderskriverView(behandling)
     }
 
     @GetMapping("/{id}/medunderskriverflyt")
