@@ -10,22 +10,19 @@ import org.springframework.stereotype.Service
 class InnloggetSaksbehandlerService(
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val tokenUtil: TokenUtil,
-    @Value("\${FORTROLIG_ROLE_ID}") private val fortroligRoleId: String,
-    @Value("\${STRENGT_FORTROLIG_ROLE_ID}") private val strengtFortroligRoleId: String,
-    @Value("\${EGEN_ANSATT_ROLE_ID}") private val egenAnsattRoleId: String,
-    @Value("\${KABAL_ADMIN_ROLE_ID}") private val kabalAdminRoleId: String
 ) {
 
     fun getInnloggetIdent() = tokenUtil.getIdent()
 
-    fun isKabalAdmin(): Boolean = tokenUtil.getRoleIdsFromToken().contains(kabalAdminRoleId)
+    fun isKabalAdmin(): Boolean = saksbehandlerRepository.hasKabalAdminRole(tokenUtil.getIdent())
 
-    fun kanBehandleFortrolig(): Boolean = tokenUtil.getRoleIdsFromToken().contains(fortroligRoleId)
+    fun kanBehandleFortrolig(): Boolean = saksbehandlerRepository.hasFortroligRole(tokenUtil.getIdent())
 
     fun kanBehandleStrengtFortrolig(): Boolean =
-        tokenUtil.getRoleIdsFromToken().contains(strengtFortroligRoleId)
+        saksbehandlerRepository.hasStrengtFortroligRole(tokenUtil.getIdent())
 
-    fun kanBehandleEgenAnsatt(): Boolean = tokenUtil.getRoleIdsFromToken().contains(egenAnsattRoleId)
+    fun kanBehandleEgenAnsatt(): Boolean =
+        saksbehandlerRepository.hasEgenAnsattRole(tokenUtil.getIdent())
 
     fun harTilgangTilYtelse(ytelse: Ytelse): Boolean {
         return saksbehandlerRepository.harTilgangTilYtelse(getInnloggetIdent(), ytelse)

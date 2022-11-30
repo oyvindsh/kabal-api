@@ -16,7 +16,9 @@ class SaksbehandlerRepository(
     private val azureGateway: AzureGateway,
     @Value("\${FORTROLIG_ROLE_ID}") private val fortroligRoleId: String,
     @Value("\${STRENGT_FORTROLIG_ROLE_ID}") private val strengtFortroligRoleId: String,
-    @Value("\${EGEN_ANSATT_ROLE_ID}") private val egenAnsattRoleId: String
+    @Value("\${EGEN_ANSATT_ROLE_ID}") private val egenAnsattRoleId: String,
+    @Value("\${KABAL_OPPGAVESTYRING_ALLE_ENHETER_ROLE_ID}") private val kabalOppgavestyringAlleEnheterRoleId: String,
+    @Value("\${KABAL_ADMIN_ROLE_ID}") private val kabalAdminRoleId: String
 ) {
 
     companion object {
@@ -34,9 +36,10 @@ class SaksbehandlerRepository(
         ) ?: false
     }
 
-    fun harTilgangTilYtelse(ident: String, ytelse: Ytelse): Boolean {
-        return getEnheterMedYtelserForSaksbehandler(ident).enheter.flatMap { it.ytelser }.contains(ytelse)
-    }
+    fun harTilgangTilYtelse(ident: String, ytelse: Ytelse): Boolean =
+        hasKabalOppgavestyringAlleEnheterRole(ident)
+                || getEnheterMedYtelserForSaksbehandler(ident).enheter.flatMap { it.ytelser }.contains(ytelse)
+
 
     fun getEnheterMedYtelserForSaksbehandler(ident: String): EnheterMedLovligeYtelser =
         listOf(azureGateway.getDataOmInnloggetSaksbehandler().enhet).berikMedYtelser()
@@ -73,12 +76,18 @@ class SaksbehandlerRepository(
         return saksbehandlerNameCache
     }
 
-    fun kanBehandleFortrolig(ident: String): Boolean = getRoleIds(ident).contains(fortroligRoleId)
+    fun hasFortroligRole(ident: String): Boolean = getRoleIds(ident).contains(fortroligRoleId)
 
-    fun kanBehandleStrengtFortrolig(ident: String): Boolean =
+    fun hasStrengtFortroligRole(ident: String): Boolean =
         getRoleIds(ident).contains(strengtFortroligRoleId)
 
-    fun kanBehandleEgenAnsatt(ident: String): Boolean = getRoleIds(ident).contains(egenAnsattRoleId)
+    fun hasEgenAnsattRole(ident: String): Boolean = getRoleIds(ident).contains(egenAnsattRoleId)
+
+    fun hasKabalOppgavestyringAlleEnheterRole(ident: String): Boolean =
+        getRoleIds(ident).contains(kabalOppgavestyringAlleEnheterRoleId)
+
+    fun hasKabalAdminRole(ident: String): Boolean =
+        getRoleIds(ident).contains(kabalAdminRoleId)
 
     private fun getRoleIds(ident: String): List<String> = try {
         azureGateway.getRoleIds(ident)
