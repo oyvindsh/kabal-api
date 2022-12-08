@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.view.*
-import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.service.BehandlingService
@@ -21,7 +20,6 @@ class BehandlingAssignmentController(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val saksbehandlerService: SaksbehandlerService,
     private val behandlingService: BehandlingService,
-    private val pdlFacade: PdlFacade,
 ) {
 
     companion object {

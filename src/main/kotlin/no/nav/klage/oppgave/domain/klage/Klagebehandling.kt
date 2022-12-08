@@ -56,6 +56,7 @@ class Klagebehandling(
     //Hovedbehandling
     //Skal være en kvalitetsvurdering per hovedbehandling, derfor er dette riktig sted.
     kakaKvalitetsvurderingId: UUID? = null,
+    kakaKvalitetsvurderingVersion: Int? = null,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
@@ -73,6 +74,7 @@ class Klagebehandling(
     modified = modified,
     created = created,
     kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
+    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,

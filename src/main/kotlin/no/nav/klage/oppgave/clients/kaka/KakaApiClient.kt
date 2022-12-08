@@ -24,10 +24,10 @@ class KakaApiClient(
         private val secureLogger = getSecureLogger()
     }
 
-    fun createKvalitetsvurdering(): KakaOutput {
+    fun createKvalitetsvurdering(kvalitetsvurderingVersion: Int): KakaOutput {
         logger.debug("Creating kvalitetsvurdering i kaka")
         return kakaApiWebClient.post()
-            .uri { it.path("/kabal/kvalitetsvurdering").build() }
+            .uri { it.path("/kabal/kvalitetsvurderinger/$kvalitetsvurderingVersion").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"
@@ -38,8 +38,8 @@ class KakaApiClient(
             .block() ?: throw RuntimeException("Kvalitetsvurdering could not be created")
     }
 
-    fun finalizeBehandling(saksdataInput: SaksdataInput): KakaOutput {
-        return kakaApiWebClient.post()
+    fun finalizeBehandling(saksdataInput: SaksdataInput) {
+        kakaApiWebClient.post()
             .uri { it.path("/kabal/saksdata").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
@@ -48,7 +48,7 @@ class KakaApiClient(
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(saksdataInput)
             .retrieve()
-            .bodyToMono<KakaOutput>()
+            .bodyToMono<Void>()
             .block() ?: throw RuntimeException("Saksdata could not be created")
     }
 
