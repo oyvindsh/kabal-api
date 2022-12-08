@@ -53,7 +53,7 @@ class Ankebehandling(
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
     kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int? = null,
+    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,

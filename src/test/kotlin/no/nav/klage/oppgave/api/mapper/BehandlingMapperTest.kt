@@ -88,6 +88,7 @@ class BehandlingMapperTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
         )
     }
 

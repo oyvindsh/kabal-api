@@ -24,3 +24,5 @@ SAF_SCOPE: dev-fss.teamdokumenthandtering.saf-q1
 CLAM_AV_URL: http://clamav.clamav/scan
 
 FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS: 20000
+
+KAKA_VERSION_2_DATE: 2022-12-06

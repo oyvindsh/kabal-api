@@ -29,15 +29,19 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
 
     fun finalizeBehandling(behandling: Behandling) {
         logger.debug("Sending saksdata to Kaka because behandling is finished.")
-        kakaApiClient.finalizeBehandling(behandling.toSaksdataInput())
+        kakaApiClient.finalizeBehandling(
+            saksdataInput = behandling.toSaksdataInput(),
+            kvalitetsvurderingVersion = behandling.kakaKvalitetsvurderingVersion
+        )
     }
 
     fun getValidationErrors(behandling: Behandling): List<InvalidProperty> {
         logger.debug("Getting kvalitetsvurdering validation errors")
         return kakaApiClient.getValidationErrors(
-            behandling.kakaKvalitetsvurderingId!!,
-            behandling.ytelse.id,
-            behandling.type.id
+            kvalitetsvurderingId = behandling.kakaKvalitetsvurderingId!!,
+            ytelseId = behandling.ytelse.id,
+            typeId = behandling.type.id,
+            kvalitetsvurderingVersion = behandling.kakaKvalitetsvurderingVersion,
         ).validationErrors.map {
             InvalidProperty(
                 field = it.field,

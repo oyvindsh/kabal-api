@@ -33,6 +33,7 @@ internal class KlagebehandlingTest {
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.IKKE_TILDELT)
         }
@@ -52,6 +53,7 @@ internal class KlagebehandlingTest {
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.IKKE_TILDELT)
         }
@@ -71,6 +73,7 @@ internal class KlagebehandlingTest {
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.TILDELT)
         }
@@ -93,7 +96,8 @@ internal class KlagebehandlingTest {
                         medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
                         medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
                     ),
-                )
+                ),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
         }
@@ -117,6 +121,7 @@ internal class KlagebehandlingTest {
                         medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
                     )
                 ),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.RETURNERT_TIL_SAKSBEHANDLER)
         }
@@ -139,6 +144,7 @@ internal class KlagebehandlingTest {
                         medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
                     )
                 ),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.MEDUNDERSKRIVER_VALGT)
         }
@@ -162,6 +168,7 @@ internal class KlagebehandlingTest {
                         medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
                     )
                 ),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.TILDELT)
         }
@@ -185,6 +192,7 @@ internal class KlagebehandlingTest {
                         avsluttet = LocalDateTime.now(),
                     )
                 ),
+                kakaKvalitetsvurderingVersion = 2,
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.FULLFOERT)
         }

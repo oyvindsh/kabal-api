@@ -78,6 +78,7 @@ class KlagebehandlingRepositoryTest {
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         klagebehandlingRepository.save(klage)
@@ -130,6 +131,7 @@ class KlagebehandlingRepositoryTest {
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
                 Saksdokument(journalpostId = "REF2", dokumentInfoId = "321"),
             ),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         klagebehandlingRepository.save(klage)
@@ -185,6 +187,7 @@ class KlagebehandlingRepositoryTest {
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
                 Saksdokument(journalpostId = "REF2", dokumentInfoId = "321"),
             ),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         klagebehandlingRepository.save(klage)

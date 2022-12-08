@@ -36,9 +36,8 @@ class AnkebehandlingService(
     }
 
     fun createAnkebehandlingFromMottak(mottak: Mottak): Ankebehandling {
+        val kvalitetsvurderingVersion = getKakaVersion()
 
-        val kakaKvalitetsvurdering =
-            kakaApiGateway.createKvalitetsvurdering(kvalitetsvurderingVersion = getKakaVersion())
         val ankebehandling = ankebehandlingRepository.save(
             Ankebehandling(
                 klager = mottak.klager.copy(),
@@ -56,8 +55,8 @@ class AnkebehandlingService(
                 mottakId = mottak.id,
                 delbehandlinger = setOf(Delbehandling()),
                 saksdokumenter = dokumentService.createSaksdokumenterFromJournalpostIdSet(mottak.mottakDokument.map { it.journalpostId }),
-                kakaKvalitetsvurderingId = kakaKvalitetsvurdering.kvalitetsvurderingId,
-                kakaKvalitetsvurderingVersion = kakaKvalitetsvurdering.kvalitetsvurderingVersion,
+                kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(kvalitetsvurderingVersion = kvalitetsvurderingVersion).kvalitetsvurderingId,
+                kakaKvalitetsvurderingVersion = kvalitetsvurderingVersion,
                 hjemler = createHjemmelSetFromMottak(mottak.hjemler),
                 klageBehandlendeEnhet = mottak.forrigeBehandlendeEnhet,
                 klagebehandlingId = mottak.forrigeBehandlingId,

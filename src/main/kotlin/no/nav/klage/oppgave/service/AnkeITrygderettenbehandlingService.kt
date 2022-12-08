@@ -12,8 +12,10 @@ import no.nav.klage.oppgave.domain.klage.Delbehandling
 import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.*
 import javax.transaction.Transactional
 
@@ -27,6 +29,8 @@ class AnkeITrygderettenbehandlingService(
     private val mottakService: MottakService,
     private val dokumentService: DokumentService,
     private val kafkaEventRepository: KafkaEventRepository,
+    @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")
+    private val kakaVersion2Date: LocalDate,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -35,6 +39,15 @@ class AnkeITrygderettenbehandlingService(
         private val objectMapperBehandlingEvents = ObjectMapper().registerModule(JavaTimeModule()).configure(
             SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false
         )
+    }
+
+    private fun getKakaVersion(): Int {
+        val kvalitetsvurderingVersion = if (LocalDate.now() >= kakaVersion2Date) {
+            2
+        } else {
+            1
+        }
+        return kvalitetsvurderingVersion
     }
 
     fun createAnkeITrygderettenbehandling(input: AnkeITrygderettenbehandlingInput): AnkeITrygderettenbehandling {
@@ -58,6 +71,7 @@ class AnkeITrygderettenbehandlingService(
                 },
                 sendtTilTrygderetten = input.sendtTilTrygderetten,
                 kjennelseMottatt = null,
+                kakaKvalitetsvurderingVersion = getKakaVersion()
             )
         )
         logger.debug("Created ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id}")

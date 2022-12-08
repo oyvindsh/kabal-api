@@ -78,7 +78,8 @@ class BehandlingMedunderskriverControllerTest {
             )
         ),
         mottattVedtaksinstans = LocalDate.now(),
-        avsenderEnhetFoersteinstans = "0101"
+        avsenderEnhetFoersteinstans = "0101",
+        kakaKvalitetsvurderingVersion = 2,
     )
 
     @BeforeEach

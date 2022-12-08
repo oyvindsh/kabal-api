@@ -437,7 +437,8 @@ class BehandlingServiceTest {
                 )
             ),
             mottattVedtaksinstans = LocalDate.now(),
-            avsenderEnhetFoersteinstans = "enhet"
+            avsenderEnhetFoersteinstans = "enhet",
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         behandlingRepository.save(behandling)
