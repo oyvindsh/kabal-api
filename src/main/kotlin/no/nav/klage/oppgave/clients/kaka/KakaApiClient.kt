@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.clients.kaka
 
-import brave.Tracer
 import no.nav.klage.oppgave.clients.kaka.model.request.SaksdataInput
 import no.nav.klage.oppgave.clients.kaka.model.response.KakaOutput
 import no.nav.klage.oppgave.clients.kaka.model.response.ValidationErrors
@@ -18,7 +17,6 @@ import java.util.*
 class KakaApiClient(
     private val kakaApiWebClient: WebClient,
     private val tokenUtil: TokenUtil,
-    private val tracer: Tracer
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -34,7 +32,6 @@ class KakaApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .contentType(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono<KakaOutput>()
@@ -48,12 +45,11 @@ class KakaApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(saksdataInput)
             .retrieve()
             .bodyToMono<Void>()
-            .block() ?: throw RuntimeException("Saksdata could not be created")
+            .block()
     }
 
     fun getValidationErrors(
@@ -74,7 +70,6 @@ class KakaApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKakaApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<ValidationErrors>()
             .block() ?: throw RuntimeException("Validation errors could not be retrieved")
