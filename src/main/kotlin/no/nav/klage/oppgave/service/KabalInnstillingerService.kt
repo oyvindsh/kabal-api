@@ -25,6 +25,9 @@ class KabalInnstillingerService(
 
     fun getPotentialMedunderskrivere(behandlingId: UUID): Medunderskrivere {
         val behandling = behandlingService.getBehandling(behandlingId)
+        if (behandling.tildeling == null) {
+            return Medunderskrivere(medunderskrivere = emptyList())
+        }
         return kabalInnstillingerClient.searchMedunderskrivere(
             MedunderskrivereInput(
                 ytelseId = behandling.ytelse.id,
