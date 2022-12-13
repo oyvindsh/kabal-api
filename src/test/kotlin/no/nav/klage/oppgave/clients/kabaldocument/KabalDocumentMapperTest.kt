@@ -77,6 +77,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         val fasitMottakere = listOf(
@@ -116,6 +117,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         val fasitMottakere = setOf(
@@ -160,6 +162,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         val fasitMottakere = setOf(
@@ -213,6 +216,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         val fasitMottakere = setOf(

@@ -88,6 +88,10 @@ class BehandlingMapper(
             fortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
+            kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
+                id = klagebehandling.kakaKvalitetsvurderingId,
+                version = klagebehandling.kakaKvalitetsvurderingVersion,
+            ),
             isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
         )
@@ -141,6 +145,10 @@ class BehandlingMapper(
             fortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
+            kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
+                id = ankebehandling.kakaKvalitetsvurderingId,
+                version = ankebehandling.kakaKvalitetsvurderingVersion,
+            ),
             isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
         )
@@ -192,6 +200,10 @@ class BehandlingMapper(
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             kvalitetsvurderingId = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
+            kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
+                id = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
+                version = ankeITrygderettenbehandling.kakaKvalitetsvurderingVersion,
+            ),
             isPossibleToUseDokumentUnderArbeid = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankeITrygderettenbehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,

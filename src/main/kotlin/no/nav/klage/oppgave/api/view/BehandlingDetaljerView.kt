@@ -45,6 +45,7 @@ data class BehandlingDetaljerView(
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
     val kvalitetsvurderingId: UUID?,
+    val kvalitetsvurderingReference: KvalitetsvurderingReference,
     val isPossibleToUseDokumentUnderArbeid: Boolean = false,
     val sattPaaVent: LocalDateTime? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
@@ -80,5 +81,10 @@ data class BehandlingDetaljerView(
         val foedselsnummer: String?,
         val navn: NavnView?,
         val kjoenn: String?,
+    )
+
+    data class KvalitetsvurderingReference(
+        val id: UUID?,
+        val version: Int,
     )
 }

@@ -7,9 +7,11 @@ import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -19,6 +21,8 @@ class KlagebehandlingService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val kakaApiGateway: KakaApiGateway,
+    @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")
+    private val kakaVersion2Date: LocalDate,
 ) {
 
     companion object {
@@ -60,6 +64,7 @@ class KlagebehandlingService(
     }
 
     fun createKlagebehandlingFromMottak(mottak: Mottak): Klagebehandling {
+        val kvalitetsvurderingVersion = getKakaVersion()
 
         val klagebehandling = klagebehandlingRepository.save(
             Klagebehandling(
@@ -81,7 +86,8 @@ class KlagebehandlingService(
                 mottakId = mottak.id,
                 delbehandlinger = setOf(Delbehandling()),
                 saksdokumenter = dokumentService.createSaksdokumenterFromJournalpostIdSet(mottak.mottakDokument.map { it.journalpostId }),
-                kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(),
+                kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(kvalitetsvurderingVersion = kvalitetsvurderingVersion).kvalitetsvurderingId,
+                kakaKvalitetsvurderingVersion = kvalitetsvurderingVersion,
                 hjemler = createHjemmelSetFromMottak(mottak.hjemler),
                 kommentarFraFoersteinstans = mottak.kommentar
             )
@@ -94,6 +100,15 @@ class KlagebehandlingService(
             )
         )
         return klagebehandling
+    }
+
+    private fun getKakaVersion(): Int {
+        val kvalitetsvurderingVersion = if (LocalDate.now() >= kakaVersion2Date) {
+            2
+        } else {
+            1
+        }
+        return kvalitetsvurderingVersion
     }
 
     private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =

@@ -5,7 +5,8 @@ import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class KakaOutput(
-    val id: UUID,
+    val kvalitetsvurderingId: UUID,
+    val kvalitetsvurderingVersion: Int,
 )
 
 data class ValidationErrors(

@@ -41,6 +41,7 @@ class AnkeITrygderettenbehandling(
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
     kakaKvalitetsvurderingId: UUID? = null,
+    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
@@ -58,6 +59,7 @@ class AnkeITrygderettenbehandling(
     modified = modified,
     created = created,
     kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
+    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,

@@ -24,10 +24,10 @@ class KakaApiClient(
         private val secureLogger = getSecureLogger()
     }
 
-    fun createKvalitetsvurdering(): KakaOutput {
+    fun createKvalitetsvurdering(kvalitetsvurderingVersion: Int): KakaOutput {
         logger.debug("Creating kvalitetsvurdering i kaka")
         return kakaApiWebClient.post()
-            .uri { it.path("/kabal/kvalitetsvurdering").build() }
+            .uri { it.path("/kabal/kvalitetsvurderinger/v$kvalitetsvurderingVersion").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"
@@ -38,9 +38,9 @@ class KakaApiClient(
             .block() ?: throw RuntimeException("Kvalitetsvurdering could not be created")
     }
 
-    fun finalizeBehandling(saksdataInput: SaksdataInput): KakaOutput {
-        return kakaApiWebClient.post()
-            .uri { it.path("/kabal/saksdata").build() }
+    fun finalizeBehandling(saksdataInput: SaksdataInput, kvalitetsvurderingVersion: Int) {
+        kakaApiWebClient.post()
+            .uri { it.path("/kabal/saksdata/v$kvalitetsvurderingVersion").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"
@@ -48,15 +48,20 @@ class KakaApiClient(
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(saksdataInput)
             .retrieve()
-            .bodyToMono<KakaOutput>()
-            .block() ?: throw RuntimeException("Saksdata could not be created")
+            .bodyToMono<Void>()
+            .block()
     }
 
-    fun getValidationErrors(kvalitetsvurderingId: UUID, ytelseId: String, typeId: String): ValidationErrors {
+    fun getValidationErrors(
+        kvalitetsvurderingId: UUID,
+        ytelseId: String,
+        typeId: String,
+        kvalitetsvurderingVersion: Int
+    ): ValidationErrors {
         logger.debug("Getting validation errors from kaka-api")
         return kakaApiWebClient.get()
             .uri {
-                it.path("/kabal/kvalitetsvurdering/{kvalitetsvurderingId}/validationerrors")
+                it.path("/kabal/kvalitetsvurderinger/v$kvalitetsvurderingVersion/{kvalitetsvurderingId}/validationerrors")
                     .queryParam("ytelseId", ytelseId)
                     .queryParam("typeId", typeId)
                     .build(kvalitetsvurderingId)

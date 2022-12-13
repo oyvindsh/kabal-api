@@ -62,6 +62,7 @@ class TilgangServiceTest {
                     avsluttet = LocalDateTime.now(),
                 )
             ),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         assertThrows<BehandlingAvsluttetException> {
@@ -98,6 +99,7 @@ class TilgangServiceTest {
                     avsluttetAvSaksbehandler = LocalDateTime.now(),
                 )
             ),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         assertThrows<BehandlingAvsluttetException> {
@@ -131,6 +133,7 @@ class TilgangServiceTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z654321")
@@ -161,6 +164,7 @@ class TilgangServiceTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z654321")
@@ -192,6 +196,7 @@ class TilgangServiceTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")

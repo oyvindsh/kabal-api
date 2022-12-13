@@ -39,6 +39,8 @@ abstract class Behandling(
     open val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "kaka_kvalitetsvurdering_id", nullable = true)
     open var kakaKvalitetsvurderingId: UUID? = null,
+    @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
+    open var kakaKvalitetsvurderingVersion: Int,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)

@@ -81,6 +81,7 @@ class MeldingRepositoryTest {
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
         )
 
         klagebehandlingRepository.save(klage)

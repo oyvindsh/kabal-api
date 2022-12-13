@@ -167,6 +167,7 @@ internal class BehandlingAvslutningServiceTest {
         ),
         avsenderEnhetFoersteinstans = "0101",
         mottattVedtaksinstans = LocalDate.now(),
+        kakaKvalitetsvurderingVersion = 2,
     )
 
     @Test
