@@ -54,7 +54,7 @@ class KakaApiClient(
 
     fun deleteKvalitetsvurderingV1(kvalitetsvurderingId: UUID) {
         kakaApiWebClient.delete()
-            .uri { it.path("/kabal/saksdata/v1/$kvalitetsvurderingId").build() }
+            .uri { it.path("/kabal/kvalitetsvurderinger/v1/$kvalitetsvurderingId").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"
