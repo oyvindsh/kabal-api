@@ -35,6 +35,13 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         )
     }
 
+    fun deleteKvalitetsvurderingV1(kvalitetsvurderingId: UUID) {
+        logger.debug("Deleting kvalitetsvurdering with id $kvalitetsvurderingId in Kaka.")
+        kakaApiClient.deleteKvalitetsvurderingV1(
+            kvalitetsvurderingId = kvalitetsvurderingId
+        )
+    }
+
     fun getValidationErrors(behandling: Behandling): List<InvalidProperty> {
         logger.debug("Getting kvalitetsvurdering validation errors")
         return kakaApiClient.getValidationErrors(
