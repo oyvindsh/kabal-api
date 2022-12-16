@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
@@ -381,6 +382,7 @@ class BehandlingService(
                     throw ValidationException("identifier is not a valid fødselsnummer")
                 }
             }
+
             9 -> {
                 if (isValidOrgnr(identifikator)) {
                     PartId(
@@ -391,6 +393,7 @@ class BehandlingService(
                     throw ValidationException("identifier is not a valid organisasjonsnummer")
                 }
             }
+
             else -> {
                 throw ValidationException("identifier is not a valid. Unknown type.")
             }
@@ -676,7 +679,11 @@ class BehandlingService(
             it.kakaKvalitetsvurderingVersion = 2
             it.modified = now()
 
-            kakaApiGateway.deleteKvalitetsvurderingV1(oldKvalitetsvurderingId!!)
+            try {
+                kakaApiGateway.deleteKvalitetsvurderingV1(oldKvalitetsvurderingId!!)
+            } catch (notFound: WebClientResponseException.NotFound) {
+                logger.warn("Got a 404 deleting kvalitetsvurdering with id $oldKvalitetsvurderingId. Continuing.")
+            }
         }
 
         val candidatesAfterMigration =
