@@ -24,3 +24,4 @@ SAF_SCOPE: prod-fss.teamdokumenthandtering.saf
 CLAM_AV_URL: http://clamav.clamav/scan
 
 KAKA_VERSION_2_DATE: 2023-01-01
+MIGRATE_CRON: 0 0 0 1 JAN *
