@@ -213,7 +213,6 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    @Synchronized
     fun Behandling.setHjemlerInVedtak(
         nyVerdi: Set<Registreringshjemmel>,
         saksbehandlerident: String
