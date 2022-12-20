@@ -5,7 +5,8 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.ytelseTilHjemler
-import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemler
+import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemlerV1
+import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemlerV2
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
@@ -15,6 +16,7 @@ import no.nav.klage.oppgave.domain.klage.utfallToTrygderetten
 import no.nav.klage.oppgave.service.AnkeITrygderettenbehandlingService
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.security.token.support.core.api.Unprotected
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -31,7 +33,9 @@ import java.util.*
 class MockDataController(
     private val mottakService: MottakService,
     private val safClient: SafGraphQlClient,
-    private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService
+    private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
+    @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")
+    private val kakaVersion2Date: LocalDate,
 ) {
 
     // Alle syntetiske personer under her er registrert under https://dolly.dev.adeo.no/gruppe/2960
@@ -239,23 +243,38 @@ class MockDataController(
                     )
                 }
 
+                val registreringsHjemmelSet = when (getKakaVersion()) {
+                    1 -> {
+                        mutableSetOf(ytelseTilRegistreringshjemlerV1[randomYtelse]!!.random())
+                    }
+
+                    2 -> {
+                        mutableSetOf(ytelseTilRegistreringshjemlerV2[randomYtelse]!!.random())
+                    }
+
+                    else ->
+                        throw error("wrong version")
+                }
+
+                val input = AnkeITrygderettenbehandlingInput(
+                    klager = klager.toKlagepart(),
+                    sakenGjelder = sakenGjelder?.toSakenGjelder(),
+                    ytelse = randomYtelse,
+                    type = type,
+                    kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
+                    dvhReferanse = input?.dvhReferanse ?: UUID.randomUUID().toString(),
+                    sakFagsystem = Fagsystem.fromNavn(oversendtSak!!.fagsystem.name),
+                    sakFagsakId = oversendtSak.fagsakId,
+                    sakMottattKlageinstans = dato.atStartOfDay(),
+                    saksdokumenter = mutableSetOf(),
+                    innsendingsHjemler = mutableSetOf(ytelseTilHjemler[randomYtelse]!!.random()),
+                    sendtTilTrygderetten = LocalDateTime.now(),
+                    registreringsHjemmelSet = registreringsHjemmelSet!!,
+                    ankebehandlingUtfall = ExternalUtfall.valueOf(utfallToTrygderetten.random().name),
+                )
+
                 ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(
-                    input = AnkeITrygderettenbehandlingInput(
-                        klager = klager.toKlagepart(),
-                        sakenGjelder = sakenGjelder?.toSakenGjelder(),
-                        ytelse = randomYtelse,
-                        type = type,
-                        kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
-                        dvhReferanse = input?.dvhReferanse ?: UUID.randomUUID().toString(),
-                        sakFagsystem = Fagsystem.fromNavn(oversendtSak!!.fagsystem.name),
-                        sakFagsakId = oversendtSak.fagsakId,
-                        sakMottattKlageinstans = dato.atStartOfDay(),
-                        saksdokumenter = mutableSetOf(),
-                        innsendingsHjemler = mutableSetOf(ytelseTilHjemler[randomYtelse]!!.random()),
-                        sendtTilTrygderetten = LocalDateTime.now(),
-                        registreringsHjemmelSet = mutableSetOf(ytelseTilRegistreringshjemler[randomYtelse]!!.random()),
-                        ankebehandlingUtfall = ExternalUtfall.valueOf(utfallToTrygderetten.random().name),
-                    )
+                    input = input
                 )
             }
         }
@@ -268,6 +287,14 @@ class MockDataController(
         )
     }
 
+    private fun getKakaVersion(): Int {
+        val kvalitetsvurderingVersion = if (LocalDate.now() >= kakaVersion2Date) {
+            2
+        } else {
+            1
+        }
+        return kvalitetsvurderingVersion
+    }
 
     private fun randomMottakDokumentType() = listOf(
         MottakDokumentType.OVERSENDELSESBREV,
