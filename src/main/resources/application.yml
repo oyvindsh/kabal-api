@@ -44,7 +44,7 @@ spring:
       max-request-size: 8MB
       max-file-size: 8MB
   codec:
-    max-in-memory-size: 16MB
+    max-in-memory-size: 256MB
 
 maxAttachmentSize: 8MB
 
