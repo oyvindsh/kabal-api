@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
@@ -31,13 +30,10 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import no.nav.klage.oppgave.util.isValidOrgnr
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalDateTime.now
 import java.util.*
 
 @Service
@@ -656,51 +652,6 @@ class BehandlingService(
     fun findBehandlingerForAvslutning(): List<Pair<UUID, Type>> =
         behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull()
             .map { it.id to it.type }
-
-    //TODO: Delete after run
-    @Scheduled(cron = "\${MIGRATE_CRON}", zone = "Europe/Oslo")
-    @SchedulerLock(name = "migrateKvalitetsvurderingerFromV1ToV2")
-    fun migrateKvalitetsvurderingerFromV1ToV2() {
-        val candidates =
-            behandlingRepository.findByDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndKakaKvalitetsvurderingIdIsNotNullAndKakaKvalitetsvurderingVersion(
-                kakaKvalitetsvurderingVersion = 1
-            )
-
-        logger.debug("Migrating kvalitetsvurdering from v1 to v2.")
-        logger.debug("Number of candidates: ${candidates.size}")
-
-        candidates.forEach {
-            val oldKvalitetsvurderingId = it.kakaKvalitetsvurderingId
-
-            logger.debug("Migrating behandling ${it.id}, kvalitetsvurdering ${it.kakaKvalitetsvurderingId}")
-            val newKvalitetsvurderingId =
-                kakaApiGateway.createKvalitetsvurdering(kvalitetsvurderingVersion = 2).kvalitetsvurderingId
-            it.kakaKvalitetsvurderingId = newKvalitetsvurderingId
-            it.kakaKvalitetsvurderingVersion = 2
-            it.modified = now()
-
-            try {
-                kakaApiGateway.deleteKvalitetsvurderingV1(oldKvalitetsvurderingId!!)
-            } catch (notFound: WebClientResponseException.NotFound) {
-                logger.warn("Got a 404 deleting kvalitetsvurdering with id $oldKvalitetsvurderingId. Continuing.")
-            }
-        }
-
-        val candidatesAfterMigration =
-            behandlingRepository.findByDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndKakaKvalitetsvurderingIdIsNotNullAndKakaKvalitetsvurderingVersion(
-                kakaKvalitetsvurderingVersion = 1
-            )
-
-        logger.debug("Number of candidates after migration: ${candidatesAfterMigration.size}")
-    }
-
-    fun getPotentialSaksbehandlereForBehandling(behandlingId: UUID): Saksbehandlere {
-        val behandling = getBehandling(behandlingId)
-        return kabalInnstillingerService.getPotentialSaksbehandlere(behandling)
-    }
-
-    fun getPotentialMedunderskrivereForBehandling(behandlingId: UUID): Medunderskrivere {
-        val behandling = getBehandling(behandlingId)
-        return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
-    }
+    
+    
 }
