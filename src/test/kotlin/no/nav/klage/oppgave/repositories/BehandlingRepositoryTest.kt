@@ -18,6 +18,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -78,6 +79,7 @@ class BehandlingRepositoryTest {
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
+            kakaKvalitetsvurderingId = UUID.randomUUID()
         )
 
         behandlingRepository.save(klage)
