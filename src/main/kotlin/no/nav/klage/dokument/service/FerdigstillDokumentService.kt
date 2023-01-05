@@ -59,8 +59,8 @@ class FerdigstillDokumentService(
                 Event(
                     behandlingId = updatedDokument.behandlingId.toString(),
                     name = "finished",
-                    id = updatedDokument.id.id.toString(),
-                    data = updatedDokument.id.id.toString(),
+                    id = updatedDokument.id.toString(),
+                    data = updatedDokument.id.toString(),
                 )
             )
 

@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -27,7 +27,7 @@ internal class SafJournalpostTest {
     fun before() {
         every { tokenUtilMock.getAppAccessTokenWithSafScope() } returns "abc"
         every { tokenUtilMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
-        every { tracerMock.currentSpan().context().traceIdString() } returns "def"
+        every { tracerMock.currentTraceContext().context()!!.traceId() } returns "def"
     }
 
     @Test

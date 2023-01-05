@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients.kabalsearch
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -22,7 +22,6 @@ class KabalSearchClient(
     ) {
         kabalSearchWebClient.delete()
             .uri { it.path("/internal/behandlinger/{id}").build(behandlingId.toString()) }
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Void>()
             .block()

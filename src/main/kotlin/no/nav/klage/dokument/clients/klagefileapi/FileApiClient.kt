@@ -1,6 +1,6 @@
 package no.nav.klage.dokument.clients.klagefileapi
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpHeaders
@@ -33,7 +33,6 @@ class FileApiClient(
         return this.fileWebClient.get()
             .uri { it.path("/document/{id}").build(id) }
             .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<ByteArray>()
             .block() ?: throw RuntimeException("Document could not be fetched")
@@ -53,7 +52,6 @@ class FileApiClient(
                 .delete()
                 .uri { it.path("/document/{id}").build(id) }
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
                 .retrieve()
                 .bodyToMono<Boolean>()
                 .block()
@@ -83,7 +81,6 @@ class FileApiClient(
             .post()
             .uri("/document")
             .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
             .retrieve()
             .bodyToMono<DocumentUploadedResponse>()

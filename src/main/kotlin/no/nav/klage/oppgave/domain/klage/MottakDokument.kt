@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
+import jakarta.persistence.*
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "mottak_dokument", schema = "klage")

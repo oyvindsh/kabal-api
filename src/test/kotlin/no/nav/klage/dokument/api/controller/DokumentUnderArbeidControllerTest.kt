@@ -12,7 +12,6 @@ import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.api.view.SmartHovedDokumentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
@@ -97,7 +96,7 @@ internal class DokumentUnderArbeidControllerTest {
             modified = LocalDateTime.now(),
             dokumentEnhetId = null,
             parentId = null,
-            id = DokumentId(UUID.randomUUID())
+            id = UUID.randomUUID()
         )
 
 
@@ -166,7 +165,7 @@ internal class DokumentUnderArbeidControllerTest {
             modified = LocalDateTime.now(),
             dokumentEnhetId = null,
             parentId = null,
-            id = DokumentId(UUID.randomUUID())
+            id = UUID.randomUUID()
         )
 
         val json = mockMvc.perform(

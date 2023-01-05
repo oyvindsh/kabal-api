@@ -26,7 +26,7 @@ class DokumentMapper {
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         return DokumentView(
-            id = dokumentUnderArbeid.id.id,
+            id = dokumentUnderArbeid.id,
             tittel = dokumentUnderArbeid.name,
             dokumentTypeId = dokumentUnderArbeid.dokumentType.id,
             opplastet = dokumentUnderArbeid.created,
@@ -34,7 +34,7 @@ class DokumentMapper {
             templateId = dokumentUnderArbeid.smartEditorTemplateId,
             version = dokumentUnderArbeid.smartEditorVersion,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
-            parent = dokumentUnderArbeid.parentId?.id,
+            parent = dokumentUnderArbeid.parentId,
         )
     }
 
@@ -43,12 +43,12 @@ class DokumentMapper {
         smartEditorDocument: DocumentOutput,
     ): SmartEditorDocumentView {
         return SmartEditorDocumentView(
-            id = dokumentUnderArbeid.id.id,
+            id = dokumentUnderArbeid.id,
             tittel = dokumentUnderArbeid.name,
             dokumentTypeId = dokumentUnderArbeid.dokumentType.id,
             templateId = dokumentUnderArbeid.smartEditorTemplateId,
             version = dokumentUnderArbeid.smartEditorVersion,
-            parent = dokumentUnderArbeid.parentId?.id,
+            parent = dokumentUnderArbeid.parentId,
             content = jacksonObjectMapper().readTree(smartEditorDocument.json),
             created = smartEditorDocument.created,
             modified = smartEditorDocument.modified,

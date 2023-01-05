@@ -1,26 +1,20 @@
 package no.nav.klage.oppgave.config.problem
 
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import org.zalando.problem.Problem
-import org.zalando.problem.Status
-import org.zalando.problem.ThrowableProblem
-import org.zalando.problem.spring.web.advice.AdviceTrait
-import org.zalando.problem.spring.web.advice.ProblemHandling
-import javax.servlet.http.HttpServletRequest
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@ControllerAdvice
-class ProblemHandlingControllerAdvice : OurOwnExceptionAdviceTrait, ProblemHandling
-
-interface OurOwnExceptionAdviceTrait : AdviceTrait {
+@RestControllerAdvice
+class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -31,7 +25,7 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
     fun catchISE(
         ex: IllegalStateException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> {
+    ): ProblemDetail {
         logger.debug("catching IllegalStateException", ex)
         try {
             val nativeRequest = request.nativeRequest
@@ -50,211 +44,208 @@ interface OurOwnExceptionAdviceTrait : AdviceTrait {
             logger.warn("problems with handling ISE", e)
         }
 
-        return create(Status.INTERNAL_SERVER_ERROR, ex, request)
+        return create(HttpStatus.INTERNAL_SERVER_ERROR, ex)
     }
 
     @ExceptionHandler
     fun handleOversendtKlageNotValidException(
         ex: OversendtKlageNotValidException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleKlagebehandlingSamtidigEndretException(
         ex: KlagebehandlingSamtidigEndretException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
     fun handleOversendtKlageReceivedBeforeException(
         ex: OversendtKlageReceivedBeforeException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
-    fun handleOppgaveNotFound(ex: OppgaveNotFoundException, request: NativeWebRequest): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    fun handleOppgaveNotFound(ex: OppgaveNotFoundException, request: NativeWebRequest): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleBehandlingNotFound(
         ex: BehandlingNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleVedtakNotFound(
         ex: VedtakNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleMeldingNotFound(
         ex: MeldingNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleSaksdokumentNotFound(
         ex: SaksdokumentNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleValidationException(
         ex: ValidationException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleBehandlingAvsluttetException(
         ex: BehandlingAvsluttetException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
     fun handlePreviousBehandlingNotFinalizedException(
         ex: PreviousBehandlingNotFinalizedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
-    fun handleMissingTilgang(ex: MissingTilgangException, request: NativeWebRequest): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    fun handleMissingTilgang(ex: MissingTilgangException, request: NativeWebRequest): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
-    fun handleNotMatchingUser(ex: NotMatchingUserException, request: NativeWebRequest): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    fun handleNotMatchingUser(ex: NotMatchingUserException, request: NativeWebRequest): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
-    fun handleFeatureNotEnabled(ex: FeatureNotEnabledException, request: NativeWebRequest): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    fun handleFeatureNotEnabled(ex: FeatureNotEnabledException, request: NativeWebRequest): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
     fun handleNoSaksbehandlerRoleEnabled(
         ex: NoSaksbehandlerRoleException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
-    fun handleNotOwnEnhet(ex: NotOwnEnhetException, request: NativeWebRequest): ResponseEntity<Problem> =
-        create(Status.FORBIDDEN, ex, request)
+    fun handleNotOwnEnhet(ex: NotOwnEnhetException, request: NativeWebRequest): ProblemDetail =
+        create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
     fun handleResponseStatusException(
         ex: WebClientResponseException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(ex, createProblem(ex), request)
+    ): ProblemDetail =
+        createProblemForWebClientResponseException(ex)
 
     @ExceptionHandler
     fun handleDuplicateOversendelse(
         ex: DuplicateOversendelseException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.CONFLICT, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.CONFLICT, ex)
 
     @ExceptionHandler
     fun handleBehandlingManglerMedunderskriverException(
         ex: BehandlingManglerMedunderskriverException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleBehandlingManglerTildelingException(
         ex: BehandlingManglerTildelingException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleBehandlingFinalizedException(
         ex: BehandlingFinalizedException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleResultatDokumentNotFoundException(
         ex: ResultatDokumentNotFoundException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.NOT_FOUND, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleEnhetNotFoundForSaksbehandlerException(
         ex: EnhetNotFoundForSaksbehandlerException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.INTERNAL_SERVER_ERROR, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.INTERNAL_SERVER_ERROR, ex)
 
     @ExceptionHandler
     fun handleIllegalOperation(
         ex: IllegalOperation,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleSectionedValidationErrorWithDetailsException(
         ex: SectionedValidationErrorWithDetailsException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(ex, createSectionedValidationProblem(ex), request)
+    ): ProblemDetail =
+        createSectionedValidationProblem(ex)
 
     @ExceptionHandler
     fun handleDokumentValidationException(
         ex: DokumentValidationException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(Status.BAD_REQUEST, ex, request)
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleJsonToPdfValidationException(
         ex: JsonToPdfValidationException,
         request: NativeWebRequest
-    ): ResponseEntity<Problem> =
-        create(ex, createJsonDocumentValidationProblem(ex), request)
+    ): ProblemDetail =
+        createJsonDocumentValidationProblem(ex)
 
-    private fun createJsonDocumentValidationProblem(ex: JsonToPdfValidationException): ThrowableProblem {
-        return Problem.builder()
-            .withStatus(Status.BAD_REQUEST)
-            .with("dokumenter", ex.errors)
-            .build()
-    }
-
-    private fun createProblem(ex: WebClientResponseException): ThrowableProblem {
-        return Problem.builder()
-            .withStatus(mapStatus(ex.statusCode))
-            .withTitle(ex.statusText)
-            .withDetail(ex.responseBodyAsString)
-            .build()
-    }
-
-    private fun createSectionedValidationProblem(ex: SectionedValidationErrorWithDetailsException): ThrowableProblem {
-        return Problem.builder()
-            .withStatus(Status.BAD_REQUEST)
-            .withTitle(ex.title)
-            .with("sections", ex.sections)
-            .build()
-    }
-
-    private fun mapStatus(status: HttpStatus): Status =
-        try {
-            Status.valueOf(status.value())
-        } catch (ex: Exception) {
-            logger.warn("Unable to map WebClientResponseException with status {}", status.value())
-            Status.INTERNAL_SERVER_ERROR
+    private fun createJsonDocumentValidationProblem(ex: JsonToPdfValidationException): ProblemDetail {
+        return ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
+            this.title = ex.message
+            this.setProperty("dokumenter", ex.errors)
         }
+    }
+
+    private fun createProblemForWebClientResponseException(ex: WebClientResponseException): ProblemDetail {
+        return ProblemDetail.forStatus(ex.statusCode).apply {
+            title = ex.statusText
+            detail = ex.responseBodyAsString
+        }
+    }
+
+    private fun createSectionedValidationProblem(ex: SectionedValidationErrorWithDetailsException): ProblemDetail {
+        return ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
+            this.title = ex.title
+            this.setProperty("sections", ex.sections)
+        }
+    }
+
+    private fun create(httpStatus: HttpStatus, ex: Exception): ProblemDetail {
+        val errorMessage = ex.message ?: "No error message available"
+        return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
+            title = errorMessage
+        }
+    }
 }

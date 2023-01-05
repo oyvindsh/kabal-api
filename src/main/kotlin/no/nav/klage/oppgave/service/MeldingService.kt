@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import jakarta.persistence.EntityNotFoundException
 import no.nav.klage.dokument.domain.Event
 import no.nav.klage.oppgave.api.mapper.MeldingMapper
 import no.nav.klage.oppgave.domain.klage.Melding
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.EntityNotFoundException
 
 @Service
 @Transactional

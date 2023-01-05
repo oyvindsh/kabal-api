@@ -41,7 +41,7 @@ class BehandlingRepositoryTest {
     lateinit var mottakRepository: MottakRepository
 
     @Test
-    fun `getOne works`() {
+    fun `store Klagebehandling works`() {
 
         val mottak = Mottak(
             ytelse = Ytelse.OMS_OMP,

@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
+import jakarta.persistence.*
 import no.nav.klage.kodeverk.PartIdType
-import javax.persistence.*
 
 @Embeddable
 data class Klager(

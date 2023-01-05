@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.api.controller
 
+import jakarta.validation.Valid
 import no.nav.klage.oppgave.api.view.OversendtKlageAnkeV3
 import no.nav.klage.oppgave.service.AnkeITrygderettenbehandlingService
 import no.nav.klage.oppgave.service.MottakService
@@ -10,7 +11,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import javax.validation.Valid
 
 @Profile("dev-gcp", "local")
 @RestController

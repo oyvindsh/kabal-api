@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients.skjermede
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -31,7 +31,6 @@ class SkjermedeApiClient(
                 "Bearer ${tokenUtil.getSkjermedeAccessToken()}"
             )
             .bodyValue(SkjermetRequest(personident = fnr))
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Boolean>()
             .block() ?: throw RuntimeException("Null response from skjermede")

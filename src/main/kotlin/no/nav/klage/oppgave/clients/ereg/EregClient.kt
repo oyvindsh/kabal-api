@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.ereg
 
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -28,7 +28,6 @@ class EregClient(
                         .build(orgnummer)
                 }
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
                 .bodyToMono<Organisasjon>()

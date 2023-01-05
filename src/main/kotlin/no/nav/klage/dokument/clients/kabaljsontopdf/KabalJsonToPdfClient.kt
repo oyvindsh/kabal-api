@@ -1,6 +1,6 @@
 package no.nav.klage.dokument.clients.kabaljsontopdf
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.dokument.clients.kabaljsontopdf.domain.DocumentValidationResponse
 import no.nav.klage.dokument.domain.PDFDocument
 import no.nav.klage.oppgave.util.getLogger
@@ -26,7 +26,6 @@ class KabalJsonToPdfClient(
             .uri { it.path("/topdf").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(json)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .toEntity(ByteArray::class.java)
             .map {
@@ -45,7 +44,6 @@ class KabalJsonToPdfClient(
             .uri { it.path("/validate").build() }
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(json)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DocumentValidationResponse>()
             .block() ?: throw RuntimeException("Response null")

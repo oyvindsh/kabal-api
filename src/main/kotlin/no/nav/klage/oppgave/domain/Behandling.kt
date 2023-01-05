@@ -1,16 +1,18 @@
 package no.nav.klage.oppgave.domain
 
+import jakarta.persistence.*
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.kodeverk.hjemmel.HjemmelConverter
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.FagsystemConverter
+import no.nav.klage.oppgave.domain.klage.TypeConverter
+import no.nav.klage.oppgave.domain.klage.YtelseConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

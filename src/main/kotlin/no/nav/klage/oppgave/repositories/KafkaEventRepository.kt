@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
 interface KafkaEventRepository : JpaRepository<KafkaEvent, UUID> {
-    fun getAllByStatusInAndTypeIsLikeOrderByCreated(statuses: List<UtsendingStatus>, type: EventType): List<KafkaEvent>
+    fun getAllByStatusInAndTypeOrderByCreated(statuses: List<UtsendingStatus>, type: EventType): List<KafkaEvent>
 
     fun getAllByTypeIsLike(type: EventType): List<KafkaEvent>
 }

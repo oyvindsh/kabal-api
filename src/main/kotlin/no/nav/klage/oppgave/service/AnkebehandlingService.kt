@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import jakarta.transaction.Transactional
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
@@ -13,7 +14,6 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
-import javax.transaction.Transactional
 
 @Service
 @Transactional
