@@ -529,7 +529,6 @@ class BehandlingService(
         if (behandling.sakenGjelder.erPerson()) {
             tilgangService.verifyInnloggetSaksbehandlersTilgangTil(behandling.sakenGjelder.partId.value)
         }
-        tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(behandling.ytelse)
     }
 
     private fun checkSkrivetilgang(behandling: Behandling) {

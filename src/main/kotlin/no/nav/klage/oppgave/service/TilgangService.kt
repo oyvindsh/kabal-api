@@ -73,12 +73,6 @@ class TilgangService(
         }
     }
 
-    fun verifyInnloggetSaksbehandlersTilgangTilYtelse(ytelse: Ytelse) {
-        if (!innloggetSaksbehandlerService.harTilgangTilYtelse(ytelse)) {
-            throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse")
-        }
-    }
-
     fun verifyInnloggetSaksbehandlerErMedunderskriverAndNotFinalized(behandling: Behandling) {
         if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null || behandling.currentDelbehandling().avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
@@ -97,16 +91,6 @@ class TilgangService(
             kanBehandleStrengtFortrolig = { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() },
             kanBehandleFortrolig = { innloggetSaksbehandlerService.kanBehandleFortrolig() },
             kanBehandleEgenAnsatt = { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() },
-        )
-    }
-
-    fun harSaksbehandlerTilgangTil(ident: String, fnr: String): Boolean {
-        return verifiserTilgangTilPersonForSaksbehandler(
-            fnr = fnr,
-            ident = ident,
-            kanBehandleStrengtFortrolig = { saksbehandlerRepository.hasStrengtFortroligRole(ident) },
-            kanBehandleFortrolig = { saksbehandlerRepository.hasFortroligRole(ident) },
-            kanBehandleEgenAnsatt = { saksbehandlerRepository.hasEgenAnsattRole(ident) },
         )
     }
 

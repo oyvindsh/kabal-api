@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.TokenUtil
 import org.springframework.stereotype.Service
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service
 class InnloggetSaksbehandlerService(
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val tokenUtil: TokenUtil,
-    private val saksbehandlerService: SaksbehandlerService
 ) {
 
     fun getInnloggetIdent() = tokenUtil.getIdent()
@@ -23,8 +21,4 @@ class InnloggetSaksbehandlerService(
 
     fun kanBehandleEgenAnsatt(): Boolean =
         saksbehandlerRepository.hasEgenAnsattRole(tokenUtil.getIdent())
-
-    fun harTilgangTilYtelse(ytelse: Ytelse): Boolean {
-        return saksbehandlerService.saksbehandlerHasAccessToYtelse(getInnloggetIdent(), ytelse)
-    }
 }
