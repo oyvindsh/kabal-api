@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.clients.kabalinnstillinger.KabalInnstillingerClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.MedunderskrivereInput
@@ -36,6 +37,13 @@ class KabalInnstillingerService(
                 navIdent = behandling.tildeling!!.saksbehandlerident!!
             )
         )
+    }
+
+    //TODO: Bør vi ha et cache her? Kan være et problem om leder gir nye tilganger, kanskje et kortere cache?
+    fun getTildelteYtelserForSaksbehandler(navIdent: String): List<Ytelse> {
+        return kabalInnstillingerClient.getSaksbehandlersTildelteYtelser(navIdent).ytelseIdList.map {
+            Ytelse.of(it)
+        }
     }
 
 }

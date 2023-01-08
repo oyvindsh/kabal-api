@@ -217,7 +217,7 @@ class BehandlingService(
         val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
         if (tildeltSaksbehandlerIdent != null) {
             //Denne sjekken gjøres kun når det er en tildeling:
-            checkEnhetOgTemaTilgang(tildeltSaksbehandlerIdent, enhetId!!, behandling)
+            checkYtelseAccess(tildeltSaksbehandlerIdent = tildeltSaksbehandlerIdent, behandling = behandling)
         }
         val event =
             behandling.setTildeling(
@@ -548,15 +548,13 @@ class BehandlingService(
         behandlingRepository.getReferenceById(behandlingId)
             .also { checkSkrivetilgangForSystembruker(it) }
 
-    private fun checkEnhetOgTemaTilgang(
+    private fun checkYtelseAccess(
         tildeltSaksbehandlerIdent: String,
-        tildeltEnhetId: String,
         behandling: Behandling
     ) {
-        tilgangService.verifySaksbehandlersTilgangTilEnhetOgYtelse(
-            tildeltSaksbehandlerIdent,
-            tildeltEnhetId,
-            behandling.ytelse
+        tilgangService.verifySaksbehandlersAccessToYtelse(
+            saksbehandlerIdent = tildeltSaksbehandlerIdent,
+            ytelse = behandling.ytelse,
         )
     }
 

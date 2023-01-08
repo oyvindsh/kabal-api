@@ -32,8 +32,16 @@ class TilgangServiceTest {
 
     private val saksbehandlerRepository: SaksbehandlerRepository = mockk()
 
+    private val saksbehandlerService: SaksbehandlerService = mockk()
+
     private val tilgangService =
-        TilgangService(pdlFacade, egenAnsattService, innloggetSaksbehandlerService, saksbehandlerRepository)
+        TilgangService(
+            pdlFacade,
+            egenAnsattService,
+            innloggetSaksbehandlerService,
+            saksbehandlerRepository,
+            saksbehandlerService
+        )
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet`() {

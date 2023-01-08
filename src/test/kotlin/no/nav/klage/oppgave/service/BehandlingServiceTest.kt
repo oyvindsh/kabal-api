@@ -87,6 +87,9 @@ class BehandlingServiceTest {
     @MockkBean
     lateinit var dokumentService: DokumentService
 
+    @MockkBean
+    lateinit var saksbehandlerService: SaksbehandlerService
+
     lateinit var behandlingService: BehandlingService
 
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"

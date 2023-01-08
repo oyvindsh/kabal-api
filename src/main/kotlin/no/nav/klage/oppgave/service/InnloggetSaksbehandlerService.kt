@@ -3,13 +3,13 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.TokenUtil
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class InnloggetSaksbehandlerService(
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val tokenUtil: TokenUtil,
+    private val saksbehandlerService: SaksbehandlerService
 ) {
 
     fun getInnloggetIdent() = tokenUtil.getIdent()
@@ -25,6 +25,6 @@ class InnloggetSaksbehandlerService(
         saksbehandlerRepository.hasEgenAnsattRole(tokenUtil.getIdent())
 
     fun harTilgangTilYtelse(ytelse: Ytelse): Boolean {
-        return saksbehandlerRepository.harTilgangTilYtelse(getInnloggetIdent(), ytelse)
+        return saksbehandlerService.saksbehandlerHasAccessToYtelse(getInnloggetIdent(), ytelse)
     }
 }
