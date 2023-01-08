@@ -126,6 +126,9 @@ internal class BehandlingAvslutningServiceTest {
     lateinit var kabalDocumentGateway: KabalDocumentGateway
 
     @MockkBean(relaxed = true)
+    lateinit var kabalInnstillingerService: KabalInnstillingerService
+
+    @MockkBean(relaxed = true)
     lateinit var kakaApiGateway: KakaApiGateway
 
     private val mottak = Mottak(
