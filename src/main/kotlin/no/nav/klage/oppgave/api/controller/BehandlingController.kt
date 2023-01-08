@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.FullmektigSearchService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
-import no.nav.klage.oppgave.service.KabalInnstillingerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -27,7 +26,6 @@ class BehandlingController(
     private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val fullmektigSearchService: FullmektigSearchService,
-    private val kabalInnstillingerService: KabalInnstillingerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -284,7 +282,7 @@ class BehandlingController(
             logger
         )
 
-        return kabalInnstillingerService.getPotentialSaksbehandlere(behandlingId = behandlingId)
+        return behandlingService.getPotentialSaksbehandlereForBehandling(behandlingId = behandlingId)
     }
 
     @GetMapping("/behandlinger/{id}/potentialmedunderskrivere")
@@ -297,7 +295,7 @@ class BehandlingController(
             logger
         )
 
-        return kabalInnstillingerService.getPotentialMedunderskrivere(behandlingId = behandlingId)
+        return behandlingService.getPotentialMedunderskrivereForBehandling(behandlingId = behandlingId)
     }
 
     @GetMapping("/behandlinger/{id}/sakengjelder")

@@ -6,6 +6,8 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
+import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
@@ -47,6 +49,7 @@ class BehandlingService(
     private val kakaApiGateway: KakaApiGateway,
     private val dokumentService: DokumentService,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
+    private val kabalInnstillingerService: KabalInnstillingerService
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -690,5 +693,15 @@ class BehandlingService(
             )
 
         logger.debug("Number of candidates after migration: ${candidatesAfterMigration.size}")
+    }
+
+    fun getPotentialSaksbehandlereForBehandling(behandlingId: UUID): Saksbehandlere {
+        val behandling = getBehandling(behandlingId)
+        return kabalInnstillingerService.getPotentialSaksbehandlere(behandling)
+    }
+
+    fun getPotentialMedunderskrivereForBehandling(behandlingId: UUID): Medunderskrivere {
+        val behandling = getBehandling(behandlingId)
+        return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
     }
 }

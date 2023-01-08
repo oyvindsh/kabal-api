@@ -88,6 +88,9 @@ class BehandlingServiceTest {
     lateinit var dokumentService: DokumentService
 
     @MockkBean
+    lateinit var kabalInnstillingerService: KabalInnstillingerService
+
+    @MockkBean
     lateinit var saksbehandlerService: SaksbehandlerService
 
     lateinit var behandlingService: BehandlingService
@@ -105,6 +108,7 @@ class BehandlingServiceTest {
             kakaApiGateway,
             dokumentService,
             dokumentUnderArbeidRepository,
+            kabalInnstillingerService
         )
     }
 
