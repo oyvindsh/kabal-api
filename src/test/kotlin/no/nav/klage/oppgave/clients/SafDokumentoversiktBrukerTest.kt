@@ -27,7 +27,6 @@ internal class SafDokumentoversiktBrukerTest {
     fun before() {
         every { tokenUtilMock.getAppAccessTokenWithSafScope() } returns "abc"
         every { tokenUtilMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
-//        every { tracerMock.currentTraceContext().context()!!.traceId() } returns "def"
     }
 
     @Test
