@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
 import io.swagger.v3.oas.annotations.media.Schema
-import javax.persistence.AttributeConverter
-import javax.persistence.Converter
+import jakarta.persistence.AttributeConverter
+import jakarta.persistence.Converter
 
 @Schema
 enum class SivilstandType(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {

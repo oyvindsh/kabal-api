@@ -1,5 +1,8 @@
 package no.nav.klage.oppgave.domain.klage
 
+import jakarta.persistence.Column
+import jakarta.persistence.DiscriminatorValue
+import jakarta.persistence.Entity
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
@@ -8,9 +11,6 @@ import no.nav.klage.oppgave.domain.Behandling
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.DiscriminatorValue
-import javax.persistence.Entity
 
 @Entity
 @DiscriminatorValue("anke")

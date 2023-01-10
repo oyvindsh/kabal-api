@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import jakarta.transaction.Transactional
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
@@ -17,7 +18,6 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.*
-import javax.transaction.Transactional
 
 @Service
 @Transactional

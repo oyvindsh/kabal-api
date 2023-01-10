@@ -1,23 +1,23 @@
 package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
+import jakarta.persistence.*
 import no.nav.klage.kodeverk.Brevmottakertype
-import no.nav.klage.kodeverk.BrevmottakertypeConverter
 import no.nav.klage.kodeverk.DokumentType
-import no.nav.klage.kodeverk.DokumentTypeConverter
+import no.nav.klage.oppgave.domain.klage.BrevmottakertypeConverter
+import no.nav.klage.oppgave.domain.klage.DokumentTypeConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "dokument_under_arbeid", schema = "klage")
 @DynamicUpdate
 open class DokumentUnderArbeid(
-    @EmbeddedId
-    open var id: DokumentId = DokumentId(UUID.randomUUID()),
+    @Id
+    val id: UUID = UUID.randomUUID(),
     @Column(name = "mellomlager_id")
     open var mellomlagerId: String?,
     @Column(name = "opplastet")
@@ -55,14 +55,9 @@ open class DokumentUnderArbeid(
     )
     @Convert(converter = BrevmottakertypeConverter::class)
     @Column(name = "id")
-    var brevmottakertyper: MutableSet<Brevmottakertype> = mutableSetOf(),
-    @Embedded
-    @AttributeOverrides(
-        value = [
-            AttributeOverride(name = "id", column = Column(name = "parent_id"))
-        ]
-    )
-    open var parentId: DokumentId? = null,
+    open var brevmottakertyper: MutableSet<Brevmottakertype> = mutableSetOf(),
+    @Column(name = "parent_id")
+    open var parentId: UUID? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
@@ -79,13 +74,13 @@ open class DokumentUnderArbeid(
 
         other as DokumentUnderArbeid
 
-        if (id.id != other.id.id) return false
+        if (id != other.id) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id.id.hashCode()
+        return id.hashCode()
     }
 
     override fun toString(): String {

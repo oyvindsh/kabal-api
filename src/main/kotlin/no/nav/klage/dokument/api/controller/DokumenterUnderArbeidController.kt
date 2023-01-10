@@ -3,11 +3,11 @@ package no.nav.klage.dokument.api.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.dokument.api.mapper.DokumentInputMapper
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.Event
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import java.time.Duration
 import java.util.*
-import javax.servlet.http.HttpServletRequest
 
 @RestController
 @Tag(name = "kabal-api-dokumenter")
@@ -73,7 +72,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.updateDokumentType(
                 behandlingId = behandlingId,
-                dokumentId = DokumentId(dokumentId),
+                dokumentId = dokumentId,
                 dokumentType = DokumentType.of(input.dokumentTypeId),
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
@@ -90,7 +89,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToByteArray(
             dokumentUnderArbeidService.hentOgMellomlagreDokument(
                 behandlingId = behandlingId,
-                dokumentId = DokumentId(dokumentId),
+                dokumentId = dokumentId,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
         )
@@ -104,7 +103,7 @@ class DokumentUnderArbeidController(
         logger.debug("Kall mottatt på deleteDokument for $dokumentId")
         dokumentUnderArbeidService.slettDokument(
             behandlingId = behandlingId,
-            dokumentId = DokumentId(dokumentId),
+            dokumentId = dokumentId,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
     }
@@ -120,14 +119,14 @@ class DokumentUnderArbeidController(
             val hovedDokument = if (input.dokumentId == null) {
                 dokumentUnderArbeidService.frikobleVedlegg(
                     behandlingId = behandlingId,
-                    dokumentId = DokumentId(persistentDokumentId),
+                    dokumentId = persistentDokumentId,
                     innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
                 )
             } else {
                 dokumentUnderArbeidService.kobleVedlegg(
                     behandlingId = behandlingId,
-                    dokumentId = DokumentId(input.dokumentId),
-                    dokumentIdHovedDokumentSomSkalBliVedlegg = DokumentId(persistentDokumentId),
+                    dokumentId = input.dokumentId,
+                    dokumentIdHovedDokumentSomSkalBliVedlegg = persistentDokumentId,
                     innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
                 )
             }
@@ -157,7 +156,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.finnOgMarkerFerdigHovedDokument(
                 behandlingId = behandlingId,
-                dokumentId = DokumentId(dokumentId),
+                dokumentId = dokumentId,
                 ident = ident,
                 brevmottakertyper = input.brevmottakertypeIds.map { Brevmottakertype.of(it) }.toSet(),
             )
@@ -169,7 +168,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentid") dokumentId: UUID,
     ): List<DocumentValidationResponse> {
-        return dokumentUnderArbeidService.validateSmartDokument(DokumentId(dokumentId))
+        return dokumentUnderArbeidService.validateSmartDokument(dokumentId)
     }
 
     //Old event stuff. Clients should read from EventController instead, and this can be deleted.
@@ -229,7 +228,7 @@ class DokumentUnderArbeidController(
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.updateDokumentTitle(
                 behandlingId = behandlingId,
-                dokumentId = DokumentId(dokumentId),
+                dokumentId = dokumentId,
                 dokumentTitle = input.title,
                 innloggetIdent = ident,
             )

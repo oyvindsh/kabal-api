@@ -104,7 +104,7 @@ class KafkaEventRepositoryTest {
 
         testEntityManager.flush()
 
-        val list = kafkaEventRepository.getAllByStatusInAndTypeIsLikeOrderByCreated(
+        val list = kafkaEventRepository.getAllByStatusInAndTypeOrderByCreated(
             listOf(IKKE_SENDT, FEILET),
             EventType.STATS_DVH
         )

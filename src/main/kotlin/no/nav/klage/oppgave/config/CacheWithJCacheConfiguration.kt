@@ -12,7 +12,6 @@ import javax.cache.configuration.MutableConfiguration
 import javax.cache.expiry.CreatedExpiryPolicy
 import javax.cache.expiry.Duration
 
-
 @EnableCaching
 @Configuration
 class CacheWithJCacheConfiguration(private val environment: Environment) : JCacheManagerCustomizer {

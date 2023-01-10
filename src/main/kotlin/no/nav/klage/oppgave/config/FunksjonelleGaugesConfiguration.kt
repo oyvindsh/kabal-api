@@ -1,10 +1,10 @@
 package no.nav.klage.oppgave.config
 
 import io.micrometer.core.instrument.MeterRegistry
+import jakarta.annotation.PreDestroy
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import javax.annotation.PreDestroy
 
 
 @Configuration

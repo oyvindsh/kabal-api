@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.util
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.domain.AuditLogEvent
 import no.nav.klage.oppgave.domain.AuditLogEvent.Level.INFO
 import no.nav.klage.oppgave.domain.AuditLogEvent.Level.WARN
@@ -81,6 +81,6 @@ class AuditLogger(
             "end=${System.currentTimeMillis()}",
             "suid=${logEvent.navIdent}",
             "duid=${logEvent.personFnr}",
-            "sproc=${tracer.currentSpan().context().traceIdString()}}",
+            "sproc=${tracer.currentTraceContext().context()!!.traceId()}}",
         )
 }

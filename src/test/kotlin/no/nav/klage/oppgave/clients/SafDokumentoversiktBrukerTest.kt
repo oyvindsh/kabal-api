@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -20,14 +20,13 @@ internal class SafDokumentoversiktBrukerTest {
     @MockK
     lateinit var tokenUtilMock: TokenUtil
 
-    @MockK
+    @MockK(relaxed = true)
     lateinit var tracerMock: Tracer
 
     @BeforeEach
     fun before() {
         every { tokenUtilMock.getAppAccessTokenWithSafScope() } returns "abc"
         every { tokenUtilMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
-        every { tracerMock.currentSpan().context().traceIdString() } returns "def"
     }
 
     @Test

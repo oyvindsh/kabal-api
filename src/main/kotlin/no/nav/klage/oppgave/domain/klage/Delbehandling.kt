@@ -1,17 +1,14 @@
 package no.nav.klage.oppgave.domain.klage
 
+import jakarta.persistence.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt
-import no.nav.klage.kodeverk.MedunderskriverflytConverter
 import no.nav.klage.kodeverk.Utfall
-import no.nav.klage.kodeverk.UtfallConverter
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.kodeverk.hjemmel.RegistreringshjemmelConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "delbehandling", schema = "klage")

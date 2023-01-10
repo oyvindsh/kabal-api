@@ -10,7 +10,6 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClie
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.ModifyCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -102,14 +101,14 @@ class SmartEditorController(
     ): SmartEditorDocumentView {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = false
             )
 
         if (input.templateId != null) {
             dokumentUnderArbeidService.updateSmartEditorTemplateId(
                 behandlingId = behandlingId,
-                dokumentId = DokumentId(id = documentId),
+                dokumentId = documentId,
                 templateId = input.templateId,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             )
@@ -117,7 +116,7 @@ class SmartEditorController(
 
         val dokumentUnderArbeid = dokumentUnderArbeidService.updateSmartEditorVersion(
             behandlingId = behandlingId,
-            dokumentId = DokumentId(id = documentId),
+            dokumentId = documentId,
             version = input.version,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
@@ -138,13 +137,13 @@ class SmartEditorController(
     fun getDocument(@PathVariable("dokumentId") documentId: UUID): SmartEditorDocumentView {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
         val document = kabalSmartEditorApiClient.getDocument(smartEditorId)
 
         return dokumentMapper.mapToSmartEditorDocumentView(
-            dokumentUnderArbeid = dokumentUnderArbeidService.getDokumentUnderArbeid(DokumentId(documentId)),
+            dokumentUnderArbeid = dokumentUnderArbeidService.getDokumentUnderArbeid(documentId),
             smartEditorDocument = document,
         )
     }
@@ -162,7 +161,7 @@ class SmartEditorController(
         //TODO: Skal hvem som helst få kommentere?
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
 
@@ -181,7 +180,7 @@ class SmartEditorController(
     ): CommentOutput {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
 
@@ -202,7 +201,7 @@ class SmartEditorController(
     ): List<CommentOutput> {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
         return kabalSmartEditorApiClient.getAllCommentsWithPossibleThreads(smartEditorId)
@@ -222,7 +221,7 @@ class SmartEditorController(
         //TODO: Skal hvem som helst få kommentere?
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
 
@@ -240,7 +239,7 @@ class SmartEditorController(
     ): CommentOutput {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
         return kabalSmartEditorApiClient.getCommentWithPossibleThread(smartEditorId, commentId)
@@ -257,7 +256,7 @@ class SmartEditorController(
     ) {
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
-                dokumentId = DokumentId(documentId),
+                dokumentId = documentId,
                 readOnly = true
             )
         kabalSmartEditorApiClient.deleteCommentWithPossibleThread(documentId = smartEditorId, commentId = commentId)

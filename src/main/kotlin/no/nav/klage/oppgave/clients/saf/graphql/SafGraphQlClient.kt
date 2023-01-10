@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients.saf.graphql
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -39,8 +39,6 @@ class SafGraphQlClient(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
                 )
-                .header("Nav-Callid", tracer.currentSpan().context().traceIdString())
-
                 .bodyValue(hentDokumentoversiktBrukerQuery(fnr, tema, pageSize, previousPageRef))
                 .retrieve()
                 .bodyToMono<DokumentoversiktBrukerResponse>()

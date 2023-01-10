@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.domain.klage
 
+import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "endringslogginnslag", schema = "klage")

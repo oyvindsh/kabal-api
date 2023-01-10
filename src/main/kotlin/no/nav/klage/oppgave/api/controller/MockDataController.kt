@@ -269,7 +269,7 @@ class MockDataController(
                     saksdokumenter = mutableSetOf(),
                     innsendingsHjemler = mutableSetOf(ytelseTilHjemler[randomYtelse]!!.random()),
                     sendtTilTrygderetten = LocalDateTime.now(),
-                    registreringsHjemmelSet = registreringsHjemmelSet!!,
+                    registreringsHjemmelSet = registreringsHjemmelSet,
                     ankebehandlingUtfall = ExternalUtfall.valueOf(utfallToTrygderetten.random().name),
                 )
 

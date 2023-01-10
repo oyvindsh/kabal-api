@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.domain.klage
 
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.Embeddable
 
 @Embeddable
 data class MedunderskriverTildeling(

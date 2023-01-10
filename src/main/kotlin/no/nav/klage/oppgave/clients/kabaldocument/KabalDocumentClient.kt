@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.DokumentEnhetWithDokumentreferanserInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetFullfoerOutput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetOutput
@@ -35,7 +35,6 @@ class KabalDocumentClient(
             )
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DokumentEnhetOutput>()
             .block() ?: throw RuntimeException("Dokumentenhet could not be created")
@@ -50,7 +49,6 @@ class KabalDocumentClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalDocumentScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DokumentEnhetOutput>()
             .block() ?: throw RuntimeException("Dokumentenhet could not be fetched")
@@ -65,7 +63,6 @@ class KabalDocumentClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKabalDocumentScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DokumentEnhetFullfoerOutput>()
             .block() ?: throw RuntimeException("DokumentEnhet could not be finalized")

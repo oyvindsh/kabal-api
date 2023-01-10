@@ -1,11 +1,14 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.kodeverk.*
+import jakarta.persistence.*
+import no.nav.klage.kodeverk.Fagsystem
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.kodeverk.Type
+import no.nav.klage.kodeverk.Ytelse
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "mottak", schema = "klage")

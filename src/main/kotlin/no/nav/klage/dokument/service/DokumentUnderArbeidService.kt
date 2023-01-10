@@ -1,11 +1,11 @@
 package no.nav.klage.dokument.service
 
+import jakarta.transaction.Transactional
 import no.nav.klage.dokument.api.view.DocumentValidationResponse
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.MellomlagretDokument
 import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentId
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJournalpostId
 import no.nav.klage.dokument.exceptions.DokumentValidationException
@@ -31,7 +31,6 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
-import javax.transaction.Transactional
 
 @Service
 @Transactional
@@ -140,11 +139,11 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
-    fun getDokumentUnderArbeid(dokumentId: DokumentId) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+    fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
     fun updateDokumentType(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         dokumentType: DokumentType,
         innloggetIdent: String
     ): DokumentUnderArbeid {
@@ -179,7 +178,7 @@ class DokumentUnderArbeidService(
 
     fun updateDokumentTitle(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         dokumentTitle: String,
         innloggetIdent: String
     ): DokumentUnderArbeid {
@@ -208,7 +207,7 @@ class DokumentUnderArbeidService(
 
     fun updateSmartEditorVersion(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         version: Int,
         innloggetIdent: String
     ): DokumentUnderArbeid {
@@ -241,7 +240,7 @@ class DokumentUnderArbeidService(
 
     fun updateSmartEditorTemplateId(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         templateId: String,
         innloggetIdent: String
     ): DokumentUnderArbeid {
@@ -274,7 +273,7 @@ class DokumentUnderArbeidService(
 
     private fun updateJournalposter(
         behandlingId: UUID,
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         journalpostIdSet: Set<DokumentUnderArbeidJournalpostId>
     ): DokumentUnderArbeid {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -298,7 +297,7 @@ class DokumentUnderArbeidService(
     }
 
     fun validateSmartDokument(
-        dokumentId: DokumentId
+        dokumentId: UUID
     ): List<DocumentValidationResponse> {
         val documentValidationResults = mutableListOf<DocumentValidationResponse>()
 
@@ -317,12 +316,12 @@ class DokumentUnderArbeidService(
     }
 
     private fun validateSingleDocument(dokument: DokumentUnderArbeid): DocumentValidationResponse {
-        logger.debug("Getting json document, dokumentId: ${dokument.id.id}")
+        logger.debug("Getting json document, dokumentId: ${dokument.id}")
         val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
-        logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${dokument.id.id}")
+        logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${dokument.id}")
         val response = kabalJsonToPdfClient.validateJsonDocument(documentJson)
         return DocumentValidationResponse(
-            dokumentId = dokument.id.id.toString(),
+            dokumentId = dokument.id.toString(),
             errors = response.errors.map {
                 DocumentValidationResponse.DocumentValidationError(
                     type = it.type,
@@ -334,7 +333,7 @@ class DokumentUnderArbeidService(
 
     fun finnOgMarkerFerdigHovedDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
@@ -405,7 +404,7 @@ class DokumentUnderArbeidService(
 
     fun hentOgMellomlagreDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         innloggetIdent: String
     ): MellomlagretDokument {
         val dokument =
@@ -427,7 +426,7 @@ class DokumentUnderArbeidService(
 
     fun slettDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         innloggetIdent: String
     ) {
         val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -464,8 +463,8 @@ class DokumentUnderArbeidService(
 
     fun kobleVedlegg(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
-        dokumentIdHovedDokumentSomSkalBliVedlegg: DokumentId,
+        dokumentId: UUID,
+        dokumentIdHovedDokumentSomSkalBliVedlegg: UUID,
         innloggetIdent: String
     ): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -496,7 +495,7 @@ class DokumentUnderArbeidService(
 
     fun frikobleVedlegg(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: DokumentId,
+        dokumentId: UUID,
         innloggetIdent: String
     ): DokumentUnderArbeid {
         val vedlegg = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -529,7 +528,7 @@ class DokumentUnderArbeidService(
         )
     }
 
-    fun opprettDokumentEnhet(hovedDokumentId: DokumentId): DokumentUnderArbeid {
+    fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.dokumentEnhetId == null) {
@@ -541,7 +540,7 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
-    fun ferdigstillDokumentEnhet(hovedDokumentId: DokumentId): DokumentUnderArbeid {
+    fun ferdigstillDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
@@ -572,7 +571,7 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
-    fun getSmartEditorId(dokumentId: DokumentId, readOnly: Boolean): UUID {
+    fun getSmartEditorId(dokumentId: UUID, readOnly: Boolean): UUID {
         val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
 
@@ -587,7 +586,7 @@ class DokumentUnderArbeidService(
         }
 
         return dokumentUnderArbeid.smartEditorId
-            ?: throw DokumentValidationException("${dokumentId.id} er ikke et smarteditor dokument")
+            ?: throw DokumentValidationException("$dokumentId er ikke et smarteditor dokument")
     }
 
     private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid) {
@@ -637,14 +636,14 @@ class DokumentUnderArbeidService(
         fraVerdi: String?,
         tilVerdi: String?,
         tidspunkt: LocalDateTime,
-        dokumentId: DokumentId,
+        dokumentId: UUID,
     ) {
         listOfNotNull(
             this.endringslogg(
                 saksbehandlerident = saksbehandlerident,
                 felt = Felt.DOKUMENT_UNDER_ARBEID_ID,
-                fraVerdi = fraVerdi.let { dokumentId.id.toString() },
-                tilVerdi = tilVerdi.let { dokumentId.id.toString() },
+                fraVerdi = fraVerdi.let { dokumentId.toString() },
+                tilVerdi = tilVerdi.let { dokumentId.toString() },
                 tidspunkt = tidspunkt,
             ),
             this.endringslogg(

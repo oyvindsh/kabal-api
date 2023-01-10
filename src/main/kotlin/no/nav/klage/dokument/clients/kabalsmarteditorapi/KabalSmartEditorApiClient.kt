@@ -1,6 +1,6 @@
 package no.nav.klage.dokument.clients.kabalsmarteditorapi
 
-import brave.Tracer
+import io.micrometer.tracing.Tracer
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.ModifyCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
@@ -36,7 +36,6 @@ class KabalSmartEditorApiClient(
             )
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(jsonInput)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DocumentOutput>()
             .block() ?: throw RuntimeException("Document could not be created")
@@ -54,7 +53,6 @@ class KabalSmartEditorApiClient(
             )
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(jsonInput)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DocumentOutput>()
             .block() ?: throw RuntimeException("Document could not be updated")
@@ -69,7 +67,6 @@ class KabalSmartEditorApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<DocumentOutput>()
             .block() ?: throw RuntimeException("Document could not be retrieved")
@@ -84,7 +81,6 @@ class KabalSmartEditorApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Unit>()
             .block()
@@ -102,7 +98,6 @@ class KabalSmartEditorApiClient(
             )
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<CommentOutput>()
             .block() ?: throw RuntimeException("Comment could not be created")
@@ -117,7 +112,6 @@ class KabalSmartEditorApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<List<CommentOutput>>()
             .block() ?: throw RuntimeException("Comments could not be retrieved")
@@ -136,7 +130,6 @@ class KabalSmartEditorApiClient(
             )
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<CommentOutput>()
             .block() ?: throw RuntimeException("Comment could not be replied to")
@@ -152,7 +145,6 @@ class KabalSmartEditorApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<CommentOutput>()
             .block() ?: throw RuntimeException("Comment could not be retrieved")
@@ -168,7 +160,6 @@ class KabalSmartEditorApiClient(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
             )
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<Unit>()
             .block()
@@ -187,7 +178,6 @@ class KabalSmartEditorApiClient(
             )
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(input)
-            .header("Nav-Call-Id", tracer.currentSpan().context().traceIdString())
             .retrieve()
             .bodyToMono<CommentOutput>()
             .block() ?: throw RuntimeException("Comment could not be modified")

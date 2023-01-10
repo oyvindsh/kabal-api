@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.domain.kafka
 
+import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
 
 @Entity
 @Table(name = "kafka_event", schema = "klage")

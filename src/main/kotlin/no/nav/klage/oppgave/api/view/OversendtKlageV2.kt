@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.view
 
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.PastOrPresent
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
@@ -9,7 +10,6 @@ import no.nav.klage.oppgave.domain.klage.MottakHjemmel
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
-import javax.validation.constraints.PastOrPresent
 
 @Schema
 data class OversendtKlageV2(
