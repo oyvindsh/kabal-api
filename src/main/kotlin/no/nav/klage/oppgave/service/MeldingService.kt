@@ -8,6 +8,8 @@ import no.nav.klage.dokument.domain.Event
 import no.nav.klage.oppgave.api.mapper.MeldingMapper
 import no.nav.klage.oppgave.domain.klage.Melding
 import no.nav.klage.oppgave.exceptions.MeldingNotFoundException
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
+import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.MeldingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
@@ -19,6 +21,7 @@ import java.util.*
 @Transactional
 class MeldingService(
     private val meldingRepository: MeldingRepository,
+    private val behandlingRepository: BehandlingRepository,
     private val kafkaInternalEventService: KafkaInternalEventService,
     private val meldingMapper: MeldingMapper,
 ) {
@@ -55,7 +58,7 @@ class MeldingService(
     ) {
         try {
             val melding = meldingRepository.getReferenceById(meldingId)
-            validateRightsToModifyMelding(melding, innloggetIdent)
+            validateRightsToDeleteMelding(melding, innloggetIdent)
 
             meldingRepository.delete(melding)
 
@@ -96,8 +99,20 @@ class MeldingService(
 
     private fun validateRightsToModifyMelding(melding: Melding, innloggetIdent: String) {
         if (melding.saksbehandlerident != innloggetIdent) {
-            throw RuntimeException(
-                "saksbehandler ($innloggetIdent) is not the author of melding (${melding.id}), and is not allowed to delete it."
+            throw MissingTilgangException(
+                "Saksbehandler ($innloggetIdent) is not the author of melding (${melding.id}), and is not allowed to modify it."
+            )
+        }
+    }
+
+    private fun validateRightsToDeleteMelding(melding: Melding, innloggetIdent: String) {
+        val behandling = behandlingRepository.getReferenceById(melding.behandlingId)
+
+        if (behandling.tildeling?.saksbehandlerident == innloggetIdent || melding.saksbehandlerident == innloggetIdent) {
+            return
+        } else {
+            throw MissingTilgangException(
+                "Saksbehandler ($innloggetIdent) is not allowed to delete melding ${melding.id}."
             )
         }
     }
