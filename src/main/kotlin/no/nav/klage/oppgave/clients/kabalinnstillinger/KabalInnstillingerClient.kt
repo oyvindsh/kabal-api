@@ -32,7 +32,7 @@ class KabalInnstillingerClient(
             )
             .retrieve()
             .bodyToMono<SaksbehandlerAccess>()
-            .block() ?: throw RuntimeException("Could notget tildelte ytelser")
+            .block() ?: throw RuntimeException("Could not get tildelte ytelser")
     }
 
     fun searchMedunderskrivere(input: MedunderskrivereInput): Medunderskrivere {
