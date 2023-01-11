@@ -1,20 +1,19 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.clients.kabalinnstillinger.KabalInnstillingerClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.MedunderskrivereInput
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.SaksbehandlerSearchInput
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
+import no.nav.klage.oppgave.domain.Behandling
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class KabalInnstillingerService(
-    private val behandlingService: BehandlingService,
     private val kabalInnstillingerClient: KabalInnstillingerClient,
 ) {
-    fun getPotentialSaksbehandlere(behandlingId: UUID): Saksbehandlere {
-        val behandling = behandlingService.getBehandling(behandlingId)
+    fun getPotentialSaksbehandlere(behandling: Behandling): Saksbehandlere {
         return kabalInnstillingerClient.searchSaksbehandlere(
             SaksbehandlerSearchInput(
                 ytelseId = behandling.ytelse.id,
@@ -23,8 +22,7 @@ class KabalInnstillingerService(
         )
     }
 
-    fun getPotentialMedunderskrivere(behandlingId: UUID): Medunderskrivere {
-        val behandling = behandlingService.getBehandling(behandlingId)
+    fun getPotentialMedunderskrivere(behandling: Behandling): Medunderskrivere {
         if (behandling.tildeling == null) {
             return Medunderskrivere(medunderskrivere = emptyList())
         }
@@ -36,6 +34,13 @@ class KabalInnstillingerService(
                 navIdent = behandling.tildeling!!.saksbehandlerident!!
             )
         )
+    }
+
+    //TODO: Bør vi ha et cache her? Kan være et problem om leder gir nye tilganger, kanskje et kortere cache?
+    fun getTildelteYtelserForSaksbehandler(navIdent: String): List<Ytelse> {
+        return kabalInnstillingerClient.getSaksbehandlersTildelteYtelser(navIdent).ytelseIdList.map {
+            Ytelse.of(it)
+        }
     }
 
 }

@@ -17,8 +17,10 @@ class TilgangService(
     private val pdlFacade: PdlFacade,
     private val egenAnsattService: EgenAnsattService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val saksbehandlerRepository: SaksbehandlerRepository
-) {
+    private val saksbehandlerRepository: SaksbehandlerRepository,
+    private val saksbehandlerService: SaksbehandlerService,
+
+    ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -65,15 +67,8 @@ class TilgangService(
         }
     }
 
-    fun verifySaksbehandlersTilgangTilEnhetOgYtelse(saksbehandlerIdent: String, enhetId: String, ytelse: Ytelse) {
-        if (!saksbehandlerRepository.harTilgangTilEnhetOgYtelse(saksbehandlerIdent, enhetId, ytelse)) {
-            throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse i enhet $enhetId")
-        }
-    }
-
-    //Trenger vi denne?
-    fun verifyInnloggetSaksbehandlersTilgangTilYtelse(ytelse: Ytelse) {
-        if (!innloggetSaksbehandlerService.harTilgangTilYtelse(ytelse)) {
+    fun verifySaksbehandlersAccessToYtelse(saksbehandlerIdent: String, ytelse: Ytelse) {
+        if (!saksbehandlerService.saksbehandlerHasAccessToYtelse(saksbehandlerIdent, ytelse)) {
             throw MissingTilgangException("Saksbehandler har ikke tilgang til ytelse $ytelse")
         }
     }
@@ -96,16 +91,6 @@ class TilgangService(
             kanBehandleStrengtFortrolig = { innloggetSaksbehandlerService.kanBehandleStrengtFortrolig() },
             kanBehandleFortrolig = { innloggetSaksbehandlerService.kanBehandleFortrolig() },
             kanBehandleEgenAnsatt = { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() },
-        )
-    }
-
-    fun harSaksbehandlerTilgangTil(ident: String, fnr: String): Boolean {
-        return verifiserTilgangTilPersonForSaksbehandler(
-            fnr = fnr,
-            ident = ident,
-            kanBehandleStrengtFortrolig = { saksbehandlerRepository.hasStrengtFortroligRole(ident) },
-            kanBehandleFortrolig = { saksbehandlerRepository.hasFortroligRole(ident) },
-            kanBehandleEgenAnsatt = { saksbehandlerRepository.hasEgenAnsattRole(ident) },
         )
     }
 

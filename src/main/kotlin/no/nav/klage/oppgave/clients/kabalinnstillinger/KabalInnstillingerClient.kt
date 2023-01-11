@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.clients.kabalinnstillinger
 
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.MedunderskrivereInput
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.SaksbehandlerSearchInput
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
+import no.nav.klage.oppgave.clients.kabalinnstillinger.model.*
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -23,6 +20,19 @@ class KabalInnstillingerClient(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+    }
+
+    fun getSaksbehandlersTildelteYtelser(navIdent: String): SaksbehandlerAccess {
+        logger.debug("Getting tildelte ytelser for $navIdent in kabal-innstillinger")
+        return kabalInnstillingerWebClient.get()
+            .uri { it.path("/ansatte/$navIdent/tildelteytelser").build() }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getUserAccessTokenWithKabalInnstillingerScope()}"
+            )
+            .retrieve()
+            .bodyToMono<SaksbehandlerAccess>()
+            .block() ?: throw RuntimeException("Could not get tildelte ytelser")
     }
 
     fun searchMedunderskrivere(input: MedunderskrivereInput): Medunderskrivere {

@@ -87,6 +87,12 @@ class BehandlingServiceTest {
     @MockkBean
     lateinit var dokumentService: DokumentService
 
+    @MockkBean
+    lateinit var kabalInnstillingerService: KabalInnstillingerService
+
+    @MockkBean
+    lateinit var saksbehandlerService: SaksbehandlerService
+
     lateinit var behandlingService: BehandlingService
 
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"
@@ -102,6 +108,7 @@ class BehandlingServiceTest {
             kakaApiGateway,
             dokumentService,
             dokumentUnderArbeidRepository,
+            kabalInnstillingerService
         )
     }
 
@@ -112,7 +119,6 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
 
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
 
             assertThat(
                 behandlingService.getBehandlingForUpdate(
@@ -127,7 +133,6 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
 
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) }.throws(
                 BehandlingAvsluttetException("")
             )
@@ -144,7 +149,6 @@ class BehandlingServiceTest {
             val behandlingId = behandling.id
 
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
 
@@ -174,7 +178,6 @@ class BehandlingServiceTest {
 
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
 
             assertThrows<BehandlingManglerMedunderskriverException> {
                 behandlingService.switchMedunderskriverFlyt(
@@ -191,7 +194,6 @@ class BehandlingServiceTest {
 
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -215,7 +217,6 @@ class BehandlingServiceTest {
 
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -240,7 +241,6 @@ class BehandlingServiceTest {
 
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -269,7 +269,6 @@ class BehandlingServiceTest {
 
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -298,7 +297,6 @@ class BehandlingServiceTest {
         val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
         every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTilYtelse(any()) } returns Unit
         every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
         assertThrows<BehandlingFinalizedException> {

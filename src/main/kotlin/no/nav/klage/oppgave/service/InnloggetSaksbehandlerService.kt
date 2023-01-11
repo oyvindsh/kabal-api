@@ -1,9 +1,7 @@
 package no.nav.klage.oppgave.service
 
-import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.TokenUtil
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -23,8 +21,4 @@ class InnloggetSaksbehandlerService(
 
     fun kanBehandleEgenAnsatt(): Boolean =
         saksbehandlerRepository.hasEgenAnsattRole(tokenUtil.getIdent())
-
-    fun harTilgangTilYtelse(ytelse: Ytelse): Boolean {
-        return saksbehandlerRepository.harTilgangTilYtelse(getInnloggetIdent(), ytelse)
-    }
 }

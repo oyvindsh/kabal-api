@@ -1,10 +1,5 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.kodeverk.Ytelse
-import no.nav.klage.kodeverk.klageenhetTilYtelser
-import no.nav.klage.oppgave.domain.saksbehandler.Enhet
-import no.nav.klage.oppgave.domain.saksbehandler.EnhetMedLovligeYtelser
-import no.nav.klage.oppgave.domain.saksbehandler.EnheterMedLovligeYtelser
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -29,35 +24,6 @@ class SaksbehandlerRepository(
 
         const val MAX_AMOUNT_IDENTS_IN_GRAPH_QUERY = 15
     }
-
-    fun harTilgangTilEnhetOgYtelse(ident: String, enhetId: String, ytelse: Ytelse): Boolean {
-        return getEnheterMedYtelserForSaksbehandler(ident).enheter.firstOrNull { it.enhet.enhetId == enhetId }?.ytelser?.contains(
-            ytelse
-        ) ?: false
-    }
-
-    fun harTilgangTilYtelse(ident: String, ytelse: Ytelse): Boolean =
-        hasKabalOppgavestyringAlleEnheterRole(ident)
-                || getEnheterMedYtelserForSaksbehandler(ident).enheter.flatMap { it.ytelser }.contains(ytelse)
-
-
-    fun getEnheterMedYtelserForSaksbehandler(ident: String): EnheterMedLovligeYtelser =
-        listOf(azureGateway.getDataOmInnloggetSaksbehandler().enhet).berikMedYtelser()
-
-    fun getEnhetForSaksbehandler(ident: String): Enhet =
-        azureGateway.getDataOmInnloggetSaksbehandler().enhet
-
-    private fun List<Enhet>.berikMedYtelser(): EnheterMedLovligeYtelser {
-        return EnheterMedLovligeYtelser(this.map {
-            EnhetMedLovligeYtelser(
-                enhet = it,
-                ytelser = getYtelserForEnhet(it)
-            )
-        })
-    }
-
-    private fun getYtelserForEnhet(enhet: Enhet): List<Ytelse> =
-        klageenhetTilYtelser.filter { it.key.navn == enhet.enhetId }.flatMap { it.value }
 
     fun getNamesForSaksbehandlere(identer: Set<String>): Map<String, String> {
         logger.debug("Fetching names for saksbehandlere from Microsoft Graph")
