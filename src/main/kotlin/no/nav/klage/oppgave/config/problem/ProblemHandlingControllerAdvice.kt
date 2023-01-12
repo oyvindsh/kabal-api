@@ -260,16 +260,16 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         }
     }
 
-    private fun create(httpHttpStatus: HttpStatus, ex: Exception): ProblemDetail {
+    private fun create(httpStatus: HttpStatus, ex: Exception): ProblemDetail {
         val errorMessage = ex.message ?: "No error message available"
 
         logError(
-            httpStatus = httpHttpStatus,
+            httpStatus = httpStatus,
             errorMessage = errorMessage,
             exception = ex
         )
 
-        return ProblemDetail.forStatusAndDetail(httpHttpStatus, errorMessage).apply {
+        return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
             title = errorMessage
         }
     }
