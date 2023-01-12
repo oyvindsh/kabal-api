@@ -652,6 +652,14 @@ class BehandlingService(
     fun findBehandlingerForAvslutning(): List<Pair<UUID, Type>> =
         behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull()
             .map { it.id to it.type }
-    
-    
+
+    fun getPotentialSaksbehandlereForBehandling(behandlingId: UUID): Saksbehandlere {
+        val behandling = getBehandling(behandlingId)
+        return kabalInnstillingerService.getPotentialSaksbehandlere(behandling)
+    }
+
+    fun getPotentialMedunderskrivereForBehandling(behandlingId: UUID): Medunderskrivere {
+        val behandling = getBehandling(behandlingId)
+        return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
+    }
 }
