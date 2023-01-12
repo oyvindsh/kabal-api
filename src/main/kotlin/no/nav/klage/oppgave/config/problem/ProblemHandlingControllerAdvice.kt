@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.oppgave.exceptions.*
-import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -18,7 +18,7 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @ExceptionHandler
@@ -222,6 +222,12 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         createJsonDocumentValidationProblem(ex)
 
     private fun createJsonDocumentValidationProblem(ex: JsonToPdfValidationException): ProblemDetail {
+        logError(
+            httpStatus = HttpStatus.BAD_REQUEST,
+            errorMessage = ex.message ?: "json validation error without description",
+            exception = ex
+        )
+
         return ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
             this.title = ex.message
             this.setProperty("dokumenter", ex.errors)
@@ -229,6 +235,12 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
     }
 
     private fun createProblemForWebClientResponseException(ex: WebClientResponseException): ProblemDetail {
+        logError(
+            httpStatus = HttpStatus.valueOf(ex.statusCode.value()),
+            errorMessage = ex.statusText,
+            exception = ex
+        )
+
         return ProblemDetail.forStatus(ex.statusCode).apply {
             title = ex.statusText
             detail = ex.responseBodyAsString
@@ -236,16 +248,40 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
     }
 
     private fun createSectionedValidationProblem(ex: SectionedValidationErrorWithDetailsException): ProblemDetail {
+        logError(
+            httpStatus = HttpStatus.BAD_REQUEST,
+            errorMessage = ex.title,
+            exception = ex
+        )
+
         return ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
             this.title = ex.title
             this.setProperty("sections", ex.sections)
         }
     }
 
-    private fun create(httpStatus: HttpStatus, ex: Exception): ProblemDetail {
+    private fun create(httpHttpStatus: HttpStatus, ex: Exception): ProblemDetail {
         val errorMessage = ex.message ?: "No error message available"
-        return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
+
+        logError(
+            httpStatus = httpHttpStatus,
+            errorMessage = errorMessage,
+            exception = ex
+        )
+
+        return ProblemDetail.forStatusAndDetail(httpHttpStatus, errorMessage).apply {
             title = errorMessage
+        }
+    }
+
+    private fun logError(httpStatus: HttpStatus, errorMessage: String, exception: Exception) {
+        when {
+            httpStatus.is5xxServerError -> {
+                secureLogger.error("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
+            }
+            else -> {
+                secureLogger.warn("Exception thrown to client: ${httpStatus.reasonPhrase}, $errorMessage", exception)
+            }
         }
     }
 }
