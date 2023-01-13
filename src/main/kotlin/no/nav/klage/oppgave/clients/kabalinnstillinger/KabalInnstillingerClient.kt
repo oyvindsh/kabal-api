@@ -25,7 +25,7 @@ class KabalInnstillingerClient(
     fun getTildelteYtelserForEnhet(enhet: String): TildelteYtelserResponse {
         logger.debug("Getting tildelte ytelser for enhet $enhet in kabal-innstillinger")
         return kabalInnstillingerWebClient.get()
-            .uri { it.path("/enhet/{enhet}/tildelteytelser").build() }
+            .uri { it.path("/enhet/$enhet/tildelteytelser").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getUserAccessTokenWithKabalInnstillingerScope()}"
