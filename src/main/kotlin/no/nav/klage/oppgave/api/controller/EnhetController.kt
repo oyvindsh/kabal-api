@@ -13,7 +13,7 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping("/enhet")
+@RequestMapping("/enheter")
 class EnhetController(
     private val enhetService: EnhetService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService
