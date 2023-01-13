@@ -662,4 +662,8 @@ class BehandlingService(
         val behandling = getBehandling(behandlingId)
         return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
     }
+
+    fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
+        return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet)
+    }
 }

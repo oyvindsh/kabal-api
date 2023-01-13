@@ -21,4 +21,7 @@ class InnloggetSaksbehandlerService(
 
     fun kanBehandleEgenAnsatt(): Boolean =
         saksbehandlerRepository.hasEgenAnsattRole(tokenUtil.getIdent())
+
+    fun hasKabalInnsynEgenEnhetRole(): Boolean =
+        saksbehandlerRepository.hasKabalInnsynEgenEnhetRole(tokenUtil.getIdent())
 }

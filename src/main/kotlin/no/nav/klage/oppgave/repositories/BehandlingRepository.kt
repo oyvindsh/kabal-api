@@ -14,6 +14,8 @@ interface BehandlingRepository : JpaRepository<Behandling, UUID> {
 
     fun findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull(): List<Behandling>
 
+    fun findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet: String): List<Behandling>
+
     fun existsBySakFagsystemAndKildeReferanseAndType(
         sakFagsystem: Fagsystem,
         kildeReferanse: String,

@@ -30,3 +30,8 @@ data class SaksbehandlerAccess(
     val created: LocalDateTime?,
     val accessRightsModified: LocalDateTime?,
 )
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class TildelteYtelserResponse(
+    val ytelseIdList: List<String>
+)

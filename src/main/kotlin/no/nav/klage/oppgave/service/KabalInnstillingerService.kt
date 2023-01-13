@@ -43,4 +43,9 @@ class KabalInnstillingerService(
         }
     }
 
+    fun getTildelteYtelserForEnhet(enhet: String): Set<Ytelse> {
+        return kabalInnstillingerClient.getTildelteYtelserForEnhet(enhet).ytelseIdList.map {
+            Ytelse.of(it)
+        }.toSet()
+    }
 }
