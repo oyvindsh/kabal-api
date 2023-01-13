@@ -18,6 +18,6 @@ class EnhetService(
         val enhetensBehandlingerYtelseSet =
             behandlingService.getAllBehandlingerForEnhet(enhet).map { it.ytelse }.toSet()
 
-        return (enhetensTildelteYtelser + enhetensBehandlingerYtelseSet).map { it.id }
+        return (enhetensTildelteYtelser + enhetensBehandlingerYtelseSet).sortedBy { it.navn }.map { it.id }
     }
 }
