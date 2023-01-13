@@ -13,7 +13,8 @@ class SaksbehandlerRepository(
     @Value("\${STRENGT_FORTROLIG_ROLE_ID}") private val strengtFortroligRoleId: String,
     @Value("\${EGEN_ANSATT_ROLE_ID}") private val egenAnsattRoleId: String,
     @Value("\${KABAL_OPPGAVESTYRING_ALLE_ENHETER_ROLE_ID}") private val kabalOppgavestyringAlleEnheterRoleId: String,
-    @Value("\${KABAL_ADMIN_ROLE_ID}") private val kabalAdminRoleId: String
+    @Value("\${KABAL_ADMIN_ROLE_ID}") private val kabalAdminRoleId: String,
+    @Value("\${KABAL_INNSYN_EGEN_ENHET_ROLE_ID}") private val kabalInnsynEgenEnhetRoleId: String,
 ) {
 
     companion object {
@@ -65,4 +66,7 @@ class SaksbehandlerRepository(
     fun getNameForSaksbehandler(navIdent: String): String {
         return azureGateway.getPersonligDataOmSaksbehandlerMedIdent(navIdent).sammensattNavn
     }
+
+    fun hasKabalInnsynEgenEnhetRole(ident: String): Boolean =
+        getRoleIds(ident).contains(kabalInnsynEgenEnhetRoleId)
 }

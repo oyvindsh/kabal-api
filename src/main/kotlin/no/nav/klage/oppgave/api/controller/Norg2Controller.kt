@@ -13,7 +13,7 @@ class Norg2Controller(
     val norg2Client: Norg2Client
 ) {
 
-    @GetMapping("/enhet/{enhetNr}")
+    @GetMapping("/enheter/{enhetNr}")
     fun getEnhet(@PathVariable("enhetNr") enhetNr: String): Enhet = norg2Client.fetchEnhet(enhetNr)
 
 }

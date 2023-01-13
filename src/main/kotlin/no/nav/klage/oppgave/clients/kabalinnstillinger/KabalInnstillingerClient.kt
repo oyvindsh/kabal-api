@@ -22,6 +22,19 @@ class KabalInnstillingerClient(
         private val secureLogger = getSecureLogger()
     }
 
+    fun getTildelteYtelserForEnhet(enhet: String): TildelteYtelserResponse {
+        logger.debug("Getting tildelte ytelser for enhet $enhet in kabal-innstillinger")
+        return kabalInnstillingerWebClient.get()
+            .uri { it.path("/enhet/$enhet/tildelteytelser").build() }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getUserAccessTokenWithKabalInnstillingerScope()}"
+            )
+            .retrieve()
+            .bodyToMono<TildelteYtelserResponse>()
+            .block() ?: throw RuntimeException("Could not get tildelte ytelser for enhet $enhet")
+    }
+
     fun getSaksbehandlersTildelteYtelser(navIdent: String): SaksbehandlerAccess {
         logger.debug("Getting tildelte ytelser for $navIdent in kabal-innstillinger")
         return kabalInnstillingerWebClient.get()
