@@ -267,6 +267,6 @@ class BehandlingRepositoryTest {
         val result =
             behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet = ENHET_1)
 
-        assertThat(result).isEqualTo(klageTildeltEnhet1)
+        assertThat(result).isEqualTo(listOf(klageTildeltEnhet1))
     }
 }
