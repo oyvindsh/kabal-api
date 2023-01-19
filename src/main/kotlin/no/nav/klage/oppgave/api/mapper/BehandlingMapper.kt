@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.Behandling
-import no.nav.klage.oppgave.domain.DokumentMetadata
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -307,25 +306,6 @@ class BehandlingMapper(
             id = id,
             utfall = utfall?.id,
             hjemler = hjemler.map { it.id }.toSet(),
-            file = getVedleggView(dokumentEnhetId)
-        )
-    }
-
-    fun getVedleggView(dokumentEnhetId: UUID?): VedleggView? {
-        return if (dokumentEnhetId != null && kabalDocumentGateway.isHovedDokumentUploaded(dokumentEnhetId)) {
-            mapDokumentMetadataToVedleggView(
-                kabalDocumentGateway.getMetadataOmHovedDokument(dokumentEnhetId)!!,
-            )
-        } else null
-    }
-
-    fun mapDokumentMetadataToVedleggView(
-        dokumentMetadata: DokumentMetadata
-    ): VedleggView {
-        return VedleggView(
-            dokumentMetadata.title,
-            dokumentMetadata.size,
-            dokumentMetadata.opplastet
         )
     }
 
