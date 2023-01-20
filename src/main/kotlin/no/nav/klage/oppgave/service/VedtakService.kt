@@ -49,6 +49,7 @@ class VedtakService(
             behandlingId = behandlingId,
             systemUserContext = systemUserContext,
         )
+        //TODO: Versjonssjekk på input
         val event =
             behandling.setHjemlerInVedtak(hjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)

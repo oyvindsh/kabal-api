@@ -40,20 +40,6 @@ class KabalDocumentClient(
             .block() ?: throw RuntimeException("Dokumentenhet could not be created")
     }
 
-    fun getDokumentEnhet(
-        dokumentEnhetId: UUID,
-    ): DokumentEnhetOutput {
-        return kabalDocumentWebClient.get()
-            .uri { it.path("/dokumentenheter/{dokumentEnhetId}").build(dokumentEnhetId) }
-            .header(
-                HttpHeaders.AUTHORIZATION,
-                "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalDocumentScope()}"
-            )
-            .retrieve()
-            .bodyToMono<DokumentEnhetOutput>()
-            .block() ?: throw RuntimeException("Dokumentenhet could not be fetched")
-    }
-
     fun fullfoerDokumentEnhet(
         dokumentEnhetId: UUID
     ): DokumentEnhetFullfoerOutput {
