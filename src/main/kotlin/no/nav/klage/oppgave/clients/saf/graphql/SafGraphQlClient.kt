@@ -31,6 +31,7 @@ class SafGraphQlClient(
         pageSize: Int,
         previousPageRef: String? = null
     ): DokumentoversiktBruker {
+        secureLogger.debug("saf access token: {}", tokenUtil.getSaksbehandlerAccessTokenWithSafScope())
         val start = System.currentTimeMillis()
         return runWithTimingAndLogging {
             safWebClient.post()
