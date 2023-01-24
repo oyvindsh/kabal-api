@@ -178,8 +178,7 @@ class StatistikkTilDVHService(
     ): LocalDateTime {
         return when (behandlingState) {
             BehandlingState.MOTTATT -> behandling.mottattKlageinstans
-            BehandlingState.TILDELT_SAKSBEHANDLER -> behandling.tildeling?.tidspunkt
-                ?: throw RuntimeException("tildelt mangler")
+            BehandlingState.TILDELT_SAKSBEHANDLER -> behandling.modified //tildelt eller fradelt
 
             BehandlingState.AVSLUTTET, BehandlingState.NY_ANKEBEHANDLING_I_KA -> behandling.currentDelbehandling().avsluttetAvSaksbehandler
                 ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")

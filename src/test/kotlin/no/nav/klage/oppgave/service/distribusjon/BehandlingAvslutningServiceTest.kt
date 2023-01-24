@@ -190,13 +190,7 @@ internal class BehandlingAvslutningServiceTest {
         every { kafkaEventRepository.save(any()) } returns mockk()
         every { kabalDocumentGateway.fullfoerDokumentEnhet(any()) } returns listOf(
             BrevmottakerWithJoarkAndDokDistInfo(
-                partId = PartId(
-                    type = PartIdType.PERSON,
-                    value = fnr
-                ),
-                navn = null,
                 journalpostId = JournalpostId(value = journalpostId),
-                dokdistReferanse = null
             )
         )
 
