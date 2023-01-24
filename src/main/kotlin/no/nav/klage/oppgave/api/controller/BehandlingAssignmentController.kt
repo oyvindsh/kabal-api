@@ -27,29 +27,6 @@ class BehandlingAssignmentController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    //TODO remove when FE migrated to new endpoint without navident
-    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/{id}/saksbehandlertildeling")
-    fun assignSaksbehandlerOld(
-        @Parameter(description = "NavIdent til en ansatt")
-        @PathVariable navIdent: String,
-        @Parameter(description = "Id til en behandling")
-        @PathVariable("id") behandlingId: UUID,
-        @RequestBody saksbehandlertildeling: Saksbehandlertildeling
-    ): TildelingEditedView {
-        logger.debug("assignSaksbehandlerOld is requested for behandling: {}", behandlingId)
-
-        val behandling = behandlingService.setSaksbehandler(
-            behandlingId = behandlingId,
-            tildeltSaksbehandlerIdent = saksbehandlertildeling.navIdent,
-            enhetId = saksbehandlerService.getEnhetForSaksbehandler(saksbehandlertildeling.navIdent).enhetId,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        )
-        return TildelingEditedView(
-            behandling.modified,
-            behandling.tildeling!!.tidspunkt.toLocalDate()
-        )
-    }
-
     @PutMapping("/behandlinger/{id}/saksbehandler")
     fun setSaksbehandler(
         @Parameter(description = "Id til en behandling")
@@ -79,28 +56,6 @@ class BehandlingAssignmentController(
         val behandling = behandlingService.getBehandling(behandlingId)
 
         return getSaksbehandlerViewWrapped(behandling)
-    }
-
-    //TODO remove when FE migrated to new endpoint without navident
-    @PostMapping("/ansatte/{navIdent}/klagebehandlinger/{id}/saksbehandlerfradeling")
-    fun unassignSaksbehandlerOld(
-        @Parameter(description = "NavIdent til en ansatt")
-        @PathVariable navIdent: String,
-        @Parameter(description = "Id til en behandling")
-        @PathVariable("id") behandlingId: UUID
-    ): TildelingEditedView {
-        logger.debug("unassignSaksbehandlerOld is requested for behandling: {}", behandlingId)
-
-        val behandling = behandlingService.setSaksbehandler(
-            behandlingId = behandlingId,
-            tildeltSaksbehandlerIdent = null,
-            enhetId = null,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        )
-        return TildelingEditedView(
-            behandling.modified,
-            behandling.modified.toLocalDate()
-        )
     }
 
     private fun getSaksbehandlerViewWrapped(behandling: Behandling): SaksbehandlerViewWrapped {
