@@ -17,6 +17,11 @@ object BehandlingSetters {
         nyVerdiEnhet: String?,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
+        if (!(nyVerdiSaksbehandlerident == null && nyVerdiEnhet == null) &&
+            !(nyVerdiSaksbehandlerident != null && nyVerdiEnhet != null)) {
+            error("saksbehandler and enhet must both be set (or null)")
+        }
+
         val gammelVerdiSaksbehandlerident = tildeling?.saksbehandlerident
         val gammelVerdiEnhet = tildeling?.enhet
         val gammelVerdiTidspunkt = tildeling?.tidspunkt
@@ -24,17 +29,21 @@ object BehandlingSetters {
         if (tildeling != null) {
             tildelingHistorikk.add(TildelingHistorikk(tildeling = tildeling!!.copy()))
         }
-        tildeling = Tildeling(nyVerdiSaksbehandlerident, nyVerdiEnhet, tidspunkt)
+        tildeling = if (nyVerdiSaksbehandlerident == null) {
+            null
+        } else {
+            Tildeling(nyVerdiSaksbehandlerident, nyVerdiEnhet, tidspunkt)
+        }
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
 
         endringslogg(
-            saksbehandlerident,
-            Felt.TILDELT,
-            gammelVerdiTidspunkt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
-            tidspunkt.format(DateTimeFormatter.ISO_LOCAL_DATE),
-            tidspunkt
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.TILDELT,
+            fraVerdi = gammelVerdiTidspunkt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            tilVerdi = tidspunkt.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            tidspunkt = tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
         endringslogg(

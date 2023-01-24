@@ -99,7 +99,7 @@ class BehandlingAssignmentController(
         )
         return TildelingEditedView(
             behandling.modified,
-            behandling.tildeling!!.tidspunkt.toLocalDate()
+            behandling.modified.toLocalDate()
         )
     }
 
