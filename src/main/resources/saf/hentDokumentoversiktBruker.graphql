@@ -50,6 +50,33 @@ query($brukerId: BrukerIdInput!, $tema: [Tema!], $foerste: Int, $etter: String) 
                     skjerming
                 }
             }
+            relevanteDatoer {
+                dato
+                datotype
+            }
+            antallRetur
+            tilleggsopplysninger {
+                nokkel
+                verdi
+            }
+            kanal
+            utsendingsinfo {
+                epostVarselSendt {
+                    tittel
+                    adresse
+                    varslingstekst
+                }
+                smsVarselSendt {
+                    adresse
+                    varslingstekst
+                }
+                fysiskpostSendt {
+                    adressetekstKonvolutt
+                }
+                digitalpostSendt {
+                    adresse
+                }
+            }
         }
         sideInfo {
             sluttpeker

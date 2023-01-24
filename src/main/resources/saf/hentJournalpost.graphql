@@ -1,6 +1,5 @@
 query($journalpostId: String!) {
-    journalpost(
-        journalpostId: $journalpostId) {
+    journalpost(journalpostId: $journalpostId) {
         journalpostId
         tittel
         journalposttype
@@ -44,6 +43,33 @@ query($journalpostId: String!) {
                 saksbehandlerHarTilgang
                 skjerming
             }
+        }
+        relevanteDatoer {
+           dato
+           datotype
+        }
+        antallRetur
+        tilleggsopplysninger {
+           nokkel
+           verdi
+        }
+        kanal
+        utsendingsinfo {
+           epostVarselSendt {
+               tittel
+               adresse
+               varslingstekst
+           }
+           smsVarselSendt {
+               adresse
+               varslingstekst
+           }
+           fysiskpostSendt {
+               adressetekstKonvolutt
+           }
+           digitalpostSendt {
+               adresse
+           }
         }
     }
 }

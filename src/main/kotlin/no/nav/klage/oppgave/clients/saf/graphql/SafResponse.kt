@@ -33,7 +33,71 @@ data class Journalpost(
     val sak: Sak?,
     val skjerming: String?,
     val datoOpprettet: LocalDateTime,
-    val dokumenter: List<DokumentInfo>?
+    val dokumenter: List<DokumentInfo>?,
+    val relevanteDatoer: List<RelevantDato>?,
+    val antallRetur: String?,
+    val tilleggsopplysninger: List<Tillegsopplysning>?,
+    val kanal: Kanal,
+    val utsendingsinfo: Utsendingsinfo?,
+)
+
+data class Utsendingsinfo(
+    val epostVarselSendt: EpostVarselSendt?,
+    val smsVarselSendt: SmsVarselSendt?,
+    val fysiskpostSendt: FysiskpostSendt?,
+    val digitalpostSendt: DigitalpostSendt?,
+) {
+    data class EpostVarselSendt(
+        val tittel: String,
+        val adresse: String,
+        val varslingtekst: String,
+    )
+
+    data class SmsVarselSendt(
+        val adresse: String,
+        val varslingtekst: String,
+    )
+
+    data class FysiskpostSendt(
+        val adressetekstKonvolutt: String,
+    )
+
+    data class DigitalpostSendt(
+        val adresse: String,
+    )
+}
+
+enum class Kanal {
+    ALTINN,
+    EIA,
+    NAV_NO,
+    NAV_NO_UINNLOGGET,
+    NAV_NO_CHAT,
+    SKAN_NETS,
+    SKAN_PEN,
+    SKAN_IM,
+    INNSENDT_NAV_ANSATT,
+    EESSI,
+    EKST_OPPS,
+    SENTRAL_UTSKRIFT,
+    LOKAL_UTSKRIFT,
+    SDP,
+    TRYGDERETTEN,
+    HELSENETTET,
+    INGEN_DISTRIBUSJON,
+    DPV,
+    DPVS,
+    UKJENT,
+}
+
+data class Tillegsopplysning(
+    val nokkel: String,
+    val verdi: String,
+)
+
+data class RelevantDato(
+    val dato: LocalDateTime,
+    val datotype: Datotype,
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -196,4 +260,14 @@ enum class Journalposttype {
     I, //Inngående dokument: Dokumentasjon som NAV har mottatt fra en ekstern part. De fleste inngående dokumenter er søknader, ettersendelser av dokumentasjon til sak, eller innsendinger fra arbeidsgivere. Meldinger brukere har sendt til "Skriv til NAV" arkiveres også som inngående dokumenter.
     U, //Utgående dokument: Dokumentasjon som NAV har produsert og sendt ut til en ekstern part. De fleste utgående dokumenter er informasjons- eller vedtaksbrev til privatpersoner eller organisasjoner. "Skriv til NAV"-meldinger som saksbehandlere har sendt til brukere arkiveres også som utgående dokumenter.
     N //Notat: Dokumentasjon som NAV har produsert selv, uten at formålet er å distribuere dette ut av NAV. Eksempler på notater er samtalereferater med veileder på kontaktsenter og interne forvaltningsnotater.
+}
+
+enum class Datotype {
+    DATO_SENDT_PRINT,
+    DATO_EKSPEDERT,
+    DATO_JOURNALFOERT,
+    DATO_REGISTRERT,
+    DATO_AVS_RETUR,
+    DATO_DOKUMENT,
+    DATO_LEST,
 }
