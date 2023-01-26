@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.clients.saf.graphql
 
-import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -15,7 +14,6 @@ import java.time.LocalDateTime
 class SafGraphQlClient(
     private val safWebClient: WebClient,
     private val tokenUtil: TokenUtil,
-    private val tracer: Tracer,
 ) {
 
     companion object {
@@ -31,7 +29,6 @@ class SafGraphQlClient(
         pageSize: Int,
         previousPageRef: String? = null
     ): DokumentoversiktBruker {
-        secureLogger.debug("saf access token: {}", tokenUtil.getSaksbehandlerAccessTokenWithSafScope())
         val start = System.currentTimeMillis()
         return runWithTimingAndLogging {
             safWebClient.post()
