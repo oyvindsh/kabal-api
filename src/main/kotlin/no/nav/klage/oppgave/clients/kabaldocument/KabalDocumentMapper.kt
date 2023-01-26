@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.kodeverk.Brevmottakertype
+import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.*
@@ -25,6 +26,7 @@ class KabalDocumentMapper(
         private val secureLogger = getSecureLogger()
 
         private const val BREVKODE = "BREV_FRA_KLAGEINSTANS"
+        private const val BREVKODE_NOTAT = "NOTAT_FRA_KLAGEINSTANS"
         private const val BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS = "ab0164"
         private const val KLAGEBEHANDLING_ID_KEY = "klagebehandling_id"
     }
@@ -35,7 +37,7 @@ class KabalDocumentMapper(
         vedlegg: SortedSet<DokumentUnderArbeid>
     ): DokumentEnhetWithDokumentreferanserInput {
         return DokumentEnhetWithDokumentreferanserInput(
-            brevMottakere = mapBrevmottakere(behandling, hovedDokument.brevmottakertyper),
+            brevMottakere = mapBrevmottakere(behandling, hovedDokument.brevmottakertyper, hovedDokument.dokumentType),
             journalfoeringData = JournalfoeringDataInput(
                 sakenGjelder = PartIdInput(
                     partIdTypeId = behandling.sakenGjelder.partId.type.id,
@@ -49,7 +51,7 @@ class KabalDocumentMapper(
                 behandlingstema = BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS,
                 //Tittel gjelder journalposten, ikke selve dokumentet som lastes opp. Vises i Gosys.
                 tittel = hovedDokument.dokumentType.beskrivelse,
-                brevKode = BREVKODE,
+                brevKode = if (hovedDokument.dokumentType == DokumentType.NOTAT) BREVKODE_NOTAT else BREVKODE,
                 tilleggsopplysning = TilleggsopplysningInput(
                     key = KLAGEBEHANDLING_ID_KEY,
                     value = behandling.id.toString()
@@ -74,20 +76,25 @@ class KabalDocumentMapper(
 
     fun mapBrevmottakere(
         behandling: Behandling,
-        brevMottakertyper: MutableSet<Brevmottakertype>
+        brevMottakertyper: MutableSet<Brevmottakertype>,
+        dokumentType: DokumentType
     ): List<BrevmottakerInput> {
         val brevmottakerPartIds = mutableSetOf<PartId>()
 
-        if (brevMottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
-            brevmottakerPartIds.add(behandling.klager.prosessfullmektig!!.partId)
-        }
-
-        if (brevMottakertyper.contains(Brevmottakertype.KLAGER)) {
-            brevmottakerPartIds.add(behandling.klager.partId)
-        }
-
-        if (brevMottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)) {
+        if (dokumentType == DokumentType.NOTAT) {
             brevmottakerPartIds.add(behandling.sakenGjelder.partId)
+        } else {
+            if (brevMottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
+                brevmottakerPartIds.add(behandling.klager.prosessfullmektig!!.partId)
+            }
+
+            if (brevMottakertyper.contains(Brevmottakertype.KLAGER)) {
+                brevmottakerPartIds.add(behandling.klager.partId)
+            }
+
+            if (brevMottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)) {
+                brevmottakerPartIds.add(behandling.sakenGjelder.partId)
+            }
         }
 
         return brevmottakerPartIds.map { mapPartIdToBrevmottakerInput(it) }
