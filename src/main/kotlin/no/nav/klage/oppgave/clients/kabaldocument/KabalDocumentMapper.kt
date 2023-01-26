@@ -26,6 +26,7 @@ class KabalDocumentMapper(
         private val secureLogger = getSecureLogger()
 
         private const val BREVKODE = "BREV_FRA_KLAGEINSTANS"
+        private const val BREVKODE_NOTAT = "NOTAT_FRA_KLAGEINSTANS"
         private const val BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS = "ab0164"
         private const val KLAGEBEHANDLING_ID_KEY = "klagebehandling_id"
     }
@@ -50,7 +51,7 @@ class KabalDocumentMapper(
                 behandlingstema = BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS,
                 //Tittel gjelder journalposten, ikke selve dokumentet som lastes opp. Vises i Gosys.
                 tittel = hovedDokument.dokumentType.beskrivelse,
-                brevKode = BREVKODE,
+                brevKode = if (hovedDokument.dokumentType == DokumentType.NOTAT) BREVKODE_NOTAT else BREVKODE,
                 tilleggsopplysning = TilleggsopplysningInput(
                     key = KLAGEBEHANDLING_ID_KEY,
                     value = behandling.id.toString()
