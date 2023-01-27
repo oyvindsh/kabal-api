@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.clients
 
-import io.micrometer.tracing.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -19,9 +18,6 @@ internal class SafDokumentoversiktBrukerTest {
 
     @MockK
     lateinit var tokenUtilMock: TokenUtil
-
-    @MockK(relaxed = true)
-    lateinit var tracerMock: Tracer
 
     @BeforeEach
     fun before() {
@@ -51,7 +47,6 @@ internal class SafDokumentoversiktBrukerTest {
         val safClient = SafGraphQlClient(
             createShortCircuitWebClient(jsonResponse),
             tokenUtilMock,
-            tracerMock
         )
 
         return safClient.getDokumentoversiktBruker("fnr", emptyList(), 1, null)

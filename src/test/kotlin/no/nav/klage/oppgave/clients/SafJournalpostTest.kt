@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.clients
 
-import io.micrometer.tracing.Tracer
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -20,14 +19,10 @@ internal class SafJournalpostTest {
     @MockK
     lateinit var tokenUtilMock: TokenUtil
 
-    @MockK
-    lateinit var tracerMock: Tracer
-
     @BeforeEach
     fun before() {
         every { tokenUtilMock.getAppAccessTokenWithSafScope() } returns "abc"
         every { tokenUtilMock.getSaksbehandlerAccessTokenWithSafScope() } returns "abc"
-        every { tracerMock.currentTraceContext().context()!!.traceId() } returns "def"
     }
 
     @Test
@@ -52,7 +47,6 @@ internal class SafJournalpostTest {
         val safClient = SafGraphQlClient(
             createShortCircuitWebClient(jsonResponse),
             tokenUtilMock,
-            tracerMock
         )
 
         return safClient.getJournalpostAsSaksbehandler("whatever")
