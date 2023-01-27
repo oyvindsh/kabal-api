@@ -10,16 +10,17 @@ val springDocVersion = "2.0.2"
 val testContainersVersion = "1.17.6"
 val shedlockVersion = "5.1.0"
 val archunitVersion = "1.0.1"
-val kotlinXmlBuilderVersion = "1.8.0"
+val kotlinXmlBuilderVersion = "1.9.0"
 val logbackSyslog4jVersion = "1.0.0"
 val jacksonJsonschemaVersion = "1.0.39"
 val pdfboxVersion = "2.0.27"
 val tikaVersion = "2.6.0"
 val verapdfVersion = "1.22.2"
+val klageKodeverkVersion = "1.2.11"
 
 plugins {
     val kotlinVersion = "1.8.0"
-    id("org.springframework.boot") version "3.0.1"
+    id("org.springframework.boot") version "3.0.2"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -74,7 +75,7 @@ dependencies {
 
     implementation("org.redundent:kotlin-xml-builder:$kotlinXmlBuilderVersion")
 
-    implementation("com.github.navikt:klage-kodeverk:1.2.4")
+    implementation("com.github.navikt:klage-kodeverk:$klageKodeverkVersion")
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
