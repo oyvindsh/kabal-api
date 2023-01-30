@@ -205,7 +205,9 @@ class DokumentMapper {
             avsenderMottaker = if (journalpost.avsenderMottaker != null) {
                 DokumentReferanse.AvsenderMottaker(
                     id = journalpost.avsenderMottaker.id,
-                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(journalpost.avsenderMottaker.type.name),
+                    type = if (journalpost.avsenderMottaker.type != null) DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
+                        journalpost.avsenderMottaker.type.name
+                    ) else null,
                     navn = journalpost.avsenderMottaker.navn,
                     land = journalpost.avsenderMottaker.land,
                     erLikBruker = journalpost.avsenderMottaker.erLikBruker,
