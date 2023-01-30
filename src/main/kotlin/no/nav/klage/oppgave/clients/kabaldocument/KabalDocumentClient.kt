@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
-import io.micrometer.tracing.Tracer
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.DokumentEnhetWithDokumentreferanserInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetFullfoerOutput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetOutput
@@ -17,7 +16,6 @@ import java.util.*
 class KabalDocumentClient(
     private val kabalDocumentWebClient: WebClient,
     private val tokenUtil: TokenUtil,
-    private val tracer: Tracer
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
