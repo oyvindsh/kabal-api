@@ -12,7 +12,7 @@ sak {
     fagsaksystem
 }
 bruker {
-    aid
+    id
     type
 }
 avsenderMottaker {
