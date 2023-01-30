@@ -6,77 +6,7 @@ query($brukerId: BrukerIdInput!, $tema: [Tema!], $foerste: Int, $etter: String) 
         foerste: $foerste,
         etter: $etter) {
         journalposter {
-            journalpostId
-            tittel
-            journalposttype
-            journalstatus
-            tema
-            temanavn
-            behandlingstema
-            behandlingstemanavn
-            sak {
-                datoOpprettet
-                fagsakId
-                fagsaksystem
-            }
-            bruker {
-                id
-                type
-            }
-            avsenderMottaker {
-                id
-                type
-                navn
-                land
-                erLikBruker
-            }
-            journalfoerendeEnhet
-            journalfortAvNavn
-            opprettetAvNavn
-            skjerming
-            datoOpprettet
-            dokumenter {
-                dokumentInfoId
-                tittel
-                brevkode
-                dokumentstatus
-                datoFerdigstilt
-                originalJournalpostId
-                skjerming
-                dokumentvarianter {
-                    variantformat
-                    filnavn
-                    saksbehandlerHarTilgang
-                    skjerming
-                }
-            }
-            relevanteDatoer {
-                dato
-                datotype
-            }
-            antallRetur
-            tilleggsopplysninger {
-                nokkel
-                verdi
-            }
-            kanal
-            utsendingsinfo {
-                epostVarselSendt {
-                    tittel
-                    adresse
-                    varslingstekst
-                }
-                smsVarselSendt {
-                    adresse
-                    varslingstekst
-                }
-                fysiskpostSendt {
-                    adressetekstKonvolutt
-                }
-                digitalpostSendt {
-                    adresse
-                }
-            }
+            <replace>
         }
         sideInfo {
             sluttpeker

@@ -21,9 +21,13 @@ fun hentDokumentoversiktBrukerQuery(
     pageSize: Int,
     previousPageRef: String?
 ): HentDokumentoversiktBrukerGraphqlQuery {
+    val journalpostProperties = HentJournalpostGraphqlQuery::class.java.getResource("/saf/journalpostProperties.txt")
+        .readText()
     val query =
         HentDokumentoversiktBrukerGraphqlQuery::class.java.getResource("/saf/hentDokumentoversiktBruker.graphql")
-            .readText().replace("[\n\r]", "")
+            .readText()
+            .replace("<replace>", journalpostProperties)
+            .replace("[\n\r]", "")
     return HentDokumentoversiktBrukerGraphqlQuery(
         query,
         DokumentoversiktBrukerVariables(

@@ -80,7 +80,7 @@ internal class SafDokumentoversiktBrukerTest {
                     "id": "11126532778",
                     "type": "FNR",
                     "navn": "MASKERT_FELT",
-                    "land": null,
+                    "land": "NO",
                     "erLikBruker": true
                   },
                   "journalfoerendeEnhet": "9999",

@@ -71,10 +71,10 @@ internal class SafJournalpostTest {
             "type": "AKTOERID"
           },
           "avsenderMottaker": {
-            "id": null,
-            "type": "NULL",
+            "id": "123",
+            "type": "FNR",
             "navn": "MASKERT_FELT",
-            "land": null,
+            "land": "NO",
             "erLikBruker": false
           },
           "journalfoerendeEnhet": "4817",
@@ -115,7 +115,17 @@ internal class SafJournalpostTest {
                 }
               ]
             }
-          ]
+          ],
+          "utsendingsinfo": {
+            "epostVarselSendt": {
+                "tittel": "Melding fra NAV",
+                "adresse": "navn.navnesen@epost.no",
+                "varslingstekst": "<!DOCTYPE html><html><head><title>Melding fra NAV</title></head><body><!DOCTYPE html><body>noe</body></html>"
+            },
+            "smsVarselSendt": null,
+            "fysiskpostSendt": null,
+            "digitalpostSendt": null
+          }
         }
       }
     }

@@ -202,6 +202,19 @@ class DokumentMapper {
                     fagsaksystem = journalpost.sak.fagsaksystem,
                 )
             } else null,
+            avsenderMottaker = if (journalpost.avsenderMottaker != null) {
+                DokumentReferanse.AvsenderMottaker(
+                    id = journalpost.avsenderMottaker.id,
+                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(journalpost.avsenderMottaker.type.name),
+                    navn = journalpost.avsenderMottaker.navn,
+                    land = journalpost.avsenderMottaker.land,
+                    erLikBruker = journalpost.avsenderMottaker.erLikBruker,
+
+                    )
+            } else null,
+            journalfoerendeEnhet = journalpost.journalfoerendeEnhet,
+            journalfortAvNavn = journalpost.journalfortAvNavn,
+            opprettetAvNavn = journalpost.opprettetAvNavn,
             datoOpprettet = journalpost.datoOpprettet,
             relevantDates = journalpost.relevanteDatoer?.map {
                 DokumentReferanse.RelevantDate(
@@ -211,7 +224,7 @@ class DokumentMapper {
             },
             antallRetur = journalpost.antallRetur?.toInt(),
             tilleggsopplysninger = journalpost.tilleggsopplysninger?.map {
-                DokumentReferanse.Tillegsopplysning(
+                DokumentReferanse.Tilleggsopplysning(
                     key = it.nokkel,
                     value = it.verdi,
                 )
@@ -236,13 +249,13 @@ class DokumentMapper {
                     DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
                         tittel = epostVarselSendt.tittel,
                         adresse = epostVarselSendt.adresse,
-                        varslingtekst = epostVarselSendt.varslingtekst,
+                        varslingstekst = epostVarselSendt.varslingstekst,
                     )
                 } else null,
                 smsVarselSendt = if (smsVarselSendt != null) {
                     DokumentReferanse.Utsendingsinfo.SmsVarselSendt(
                         adresse = smsVarselSendt.adresse,
-                        varslingtekst = smsVarselSendt.varslingtekst,
+                        varslingstekst = smsVarselSendt.varslingstekst,
                     )
                 } else null,
                 fysiskpostSendt = if (fysiskpostSendt != null) {

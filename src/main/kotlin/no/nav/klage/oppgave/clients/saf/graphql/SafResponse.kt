@@ -31,15 +31,32 @@ data class Journalpost(
     val behandlingstema: String?,
     val behandlingstemanavn: String?,
     val sak: Sak?,
+    val avsenderMottaker: AvsenderMottaker?,
+    val journalfoerendeEnhet: String?,
+    val journalfortAvNavn: String?,
+    val opprettetAvNavn: String?,
     val skjerming: String?,
     val datoOpprettet: LocalDateTime,
     val dokumenter: List<DokumentInfo>?,
     val relevanteDatoer: List<RelevantDato>?,
     val antallRetur: String?,
-    val tilleggsopplysninger: List<Tillegsopplysning>?,
+    val tilleggsopplysninger: List<Tilleggsopplysning>?,
     val kanal: Kanal,
     val utsendingsinfo: Utsendingsinfo?,
 )
+
+data class AvsenderMottaker(
+    val id: String,
+    val type: AvsenderMottakerIdType,
+    val navn: String,
+    val land: String,
+    val erLikBruker: Boolean,
+
+) {
+    enum class AvsenderMottakerIdType {
+        FNR, ORGNR, HPRNR, UTL_ORG, UKJENT
+    }
+}
 
 data class Utsendingsinfo(
     val epostVarselSendt: EpostVarselSendt?,
@@ -50,12 +67,12 @@ data class Utsendingsinfo(
     data class EpostVarselSendt(
         val tittel: String,
         val adresse: String,
-        val varslingtekst: String,
+        val varslingstekst: String,
     )
 
     data class SmsVarselSendt(
         val adresse: String,
-        val varslingtekst: String,
+        val varslingstekst: String,
     )
 
     data class FysiskpostSendt(
@@ -90,7 +107,7 @@ enum class Kanal {
     UKJENT,
 }
 
-data class Tillegsopplysning(
+data class Tilleggsopplysning(
     val nokkel: String,
     val verdi: String,
 )

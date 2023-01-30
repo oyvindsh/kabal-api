@@ -24,13 +24,30 @@ data class DokumentReferanse(
     val behandlingstema: String?,
     val behandlingstemanavn: String?,
     val sak: Sak?,
+    val avsenderMottaker: AvsenderMottaker?,
+    val journalfoerendeEnhet: String?,
+    val journalfortAvNavn: String?,
+    val opprettetAvNavn: String?,
     val datoOpprettet: LocalDateTime,
     val relevantDates: List<RelevantDate>?,
     val antallRetur: Int?,
-    val tilleggsopplysninger: List<Tillegsopplysning>?,
+    val tilleggsopplysninger: List<Tilleggsopplysning>?,
     val kanal: String,
     val utsendingsinfo: Utsendingsinfo?,
 ) {
+
+    data class AvsenderMottaker(
+        val id: String,
+        val type: AvsenderMottakerIdType,
+        val navn: String,
+        val land: String,
+        val erLikBruker: Boolean,
+
+        ) {
+        enum class AvsenderMottakerIdType {
+            FNR, ORGNR, HPRNR, UTL_ORG, UKJENT
+        }
+    }
 
     data class VedleggReferanse(
         val dokumentInfoId: String,
@@ -62,7 +79,7 @@ data class DokumentReferanse(
         }
     }
 
-    data class Tillegsopplysning(
+    data class Tilleggsopplysning(
         val key: String,
         val value: String,
     )
@@ -76,12 +93,12 @@ data class DokumentReferanse(
         data class EpostVarselSendt(
             val tittel: String,
             val adresse: String,
-            val varslingtekst: String,
+            val varslingstekst: String,
         )
 
         data class SmsVarselSendt(
             val adresse: String,
-            val varslingtekst: String,
+            val varslingstekst: String,
         )
 
         data class FysiskpostSendt(
