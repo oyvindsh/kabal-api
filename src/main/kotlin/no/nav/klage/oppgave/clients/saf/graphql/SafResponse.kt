@@ -54,7 +54,8 @@ data class AvsenderMottaker(
 
 ) {
     enum class AvsenderMottakerIdType {
-        FNR, ORGNR, HPRNR, UTL_ORG, UKJENT
+        //Why is NULL sent as a value?
+        FNR, ORGNR, HPRNR, UTL_ORG, UKJENT, NULL
     }
 }
 

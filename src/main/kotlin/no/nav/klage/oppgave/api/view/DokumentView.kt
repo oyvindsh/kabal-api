@@ -45,7 +45,8 @@ data class DokumentReferanse(
 
         ) {
         enum class AvsenderMottakerIdType {
-            FNR, ORGNR, HPRNR, UTL_ORG, UKJENT
+            //TODO look into NULL
+            FNR, ORGNR, HPRNR, UTL_ORG, UKJENT, NULL
         }
     }
 
