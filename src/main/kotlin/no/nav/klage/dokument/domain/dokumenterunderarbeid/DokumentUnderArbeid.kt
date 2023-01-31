@@ -43,6 +43,8 @@ open class DokumentUnderArbeid(
     open var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "markert_ferdig")
     open var markertFerdig: LocalDateTime? = null,
+    @Column(name = "markert_ferdig_by")
+    open var markertFerdigBy: String? = null,
     @Column(name = "ferdigstilt")
     open var ferdigstilt: LocalDateTime? = null,
     @Column(name = "dokument_enhet_id")
@@ -102,9 +104,10 @@ open class DokumentUnderArbeid(
         }
     }
 
-    fun markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt: LocalDateTime) {
+    fun markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt: LocalDateTime, saksbehandlerIdent: String) {
         if (markertFerdig == null) {
             markertFerdig = tidspunkt
+            markertFerdigBy = saksbehandlerIdent
             modified = tidspunkt
         }
     }

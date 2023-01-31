@@ -48,7 +48,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             smartEditorVersion = null,
         )
-        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now())
+        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now(), "S123456")
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(LocalDateTime.now())
         dokumentUnderArbeidRepository.save(hovedDokument)
 

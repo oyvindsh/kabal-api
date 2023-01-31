@@ -364,9 +364,9 @@ class DokumentUnderArbeidService(
 
         val now = LocalDateTime.now()
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
-        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(now)
+        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident)
         hovedDokument.brevmottakertyper = brevmottakertyper.toMutableSet()
-        vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(now) }
+        vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident) }
 
         //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
         if (hovedDokument.smartEditorId != null) {
