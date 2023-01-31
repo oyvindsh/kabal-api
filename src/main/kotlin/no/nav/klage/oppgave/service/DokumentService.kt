@@ -190,12 +190,88 @@ class DokumentMapper {
             valgt = behandling.saksdokumenter.containsDokument(
                 journalpost.journalpostId,
                 hoveddokument.dokumentInfoId
-            )
+            ),
+            journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
+            journalstatus = journalpost.journalstatus?.name,
+            behandlingstema = journalpost.behandlingstema,
+            behandlingstemanavn = journalpost.behandlingstemanavn,
+            sak = if (journalpost.sak != null) {
+                DokumentReferanse.Sak(
+                    datoOpprettet = journalpost.sak.datoOpprettet,
+                    fagsakId = journalpost.sak.fagsakId,
+                    fagsaksystem = journalpost.sak.fagsaksystem,
+                )
+            } else null,
+            avsenderMottaker = if (journalpost.avsenderMottaker != null) {
+                DokumentReferanse.AvsenderMottaker(
+                    id = journalpost.avsenderMottaker.id,
+                    type = if (journalpost.avsenderMottaker.type != null) DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
+                        journalpost.avsenderMottaker.type.name
+                    ) else null,
+                    navn = journalpost.avsenderMottaker.navn,
+                    land = journalpost.avsenderMottaker.land,
+                    erLikBruker = journalpost.avsenderMottaker.erLikBruker,
+
+                    )
+            } else null,
+            journalfoerendeEnhet = journalpost.journalfoerendeEnhet,
+            journalfortAvNavn = journalpost.journalfortAvNavn,
+            opprettetAvNavn = journalpost.opprettetAvNavn,
+            datoOpprettet = journalpost.datoOpprettet,
+            relevantDates = journalpost.relevanteDatoer?.map {
+                DokumentReferanse.RelevantDate(
+                    date = it.dato,
+                    dateType = DokumentReferanse.RelevantDate.DateType.valueOf(it.datotype.name)
+                )
+            },
+            antallRetur = journalpost.antallRetur?.toInt(),
+            tilleggsopplysninger = journalpost.tilleggsopplysninger?.map {
+                DokumentReferanse.Tilleggsopplysning(
+                    key = it.nokkel,
+                    value = it.verdi,
+                )
+            },
+            kanal = journalpost.kanal.name,
+            utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
         )
 
         dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost, behandling))
 
         return dokumentReferanse
+    }
+
+    private fun getUtsendingsinfo(utsendingsinfo: Utsendingsinfo?): DokumentReferanse.Utsendingsinfo? {
+        if (utsendingsinfo == null) {
+            return null
+        }
+
+        return with(utsendingsinfo) {
+            DokumentReferanse.Utsendingsinfo(
+                epostVarselSendt = if (epostVarselSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
+                        tittel = epostVarselSendt.tittel,
+                        adresse = epostVarselSendt.adresse,
+                        varslingstekst = epostVarselSendt.varslingstekst,
+                    )
+                } else null,
+                smsVarselSendt = if (smsVarselSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.SmsVarselSendt(
+                        adresse = smsVarselSendt.adresse,
+                        varslingstekst = smsVarselSendt.varslingstekst,
+                    )
+                } else null,
+                fysiskpostSendt = if (fysiskpostSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.FysiskpostSendt(
+                        adressetekstKonvolutt = fysiskpostSendt.adressetekstKonvolutt,
+                    )
+                } else null,
+                digitalpostSendt = if (digitalpostSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.DigitalpostSendt(
+                        adresse = digitalpostSendt.adresse,
+                    )
+                } else null,
+            )
+        }
     }
 
     private fun getVedlegg(
