@@ -36,7 +36,7 @@ class JournalfoertDokumentController(
 
             )
         kabalDocumentClient.updateDocumentTitle(
-            journalpostId = "598116098", dokumentInfoId = "624863226", newTitle = "ny tittel ja ${LocalDateTime.now()}"
+            journalpostId = "598114463", dokumentInfoId = "624861392", newTitle = "ny tittel ja ${LocalDateTime.now()}"
 
         )
     }

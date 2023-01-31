@@ -65,6 +65,6 @@ class KabalDocumentClient(
             .bodyValue(input)
             .retrieve()
             .bodyToMono<Void>()
-            .block() ?: throw RuntimeException("DokumentEnhet could not be finalized")
+            .block() ?: throw RuntimeException("Document title could not be updated")
     }
 }
