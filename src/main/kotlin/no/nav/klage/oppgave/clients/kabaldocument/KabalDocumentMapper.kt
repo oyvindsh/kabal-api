@@ -62,6 +62,7 @@ class KabalDocumentMapper(
                 vedlegg = vedlegg.map { mapDokumentUnderArbeidToDokumentReferanse(it) }
             ),
             dokumentTypeId = hovedDokument.dokumentType.id,
+            journalfoerendeSaksbehandlerIdent = hovedDokument.markertFerdigBy!!
         )
     }
 
