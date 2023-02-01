@@ -44,6 +44,7 @@ data class BehandlingDetaljerView(
     val egenAnsatt: Boolean,
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
+    val vergemaalEllerFremtidsfullmakt: Boolean,
     val kvalitetsvurderingId: UUID?,
     val kvalitetsvurderingReference: KvalitetsvurderingReference,
     val isPossibleToUseDokumentUnderArbeid: Boolean = false,

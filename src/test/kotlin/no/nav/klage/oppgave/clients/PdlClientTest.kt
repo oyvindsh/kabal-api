@@ -58,7 +58,8 @@ internal class PdlClientTest {
                 }
               ],
               "adressebeskyttelse": [],
-              "sivilstand": []
+              "sivilstand": [],
+              "vergemaalEllerFremtidsfullmakt": []
             }
           }
         }

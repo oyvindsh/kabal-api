@@ -31,7 +31,8 @@ class HentPersonMapper {
             sivilstand = pdlPerson.sivilstand
                 .filter { it.relatertVedSivilstand != null }
                 .firstOrNull { it.type == PdlPerson.Sivilstand.SivilstandType.GIFT || it.type == PdlPerson.Sivilstand.SivilstandType.REGISTRERT_PARTNER }
-                ?.mapSivilstand()
+                ?.mapSivilstand(),
+            vergemaalEllerFremtidsfullmakt = pdlPerson.vergemaalEllerFremtidsfullmakt.isNotEmpty()
         )
     }
 

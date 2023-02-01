@@ -16,6 +16,15 @@ query($ident: ID!){
             gyldigFraOgMed
             relatertVedSivilstand
             bekreftelsesdato
+        },
+        vergemaalEllerFremtidsfullmakt(historikk: false) {
+            type
+            embete
+            vergeEllerFullmektig {
+                motpartsPersonident
+                omfang
+                omfangetErInnenPersonligOmraade
+            }
         }
     }
 }
