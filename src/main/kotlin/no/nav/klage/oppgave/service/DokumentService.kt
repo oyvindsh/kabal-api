@@ -192,7 +192,9 @@ class DokumentMapper {
                 hoveddokument.dokumentInfoId
             ),
             journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
-            journalstatus = journalpost.journalstatus?.name,
+            journalstatus = if (journalpost.journalstatus != null) {
+                DokumentReferanse.Journalstatus.valueOf(journalpost.journalstatus.name)
+            } else null,
             behandlingstema = journalpost.behandlingstema,
             behandlingstemanavn = journalpost.behandlingstemanavn,
             sak = if (journalpost.sak != null) {
@@ -218,10 +220,10 @@ class DokumentMapper {
             journalfortAvNavn = journalpost.journalfortAvNavn,
             opprettetAvNavn = journalpost.opprettetAvNavn,
             datoOpprettet = journalpost.datoOpprettet,
-            relevantDates = journalpost.relevanteDatoer?.map {
-                DokumentReferanse.RelevantDate(
-                    date = it.dato,
-                    dateType = DokumentReferanse.RelevantDate.DateType.valueOf(it.datotype.name)
+            relevanteDatoer = journalpost.relevanteDatoer?.map {
+                DokumentReferanse.RelevantDato(
+                    dato = it.dato,
+                    datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
                 )
             },
             antallRetur = journalpost.antallRetur?.toInt(),
@@ -231,7 +233,8 @@ class DokumentMapper {
                     value = it.verdi,
                 )
             },
-            kanal = journalpost.kanal.name,
+            kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
+            kanalnavn = journalpost.kanalnavn,
             utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
         )
 
