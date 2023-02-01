@@ -170,8 +170,8 @@ class MottakService(
             throw BehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet")
         } else if (klagebehandling.get().tildeling == null) {
             throw BehandlingManglerTildelingException("Klagebehandling med id $klagebehandlingId mangler tildeling")
-        } else if (klagebehandling.get().avsluttet != null) {
-            throw PreviousBehandlingNotFinalizedException("Klagebehanlding med id $klagebehandlingId er ikke fullført")
+        } else if (klagebehandling.get().isAvsluttet()) {
+            throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
         }
 
         val existingAnke = ankebehandlingRepository.findByKlagebehandlingId(klagebehandlingId)

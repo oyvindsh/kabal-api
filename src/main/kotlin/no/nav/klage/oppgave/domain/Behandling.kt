@@ -100,11 +100,7 @@ abstract class Behandling(
             currentDelbehandling().avsluttetAvSaksbehandler = avsluttetAvSaksbehandler
         }
 
-    var avsluttet: LocalDateTime?
-        get() = currentDelbehandling().avsluttet
-        set(avsluttet) {
-            currentDelbehandling().avsluttet = avsluttet
-        }
+    fun isAvsluttet() = currentDelbehandling().avsluttet != null
 
     var medunderskriver: MedunderskriverTildeling?
         get() = currentDelbehandling().medunderskriver
@@ -123,7 +119,7 @@ abstract class Behandling(
      */
     fun getStatus(): Status {
         return when {
-            avsluttet != null -> Status.FULLFOERT
+            isAvsluttet() -> Status.FULLFOERT
             avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
             sattPaaVent != null -> Status.SATT_PAA_VENT
             medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> Status.SENDT_TIL_MEDUNDERSKRIVER
