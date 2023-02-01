@@ -84,7 +84,7 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
         try {
             logger.info("Finding roles for ident $navIdent")
             microsoftGraphClient.getSaksbehandlersGroups(navIdent)
-                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.mailNickname ?: it.id) }
+                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.onPremisesSamAccountName ?: it.id) }
         } catch (e: Exception) {
             logger.error("Failed to call getSaksbehandlersGroups for navident $navIdent", e)
             throw e
@@ -93,7 +93,7 @@ class DefaultAzureGateway(private val microsoftGraphClient: MicrosoftGraphClient
     override fun getRollerForInnloggetSaksbehandler(): List<SaksbehandlerRolle> =
         try {
             microsoftGraphClient.getInnloggetSaksbehandlersGroups()
-                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.mailNickname ?: it.id) }
+                .map { SaksbehandlerRolle(it.id, it.displayName ?: it.onPremisesSamAccountName ?: it.id) }
         } catch (e: Exception) {
             logger.error("Failed to call getInnloggetSaksbehandlersGroups", e)
             throw e
