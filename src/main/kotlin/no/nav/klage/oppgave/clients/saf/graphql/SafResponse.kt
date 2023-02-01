@@ -42,6 +42,7 @@ data class Journalpost(
     val antallRetur: String?,
     val tilleggsopplysninger: List<Tilleggsopplysning>?,
     val kanal: Kanal,
+    val kanalnavn: String,
     val utsendingsinfo: Utsendingsinfo?,
 )
 
