@@ -308,7 +308,7 @@ class BehandlingMapper(
         return if (erVirksomhet()) {
             false
         } else {
-            pdlFacade.getPersonInfo(partId.value).vergemaalEllerFremtidsfullmakt
+            pdlFacade.getPersonInfo(partId.value).vergemaalEllerFremtidsfullmakt ?: false
         }
     }
 

@@ -45,6 +45,7 @@ class KabalDocumentMapperTest {
             null,
             null,
             null,
+            null,
             null
         )
 
