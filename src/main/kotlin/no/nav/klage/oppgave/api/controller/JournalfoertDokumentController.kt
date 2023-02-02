@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.oppgave.api.view.UpdateDocumentTitleInput
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -8,7 +9,6 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -25,9 +25,9 @@ class JournalfoertDokumentController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @GetMapping("/updateTitle")
+    @PutMapping("/updateTitle")
     fun updateTitle(
-
+        @RequestBody input: UpdateDocumentTitleInput
     ) {
         logMethodDetails(
             methodName = ::updateTitle.name,
@@ -36,8 +36,9 @@ class JournalfoertDokumentController(
 
             )
         kabalDocumentClient.updateDocumentTitle(
-            journalpostId = "598114463", dokumentInfoId = "624861392", newTitle = "ny tittel ja ${LocalDateTime.now()}"
-
+            journalpostId = input.journalpostId,
+            dokumentInfoId = input.dokumentInfoId,
+            newTitle = input.newTitle
         )
     }
 }
