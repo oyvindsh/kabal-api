@@ -86,6 +86,7 @@ class BehandlingMapper(
             egenAnsatt = klagebehandling.sakenGjelder.erEgenAnsatt(),
             fortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
+            vergemaalEllerFremtidsfullmakt = klagebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
             kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
                 id = klagebehandling.kakaKvalitetsvurderingId,
@@ -143,6 +144,7 @@ class BehandlingMapper(
             egenAnsatt = ankebehandling.sakenGjelder.erEgenAnsatt(),
             fortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
+            vergemaalEllerFremtidsfullmakt = ankebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
             kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
                 id = ankebehandling.kakaKvalitetsvurderingId,
@@ -198,6 +200,7 @@ class BehandlingMapper(
             egenAnsatt = ankeITrygderettenbehandling.sakenGjelder.erEgenAnsatt(),
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
+            vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingId = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
             kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
                 id = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
@@ -298,6 +301,14 @@ class BehandlingMapper(
             false
         } else {
             egenAnsattService.erEgenAnsatt(partId.value)
+        }
+    }
+
+    private fun SakenGjelder.harVergemaalEllerFremtidsfullmakt(): Boolean {
+        return if (erVirksomhet()) {
+            false
+        } else {
+            pdlFacade.getPersonInfo(partId.value).vergemaalEllerFremtidsfullmakt ?: false
         }
     }
 

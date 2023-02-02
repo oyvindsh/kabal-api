@@ -20,7 +20,8 @@ data class PdlPerson(
     val adressebeskyttelse: List<Adressebeskyttelse>,
     val navn: List<Navn>,
     val kjoenn: List<Kjoenn>,
-    val sivilstand: List<Sivilstand>
+    val sivilstand: List<Sivilstand>,
+    val vergemaalEllerFremtidsfullmakt: List<VergemaalEllerFremtidsfullmakt>
 ) {
     data class Adressebeskyttelse(val gradering: GraderingType) {
         enum class GraderingType { STRENGT_FORTROLIG_UTLAND, STRENGT_FORTROLIG, FORTROLIG, UGRADERT }
@@ -57,5 +58,17 @@ data class PdlPerson(
 
     data class Kjoenn(val kjoenn: KjoennType?) {
         enum class KjoennType { MANN, KVINNE, UKJENT }
+    }
+
+    data class VergemaalEllerFremtidsfullmakt(
+        val type: String,
+        val embete: String,
+        val vergeEllerFullmektig: VergeEllerFullmektig
+    ) {
+        data class VergeEllerFullmektig(
+            val motpartsPersonident: String,
+            val omfang: String,
+            val omfangetErInnenPersonligOmraad: Boolean
+        )
     }
 }

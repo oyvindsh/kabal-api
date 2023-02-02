@@ -10,7 +10,8 @@ data class Person(
     val sammensattNavn: String?,
     val beskyttelsesbehov: Beskyttelsesbehov?,
     val kjoenn: String?,
-    val sivilstand: Sivilstand?
+    val sivilstand: Sivilstand?,
+    val vergemaalEllerFremtidsfullmakt: Boolean?,
 ) {
     fun harBeskyttelsesbehovFortrolig() = beskyttelsesbehov == Beskyttelsesbehov.FORTROLIG
 

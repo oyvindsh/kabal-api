@@ -223,7 +223,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
@@ -245,7 +246,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.STRENGT_FORTROLIG,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
@@ -266,7 +268,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = null,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
@@ -287,7 +290,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = null,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
@@ -308,7 +312,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
@@ -331,7 +336,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
@@ -354,7 +360,8 @@ class TilgangServiceTest {
                 sammensattNavn = "",
                 beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
                 kjoenn = "",
-                sivilstand = null
+                sivilstand = null,
+                vergemaalEllerFremtidsfullmakt = false,
             )
         )
 
