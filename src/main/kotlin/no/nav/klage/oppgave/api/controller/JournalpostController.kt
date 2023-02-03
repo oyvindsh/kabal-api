@@ -36,7 +36,7 @@ class JournalpostController(
         summary = "Oppdaterer filnavn i dokumentarkivet",
         description = "Oppdaterer filnavn i dokumentarkivet"
     )
-    @PutMapping("/{journalpostId}/dokumenter/{dokumentInfoId}/title")
+    @PutMapping("/{journalpostId}/dokumenter/{dokumentInfoId}/tittel")
     fun updateTitle(
         @Parameter(description = "Id til journalpost")
         @PathVariable journalpostId: String,
