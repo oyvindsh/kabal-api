@@ -58,7 +58,10 @@ class KabalDocumentClient(
         input: UpdateTitleInput
     ) {
         kabalDocumentWebClient.put()
-            .uri { it.path("/dokarkiv/{journalpostId}/title").build(journalpostId) }
+            .uri {
+                it.path("/dokarkiv/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}/title")
+                    .build(journalpostId, input.dokumentInfoId)
+            }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalDocumentScope()}"
