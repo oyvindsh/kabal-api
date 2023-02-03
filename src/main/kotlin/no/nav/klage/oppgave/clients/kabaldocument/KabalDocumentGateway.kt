@@ -43,13 +43,13 @@ class KabalDocumentGateway(
     fun updateDocumentTitle(
         journalpostId: String,
         dokumentInfoId: String,
-        newTitle: String
+        title: String
     ) {
         kabalDocumentClient.updateDocumentTitle(
+            journalpostId = journalpostId,
             input = UpdateTitleInput(
-                journalpostId = journalpostId,
                 dokumentInfoId = dokumentInfoId,
-                newTitle = newTitle
+                title = title
             )
         )
     }

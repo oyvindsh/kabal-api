@@ -54,6 +54,7 @@ class BehandlingDokumentController(
         )
     }
 
+    //TODO: Fjern når FE har tatt i bruk tilsvarende i JournalfoertDokumentCont
     @Operation(
         summary = "Henter fil fra dokumentarkivet",
         description = "Henter fil fra dokumentarkivet som pdf gitt at saksbehandler har tilgang"
