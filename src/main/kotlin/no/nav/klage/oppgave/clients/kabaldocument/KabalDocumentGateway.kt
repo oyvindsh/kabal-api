@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.oppgave.clients.kabaldocument.model.request.UpdateTitleInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.BrevmottakerWithJoarkAndDokDistInfo
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.util.getLogger
@@ -38,4 +39,18 @@ class KabalDocumentGateway(
 
     fun fullfoerDokumentEnhet(dokumentEnhetId: UUID): List<BrevmottakerWithJoarkAndDokDistInfo> =
         kabalDocumentClient.fullfoerDokumentEnhet(dokumentEnhetId).brevMottakerWithJoarkAndDokDistInfoList
+
+    fun updateDocumentTitle(
+        journalpostId: String,
+        dokumentInfoId: String,
+        title: String
+    ) {
+        kabalDocumentClient.updateDocumentTitle(
+            journalpostId = journalpostId,
+            input = UpdateTitleInput(
+                dokumentInfoId = dokumentInfoId,
+                title = title
+            )
+        )
+    }
 }

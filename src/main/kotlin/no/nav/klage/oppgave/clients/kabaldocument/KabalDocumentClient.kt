@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.DokumentEnhetWithDokumentreferanserInput
+import no.nav.klage.oppgave.clients.kabaldocument.model.request.UpdateTitleInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetFullfoerOutput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.DokumentEnhetOutput
 import no.nav.klage.oppgave.util.TokenUtil
@@ -50,5 +51,24 @@ class KabalDocumentClient(
             .retrieve()
             .bodyToMono<DokumentEnhetFullfoerOutput>()
             .block() ?: throw RuntimeException("DokumentEnhet could not be finalized")
+    }
+
+    fun updateDocumentTitle(
+        journalpostId: String,
+        input: UpdateTitleInput
+    ) {
+        kabalDocumentWebClient.put()
+            .uri {
+                it.path("/dokarkiv/journalposter/{journalpostId}/dokumenter/{dokumentInfoId}/title")
+                    .build(journalpostId, input.dokumentInfoId)
+            }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalDocumentScope()}"
+            )
+            .bodyValue(input)
+            .retrieve()
+            .bodyToMono<Void>()
+            .block()
     }
 }
