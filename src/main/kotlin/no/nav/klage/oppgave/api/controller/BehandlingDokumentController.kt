@@ -12,6 +12,7 @@ import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpHeaders
@@ -33,6 +34,7 @@ class BehandlingDokumentController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     @Operation(
@@ -46,12 +48,20 @@ class BehandlingDokumentController(
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
         @RequestParam(required = false, name = "temaer") temaer: List<String>? = emptyList()
     ): DokumenterResponse {
-        return behandlingService.fetchDokumentlisteForBehandling(
+        val fetchDokumentlisteForBehandling = behandlingService.fetchDokumentlisteForBehandling(
             behandlingId = behandlingId,
             temaer = temaer?.map { Tema.of(it) } ?: emptyList(),
             pageSize = pageSize,
             previousPageRef = previousPageRef
         )
+
+        fetchDokumentlisteForBehandling.dokumenter.forEach { d ->
+            if ((d.relevanteDatoer?.size ?: 0) > 2) {
+                secureLogger.debug("metatadata log for document: {}", d)
+            }
+        }
+
+        return fetchDokumentlisteForBehandling
     }
 
     //TODO: Fjern når FE har tatt i bruk tilsvarende i JournalfoertDokumentCont
