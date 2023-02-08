@@ -98,7 +98,7 @@ spec:
         - application: kabal-file-api
         - application: kabal-json-to-pdf
         - application: clamav
-          namespace: clamav
+          namespace: nais-system
       external:
       {{#each externalHosts}}
         - host: {{host}}
