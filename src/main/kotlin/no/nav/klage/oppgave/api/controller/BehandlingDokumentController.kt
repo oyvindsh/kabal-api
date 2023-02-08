@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.api.controller
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -35,6 +37,8 @@ class BehandlingDokumentController(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
+
+        val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     }
 
     @Operation(
@@ -55,11 +59,35 @@ class BehandlingDokumentController(
             previousPageRef = previousPageRef
         )
 
-        fetchDokumentlisteForBehandling.dokumenter.forEach { d ->
-            if ((d.relevanteDatoer?.size ?: 0) > 2) {
-                secureLogger.debug("metatadata log for document: {}", d)
+        //log document data for a short period
+        try {
+            fetchDokumentlisteForBehandling.dokumenter.forEach { d ->
+                if ((d.relevanteDatoer?.size ?: 0) > 2) {
+                    if (d.avsenderMottaker != null) {
+                        //No need to log actual id or name
+                        secureLogger.debug(
+                            "metatadata log for document: {}",
+                            objectMapper.writeValueAsString(
+                                d.copy(
+                                    avsenderMottaker = d.avsenderMottaker.copy(
+                                        id = "xxx",
+                                        navn = "Xxx Yyy"
+                                    )
+                                )
+                            )
+                        )
+                    } else {
+                        secureLogger.debug(
+                            "metatadata log for document: {}",
+                            objectMapper.writeValueAsString(d)
+                        )
+                    }
+                }
             }
+        } catch (e: Exception) {
+            //Don't care
         }
+
 
         return fetchDokumentlisteForBehandling
     }
