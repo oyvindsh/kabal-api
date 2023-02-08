@@ -3,8 +3,8 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
+import no.nav.klage.oppgave.service.KlagebehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -16,7 +16,7 @@ import java.util.*
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class BrukerController(
-    private val behandlingService: BehandlingService,
+    private val klagebehandlingService: KlagebehandlingService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
 ) {
 
@@ -25,16 +25,16 @@ class BrukerController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @GetMapping("/brukere/{partIdValue}/completedbehandlinger")
-    fun getCompletedBehandlingerByPartIdValue(
+    @GetMapping("/brukere/{partIdValue}/completedklagebehandlinger")
+    fun getCompletedKlagebehandlingerByPartIdValue(
         @PathVariable("partIdValue") partIdValue: String
-    ): List<CompletedBehandling> {
+    ): List<CompletedKlagebehandling> {
         logMethodDetails(
-            methodName = ::getCompletedBehandlingerByPartIdValue.name,
+            methodName = ::getCompletedKlagebehandlingerByPartIdValue.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger
         )
-        
-        return behandlingService.findCompletedBehandlingerByPartIdValue(partIdValue)
+
+        return klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = partIdValue)
     }
 }

@@ -2,6 +2,8 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.oppgave.api.mapper.BehandlingMapper
+import no.nav.klage.oppgave.api.view.CompletedKlagebehandling
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
@@ -23,6 +25,8 @@ class KlagebehandlingService(
     private val kakaApiGateway: KakaApiGateway,
     @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")
     private val kakaVersion2Date: LocalDate,
+    private val behandlingMapper: BehandlingMapper,
+    private val behandlingService: BehandlingService
 ) {
 
     companion object {
@@ -36,6 +40,23 @@ class KlagebehandlingService(
         Utfall.STADFESTELSE,
         Utfall.UGUNST,
         Utfall.AVVIST
+    )
+
+    fun findCompletedKlagebehandlingerByPartIdValue(
+        partIdValue: String
+    ): List<CompletedKlagebehandling> {
+        behandlingService.checkLeseTilgang(partIdValue)
+        return klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(partIdValue)
+            .map { it.toCompletedKlagebehandling() }
+    }
+
+    private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
+        behandlingId = this.id,
+        ytelse = this.ytelse,
+        utfall = this.currentDelbehandling().utfall!!,
+        vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
+        sakenGjelder = behandlingMapper.getSakenGjelderView(this.sakenGjelder),
+        klager = behandlingMapper.getKlagerView(this.klager),
     )
 
     fun findMuligAnkeByPartId(

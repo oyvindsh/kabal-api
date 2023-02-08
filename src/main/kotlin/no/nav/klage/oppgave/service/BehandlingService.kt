@@ -4,7 +4,6 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.oppgave.api.view.CompletedBehandling
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
@@ -528,7 +527,7 @@ class BehandlingService(
         }
     }
 
-    private fun checkLeseTilgang(partIdValue: String) {
+    fun checkLeseTilgang(partIdValue: String) {
         tilgangService.verifyInnloggetSaksbehandlersTilgangTil(partIdValue)
     }
 
@@ -671,27 +670,4 @@ class BehandlingService(
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
         return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet)
     }
-
-    fun findCompletedBehandlingerByPartIdValue(
-        partIdValue: String
-    ): List<CompletedBehandling> {
-        checkLeseTilgang(partIdValue)
-        //TODO: Skal partId tas inn i spørring?
-        return behandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
-            .filter {
-                it.klager.partId.value == partIdValue
-            }
-            .map { it.toCompletedBehandling() }
-    }
-
-    private fun Behandling.toCompletedBehandling(): CompletedBehandling = CompletedBehandling(
-        type = this.type,
-        internalSaksnummer = this.id,
-        tema = this.ytelse.toTema(),
-        ytelse = this.ytelse,
-        utfall = this.currentDelbehandling().utfall!!,
-        vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
-        foedselsnummer = this.klager.partId.value
-    )
-
 }

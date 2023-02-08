@@ -1,19 +1,16 @@
 package no.nav.klage.oppgave.api.view
 
-import no.nav.klage.kodeverk.Tema
-import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.Ytelse
 import java.time.LocalDateTime
 import java.util.*
 
-data class CompletedBehandling(
-    val type: Type,
-    val internalSaksnummer: UUID,
-    val tema: Tema,
+data class CompletedKlagebehandling(
+    val behandlingId: UUID,
     val ytelse: Ytelse,
     val utfall: Utfall,
     val vedtakDate: LocalDateTime,
-    val foedselsnummer: String
+    val sakenGjelder: BehandlingDetaljerView.SakenGjelderView,
+    val klager: BehandlingDetaljerView.KlagerView,
 )
 
