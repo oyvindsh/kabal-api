@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.BehandlingEditedView
+import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -61,35 +62,47 @@ class BehandlingDokumentController(
 
         //log document data for a short period
         try {
+            val interestingTypes = setOf(
+                DokumentReferanse.RelevantDato.Datotype.DATO_SENDT_PRINT,
+                DokumentReferanse.RelevantDato.Datotype.DATO_AVS_RETUR,
+                DokumentReferanse.RelevantDato.Datotype.DATO_LEST,
+            )
             fetchDokumentlisteForBehandling.dokumenter.forEach { d ->
-                if ((d.relevanteDatoer?.size ?: 0) > 2) {
-                    if (d.avsenderMottaker != null) {
-                        //No need to log actual id or name
-                        secureLogger.debug(
-                            "metatadata log for document: {}",
-                            objectMapper.writeValueAsString(
-                                d.copy(
-                                    avsenderMottaker = d.avsenderMottaker.copy(
-                                        id = "xxx",
-                                        navn = "Xxx Yyy"
-                                    )
-                                )
-                            )
-                        )
-                    } else {
-                        secureLogger.debug(
-                            "metatadata log for document: {}",
-                            objectMapper.writeValueAsString(d)
-                        )
+                if (d.relevanteDatoer != null) {
+                    if (d.relevanteDatoer.size >= 4) {
+                        logMetadata(d)
+                    } else if (d.relevanteDatoer.map { it.datotype }.any { it in interestingTypes }) {
+                        logMetadata(d)
                     }
                 }
             }
         } catch (e: Exception) {
-            //Don't care
+            secureLogger.warn("Something wrong with metadata logging", e)
         }
 
-
         return fetchDokumentlisteForBehandling
+    }
+
+    private fun logMetadata(d: DokumentReferanse) {
+        if (d.avsenderMottaker != null) {
+            //No need to log actual id or name
+            secureLogger.debug(
+                "metatadata log for document: {}",
+                objectMapper.writeValueAsString(
+                    d.copy(
+                        avsenderMottaker = d.avsenderMottaker.copy(
+                            id = "xxx",
+                            navn = "Xxx Yyy"
+                        )
+                    )
+                )
+            )
+        } else {
+            secureLogger.debug(
+                "metatadata log for document: {}",
+                objectMapper.writeValueAsString(d)
+            )
+        }
     }
 
     //TODO: Fjern når FE har tatt i bruk tilsvarende i JournalfoertDokumentCont
