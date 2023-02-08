@@ -62,16 +62,9 @@ class BehandlingDokumentController(
 
         //log document data for a short period
         try {
-            val interestingTypes = setOf(
-                DokumentReferanse.RelevantDato.Datotype.DATO_SENDT_PRINT,
-                DokumentReferanse.RelevantDato.Datotype.DATO_AVS_RETUR,
-                DokumentReferanse.RelevantDato.Datotype.DATO_LEST,
-            )
             fetchDokumentlisteForBehandling.dokumenter.forEach { d ->
                 if (d.relevanteDatoer != null) {
-                    if (d.relevanteDatoer.size >= 4) {
-                        logMetadata(d)
-                    } else if (d.relevanteDatoer.map { it.datotype }.any { it in interestingTypes }) {
+                    if (d.relevanteDatoer.size >= 4 && DokumentReferanse.RelevantDato.Datotype.DATO_AVS_RETUR in d.relevanteDatoer.map { it.datotype }) {
                         logMetadata(d)
                     }
                 }
