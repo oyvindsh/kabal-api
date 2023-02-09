@@ -19,6 +19,7 @@ inboundApplications:
   - application: klage-dittnav-api
   - application: klage-arkiver-journalpost
   - application: kabal-behandling-creator
+  - application: kabin-api
   - application: k9-klage
     namespace: k9saksbehandling
     cluster: dev-fss
