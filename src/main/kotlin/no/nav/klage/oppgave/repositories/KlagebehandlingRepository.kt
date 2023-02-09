@@ -18,6 +18,8 @@ interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID> {
 
     fun findByDelbehandlingerAvsluttetIsNotNull(): List<Klagebehandling>
 
+    fun findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(partIdValue: String): List<Klagebehandling>
+
     fun findByKildeReferanseAndYtelse(kildeReferanse: String, ytelse: Ytelse): Klagebehandling?
 
     fun findByDvhReferanse(dvhReferanse: String): Klagebehandling?

@@ -523,8 +523,12 @@ class BehandlingService(
 
     private fun checkLeseTilgang(behandling: Behandling) {
         if (behandling.sakenGjelder.erPerson()) {
-            tilgangService.verifyInnloggetSaksbehandlersTilgangTil(behandling.sakenGjelder.partId.value)
+            checkLeseTilgang(behandling.sakenGjelder.partId.value)
         }
+    }
+
+    fun checkLeseTilgang(partIdValue: String) {
+        tilgangService.verifyInnloggetSaksbehandlersTilgangTil(partIdValue)
     }
 
     private fun checkSkrivetilgang(behandling: Behandling) {
