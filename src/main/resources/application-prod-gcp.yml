@@ -21,6 +21,6 @@ AIVEN_ES_USE_SSL: true
 SAF_BASE_URL: https://saf.prod-fss-pub.nais.io/
 SAF_SCOPE: prod-fss.teamdokumenthandtering.saf
 
-CLAM_AV_URL: http://clamav.clamav/scan
+CLAM_AV_URL: http://clamav.nais-system/scan
 
 KAKA_VERSION_2_DATE: 2023-01-01

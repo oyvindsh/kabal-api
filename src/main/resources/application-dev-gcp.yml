@@ -21,7 +21,7 @@ AIVEN_ES_USE_SSL: true
 SAF_BASE_URL: https://saf.dev-fss-pub.nais.io/
 SAF_SCOPE: dev-fss.teamdokumenthandtering.saf-q1
 
-CLAM_AV_URL: http://clamav.clamav/scan
+CLAM_AV_URL: http://clamav.nais-system/scan
 
 FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS: 20000
 
