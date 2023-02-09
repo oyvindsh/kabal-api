@@ -8,6 +8,7 @@ import io.mockk.mockk
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.BrevmottakerWithJoarkAndDokDistInfo
@@ -64,6 +65,9 @@ internal class BehandlingAvslutningServiceTest {
 
     @Configuration
     internal class MyTestConfiguration {
+
+        @MockkBean(relaxed = true)
+        lateinit var behandlingMapper: BehandlingMapper
 
         @MockkBean(relaxed = true)
         lateinit var tilgangService: TilgangService
