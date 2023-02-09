@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.BehandlingEditedView
-import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -53,49 +52,12 @@ class BehandlingDokumentController(
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
         @RequestParam(required = false, name = "temaer") temaer: List<String>? = emptyList()
     ): DokumenterResponse {
-        val fetchDokumentlisteForBehandling = behandlingService.fetchDokumentlisteForBehandling(
+        return behandlingService.fetchDokumentlisteForBehandling(
             behandlingId = behandlingId,
             temaer = temaer?.map { Tema.of(it) } ?: emptyList(),
             pageSize = pageSize,
             previousPageRef = previousPageRef
         )
-
-        //log document data for a short period
-        try {
-            fetchDokumentlisteForBehandling.dokumenter.forEach { d ->
-                if (d.relevanteDatoer != null) {
-                    if (d.relevanteDatoer.size >= 4 && DokumentReferanse.RelevantDato.Datotype.DATO_AVS_RETUR in d.relevanteDatoer.map { it.datotype }) {
-                        logMetadata(d)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            secureLogger.warn("Something wrong with metadata logging", e)
-        }
-
-        return fetchDokumentlisteForBehandling
-    }
-
-    private fun logMetadata(d: DokumentReferanse) {
-        if (d.avsenderMottaker != null) {
-            //No need to log actual id or name
-            secureLogger.debug(
-                "metatadata log for document: {}",
-                objectMapper.writeValueAsString(
-                    d.copy(
-                        avsenderMottaker = d.avsenderMottaker.copy(
-                            id = "xxx",
-                            navn = "Xxx Yyy"
-                        )
-                    )
-                )
-            )
-        } else {
-            secureLogger.debug(
-                "metatadata log for document: {}",
-                objectMapper.writeValueAsString(d)
-            )
-        }
     }
 
     //TODO: Fjern når FE har tatt i bruk tilsvarende i JournalfoertDokumentCont
