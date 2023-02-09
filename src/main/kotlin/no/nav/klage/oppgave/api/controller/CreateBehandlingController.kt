@@ -15,7 +15,8 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class BrukerController(
+@RequestMapping("/api/internal")
+class CreateBehandlingController(
     private val klagebehandlingService: KlagebehandlingService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
 ) {
