@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.Ytelse
 import java.time.LocalDateTime
@@ -14,6 +15,7 @@ data class CompletedKlagebehandling(
     val klager: BehandlingDetaljerView.KlagerView,
     val prosessfullmektig: BehandlingDetaljerView.ProsessfullmektigView?,
     val tilknyttedeDokumenter: List<TilknyttetDokument>,
-    val saksId: String?
+    val sakFagsakId: String?,
+    val sakFagsystem: Fagsystem
 )
 
