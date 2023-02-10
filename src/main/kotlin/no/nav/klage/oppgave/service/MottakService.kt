@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
@@ -13,10 +14,7 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.config.incrementMottattKlageAnke
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Mottak
-import no.nav.klage.oppgave.domain.klage.MottakDokument
-import no.nav.klage.oppgave.domain.klage.MottakDokumentType
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
 import no.nav.klage.oppgave.eventlisteners.CreateBehandlingFromMottakEventListener
 import no.nav.klage.oppgave.exceptions.*
@@ -151,26 +149,39 @@ class MottakService(
     fun createAnkeMottakBasertPaaKlagebehandlingId(input: AnkeBasertPaaKlageInput): Behandling {
         val klagebehandlingId = input.klagebehandlingId
         logger.debug("Prøver å lagre anke basert på klagebehandlingId {}", klagebehandlingId)
-        val klagebehandling = klagebehandlingRepository.findById(klagebehandlingId)
+        val klagebehandling = klagebehandlingRepository.getReferenceById(klagebehandlingId)
 
         validateAnkeCreationBasedOnKlagebehandling(klagebehandling, klagebehandlingId)
 
-        val mottak = mottakRepository.save(klagebehandling.get().toAnkeMottak(input.innsendtAnkeJournalpostId))
+        val mottak = mottakRepository.save(klagebehandling.toAnkeMottak(input.innsendtAnkeJournalpostId))
 
         logger.debug("Har lagret mottak {}, basert på innsendt klagebehandlingId: {}", mottak.id, klagebehandlingId)
 
         return createBehandlingFromMottakEventListener.createBehandling(MottakLagretEvent(mottak))
     }
 
+    @Transactional
+    fun createAnkeMottakFromKabinInput(input: CreateAnkeBasedOnKabinInput) {
+        val klagebehandlingId = input.klagebehandlingId
+        logger.debug("Prøver å lagre anke basert på Kabin-input med klagebehandlingId {}", klagebehandlingId)
+        val klagebehandling = klagebehandlingRepository.getReferenceById(klagebehandlingId)
+
+        validateAnkeCreationBasedOnKlagebehandling(klagebehandling, klagebehandlingId)
+
+        val mottak = mottakRepository.save(klagebehandling.toAnkeMottak(input))
+
+        logger.debug(
+            "Har lagret mottak {}, basert på innsendt klagebehandlingId: {} fra Kabin",
+            mottak.id,
+            klagebehandlingId
+        )
+    }
+
     fun validateAnkeCreationBasedOnKlagebehandling(
-        klagebehandling: Optional<Klagebehandling>,
+        klagebehandling: Klagebehandling,
         klagebehandlingId: UUID
     ) {
-        if (klagebehandling.isEmpty) {
-            throw BehandlingNotFoundException("Klagebehandling med id $klagebehandlingId ikke funnet")
-        } else if (klagebehandling.get().tildeling == null) {
-            throw BehandlingManglerTildelingException("Klagebehandling med id $klagebehandlingId mangler tildeling")
-        } else if (klagebehandling.get().isAvsluttet()) {
+        if (!klagebehandling.isAvsluttet()) {
             throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
         }
 
@@ -334,6 +345,69 @@ class MottakService(
             innsendtDato = LocalDate.now(),
             brukersHenvendelseMottattNavDato = LocalDate.now(),
             sakMottattKaDato = LocalDateTime.now(),
+            fristFraFoersteinstans = null,
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            ytelse = ytelse,
+            kommentar = null,
+            forrigeBehandlingId = id,
+            innsynUrl = null
+        )
+    }
+
+    private fun Klagebehandling.toAnkeMottak(input: CreateAnkeBasedOnKabinInput): Mottak {
+        val prosessfullmektig = if (input.prosessfullmektig != null) {
+            Prosessfullmektig(
+                partId = PartId(
+                    type = PartIdType.of(input.prosessfullmektig.id.type.name),
+                    value = input.prosessfullmektig.id.verdi
+                ),
+                skalPartenMottaKopi = true
+            )
+        } else {
+            klager.prosessfullmektig
+        }
+
+        val klager = if (input.klager != null) {
+            Klager(
+                partId = PartId(
+                    type = PartIdType.of(input.klager.id.type.name),
+                    value = input.klager.id.verdi
+                ),
+                prosessfullmektig = prosessfullmektig
+            )
+        } else {
+            klager
+        }
+
+        //TODO: Legg inn støtte for innsendt ankedokument
+//        val innsendtDokument =
+//            if (innsendtAnkeJournalpostId != null) {
+//                mutableSetOf(
+//                    MottakDokument(
+//                        type = MottakDokumentType.BRUKERS_ANKE,
+//                        journalpostId = innsendtAnkeJournalpostId
+//                    )
+//                )
+//            } else mutableSetOf()
+
+        return Mottak(
+            type = Type.ANKE,
+            klager = klager,
+            sakenGjelder = sakenGjelder,
+            sakFagsystem = sakFagsystem,
+            sakFagsakId = sakFagsakId,
+            kildeReferanse = kildeReferanse,
+            dvhReferanse = dvhReferanse,
+            //Dette er søkehjemler
+            hjemler = mottakRepository.getReferenceById(id).hjemler,
+            forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
+            forrigeBehandlendeEnhet = tildeling!!.enhet!!,
+            mottakDokument = mutableSetOf(),
+            //TODO: Dobbeltsjekk hvilke av disse tre som blir riktige
+            innsendtDato = input.mottattNav,
+            brukersHenvendelseMottattNavDato = input.mottattNav,
+            sakMottattKaDato = input.mottattNav.atStartOfDay(),
             fristFraFoersteinstans = null,
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),

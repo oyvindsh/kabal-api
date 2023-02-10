@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.MottakService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -19,6 +20,7 @@ import java.util.*
 class KabinApiController(
     private val klagebehandlingService: KlagebehandlingService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val mottakService: MottakService
 ) {
 
     companion object {
@@ -37,5 +39,20 @@ class KabinApiController(
         )
 
         return klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = input.idnummer)
+    }
+
+    @PostMapping("/createanke")
+    fun createAnke(
+        @RequestBody input: CreateAnkeBasedOnKabinInput
+    ) {
+        logMethodDetails(
+            methodName = ::createAnke.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+
+        mottakService.createAnkeMottakFromKabinInput(input = input)
+
+        //TODO: Sjekk behov for å sende Kafka-melding om ANKE_OPPRETTET, dobbeltsjekk DVH
     }
 }
