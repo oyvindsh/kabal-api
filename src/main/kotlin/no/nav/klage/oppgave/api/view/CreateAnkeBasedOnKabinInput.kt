@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.api.view
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.util.*
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class CreateAnkeBasedOnKabinInput(
     val klagebehandlingId: UUID,
     val mottattNav: LocalDate,
