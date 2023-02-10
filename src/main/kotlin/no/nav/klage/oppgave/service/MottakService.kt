@@ -380,16 +380,13 @@ class MottakService(
             klager
         }
 
-        //TODO: Legg inn støtte for innsendt ankedokument
-//        val innsendtDokument =
-//            if (innsendtAnkeJournalpostId != null) {
-//                mutableSetOf(
-//                    MottakDokument(
-//                        type = MottakDokumentType.BRUKERS_ANKE,
-//                        journalpostId = innsendtAnkeJournalpostId
-//                    )
-//                )
-//            } else mutableSetOf()
+        val innsendtDokument =
+            mutableSetOf(
+                MottakDokument(
+                    type = MottakDokumentType.BRUKERS_ANKE,
+                    journalpostId = input.ankeDocumentJournalpostId
+                )
+            )
 
         return Mottak(
             type = Type.ANKE,
@@ -403,7 +400,7 @@ class MottakService(
             hjemler = mottakRepository.getReferenceById(id).hjemler,
             forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
             forrigeBehandlendeEnhet = tildeling!!.enhet!!,
-            mottakDokument = mutableSetOf(),
+            mottakDokument = innsendtDokument,
             //TODO: Dobbeltsjekk hvilke av disse tre som blir riktige
             innsendtDato = input.mottattNav,
             brukersHenvendelseMottattNavDato = input.mottattNav,

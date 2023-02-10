@@ -64,7 +64,8 @@ class KlagebehandlingService(
                 journalpostId = it.journalpostId,
                 dokumentInfoId = it.dokumentInfoId
             )
-        }
+        },
+        saksId = this.sakFagsakId
     )
 
     fun findMuligAnkeByPartId(

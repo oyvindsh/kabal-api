@@ -7,7 +7,8 @@ class CreateAnkeBasedOnKabinInput(
     val klagebehandlingId: UUID,
     val mottattNav: LocalDate,
     val klager: OversendtKlager?,
-    val prosessfullmektig: OversendtProsessfullmektig?
+    val prosessfullmektig: OversendtProsessfullmektig?,
+    val ankeDocumentJournalpostId: String,
 ) {
     data class OversendtKlager(
         val id: OversendtPartId,
