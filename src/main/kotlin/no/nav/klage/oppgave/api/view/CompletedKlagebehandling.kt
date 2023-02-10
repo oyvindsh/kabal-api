@@ -12,5 +12,7 @@ data class CompletedKlagebehandling(
     val vedtakDate: LocalDateTime,
     val sakenGjelder: BehandlingDetaljerView.SakenGjelderView,
     val klager: BehandlingDetaljerView.KlagerView,
+    val prosessfullmektig: BehandlingDetaljerView.ProsessfullmektigView?,
+    val tilknyttedeDokumenter: List<TilknyttetDokument>,
 )
 

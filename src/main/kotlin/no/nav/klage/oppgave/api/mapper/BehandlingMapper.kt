@@ -55,7 +55,7 @@ class BehandlingMapper(
             mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
             sakenGjelder = getSakenGjelderView(klagebehandling.sakenGjelder),
             klager = getKlagerView(klagebehandling.klager),
-            prosessfullmektig = klagebehandling.klager.prosessfullmektig?.getProsessfullmektigView(),
+            prosessfullmektig = klagebehandling.klager.prosessfullmektig?.let { getProsessfullmektigView(it) },
             tema = klagebehandling.ytelse.toTema().id,
             ytelse = klagebehandling.ytelse.id,
             type = klagebehandling.type.id,
@@ -110,7 +110,7 @@ class BehandlingMapper(
             mottattVedtaksinstans = null,
             sakenGjelder = getSakenGjelderView(ankebehandling.sakenGjelder),
             klager = getKlagerView(ankebehandling.klager),
-            prosessfullmektig = ankebehandling.klager.prosessfullmektig?.getProsessfullmektigView(),
+            prosessfullmektig = ankebehandling.klager.prosessfullmektig?.let { getProsessfullmektigView(it) },
             tema = ankebehandling.ytelse.toTema().id,
             ytelse = ankebehandling.ytelse.id,
             type = ankebehandling.type.id,
@@ -166,7 +166,7 @@ class BehandlingMapper(
             mottattVedtaksinstans = null,
             sakenGjelder = getSakenGjelderView(ankeITrygderettenbehandling.sakenGjelder),
             klager = getKlagerView(ankeITrygderettenbehandling.klager),
-            prosessfullmektig = ankeITrygderettenbehandling.klager.prosessfullmektig?.getProsessfullmektigView(),
+            prosessfullmektig = ankeITrygderettenbehandling.klager.prosessfullmektig?.let { getProsessfullmektigView(it) },
             tema = ankeITrygderettenbehandling.ytelse.toTema().id,
             ytelse = ankeITrygderettenbehandling.ytelse.id,
             type = ankeITrygderettenbehandling.type.id,
@@ -260,9 +260,9 @@ class BehandlingMapper(
         }
     }
 
-    private fun Prosessfullmektig.getProsessfullmektigView(): BehandlingDetaljerView.ProsessfullmektigView {
-        if (erPerson()) {
-            val person = pdlFacade.getPersonInfo(partId.value)
+    fun getProsessfullmektigView(prosessfullmektig: Prosessfullmektig): BehandlingDetaljerView.ProsessfullmektigView {
+        if (prosessfullmektig.erPerson()) {
+            val person = pdlFacade.getPersonInfo(prosessfullmektig.partId.value)
             return BehandlingDetaljerView.ProsessfullmektigView(
                 person = BehandlingDetaljerView.PersonView(
                     foedselsnummer = person.foedselsnr,
@@ -273,8 +273,8 @@ class BehandlingMapper(
         } else {
             return BehandlingDetaljerView.ProsessfullmektigView(
                 person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = partId.value,
-                    navn = eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
+                    virksomhetsnummer = prosessfullmektig.partId.value,
+                    navn = eregClient.hentOrganisasjon(prosessfullmektig.partId.value)?.navn?.sammensattNavn()
                 )
             )
         }
