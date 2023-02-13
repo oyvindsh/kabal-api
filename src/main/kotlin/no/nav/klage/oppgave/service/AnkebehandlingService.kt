@@ -65,15 +65,7 @@ class AnkebehandlingService(
         logger.debug("Created ankebehandling ${ankebehandling.id} for mottak ${mottak.id}")
 
         if (mottak.forrigeBehandlingId != null) {
-            logger.debug("Getting registreringshjemler from klagebehandling ${mottak.forrigeBehandlingId} for ankebehandling ${ankebehandling.id}")
             val klagebehandling = klagebehandlingRepository.getReferenceById(mottak.forrigeBehandlingId)
-            vedtakService.setHjemler(
-                behandlingId = ankebehandling.id,
-                hjemler = klagebehandling.currentDelbehandling().hjemler,
-                utfoerendeSaksbehandlerIdent = SYSTEMBRUKER,
-                systemUserContext = true,
-            )
-
             val klagebehandlingDokumenter = klagebehandling.saksdokumenter
 
             logger.debug("Adding saksdokumenter from klagebehandling ${mottak.forrigeBehandlingId} to ankebehandling ${ankebehandling.id}")

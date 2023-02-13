@@ -185,6 +185,7 @@ class MottakService(
             throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
         }
 
+
         val existingAnke = ankebehandlingRepository.findByKlagebehandlingId(klagebehandlingId)
 
         if (existingAnke != null) {
@@ -337,7 +338,7 @@ class MottakService(
             sakFagsakId = sakFagsakId,
             kildeReferanse = kildeReferanse,
             dvhReferanse = dvhReferanse,
-            //Dette er søkehjemler, registreringshjemler blir kopiert over i AnkebehandlingService.
+            //Dette er søkehjemler
             hjemler = mottakRepository.getReferenceById(id).hjemler,
             forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
             forrigeBehandlendeEnhet = tildeling!!.enhet!!,
@@ -351,7 +352,8 @@ class MottakService(
             ytelse = ytelse,
             kommentar = null,
             forrigeBehandlingId = id,
-            innsynUrl = null
+            innsynUrl = null,
+            sentFrom = Mottak.Sender.BRUKER,
         )
     }
 
@@ -365,7 +367,7 @@ class MottakService(
                 skalPartenMottaKopi = true
             )
         } else {
-            klager.prosessfullmektig
+            null
         }
 
         val klager = if (input.klager != null) {
@@ -377,7 +379,13 @@ class MottakService(
                 prosessfullmektig = prosessfullmektig
             )
         } else {
-            klager
+            Klager(
+                partId = PartId(
+                    type = PartIdType.of(sakenGjelder.partId.type.name),
+                    value = sakenGjelder.partId.value
+                ),
+                prosessfullmektig = prosessfullmektig
+            )
         }
 
         val innsendtDokument =
@@ -401,7 +409,6 @@ class MottakService(
             forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
             forrigeBehandlendeEnhet = tildeling!!.enhet!!,
             mottakDokument = innsendtDokument,
-            //TODO: Dobbeltsjekk hvilke av disse tre som blir riktige
             innsendtDato = input.mottattNav,
             brukersHenvendelseMottattNavDato = input.mottattNav,
             sakMottattKaDato = input.mottattNav.atStartOfDay(),
@@ -411,7 +418,8 @@ class MottakService(
             ytelse = ytelse,
             kommentar = null,
             forrigeBehandlingId = id,
-            innsynUrl = null
+            innsynUrl = null,
+            sentFrom = Mottak.Sender.KABIN,
         )
     }
 }
