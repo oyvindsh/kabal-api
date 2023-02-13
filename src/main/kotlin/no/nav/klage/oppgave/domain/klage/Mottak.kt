@@ -67,8 +67,15 @@ class Mottak(
     val kommentar: String? = null,
     @Column(name = "forrige_behandling_id")
     val forrigeBehandlingId: UUID? = null,
+    @Column(name = "sent_from")
+    @Enumerated(EnumType.STRING)
+    val sentFrom: Sender = Sender.FAGSYSTEM
 
-    ) {
+) {
+
+    enum class Sender {
+        FAGSYSTEM, KABIN, BRUKER
+    }
 
     override fun toString(): String {
         return "Mottak(id=$id, " +

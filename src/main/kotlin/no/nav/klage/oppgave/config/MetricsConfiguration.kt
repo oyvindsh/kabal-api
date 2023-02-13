@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.config
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.Ytelse
-import no.nav.klage.oppgave.api.view.KildeFagsystem
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.annotation.Configuration
 
@@ -18,14 +15,14 @@ class MetricsConfiguration {
     }
 }
 
-fun MeterRegistry.incrementMottattKlageAnke(kildesystem: KildeFagsystem, ytelse: Ytelse, type: Type) {
+fun MeterRegistry.incrementMottattKlageAnke(kildesystem: String, ytelse: String, type: String) {
     counter(
         MetricsConfiguration.MOTTATT_KLAGEANKE,
         "kildesystem",
-        kildesystem.name,
+        kildesystem,
         "ytelse",
-        ytelse.navn,
+        ytelse,
         "type",
-        type.navn
+        type
     ).increment()
 }

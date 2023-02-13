@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.KlagebehandlingService
+import no.nav.klage.oppgave.service.MottakService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -16,9 +17,10 @@ import java.util.*
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 @RequestMapping("/api/internal")
-class CreateBehandlingController(
+class KabinApiController(
     private val klagebehandlingService: KlagebehandlingService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val mottakService: MottakService
 ) {
 
     companion object {
@@ -26,16 +28,31 @@ class CreateBehandlingController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @GetMapping("/brukere/{partIdValue}/completedklagebehandlinger")
-    fun getCompletedKlagebehandlingerByPartIdValue(
-        @PathVariable("partIdValue") partIdValue: String
+    @PostMapping("/completedklagebehandlinger")
+    fun getCompletedKlagebehandlinger(
+        @RequestBody input: GetCompletedKlagebehandlingerInput
     ): List<CompletedKlagebehandling> {
         logMethodDetails(
-            methodName = ::getCompletedKlagebehandlingerByPartIdValue.name,
+            methodName = ::getCompletedKlagebehandlinger.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger
         )
 
-        return klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = partIdValue)
+        return klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = input.idnummer)
+    }
+
+    @PostMapping("/createanke")
+    fun createAnke(
+        @RequestBody input: CreateAnkeBasedOnKabinInput
+    ) {
+        logMethodDetails(
+            methodName = ::createAnke.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+
+        mottakService.createAnkeMottakFromKabinInput(input = input)
+
+        //TODO: Sjekk behov for å sende Kafka-melding om ANKE_OPPRETTET, dobbeltsjekk DVH
     }
 }

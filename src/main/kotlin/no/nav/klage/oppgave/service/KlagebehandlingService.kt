@@ -4,6 +4,7 @@ import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.CompletedKlagebehandling
+import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
@@ -52,11 +53,20 @@ class KlagebehandlingService(
 
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
         behandlingId = this.id,
-        ytelse = this.ytelse,
-        utfall = this.currentDelbehandling().utfall!!,
+        ytelseId = this.ytelse.id,
+        utfallId = this.currentDelbehandling().utfall!!.id,
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
         sakenGjelder = behandlingMapper.getSakenGjelderView(this.sakenGjelder),
         klager = behandlingMapper.getKlagerView(this.klager),
+        prosessfullmektig = this.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+        tilknyttedeDokumenter = this.saksdokumenter.map {
+            TilknyttetDokument(
+                journalpostId = it.journalpostId,
+                dokumentInfoId = it.dokumentInfoId
+            )
+        },
+        sakFagsakId = this.sakFagsakId,
+        sakFagsystem = this.sakFagsystem
     )
 
     fun findMuligAnkeByPartId(

@@ -1,0 +1,2 @@
+ALTER TABLE klage.mottak
+    ADD COLUMN sent_from TEXT DEFAULT 'FAGSYSTEM' NOT NULL;

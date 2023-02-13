@@ -12,7 +12,6 @@ data class BehandlingEvent(
     val detaljer: BehandlingDetaljer,
 )
 
-//TODO: Vurder å renske ut ANKEBEHANDLING_OPPRETTET
 enum class BehandlingEventType {
     KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_OPPRETTET, ANKEBEHANDLING_AVSLUTTET, ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET
 }
