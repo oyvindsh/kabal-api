@@ -107,7 +107,7 @@ class AnkeITrygderettenbehandlingService(
             eventId = UUID.randomUUID(),
             kildeReferanse = ankeITrygderettenbehandling.kildeReferanse,
             kilde = ankeITrygderettenbehandling.sakFagsystem.navn,
-            kabalReferanse = ankeITrygderettenbehandling.currentDelbehandling().id.toString(),
+            kabalReferanse = ankeITrygderettenbehandling.id.toString(),
             type = BehandlingEventType.ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET,
             detaljer = BehandlingDetaljer(
                 ankeITrygderettenbehandlingOpprettet =

@@ -95,7 +95,7 @@ class BehandlingAvslutningService(
                 eventId = UUID.randomUUID(),
                 kildeReferanse = behandling.kildeReferanse,
                 kilde = behandling.sakFagsystem.navn,
-                kabalReferanse = behandling.currentDelbehandling().id.toString(),
+                kabalReferanse = behandling.id.toString(),
                 type = when (behandling.type) {
                     Type.KLAGE -> KLAGEBEHANDLING_AVSLUTTET
                     Type.ANKE -> ANKEBEHANDLING_AVSLUTTET

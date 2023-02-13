@@ -71,10 +71,12 @@ class MottakService(
         secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlage: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
 
-        applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
-
-        //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlageAnke(oversendtKlage.kilde, oversendtKlage.ytelse, oversendtKlage.type)
+        publishEventAndUpdateMetrics(
+            mottak = mottak,
+            kilde = oversendtKlage.kilde.name,
+            ytelse = oversendtKlage.ytelse.navn,
+            type = oversendtKlage.type.navn,
+        )
     }
 
     @Transactional
@@ -86,13 +88,11 @@ class MottakService(
         secureLogger.debug("Har lagret følgende mottak basert på en oversendtKlageAnke: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
 
-        applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
-
-        //TODO: Move to outside of transaction to make sure it went well
-        meterRegistry.incrementMottattKlageAnke(
-            oversendtKlageAnke.kilde,
-            oversendtKlageAnke.ytelse,
-            oversendtKlageAnke.type
+        publishEventAndUpdateMetrics(
+            mottak = mottak,
+            kilde = oversendtKlageAnke.kilde.name,
+            ytelse = oversendtKlageAnke.ytelse.navn,
+            type = oversendtKlageAnke.type.navn,
         )
     }
 
@@ -106,12 +106,27 @@ class MottakService(
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
 
         meterRegistry.incrementMottattKlageAnke(
-            oversendtKlageAnke.kilde,
-            oversendtKlageAnke.ytelse,
-            oversendtKlageAnke.type
+            oversendtKlageAnke.kilde.name,
+            oversendtKlageAnke.ytelse.navn,
+            oversendtKlageAnke.type.navn
         )
 
         return createBehandlingFromMottakEventListener.createBehandling(MottakLagretEvent(mottak))
+    }
+
+    private fun publishEventAndUpdateMetrics(
+        mottak: Mottak,
+        kilde: String,
+        ytelse: String,
+        type: String
+    ) {
+        applicationEventPublisher.publishEvent(MottakLagretEvent(mottak))
+
+        meterRegistry.incrementMottattKlageAnke(
+            kildesystem = kilde,
+            ytelse = ytelse,
+            type = type
+        )
     }
 
     private fun validateAndSaveMottak(oversendtKlageAnke: OversendtKlageAnkeV3): Mottak {
@@ -169,6 +184,13 @@ class MottakService(
         validateAnkeCreationBasedOnKlagebehandling(klagebehandling, klagebehandlingId)
 
         val mottak = mottakRepository.save(klagebehandling.toAnkeMottak(input))
+
+        publishEventAndUpdateMetrics(
+            mottak = mottak,
+            kilde = mottak.sakFagsystem.navn,
+            ytelse = mottak.ytelse.navn,
+            type = mottak.type.navn,
+        )
 
         logger.debug(
             "Har lagret mottak {}, basert på innsendt klagebehandlingId: {} fra Kabin",
