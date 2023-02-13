@@ -53,8 +53,8 @@ class KlagebehandlingService(
 
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
         behandlingId = this.id,
-        ytelse = this.ytelse,
-        utfall = this.currentDelbehandling().utfall!!,
+        ytelseId = this.ytelse.id,
+        utfallId = this.currentDelbehandling().utfall!!.id,
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
         sakenGjelder = behandlingMapper.getSakenGjelderView(this.sakenGjelder),
         klager = behandlingMapper.getKlagerView(this.klager),
