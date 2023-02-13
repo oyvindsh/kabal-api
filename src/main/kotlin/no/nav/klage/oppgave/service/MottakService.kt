@@ -383,8 +383,8 @@ class MottakService(
         val prosessfullmektig = if (input.prosessfullmektig != null) {
             Prosessfullmektig(
                 partId = PartId(
-                    type = PartIdType.of(input.prosessfullmektig.id.type.name),
-                    value = input.prosessfullmektig.id.verdi
+                    type = PartIdType.of(input.prosessfullmektig.type.name),
+                    value = input.prosessfullmektig.value
                 ),
                 skalPartenMottaKopi = true
             )
@@ -395,8 +395,8 @@ class MottakService(
         val klager = if (input.klager != null) {
             Klager(
                 partId = PartId(
-                    type = PartIdType.of(input.klager.id.type.name),
-                    value = input.klager.id.verdi
+                    type = PartIdType.of(input.klager.type.name),
+                    value = input.klager.value
                 ),
                 prosessfullmektig = prosessfullmektig
             )
