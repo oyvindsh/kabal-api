@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -49,6 +50,18 @@ class KlagebehandlingService(
         behandlingService.checkLeseTilgang(partIdValue)
         return klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(partIdValue)
             .map { it.toCompletedKlagebehandling() }
+    }
+
+    fun findCompletedKlagebehandlingById(
+        klagebehandlingId: UUID
+    ): CompletedKlagebehandling {
+        val behandling = klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId)
+        if (behandling != null) {
+            behandlingService.checkLeseTilgang(behandling)
+            return behandling.toCompletedKlagebehandling()
+        } else {
+            throw BehandlingNotFoundException("Completed klagebehandling with id $klagebehandlingId not found")
+        }
     }
 
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
