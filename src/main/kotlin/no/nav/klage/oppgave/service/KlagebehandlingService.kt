@@ -65,21 +65,22 @@ class KlagebehandlingService(
     }
 
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
-        behandlingId = this.id,
-        ytelseId = this.ytelse.id,
-        utfallId = this.currentDelbehandling().utfall!!.id,
+        behandlingId = id,
+        ytelseId = ytelse.id,
+        utfallId = currentDelbehandling().utfall!!.id,
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
-        sakenGjelder = behandlingMapper.getSakenGjelderView(this.sakenGjelder),
-        klager = behandlingMapper.getKlagerView(this.klager),
-        prosessfullmektig = this.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
-        tilknyttedeDokumenter = this.saksdokumenter.map {
+        sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
+        klager = behandlingMapper.getKlagerView(klager),
+        prosessfullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+        tilknyttedeDokumenter = saksdokumenter.map {
             TilknyttetDokument(
                 journalpostId = it.journalpostId,
                 dokumentInfoId = it.dokumentInfoId
             )
         },
-        sakFagsakId = this.sakFagsakId,
-        sakFagsystem = this.sakFagsystem
+        sakFagsakId = sakFagsakId,
+        sakFagsystem = sakFagsystem,
+        klageBehandlendeEnhet = tildeling!!.enhet!!
     )
 
     fun findMuligAnkeByPartId(
