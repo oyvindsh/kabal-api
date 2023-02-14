@@ -41,6 +41,19 @@ class KabinApiController(
         return klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = input.idnummer)
     }
 
+    @GetMapping("/completedklagebehandlinger/{klagebehandlingId}")
+    fun getCompletedKlagebehandling(
+        @PathVariable klagebehandlingId: UUID
+    ): CompletedKlagebehandling {
+        logMethodDetails(
+            methodName = ::getCompletedKlagebehandling.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+
+        return klagebehandlingService.findCompletedKlagebehandlingById(klagebehandlingId)
+    }
+
     @PostMapping("/createanke")
     fun createAnke(
         @RequestBody input: CreateAnkeBasedOnKabinInput

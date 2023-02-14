@@ -521,7 +521,7 @@ class BehandlingService(
             .also { if (!systemUserContext) checkLeseTilgang(it) }
             .also { if (!systemUserContext && !ignoreCheckSkrivetilgang) checkSkrivetilgang(it) }
 
-    private fun checkLeseTilgang(behandling: Behandling) {
+    fun checkLeseTilgang(behandling: Behandling) {
         if (behandling.sakenGjelder.erPerson()) {
             checkLeseTilgang(behandling.sakenGjelder.partId.value)
         }

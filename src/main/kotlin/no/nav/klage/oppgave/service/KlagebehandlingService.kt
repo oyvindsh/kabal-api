@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -51,22 +52,35 @@ class KlagebehandlingService(
             .map { it.toCompletedKlagebehandling() }
     }
 
+    fun findCompletedKlagebehandlingById(
+        klagebehandlingId: UUID
+    ): CompletedKlagebehandling {
+        val behandling = klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId)
+        if (behandling != null) {
+            behandlingService.checkLeseTilgang(behandling)
+            return behandling.toCompletedKlagebehandling()
+        } else {
+            throw BehandlingNotFoundException("Completed klagebehandling with id $klagebehandlingId not found")
+        }
+    }
+
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
-        behandlingId = this.id,
-        ytelseId = this.ytelse.id,
-        utfallId = this.currentDelbehandling().utfall!!.id,
+        behandlingId = id,
+        ytelseId = ytelse.id,
+        utfallId = currentDelbehandling().utfall!!.id,
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
-        sakenGjelder = behandlingMapper.getSakenGjelderView(this.sakenGjelder),
-        klager = behandlingMapper.getKlagerView(this.klager),
-        prosessfullmektig = this.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
-        tilknyttedeDokumenter = this.saksdokumenter.map {
+        sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
+        klager = behandlingMapper.getKlagerView(klager),
+        prosessfullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+        tilknyttedeDokumenter = saksdokumenter.map {
             TilknyttetDokument(
                 journalpostId = it.journalpostId,
                 dokumentInfoId = it.dokumentInfoId
             )
         },
-        sakFagsakId = this.sakFagsakId,
-        sakFagsystem = this.sakFagsystem
+        sakFagsakId = sakFagsakId,
+        sakFagsystem = sakFagsystem,
+        klageBehandlendeEnhet = tildeling!!.enhet!!
     )
 
     fun findMuligAnkeByPartId(
