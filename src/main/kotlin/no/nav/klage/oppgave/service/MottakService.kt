@@ -427,7 +427,7 @@ class MottakService(
             kildeReferanse = kildeReferanse,
             dvhReferanse = dvhReferanse,
             //Dette er søkehjemler
-            hjemler = mottakRepository.getReferenceById(id).hjemler,
+            hjemler = hjemler.map { MottakHjemmel(hjemmelId = it.id) }.toSet(),
             forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
             forrigeBehandlendeEnhet = tildeling!!.enhet!!,
             mottakDokument = innsendtDokument,
