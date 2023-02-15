@@ -380,11 +380,11 @@ class MottakService(
     }
 
     private fun Klagebehandling.toAnkeMottak(input: CreateAnkeBasedOnKabinInput): Mottak {
-        val prosessfullmektig = if (input.prosessfullmektig != null) {
+        val prosessfullmektig = if (input.fullmektig != null) {
             Prosessfullmektig(
                 partId = PartId(
-                    type = PartIdType.of(input.prosessfullmektig.type.name),
-                    value = input.prosessfullmektig.value
+                    type = PartIdType.of(input.fullmektig.type.name),
+                    value = input.fullmektig.value
                 ),
                 skalPartenMottaKopi = true
             )

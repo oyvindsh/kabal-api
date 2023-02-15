@@ -71,7 +71,7 @@ class KlagebehandlingService(
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
         sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
         klager = behandlingMapper.getKlagerView(klager),
-        prosessfullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+        fullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
         tilknyttedeDokumenter = saksdokumenter.map {
             TilknyttetDokument(
                 journalpostId = it.journalpostId,
