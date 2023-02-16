@@ -12,6 +12,7 @@ import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
 import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -35,6 +36,7 @@ class KlagebehandlingService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     var muligAnkeUtfall = setOf(
@@ -50,12 +52,17 @@ class KlagebehandlingService(
     ): List<CompletedKlagebehandling> {
         return try {
             behandlingService.checkLeseTilgang(partIdValue)
-            klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(
-                partIdValue
-            ).map { it.toCompletedKlagebehandling() }
+            val results =
+                klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(
+                    partIdValue
+                )
+            results.map { it.toCompletedKlagebehandling() }
         } catch (pdlee: PDLErrorException) {
             logger.warn("Returning empty list of CompletedKlagebehandling b/c pdl gave error response. Check secure logs")
             emptyList()
+        } catch (e: Exception) {
+            secureLogger.warn("Unknown exception thrown when fetching CompletedKlagebehandling.", e)
+            throw e
         }
     }
 
