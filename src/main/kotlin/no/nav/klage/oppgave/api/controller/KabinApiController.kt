@@ -38,9 +38,15 @@ class KabinApiController(
             logger = logger
         )
 
-        val results =
-            klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = input.idnummer)
-        return results
+        try {
+            val results =
+                klagebehandlingService.findCompletedKlagebehandlingerByPartIdValue(partIdValue = input.idnummer)
+            logger.debug("results for completedklagebehandlinger: {}", results)
+            return results
+        } catch (e: Exception) {
+            logger.error("could not get completedklagebehandlinger", e)
+            throw e
+        }
     }
 
     @GetMapping("/completedklagebehandlinger/{klagebehandlingId}")
