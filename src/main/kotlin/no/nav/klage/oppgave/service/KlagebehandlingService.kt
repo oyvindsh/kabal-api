@@ -62,9 +62,6 @@ class KlagebehandlingService(
         } catch (pdlee: PDLErrorException) {
             logger.warn("Returning empty list of CompletedKlagebehandling b/c pdl gave error response. Check secure logs")
             emptyList()
-        } catch (e: Exception) {
-            secureLogger.warn("Unknown exception thrown when fetching CompletedKlagebehandling.", e)
-            throw e
         }
     }
 
