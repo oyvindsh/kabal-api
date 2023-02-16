@@ -207,7 +207,6 @@ class MottakService(
             throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
         }
 
-
         val existingAnke = ankebehandlingRepository.findByKlagebehandlingId(klagebehandlingId)
 
         if (existingAnke != null) {
