@@ -16,6 +16,7 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.*
@@ -47,6 +48,7 @@ class KlagebehandlingService(
         Utfall.AVVIST
     )
 
+    @Transactional(propagation = Propagation.NEVER)
     fun findCompletedKlagebehandlingerByPartIdValue(
         partIdValue: String
     ): List<CompletedKlagebehandling> {
