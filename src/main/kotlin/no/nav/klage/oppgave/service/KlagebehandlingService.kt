@@ -9,6 +9,7 @@ import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
+import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.beans.factory.annotation.Value
@@ -47,9 +48,15 @@ class KlagebehandlingService(
     fun findCompletedKlagebehandlingerByPartIdValue(
         partIdValue: String
     ): List<CompletedKlagebehandling> {
-        behandlingService.checkLeseTilgang(partIdValue)
-        return klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(partIdValue)
-            .map { it.toCompletedKlagebehandling() }
+        return try {
+            behandlingService.checkLeseTilgang(partIdValue)
+            klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(
+                partIdValue
+            ).map { it.toCompletedKlagebehandling() }
+        } catch (pdlee: PDLErrorException) {
+            logger.warn("Returning empty list of CompletedKlagebehandling b/c pdl gave error response. Check secure logs")
+            emptyList()
+        }
     }
 
     fun findCompletedKlagebehandlingById(

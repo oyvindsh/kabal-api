@@ -63,3 +63,8 @@ class BehandlingManglerTildelingException(msg: String) : RuntimeException(msg)
 class EnhetNotFoundForSaksbehandlerException(msg: String) : RuntimeException(msg)
 
 class IllegalOperation(msg: String) : RuntimeException(msg)
+
+/**
+ * When PDL-api works, but responds with an error for some reason
+ */
+class PDLErrorException(msg: String) : RuntimeException(msg)
