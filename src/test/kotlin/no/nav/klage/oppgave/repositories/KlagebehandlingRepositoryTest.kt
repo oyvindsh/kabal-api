@@ -38,8 +38,10 @@ class KlagebehandlingRepositoryTest {
     lateinit var klagebehandlingRepository: KlagebehandlingRepository
 
     @Autowired
-    lateinit var mottakRepository: MottakRepository
+    lateinit var ankebehandlingRepository: AnkebehandlingRepository
 
+    @Autowired
+    lateinit var mottakRepository: MottakRepository
 
     @Test
     fun `persist klage works`() {
@@ -204,6 +206,116 @@ class KlagebehandlingRepositoryTest {
         val foundModifiedKlage = klagebehandlingRepository.findById(klage.id).get()
         assertThat(foundModifiedKlage.saksdokumenter).hasSize(1)
         assertThat(foundModifiedKlage.saksdokumenter.first().journalpostId).isEqualTo("REF2")
+    }
+
+    @Test
+    fun `get ankemuligheter returns only one with no existing anke`() {
+        val mottak1 = Mottak(
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            kildeReferanse = "1234234",
+            sakMottattKaDato = LocalDateTime.now(),
+            sakFagsystem = Fagsystem.K9,
+            forrigeBehandlendeEnhet = "0101",
+            brukersHenvendelseMottattNavDato = LocalDate.now()
+        )
+
+        val mottak2 = Mottak(
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            kildeReferanse = "1234234",
+            sakMottattKaDato = LocalDateTime.now(),
+            sakFagsystem = Fagsystem.K9,
+            forrigeBehandlendeEnhet = "0101",
+            brukersHenvendelseMottattNavDato = LocalDate.now()
+        )
+
+        mottakRepository.save(mottak1)
+        mottakRepository.save(mottak2)
+
+        val klageWithNoAnke = Klagebehandling(
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            frist = LocalDate.now(),
+            hjemler = mutableSetOf(
+                Hjemmel.FTRL_8_7
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDateTime.now(),
+            sakFagsystem = Fagsystem.K9,
+            kildeReferanse = "abc",
+            mottakId = mottak1.id,
+            avsenderEnhetFoersteinstans = "0101",
+            mottattVedtaksinstans = LocalDate.now(),
+            delbehandlinger = setOf(Delbehandling(
+                avsluttet = LocalDateTime.now()
+            )),
+            kakaKvalitetsvurderingVersion = 2,
+        )
+
+        val klageWithAnke = Klagebehandling(
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            frist = LocalDate.now(),
+            hjemler = mutableSetOf(
+                Hjemmel.FTRL_8_7
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDateTime.now(),
+            sakFagsystem = Fagsystem.K9,
+            kildeReferanse = "abc",
+            mottakId = mottak2.id,
+            avsenderEnhetFoersteinstans = "0101",
+            mottattVedtaksinstans = LocalDate.now(),
+            delbehandlinger = setOf(Delbehandling(
+                avsluttet = LocalDateTime.now()
+            )),
+            kakaKvalitetsvurderingVersion = 2,
+        )
+
+        klagebehandlingRepository.save(klageWithNoAnke)
+        klagebehandlingRepository.save(klageWithAnke)
+
+        val ankebehandling = Ankebehandling(
+            klageBehandlendeEnhet = "",
+            klagebehandlingId = klageWithAnke.id,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            kildeReferanse = "abc",
+            dvhReferanse = "abc",
+            sakFagsystem = Fagsystem.K9,
+            mottattKlageinstans = LocalDateTime.now(),
+            kakaKvalitetsvurderingVersion = 2,
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            delbehandlinger = setOf(),
+        )
+
+        ankebehandlingRepository.save(ankebehandling)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        assertThat(klagebehandlingRepository.getAnkemuligheter("23452354")).containsExactly(klageWithNoAnke)
     }
 
 }

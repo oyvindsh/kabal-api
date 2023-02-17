@@ -10,15 +10,13 @@ import java.util.*
 
 
 @Repository
-interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID> {
+interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID>, KlagebehandlingRepositoryCustom {
 
     fun findByMottakId(mottakId: UUID): Klagebehandling?
 
     fun findByIdAndDelbehandlingerAvsluttetIsNotNull(id: UUID): Klagebehandling?
 
     fun findByDelbehandlingerAvsluttetIsNotNull(): List<Klagebehandling>
-
-    fun findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(partIdValue: String): List<Klagebehandling>
 
     fun findByKildeReferanseAndYtelse(kildeReferanse: String, ytelse: Ytelse): Klagebehandling?
 

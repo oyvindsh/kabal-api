@@ -55,9 +55,7 @@ class KlagebehandlingService(
         return try {
             behandlingService.checkLeseTilgang(partIdValue)
             val results =
-                klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(
-                    partIdValue
-                )
+                klagebehandlingRepository.getAnkemuligheter(partIdValue)
             results.map { it.toCompletedKlagebehandling() }
         } catch (pdlee: PDLErrorException) {
             logger.warn("Returning empty list of CompletedKlagebehandling b/c pdl gave error response. Check secure logs")
