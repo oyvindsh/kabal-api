@@ -48,7 +48,7 @@ class KlagebehandlingService(
         partIdValue: String
     ): List<CompletedKlagebehandling> {
         behandlingService.checkLeseTilgang(partIdValue)
-        return klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndSakenGjelderPartIdValue(partIdValue)
+        return klagebehandlingRepository.getAnkemuligheter(partIdValue)
             .map { it.toCompletedKlagebehandling() }
     }
 
