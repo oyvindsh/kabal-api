@@ -4,6 +4,7 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -42,7 +43,7 @@ class FullmektigSearchService(
                         secureLogger.warn("Saksbehandler does not have access to view person")
                         BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
                     }
-                } catch (e: Exception) {
+                } catch (pdlee: PDLErrorException) {
                     BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
                 }
             }

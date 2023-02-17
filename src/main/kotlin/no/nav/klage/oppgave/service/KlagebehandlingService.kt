@@ -9,11 +9,14 @@ import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
+import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.*
@@ -34,6 +37,7 @@ class KlagebehandlingService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
     var muligAnkeUtfall = setOf(
@@ -44,12 +48,19 @@ class KlagebehandlingService(
         Utfall.AVVIST
     )
 
+    @Transactional(propagation = Propagation.NEVER)
     fun findCompletedKlagebehandlingerByPartIdValue(
         partIdValue: String
     ): List<CompletedKlagebehandling> {
-        behandlingService.checkLeseTilgang(partIdValue)
-        return klagebehandlingRepository.getAnkemuligheter(partIdValue)
-            .map { it.toCompletedKlagebehandling() }
+        return try {
+            behandlingService.checkLeseTilgang(partIdValue)
+            val results =
+                klagebehandlingRepository.getAnkemuligheter(partIdValue)
+            results.map { it.toCompletedKlagebehandling() }
+        } catch (pdlee: PDLErrorException) {
+            logger.warn("Returning empty list of CompletedKlagebehandling b/c pdl gave error response. Check secure logs")
+            emptyList()
+        }
     }
 
     fun findCompletedKlagebehandlingById(

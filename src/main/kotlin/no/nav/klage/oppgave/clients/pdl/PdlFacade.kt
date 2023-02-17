@@ -4,6 +4,7 @@ import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonMapper
 import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonResponse
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlClient
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlPerson
+import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
@@ -26,7 +27,7 @@ class PdlFacade(
             return personCacheService.getPerson(fnr)
         }
         val hentPersonResponse: HentPersonResponse = pdlClient.getPersonInfo(fnr)
-        val pdlPerson = hentPersonResponse.getPersonOrLogErrors(fnr)
+        val pdlPerson = hentPersonResponse.getPersonOrThrowError(fnr)
         return hentPersonMapper.mapToPerson(fnr, pdlPerson).also { personCacheService.updatePersonCache(it) }
     }
 
@@ -39,12 +40,12 @@ class PdlFacade(
         return true
     }
 
-    private fun HentPersonResponse.getPersonOrLogErrors(fnr: String): PdlPerson =
+    private fun HentPersonResponse.getPersonOrThrowError(fnr: String): PdlPerson =
         if (this.errors.isNullOrEmpty() && this.data != null && this.data.hentPerson != null) {
             this.data.hentPerson
         } else {
             logger.warn("Errors returned from PDL or person not found. See securelogs for details.")
             secureLogger.warn("Errors returned for hentPerson($fnr) from PDL: ${this.errors}")
-            throw RuntimeException("Klarte ikke å hente person fra PDL")
+            throw PDLErrorException("Klarte ikke å hente person fra PDL")
         }
 }
