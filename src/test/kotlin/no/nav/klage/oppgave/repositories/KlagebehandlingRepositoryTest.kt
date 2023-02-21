@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
-import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.PartIdType
-import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.Ytelse
+import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
@@ -232,8 +229,20 @@ class KlagebehandlingRepositoryTest {
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
 
+        val mottak3 = Mottak(
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            kildeReferanse = "1234234",
+            sakMottattKaDato = LocalDateTime.now(),
+            sakFagsystem = Fagsystem.K9,
+            forrigeBehandlendeEnhet = "0101",
+            brukersHenvendelseMottattNavDato = LocalDate.now()
+        )
+
         mottakRepository.save(mottak1)
         mottakRepository.save(mottak2)
+        mottakRepository.save(mottak3)
 
         val klageWithNoAnke = Klagebehandling(
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
@@ -256,7 +265,35 @@ class KlagebehandlingRepositoryTest {
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling(
-                avsluttet = LocalDateTime.now()
+                avsluttet = LocalDateTime.now(),
+                utfall = Utfall.STADFESTELSE,
+            )),
+            kakaKvalitetsvurderingVersion = 2,
+        )
+
+        val klageWithNoAnkeButNoAnkemulighet = Klagebehandling(
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            frist = LocalDate.now(),
+            hjemler = mutableSetOf(
+                Hjemmel.FTRL_8_7
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDateTime.now(),
+            sakFagsystem = Fagsystem.K9,
+            kildeReferanse = "abc",
+            mottakId = mottak1.id,
+            avsenderEnhetFoersteinstans = "0101",
+            mottattVedtaksinstans = LocalDate.now(),
+            delbehandlinger = setOf(Delbehandling(
+                avsluttet = LocalDateTime.now(),
+                utfall = Utfall.RETUR,
             )),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -282,12 +319,14 @@ class KlagebehandlingRepositoryTest {
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling(
-                avsluttet = LocalDateTime.now()
+                avsluttet = LocalDateTime.now(),
+                utfall = Utfall.STADFESTELSE,
             )),
             kakaKvalitetsvurderingVersion = 2,
         )
 
         klagebehandlingRepository.save(klageWithNoAnke)
+        klagebehandlingRepository.save(klageWithNoAnkeButNoAnkemulighet)
         klagebehandlingRepository.save(klageWithAnke)
 
         val ankebehandling = Ankebehandling(
