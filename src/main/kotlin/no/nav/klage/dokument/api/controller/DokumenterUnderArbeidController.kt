@@ -171,7 +171,7 @@ class DokumentUnderArbeidController(
         return dokumentUnderArbeidService.validateSmartDokument(dokumentId)
     }
 
-    //Old event stuff. Clients should read from EventController instead, and this can be deleted.
+    //TODO: Old event stuff. Clients should read from EventController instead, and this can be deleted.
     @GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun documentEvents(
         @PathVariable("behandlingId") behandlingId: String,
