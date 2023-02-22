@@ -5,6 +5,9 @@ import org.springframework.http.MediaType
 data class OpplastetMellomlagretDokument(
     override val title: String,
     override val content: ByteArray,
+    /** Not used for anything at the moment when uploading documents.
+     * Only used when fetching them.
+     * */
     override val contentType: MediaType
 ) : MellomlagretDokument {
     override fun equals(other: Any?): Boolean {

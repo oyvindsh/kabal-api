@@ -68,3 +68,5 @@ class IllegalOperation(msg: String) : RuntimeException(msg)
  * When PDL-api works, but responds with an error for some reason
  */
 class PDLErrorException(msg: String) : RuntimeException(msg)
+
+class AttachmentCouldNotBeConvertedException(override val message: String = "FILE_COULD_NOT_BE_CONVERTED") : RuntimeException()
