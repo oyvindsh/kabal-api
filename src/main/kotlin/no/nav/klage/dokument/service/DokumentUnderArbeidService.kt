@@ -13,7 +13,6 @@ import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
-import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
@@ -23,7 +22,6 @@ import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -162,10 +160,6 @@ class DokumentUnderArbeidService(
 
         if (dokumentUnderArbeid.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
-        }
-
-        if (dokumentUnderArbeid.smartEditorId != null) {
-            throw DokumentValidationException("Kan ikke endre dokumenttype på et smartdokument")
         }
 
         val previousValue = dokumentUnderArbeid.dokumentType
@@ -308,7 +302,6 @@ class DokumentUnderArbeidService(
         val documentValidationResults = mutableListOf<DocumentValidationResponse>()
 
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
-
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         if (hovedDokument.smartEditorId != null) {
             documentValidationResults += validateSingleDocument(hovedDokument)
@@ -365,33 +358,8 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
         }
 
-        //TODO add support for anke
-        if (behandling is Klagebehandling &&
-            hovedDokument.dokumentType in listOf(DokumentType.VEDTAK, DokumentType.BESLUTNING) &&
-            behandling.currentDelbehandling().utfall in listOf(Utfall.TRUKKET, Utfall.RETUR)
-        ) {
-            throw DokumentValidationException("Ugyldig kombinasjon av dokumenttype og utfall")
-        }
-
         if (hovedDokument.parentId != null) {
             throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
-        }
-
-        //TODO add support for anker also.
-        //override in some cases
-        if (behandling is Klagebehandling && hovedDokument.smartEditorId != null) {
-            hovedDokument.dokumentType = when {
-                hovedDokument.dokumentType == DokumentType.VEDTAK && behandling.currentDelbehandling().utfall == Utfall.OPPHEVET -> DokumentType.BESLUTNING
-                hovedDokument.dokumentType == DokumentType.BESLUTNING && behandling.currentDelbehandling().utfall in listOf(
-                    Utfall.STADFESTELSE,
-                    Utfall.DELVIS_MEDHOLD,
-                    Utfall.MEDHOLD,
-                    Utfall.AVVIST,
-                    Utfall.UGUNST
-                ) -> DokumentType.VEDTAK
-                hovedDokument.dokumentType == DokumentType.BREV && behandling.currentDelbehandling().utfall == Utfall.RETUR -> DokumentType.BESLUTNING
-                else -> hovedDokument.dokumentType
-            }
         }
 
         val now = LocalDateTime.now()
