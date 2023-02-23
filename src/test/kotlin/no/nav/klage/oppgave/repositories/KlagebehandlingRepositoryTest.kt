@@ -50,6 +50,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -72,6 +73,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",
@@ -98,6 +100,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -121,6 +124,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
             mottattVedtaksinstans = LocalDate.now(),
@@ -154,6 +158,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -177,6 +182,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
             mottattVedtaksinstans = LocalDate.now(),
@@ -214,6 +220,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -225,6 +232,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -236,6 +244,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -260,14 +269,17 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak1.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling(
-                avsluttet = LocalDateTime.now(),
-                utfall = Utfall.STADFESTELSE,
-            )),
+            delbehandlinger = setOf(
+                Delbehandling(
+                    avsluttet = LocalDateTime.now(),
+                    utfall = Utfall.STADFESTELSE,
+                )
+            ),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -287,14 +299,17 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak1.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling(
-                avsluttet = LocalDateTime.now(),
-                utfall = Utfall.RETUR,
-            )),
+            delbehandlinger = setOf(
+                Delbehandling(
+                    avsluttet = LocalDateTime.now(),
+                    utfall = Utfall.RETUR,
+                )
+            ),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -314,14 +329,17 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak2.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling(
-                avsluttet = LocalDateTime.now(),
-                utfall = Utfall.STADFESTELSE,
-            )),
+            delbehandlinger = setOf(
+                Delbehandling(
+                    avsluttet = LocalDateTime.now(),
+                    utfall = Utfall.STADFESTELSE,
+                )
+            ),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -342,6 +360,7 @@ class KlagebehandlingRepositoryTest {
             kildeReferanse = "abc",
             dvhReferanse = "abc",
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             mottattKlageinstans = LocalDateTime.now(),
             kakaKvalitetsvurderingVersion = 2,
             created = LocalDateTime.now(),

@@ -13,7 +13,7 @@ data class CompletedKlagebehandling(
     val klager: BehandlingDetaljerView.KlagerView,
     val fullmektig: BehandlingDetaljerView.ProsessfullmektigView?,
     val tilknyttedeDokumenter: List<TilknyttetDokument>,
-    val sakFagsakId: String?,
+    val sakFagsakId: String,
     val sakFagsystem: Fagsystem,
     val klageBehandlendeEnhet: String
 )

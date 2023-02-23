@@ -224,8 +224,8 @@ data class BehandlingSkjemaV2(
     val ytelse: Kode,
     val type: Kode,
     val kildeReferanse: String,
-    val sakFagsystem: Kode?,
-    val sakFagsakId: String?,
+    val sakFagsystem: Kode,
+    val sakFagsakId: String,
     val innsendtDato: LocalDate? = null,
     val mottattFoersteinstansDato: LocalDate? = null,
     //Nytt navn på avsenderSaksbehandlerFoersteinstans, legger til null som default. Brukes kun til klagebehandling.

@@ -145,6 +145,7 @@ internal class BehandlingAvslutningServiceTest {
         kildeReferanse = UUID.randomUUID().toString(),
         sakMottattKaDato = LocalDateTime.now(),
         sakFagsystem = Fagsystem.K9,
+        sakFagsakId = "123",
         forrigeBehandlendeEnhet = "0101",
         brukersHenvendelseMottattNavDato = LocalDate.now()
     )
@@ -166,6 +167,7 @@ internal class BehandlingAvslutningServiceTest {
         modified = LocalDateTime.now(),
         mottattKlageinstans = LocalDateTime.now(),
         sakFagsystem = Fagsystem.K9,
+        sakFagsakId = "123",
         kildeReferanse = "abc",
         mottakId = mottak.id,
         delbehandlinger = setOf(

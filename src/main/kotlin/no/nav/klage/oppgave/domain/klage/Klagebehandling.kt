@@ -43,7 +43,7 @@ class Klagebehandling(
     kildeReferanse: String,
     dvhReferanse: String? = null,
     sakFagsystem: Fagsystem,
-    sakFagsakId: String? = null,
+    sakFagsakId: String,
     //Settes automatisk i klage, må kunne justeres i anke. Bør også representeres i delbehandlinger. Må gjøres entydig i anke, hører antageligvis ikke hjemme i felles klasse.
     mottattKlageinstans: LocalDateTime,
     //TODO: Trenger denne være nullable? Den blir da alltid satt i createKlagebehandlingFromMottak?

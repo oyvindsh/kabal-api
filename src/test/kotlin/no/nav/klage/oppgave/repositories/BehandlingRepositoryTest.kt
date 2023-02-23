@@ -54,6 +54,7 @@ class BehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -76,6 +77,7 @@ class BehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",
@@ -103,6 +105,7 @@ class BehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -125,6 +128,7 @@ class BehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak1.id,
             avsenderEnhetFoersteinstans = "0101",
@@ -145,6 +149,7 @@ class BehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -167,6 +172,7 @@ class BehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak2.id,
             avsenderEnhetFoersteinstans = "0101",
@@ -187,6 +193,7 @@ class BehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -209,6 +216,7 @@ class BehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak3.id,
             avsenderEnhetFoersteinstans = "0101",
@@ -225,6 +233,7 @@ class BehandlingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -247,6 +256,7 @@ class BehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak4.id,
             avsenderEnhetFoersteinstans = "0101",

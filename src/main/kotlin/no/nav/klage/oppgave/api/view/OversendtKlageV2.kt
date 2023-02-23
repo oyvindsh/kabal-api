@@ -32,7 +32,7 @@ data class OversendtKlageV2(
         description = "Fagsak brukt til journalføring. Dersom denne er tom journalfører vi på generell sak",
         required = false
     )
-    val fagsak: OversendtSak? = null,
+    val fagsak: OversendtSak,
     @Schema(
         description = "Id som er intern for kildesystemet (f.eks. K9) så vedtak fra oss knyttes riktig i kilde",
         required = true
@@ -101,7 +101,7 @@ fun OversendtKlageV2.toMottak() = Mottak(
     sakenGjelder = sakenGjelder?.toSakenGjelder(),
     innsynUrl = innsynUrl,
     sakFagsystem = kilde.mapFagsystem(),
-    sakFagsakId = fagsak?.fagsakId,
+    sakFagsakId = fagsak.fagsakId,
     kildeReferanse = kildeReferanse,
     dvhReferanse = dvhReferanse,
     hjemler = hjemler?.map { MottakHjemmel(hjemmelId = it.id) }?.toSet(),

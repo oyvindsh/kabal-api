@@ -60,7 +60,7 @@ abstract class Behandling(
     @Column(name = "frist")
     open var frist: LocalDate? = null,
     @Column(name = "sak_fagsak_id")
-    open val sakFagsakId: String? = null,
+    open val sakFagsakId: String,
     @Column(name = "sak_fagsystem")
     @Convert(converter = FagsystemConverter::class)
     open val sakFagsystem: Fagsystem,
