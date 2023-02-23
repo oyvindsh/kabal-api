@@ -72,7 +72,14 @@ class MockDataController(
                 ),
                 fagsak = OversendtSak(
                     fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
-                    fagsystem = journalpost.sak?.fagsaksystem?.let { KildeFagsystem.valueOf(it) } ?: KildeFagsystem.AO01
+                    fagsystem = journalpost.sak?.fagsaksystem?.let {
+                        try {
+                            KildeFagsystem.valueOf(it)
+                        } catch (e: Exception) {
+                            KildeFagsystem.AO01
+                        }
+                    }
+                        ?: KildeFagsystem.AO01
                 ),
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
@@ -116,7 +123,14 @@ class MockDataController(
                 ),
                 fagsak = OversendtSak(
                     fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
-                    fagsystem = journalpost.sak?.fagsaksystem?.let { KildeFagsystem.valueOf(it) } ?: KildeFagsystem.AO01
+                    fagsystem = journalpost.sak?.fagsaksystem?.let {
+                        try {
+                            KildeFagsystem.valueOf(it)
+                        } catch (e: Exception) {
+                            KildeFagsystem.AO01
+                        }
+                    }
+                        ?: KildeFagsystem.AO01
                 ),
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
@@ -207,7 +221,13 @@ class MockDataController(
                         klager = klager,
                         fagsak = OversendtSak(
                             fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
-                            fagsystem = journalpost.sak?.fagsaksystem?.let { KildeFagsystem.valueOf(it) }
+                            fagsystem = journalpost.sak?.fagsaksystem?.let {
+                                try {
+                                    KildeFagsystem.valueOf(it)
+                                } catch (e: Exception) {
+                                    KildeFagsystem.AO01
+                                }
+                            }
                                 ?: KildeFagsystem.AO01
                         ),
                         sakenGjelder = sakenGjelder,
