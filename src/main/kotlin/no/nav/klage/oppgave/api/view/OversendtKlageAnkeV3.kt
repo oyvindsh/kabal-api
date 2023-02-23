@@ -30,10 +30,10 @@ data class OversendtKlageAnkeV3(
     )
     val sakenGjelder: OversendtSakenGjelder? = null,
     @Schema(
-        description = "Fagsak brukt til journalføring. Dersom denne er tom journalfører vi på generell sak",
+        description = "Fagsak brukt til journalføring.",
         required = false
     )
-    val fagsak: OversendtSak? = null,
+    val fagsak: OversendtSak,
     @Schema(
         description = "Id som er intern for kildesystemet (f.eks. K9) så vedtak fra oss knyttes riktig i kilde",
         required = true
@@ -113,7 +113,7 @@ fun OversendtKlageAnkeV3.toMottak(forrigeBehandlingId: UUID? = null) = Mottak(
     sakenGjelder = sakenGjelder?.toSakenGjelder(),
     innsynUrl = innsynUrl,
     sakFagsystem = kilde.mapFagsystem(),
-    sakFagsakId = fagsak?.fagsakId,
+    sakFagsakId = fagsak.fagsakId,
     kildeReferanse = kildeReferanse,
     dvhReferanse = dvhReferanse,
     hjemler = hjemler?.map { MottakHjemmel(hjemmelId = it.id) }?.toSet(),

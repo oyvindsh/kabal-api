@@ -30,7 +30,7 @@ class Mottak(
     @Convert(converter = FagsystemConverter::class)
     val sakFagsystem: Fagsystem,
     @Column(name = "sak_fagsak_id")
-    val sakFagsakId: String? = null,
+    val sakFagsakId: String,
     @Column(name = "kilde_referanse")
     val kildeReferanse: String,
     @Column(name = "dvh_referanse")

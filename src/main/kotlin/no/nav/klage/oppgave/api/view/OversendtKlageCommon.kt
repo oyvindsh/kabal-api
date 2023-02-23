@@ -163,7 +163,7 @@ data class OversendtSak(
         required = false,
         example = "134132412"
     )
-    val fagsakId: String? = null,
+    val fagsakId: String,
     @Schema(
         required = true,
         example = "K9"

@@ -54,6 +54,7 @@ class MeldingRepositoryTest {
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -76,6 +77,7 @@ class MeldingRepositoryTest {
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
             sakFagsystem = Fagsystem.K9,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",

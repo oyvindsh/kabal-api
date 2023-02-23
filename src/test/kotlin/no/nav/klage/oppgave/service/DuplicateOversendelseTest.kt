@@ -102,7 +102,11 @@ internal class DuplicateOversendelseTest {
                 )
             ),
             kilde = KildeFagsystem.K9,
-            kildeReferanse = "abc"
+            kildeReferanse = "abc",
+            fagsak = OversendtSak(
+                fagsakId = "123",
+                fagsystem = KildeFagsystem.K9
+            )
         )
 
         mottakService.createMottakForKlageV2(oversendtKlage)

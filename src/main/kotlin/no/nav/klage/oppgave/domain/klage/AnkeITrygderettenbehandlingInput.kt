@@ -17,7 +17,7 @@ data class AnkeITrygderettenbehandlingInput(
     val kildeReferanse: String,
     val dvhReferanse: String?,
     val sakFagsystem: Fagsystem,
-    val sakFagsakId: String? = null,
+    val sakFagsakId: String,
     val sakMottattKlageinstans: LocalDateTime,
     val saksdokumenter: MutableSet<Saksdokument>,
     val innsendingsHjemler: Set<Hjemmel>?,

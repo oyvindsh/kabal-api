@@ -62,6 +62,7 @@ class KabalDocumentMapperTest {
 
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -104,6 +105,7 @@ class KabalDocumentMapperTest {
 
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -145,6 +147,7 @@ class KabalDocumentMapperTest {
 
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr2), false),
@@ -191,6 +194,7 @@ class KabalDocumentMapperTest {
 
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             klager = Klager(PartId(PartIdType.PERSON, fnr)),
             sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr2), false),
@@ -237,6 +241,7 @@ class KabalDocumentMapperTest {
 
         val klagebehandling = Klagebehandling(
             sakFagsystem = Fagsystem.AO01,
+            sakFagsakId = "123",
             kildeReferanse = "abc",
             klager = Klager(
                 PartId(PartIdType.PERSON, fnr),

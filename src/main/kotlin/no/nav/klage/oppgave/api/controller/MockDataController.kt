@@ -70,12 +70,17 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
                 ),
-                fagsak = journalpost?.sak?.let {
-                    OversendtSak(
-                        fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = KildeFagsystem.AO01
-                    )
-                },
+                fagsak = OversendtSak(
+                    fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
+                    fagsystem = journalpost.sak?.fagsaksystem?.let {
+                        try {
+                            KildeFagsystem.valueOf(it)
+                        } catch (e: Exception) {
+                            KildeFagsystem.AO01
+                        }
+                    }
+                        ?: KildeFagsystem.AO01
+                ),
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -116,12 +121,17 @@ class MockDataController(
                         skalKlagerMottaKopi = true
                     )
                 ),
-                fagsak = journalpost?.sak?.let {
-                    OversendtSak(
-                        fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = KildeFagsystem.AO01
-                    )
-                },
+                fagsak = OversendtSak(
+                    fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
+                    fagsystem = journalpost.sak?.fagsaksystem?.let {
+                        try {
+                            KildeFagsystem.valueOf(it)
+                        } catch (e: Exception) {
+                            KildeFagsystem.AO01
+                        }
+                    }
+                        ?: KildeFagsystem.AO01
+                ),
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
                 hjemler = listOf(
@@ -209,12 +219,17 @@ class MockDataController(
                         ytelse = randomYtelse,
                         type = type,
                         klager = klager,
-                        fagsak = journalpost?.sak?.let {
-                            OversendtSak(
-                                fagsakId = it.fagsakId ?: "UKJENT",
-                                fagsystem = KildeFagsystem.AO01
-                            )
-                        },
+                        fagsak = OversendtSak(
+                            fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
+                            fagsystem = journalpost.sak?.fagsaksystem?.let {
+                                try {
+                                    KildeFagsystem.valueOf(it)
+                                } catch (e: Exception) {
+                                    KildeFagsystem.AO01
+                                }
+                            }
+                                ?: KildeFagsystem.AO01
+                        ),
                         sakenGjelder = sakenGjelder,
                         kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
                         dvhReferanse = input?.dvhReferanse,
