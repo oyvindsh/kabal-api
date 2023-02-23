@@ -54,8 +54,8 @@ class Mottak(
     //Denne vil være den samme verdien som brukersHenvendelseMottattNavDato for anke, ikke for klage.
     @Column(name = "dato_sak_mottatt_klageinstans")
     val sakMottattKaDato: LocalDateTime,
-    @Column(name = "dato_frist_fra_foersteinstans")
-    val fristFraFoersteinstans: LocalDate? = null,
+    @Column(name = "dato_frist")
+    val frist: LocalDate? = null,
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
@@ -97,5 +97,7 @@ class Mottak(
         return id.hashCode()
     }
 
-    fun generateFrist(): LocalDate = sakMottattKaDato.toLocalDate() + Period.ofWeeks(12)
+    fun generateFrist(): LocalDate {
+        return frist ?: (sakMottattKaDato.toLocalDate() + Period.ofWeeks(12))
+    }
 }

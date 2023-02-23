@@ -8,6 +8,7 @@ import java.util.*
 class CreateAnkeBasedOnKabinInput(
     val klagebehandlingId: UUID,
     val mottattNav: LocalDate,
+    val fristInWeeks: Int,
     val klager: OversendtPartId?,
     val fullmektig: OversendtPartId?,
     val ankeDocumentJournalpostId: String,

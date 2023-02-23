@@ -70,7 +70,7 @@ data class OversendtKlageAnkeV3(
     val brukersHenvendelseMottattNavDato: LocalDate,
     val innsendtTilNav: LocalDate,
     @Schema(
-        description = "Kan settes dersom førsteinstans ønsker å overstyre frist. Ikke i bruk per i dag.",
+        description = "Kan settes for å overstyre frist.",
         required = false
     )
     val frist: LocalDate? = null,
@@ -126,7 +126,7 @@ fun OversendtKlageAnkeV3.toMottak(forrigeBehandlingId: UUID? = null) = Mottak(
         sakMottattKaDato != null -> sakMottattKaDato.atStartOfDay()
         else -> LocalDateTime.now()
     },
-    fristFraFoersteinstans = frist,
+    frist = frist,
     ytelse = ytelse,
     forrigeBehandlingId = forrigeBehandlingId
 )
