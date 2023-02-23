@@ -45,7 +45,8 @@ class BehandlingService(
     private val kakaApiGateway: KakaApiGateway,
     private val dokumentService: DokumentService,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
-    private val kabalInnstillingerService: KabalInnstillingerService
+    private val kabalInnstillingerService: KabalInnstillingerService,
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -249,11 +250,15 @@ class BehandlingService(
         frist: LocalDate,
         utfoerendeSaksbehandlerIdent: String,
     ): LocalDateTime {
+        if (!innloggetSaksbehandlerService.isKabalOppgavestyringAlleEnheter()) {
+            throw MissingTilgangException("$utfoerendeSaksbehandlerIdent does not have the right to modify frist")
+        }
+
         val behandling = getBehandlingForUpdate(
-            behandlingId
+            behandlingId = behandlingId,
+            ignoreCheckSkrivetilgang = true
         )
-        val event =
-            behandling.setFrist(frist, utfoerendeSaksbehandlerIdent)
+        val event = behandling.setFrist(frist, utfoerendeSaksbehandlerIdent)
 
         applicationEventPublisher.publishEvent(event)
         return behandling.modified
@@ -264,16 +269,18 @@ class BehandlingService(
         date: LocalDateTime,
         utfoerendeSaksbehandlerIdent: String
     ): LocalDateTime {
-        val behandling = getBehandlingForUpdate(
-            behandlingId
-        )
+        val behandling = if (innloggetSaksbehandlerService.isKabalOppgavestyringAlleEnheter()) {
+            getBehandlingForUpdate(
+                behandlingId = behandlingId,
+                ignoreCheckSkrivetilgang = true,
+            )
+        } else {
+            getBehandlingForUpdate(behandlingId)
+        }
 
-        if (behandling is Ankebehandling) {
-            val event =
-                behandling.setMottattKlageinstans(date, utfoerendeSaksbehandlerIdent)
-            applicationEventPublisher.publishEvent(event)
-            return behandling.modified
-        } else throw IllegalOperation("Dette feltet kan bare settes i ankesaker")
+        val event = behandling.setMottattKlageinstans(date, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return behandling.modified
     }
 
     fun setMottattVedtaksinstans(

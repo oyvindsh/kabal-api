@@ -73,6 +73,9 @@ internal class BehandlingAvslutningServiceTest {
         lateinit var tilgangService: TilgangService
 
         @MockkBean(relaxed = true)
+        lateinit var innloggetSaksbehandlerService: InnloggetSaksbehandlerService
+
+        @MockkBean(relaxed = true)
         lateinit var applicationEventPublisher: ApplicationEventPublisher
 
         @MockkBean(relaxed = true)

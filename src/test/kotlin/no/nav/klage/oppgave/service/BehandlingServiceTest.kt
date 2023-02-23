@@ -108,7 +108,8 @@ class BehandlingServiceTest {
             kakaApiGateway,
             dokumentService,
             dokumentUnderArbeidRepository,
-            kabalInnstillingerService
+            kabalInnstillingerService,
+            innloggetSaksbehandlerService,
         )
     }
 
