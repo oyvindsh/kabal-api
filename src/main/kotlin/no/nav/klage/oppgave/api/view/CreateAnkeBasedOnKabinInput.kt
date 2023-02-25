@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class CreateAnkeBasedOnKabinInput(
+data class CreateAnkeBasedOnKabinInput(
     val klagebehandlingId: UUID,
     val mottattNav: LocalDate,
     val fristInWeeks: Int,
@@ -20,3 +20,7 @@ class CreateAnkeBasedOnKabinInput(
 
     enum class OversendtPartIdType { PERSON, VIRKSOMHET }
 }
+
+data class CreatedAnkeResponse(
+    val mottakId: UUID,
+)

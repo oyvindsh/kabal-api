@@ -60,16 +60,15 @@ class KabinApiController(
     @PostMapping("/createanke")
     fun createAnke(
         @RequestBody input: CreateAnkeBasedOnKabinInput
-    ) {
+    ): CreatedAnkeResponse {
         logMethodDetails(
             methodName = ::createAnke.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger
         )
-
-        mottakService.createAnkeMottakFromKabinInput(input = input)
-
         //TODO: Sjekk behov for å sende Kafka-melding om ANKE_OPPRETTET, dobbeltsjekk DVH
+
+        return CreatedAnkeResponse(mottakId = mottakService.createAnkeMottakFromKabinInput(input = input))
     }
 
     @GetMapping("/anker/{mottakId}/status")
@@ -87,7 +86,8 @@ class KabinApiController(
         val ankebehandling = ankebehandlingService.getAnkebehandlingFromMottakId(mottakId)
             ?: throw BehandlingNotFoundException("anke not found")
 
-        val completedKlagebehandling = klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
+        val completedKlagebehandling =
+            klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
 
         return CreatedBehandlingStatusForKabin(
             typeId = Type.ANKE.id,
