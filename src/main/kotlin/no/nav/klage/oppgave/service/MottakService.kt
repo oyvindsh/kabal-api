@@ -442,4 +442,6 @@ class MottakService(
             sentFrom = Mottak.Sender.KABIN,
         )
     }
+
+    fun getMottak(mottakId: UUID): Mottak? = mottakRepository.getReferenceById(mottakId)
 }

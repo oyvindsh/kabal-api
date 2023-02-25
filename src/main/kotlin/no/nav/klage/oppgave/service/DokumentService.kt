@@ -130,6 +130,12 @@ class DokumentService(
         return safRestClient.getDokument(dokumentInfoId, journalpostId)
     }
 
+    fun getDokumentReferanse(journalpostId: String, behandling: Behandling): DokumentReferanse {
+        val journalpost = safGraphQlClient.getJournalpostAsSaksbehandler(journalpostId)
+            ?: throw RuntimeException("Could not find journalpost with id $journalpostId and behandlingId ${behandling.id}")
+        return dokumentMapper.mapJournalpostToDokumentReferanse(journalpost = journalpost, behandling = behandling)
+    }
+
     fun getMainDokumentAsSaksbehandler(journalpostId: String): ArkivertDokument {
         val dokumentInfoId = fetchDokumentInfoIdForJournalpostAsSaksbehandler(journalpostId)
         return getArkivertDokument(journalpostId, dokumentInfoId.first())
