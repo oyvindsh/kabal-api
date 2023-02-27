@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.Period
+import java.util.*
 
 @Service
 @Transactional
@@ -33,6 +34,10 @@ class AnkebehandlingService(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         const val SYSTEMBRUKER = "SYSTEMBRUKER"
+    }
+
+    fun getAnkebehandlingFromMottakId(mottakId: UUID): Ankebehandling? {
+        return ankebehandlingRepository.findByMottakId(mottakId)
     }
 
     fun createAnkebehandlingFromMottak(mottak: Mottak): Ankebehandling {

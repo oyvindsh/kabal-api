@@ -176,7 +176,7 @@ class MottakService(
     }
 
     @Transactional
-    fun createAnkeMottakFromKabinInput(input: CreateAnkeBasedOnKabinInput) {
+    fun createAnkeMottakFromKabinInput(input: CreateAnkeBasedOnKabinInput): UUID {
         val klagebehandlingId = input.klagebehandlingId
         logger.debug("Prøver å lagre anke basert på Kabin-input med klagebehandlingId {}", klagebehandlingId)
         val klagebehandling = klagebehandlingRepository.getReferenceById(klagebehandlingId)
@@ -197,6 +197,8 @@ class MottakService(
             mottak.id,
             klagebehandlingId
         )
+
+        return mottak.id
     }
 
     fun validateAnkeCreationBasedOnKlagebehandling(
@@ -442,4 +444,6 @@ class MottakService(
             sentFrom = Mottak.Sender.KABIN,
         )
     }
+
+    fun getMottak(mottakId: UUID): Mottak? = mottakRepository.getReferenceById(mottakId)
 }
