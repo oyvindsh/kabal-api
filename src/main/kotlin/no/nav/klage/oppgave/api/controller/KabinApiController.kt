@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
@@ -24,6 +25,7 @@ class KabinApiController(
     private val mottakService: MottakService,
     private val ankebehandlingService: AnkebehandlingService,
     private val dokumentService: DokumentService,
+    private val behandlingMapper: BehandlingMapper,
 ) {
 
     companion object {
@@ -96,8 +98,8 @@ class KabinApiController(
             utfallId = completedKlagebehandling.utfallId,
             vedtakDate = completedKlagebehandling.vedtakDate,
             sakenGjelder = completedKlagebehandling.sakenGjelder,
-            klager = completedKlagebehandling.klager,
-            fullmektig = completedKlagebehandling.fullmektig,
+            klager = behandlingMapper.getKlagerView(ankebehandling.klager),
+            fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
             tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
             mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
             frist = ankebehandling.frist!!,
