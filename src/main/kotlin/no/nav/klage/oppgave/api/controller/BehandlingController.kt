@@ -273,7 +273,7 @@ class BehandlingController(
         return fullmektigSearchService.searchFullmektig(input.identifikator)
     }
 
-    @GetMapping("/[behandlingerId}/potentialsaksbehandlere")
+    @GetMapping("/{behandlingerId}/potentialsaksbehandlere")
     fun getPotentialSaksbehandlere(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): Saksbehandlere {
