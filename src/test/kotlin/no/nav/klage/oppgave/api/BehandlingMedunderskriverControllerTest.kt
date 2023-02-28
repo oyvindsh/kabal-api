@@ -109,7 +109,7 @@ class BehandlingMedunderskriverControllerTest {
             "A12345"
         )
 
-        mockMvc.put("/klagebehandlinger/$klagebehandlingId/medunderskriverident") {
+        mockMvc.put("/behandlinger/$klagebehandlingId/medunderskriverident") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(input)
             accept = MediaType.APPLICATION_JSON
@@ -120,7 +120,7 @@ class BehandlingMedunderskriverControllerTest {
 
     @Test
     fun `putMedunderskriverident with incorrect input should return 400 error`() {
-        mockMvc.put("/klagebehandlinger/$klagebehandlingId/medunderskriverident") {
+        mockMvc.put("/behandlinger/$klagebehandlingId/medunderskriverident") {
         }.andExpect {
             status { is4xxClientError() }
         }

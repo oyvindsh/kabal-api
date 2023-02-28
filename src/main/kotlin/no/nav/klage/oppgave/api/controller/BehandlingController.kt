@@ -21,6 +21,7 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
+@RequestMapping(value = ["/klagebehandlinger", "/behandlinger"])
 class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
@@ -32,7 +33,7 @@ class BehandlingController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/klagebehandlinger/{behandlingId}/sattpaavent")
+    @PostMapping("/{behandlingId}/sattpaavent")
     fun setSattPaaVent(
         @Parameter(description = "Id til en behandling")
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -51,7 +52,7 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @DeleteMapping("/klagebehandlinger/{behandlingId}/sattpaavent")
+    @DeleteMapping("/{behandlingId}/sattpaavent")
     fun deleteSattPaaVent(
         @Parameter(description = "Id til en behandling")
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -70,9 +71,9 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PostMapping("/behandlinger/{id}/fullfoer")
+    @PostMapping("/{behandlingId}/fullfoer")
     fun fullfoerBehandling(
-        @PathVariable("id") behandlingId: UUID
+        @PathVariable("behandlingId") behandlingId: UUID
     ): BehandlingFullfoertView {
         logKlagebehandlingMethodDetails(
             ::fullfoerBehandling.name,
@@ -89,9 +90,9 @@ class BehandlingController(
     }
 
 
-    @PutMapping("/behandlinger/{id}/mottattklageinstans")
+    @PutMapping("/{behandlingId}/mottattklageinstans")
     fun setMottattKlageinstans(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: BehandlingDateInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -110,9 +111,9 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PutMapping("/behandlinger/{id}/mottattvedtaksinstans")
+    @PutMapping("/{behandlingId}/mottattvedtaksinstans")
     fun setMottattVedtaksinstans(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: BehandlingDateInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -131,9 +132,9 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PutMapping("/behandlinger/{id}/sendttiltrygderetten")
+    @PutMapping("/{behandlingId}/sendttiltrygderetten")
     fun setSendtTilTrygderetten(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: BehandlingDateInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -152,9 +153,9 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PutMapping("/behandlinger/{id}/kjennelsemottatt")
+    @PutMapping("/{behandlingId}/kjennelsemottatt")
     fun setKjennelseMottatt(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: BehandlingDateInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -173,9 +174,9 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PutMapping("/behandlinger/{id}/frist")
+    @PutMapping("/{behandlingId}/frist")
     fun setFrist(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: BehandlingDateInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -198,9 +199,9 @@ class BehandlingController(
      * Valgfri validering før innsending/fullføring.
      * Gjøres uansett ved fullføring av behandlingen.
      */
-    @GetMapping("/behandlinger/{id}/validate")
+    @GetMapping("/{behandlingId}/validate")
     fun validate(
-        @PathVariable("id") behandlingId: UUID
+        @PathVariable("behandlingId") behandlingId: UUID
     ): ValidationPassedResponse {
         logKlagebehandlingMethodDetails(
             ::validate.name,
@@ -217,9 +218,9 @@ class BehandlingController(
         return ValidationPassedResponse()
     }
 
-    @PutMapping("/behandlinger/{id}/innsendingshjemler")
+    @PutMapping("/{behandlingId}/innsendingshjemler")
     fun setInnsendingshjemler(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: InnsendingshjemlerInput,
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -238,9 +239,9 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PutMapping("/behandlinger/{id}/fullmektig")
+    @PutMapping("/{behandlingId}/fullmektig")
     fun setFullmektig(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: FullmektigInput,
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
@@ -272,9 +273,9 @@ class BehandlingController(
         return fullmektigSearchService.searchFullmektig(input.identifikator)
     }
 
-    @GetMapping("/behandlinger/{id}/potentialsaksbehandlere")
+    @GetMapping("/[behandlingerId}/potentialsaksbehandlere")
     fun getPotentialSaksbehandlere(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
     ): Saksbehandlere {
         logMethodDetails(
             ::getPotentialSaksbehandlere.name,
@@ -285,9 +286,9 @@ class BehandlingController(
         return behandlingService.getPotentialSaksbehandlereForBehandling(behandlingId = behandlingId)
     }
 
-    @GetMapping("/behandlinger/{id}/potentialmedunderskrivere")
+    @GetMapping("/{behandlingId}/potentialmedunderskrivere")
     fun getPotentialMedunderskrivere(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
     ): Medunderskrivere {
         logMethodDetails(
             ::getPotentialMedunderskrivere.name,
@@ -298,9 +299,9 @@ class BehandlingController(
         return behandlingService.getPotentialMedunderskrivereForBehandling(behandlingId = behandlingId)
     }
 
-    @GetMapping("/behandlinger/{id}/sakengjelder")
+    @GetMapping("/{behandlingId}/sakengjelder")
     fun getSakenGjelder(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
     ): SakenGjelderWrapped {
         logMethodDetails(
             ::getSakenGjelder.name,
