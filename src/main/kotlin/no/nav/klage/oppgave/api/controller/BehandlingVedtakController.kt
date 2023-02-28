@@ -18,7 +18,7 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping("/klagebehandlinger")
+@RequestMapping(value = ["/klagebehandlinger", "/behandlinger"])
 class BehandlingVedtakController(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val vedtakService: VedtakService
@@ -29,9 +29,9 @@ class BehandlingVedtakController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PutMapping("/{id}/resultat/utfall")
+    @PutMapping("/{behandlingId}/resultat/utfall")
     fun setUtfall(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: VedtakUtfallInput
     ): VedtakEditedView {
         logBehandlingMethodDetails(
@@ -49,9 +49,9 @@ class BehandlingVedtakController(
         )
     }
 
-    @PutMapping("/{id}/resultat/hjemler")
+    @PutMapping("/{behandlingId}/resultat/hjemler")
     fun setHjemler(
-        @PathVariable("id") behandlingId: UUID,
+        @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: VedtakHjemlerInput
     ): VedtakEditedView {
         logBehandlingMethodDetails(

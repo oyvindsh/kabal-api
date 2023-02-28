@@ -11,7 +11,7 @@ import java.time.Instant
 
 
 @Component
-@WebFilter("/klagebehandlinger/*")
+@WebFilter(urlPatterns = ["/klagebehandlinger/*", "/behandlinger/*"])
 class TimingFilter : Filter {
 
     companion object {
