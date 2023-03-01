@@ -4,5 +4,5 @@ import org.springframework.web.multipart.MultipartFile
 
 data class FilInput(
     val file: MultipartFile,
-    val tittel: String?
+    val dokumentTypeId: String = "2",
 )
