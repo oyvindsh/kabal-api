@@ -434,7 +434,7 @@ class MottakService(
             innsendtDato = input.mottattNav,
             brukersHenvendelseMottattNavDato = input.mottattNav,
             sakMottattKaDato = input.mottattNav.atStartOfDay(),
-            frist = LocalDate.now().plusWeeks(input.fristInWeeks.toLong()),
+            frist = input.mottattNav.plusWeeks(input.fristInWeeks.toLong()),
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             ytelse = ytelse,
