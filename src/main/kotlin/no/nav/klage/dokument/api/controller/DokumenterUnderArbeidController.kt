@@ -49,13 +49,13 @@ class DokumentUnderArbeidController(
         logger.debug("Kall mottatt på createAndUploadHoveddokument")
         val opplastetFil = dokumentInputMapper.mapToMellomlagretDokument(
             multipartFile = input.file,
-            tittel = input.tittel,
-            dokumentType = DokumentType.VEDTAK
+            tittel = input.file.originalFilename,
+            dokumentType = DokumentType.of(input.dokumentTypeId),
         )
         return dokumentMapper.mapToDokumentView(
             dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
                 behandlingId = behandlingId,
-                dokumentType = DokumentType.VEDTAK,
+                dokumentType = DokumentType.of(input.dokumentTypeId),
                 opplastetFil = opplastetFil,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = opplastetFil.title,
