@@ -22,8 +22,8 @@ class DokumentInputMapper {
         tittel: String?,
         dokumentType: DokumentType
     ): MellomlagretDokument {
-        val dokumentTittel = tittel ?: multipartFile.originalFilename
-        ?: (dokumentType.defaultFilnavn.also { logger.warn("Filnavn ikke angitt i MultipartFile") })
+        val dokumentTittel =
+            tittel ?: (dokumentType.defaultFilnavn.also { logger.warn("Filnavn ikke angitt i MultipartFile") })
         return OpplastetMellomlagretDokument(
             title = dokumentTittel,
             content = multipartFile.bytes,
