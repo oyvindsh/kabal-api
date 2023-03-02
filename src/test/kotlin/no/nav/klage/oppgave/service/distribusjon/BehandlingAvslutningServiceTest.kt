@@ -16,6 +16,7 @@ import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.rest.ArbeidOgInntektClient
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
@@ -122,6 +123,9 @@ internal class BehandlingAvslutningServiceTest {
 
     @MockkBean
     lateinit var ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService
+
+    @MockkBean
+    lateinit var arbeidOgInntektClient: ArbeidOgInntektClient
 
     @SpykBean
     lateinit var behandlingAvslutningService: BehandlingAvslutningService
