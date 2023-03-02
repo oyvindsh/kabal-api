@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
+import no.nav.klage.oppgave.clients.saf.rest.ArbeidOgInntektClient
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setKjennelseMottatt
@@ -47,6 +48,7 @@ class BehandlingService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val kabalInnstillingerService: KabalInnstillingerService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val arbeidOgInntektClient: ArbeidOgInntektClient
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -676,5 +678,15 @@ class BehandlingService(
 
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
         return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet)
+    }
+
+    fun getAInntektUrl(behandlingId: UUID): String {
+        val behandling = getBehandling(behandlingId = behandlingId)
+        return arbeidOgInntektClient.getAInntektUrl(behandling.sakenGjelder.partId.value)
+    }
+
+    fun getAARegisterUrl(behandlingId: UUID): String {
+        val behandling = getBehandling(behandlingId = behandlingId)
+        return arbeidOgInntektClient.getAARegisterUrl(behandling.sakenGjelder.partId.value)
     }
 }

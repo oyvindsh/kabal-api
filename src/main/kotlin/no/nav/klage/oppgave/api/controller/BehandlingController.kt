@@ -298,4 +298,30 @@ class BehandlingController(
             behandlingService.getBehandling(behandlingId).sakenGjelder
         )
     }
+
+    @GetMapping("/{behandlingId}/ainntekturl")
+    fun getAInntektUrl(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): String {
+        logMethodDetails(
+            ::getAInntektUrl.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return behandlingService.getAInntektUrl(behandlingId)
+    }
+
+    @GetMapping("/{behandlingId}/aaregisterurl")
+    fun getAARegisterUrl(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): String {
+        logMethodDetails(
+            ::getAARegisterUrl.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return behandlingService.getAARegisterUrl(behandlingId)
+    }
 }
