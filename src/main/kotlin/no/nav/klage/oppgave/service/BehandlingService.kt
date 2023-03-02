@@ -5,10 +5,10 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
-import no.nav.klage.oppgave.clients.saf.rest.ArbeidOgInntektClient
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setKjennelseMottatt

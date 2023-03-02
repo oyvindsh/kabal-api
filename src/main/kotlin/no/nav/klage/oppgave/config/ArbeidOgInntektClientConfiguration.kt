@@ -16,7 +16,7 @@ class ArbeidOgInntektClientConfiguration(private val webClientBuilder: WebClient
     private lateinit var arbeidOgInntektUrl: String
 
     @Bean
-    fun arbeidOgInntektClient(): WebClient {
+    fun arbeidOgInntektWebClient(): WebClient {
         return webClientBuilder
             .baseUrl(arbeidOgInntektUrl)
             .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))

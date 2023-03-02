@@ -1,4 +1,4 @@
-package no.nav.klage.oppgave.clients.saf.rest
+package no.nav.klage.oppgave.clients.arbeidoginntekt
 
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class ArbeidOgInntektClient(
-    private val arbeidOgInntektClient: WebClient,
+    private val arbeidOgInntektWebClient: WebClient,
 ) {
 
     companion object {
@@ -21,7 +21,7 @@ class ArbeidOgInntektClient(
     fun getAInntektUrl(
         personIdent: String
     ): String {
-        return arbeidOgInntektClient.get()
+        return arbeidOgInntektWebClient.get()
             .uri("api/v2/redirect/sok/a-inntekt")
             .header(
                 "Nav-Personident",
@@ -35,7 +35,7 @@ class ArbeidOgInntektClient(
     fun getAARegisterUrl(
         personIdent: String
     ): String {
-        return arbeidOgInntektClient.get()
+        return arbeidOgInntektWebClient.get()
             .uri("api/v2/redirect/sok/arbeidstaker")
             .header(
                 "Nav-Personident",

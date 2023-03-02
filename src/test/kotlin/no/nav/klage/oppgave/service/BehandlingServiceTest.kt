@@ -8,10 +8,10 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
+import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.clients.saf.rest.ArbeidOgInntektClient
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
