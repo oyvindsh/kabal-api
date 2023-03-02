@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
-import no.nav.klage.oppgave.service.FullmektigSearchService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
@@ -26,7 +25,6 @@ class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val fullmektigSearchService: FullmektigSearchService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -258,19 +256,6 @@ class BehandlingController(
         )
 
         return BehandlingEditedView(modified = modified)
-    }
-
-    @PostMapping("/searchfullmektig")
-    fun searchFullmektig(
-        @RequestBody input: SearchFullmektigInput,
-    ): BehandlingDetaljerView.ProsessfullmektigView {
-        logMethodDetails(
-            ::searchFullmektig.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            logger
-        )
-
-        return fullmektigSearchService.searchFullmektig(input.identifikator)
     }
 
     @GetMapping("/{behandlingId}/potentialsaksbehandlere")
