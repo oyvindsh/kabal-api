@@ -15,6 +15,7 @@ import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.ModelAndView
 import java.util.*
 
 @RestController
@@ -299,29 +300,29 @@ class BehandlingController(
         )
     }
 
-    @GetMapping("/{behandlingId}/ainntekturl")
+    @GetMapping("/{behandlingId}/ainntekt")
     fun getAInntektUrl(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): String {
+    ): ModelAndView {
         logMethodDetails(
             ::getAInntektUrl.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             logger
         )
 
-        return behandlingService.getAInntektUrl(behandlingId)
+        return ModelAndView(/* viewName = */ "redirect:" + behandlingService.getAInntektUrl(behandlingId))
     }
 
-    @GetMapping("/{behandlingId}/aaregisterurl")
+    @GetMapping("/{behandlingId}/aaregister")
     fun getAARegisterUrl(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): String {
+    ): ModelAndView {
         logMethodDetails(
             ::getAARegisterUrl.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             logger
         )
 
-        return behandlingService.getAARegisterUrl(behandlingId)
+        return ModelAndView(/* viewName = */ "redirect:" + behandlingService.getAARegisterUrl(behandlingId))
     }
 }
