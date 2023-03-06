@@ -38,8 +38,7 @@ class MockDataController(
     private val kakaVersion2Date: LocalDate,
 ) {
 
-    // Alle syntetiske personer under her er registrert under https://dolly.dev.adeo.no/gruppe/2960
-
+    //https://dolly.ekstern.dev.nav.no/gruppe/6336
     @Unprotected
     @PostMapping("/kode6")
     fun createKode6Person() {
