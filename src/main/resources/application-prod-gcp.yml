@@ -25,4 +25,4 @@ CLAM_AV_URL: http://clamav.nais-system/scan
 
 KAKA_VERSION_2_DATE: 2023-01-01
 
-ARBEID_OG_INNTEKT_URL: https://arbeid-og-inntekt.nais.adeo.no/
+ARBEID_OG_INNTEKT_URL: https://arbeid-og-inntekt.prod-fss-pub.nais.io/
