@@ -99,10 +99,6 @@ spec:
         - application: kabal-json-to-pdf
         - application: clamav
           namespace: nais-system
-        - application: arbeid-og-inntekt
-          namespace: team-inntekt
-        - application: arbeid-og-inntekt-q1
-          namespace: team-inntekt
       external:
       {{#each externalHosts}}
         - host: {{host}}

@@ -27,4 +27,4 @@ FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS: 20000
 
 KAKA_VERSION_2_DATE: 2022-12-20
 
-ARBEID_OG_INNTEKT_URL: https://arbeid-og-inntekt-q1.dev.adeo.no/
+ARBEID_OG_INNTEKT_URL: https://arbeid-og-inntekt-q1.dev-fss-pub.nais.io/
