@@ -8,6 +8,7 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
+import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -93,6 +94,9 @@ class BehandlingServiceTest {
     @MockkBean
     lateinit var saksbehandlerService: SaksbehandlerService
 
+    @MockkBean
+    lateinit var arbeidOgInntektClient: ArbeidOgInntektClient
+
     lateinit var behandlingService: BehandlingService
 
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"
@@ -102,14 +106,15 @@ class BehandlingServiceTest {
     @BeforeEach
     fun setup() {
         behandlingService = BehandlingService(
-            behandlingRepository,
-            tilgangService,
-            applicationEventPublisher,
-            kakaApiGateway,
-            dokumentService,
-            dokumentUnderArbeidRepository,
-            kabalInnstillingerService,
-            innloggetSaksbehandlerService,
+            behandlingRepository = behandlingRepository,
+            tilgangService = tilgangService,
+            applicationEventPublisher = applicationEventPublisher,
+            kakaApiGateway = kakaApiGateway,
+            dokumentService = dokumentService,
+            dokumentUnderArbeidRepository = dokumentUnderArbeidRepository,
+            kabalInnstillingerService = kabalInnstillingerService,
+            innloggetSaksbehandlerService = innloggetSaksbehandlerService,
+            arbeidOgInntektClient = arbeidOgInntektClient
         )
     }
 
