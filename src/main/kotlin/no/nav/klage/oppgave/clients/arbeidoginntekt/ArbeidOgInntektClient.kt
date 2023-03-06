@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.clients.arbeidoginntekt
 
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -27,6 +28,7 @@ class ArbeidOgInntektClient(
                 "Nav-Personident",
                 personIdent
             )
+            .accept(MediaType.ALL)
             .retrieve()
             .bodyToMono<String>()
             .block() ?: throw RuntimeException("No AInntekt url returned")
@@ -41,6 +43,7 @@ class ArbeidOgInntektClient(
                 "Nav-Personident",
                 personIdent
             )
+            .accept(MediaType.ALL)
             .retrieve()
             .bodyToMono<String>()
             .block() ?: throw RuntimeException("No AAreg url returned")
