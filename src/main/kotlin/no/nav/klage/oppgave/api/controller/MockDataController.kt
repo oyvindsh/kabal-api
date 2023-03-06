@@ -43,19 +43,21 @@ class MockDataController(
     @Unprotected
     @PostMapping("/kode6")
     fun createKode6Person() {
-        createKlagebehandlingForASpecificPerson("15436621822") // ÅPENHJERTIG SAKS
+        createKlagebehandlingForASpecificPerson("26876597755") // ÅPENHJERTIG SAKS
     }
 
+    //https://dolly.ekstern.dev.nav.no/gruppe/6335
     @Unprotected
     @PostMapping("/kode7")
     fun createKode7Person() {
-        createKlagebehandlingForASpecificPerson("28107122119") // GOD STAFFELI
+        createKlagebehandlingForASpecificPerson("17855999285") // GOD STAFFELI
     }
 
+    //https://dolly.ekstern.dev.nav.no/gruppe/6334
     @Unprotected
     @PostMapping("/egenansatt")
     fun createEgenAnsattBehandling() {
-        createKlagebehandlingForASpecificPerson("29468230052") // Gjensidig Strømpebukse)
+        createKlagebehandlingForASpecificPerson("12518812945") // Gjensidig Strømpebukse)
     }
 
     fun createKlagebehandlingForASpecificPerson(fnr: String) {
@@ -105,7 +107,7 @@ class MockDataController(
     @Unprotected
     @PostMapping("/fullmakt")
     fun createPersonWithFullmakt() {
-        val fnr = "17117323862" // SNILL VEPS
+        val fnr = "28497037273"
         val journalpostId = "510534808"
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
@@ -117,7 +119,7 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr),
                     klagersProsessfullmektig = OversendtProsessfullmektig(
-                        id = OversendtPartId(OversendtPartIdType.PERSON, "25017820926"),
+                        id = OversendtPartId(OversendtPartIdType.PERSON, "07467517958"),
                         skalKlagerMottaKopi = true
                     )
                 ),
@@ -184,19 +186,19 @@ class MockDataController(
         val hjemmelId: String,
     )
 
+    //https://dolly.ekstern.dev.nav.no/gruppe/6332
     private fun createKlanke(type: Type, input: MockInput?): MockDataResponse {
         val dollyDoc = listOf(
-            SyntheticWithDoc("02446701749", "510534792"),
-            SyntheticWithDoc("29437117843", "510534815"),
-            SyntheticWithDoc("25438301286", "510534816"),
-            SyntheticWithDoc("18496900509", "510534817"),
-            SyntheticWithDoc("28416904490", "510534818"),
-            SyntheticWithDoc("17457337760", "510534819"),
-            SyntheticWithDoc("16498818653", "510534820"),
-            SyntheticWithDoc("20467938577", "510534821"),
-            SyntheticWithDoc("14437830275", "510534823"),
-            SyntheticWithDoc("18418507701", "510534797"),
-            SyntheticWithDoc("12518603068", "510534824")
+            SyntheticWithDoc("28497037273", "510534792"),
+            SyntheticWithDoc("28479115739", "510534815"),
+            SyntheticWithDoc("14416711195", "510534816"),
+            SyntheticWithDoc("09458637668", "510534817"),
+            SyntheticWithDoc("23419040975", "510534818"),
+            SyntheticWithDoc("09517901498", "510534819"),
+            SyntheticWithDoc("07467517958", "510534820"),
+            SyntheticWithDoc("20516444240", "510534821"),
+            SyntheticWithDoc("30508937519", "510534823"),
+            SyntheticWithDoc("23427234738", "510534797"),
         ).random()
 
         val fnr = dollyDoc.fnr
