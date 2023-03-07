@@ -20,7 +20,6 @@ import no.nav.klage.oppgave.eventlisteners.CreateBehandlingFromMottakEventListen
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
-import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -41,7 +40,6 @@ class MottakService(
     private val mottakRepository: MottakRepository,
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val ankebehandlingRepository: AnkebehandlingRepository,
-    private val behandlingRepository: BehandlingRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
