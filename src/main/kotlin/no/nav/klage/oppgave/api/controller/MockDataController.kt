@@ -24,8 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Year
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
+import kotlin.random.Random
 
 @Profile("dev-gcp")
 @RestController
@@ -38,24 +39,25 @@ class MockDataController(
     private val kakaVersion2Date: LocalDate,
 ) {
 
-    // Alle syntetiske personer under her er registrert under https://dolly.dev.adeo.no/gruppe/2960
-
+    //https://dolly.ekstern.dev.nav.no/gruppe/6336
     @Unprotected
     @PostMapping("/kode6")
     fun createKode6Person() {
-        createKlagebehandlingForASpecificPerson("15436621822") // ÅPENHJERTIG SAKS
+        createKlagebehandlingForASpecificPerson("26876597755")
     }
 
+    //https://dolly.ekstern.dev.nav.no/gruppe/6335
     @Unprotected
     @PostMapping("/kode7")
     fun createKode7Person() {
-        createKlagebehandlingForASpecificPerson("28107122119") // GOD STAFFELI
+        createKlagebehandlingForASpecificPerson("17855999285")
     }
 
+    //https://dolly.ekstern.dev.nav.no/gruppe/6334
     @Unprotected
     @PostMapping("/egenansatt")
     fun createEgenAnsattBehandling() {
-        createKlagebehandlingForASpecificPerson("29468230052") // Gjensidig Strømpebukse)
+        createKlagebehandlingForASpecificPerson("12518812945")
     }
 
     fun createKlagebehandlingForASpecificPerson(fnr: String) {
@@ -105,7 +107,7 @@ class MockDataController(
     @Unprotected
     @PostMapping("/fullmakt")
     fun createPersonWithFullmakt() {
-        val fnr = "17117323862" // SNILL VEPS
+        val fnr = "28497037273"
         val journalpostId = "510534808"
         val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
         val dato = LocalDate.of(2020, 1, 13)
@@ -117,7 +119,7 @@ class MockDataController(
                 klager = OversendtKlager(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr),
                     klagersProsessfullmektig = OversendtProsessfullmektig(
-                        id = OversendtPartId(OversendtPartIdType.PERSON, "25017820926"),
+                        id = OversendtPartId(OversendtPartIdType.PERSON, "07467517958"),
                         skalKlagerMottaKopi = true
                     )
                 ),
@@ -184,61 +186,88 @@ class MockDataController(
         val hjemmelId: String,
     )
 
+    //https://dolly.ekstern.dev.nav.no/gruppe/6332
+    private fun getFnrAndJournalpostId(ytelse: Ytelse): FnrAndJournalpostId {
+        return when (ytelse) {
+            Ytelse.ENF_ENF -> FnrAndJournalpostId(
+                fnr = "17887799784", journalpostId = "598126218"
+            )
+
+            Ytelse.BAR_BAR -> FnrAndJournalpostId(
+                fnr = "50884800363", journalpostId = "598126221"
+            )
+
+            Ytelse.KON_KON -> FnrAndJournalpostId(
+                fnr = "09868799487", journalpostId = "598126222"
+            )
+
+            Ytelse.OMS_OLP, Ytelse.OMS_OMP, Ytelse.OMS_PLS, Ytelse.OMS_PSB -> FnrAndJournalpostId(
+                fnr = "22816897630", journalpostId = "598126223"
+            )
+
+            Ytelse.SYK_SYK -> FnrAndJournalpostId(
+                fnr = "15896899446", journalpostId = "598126077"
+            )
+
+            Ytelse.SUP_UFF -> FnrAndJournalpostId(
+                fnr = "24898299771", journalpostId = "598126224"
+            )
+
+            Ytelse.FOR_ENG, Ytelse.FOR_FOR, Ytelse.FOR_SVA -> FnrAndJournalpostId(
+                fnr = "14828897927", journalpostId = "598126225"
+            )
+
+            else -> FnrAndJournalpostId(
+                fnr = "17887799784", journalpostId = "598126218"
+            )
+        }
+    }
+
+    data class FnrAndJournalpostId(
+        val fnr: String,
+        val journalpostId: String
+    )
+
     private fun createKlanke(type: Type, input: MockInput?): MockDataResponse {
-        val dollyDoc = listOf(
-            SyntheticWithDoc("02446701749", "510534792"),
-            SyntheticWithDoc("29437117843", "510534815"),
-            SyntheticWithDoc("25438301286", "510534816"),
-            SyntheticWithDoc("18496900509", "510534817"),
-            SyntheticWithDoc("28416904490", "510534818"),
-            SyntheticWithDoc("17457337760", "510534819"),
-            SyntheticWithDoc("16498818653", "510534820"),
-            SyntheticWithDoc("20467938577", "510534821"),
-            SyntheticWithDoc("14437830275", "510534823"),
-            SyntheticWithDoc("18418507701", "510534797"),
-            SyntheticWithDoc("12518603068", "510534824")
-        ).random()
+        val ytelse = if (input == null) Ytelse.SYK_SYK else input.ytelse ?: ytelseTilHjemler.keys.random()
 
-        val fnr = dollyDoc.fnr
-        val journalpostId = dollyDoc.journalpost
-        val journalpost = safClient.getJournalpostAsSystembruker(journalpostId)
+        val fnrAndJournalpostId = getFnrAndJournalpostId(ytelse)
 
-        val dato = LocalDate.of(Year.now().value - 1, (1..12).random(), (1..28).random())
+        val fnr = fnrAndJournalpostId.fnr
+        val journalpostId = fnrAndJournalpostId.journalpostId
+        val lastMonth = LocalDate.now().minusMonths(1).toEpochDay()
+        val now = LocalDate.now().toEpochDay()
+        val dato = LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(lastMonth, now))
 
-        val randomYtelse = if (input == null) Ytelse.SYK_SYK else input.ytelse ?: ytelseTilHjemler.keys.random()
         val klager = input?.klager ?: OversendtKlager(
             id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
         )
 
         val sakenGjelder = input?.sakenGjelder
 
+        val oversendtSak = OversendtSak(
+            fagsakId = Random.nextInt(from = 1, until = 9999).toString(),
+            fagsystem = KildeFagsystem.AO01
+
+        )
+
         val behandling = when (type) {
             Type.KLAGE, Type.ANKE -> {
                 mottakService.createMottakForKlageAnkeV3ForE2ETests(
                     OversendtKlageAnkeV3(
-                        ytelse = randomYtelse,
+                        ytelse = ytelse,
                         type = type,
                         klager = klager,
-                        fagsak = OversendtSak(
-                            fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
-                            fagsystem = journalpost.sak?.fagsaksystem?.let {
-                                try {
-                                    KildeFagsystem.valueOf(it)
-                                } catch (e: Exception) {
-                                    KildeFagsystem.AO01
-                                }
-                            }
-                                ?: KildeFagsystem.AO01
-                        ),
+                        fagsak = oversendtSak,
                         sakenGjelder = sakenGjelder,
                         kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
                         dvhReferanse = input?.dvhReferanse,
                         innsynUrl = "https://nav.no",
-                        hjemler = listOf(ytelseTilHjemler[randomYtelse]!!.random()),
+                        hjemler = listOf(ytelseTilHjemler[ytelse]!!.random()),
                         forrigeBehandlendeEnhet = input?.forrigeBehandlendeEnhet ?: "4295", //NAV Klageinstans nord
                         tilknyttedeJournalposter = listOf(
                             OversendtDokumentReferanse(
-                                randomMottakDokumentType(),
+                                MottakDokumentType.BRUKERS_KLAGE,
                                 journalpostId
                             )
                         ),
@@ -251,20 +280,13 @@ class MockDataController(
             }
 
             Type.ANKE_I_TRYGDERETTEN -> {
-                val oversendtSak = journalpost!!.sak?.let {
-                    OversendtSak(
-                        fagsakId = it.fagsakId ?: "UKJENT",
-                        fagsystem = KildeFagsystem.AO01
-                    )
-                }
-
                 val registreringsHjemmelSet = when (getKakaVersion()) {
                     1 -> {
-                        mutableSetOf(ytelseTilRegistreringshjemlerV1[randomYtelse]!!.random())
+                        mutableSetOf(ytelseTilRegistreringshjemlerV1[ytelse]!!.random())
                     }
 
                     2 -> {
-                        mutableSetOf(ytelseTilRegistreringshjemlerV2[randomYtelse]!!.random())
+                        mutableSetOf(ytelseTilRegistreringshjemlerV2[ytelse]!!.random())
                     }
 
                     else ->
@@ -274,15 +296,15 @@ class MockDataController(
                 val input = AnkeITrygderettenbehandlingInput(
                     klager = klager.toKlagepart(),
                     sakenGjelder = sakenGjelder?.toSakenGjelder(),
-                    ytelse = randomYtelse,
+                    ytelse = ytelse,
                     type = type,
                     kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
                     dvhReferanse = input?.dvhReferanse ?: UUID.randomUUID().toString(),
-                    sakFagsystem = Fagsystem.fromNavn(oversendtSak!!.fagsystem.name),
+                    sakFagsystem = Fagsystem.fromNavn(oversendtSak.fagsystem.name),
                     sakFagsakId = oversendtSak.fagsakId,
                     sakMottattKlageinstans = dato.atStartOfDay(),
                     saksdokumenter = mutableSetOf(),
-                    innsendingsHjemler = mutableSetOf(ytelseTilHjemler[randomYtelse]!!.random()),
+                    innsendingsHjemler = mutableSetOf(ytelseTilHjemler[ytelse]!!.random()),
                     sendtTilTrygderetten = LocalDateTime.now(),
                     registreringsHjemmelSet = registreringsHjemmelSet,
                     ankebehandlingUtfall = ExternalUtfall.valueOf(utfallToTrygderetten.random().name),
@@ -317,11 +339,6 @@ class MockDataController(
         MottakDokumentType.BRUKERS_KLAGE,
         MottakDokumentType.OPPRINNELIG_VEDTAK
     ).shuffled().first()
-
-    data class SyntheticWithDoc(
-        val fnr: String,
-        val journalpost: String
-    )
 
     data class MockInput(
         val ytelse: Ytelse?,
