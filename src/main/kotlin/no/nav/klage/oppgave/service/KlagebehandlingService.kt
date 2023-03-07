@@ -94,10 +94,6 @@ class KlagebehandlingService(
         sakFagsakId = sakFagsakId,
         sakFagsystem = sakFagsystem,
         klageBehandlendeEnhet = tildeling!!.enhet!!,
-        alreadyUsedJournalpostIdList = mottakRepository.findBySakenGjelderOrKlager(fnr = sakenGjelder.partId.value)
-            .flatMap { it.mottakDokument }
-            .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
-            .map { it.journalpostId }
     )
 
     fun findMuligAnkeByPartId(

@@ -111,4 +111,19 @@ class KabinApiController(
             )
         )
     }
+
+    @PostMapping("/searchusedjournalpostid")
+    fun getUsedJournalpostIdListForPerson(
+        @RequestBody input: SearchUsedJournalpostIdInput,
+    ): List<String> {
+        logMethodDetails(
+            methodName = ::getUsedJournalpostIdListForPerson.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+        return mottakService.findMottakBySakenGjelder(sakenGjelder = input.fnr)
+            .flatMap { it.mottakDokument }
+            .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
+            .map { it.journalpostId }.toSet().toList()
+    }
 }
