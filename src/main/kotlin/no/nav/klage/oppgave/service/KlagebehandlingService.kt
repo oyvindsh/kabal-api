@@ -31,7 +31,8 @@ class KlagebehandlingService(
     @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")
     private val kakaVersion2Date: LocalDate,
     private val behandlingMapper: BehandlingMapper,
-    private val behandlingService: BehandlingService
+    private val behandlingService: BehandlingService,
+    private val mottakService: MottakService,
 ) {
 
     companion object {
@@ -91,7 +92,11 @@ class KlagebehandlingService(
         },
         sakFagsakId = sakFagsakId,
         sakFagsystem = sakFagsystem,
-        klageBehandlendeEnhet = tildeling!!.enhet!!
+        klageBehandlendeEnhet = tildeling!!.enhet!!,
+        alreadyUsedJournalpostIdList = mottakService.findMottakBySakenGjelder(sakenGjelder = sakenGjelder.partId.value)
+            .flatMap { it.mottakDokument }
+            .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
+            .map { it.journalpostId }
     )
 
     fun findMuligAnkeByPartId(

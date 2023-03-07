@@ -66,6 +66,8 @@ class MottakRepositoryTest {
         testEntityManager.clear()
 
         assertThat(mottakRepository.findById(mottak.id).get()).isEqualTo(mottak)
+
+        assertThat(mottakRepository.findBySakenGjelderOrKlager("123454").first()).isEqualTo(mottak)
     }
 
 }

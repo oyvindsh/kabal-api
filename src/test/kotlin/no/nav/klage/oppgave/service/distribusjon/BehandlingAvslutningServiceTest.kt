@@ -143,6 +143,9 @@ internal class BehandlingAvslutningServiceTest {
     @MockkBean(relaxed = true)
     lateinit var kakaApiGateway: KakaApiGateway
 
+    @MockkBean(relaxed = true)
+    lateinit var mottakService: MottakService
+
     private val mottak = Mottak(
         ytelse = Ytelse.OMS_OMP,
         type = Type.KLAGE,
