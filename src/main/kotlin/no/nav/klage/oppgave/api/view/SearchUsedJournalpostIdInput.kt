@@ -1,5 +1,5 @@
 package no.nav.klage.oppgave.api.view
 
-data class SearchUsedJournalpostId(
+data class SearchUsedJournalpostIdInput(
     val fnr: String,
 )

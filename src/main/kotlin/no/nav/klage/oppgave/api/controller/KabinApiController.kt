@@ -114,7 +114,7 @@ class KabinApiController(
 
     @PostMapping("/searchusedjournalpostid")
     fun getUsedJournalpostIdListForPerson(
-        @RequestBody input: SearchUsedJournalpostId,
+        @RequestBody input: SearchUsedJournalpostIdInput,
     ): List<String> {
         logMethodDetails(
             methodName = ::getUsedJournalpostIdListForPerson.name,
