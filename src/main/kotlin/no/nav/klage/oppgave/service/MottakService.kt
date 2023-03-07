@@ -20,7 +20,6 @@ import no.nav.klage.oppgave.eventlisteners.CreateBehandlingFromMottakEventListen
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
-import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -41,7 +40,6 @@ class MottakService(
     private val mottakRepository: MottakRepository,
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val ankebehandlingRepository: AnkebehandlingRepository,
-    private val behandlingRepository: BehandlingRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
@@ -166,7 +164,11 @@ class MottakService(
         logger.debug("Prøver å lagre anke basert på klagebehandlingId {}", klagebehandlingId)
         val klagebehandling = klagebehandlingRepository.getReferenceById(klagebehandlingId)
 
-        validateAnkeCreationBasedOnKlagebehandling(klagebehandling, klagebehandlingId)
+        validateAnkeCreationBasedOnKlagebehandling(
+            klagebehandling = klagebehandling,
+            klagebehandlingId = klagebehandlingId,
+            ankeJournalpostId = input.innsendtAnkeJournalpostId!!
+        )
 
         val mottak = mottakRepository.save(klagebehandling.toAnkeMottak(input.innsendtAnkeJournalpostId))
 
@@ -181,7 +183,11 @@ class MottakService(
         logger.debug("Prøver å lagre anke basert på Kabin-input med klagebehandlingId {}", klagebehandlingId)
         val klagebehandling = klagebehandlingRepository.getReferenceById(klagebehandlingId)
 
-        validateAnkeCreationBasedOnKlagebehandling(klagebehandling, klagebehandlingId)
+        validateAnkeCreationBasedOnKlagebehandling(
+            klagebehandling = klagebehandling,
+            klagebehandlingId = klagebehandlingId,
+            ankeJournalpostId = input.ankeDocumentJournalpostId
+        )
 
         val mottak = mottakRepository.save(klagebehandling.toAnkeMottak(input))
 
@@ -203,7 +209,8 @@ class MottakService(
 
     fun validateAnkeCreationBasedOnKlagebehandling(
         klagebehandling: Klagebehandling,
-        klagebehandlingId: UUID
+        klagebehandlingId: UUID,
+        ankeJournalpostId: String,
     ) {
         if (!klagebehandling.isAvsluttet()) {
             throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
@@ -213,10 +220,26 @@ class MottakService(
 
         if (existingAnke != null) {
             val message =
-                "Anke har allerede blir opprettet på klagebehandling med id $klagebehandlingId"
+                "Anke har allerede blitt opprettet på klagebehandling med id $klagebehandlingId"
             logger.warn(message)
             throw DuplicateOversendelseException(message)
         }
+
+        if (mottakRepository.findBySakenGjelderOrKlager(klagebehandling.sakenGjelder.partId.value)
+                .flatMap { it.mottakDokument }
+                .any {
+                    it.type in listOf(
+                        MottakDokumentType.BRUKERS_ANKE,
+                        MottakDokumentType.BRUKERS_KLAGE
+                    ) && it.journalpostId == ankeJournalpostId
+                }
+        ) {
+            val message =
+                "Journalpost med id $ankeJournalpostId har allerede blitt brukt for å opprette klage/anke"
+            logger.warn(message)
+            throw DuplicateOversendelseException(message)
+        }
+
     }
 
     fun OversendtKlageV2.validate() {
@@ -446,4 +469,8 @@ class MottakService(
     }
 
     fun getMottak(mottakId: UUID): Mottak? = mottakRepository.getReferenceById(mottakId)
+
+    fun findMottakBySakenGjelder(sakenGjelder: String): List<Mottak> {
+        return mottakRepository.findBySakenGjelderOrKlager(sakenGjelder)
+    }
 }
