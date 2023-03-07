@@ -16,5 +16,4 @@ data class CompletedKlagebehandling(
     val sakFagsakId: String,
     val sakFagsystem: Fagsystem,
     val klageBehandlendeEnhet: String,
-    val alreadyUsedJournalpostIdList: List<String>,
 )
