@@ -15,7 +15,7 @@ data class DokumentReferanse(
     val dokumentInfoId: String,
     val tittel: String?,
     val tema: String?,
-    val temaId: String,
+    val temaId: String?,
     val registrert: LocalDate,
     val harTilgangTilArkivvariant: Boolean,
     val valgt: Boolean,
