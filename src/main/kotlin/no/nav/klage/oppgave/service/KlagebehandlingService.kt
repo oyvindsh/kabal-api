@@ -93,6 +93,7 @@ class KlagebehandlingService(
         },
         sakFagsakId = sakFagsakId,
         sakFagsystem = sakFagsystem,
+        fagsystemId = sakFagsystem.id,
         klageBehandlendeEnhet = tildeling!!.enhet!!,
     )
 

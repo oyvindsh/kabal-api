@@ -15,5 +15,6 @@ data class CompletedKlagebehandling(
     val tilknyttedeDokumenter: List<TilknyttetDokument>,
     val sakFagsakId: String,
     val sakFagsystem: Fagsystem,
+    val fagsystemId: String,
     val klageBehandlendeEnhet: String,
 )
