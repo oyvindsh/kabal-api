@@ -231,7 +231,7 @@ class BehandlingController(
 
         val modified = behandlingService.setInnsendingshjemler(
             behandlingId = behandlingId,
-            hjemler = input.hjemler,
+            hjemler = input.hjemmelIdList.ifEmpty { input.hjemler },
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 

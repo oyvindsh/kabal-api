@@ -19,5 +19,6 @@ data class CreatedBehandlingStatusForKabin(
     val frist: LocalDate,
     val sakFagsakId: String,
     val sakFagsystem: Fagsystem,
+    val fagsystemId: String,
     val journalpost: DokumentReferanse,
 )

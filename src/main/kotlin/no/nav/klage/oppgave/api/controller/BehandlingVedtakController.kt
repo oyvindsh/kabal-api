@@ -42,9 +42,9 @@ class BehandlingVedtakController(
         )
         return VedtakEditedView(
             vedtakService.setUtfall(
-                behandlingId,
-                input.utfall?.let { Utfall.of(it) },
-                innloggetSaksbehandlerService.getInnloggetIdent()
+                behandlingId = behandlingId,
+                utfall = input.utfallId?.let { Utfall.of(it) } ?: input.utfall?.let { Utfall.of(it) },
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             ).modified
         )
     }
@@ -63,7 +63,8 @@ class BehandlingVedtakController(
         return VedtakEditedView(
             vedtakService.setHjemler(
                 behandlingId = behandlingId,
-                hjemler = input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
+                hjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
+                    ?: input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
                 utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             ).modified
         )

@@ -105,6 +105,7 @@ class KabinApiController(
             frist = ankebehandling.frist!!,
             sakFagsakId = completedKlagebehandling.sakFagsakId,
             sakFagsystem = completedKlagebehandling.sakFagsystem,
+            fagsystemId = completedKlagebehandling.fagsystemId,
             journalpost = dokumentService.getDokumentReferanse(
                 journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,
                 behandling = ankebehandling
