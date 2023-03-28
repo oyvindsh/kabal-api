@@ -14,7 +14,9 @@ data class CompletedKlagebehandling(
     val fullmektig: BehandlingDetaljerView.ProsessfullmektigView?,
     val tilknyttedeDokumenter: List<TilknyttetDokument>,
     val sakFagsakId: String,
+    val fagsakId: String,
     val sakFagsystem: Fagsystem,
+    val fagsystem: Fagsystem,
     val fagsystemId: String,
     val klageBehandlendeEnhet: String,
 )

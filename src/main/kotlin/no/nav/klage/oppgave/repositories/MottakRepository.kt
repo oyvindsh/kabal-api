@@ -11,8 +11,8 @@ import java.util.*
 @Repository
 interface MottakRepository : JpaRepository<Mottak, UUID> {
 
-    fun existsBySakFagsystemAndKildeReferanseAndType(
-        sakFagsystem: Fagsystem,
+    fun existsByFagsystemAndKildeReferanseAndType(
+        fagsystem: Fagsystem,
         kildeReferanse: String,
         type: Type
     ): Boolean

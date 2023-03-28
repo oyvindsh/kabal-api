@@ -53,8 +53,8 @@ class MeldingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             kildeReferanse = "1234234",
             sakMottattKaDato = LocalDateTime.now(),
-            sakFagsystem = Fagsystem.K9,
-            sakFagsakId = "123",
+            fagsystem = Fagsystem.K9,
+            fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
             brukersHenvendelseMottattNavDato = LocalDate.now()
         )
@@ -76,8 +76,8 @@ class MeldingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             mottattKlageinstans = LocalDateTime.now(),
-            sakFagsystem = Fagsystem.K9,
-            sakFagsakId = "123",
+            fagsystem = Fagsystem.K9,
+            fagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",

@@ -101,8 +101,8 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         ytelse = ytelse.mapToSkjemaV2(),
         type = type.mapToSkjemaV2(),
         kildeReferanse = kildeReferanse,
-        sakFagsystem = sakFagsystem.mapToSkjemaV2(),
-        sakFagsakId = sakFagsakId,
+        sakFagsystem = fagsystem.mapToSkjemaV2(),
+        sakFagsakId = fagsakId,
         innsendtDato = innsendt,
         forrigeSaksbehandler = avsenderSaksbehandleridentFoersteinstans?.let {
             BehandlingSkjemaV2.Saksbehandler(it)
@@ -118,7 +118,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
-        kildesystem = sakFagsystem.mapToSkjemaV2(),
+        kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = delbehandlinger.let { vedtak ->
             BehandlingSkjemaV2.Vedtak(
@@ -151,8 +151,8 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         ytelse = ytelse.mapToSkjemaV2(),
         type = type.mapToSkjemaV2(),
         kildeReferanse = kildeReferanse,
-        sakFagsystem = sakFagsystem.mapToSkjemaV2(),
-        sakFagsakId = sakFagsakId,
+        sakFagsystem = fagsystem.mapToSkjemaV2(),
+        sakFagsakId = fagsakId,
         innsendtDato = innsendt,
         forrigeVedtaksDato = klageVedtaksDato,
         forrigeBehandlendeEnhet = klageBehandlendeEnhet.let { BehandlingSkjemaV2.Enhet(it) },
@@ -166,7 +166,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
-        kildesystem = sakFagsystem.mapToSkjemaV2(),
+        kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = delbehandlinger.let { vedtak ->
             BehandlingSkjemaV2.Vedtak(
@@ -191,8 +191,8 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         ytelse = ytelse.mapToSkjemaV2(),
         type = type.mapToSkjemaV2(),
         kildeReferanse = kildeReferanse,
-        sakFagsystem = sakFagsystem.mapToSkjemaV2(),
-        sakFagsakId = sakFagsakId,
+        sakFagsystem = fagsystem.mapToSkjemaV2(),
+        sakFagsakId = fagsakId,
         sakMottattKaDato = mottattKlageinstans,
         avsluttetAvSaksbehandlerTidspunkt = currentDelbehandling().avsluttetAvSaksbehandler,
         avsluttetTidspunkt = currentDelbehandling().avsluttet,
@@ -203,7 +203,7 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
-        kildesystem = sakFagsystem.mapToSkjemaV2(),
+        kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = delbehandlinger.let { vedtak ->
             BehandlingSkjemaV2.Vedtak(

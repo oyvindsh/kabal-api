@@ -60,7 +60,7 @@ class CreateBehandlingFromMottakEventListener(
         val behandlingEvent = BehandlingEvent(
             eventId = UUID.randomUUID(),
             kildeReferanse = ankebehandling.kildeReferanse,
-            kilde = ankebehandling.sakFagsystem.navn,
+            kilde = ankebehandling.fagsystem.navn,
             kabalReferanse = ankebehandling.id.toString(),
             type = BehandlingEventType.ANKEBEHANDLING_OPPRETTET,
             detaljer = BehandlingDetaljer(
@@ -74,7 +74,7 @@ class CreateBehandlingFromMottakEventListener(
             KafkaEvent(
                 id = UUID.randomUUID(),
                 behandlingId = ankebehandling.id,
-                kilde = ankebehandling.sakFagsystem.navn,
+                kilde = ankebehandling.fagsystem.navn,
                 kildeReferanse = ankebehandling.kildeReferanse,
                 jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
                 type = EventType.BEHANDLING_EVENT

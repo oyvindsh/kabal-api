@@ -59,8 +59,8 @@ class AnkeITrygderettenbehandlingService(
                 type = input.type,
                 kildeReferanse = input.kildeReferanse,
                 dvhReferanse = input.dvhReferanse,
-                sakFagsystem = input.sakFagsystem,
-                sakFagsakId = input.sakFagsakId,
+                fagsystem = input.fagsystem,
+                fagsakId = input.fagsakId,
                 mottattKlageinstans = input.sakMottattKlageinstans,
                 tildeling = null,
                 delbehandlinger = setOf(Delbehandling()),
@@ -106,7 +106,7 @@ class AnkeITrygderettenbehandlingService(
         val behandlingEvent = BehandlingEvent(
             eventId = UUID.randomUUID(),
             kildeReferanse = ankeITrygderettenbehandling.kildeReferanse,
-            kilde = ankeITrygderettenbehandling.sakFagsystem.navn,
+            kilde = ankeITrygderettenbehandling.fagsystem.navn,
             kabalReferanse = ankeITrygderettenbehandling.id.toString(),
             type = BehandlingEventType.ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET,
             detaljer = BehandlingDetaljer(
@@ -121,7 +121,7 @@ class AnkeITrygderettenbehandlingService(
             KafkaEvent(
                 id = UUID.randomUUID(),
                 behandlingId = ankeITrygderettenbehandling.id,
-                kilde = ankeITrygderettenbehandling.sakFagsystem.navn,
+                kilde = ankeITrygderettenbehandling.fagsystem.navn,
                 kildeReferanse = ankeITrygderettenbehandling.kildeReferanse,
                 jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
                 type = EventType.BEHANDLING_EVENT

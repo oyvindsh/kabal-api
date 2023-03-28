@@ -22,8 +22,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status IKKE_TILDELT`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -42,8 +42,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status IKKE_TILDELT etter tidligere tildeling`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -63,8 +63,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status TILDELT`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -84,8 +84,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status SENDT_TIL_MEDUNDERSKRIVER`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -109,8 +109,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status RETURNERT_TIL_SAKSBEHANDLER`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -134,8 +134,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status MEDUNDERSKRIVER_VALGT`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -158,8 +158,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status TILDELT når medunderskriver er fjernet`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),
@@ -183,8 +183,8 @@ internal class KlagebehandlingTest {
         @Test
         fun `status FULLFOERT`() {
             val klagebehandling = Klagebehandling(
-                sakFagsystem = Fagsystem.AO01,
-                sakFagsakId = "123",
+                fagsystem = Fagsystem.AO01,
+                fagsakId = "123",
                 kildeReferanse = "abc",
                 klager = Klager(PartId(PartIdType.PERSON, fnr)),
                 sakenGjelder = SakenGjelder(PartId(PartIdType.PERSON, fnr), false),

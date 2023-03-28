@@ -117,13 +117,13 @@ class AdminService(
             )
 
         val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem =
-            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.fagsystem }
 
         val ankebehandlingerWithouthAnkeITrygderetten =
-            candidates.filter { it.kildeReferanse to it.sakFagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
+            candidates.filter { it.kildeReferanse to it.fagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
 
         val ankebehandlingerWithAnkeITrygderetten =
-            candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
+            candidates.filter { it.kildeReferanse to it.fagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystem }
 
         var logString = ""
 
@@ -151,13 +151,13 @@ class AdminService(
         }
 
         val existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter =
-            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.sakFagsystem }
+            ankeITrygderettenbehandlingRepository.findAll().map { it.kildeReferanse to it.fagsystem }
 
         val ankebehandlingerWithouthAnkeITrygderettenAfter =
-            candidates.filter { it.kildeReferanse to it.sakFagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
+            candidates.filter { it.kildeReferanse to it.fagsystem !in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
 
         val ankebehandlingerWithAnkeITrygderettenAfter =
-            candidates.filter { it.kildeReferanse to it.sakFagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
+            candidates.filter { it.kildeReferanse to it.fagsystem in existingAnkeITrygderettenBehandlingKildereferanseAndFagsystemAfter }
 
         logString += "Antall manglende ankeITrygderetten etter operasjonen: ${ankebehandlingerWithouthAnkeITrygderettenAfter.size} \n"
         logString += "Antall opprettede ankeITrygderetten etter operasjonen: ${ankebehandlingerWithAnkeITrygderettenAfter.size} \n"

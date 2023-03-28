@@ -60,10 +60,10 @@ abstract class Behandling(
     @Column(name = "frist")
     open var frist: LocalDate? = null,
     @Column(name = "sak_fagsak_id")
-    open val sakFagsakId: String,
+    open val fagsakId: String,
     @Column(name = "sak_fagsystem")
     @Convert(converter = FagsystemConverter::class)
-    open val sakFagsystem: Fagsystem,
+    open val fagsystem: Fagsystem,
     @Column(name = "dvh_referanse")
     open val dvhReferanse: String? = null,
     //Her går vi mot en løsning der en behandling har flere delbehandlingerer, som nok er bedre begrep enn vedtak.
