@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
@@ -209,8 +210,7 @@ class DokumentMapper {
                     datoOpprettet = journalpost.sak.datoOpprettet,
                     fagsakId = journalpost.sak.fagsakId,
                     fagsaksystem = journalpost.sak.fagsaksystem,
-                    //TODO: Fix kodeverk parsing
-                    fagsystemId = journalpost.sak.fagsaksystem
+                    fagsystemId = journalpost.sak.fagsaksystem?.let { Fagsystem.fromNavn(it).id }
                 )
             } else null,
             avsenderMottaker = if (journalpost.avsenderMottaker != null) {
