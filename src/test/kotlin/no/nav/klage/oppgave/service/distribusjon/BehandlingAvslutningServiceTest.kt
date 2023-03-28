@@ -149,8 +149,8 @@ internal class BehandlingAvslutningServiceTest {
         klager = Klager(partId = PartId(type = PartIdType.PERSON, value = fnr)),
         kildeReferanse = UUID.randomUUID().toString(),
         sakMottattKaDato = LocalDateTime.now(),
-        sakFagsystem = Fagsystem.K9,
-        sakFagsakId = "123",
+        fagsystem = Fagsystem.K9,
+        fagsakId = "123",
         forrigeBehandlendeEnhet = "0101",
         brukersHenvendelseMottattNavDato = LocalDate.now()
     )
@@ -171,8 +171,8 @@ internal class BehandlingAvslutningServiceTest {
         created = LocalDateTime.now(),
         modified = LocalDateTime.now(),
         mottattKlageinstans = LocalDateTime.now(),
-        sakFagsystem = Fagsystem.K9,
-        sakFagsakId = "123",
+        fagsystem = Fagsystem.K9,
+        fagsakId = "123",
         kildeReferanse = "abc",
         mottakId = mottak.id,
         delbehandlinger = setOf(

@@ -103,8 +103,10 @@ class KabinApiController(
             tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
             mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
             frist = ankebehandling.frist!!,
-            sakFagsakId = completedKlagebehandling.sakFagsakId,
-            sakFagsystem = completedKlagebehandling.sakFagsystem,
+            sakFagsakId = completedKlagebehandling.fagsakId,
+            fagsakId = completedKlagebehandling.fagsakId,
+            sakFagsystem = completedKlagebehandling.fagsystem,
+            fagsystem = completedKlagebehandling.fagsystem,
             fagsystemId = completedKlagebehandling.fagsystemId,
             journalpost = dokumentService.getDokumentReferanse(
                 journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,

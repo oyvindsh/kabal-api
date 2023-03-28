@@ -44,8 +44,8 @@ class KabalDocumentMapper(
                     value = behandling.sakenGjelder.partId.value
                 ),
                 temaId = behandling.ytelse.toTema().id,
-                sakFagsakId = behandling.sakFagsakId,
-                sakFagsystemId = behandling.sakFagsystem.id,
+                sakFagsakId = behandling.fagsakId,
+                sakFagsystemId = behandling.fagsystem.id,
                 kildeReferanse = behandling.id.toString(),
                 enhet = behandling.tildeling!!.enhet!!,
                 behandlingstema = BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS,

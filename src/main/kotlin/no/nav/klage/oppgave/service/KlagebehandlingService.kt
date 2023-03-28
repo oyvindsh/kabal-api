@@ -91,9 +91,11 @@ class KlagebehandlingService(
                 dokumentInfoId = it.dokumentInfoId
             )
         },
-        sakFagsakId = sakFagsakId,
-        sakFagsystem = sakFagsystem,
-        fagsystemId = sakFagsystem.id,
+        sakFagsakId = fagsakId,
+        fagsakId = fagsakId,
+        sakFagsystem = fagsystem,
+        fagsystem = fagsystem,
+        fagsystemId = fagsystem.id,
         klageBehandlendeEnhet = tildeling!!.enhet!!,
     )
 
@@ -133,8 +135,8 @@ class KlagebehandlingService(
                 type = mottak.type,
                 kildeReferanse = mottak.kildeReferanse,
                 dvhReferanse = mottak.dvhReferanse,
-                sakFagsystem = mottak.sakFagsystem,
-                sakFagsakId = mottak.sakFagsakId,
+                fagsystem = mottak.fagsystem,
+                fagsakId = mottak.fagsakId,
                 innsendt = mottak.innsendtDato,
                 mottattVedtaksinstans = mottak.brukersHenvendelseMottattNavDato,
                 avsenderEnhetFoersteinstans = mottak.forrigeBehandlendeEnhet,

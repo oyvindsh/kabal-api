@@ -94,7 +94,7 @@ class BehandlingAvslutningService(
             val behandlingEvent = BehandlingEvent(
                 eventId = UUID.randomUUID(),
                 kildeReferanse = behandling.kildeReferanse,
-                kilde = behandling.sakFagsystem.navn,
+                kilde = behandling.fagsystem.navn,
                 kabalReferanse = behandling.id.toString(),
                 type = when (behandling.type) {
                     Type.KLAGE -> KLAGEBEHANDLING_AVSLUTTET
@@ -107,7 +107,7 @@ class BehandlingAvslutningService(
                 KafkaEvent(
                     id = UUID.randomUUID(),
                     behandlingId = behandlingId,
-                    kilde = behandling.sakFagsystem.navn,
+                    kilde = behandling.fagsystem.navn,
                     kildeReferanse = behandling.kildeReferanse,
                     jsonPayload = objectMapperBehandlingEvents.writeValueAsString(behandlingEvent),
                     type = EventType.BEHANDLING_EVENT

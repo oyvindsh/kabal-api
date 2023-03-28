@@ -28,9 +28,9 @@ class Mottak(
     val sakenGjelder: SakenGjelder? = null,
     @Column(name = "sak_fagsystem")
     @Convert(converter = FagsystemConverter::class)
-    val sakFagsystem: Fagsystem,
+    val fagsystem: Fagsystem,
     @Column(name = "sak_fagsak_id")
-    val sakFagsakId: String,
+    val fagsakId: String,
     @Column(name = "kilde_referanse")
     val kildeReferanse: String,
     @Column(name = "dvh_referanse")

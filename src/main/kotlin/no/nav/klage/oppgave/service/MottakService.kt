@@ -193,7 +193,7 @@ class MottakService(
 
         publishEventAndUpdateMetrics(
             mottak = mottak,
-            kilde = mottak.sakFagsystem.navn,
+            kilde = mottak.fagsystem.navn,
             ytelse = mottak.ytelse.navn,
             type = mottak.type.navn,
         )
@@ -270,15 +270,15 @@ class MottakService(
         validateEnhet(forrigeBehandlendeEnhet)
     }
 
-    private fun validateDuplicate(sakFagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
-        if (mottakRepository.existsBySakFagsystemAndKildeReferanseAndType(
-                sakFagsystem.mapFagsystem(),
+    private fun validateDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
+        if (mottakRepository.existsByFagsystemAndKildeReferanseAndType(
+                fagsystem.mapFagsystem(),
                 kildeReferanse,
                 type
             )
         ) {
             val message =
-                "Kunne ikke lagre oversendelse grunnet duplikat: kildesystem ${sakFagsystem.name} og kildereferanse: $kildeReferanse"
+                "Kunne ikke lagre oversendelse grunnet duplikat: kildesystem ${fagsystem.name} og kildereferanse: $kildeReferanse"
             logger.warn(message)
             throw DuplicateOversendelseException(message)
         }
@@ -380,8 +380,8 @@ class MottakService(
             type = Type.ANKE,
             klager = klager,
             sakenGjelder = sakenGjelder,
-            sakFagsystem = sakFagsystem,
-            sakFagsakId = sakFagsakId,
+            fagsystem = fagsystem,
+            fagsakId = fagsakId,
             kildeReferanse = kildeReferanse,
             dvhReferanse = dvhReferanse,
             //Dette er søkehjemler
@@ -445,8 +445,8 @@ class MottakService(
             type = Type.ANKE,
             klager = klager,
             sakenGjelder = sakenGjelder,
-            sakFagsystem = sakFagsystem,
-            sakFagsakId = sakFagsakId,
+            fagsystem = fagsystem,
+            fagsakId = fagsakId,
             kildeReferanse = kildeReferanse,
             dvhReferanse = dvhReferanse,
             //Dette er søkehjemler
