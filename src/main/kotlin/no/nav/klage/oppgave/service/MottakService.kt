@@ -219,7 +219,7 @@ class MottakService(
 
         val mottak = mottakRepository.save(klageInput.toMottak())
 
-        secureLogger.debug("Har lagret følgende mottak basert på en OversendtKlageFromKabin: {}", mottak)
+        secureLogger.debug("Har lagret følgende mottak basert på en CreateKlageBasedOnKabinInput: {}", mottak)
         logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
 
         publishEventAndUpdateMetrics(
