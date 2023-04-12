@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.service
 
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
@@ -17,7 +18,10 @@ import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
 import no.nav.klage.oppgave.eventlisteners.CreateBehandlingFromMottakEventListener
-import no.nav.klage.oppgave.exceptions.*
+import no.nav.klage.oppgave.exceptions.DuplicateOversendelseException
+import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
+import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
+import no.nav.klage.oppgave.exceptions.PreviousBehandlingNotFinalizedException
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
@@ -207,7 +211,28 @@ class MottakService(
         return mottak.id
     }
 
-    fun validateAnkeCreationBasedOnKlagebehandling(
+    @Transactional
+    fun createKlageMottakFromKabinInput(klageInput: CreateKlageBasedOnKabinInput): UUID {
+        secureLogger.debug("Prøver å lage mottak fra klage fra Kabin: {}", klageInput)
+
+        klageInput.validate()
+
+        val mottak = mottakRepository.save(klageInput.toMottak())
+
+        secureLogger.debug("Har lagret følgende mottak basert på en OversendtKlageFromKabin: {}", mottak)
+        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
+        publishEventAndUpdateMetrics(
+            mottak = mottak,
+            kilde = mottak.fagsystem.name,
+            ytelse = mottak.ytelse.navn,
+            type = mottak.type.navn,
+        )
+
+        return mottak.id
+    }
+
+    private fun validateAnkeCreationBasedOnKlagebehandling(
         klagebehandling: Klagebehandling,
         klagebehandlingId: UUID,
         ankeJournalpostId: String,
@@ -246,8 +271,8 @@ class MottakService(
         validateDuplicate(kilde, kildeReferanse, type)
         validateYtelseAndHjemler(ytelse, hjemler)
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-        validatePartId(klager.id)
-        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
+        validatePartId(klager.id.toPartId())
+        sakenGjelder?.run { validatePartId(sakenGjelder.id.toPartId()) }
         validateType(type)
         validateEnhet(avsenderEnhet)
         validateKildeReferanse(kildeReferanse)
@@ -261,8 +286,8 @@ class MottakService(
         validateYtelseAndHjemler(ytelse, hjemler)
         validateDuplicate(kilde, kildeReferanse, type)
         tilknyttedeJournalposter.forEach { validateJournalpost(it.journalpostId) }
-        validatePartId(klager.id)
-        sakenGjelder?.run { validatePartId(sakenGjelder.id) }
+        validatePartId(klager.id.toPartId())
+        sakenGjelder?.run { validatePartId(sakenGjelder.id.toPartId()) }
         validateDateNotInFuture(brukersHenvendelseMottattNavDato, ::brukersHenvendelseMottattNavDato.name)
         validateDateNotInFuture(innsendtTilNav, ::innsendtTilNav.name)
         validateDateNotInFuture(sakMottattKaDato, ::sakMottattKaDato.name)
@@ -270,11 +295,24 @@ class MottakService(
         validateEnhet(forrigeBehandlendeEnhet)
     }
 
+    fun CreateKlageBasedOnKabinInput.validate() {
+        validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
+        validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.KLAGE)
+        validateJournalpost(klageJournalpostId)
+        validatePartId(klager.toPartId())
+        validatePartId(sakenGjelder.toPartId())
+        fullmektig?.let { validatePartId(it.toPartId()) }
+        validateDateNotInFuture(brukersHenvendelseMottattNav, ::brukersHenvendelseMottattNav.name)
+        validateDateNotInFuture(sakMottattKa, ::sakMottattKa.name)
+        validateKildeReferanse(kildereferanse)
+        validateEnhet(forrigeBehandlendeEnhet)
+    }
+
     private fun validateDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
         if (mottakRepository.existsByFagsystemAndKildeReferanseAndType(
-                fagsystem.mapFagsystem(),
-                kildeReferanse,
-                type
+                fagsystem = fagsystem.mapFagsystem(),
+                kildeReferanse = kildeReferanse,
+                type = type
             )
         ) {
             val message =
@@ -342,23 +380,23 @@ class MottakService(
             throw OversendtKlageNotValidException("$journalpostId er ikke en gyldig journalpost referanse")
         }
 
-    private fun validatePartId(partId: OversendtPartId) {
+    private fun validatePartId(partId: PartId) {
         when (partId.type) {
-            OversendtPartIdType.VIRKSOMHET -> {
-                if (!isValidOrgnr(partId.verdi)) {
+            PartIdType.VIRKSOMHET -> {
+                if (!isValidOrgnr(partId.value)) {
                     throw OversendtKlageNotValidException("Ugyldig organisasjonsnummer")
                 }
-                if (!eregClient.organisasjonExists(partId.verdi)) {
+                if (!eregClient.organisasjonExists(partId.value)) {
                     throw OversendtKlageNotValidException("Organisasjonen fins ikke i Ereg")
                 }
             }
 
-            OversendtPartIdType.PERSON -> {
-                if (!isValidFnrOrDnr(partId.verdi)) {
+            PartIdType.PERSON -> {
+                if (!isValidFnrOrDnr(partId.value)) {
                     throw OversendtKlageNotValidException("Ugyldig fødselsnummer")
                 }
 
-                if (!pdlFacade.personExists(partId.verdi)) {
+                if (!pdlFacade.personExists(partId.value)) {
                     throw OversendtKlageNotValidException("Personen fins ikke i PDL")
                 }
             }

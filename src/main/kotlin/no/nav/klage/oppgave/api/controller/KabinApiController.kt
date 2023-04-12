@@ -129,4 +129,63 @@ class KabinApiController(
             .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
             .map { it.journalpostId }.toSet().toList()
     }
+
+    @PostMapping("/createklage")
+    fun createKlage(
+        @RequestBody input: CreateKlageBasedOnKabinInput
+    ): CreatedKlageResponse {
+        logMethodDetails(
+            methodName = ::createKlage.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+        //TODO: Sjekk behov for å sende Kafka-melding, dobbeltsjekk DVH
+
+        return CreatedKlageResponse(mottakId = mottakService.createKlageMottakFromKabinInput(klageInput = input))
+    }
+
+    @GetMapping("/klager/{mottakId}/status")
+    fun getCreatedKlagebehandlingStatus(
+        @PathVariable mottakId: UUID
+    ): CreatedBehandlingStatusForKabin {
+        logMethodDetails(
+            methodName = ::getCreatedKlagebehandlingStatus.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+
+        TODO()
+        /*
+        val mottak =
+            mottakService.getMottak(mottakId = mottakId) ?: throw RuntimeException("mottak not found for id $mottakId")
+        val klagebehandling = klagebehandlingService.getAnkebehandlingFromMottakId(mottakId)
+            ?: throw BehandlingNotFoundException("anke not found")
+
+        val completedKlagebehandling =
+            klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
+
+        return CreatedBehandlingStatusForKabin(
+            typeId = Type.ANKE.id,
+            behandlingId = completedKlagebehandling.behandlingId,
+            ytelseId = completedKlagebehandling.ytelseId,
+            utfallId = completedKlagebehandling.utfallId,
+            vedtakDate = completedKlagebehandling.vedtakDate,
+            sakenGjelder = completedKlagebehandling.sakenGjelder,
+            klager = behandlingMapper.getKlagerView(ankebehandling.klager),
+            fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+            tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
+            mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
+            frist = ankebehandling.frist!!,
+            sakFagsakId = completedKlagebehandling.fagsakId,
+            fagsakId = completedKlagebehandling.fagsakId,
+            sakFagsystem = completedKlagebehandling.fagsystem,
+            fagsystem = completedKlagebehandling.fagsystem,
+            fagsystemId = completedKlagebehandling.fagsystemId,
+            journalpost = dokumentService.getDokumentReferanse(
+                journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,
+                behandling = ankebehandling
+            )
+        )
+        */
+    }
 }

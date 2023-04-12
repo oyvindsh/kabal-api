@@ -40,7 +40,7 @@ data class OversendtKlageAnkeV3(
     )
     val kildeReferanse: String,
     @Schema(
-        description = "Id som rapporters på til DVH, bruker kildeReferanse hvis denne ikke er satt",
+        description = "Id som rapporteres på til DVH, bruker kildeReferanse hvis denne ikke er satt",
         required = false
     )
     val dvhReferanse: String? = null,

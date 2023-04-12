@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.eventlisteners
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -60,7 +61,7 @@ class StatistikkTilDVHService(
     private fun StatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
 
     private fun shouldSendStats(behandlingEndretEvent: BehandlingEndretEvent) =
-        (behandlingEndretEvent.endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN) ||
+        behandlingEndretEvent.behandling.fagsystem != Fagsystem.IT01 && (behandlingEndretEvent.endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN) ||
                 behandlingEndretEvent.endringslogginnslag.any {
                     it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                             || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
