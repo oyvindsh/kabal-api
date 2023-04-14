@@ -88,7 +88,8 @@ fun CreateKlageBasedOnKabinInput.toMottak(forrigeBehandlingId: UUID? = null): Mo
         sakMottattKaDato = sakMottattKa.atStartOfDay(),
         frist = frist,
         ytelse = Ytelse.of(ytelseId),
-        forrigeBehandlingId = forrigeBehandlingId
+        forrigeBehandlingId = forrigeBehandlingId,
+        sentFrom = Mottak.Sender.KABIN,
     )
 }
 

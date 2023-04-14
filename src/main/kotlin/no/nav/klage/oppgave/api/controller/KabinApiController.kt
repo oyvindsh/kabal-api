@@ -76,7 +76,7 @@ class KabinApiController(
     @GetMapping("/anker/{mottakId}/status")
     fun getCreatedAnkebehandlingStatus(
         @PathVariable mottakId: UUID
-    ): CreatedBehandlingStatusForKabin {
+    ): CreatedAnkebehandlingStatusForKabin {
         logMethodDetails(
             methodName = ::getCreatedAnkebehandlingStatus.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -91,7 +91,7 @@ class KabinApiController(
         val completedKlagebehandling =
             klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
 
-        return CreatedBehandlingStatusForKabin(
+        return CreatedAnkebehandlingStatusForKabin(
             typeId = Type.ANKE.id,
             behandlingId = completedKlagebehandling.behandlingId,
             ytelseId = completedKlagebehandling.ytelseId,
@@ -147,45 +147,36 @@ class KabinApiController(
     @GetMapping("/klager/{mottakId}/status")
     fun getCreatedKlagebehandlingStatus(
         @PathVariable mottakId: UUID
-    ): CreatedBehandlingStatusForKabin {
+    ): CreatedKlagebehandlingStatusForKabin {
         logMethodDetails(
             methodName = ::getCreatedKlagebehandlingStatus.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger
         )
 
-        TODO()
-        /*
         val mottak =
             mottakService.getMottak(mottakId = mottakId) ?: throw RuntimeException("mottak not found for id $mottakId")
-        val klagebehandling = klagebehandlingService.getAnkebehandlingFromMottakId(mottakId)
-            ?: throw BehandlingNotFoundException("anke not found")
+        val klagebehandling = klagebehandlingService.getKlagebehandlingFromMottakId(mottakId)
+            ?: throw BehandlingNotFoundException("klage not found")
 
-        val completedKlagebehandling =
-            klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
-
-        return CreatedBehandlingStatusForKabin(
-            typeId = Type.ANKE.id,
-            behandlingId = completedKlagebehandling.behandlingId,
-            ytelseId = completedKlagebehandling.ytelseId,
-            utfallId = completedKlagebehandling.utfallId,
-            vedtakDate = completedKlagebehandling.vedtakDate,
-            sakenGjelder = completedKlagebehandling.sakenGjelder,
-            klager = behandlingMapper.getKlagerView(ankebehandling.klager),
-            fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
-            tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
-            mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
-            frist = ankebehandling.frist!!,
-            sakFagsakId = completedKlagebehandling.fagsakId,
-            fagsakId = completedKlagebehandling.fagsakId,
-            sakFagsystem = completedKlagebehandling.fagsystem,
-            fagsystem = completedKlagebehandling.fagsystem,
-            fagsystemId = completedKlagebehandling.fagsystemId,
+        return CreatedKlagebehandlingStatusForKabin(
+            typeId = Type.KLAGE.id,
+            behandlingId = klagebehandling.id,
+            ytelseId = klagebehandling.ytelse.id,
+            sakenGjelder = behandlingMapper.getSakenGjelderView(klagebehandling.sakenGjelder),
+            klager = behandlingMapper.getKlagerView(klagebehandling.klager),
+            fullmektig = klagebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+            mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
+            mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
+            frist = klagebehandling.frist!!,
+            fagsakId = klagebehandling.fagsakId,
+            fagsystemId = klagebehandling.fagsystem.id,
             journalpost = dokumentService.getDokumentReferanse(
-                journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,
-                behandling = ankebehandling
-            )
+                journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_KLAGE }!!.journalpostId,
+                behandling = klagebehandling
+            ),
+            kildereferanse = mottak.kildeReferanse,
         )
-        */
+
     }
 }
