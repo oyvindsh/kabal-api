@@ -2,12 +2,14 @@ package no.nav.klage.dokument.clients.kabalsmarteditorapi
 
 import io.micrometer.tracing.Tracer
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.DeleteCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.ModifyCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -152,13 +154,19 @@ class KabalSmartEditorApiClient(
 
     fun deleteCommentWithPossibleThread(
         documentId: UUID,
-        commentId: UUID
+        commentId: UUID,
+        behandlingTildeltIdent: String?
     ) {
-        kabalSmartEditorApiWebClient.delete()
+        kabalSmartEditorApiWebClient.method(HttpMethod.DELETE)
             .uri { it.path("/documents/$documentId/comments/$commentId").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
+            )
+            .bodyValue(
+                DeleteCommentInput(
+                    behandlingTildeltIdent = behandlingTildeltIdent
+                )
             )
             .retrieve()
             .bodyToMono<Unit>()

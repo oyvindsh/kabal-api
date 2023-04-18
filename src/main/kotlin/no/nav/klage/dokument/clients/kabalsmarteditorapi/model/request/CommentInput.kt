@@ -13,3 +13,7 @@ data class CommentInput(
 data class ModifyCommentInput(
     val text: String,
 )
+
+data class DeleteCommentInput(
+    val behandlingTildeltIdent: String?
+)
