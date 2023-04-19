@@ -2,6 +2,7 @@ package no.nav.klage.dokument.clients.kabalsmarteditorapi
 
 import io.micrometer.tracing.Tracer
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.CommentInput
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.DeleteCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.request.ModifyCommentInput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentOutput
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
@@ -152,13 +153,19 @@ class KabalSmartEditorApiClient(
 
     fun deleteCommentWithPossibleThread(
         documentId: UUID,
-        commentId: UUID
+        commentId: UUID,
+        behandlingTildeltIdent: String?
     ) {
-        kabalSmartEditorApiWebClient.delete()
-            .uri { it.path("/documents/$documentId/comments/$commentId").build() }
+        kabalSmartEditorApiWebClient.post()
+            .uri { it.path("/documents/$documentId/comments/$commentId/delete").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
+            )
+            .bodyValue(
+                DeleteCommentInput(
+                    behandlingTildeltIdent = behandlingTildeltIdent
+                )
             )
             .retrieve()
             .bodyToMono<Unit>()
