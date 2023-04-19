@@ -9,7 +9,6 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.Document
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -157,8 +156,8 @@ class KabalSmartEditorApiClient(
         commentId: UUID,
         behandlingTildeltIdent: String?
     ) {
-        kabalSmartEditorApiWebClient.method(HttpMethod.DELETE)
-            .uri { it.path("/documents/$documentId/comments/$commentId").build() }
+        kabalSmartEditorApiWebClient.post()
+            .uri { it.path("/documents/$documentId/comments/$commentId/delete").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithKabalSmartEditorApiScope()}"
