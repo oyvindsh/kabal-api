@@ -13,6 +13,7 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentO
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -30,6 +31,7 @@ class SmartEditorController(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val dokumentMapper: DokumentMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val behandlingService: BehandlingService
 
     ) {
     companion object {
@@ -251,6 +253,7 @@ class SmartEditorController(
     )
     @DeleteMapping("/{dokumentId}/comments/{commentId}")
     fun deleteCommentWithPossibleThread(
+        @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
     ) {
@@ -259,6 +262,13 @@ class SmartEditorController(
                 dokumentId = documentId,
                 readOnly = true
             )
-        kabalSmartEditorApiClient.deleteCommentWithPossibleThread(documentId = smartEditorId, commentId = commentId)
+
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        kabalSmartEditorApiClient.deleteCommentWithPossibleThread(
+            documentId = smartEditorId,
+            commentId = commentId,
+            behandlingTildeltIdent = behandling.tildeling?.saksbehandlerident
+        )
     }
 }
