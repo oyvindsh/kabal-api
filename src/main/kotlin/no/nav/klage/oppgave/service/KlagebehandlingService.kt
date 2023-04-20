@@ -163,6 +163,10 @@ class KlagebehandlingService(
         return klagebehandling
     }
 
+    fun getKlagebehandlingFromMottakId(mottakId: UUID): Klagebehandling? {
+        return klagebehandlingRepository.findByMottakId(mottakId)
+    }
+
     private fun getKakaVersion(): Int {
         val kvalitetsvurderingVersion = if (LocalDate.now() >= kakaVersion2Date) {
             2

@@ -76,7 +76,7 @@ class KabinApiController(
     @GetMapping("/anker/{mottakId}/status")
     fun getCreatedAnkebehandlingStatus(
         @PathVariable mottakId: UUID
-    ): CreatedBehandlingStatusForKabin {
+    ): CreatedAnkebehandlingStatusForKabin {
         logMethodDetails(
             methodName = ::getCreatedAnkebehandlingStatus.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -91,7 +91,7 @@ class KabinApiController(
         val completedKlagebehandling =
             klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
 
-        return CreatedBehandlingStatusForKabin(
+        return CreatedAnkebehandlingStatusForKabin(
             typeId = Type.ANKE.id,
             behandlingId = completedKlagebehandling.behandlingId,
             ytelseId = completedKlagebehandling.ytelseId,
@@ -128,5 +128,55 @@ class KabinApiController(
             .flatMap { it.mottakDokument }
             .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
             .map { it.journalpostId }.toSet().toList()
+    }
+
+    @PostMapping("/createklage")
+    fun createKlage(
+        @RequestBody input: CreateKlageBasedOnKabinInput
+    ): CreatedKlageResponse {
+        logMethodDetails(
+            methodName = ::createKlage.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+        //TODO: Sjekk behov for å sende Kafka-melding, dobbeltsjekk DVH
+
+        return CreatedKlageResponse(mottakId = mottakService.createKlageMottakFromKabinInput(klageInput = input))
+    }
+
+    @GetMapping("/klager/{mottakId}/status")
+    fun getCreatedKlagebehandlingStatus(
+        @PathVariable mottakId: UUID
+    ): CreatedKlagebehandlingStatusForKabin {
+        logMethodDetails(
+            methodName = ::getCreatedKlagebehandlingStatus.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+
+        val mottak =
+            mottakService.getMottak(mottakId = mottakId) ?: throw RuntimeException("mottak not found for id $mottakId")
+        val klagebehandling = klagebehandlingService.getKlagebehandlingFromMottakId(mottakId)
+            ?: throw BehandlingNotFoundException("klage not found")
+
+        return CreatedKlagebehandlingStatusForKabin(
+            typeId = Type.KLAGE.id,
+            behandlingId = klagebehandling.id,
+            ytelseId = klagebehandling.ytelse.id,
+            sakenGjelder = behandlingMapper.getSakenGjelderView(klagebehandling.sakenGjelder),
+            klager = behandlingMapper.getKlagerView(klagebehandling.klager),
+            fullmektig = klagebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+            mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
+            mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
+            frist = klagebehandling.frist!!,
+            fagsakId = klagebehandling.fagsakId,
+            fagsystemId = klagebehandling.fagsystem.id,
+            journalpost = dokumentService.getDokumentReferanse(
+                journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_KLAGE }!!.journalpostId,
+                behandling = klagebehandling
+            ),
+            kildereferanse = mottak.kildeReferanse,
+        )
+
     }
 }

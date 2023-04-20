@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
-data class CreatedBehandlingStatusForKabin(
+data class CreatedAnkebehandlingStatusForKabin(
     val typeId: String,
     val behandlingId: UUID,
     val ytelseId: String,
@@ -23,4 +23,20 @@ data class CreatedBehandlingStatusForKabin(
     val fagsystem: Fagsystem,
     val fagsystemId: String,
     val journalpost: DokumentReferanse,
+)
+
+data class CreatedKlagebehandlingStatusForKabin(
+    val typeId: String,
+    val behandlingId: UUID,
+    val ytelseId: String,
+    val sakenGjelder: BehandlingDetaljerView.SakenGjelderView,
+    val klager: BehandlingDetaljerView.KlagerView,
+    val fullmektig: BehandlingDetaljerView.ProsessfullmektigView?,
+    val mottattVedtaksinstans: LocalDate,
+    val mottattKlageinstans: LocalDate,
+    val frist: LocalDate,
+    val fagsakId: String,
+    val fagsystemId: String,
+    val journalpost: DokumentReferanse,
+    val kildereferanse: String,
 )
