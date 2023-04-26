@@ -3,8 +3,8 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
-import no.nav.klage.oppgave.api.view.CompletedKlagebehandling
 import no.nav.klage.oppgave.api.view.TilknyttetDokument
+import no.nav.klage.oppgave.api.view.kabin.CompletedKlagebehandling
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
