@@ -9,6 +9,8 @@ import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.ytelseTilHjemler
 import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.kabin.CreateAnkeBasedOnKabinInput
+import no.nav.klage.oppgave.api.view.kabin.CreateKlageBasedOnKabinInput
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -308,6 +310,14 @@ class MottakService(
         validateEnhet(forrigeBehandlendeEnhet)
     }
 
+    fun isDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type): Boolean {
+        return mottakRepository.existsByFagsystemAndKildeReferanseAndType(
+            fagsystem = fagsystem.mapFagsystem(),
+            kildeReferanse = kildeReferanse,
+            type = type
+        )
+    }
+
     private fun validateDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
         if (mottakRepository.existsByFagsystemAndKildeReferanseAndType(
                 fagsystem = fagsystem.mapFagsystem(),
@@ -502,6 +512,59 @@ class MottakService(
             kommentar = null,
             forrigeBehandlingId = id,
             innsynUrl = null,
+            sentFrom = Mottak.Sender.KABIN,
+        )
+    }
+
+    fun CreateKlageBasedOnKabinInput.toMottak(forrigeBehandlingId: UUID? = null): Mottak {
+        val prosessfullmektig = if (fullmektig != null) {
+            Prosessfullmektig(
+                partId = fullmektig.toPartId(),
+                skalPartenMottaKopi = true
+            )
+        } else {
+            null
+        }
+
+        val klager = if (klager != null) {
+            Klager(
+                partId = klager.toPartId(),
+                prosessfullmektig = prosessfullmektig
+            )
+        } else {
+            Klager(
+                partId = sakenGjelder.toPartId(),
+                prosessfullmektig = prosessfullmektig
+            )
+        }
+
+        return Mottak(
+            type = Type.KLAGE,
+            klager = klager,
+            sakenGjelder = SakenGjelder(
+                partId = sakenGjelder.toPartId(),
+                //TODO ever used?
+                skalMottaKopi = false
+            ),
+            innsynUrl = null,
+            fagsystem = Fagsystem.of(fagsystemId),
+            fagsakId = fagsakId,
+            kildeReferanse = kildereferanse,
+            dvhReferanse = null,
+            hjemler = hjemmelIdList?.map { MottakHjemmel(hjemmelId = it) }?.toSet(),
+            forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
+            mottakDokument = mutableSetOf(
+                MottakDokument(
+                    type = MottakDokumentType.BRUKERS_KLAGE,
+                    journalpostId = klageJournalpostId
+                )
+            ),
+            innsendtDato = null,
+            brukersHenvendelseMottattNavDato = brukersHenvendelseMottattNav,
+            sakMottattKaDato = sakMottattKa.atStartOfDay(),
+            frist = frist,
+            ytelse = Ytelse.of(ytelseId),
+            forrigeBehandlingId = forrigeBehandlingId,
             sentFrom = Mottak.Sender.KABIN,
         )
     }

@@ -1,9 +1,11 @@
 package no.nav.klage.oppgave.api.controller
 
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.kabin.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
@@ -31,6 +33,19 @@ class KabinApiController(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+    @PostMapping("/isduplicate")
+    fun isDuplicate(
+        @RequestBody input: IsDuplicateInput
+    ): Boolean {
+        return mottakService.isDuplicate(
+            fagsystem = KildeFagsystem.valueOf(
+                Fagsystem.of(input.fagsystemId).name
+            ),
+            kildeReferanse = input.kildereferanse,
+            type = Type.of(input.typeId)
+        )
     }
 
     @PostMapping("/completedklagebehandlinger")
