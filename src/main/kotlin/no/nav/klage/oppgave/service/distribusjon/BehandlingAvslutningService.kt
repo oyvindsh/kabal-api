@@ -127,6 +127,7 @@ class BehandlingAvslutningService(
 
             //if fagsystem is Infotrygd also do this.
             if (behandling.fagsystem == Fagsystem.IT01) {
+                logger.debug("Klagen som er avsluttet skal sendes tilbake til Infotrygd.")
                 fssProxyClient.setToFinished(
                     sakId = behandling.kildeReferanse,
                     SakFinishedInput(
@@ -137,8 +138,10 @@ class BehandlingAvslutningService(
                             entry.value == behandling.currentDelbehandling().utfall
                         }!!.key),
                         mottaker = SakFinishedInput.Mottaker.TRYGDEKONTOR,
+                        saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
                     )
                 )
+                logger.debug("Klagen som er avsluttet ble sendt tilbake til Infotrygd.")
             }
         }
 
