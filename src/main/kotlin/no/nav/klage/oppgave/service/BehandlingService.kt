@@ -240,12 +240,12 @@ class BehandlingService(
             }
         } else {
             //if fagsystem is Infotrygd also do this.
-            if (behandling.fagsystem == Fagsystem.IT01) {
+            if (behandling.fagsystem == Fagsystem.IT01 && behandling.type != Type.ANKE_I_TRYGDERETTEN) {
                 logger.debug("Fradeling av behandling skal registreres i Infotrygd.")
                 fssProxyClient.setToHandledInKabal(
                     sakId = behandling.kildeReferanse,
                     input = HandledInKabalInput(
-                        fristAsString = behandling.frist.format(DateTimeFormatter.BASIC_ISO_DATE),
+                        fristAsString = behandling.frist!!.format(DateTimeFormatter.BASIC_ISO_DATE),
                     )
                 )
                 logger.debug("Fradeling av behandling ble registrert i Infotrygd.")

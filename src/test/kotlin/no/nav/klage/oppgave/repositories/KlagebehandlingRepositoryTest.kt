@@ -366,6 +366,7 @@ class KlagebehandlingRepositoryTest {
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             delbehandlinger = setOf(),
+            frist = LocalDate.now().plusWeeks(12),
         )
 
         ankebehandlingRepository.save(ankebehandling)

@@ -35,6 +35,7 @@ internal class KlagebehandlingTest {
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.IKKE_TILDELT)
         }
@@ -56,6 +57,7 @@ internal class KlagebehandlingTest {
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.IKKE_TILDELT)
         }
@@ -77,6 +79,7 @@ internal class KlagebehandlingTest {
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.TILDELT)
         }
@@ -102,6 +105,7 @@ internal class KlagebehandlingTest {
                     ),
                 ),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
         }
@@ -127,6 +131,7 @@ internal class KlagebehandlingTest {
                     )
                 ),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.RETURNERT_TIL_SAKSBEHANDLER)
         }
@@ -151,6 +156,7 @@ internal class KlagebehandlingTest {
                     )
                 ),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.MEDUNDERSKRIVER_VALGT)
         }
@@ -176,6 +182,7 @@ internal class KlagebehandlingTest {
                     )
                 ),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.TILDELT)
         }
@@ -201,6 +208,7 @@ internal class KlagebehandlingTest {
                     )
                 ),
                 kakaKvalitetsvurderingVersion = 2,
+                frist = LocalDate.now().plusWeeks(12),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.FULLFOERT)
         }

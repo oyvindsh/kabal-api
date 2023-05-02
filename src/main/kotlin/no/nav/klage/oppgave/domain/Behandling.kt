@@ -58,7 +58,7 @@ abstract class Behandling(
     )
     open var tildeling: Tildeling? = null,
     @Column(name = "frist")
-    open var frist: LocalDate,
+    open var frist: LocalDate? = null,
     @Column(name = "sak_fagsak_id")
     open val fagsakId: String,
     @Column(name = "sak_fagsystem")
