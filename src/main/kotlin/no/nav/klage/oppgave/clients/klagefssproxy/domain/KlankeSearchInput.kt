@@ -13,6 +13,14 @@ data class SakFromKlanke(
     val fnr: String,
 )
 
+data class SakAssignedInput(
+    val saksbehandlerIdent: String
+)
+
+data class HandledInKabalInput(
+    val fristAsString: String
+)
+
 data class SakFinishedInput(
     val status: Status,
     val nivaa: Nivaa,

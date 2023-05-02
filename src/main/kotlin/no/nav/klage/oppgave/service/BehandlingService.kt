@@ -9,6 +9,9 @@ import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
+import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.HandledInKabalInput
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakAssignedInput
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setKjennelseMottatt
@@ -35,6 +38,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service
@@ -48,7 +52,8 @@ class BehandlingService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val kabalInnstillingerService: KabalInnstillingerService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val arbeidOgInntektClient: ArbeidOgInntektClient
+    private val arbeidOgInntektClient: ArbeidOgInntektClient,
+    private val fssProxyClient: KlageFssProxyClient,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -219,8 +224,35 @@ class BehandlingService(
         val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
         if (tildeltSaksbehandlerIdent != null) {
             //Denne sjekken gjøres kun når det er en tildeling:
+
             checkYtelseAccess(tildeltSaksbehandlerIdent = tildeltSaksbehandlerIdent, behandling = behandling)
+
+            //if fagsystem is Infotrygd also do this.
+            if (behandling.fagsystem == Fagsystem.IT01) {
+                logger.debug("Tildeling av behandling skal registreres i Infotrygd.")
+                fssProxyClient.setToAssigned(
+                    sakId = behandling.kildeReferanse,
+                    input = SakAssignedInput(
+                        saksbehandlerIdent = tildeltSaksbehandlerIdent,
+                    )
+                )
+                logger.debug("Tildeling av behandling ble registrert i Infotrygd.")
+            }
+        } else {
+            //if fagsystem is Infotrygd also do this.
+            if (behandling.fagsystem == Fagsystem.IT01) {
+                logger.debug("Fradeling av behandling skal registreres i Infotrygd.")
+                fssProxyClient.setToHandledInKabal(
+                    sakId = behandling.kildeReferanse,
+                    input = HandledInKabalInput(
+                        fristAsString = behandling.frist.format(DateTimeFormatter.BASIC_ISO_DATE),
+                    )
+                )
+                logger.debug("Fradeling av behandling ble registrert i Infotrygd.")
+            }
         }
+
+
         val event =
             behandling.setTildeling(
                 nyVerdiSaksbehandlerident = tildeltSaksbehandlerIdent,

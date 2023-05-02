@@ -1,5 +1,7 @@
 package no.nav.klage.oppgave.clients.klagefssproxy
 
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.HandledInKabalInput
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakAssignedInput
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFinishedInput
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFromKlanke
 import no.nav.klage.oppgave.util.TokenUtil
@@ -33,9 +35,35 @@ class KlageFssProxyClient(
             ?: throw RuntimeException("Empty result")
     }
 
+    fun setToHandledInKabal(sakId: String, input: HandledInKabalInput) {
+        klageFssProxyWebClient.post()
+            .uri { it.path("/klanke/saker/{sakId}/handledinkabal").build(sakId) }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFSSProxyScope()}"
+            )
+            .bodyValue(input)
+            .retrieve()
+            .bodyToMono<Unit>()
+            .block()
+    }
+
     fun setToFinished(sakId: String, input: SakFinishedInput) {
         klageFssProxyWebClient.post()
             .uri { it.path("/klanke/saker/{sakId}/finished").build(sakId) }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()}"
+            )
+            .bodyValue(input)
+            .retrieve()
+            .bodyToMono<Unit>()
+            .block()
+    }
+
+    fun setToAssigned(sakId: String, input: SakAssignedInput) {
+        klageFssProxyWebClient.post()
+            .uri { it.path("/klanke/saker/{sakId}/assignedinkabal").build(sakId) }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKlageFSSProxyScope()}"

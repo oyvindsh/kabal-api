@@ -117,7 +117,7 @@ class KabinApiController(
             fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
             tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
             mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
-            frist = ankebehandling.frist!!,
+            frist = ankebehandling.frist,
             sakFagsakId = completedKlagebehandling.fagsakId,
             fagsakId = completedKlagebehandling.fagsakId,
             sakFagsystem = completedKlagebehandling.fagsystem,
@@ -183,7 +183,7 @@ class KabinApiController(
             fullmektig = klagebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
             mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
-            frist = klagebehandling.frist!!,
+            frist = klagebehandling.frist,
             fagsakId = klagebehandling.fagsakId,
             fagsystemId = klagebehandling.fagsystem.id,
             journalpost = dokumentService.getDokumentReferanse(
