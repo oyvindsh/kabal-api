@@ -15,6 +15,7 @@ import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.BrevmottakerWithJoarkAndDokDistInfo
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.JournalpostId
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
+import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 
@@ -97,6 +98,9 @@ internal class BehandlingAvslutningServiceTest {
 
         @MockkBean(relaxed = true)
         lateinit var tokenUtil: TokenUtil
+
+        @MockkBean(relaxed = true)
+        lateinit var klageFssProxyClient: KlageFssProxyClient
     }
 
     //@Autowired

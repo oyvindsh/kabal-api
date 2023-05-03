@@ -11,6 +11,7 @@ import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
+import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.Behandling
@@ -97,6 +98,9 @@ class BehandlingServiceTest {
     @MockkBean
     lateinit var arbeidOgInntektClient: ArbeidOgInntektClient
 
+    @MockkBean
+    lateinit var fssProxyClient: KlageFssProxyClient
+
     lateinit var behandlingService: BehandlingService
 
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"
@@ -114,7 +118,8 @@ class BehandlingServiceTest {
             dokumentUnderArbeidRepository = dokumentUnderArbeidRepository,
             kabalInnstillingerService = kabalInnstillingerService,
             innloggetSaksbehandlerService = innloggetSaksbehandlerService,
-            arbeidOgInntektClient = arbeidOgInntektClient
+            arbeidOgInntektClient = arbeidOgInntektClient,
+            fssProxyClient = fssProxyClient
         )
     }
 

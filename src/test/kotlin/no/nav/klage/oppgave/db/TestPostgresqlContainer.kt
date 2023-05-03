@@ -28,5 +28,4 @@ class TestPostgresqlContainer private constructor() :
         //do nothing, JVM handles shut down
     }
 
-
 }

@@ -90,6 +90,7 @@ class BehandlingMapperTest {
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
+            frist = LocalDate.now().plusWeeks(12),
         )
     }
 

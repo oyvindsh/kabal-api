@@ -6,7 +6,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.kodeverk.infotrygdKlageutfallToUtfall
+import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFinishedInput
 import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.ANKEBEHANDLING_AVSLUTTET
@@ -35,6 +39,7 @@ class BehandlingAvslutningService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val ankebehandlingService: AnkebehandlingService,
+    private val fssProxyClient: KlageFssProxyClient,
 ) {
 
     companion object {
@@ -56,11 +61,17 @@ class BehandlingAvslutningService(
             val hovedDokumenterIkkeFerdigstilte =
                 dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
             if (hovedDokumenterIkkeFerdigstilte.isNotEmpty()) {
-                logger.warn("Kunne ikke avslutte behandling $behandlingId fordi noen dokumenter mangler ferdigstilling. Prøver på nytt senere.")
+                logger.warn(
+                    "Kunne ikke avslutte behandling {} fordi noen dokumenter mangler ferdigstilling. Prøver på nytt senere.",
+                    behandlingId
+                )
                 return
             }
 
-            logger.debug("Alle vedtak i behandling $behandlingId er ferdigstilt, så vi markerer behandlingen som avsluttet")
+            logger.debug(
+                "Alle dokumenter i behandling {} er ferdigstilte, så vi kan markere behandlingen som avsluttet",
+                behandlingId
+            )
             privateAvsluttBehandling(behandlingId)
 
         } catch (e: Exception) {
@@ -113,6 +124,25 @@ class BehandlingAvslutningService(
                     type = EventType.BEHANDLING_EVENT
                 )
             )
+
+            //if fagsystem is Infotrygd also do this.
+            if (behandling.fagsystem == Fagsystem.IT01) {
+                logger.debug("Klagen som er avsluttet skal sendes tilbake til Infotrygd.")
+                fssProxyClient.setToFinished(
+                    sakId = behandling.kildeReferanse,
+                    SakFinishedInput(
+                        status = SakFinishedInput.Status.RETURNERT_TK,
+                        nivaa = SakFinishedInput.Nivaa.KA,
+                        typeResultat = SakFinishedInput.TypeResultat.RESULTAT,
+                        utfall = SakFinishedInput.Utfall.valueOf(infotrygdKlageutfallToUtfall.entries.find { entry ->
+                            entry.value == behandling.currentDelbehandling().utfall
+                        }!!.key),
+                        mottaker = SakFinishedInput.Mottaker.TRYGDEKONTOR,
+                        saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
+                    )
+                )
+                logger.debug("Klagen som er avsluttet ble sendt tilbake til Infotrygd.")
+            }
         }
 
         val event = behandling.setAvsluttet(SYSTEMBRUKER)
