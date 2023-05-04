@@ -186,6 +186,7 @@ enum class Tema {
     HJE, //Hjelpemidler
     IAR, //Inkluderende arbeidsliv
     IND, //Tiltakspenger
+    KLL, //Klage lønnsgaranti
     KON, //Kontantstøtte
     KTR, //Kontroll
     MED, //Medlemskap
