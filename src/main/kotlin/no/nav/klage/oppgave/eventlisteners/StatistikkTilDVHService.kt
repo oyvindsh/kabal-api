@@ -60,13 +60,17 @@ class StatistikkTilDVHService(
 
     private fun StatistikkTilDVH.toJson(): String = objectMapper.writeValueAsString(this)
 
-    private fun shouldSendStats(behandlingEndretEvent: BehandlingEndretEvent) =
-        behandlingEndretEvent.behandling.fagsystem != Fagsystem.IT01 && (behandlingEndretEvent.endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN) ||
-                behandlingEndretEvent.endringslogginnslag.any {
-                    it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
-                            || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                            || it.felt === Felt.KJENNELSE_MOTTATT
-                }
+    fun shouldSendStats(behandlingEndretEvent: BehandlingEndretEvent): Boolean {
+        return if (behandlingEndretEvent.behandling.fagsystem == Fagsystem.IT01) {
+            false
+        } else if (behandlingEndretEvent.endringslogginnslag.isEmpty() && behandlingEndretEvent.behandling.type != Type.ANKE_I_TRYGDERETTEN) {
+            true
+        } else behandlingEndretEvent.endringslogginnslag.any {
+            it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
+                    || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                    || it.felt === Felt.KJENNELSE_MOTTATT
+        }
+    }
 
     private fun getBehandlingState(behandlingEndretEvent: BehandlingEndretEvent): BehandlingState {
         val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
