@@ -56,7 +56,8 @@ class BehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak)
@@ -107,7 +108,8 @@ class BehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak1)
@@ -151,7 +153,8 @@ class BehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak2)
@@ -195,7 +198,8 @@ class BehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak3)
@@ -235,7 +239,8 @@ class BehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak4)

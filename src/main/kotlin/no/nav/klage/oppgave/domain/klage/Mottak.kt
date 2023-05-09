@@ -39,7 +39,7 @@ class Mottak(
     val innsynUrl: String? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "mottak_id", referencedColumnName = "id", nullable = false)
-    val hjemler: Set<MottakHjemmel>? = null,
+    val hjemler: Set<MottakHjemmel>,
     @Column(name = "forrige_saksbehandlerident")
     val forrigeSaksbehandlerident: String? = null,
     @Column(name = "forrige_behandlende_enhet")

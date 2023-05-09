@@ -176,12 +176,9 @@ class KlagebehandlingService(
         return kvalitetsvurderingVersion
     }
 
-    private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =
-        if (hjemler == null || hjemler.isEmpty()) {
-            mutableSetOf(Hjemmel.MANGLER)
-        } else {
-            hjemler.map { Hjemmel.of(it.hjemmelId) }.toMutableSet()
-        }
+    private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>): MutableSet<Hjemmel> =
+        hjemler.map { Hjemmel.of(it.hjemmelId) }.toMutableSet()
+
 
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,

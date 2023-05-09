@@ -46,7 +46,7 @@ class AnkeITrygderettenbehandling(
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
-    hjemler: Set<Hjemmel> = emptySet(),
+    hjemler: Set<Hjemmel>,
     sattPaaVent: LocalDateTime? = null,
 ) : Behandling(
     id = id,

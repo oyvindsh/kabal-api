@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api.mapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import no.nav.klage.kodeverk.*
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.SaksbehandlerView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -91,6 +92,7 @@ class BehandlingMapperTest {
             delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
     }
 

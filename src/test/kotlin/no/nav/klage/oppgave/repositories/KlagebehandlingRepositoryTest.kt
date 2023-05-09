@@ -52,7 +52,8 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak)
@@ -102,7 +103,8 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak)
@@ -160,7 +162,8 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak)
@@ -222,7 +225,8 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         val mottak2 = Mottak(
@@ -234,7 +238,8 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         val mottak3 = Mottak(
@@ -246,7 +251,8 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak1)
@@ -367,6 +373,7 @@ class KlagebehandlingRepositoryTest {
             modified = LocalDateTime.now(),
             delbehandlinger = setOf(),
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
 
         ankebehandlingRepository.save(ankebehandling)

@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.clients.kabaldocument
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.kodeverk.*
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.ereg.Navn
 import no.nav.klage.oppgave.clients.ereg.Organisasjon
@@ -79,6 +80,7 @@ class KabalDocumentMapperTest {
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
 
         val fasitMottakere = listOf(
@@ -123,6 +125,7 @@ class KabalDocumentMapperTest {
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
 
         val fasitMottakere = listOf(
@@ -166,6 +169,7 @@ class KabalDocumentMapperTest {
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
 
         val fasitMottakere = setOf(
@@ -214,6 +218,7 @@ class KabalDocumentMapperTest {
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
 
         val fasitMottakere = setOf(
@@ -271,6 +276,7 @@ class KabalDocumentMapperTest {
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
+            hjemler = setOf(Hjemmel.FTRL_9_2)
         )
 
         val fasitMottakere = setOf(

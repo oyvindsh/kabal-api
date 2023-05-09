@@ -407,7 +407,8 @@ class BehandlingServiceTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = "1000.009.002")),
         )
 
         mottakRepository.save(mottak)

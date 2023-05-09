@@ -20,7 +20,7 @@ data class AnkeITrygderettenbehandlingInput(
     val fagsakId: String,
     val sakMottattKlageinstans: LocalDateTime,
     val saksdokumenter: MutableSet<Saksdokument>,
-    val innsendingsHjemler: Set<Hjemmel>?,
+    val innsendingsHjemler: Set<Hjemmel>,
     val sendtTilTrygderetten: LocalDateTime,
     val registreringsHjemmelSet: Set<Registreringshjemmel>? = null,
     val ankebehandlingUtfall: ExternalUtfall,

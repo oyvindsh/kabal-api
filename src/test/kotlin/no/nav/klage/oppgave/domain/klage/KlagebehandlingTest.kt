@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.*
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.domain.Behandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -36,6 +37,7 @@ internal class KlagebehandlingTest {
                 delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.IKKE_TILDELT)
         }
@@ -58,6 +60,7 @@ internal class KlagebehandlingTest {
                 delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.IKKE_TILDELT)
         }
@@ -80,6 +83,7 @@ internal class KlagebehandlingTest {
                 delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.TILDELT)
         }
@@ -106,6 +110,7 @@ internal class KlagebehandlingTest {
                 ),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
         }
@@ -132,6 +137,7 @@ internal class KlagebehandlingTest {
                 ),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.RETURNERT_TIL_SAKSBEHANDLER)
         }
@@ -157,6 +163,7 @@ internal class KlagebehandlingTest {
                 ),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.MEDUNDERSKRIVER_VALGT)
         }
@@ -183,6 +190,7 @@ internal class KlagebehandlingTest {
                 ),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.TILDELT)
         }
@@ -209,6 +217,7 @@ internal class KlagebehandlingTest {
                 ),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
+                hjemler = setOf(Hjemmel.FTRL_9_2),
             )
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.FULLFOERT)
         }

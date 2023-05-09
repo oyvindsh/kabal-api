@@ -298,7 +298,7 @@ class MottakService(
     }
 
     fun CreateKlageBasedOnKabinInput.validate() {
-        validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
+        validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList.map { Hjemmel.of(it) })
         validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.KLAGE)
         validateJournalpost(klageJournalpostId)
         klager?.toPartId()?.let { validatePartId(it) }
@@ -347,14 +347,16 @@ class MottakService(
             throw OversendtKlageNotValidException("Kildereferanse kan ikke være en tom streng.")
     }
 
-    private fun validateYtelseAndHjemler(ytelse: Ytelse, hjemler: Collection<Hjemmel>?) {
+    private fun validateYtelseAndHjemler(ytelse: Ytelse, hjemler: Collection<Hjemmel>) {
         if (ytelse in ytelseTilHjemler.keys) {
-            if (!hjemler.isNullOrEmpty()) {
+            if (!hjemler.isEmpty()) {
                 hjemler.forEach {
                     if (!ytelseTilHjemler[ytelse]!!.contains(it)) {
                         throw OversendtKlageNotValidException("Behandling med ytelse ${ytelse.navn} kan ikke registreres med hjemmel $it. Ta kontakt med team klage dersom du mener hjemmelen skal være mulig å bruke for denne ytelsen.")
                     }
                 }
+            } else {
+                throw OversendtKlageNotValidException("Listen med hjemler kan ikke være tom.")
             }
         } else {
             throw OversendtKlageNotValidException("Behandling med ytelse ${ytelse.navn} kan ikke registreres. Ta kontakt med team klage dersom du vil ta i bruk ytelsen.")
@@ -433,7 +435,7 @@ class MottakService(
             kildeReferanse = kildeReferanse,
             dvhReferanse = dvhReferanse,
             //Dette er søkehjemler
-            hjemler = mottakRepository.getReferenceById(id).hjemler,
+            hjemler = hjemler.map { MottakHjemmel(hjemmelId = it.id) }.toSet(),
             forrigeSaksbehandlerident = tildeling!!.saksbehandlerident,
             forrigeBehandlendeEnhet = tildeling!!.enhet!!,
             mottakDokument = innsendtDokument,
@@ -551,7 +553,7 @@ class MottakService(
             fagsakId = fagsakId,
             kildeReferanse = kildereferanse,
             dvhReferanse = null,
-            hjemler = hjemmelIdList?.map { MottakHjemmel(hjemmelId = it) }?.toSet(),
+            hjemler = hjemmelIdList.map { MottakHjemmel(hjemmelId = it) }.toSet(),
             forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
             mottakDokument = mutableSetOf(
                 MottakDokument(

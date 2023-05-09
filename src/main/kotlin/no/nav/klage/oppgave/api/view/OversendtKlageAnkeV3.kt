@@ -51,9 +51,9 @@ data class OversendtKlageAnkeV3(
     val innsynUrl: String? = null,
     @Schema(
         description = "Hjemler knyttet til klagen",
-        required = false
+        required = true
     )
-    val hjemler: List<Hjemmel>? = emptyList(),
+    val hjemler: List<Hjemmel>,
     @Schema(
         description = "ID på enheten som behandlet vedtaket som denne henvendelsen gjelder.",
         required = true
@@ -116,7 +116,7 @@ fun OversendtKlageAnkeV3.toMottak(forrigeBehandlingId: UUID? = null) = Mottak(
     fagsakId = fagsak.fagsakId,
     kildeReferanse = kildeReferanse,
     dvhReferanse = dvhReferanse,
-    hjemler = hjemler?.map { MottakHjemmel(hjemmelId = it.id) }?.toSet(),
+    hjemler = hjemler.map { MottakHjemmel(hjemmelId = it.id) }.toSet(),
     forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
     mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),
     innsendtDato = innsendtTilNav,

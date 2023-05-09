@@ -51,9 +51,9 @@ data class OversendtKlageV2(
     val innsynUrl: String? = null,
     @Schema(
         description = "Hjemler knyttet til klagen",
-        required = false
+        required = true
     )
-    val hjemler: List<Hjemmel>? = emptyList(),
+    val hjemler: List<Hjemmel>,
     val avsenderSaksbehandlerIdent: String,
     val avsenderEnhet: String,
     @Schema(
@@ -104,7 +104,7 @@ fun OversendtKlageV2.toMottak() = Mottak(
     fagsakId = fagsak.fagsakId,
     kildeReferanse = kildeReferanse,
     dvhReferanse = dvhReferanse,
-    hjemler = hjemler?.map { MottakHjemmel(hjemmelId = it.id) }?.toSet(),
+    hjemler = hjemler.map { MottakHjemmel(hjemmelId = it.id) }.toSet(),
     forrigeSaksbehandlerident = avsenderSaksbehandlerIdent,
     forrigeBehandlendeEnhet = avsenderEnhet,
     mottakDokument = tilknyttedeJournalposter.map { it.toMottakDokument() }.toMutableSet(),

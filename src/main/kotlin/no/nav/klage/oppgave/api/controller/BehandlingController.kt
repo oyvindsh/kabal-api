@@ -7,6 +7,9 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.exceptions.InvalidProperty
+import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
+import no.nav.klage.oppgave.exceptions.ValidationSection
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
@@ -229,13 +232,34 @@ class BehandlingController(
             logger
         )
 
+        validateInnsendingshjemlerInput(input)
+
         val modified = behandlingService.setInnsendingshjemler(
             behandlingId = behandlingId,
-            hjemler = input.hjemmelIdList ?: input.hjemler ?: emptyList(),
+            hjemler = input.hjemmelIdList ?: input.hjemler!!,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
         return BehandlingEditedView(modified = modified)
+    }
+
+    private fun validateInnsendingshjemlerInput(input: InnsendingshjemlerInput) {
+        if (input.hjemmelIdList.isNullOrEmpty() && input.hjemler.isNullOrEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = listOf(
+                    ValidationSection(
+                        section = "innsendingshjemler",
+                        properties = listOf(
+                            InvalidProperty(
+                                field = "innsendingshjemler",
+                                reason = "Minst 1 innsendingshjemmel må være satt."
+                            )
+                        )
+                    )
+                )
+            )
+        }
     }
 
     @PutMapping("/{behandlingId}/fullmektig")

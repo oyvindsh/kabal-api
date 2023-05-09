@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
+import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
@@ -106,7 +107,8 @@ internal class DuplicateOversendelseTest {
             fagsak = OversendtSak(
                 fagsakId = "123",
                 fagsystem = KildeFagsystem.K9
-            )
+            ),
+            hjemler = listOf(Hjemmel.FTRL_9_2)
         )
 
         mottakService.createMottakForKlageV2(oversendtKlage)
