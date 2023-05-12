@@ -5,7 +5,6 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.ExternalUtfall
 import java.time.LocalDateTime
 

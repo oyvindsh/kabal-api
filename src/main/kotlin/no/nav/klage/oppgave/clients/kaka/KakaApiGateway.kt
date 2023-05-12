@@ -3,8 +3,8 @@ package no.nav.klage.oppgave.clients.kaka
 import no.nav.klage.kodeverk.Enhet
 import no.nav.klage.oppgave.clients.kaka.model.request.SaksdataInput
 import no.nav.klage.oppgave.clients.kaka.model.response.KakaOutput
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.exceptions.InvalidProperty
 import no.nav.klage.oppgave.util.getLogger

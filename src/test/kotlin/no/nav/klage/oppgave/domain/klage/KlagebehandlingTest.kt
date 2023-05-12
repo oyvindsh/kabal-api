@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.*
-import no.nav.klage.oppgave.domain.Behandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

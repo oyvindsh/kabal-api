@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import java.time.LocalDate
 import java.time.LocalDateTime

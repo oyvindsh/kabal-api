@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.api.controller.BehandlingMedunderskriverController
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.BehandlingMedunderskriveridentInput
 import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService

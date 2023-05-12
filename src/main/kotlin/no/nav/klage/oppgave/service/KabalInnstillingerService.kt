@@ -6,7 +6,7 @@ import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.MedunderskrivereInput
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.SaksbehandlerSearchInput
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
-import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import org.springframework.stereotype.Service
 
 @Service

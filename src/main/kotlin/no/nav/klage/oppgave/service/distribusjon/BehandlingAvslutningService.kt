@@ -11,11 +11,11 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.infotrygdKlageutfallToUtfall
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFinishedInput
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.ANKEBEHANDLING_AVSLUTTET
 import no.nav.klage.oppgave.domain.kafka.BehandlingEventType.KLAGEBEHANDLING_AVSLUTTET
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttet
 import no.nav.klage.oppgave.domain.klage.createAnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.repositories.KafkaEventRepository

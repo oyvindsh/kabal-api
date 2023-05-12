@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.repositories
 
 import jakarta.persistence.LockModeType
-import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock

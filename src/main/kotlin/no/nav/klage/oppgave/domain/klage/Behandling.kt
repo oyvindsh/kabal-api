@@ -1,12 +1,9 @@
-package no.nav.klage.oppgave.domain
+package no.nav.klage.oppgave.domain.klage
 
 import jakarta.persistence.*
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.klage.FagsystemConverter
-import no.nav.klage.oppgave.domain.klage.TypeConverter
-import no.nav.klage.oppgave.domain.klage.YtelseConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode

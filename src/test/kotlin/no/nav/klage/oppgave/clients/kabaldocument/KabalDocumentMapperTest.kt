@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.clients.kabaldocument.model.request.BrevmottakerInpu
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.PartIdInput
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
