@@ -25,6 +25,10 @@ class Ankebehandling(
     val mottakId: UUID? = null,
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
+    @Column(name = "kaka_kvalitetsvurdering_id")
+    val kakaKvalitetsvurderingId: UUID,
+    @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
+    val kakaKvalitetsvurderingVersion: Int,
 
 //    Finn ut hvordan dette skal fungere i anker etter hvert
 //    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
@@ -50,8 +54,6 @@ class Ankebehandling(
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
-    kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
@@ -69,8 +71,6 @@ class Ankebehandling(
     mottattKlageinstans = mottattKlageinstans,
     modified = modified,
     created = created,
-    kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
-    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,

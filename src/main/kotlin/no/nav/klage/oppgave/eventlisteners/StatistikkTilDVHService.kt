@@ -68,6 +68,7 @@ class StatistikkTilDVHService(
             it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                     || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
                     || it.felt === Felt.KJENNELSE_MOTTATT
+                    || it.felt === Felt.FEILREGISTRERING
         }
     }
 
@@ -78,6 +79,10 @@ class StatistikkTilDVHService(
 
         return when {
             endringslogginnslag.isEmpty() && type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
+
+            endringslogginnslag.any {
+                it.felt === Felt.FEILREGISTRERING
+            } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
                 it.felt === Felt.KJENNELSE_MOTTATT
@@ -168,9 +173,10 @@ class StatistikkTilDVHService(
             type.navn
         }
 
-    //Resultat should only be relevant if avsluttetAvSaksbehandler
     private fun getResultat(behandling: Behandling): String? =
-        if (behandling.avsluttetAvSaksbehandler != null) {
+        if (behandling.feilregistrering != null) {
+            ExternalUtfall.FEILREGISTRERT.navn
+        } else if (behandling.avsluttetAvSaksbehandler != null) {
             behandling.currentDelbehandling().utfall?.name?.let { ExternalUtfall.valueOf(it).navn }
         } else {
             null

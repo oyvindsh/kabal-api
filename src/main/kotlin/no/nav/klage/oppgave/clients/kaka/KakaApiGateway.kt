@@ -35,9 +35,9 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         )
     }
 
-    fun deleteKvalitetsvurderingV1(kvalitetsvurderingId: UUID) {
-        logger.debug("Deleting kvalitetsvurdering with id $kvalitetsvurderingId in Kaka.")
-        kakaApiClient.deleteKvalitetsvurderingV1(
+    fun deleteKvalitetsvurderingV2(kvalitetsvurderingId: UUID) {
+        logger.debug("Deleting kvalitetsvurdering with id {} in Kaka.", kvalitetsvurderingId)
+        kakaApiClient.deleteKvalitetsvurderingV2(
             kvalitetsvurderingId = kvalitetsvurderingId
         )
     }

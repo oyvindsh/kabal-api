@@ -336,6 +336,24 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
+    fun Behandling.setFeilregistrering(
+        feilregistrering: Feilregistrering,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val tidspunkt = LocalDateTime.now()
+        modified = tidspunkt
+        this.feilregistrering = feilregistrering
+        val endringslogg = Endringslogginnslag.endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.FEILREGISTRERING,
+            fraVerdi = null,
+            tilVerdi = feilregistrering.toString(),
+            behandlingId = id,
+            tidspunkt = tidspunkt
+        )
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
     private fun Behandling.endringslogg(
         saksbehandlerident: String,
         felt: Felt,

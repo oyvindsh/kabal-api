@@ -512,7 +512,7 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenterNotFinished(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
+    fun findDokumenterNotFinished(behandlingId: UUID): SortedSet<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 

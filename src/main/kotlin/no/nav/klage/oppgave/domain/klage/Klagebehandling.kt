@@ -32,6 +32,10 @@ class Klagebehandling(
     val mottakId: UUID,
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
+    @Column(name = "kaka_kvalitetsvurdering_id")
+    val kakaKvalitetsvurderingId: UUID,
+    @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
+    val kakaKvalitetsvurderingVersion: Int,
 
     //Common properties between klage/anke
     id: UUID = UUID.randomUUID(),
@@ -51,10 +55,6 @@ class Klagebehandling(
     tildeling: Tildeling? = null,
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
-    //Hovedbehandling
-    //Skal være en kvalitetsvurdering per hovedbehandling, derfor er dette riktig sted.
-    kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
@@ -72,8 +72,6 @@ class Klagebehandling(
     mottattKlageinstans = mottattKlageinstans,
     modified = modified,
     created = created,
-    kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
-    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,

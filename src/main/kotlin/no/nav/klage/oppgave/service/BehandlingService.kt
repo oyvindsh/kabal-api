@@ -18,6 +18,7 @@ import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setS
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttetAvSaksbehandler
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFeilregistrering
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFrist
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setInnsendingshjemler
@@ -719,5 +720,19 @@ class BehandlingService(
     fun getAARegisterUrl(behandlingId: UUID): String {
         val behandling = getBehandling(behandlingId = behandlingId)
         return arbeidOgInntektClient.getAARegisterUrl(behandling.sakenGjelder.partId.value)
+    }
+
+    fun feilregistrer(behandlingId: UUID, navIdent: String, reason: String, fagsystem: Fagsystem) {
+        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
+        val event = behandling.setFeilregistrering(
+            feilregistrering = Feilregistrering(
+                navIdent = navIdent,
+                registered = LocalDateTime.now(),
+                reason = reason,
+                fagsystem = fagsystem,
+            ),
+            saksbehandlerident = navIdent,
+        )
+        applicationEventPublisher.publishEvent(event)
     }
 }

@@ -52,9 +52,9 @@ class KakaApiClient(
             .block()
     }
 
-    fun deleteKvalitetsvurderingV1(kvalitetsvurderingId: UUID) {
+    fun deleteKvalitetsvurderingV2(kvalitetsvurderingId: UUID) {
         kakaApiWebClient.delete()
-            .uri { it.path("/kabal/kvalitetsvurderinger/v1/$kvalitetsvurderingId").build() }
+            .uri { it.path("/kabal/kvalitetsvurderinger/v2/$kvalitetsvurderingId").build() }
             .header(
                 HttpHeaders.AUTHORIZATION,
                 "Bearer ${tokenUtil.getAppAccessTokenWithKakaApiScope()}"

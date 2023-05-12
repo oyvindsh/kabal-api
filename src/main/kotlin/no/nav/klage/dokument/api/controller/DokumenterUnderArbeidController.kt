@@ -141,8 +141,7 @@ class DokumentUnderArbeidController(
     fun findHovedDokumenter(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
-        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId, ident = ident)
+        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId)
             .map { dokumentMapper.mapToDokumentView(it) }
     }
 

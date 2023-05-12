@@ -13,7 +13,11 @@ data class BehandlingEvent(
 )
 
 enum class BehandlingEventType {
-    KLAGEBEHANDLING_AVSLUTTET, ANKEBEHANDLING_OPPRETTET, ANKEBEHANDLING_AVSLUTTET, ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET
+    KLAGEBEHANDLING_AVSLUTTET,
+    ANKEBEHANDLING_OPPRETTET,
+    ANKEBEHANDLING_AVSLUTTET,
+    ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET,
+    BEHANDLING_FEILREGISTRERT,
 }
 
 data class BehandlingDetaljer(
@@ -21,6 +25,7 @@ data class BehandlingDetaljer(
     val ankebehandlingOpprettet: AnkebehandlingOpprettetDetaljer? = null,
     val ankebehandlingAvsluttet: AnkebehandlingAvsluttetDetaljer? = null,
     val ankeITrygderettenbehandlingOpprettet: AnkeITrygderettenbehandlingOpprettetDetaljer? = null,
+    val behandlingFeilregistrert: BehandlingFeilregistrertDetaljer? = null,
 )
 
 data class KlagebehandlingAvsluttetDetaljer(
@@ -43,4 +48,9 @@ data class AnkebehandlingAvsluttetDetaljer(
     val avsluttet: LocalDateTime,
     val utfall: ExternalUtfall,
     val journalpostReferanser: List<String>,
+)
+
+data class BehandlingFeilregistrertDetaljer(
+    val navIdent: String,
+    val reason: String,
 )

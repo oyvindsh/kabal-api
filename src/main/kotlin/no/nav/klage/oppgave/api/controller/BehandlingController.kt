@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
@@ -324,5 +325,24 @@ class BehandlingController(
         )
 
         return ModelAndView(/* viewName = */ "redirect:" + behandlingService.getAARegisterUrl(behandlingId))
+    }
+
+    @PostMapping("/{behandlingId}/feilregistrer")
+    fun setBehandlingFeilregistrert(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: FeilregistreringInput,
+    ) {
+        logMethodDetails(
+            ::setBehandlingFeilregistrert.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return behandlingService.feilregistrer(
+            behandlingId = behandlingId,
+            navIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            reason = input.reason,
+            fagsystem = Fagsystem.KABAL,
+        )
     }
 }
