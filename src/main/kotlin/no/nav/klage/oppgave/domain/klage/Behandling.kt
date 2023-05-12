@@ -89,10 +89,10 @@ abstract class Behandling(
     @Embedded
     @AttributeOverrides(
         value = [
-            AttributeOverride(name = "nav_ident", column = Column(name = "feilregistrering_nav_ident")),
+            AttributeOverride(name = "navIdent", column = Column(name = "feilregistrering_nav_ident")),
             AttributeOverride(name = "registered", column = Column(name = "feilregistrering_registered")),
             AttributeOverride(name = "reason", column = Column(name = "feilregistrering_reason")),
-            AttributeOverride(name = "fagsystem_id", column = Column(name = "feilregistrering_fagsystem_id"))
+            AttributeOverride(name = "fagsystem", column = Column(name = "feilregistrering_fagsystem_id"))
         ]
     )
     open var feilregistrering: Feilregistrering?,
