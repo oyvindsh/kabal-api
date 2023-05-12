@@ -61,6 +61,7 @@ class Klagebehandling(
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
     sattPaaVent: LocalDateTime? = null,
+    feilregistrering: Feilregistrering? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -83,6 +84,7 @@ class Klagebehandling(
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
+    feilregistrering = feilregistrering,
 ) {
 
     override fun toString(): String {

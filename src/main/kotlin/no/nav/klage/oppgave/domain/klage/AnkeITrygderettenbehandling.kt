@@ -47,6 +47,7 @@ class AnkeITrygderettenbehandling(
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
     sattPaaVent: LocalDateTime? = null,
+    feilregistrering: Feilregistrering? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -69,6 +70,7 @@ class AnkeITrygderettenbehandling(
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
+    feilregistrering = feilregistrering
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +

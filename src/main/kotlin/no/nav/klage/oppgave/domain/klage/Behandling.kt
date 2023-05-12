@@ -86,6 +86,16 @@ abstract class Behandling(
     open var hjemler: Set<Hjemmel> = emptySet(),
     @Column(name = "satt_paa_vent")
     open var sattPaaVent: LocalDateTime? = null,
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "nav_ident", column = Column(name = "feilregistrering_nav_ident")),
+            AttributeOverride(name = "registered", column = Column(name = "feilregistrering_registered")),
+            AttributeOverride(name = "reason", column = Column(name = "feilregistrering_reason")),
+            AttributeOverride(name = "fagsystem_id", column = Column(name = "feilregistrering_fagsystem_id"))
+        ]
+    )
+    open var feilregistrering: Feilregistrering?,
 ) {
     fun currentDelbehandling(): Delbehandling {
         return delbehandlinger.first()
