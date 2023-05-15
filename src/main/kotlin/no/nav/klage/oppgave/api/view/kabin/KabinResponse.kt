@@ -23,6 +23,7 @@ data class CompletedKlagebehandling(
     val fagsystem: Fagsystem,
     val fagsystemId: String,
     val klageBehandlendeEnhet: String,
+    val tildeltSaksbehandlerIdent: String?,
 )
 
 data class CreatedAnkeResponse(
@@ -51,6 +52,7 @@ data class CreatedAnkebehandlingStatusForKabin(
     val fagsystem: Fagsystem,
     val fagsystemId: String,
     val journalpost: DokumentReferanse,
+    val tildeltSaksbehandlerIdent: String?,
 )
 
 data class CreatedKlagebehandlingStatusForKabin(
@@ -67,4 +69,5 @@ data class CreatedKlagebehandlingStatusForKabin(
     val fagsystemId: String,
     val journalpost: DokumentReferanse,
     val kildereferanse: String,
+    val tildeltSaksbehandlerIdent: String?,
 )

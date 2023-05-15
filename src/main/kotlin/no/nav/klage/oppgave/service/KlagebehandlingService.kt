@@ -97,6 +97,7 @@ class KlagebehandlingService(
         fagsystem = fagsystem,
         fagsystemId = fagsystem.id,
         klageBehandlendeEnhet = tildeling!!.enhet!!,
+        tildeltSaksbehandlerIdent = tildeling!!.saksbehandlerident!!
     )
 
     fun findMuligAnkeByPartId(
