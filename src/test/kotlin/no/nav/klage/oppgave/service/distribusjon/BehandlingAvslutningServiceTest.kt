@@ -101,6 +101,9 @@ internal class BehandlingAvslutningServiceTest {
 
         @MockkBean(relaxed = true)
         lateinit var klageFssProxyClient: KlageFssProxyClient
+
+        @MockkBean(relaxed = true)
+        lateinit var saksbehandlerService: SaksbehandlerService
     }
 
     //@Autowired
