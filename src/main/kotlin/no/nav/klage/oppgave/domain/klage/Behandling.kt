@@ -122,6 +122,7 @@ abstract class Behandling(
      */
     fun getStatus(): Status {
         return when {
+            feilregistrering != null -> Status.FEILREGISTRERT
             isAvsluttet() -> Status.FULLFOERT
             avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
             sattPaaVent != null -> Status.SATT_PAA_VENT
@@ -135,6 +136,6 @@ abstract class Behandling(
     }
 
     enum class Status {
-        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT
+        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT, FEILREGISTRERT
     }
 }
