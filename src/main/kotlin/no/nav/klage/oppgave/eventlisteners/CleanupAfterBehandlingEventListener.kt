@@ -58,7 +58,8 @@ class CleanupAfterBehandlingEventListener(
             logger.debug("Cleanup and notifying vedtaksinstans after feilregistrering. Behandling.id: {}", behandling.id)
             deleteDokumenterUnderBehandling(behandling)
             deleteFromKaka(behandling)
-            notifyVedtaksinstans(behandling)
+            //FIXME add back after we have informed all clients about the change.
+            //notifyVedtaksinstans(behandling)
         }
     }
 
