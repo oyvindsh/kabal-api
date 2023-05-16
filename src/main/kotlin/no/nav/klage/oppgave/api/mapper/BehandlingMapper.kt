@@ -96,6 +96,7 @@ class BehandlingMapper(
             ),
             isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
+            feilregistrering = klagebehandling.feilregistrering.toView()
         )
     }
 
@@ -158,6 +159,7 @@ class BehandlingMapper(
             ),
             isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
+            feilregistrering = ankebehandling.feilregistrering.toView(),
         )
     }
 
@@ -211,15 +213,15 @@ class BehandlingMapper(
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            kvalitetsvurderingId = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
             kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
-                id = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
-                version = ankeITrygderettenbehandling.kakaKvalitetsvurderingVersion,
+                id = null,
+                version = 2,
             ),
             isPossibleToUseDokumentUnderArbeid = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankeITrygderettenbehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
+            feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView()
         )
     }
 
@@ -382,5 +384,16 @@ class BehandlingMapper(
                 navn = pdlFacade.getPersonInfo(sakenGjelder.partId.value).sammensattNavn,
             ),
         )
+    }
+
+    private fun Feilregistrering?.toView(): BehandlingDetaljerView.FeilregistreringView? {
+        return this?.let {
+            BehandlingDetaljerView.FeilregistreringView(
+                navIdent = it.navIdent,
+                registered = it.registered,
+                reason = it.reason,
+                fagsystemId = it.fagsystem.id
+            )
+        }
     }
 }

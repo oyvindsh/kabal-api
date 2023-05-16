@@ -79,6 +79,7 @@ class BehandlingMedunderskriverControllerTest {
         ),
         mottattVedtaksinstans = LocalDate.now(),
         avsenderEnhetFoersteinstans = "0101",
+        kakaKvalitetsvurderingId = UUID.randomUUID(),
         kakaKvalitetsvurderingVersion = 2,
     )
 

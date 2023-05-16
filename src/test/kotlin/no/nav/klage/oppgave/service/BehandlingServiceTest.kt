@@ -118,7 +118,8 @@ class BehandlingServiceTest {
             kabalInnstillingerService = kabalInnstillingerService,
             innloggetSaksbehandlerService = innloggetSaksbehandlerService,
             arbeidOgInntektClient = arbeidOgInntektClient,
-            fssProxyClient = fssProxyClient
+            fssProxyClient = fssProxyClient,
+            saksbehandlerRepository = saksbehandlerRepository,
         )
     }
 
@@ -448,6 +449,7 @@ class BehandlingServiceTest {
             ),
             mottattVedtaksinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet",
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 

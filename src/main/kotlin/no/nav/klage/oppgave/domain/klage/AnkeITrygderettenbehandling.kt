@@ -39,8 +39,6 @@ class AnkeITrygderettenbehandling(
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
-    kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
@@ -58,8 +56,6 @@ class AnkeITrygderettenbehandling(
     mottattKlageinstans = mottattKlageinstans,
     modified = modified,
     created = created,
-    kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
-    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,

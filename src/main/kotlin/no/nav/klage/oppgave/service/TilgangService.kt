@@ -40,12 +40,14 @@ class TilgangService(
     }
 
     fun verifyInnloggetSaksbehandlersSkrivetilgang(behandling: Behandling) {
-        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null || behandling.currentDelbehandling().avsluttet != null) {
-            throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
+        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null ||
+            behandling.currentDelbehandling().avsluttet != null
+        ) {
+            throw BehandlingAvsluttetException("Kan ikke endre avsluttet behandling")
         }
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
         if (!saksbehandlerHarSkrivetilgang(behandling, ident)) {
-            throw MissingTilgangException("Kun tildelt saksbehandler kan endre klagebehandlingen")
+            throw MissingTilgangException("Kun tildelt saksbehandler kan endre behandlingen")
         }
     }
 

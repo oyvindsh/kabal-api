@@ -112,7 +112,7 @@ class AdminService(
         logger.debug("Attempting generate missing AnkeITrygderettenBehandling")
 
         val candidates =
-            ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndDelbehandlingerUtfallIn(
+            ankebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndDelbehandlingerUtfallInAndFeilregistreringIsNull(
                 utfallToTrygderetten
             )
 

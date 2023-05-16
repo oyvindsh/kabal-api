@@ -76,6 +76,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -120,6 +121,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -163,6 +165,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -211,6 +214,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -268,6 +272,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )

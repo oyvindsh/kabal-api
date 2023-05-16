@@ -49,12 +49,15 @@ data class BehandlingDetaljerView(
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
     val vergemaalEllerFremtidsfullmakt: Boolean,
-    val kvalitetsvurderingId: UUID?,
+    //TODO can be deleted?
+    val kvalitetsvurderingId: UUID? = null,
+    //TODO make nullable
     val kvalitetsvurderingReference: KvalitetsvurderingReference,
     val isPossibleToUseDokumentUnderArbeid: Boolean = false,
     val sattPaaVent: LocalDateTime? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
+    val feilregistrering: FeilregistreringView? = null,
 ) {
     data class NavnView(
         val fornavn: String?,
@@ -91,5 +94,12 @@ data class BehandlingDetaljerView(
     data class KvalitetsvurderingReference(
         val id: UUID?,
         val version: Int,
+    )
+
+    data class FeilregistreringView(
+        val navIdent: String,
+        val registered: LocalDateTime,
+        val reason: String,
+        val fagsystemId: String,
     )
 }

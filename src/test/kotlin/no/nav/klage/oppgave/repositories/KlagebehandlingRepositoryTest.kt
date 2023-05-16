@@ -15,6 +15,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -79,6 +80,7 @@ class KlagebehandlingRepositoryTest {
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -134,6 +136,7 @@ class KlagebehandlingRepositoryTest {
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
                 Saksdokument(journalpostId = "REF2", dokumentInfoId = "321"),
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -192,6 +195,7 @@ class KlagebehandlingRepositoryTest {
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
                 Saksdokument(journalpostId = "REF2", dokumentInfoId = "321"),
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -280,6 +284,7 @@ class KlagebehandlingRepositoryTest {
                     utfall = Utfall.STADFESTELSE,
                 )
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -310,6 +315,7 @@ class KlagebehandlingRepositoryTest {
                     utfall = Utfall.RETUR,
                 )
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -340,6 +346,7 @@ class KlagebehandlingRepositoryTest {
                     utfall = Utfall.STADFESTELSE,
                 )
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -362,6 +369,7 @@ class KlagebehandlingRepositoryTest {
             fagsystem = Fagsystem.K9,
             fagsakId = "123",
             mottattKlageinstans = LocalDateTime.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),

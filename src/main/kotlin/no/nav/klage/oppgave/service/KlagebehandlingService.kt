@@ -102,7 +102,7 @@ class KlagebehandlingService(
     fun findMuligAnkeByPartId(
         partId: String
     ): List<MuligAnke> =
-        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
+        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndFeilregistreringIsNull()
             .filter {
                 it.klager.partId.value == partId &&
                         muligAnkeUtfall.contains(it.currentDelbehandling().utfall)

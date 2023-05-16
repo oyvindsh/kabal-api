@@ -340,7 +340,6 @@ class BehandlingController(
 
         return behandlingService.feilregistrer(
             behandlingId = behandlingId,
-            navIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             reason = input.reason,
             fagsystem = Fagsystem.KABAL,
         )

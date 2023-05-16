@@ -8,8 +8,8 @@ import java.util.*
 
 @Repository
 interface AnkebehandlingRepository : JpaRepository<Ankebehandling, UUID> {
-    fun findByKlagebehandlingId(klagebehandlingId: UUID): Ankebehandling?
-    fun findByDelbehandlingerAvsluttetIsNotNullAndDelbehandlingerUtfallIn(utfallSet: Set<Utfall>): List<Ankebehandling>
+    fun findByKlagebehandlingIdAndFeilregistreringIsNull(klagebehandlingId: UUID): Ankebehandling?
+    fun findByDelbehandlingerAvsluttetIsNotNullAndDelbehandlingerUtfallInAndFeilregistreringIsNull(utfallSet: Set<Utfall>): List<Ankebehandling>
     fun findByMottakId(mottakId: UUID): Ankebehandling?
 
 }

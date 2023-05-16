@@ -33,6 +33,7 @@ internal class KlagebehandlingTest {
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -55,6 +56,7 @@ internal class KlagebehandlingTest {
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -77,6 +79,7 @@ internal class KlagebehandlingTest {
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
                 delbehandlinger = setOf(Delbehandling()),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -103,6 +106,7 @@ internal class KlagebehandlingTest {
                         medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
                     ),
                 ),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -129,6 +133,7 @@ internal class KlagebehandlingTest {
                         medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
                     )
                 ),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -154,6 +159,7 @@ internal class KlagebehandlingTest {
                         medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
                     )
                 ),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -180,6 +186,7 @@ internal class KlagebehandlingTest {
                         medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
                     )
                 ),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )
@@ -206,6 +213,7 @@ internal class KlagebehandlingTest {
                         avsluttet = LocalDateTime.now(),
                     )
                 ),
+                kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
             )

@@ -30,6 +30,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtaksinstans
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.isValidFnrOrDnr
 import no.nav.klage.oppgave.util.isValidOrgnr
@@ -54,6 +55,7 @@ class BehandlingService(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val arbeidOgInntektClient: ArbeidOgInntektClient,
     private val fssProxyClient: KlageFssProxyClient,
+    private val saksbehandlerRepository: SaksbehandlerRepository,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -559,6 +561,11 @@ class BehandlingService(
         systemUserContext: Boolean = false
     ): Behandling =
         behandlingRepository.findById(behandlingId).get()
+            .also {
+                if (!systemUserContext && it.feilregistrering != null) {
+                    throw BehandlingAvsluttetException("Behandlingen er feilregistrert")
+                }
+            }
             .also { if (!systemUserContext) checkLeseTilgang(it) }
             .also { if (!systemUserContext && !ignoreCheckSkrivetilgang) checkSkrivetilgang(it) }
 
@@ -695,7 +702,7 @@ class BehandlingService(
 
     @Transactional(readOnly = true)
     fun findBehandlingerForAvslutning(): List<Pair<UUID, Type>> =
-        behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNull()
+        behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull()
             .map { it.id to it.type }
 
     fun getPotentialSaksbehandlereForBehandling(behandlingId: UUID): Saksbehandlere {
@@ -709,7 +716,9 @@ class BehandlingService(
     }
 
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
-        return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet)
+        return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
+            enhet
+        )
     }
 
     fun getAInntektUrl(behandlingId: UUID): String {
@@ -722,8 +731,19 @@ class BehandlingService(
         return arbeidOgInntektClient.getAARegisterUrl(behandling.sakenGjelder.partId.value)
     }
 
-    fun feilregistrer(behandlingId: UUID, navIdent: String, reason: String, fagsystem: Fagsystem) {
-        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
+    fun feilregistrer(behandlingId: UUID, reason: String, fagsystem: Fagsystem) {
+        val navIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+
+        val behandling = if (!saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(navIdent)) {
+            getBehandlingForUpdate(behandlingId = behandlingId)
+        } else {
+            getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+        }
+
+        feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+    }
+
+    private fun feilregistrer(behandling: Behandling, navIdent: String, reason: String, fagsystem: Fagsystem) {
         val event = behandling.setFeilregistrering(
             feilregistrering = Feilregistrering(
                 navIdent = navIdent,
