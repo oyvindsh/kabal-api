@@ -33,7 +33,7 @@ class Klagebehandling(
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
     @Column(name = "kaka_kvalitetsvurdering_id")
-    val kakaKvalitetsvurderingId: UUID,
+    var kakaKvalitetsvurderingId: UUID?,
     @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
     val kakaKvalitetsvurderingVersion: Int,
 

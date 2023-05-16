@@ -65,7 +65,7 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
         }
 
         return kakaApiClient.getValidationErrors(
-            kvalitetsvurderingId = kvalitetsvurderingId,
+            kvalitetsvurderingId = kvalitetsvurderingId!!,
             ytelseId = behandling.ytelse.id,
             typeId = behandling.type.id,
             kvalitetsvurderingVersion = kvalitetsvurderingVersion,
@@ -110,7 +110,7 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
             mottattVedtaksinstans = if (this is Klagebehandling) mottattVedtaksinstans else null,
             utfall = currentDelbehandling().utfall!!.id,
             registreringshjemler = currentDelbehandling().hjemler.map { it.id },
-            kvalitetsvurderingId = kvalitetsvurderingId,
+            kvalitetsvurderingId = kvalitetsvurderingId!!,
             avsluttetAvSaksbehandler = currentDelbehandling().avsluttetAvSaksbehandler!!,
             utfoerendeSaksbehandler = tildeling?.saksbehandlerident!!,
             tilknyttetEnhet = tilknyttetEnhet!!.navn

@@ -11,7 +11,9 @@ import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
+import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MeldingRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -25,6 +27,8 @@ class CleanupAfterBehandlingEventListener(
     private val kafkaEventRepository: KafkaEventRepository,
     private val kakaApiGateway: KakaApiGateway,
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
+    private val klagebehandlingRepository: KlagebehandlingRepository,
+    private val ankebehandlingRepository: AnkebehandlingRepository,
 ) {
 
     companion object {
@@ -68,7 +72,7 @@ class CleanupAfterBehandlingEventListener(
                 )
             } catch (e: Exception) {
                 //best effort
-                logger.warn("Couldn't clean up dokumenter under arbeid")
+                logger.warn("Couldn't clean up dokumenter under arbeid", e)
             }
         }
     }
@@ -106,7 +110,9 @@ class CleanupAfterBehandlingEventListener(
                 behandling as Klagebehandling
                 when (behandling.kakaKvalitetsvurderingVersion) {
                     2 -> {
-                        kakaApiGateway.deleteKvalitetsvurderingV2(behandling.kakaKvalitetsvurderingId)
+                        kakaApiGateway.deleteKvalitetsvurderingV2(behandling.kakaKvalitetsvurderingId!!)
+                        behandling.kakaKvalitetsvurderingId = null
+                        klagebehandlingRepository.save(behandling)
                     }
                 }
             }
@@ -115,7 +121,9 @@ class CleanupAfterBehandlingEventListener(
                 behandling as Ankebehandling
                 when (behandling.kakaKvalitetsvurderingVersion) {
                     2 -> {
-                        kakaApiGateway.deleteKvalitetsvurderingV2(behandling.kakaKvalitetsvurderingId)
+                        kakaApiGateway.deleteKvalitetsvurderingV2(behandling.kakaKvalitetsvurderingId!!)
+                        behandling.kakaKvalitetsvurderingId = null
+                        ankebehandlingRepository.save(behandling)
                     }
                 }
             }

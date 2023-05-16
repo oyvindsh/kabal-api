@@ -26,8 +26,8 @@ class Ankebehandling(
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
     @Column(name = "kaka_kvalitetsvurdering_id")
-    val kakaKvalitetsvurderingId: UUID,
-    @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
+    var kakaKvalitetsvurderingId: UUID?,
+    @Column(name = "kaka_kvalitetsvurdering_version", nullable = true)
     val kakaKvalitetsvurderingVersion: Int,
 
 //    Finn ut hvordan dette skal fungere i anker etter hvert
