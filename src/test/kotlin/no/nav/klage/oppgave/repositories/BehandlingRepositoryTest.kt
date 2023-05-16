@@ -149,7 +149,9 @@ class BehandlingRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(behandlingRepository.findById(klage.id).get().feilregistrering).isEqualTo(klage.feilregistrering)
+        assertThat(
+            behandlingRepository.findById(klage.id).get().feilregistrering!!.navIdent
+        ).isEqualTo(klage.feilregistrering!!.navIdent)
     }
 
     @Test
