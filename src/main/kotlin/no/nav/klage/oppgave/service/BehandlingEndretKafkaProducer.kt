@@ -30,11 +30,15 @@ class BehandlingEndretKafkaProducer(
 
     fun sendKlageEndretV2(klagebehandling: Klagebehandling) {
         logger.debug("Sending to Kafka topic: {}", topicV2)
+
+        val json = klagebehandling.mapToSkjemaV2().toJson()
+        secureLogger.debug("Sending to Kafka topic: {}, value: {}", topicV2, json)
+
         runCatching {
             val result = aivenKafkaTemplate.send(
                 topicV2,
                 klagebehandling.id.toString(),
-                klagebehandling.mapToSkjemaV2().toJson()
+                json
             ).get()
             logger.info("Klage endret sent to Kafka")
             secureLogger.debug("Klage endret for klagebehandling ${klagebehandling.id} sent to kafka ($result)")
