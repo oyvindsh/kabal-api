@@ -331,17 +331,27 @@ class BehandlingController(
     fun setBehandlingFeilregistrert(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: FeilregistreringInput,
-    ) {
+    ): FeilregistreringResponse {
         logMethodDetails(
             ::setBehandlingFeilregistrert.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             logger
         )
 
-        return behandlingService.feilregistrer(
+        val modifiedBehandling = behandlingService.feilregistrer(
             behandlingId = behandlingId,
             reason = input.reason,
             fagsystem = Fagsystem.KABAL,
+        )
+
+        return FeilregistreringResponse(
+            feilregistrering = BehandlingDetaljerView.FeilregistreringView(
+                navIdent = modifiedBehandling.feilregistrering!!.navIdent,
+                registered = modifiedBehandling.feilregistrering!!.registered,
+                reason = modifiedBehandling.feilregistrering!!.reason,
+                fagsystemId = modifiedBehandling.feilregistrering!!.fagsystem.id
+            ),
+            modified = modifiedBehandling.modified,
         )
     }
 }

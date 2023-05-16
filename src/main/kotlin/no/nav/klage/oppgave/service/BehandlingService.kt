@@ -731,7 +731,7 @@ class BehandlingService(
         return arbeidOgInntektClient.getAARegisterUrl(behandling.sakenGjelder.partId.value)
     }
 
-    fun feilregistrer(behandlingId: UUID, reason: String, fagsystem: Fagsystem) {
+    fun feilregistrer(behandlingId: UUID, reason: String, fagsystem: Fagsystem): Behandling {
         val navIdent = innloggetSaksbehandlerService.getInnloggetIdent()
 
         val behandling = if (!saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(navIdent)) {
@@ -740,10 +740,10 @@ class BehandlingService(
             getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
         }
 
-        feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+        return feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
     }
 
-    private fun feilregistrer(behandling: Behandling, navIdent: String, reason: String, fagsystem: Fagsystem) {
+    private fun feilregistrer(behandling: Behandling, navIdent: String, reason: String, fagsystem: Fagsystem): Behandling {
         val event = behandling.setFeilregistrering(
             feilregistrering = Feilregistrering(
                 navIdent = navIdent,
@@ -754,5 +754,6 @@ class BehandlingService(
             saksbehandlerident = navIdent,
         )
         applicationEventPublisher.publishEvent(event)
+        return behandling
     }
 }
