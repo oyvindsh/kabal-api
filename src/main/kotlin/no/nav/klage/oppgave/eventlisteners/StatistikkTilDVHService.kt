@@ -190,8 +190,16 @@ class StatistikkTilDVHService(
             BehandlingState.MOTTATT -> behandling.mottattKlageinstans
             BehandlingState.TILDELT_SAKSBEHANDLER -> behandling.modified //tildelt eller fradelt
 
-            BehandlingState.AVSLUTTET, BehandlingState.NY_ANKEBEHANDLING_I_KA -> behandling.currentDelbehandling().avsluttetAvSaksbehandler
-                ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
+            BehandlingState.AVSLUTTET, BehandlingState.NY_ANKEBEHANDLING_I_KA -> {
+
+                if (behandling.feilregistrering != null) {
+                    behandling.feilregistrering!!.registered
+                } else {
+                    behandling.currentDelbehandling().avsluttetAvSaksbehandler
+                        ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
+                }
+
+            }
 
             BehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")
