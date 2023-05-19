@@ -69,7 +69,8 @@ class CleanupAfterBehandlingEventListener(
                 dokumentUnderArbeidService.slettDokument(
                     behandlingId = behandling.id,
                     dokumentId = it.id,
-                    innloggetIdent = behandling.feilregistrering!!.navIdent
+                    innloggetIdent = behandling.feilregistrering!!.navIdent,
+                    ignoreCheckSkrivetilgang = true,
                 )
             } catch (e: Exception) {
                 //best effort
