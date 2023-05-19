@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
@@ -54,8 +55,11 @@ class CleanupAfterBehandlingEventListener(
                         secureLogger.error("Could not delete melding with id ${melding.id}", exception)
                     }
                 }
-        } else if (behandling.feilregistrering != null) {
-            logger.debug("Cleanup and notifying vedtaksinstans after feilregistrering. Behandling.id: {}", behandling.id)
+        } else if (behandlingEndretEvent.endringslogginnslag.any { it.felt == Felt.FEILREGISTRERING } && behandling.feilregistrering != null) {
+            logger.debug(
+                "Cleanup and notifying vedtaksinstans after feilregistrering. Behandling.id: {}",
+                behandling.id
+            )
             deleteDokumenterUnderBehandling(behandling)
             deleteFromKaka(behandling)
             //FIXME add back after we have informed all clients about the change.
