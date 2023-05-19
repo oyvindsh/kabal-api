@@ -42,14 +42,9 @@ class BehandlingMapper(
 
         return BehandlingDetaljerView(
             id = klagebehandling.id,
-            klageInnsendtdato = klagebehandling.innsendt,
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraNAVEnhetNavn = enhetNavn,
-            forrigeNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
-            forrigeNAVEnhetNavn = enhetNavn,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
-            forrigeSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
-            forrigeVedtaksDato = null,
             mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
             sakenGjelder = getSakenGjelderView(klagebehandling.sakenGjelder),
             klager = getKlagerView(klagebehandling.klager),
@@ -94,7 +89,6 @@ class BehandlingMapper(
                 id = klagebehandling.kakaKvalitetsvurderingId,
                 version = klagebehandling.kakaKvalitetsvurderingVersion,
             ),
-            isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView()
         )
@@ -105,11 +99,8 @@ class BehandlingMapper(
 
         return BehandlingDetaljerView(
             id = ankebehandling.id,
-            klageInnsendtdato = ankebehandling.innsendt,
             fraNAVEnhet = ankebehandling.klageBehandlendeEnhet,
             fraNAVEnhetNavn = forrigeEnhetNavn,
-            forrigeNAVEnhet = ankebehandling.klageBehandlendeEnhet,
-            forrigeNAVEnhetNavn = forrigeEnhetNavn,
             mottattVedtaksinstans = null,
             sakenGjelder = getSakenGjelderView(ankebehandling.sakenGjelder),
             klager = getKlagerView(ankebehandling.klager),
@@ -138,8 +129,6 @@ class BehandlingMapper(
             modified = ankebehandling.modified,
             created = ankebehandling.created,
             fraSaksbehandlerident = null,
-            forrigeSaksbehandlerident = null,
-            forrigeVedtaksDato = ankebehandling.klageVedtaksDato,
             resultat = ankebehandling.currentDelbehandling().mapToVedtakView(),
             kommentarFraVedtaksinstans = null,
             tilknyttedeDokumenter = ankebehandling.saksdokumenter.map {
@@ -157,7 +146,6 @@ class BehandlingMapper(
                 id = ankebehandling.kakaKvalitetsvurderingId,
                 version = ankebehandling.kakaKvalitetsvurderingVersion,
             ),
-            isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
         )
@@ -166,11 +154,8 @@ class BehandlingMapper(
     fun mapAnkeITrygderettenbehandlingToBehandlingDetaljerView(ankeITrygderettenbehandling: AnkeITrygderettenbehandling): BehandlingDetaljerView {
         return BehandlingDetaljerView(
             id = ankeITrygderettenbehandling.id,
-            klageInnsendtdato = null,
             fraNAVEnhet = null,
             fraNAVEnhetNavn = null,
-            forrigeNAVEnhet = null,
-            forrigeNAVEnhetNavn = null,
             mottattVedtaksinstans = null,
             sakenGjelder = getSakenGjelderView(ankeITrygderettenbehandling.sakenGjelder),
             klager = getKlagerView(ankeITrygderettenbehandling.klager),
@@ -199,8 +184,6 @@ class BehandlingMapper(
             modified = ankeITrygderettenbehandling.modified,
             created = ankeITrygderettenbehandling.created,
             fraSaksbehandlerident = null,
-            forrigeSaksbehandlerident = null,
-            forrigeVedtaksDato = null,
             resultat = ankeITrygderettenbehandling.currentDelbehandling().mapToVedtakView(),
             kommentarFraVedtaksinstans = null,
             tilknyttedeDokumenter = ankeITrygderettenbehandling.saksdokumenter.map {
@@ -217,7 +200,6 @@ class BehandlingMapper(
                 id = null,
                 version = 2,
             ),
-            isPossibleToUseDokumentUnderArbeid = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankeITrygderettenbehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,

@@ -33,7 +33,7 @@ class Delbehandling(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
-    //Overføres ikke. Innstillingsbrev fra første delbehandlinger vil dukke oppe i saksdokumenter-lista.
+    //Antageligvis ikke lenger i bruk.
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
     //Vent med vurdering. Mulig det skal være draft på tvers av delbehandlingerer.

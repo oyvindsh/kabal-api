@@ -7,11 +7,8 @@ import java.util.*
 
 data class BehandlingDetaljerView(
     val id: UUID,
-    val klageInnsendtdato: LocalDate?,
     val fraNAVEnhet: String?,
     val fraNAVEnhetNavn: String?,
-    val forrigeNAVEnhet: String? = null,
-    val forrigeNAVEnhetNavn: String? = null,
     val mottattVedtaksinstans: LocalDate? = null,
     val sakenGjelder: SakenGjelderView,
     val klager: KlagerView,
@@ -40,8 +37,6 @@ data class BehandlingDetaljerView(
     val modified: LocalDateTime,
     val created: LocalDateTime,
     val fraSaksbehandlerident: String? = null,
-    val forrigeSaksbehandlerident: String? = null,
-    val forrigeVedtaksDato: LocalDate? = null,
     val resultat: VedtakView?,
     val kommentarFraVedtaksinstans: String?,
     val tilknyttedeDokumenter: Set<TilknyttetDokument>,
@@ -53,7 +48,6 @@ data class BehandlingDetaljerView(
     val kvalitetsvurderingId: UUID? = null,
     //TODO make nullable
     val kvalitetsvurderingReference: KvalitetsvurderingReference,
-    val isPossibleToUseDokumentUnderArbeid: Boolean = false,
     val sattPaaVent: LocalDateTime? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,

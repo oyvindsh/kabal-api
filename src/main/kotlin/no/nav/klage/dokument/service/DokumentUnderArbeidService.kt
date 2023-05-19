@@ -427,12 +427,16 @@ class DokumentUnderArbeidService(
     fun slettDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
-        innloggetIdent: String
+        innloggetIdent: String,
+        ignoreCheckSkrivetilgang: Boolean = false
     ) {
         val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(dokumentUnderArbeid.behandlingId)
+        val behandling = behandlingService.getBehandlingForUpdate(
+            behandlingId = dokumentUnderArbeid.behandlingId,
+            ignoreCheckSkrivetilgang = ignoreCheckSkrivetilgang
+        )
 
         if (dokumentUnderArbeid.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
