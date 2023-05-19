@@ -428,14 +428,12 @@ class DokumentUnderArbeidService(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
         innloggetIdent: String,
-        ignoreCheckSkrivetilgang: Boolean = false
     ) {
         val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(
+        val behandling = behandlingService.getBehandling(
             behandlingId = dokumentUnderArbeid.behandlingId,
-            ignoreCheckSkrivetilgang = ignoreCheckSkrivetilgang
         )
 
         if (dokumentUnderArbeid.erMarkertFerdig()) {
