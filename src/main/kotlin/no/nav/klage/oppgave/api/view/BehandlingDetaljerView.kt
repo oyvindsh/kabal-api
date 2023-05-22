@@ -11,8 +11,8 @@ data class BehandlingDetaljerView(
     val fraNAVEnhetNavn: String?,
     val mottattVedtaksinstans: LocalDate? = null,
     val sakenGjelder: SakenGjelderView,
-    val klager: KlagerView,
-    val prosessfullmektig: ProsessfullmektigView?,
+    val klager: PartView,
+    val prosessfullmektig: PartView?,
     val tema: String,
     val temaId: String,
     val ytelse: String? = null,
@@ -59,17 +59,17 @@ data class BehandlingDetaljerView(
         val etternavn: String?,
     )
 
-    data class KlagerView(
+    data class KlagerViewOld(
         val person: PersonView?,
         val virksomhet: VirksomhetView?
     )
 
-    data class ProsessfullmektigView(
+    data class ProsessfullmektigViewOld(
         val person: PersonView?,
         val virksomhet: VirksomhetView?
     )
 
-    data class SakenGjelderView(
+    data class SakenGjelderViewOld(
         val person: PersonView?,
         val virksomhet: VirksomhetView?
     )
@@ -96,4 +96,34 @@ data class BehandlingDetaljerView(
         val reason: String,
         val fagsystemId: String,
     )
+
+    interface PartBase {
+        val id: String
+        val name: String?
+    }
+
+    enum class Sex {
+        MANN, KVINNE, UKJENT
+    }
+
+    enum class IdType {
+        FNR, ORGNR
+    }
+
+    interface IdPart {
+        val type: IdType
+    }
+
+    data class PartView(
+        override val id: String,
+        override val name: String?,
+        override val type: IdType
+    ): PartBase, IdPart
+
+    data class SakenGjelderView(
+        override val id: String,
+        override val name: String?,
+        override val type: IdType,
+        val sex: Sex,
+    ): PartBase, IdPart
 }
