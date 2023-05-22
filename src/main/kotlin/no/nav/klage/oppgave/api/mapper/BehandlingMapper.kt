@@ -336,15 +336,6 @@ class BehandlingMapper(
         )
     }
 
-    fun toSakenGjelderWrapped(sakenGjelder: SakenGjelder): SakenGjelderWrapped {
-        return SakenGjelderWrapped(
-            sakenGjelder = SakenGjelderWrapped.PersonView(
-                fnr = sakenGjelder.partId.value,
-                navn = pdlFacade.getPersonInfo(sakenGjelder.partId.value).sammensattNavn,
-            ),
-        )
-    }
-
     private fun Feilregistrering?.toView(): BehandlingDetaljerView.FeilregistreringView? {
         return this?.let {
             BehandlingDetaljerView.FeilregistreringView(
