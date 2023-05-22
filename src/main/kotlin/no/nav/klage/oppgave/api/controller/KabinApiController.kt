@@ -28,6 +28,8 @@ class KabinApiController(
     private val ankebehandlingService: AnkebehandlingService,
     private val dokumentService: DokumentService,
     private val behandlingMapper: BehandlingMapper,
+    private val behandlingService: BehandlingService,
+    private val saksbehandlerService: SaksbehandlerService
 ) {
 
     companion object {
@@ -84,8 +86,19 @@ class KabinApiController(
             logger = logger
         )
         //TODO: Sjekk behov for å sende Kafka-melding om ANKE_OPPRETTET, dobbeltsjekk DVH
-
-        return CreatedAnkeResponse(mottakId = mottakService.createAnkeMottakFromKabinInput(input = input))
+        val mottakId = mottakService.createAnkeMottakFromKabinInput(input = input)
+        if (input.saksbehandlerIdent != null) {
+            val ankebehandling = ankebehandlingService.getAnkebehandlingFromMottakId(mottakId)
+            behandlingService.setSaksbehandler(
+                behandlingId = ankebehandling!!.id,
+                tildeltSaksbehandlerIdent = input.saksbehandlerIdent,
+                enhetId = saksbehandlerService.getEnhetForSaksbehandler(
+                    input.saksbehandlerIdent
+                ).enhetId,
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            )
+        }
+        return CreatedAnkeResponse(mottakId = mottakId)
     }
 
     @GetMapping("/anker/{mottakId}/status")
@@ -126,7 +139,8 @@ class KabinApiController(
             journalpost = dokumentService.getDokumentReferanse(
                 journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,
                 behandling = ankebehandling
-            )
+            ),
+            tildeltSaksbehandlerIdent = ankebehandling.tildeling?.saksbehandlerident
         )
     }
 
@@ -156,7 +170,19 @@ class KabinApiController(
         )
         //TODO: Sjekk behov for å sende Kafka-melding, dobbeltsjekk DVH
 
-        return CreatedKlageResponse(mottakId = mottakService.createKlageMottakFromKabinInput(klageInput = input))
+        val mottakId = mottakService.createKlageMottakFromKabinInput(klageInput = input)
+        if (input.saksbehandlerIdent != null) {
+            val ankebehandling = klagebehandlingService.getKlagebehandlingFromMottakId(mottakId)
+            behandlingService.setSaksbehandler(
+                behandlingId = ankebehandling!!.id,
+                tildeltSaksbehandlerIdent = input.saksbehandlerIdent,
+                enhetId = saksbehandlerService.getEnhetForSaksbehandler(
+                    input.saksbehandlerIdent
+                ).enhetId,
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            )
+        }
+        return CreatedKlageResponse(mottakId = mottakId)
     }
 
     @GetMapping("/klager/{mottakId}/status")
@@ -191,6 +217,7 @@ class KabinApiController(
                 behandling = klagebehandling
             ),
             kildereferanse = mottak.kildeReferanse,
+            tildeltSaksbehandlerIdent = klagebehandling.tildeling?.saksbehandlerident
         )
 
     }

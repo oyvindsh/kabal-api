@@ -11,7 +11,6 @@ import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
 import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
-import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
@@ -33,7 +32,8 @@ class KlagebehandlingService(
     private val kakaVersion2Date: LocalDate,
     private val behandlingMapper: BehandlingMapper,
     private val behandlingService: BehandlingService,
-    private val mottakRepository: MottakRepository,
+    private val saksbehandlerService: SaksbehandlerService
+
 ) {
 
     companion object {
@@ -97,6 +97,8 @@ class KlagebehandlingService(
         fagsystem = fagsystem,
         fagsystemId = fagsystem.id,
         klageBehandlendeEnhet = tildeling!!.enhet!!,
+        tildeltSaksbehandlerIdent = tildeling!!.saksbehandlerident!!,
+        tildeltSaksbehandlerNavn = saksbehandlerService.getNameForIdent(tildeling!!.saksbehandlerident!!),
     )
 
     fun findMuligAnkeByPartId(
