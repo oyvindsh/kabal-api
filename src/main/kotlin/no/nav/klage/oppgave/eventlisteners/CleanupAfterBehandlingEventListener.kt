@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
+import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.FeilregistrertInKabalInput
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
@@ -30,6 +33,7 @@ class CleanupAfterBehandlingEventListener(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val ankebehandlingRepository: AnkebehandlingRepository,
+    private val fssProxyClient: KlageFssProxyClient
 ) {
 
     companion object {
@@ -62,6 +66,19 @@ class CleanupAfterBehandlingEventListener(
             )
             deleteDokumenterUnderBehandling(behandling)
             deleteFromKaka(behandling)
+
+            if (behandling.fagsystem == Fagsystem.IT01) {
+                logger.debug("Feilregistrering av behandling skal registreres i Infotrygd.")
+                fssProxyClient.setToFeilregistrertInKabal(
+                    sakId = behandling.kildeReferanse,
+                    input = FeilregistrertInKabalInput(
+                        //TODO: For testing
+                        saksbehandlerIdent = behandlingEndretEvent.endringslogginnslag.first().saksbehandlerident!!,
+                    )
+                )
+                logger.debug("Feilregistrering av behandling ble registrert i Infotrygd.")
+            }
+
             //FIXME add back after we have informed all clients about the change.
             //notifyVedtaksinstans(behandling)
         }

@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.clients.klagefssproxy
 
-import no.nav.klage.oppgave.clients.klagefssproxy.domain.HandledInKabalInput
-import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakAssignedInput
-import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFinishedInput
-import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFromKlanke
+import no.nav.klage.oppgave.clients.klagefssproxy.domain.*
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.HttpHeaders
@@ -73,4 +70,18 @@ class KlageFssProxyClient(
             .bodyToMono<Unit>()
             .block()
     }
+
+    fun setToFeilregistrertInKabal(sakId: String, input: FeilregistrertInKabalInput) {
+        klageFssProxyWebClient.post()
+            .uri { it.path("/klanke/saker/{sakId}/feilregistrertinkabal").build(sakId) }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getOnBehalfOfTokenWithKlageFSSProxyScope()}"
+            )
+            .bodyValue(input)
+            .retrieve()
+            .bodyToMono<Unit>()
+            .block()
+    }
+
 }
