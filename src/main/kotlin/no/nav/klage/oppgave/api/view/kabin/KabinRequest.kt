@@ -10,6 +10,10 @@ data class GetCompletedKlagebehandlingerInput(
     val idnummer: String
 )
 
+data class searchPartInput(
+    val identifikator: String
+)
+
 data class SearchUsedJournalpostIdInput(
     val fnr: String,
 )
