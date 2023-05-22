@@ -33,7 +33,8 @@ class KabinApiController(
     private val eregClient: EregClient,
     private val behandlingMapper: BehandlingMapper,
     private val behandlingService: BehandlingService,
-    private val saksbehandlerService: SaksbehandlerService
+    private val saksbehandlerService: SaksbehandlerService,
+    private val fullmektigSearchService: FullmektigSearchService,
 ) {
 
     companion object {
@@ -52,6 +53,13 @@ class KabinApiController(
             kildeReferanse = input.kildereferanse,
             type = Type.of(input.typeId)
         )
+    }
+
+    @PostMapping("/searchpart")
+    fun searchPart(
+        @RequestBody input: searchPartInput
+    ): BehandlingDetaljerView.ProsessfullmektigViewOld {
+        return fullmektigSearchService.searchFullmektigOld(input.identifikator)
     }
 
     @PostMapping("/completedklagebehandlinger")
