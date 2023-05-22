@@ -28,6 +28,7 @@ data class CreateAnkeBasedOnKabinInput(
     val klager: OversendtPartId?,
     val fullmektig: OversendtPartId?,
     val ankeDocumentJournalpostId: String,
+    val saksbehandlerIdent: String?,
 ) {
     data class OversendtPartId(
         val type: OversendtPartIdType,
@@ -52,6 +53,7 @@ data class CreateKlageBasedOnKabinInput(
     val frist: LocalDate,
     val ytelseId: String,
     val kildereferanse: String,
+    val saksbehandlerIdent: String?,
 ) {
     data class OversendtPartId(
         val type: OversendtPartIdType,
