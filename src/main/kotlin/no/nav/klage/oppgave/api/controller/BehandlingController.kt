@@ -289,14 +289,14 @@ class BehandlingController(
     @GetMapping("/{behandlingId}/sakengjelder")
     fun getSakenGjelder(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): SakenGjelderWrapped {
+    ): BehandlingDetaljerView.SakenGjelderView {
         logMethodDetails(
             ::getSakenGjelder.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             logger
         )
 
-        return behandlingMapper.toSakenGjelderWrapped(
+        return behandlingMapper.getSakenGjelderView(
             behandlingService.getBehandling(behandlingId).sakenGjelder
         )
     }

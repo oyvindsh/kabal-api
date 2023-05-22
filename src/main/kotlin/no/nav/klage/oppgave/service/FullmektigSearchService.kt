@@ -4,6 +4,7 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -23,41 +24,35 @@ class FullmektigSearchService(
         private val secureLogger = getSecureLogger()
     }
 
-    fun searchFullmektig(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.ProsessfullmektigView =
+    fun searchFullmektig(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.PartView =
         when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
             PartIdType.PERSON -> {
                 try {
                     if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
                         val person = pdlFacade.getPersonInfo(identifikator)
-                        BehandlingDetaljerView.ProsessfullmektigView(
-                            person = BehandlingDetaljerView.PersonView(
-                                foedselsnummer = person.foedselsnr, navn = BehandlingDetaljerView.NavnView(
-                                    fornavn = person.fornavn,
-                                    mellomnavn = person.mellomnavn,
-                                    etternavn = person.etternavn
-                                ), kjoenn = person.kjoenn
-                            ),
-                            virksomhet = null
+                        BehandlingDetaljerView.PartView(
+                            id = person.foedselsnr,
+                            name = person.settSammenNavn(),
+                            type = BehandlingDetaljerView.IdType.FNR,
                         )
                     } else {
                         secureLogger.warn("Saksbehandler does not have access to view person")
-                        BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
+                        throw MissingTilgangException("Saksbehandler does not have access to view person")
                     }
                 } catch (pdlee: PDLErrorException) {
-                    BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
+                    throw RuntimeException("PDL exception", pdlee)
                 }
             }
+
             PartIdType.VIRKSOMHET -> {
                 val organisasjon = eregClient.hentOrganisasjon(identifikator)
                 if (organisasjon == null) {
-                    BehandlingDetaljerView.ProsessfullmektigView(person = null, virksomhet = null)
+                    throw RuntimeException("Couldn't find organization: $identifikator in Ereg.")
                 } else {
-                    BehandlingDetaljerView.ProsessfullmektigView(
-                        virksomhet = BehandlingDetaljerView.VirksomhetView(
-                            virksomhetsnummer = organisasjon.organisasjonsnummer,
-                            navn = organisasjon.navn.sammensattNavn()
-                        ),
-                        person = null,
+                    BehandlingDetaljerView.PartView(
+                        id = organisasjon.organisasjonsnummer,
+                        name = organisasjon.navn.sammensattNavn(),
+                        type = BehandlingDetaljerView.IdType.ORGNR,
                     )
                 }
             }
