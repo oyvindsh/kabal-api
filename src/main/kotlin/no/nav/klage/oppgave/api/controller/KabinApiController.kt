@@ -58,8 +58,8 @@ class KabinApiController(
     @PostMapping("/searchpart")
     fun searchPart(
         @RequestBody input: searchPartInput
-    ): BehandlingDetaljerView.ProsessfullmektigView {
-        return fullmektigSearchService.searchFullmektig(input.identifikator)
+    ): BehandlingDetaljerView.ProsessfullmektigViewOld {
+        return fullmektigSearchService.searchFullmektigOld(input.identifikator)
     }
 
     @PostMapping("/completedklagebehandlinger")

@@ -57,4 +57,49 @@ class FullmektigSearchService(
                 }
             }
         }
+
+    //TODO: Remove after migration
+    fun searchFullmektigOld(
+        identifikator: String,
+        skipAccessControl: Boolean = false
+    ): BehandlingDetaljerView.ProsessfullmektigViewOld =
+        when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
+            PartIdType.PERSON -> {
+                try {
+                    if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
+                        val person = pdlFacade.getPersonInfo(identifikator)
+                        BehandlingDetaljerView.ProsessfullmektigViewOld(
+                            person = BehandlingDetaljerView.PersonView(
+                                foedselsnummer = person.foedselsnr, navn = BehandlingDetaljerView.NavnView(
+                                    fornavn = person.fornavn,
+                                    mellomnavn = person.mellomnavn,
+                                    etternavn = person.etternavn
+                                ), kjoenn = person.kjoenn
+                            ),
+                            virksomhet = null
+                        )
+                    } else {
+                        secureLogger.warn("Saksbehandler does not have access to view person")
+                        BehandlingDetaljerView.ProsessfullmektigViewOld(person = null, virksomhet = null)
+                    }
+                } catch (pdlee: PDLErrorException) {
+                    BehandlingDetaljerView.ProsessfullmektigViewOld(person = null, virksomhet = null)
+                }
+            }
+
+            PartIdType.VIRKSOMHET -> {
+                val organisasjon = eregClient.hentOrganisasjon(identifikator)
+                if (organisasjon == null) {
+                    BehandlingDetaljerView.ProsessfullmektigViewOld(person = null, virksomhet = null)
+                } else {
+                    BehandlingDetaljerView.ProsessfullmektigViewOld(
+                        virksomhet = BehandlingDetaljerView.VirksomhetView(
+                            virksomhetsnummer = organisasjon.organisasjonsnummer,
+                            navn = organisasjon.navn.sammensattNavn()
+                        ),
+                        person = null,
+                    )
+                }
+            }
+        }
 }
