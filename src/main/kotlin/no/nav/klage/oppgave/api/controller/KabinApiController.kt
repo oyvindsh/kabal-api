@@ -140,7 +140,12 @@ class KabinApiController(
                 journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,
                 behandling = ankebehandling
             ),
-            tildeltSaksbehandlerIdent = ankebehandling.tildeling?.saksbehandlerident
+            tildeltSaksbehandler = ankebehandling.tildeling?.saksbehandlerident?.let {
+                TildeltSaksbehandler(
+                    navIdent = it,
+                    navn = saksbehandlerService.getNameForIdent(it),
+                )
+            },
         )
     }
 
@@ -217,8 +222,12 @@ class KabinApiController(
                 behandling = klagebehandling
             ),
             kildereferanse = mottak.kildeReferanse,
-            tildeltSaksbehandlerIdent = klagebehandling.tildeling?.saksbehandlerident
+            tildeltSaksbehandler = klagebehandling.tildeling?.saksbehandlerident?.let {
+                TildeltSaksbehandler(
+                    navIdent = it,
+                    navn = saksbehandlerService.getNameForIdent(it),
+                )
+            },
         )
-
     }
 }
