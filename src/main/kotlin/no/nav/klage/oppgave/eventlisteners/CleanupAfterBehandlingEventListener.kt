@@ -72,7 +72,6 @@ class CleanupAfterBehandlingEventListener(
                 fssProxyClient.setToFeilregistrertInKabal(
                     sakId = behandling.kildeReferanse,
                     input = FeilregistrertInKabalInput(
-                        //TODO: For testing
                         saksbehandlerIdent = behandlingEndretEvent.endringslogginnslag.first().saksbehandlerident!!,
                     )
                 )
