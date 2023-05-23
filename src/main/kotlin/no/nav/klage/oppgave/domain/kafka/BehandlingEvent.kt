@@ -51,6 +51,7 @@ data class AnkebehandlingAvsluttetDetaljer(
 )
 
 data class BehandlingFeilregistrertDetaljer(
+    val feilregistrert: LocalDateTime,
     val navIdent: String,
     val reason: String,
 )
