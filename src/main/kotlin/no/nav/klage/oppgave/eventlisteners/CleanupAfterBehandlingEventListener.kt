@@ -79,7 +79,7 @@ class CleanupAfterBehandlingEventListener(
             }
 
             //FIXME add back after we have informed all clients about the change.
-            //notifyVedtaksinstans(behandling)
+            notifyVedtaksinstans(behandling)
         }
     }
 
