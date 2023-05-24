@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
+import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -27,6 +28,7 @@ class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val saksbehandlerService: SaksbehandlerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -346,7 +348,10 @@ class BehandlingController(
 
         return FeilregistreringResponse(
             feilregistrering = BehandlingDetaljerView.FeilregistreringView(
-                navIdent = modifiedBehandling.feilregistrering!!.navIdent,
+                feilregistrertAv = SaksbehandlerView(
+                    navIdent = modifiedBehandling.feilregistrering!!.navIdent,
+                    navn = saksbehandlerService.getNameForIdent(modifiedBehandling.feilregistrering!!.navIdent)
+                ),
                 registered = modifiedBehandling.feilregistrering!!.registered,
                 reason = modifiedBehandling.feilregistrering!!.reason,
                 fagsystemId = modifiedBehandling.feilregistrering!!.fagsystem.id

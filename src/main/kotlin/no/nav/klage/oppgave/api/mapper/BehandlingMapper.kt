@@ -339,7 +339,10 @@ class BehandlingMapper(
     private fun Feilregistrering?.toView(): BehandlingDetaljerView.FeilregistreringView? {
         return this?.let {
             BehandlingDetaljerView.FeilregistreringView(
-                navIdent = it.navIdent,
+                feilregistrertAv = SaksbehandlerView(
+                    navIdent = it.navIdent,
+                    navn = saksbehandlerRepository.getNameForSaksbehandler(it.navIdent)
+                ),
                 registered = it.registered,
                 reason = it.reason,
                 fagsystemId = it.fagsystem.id
