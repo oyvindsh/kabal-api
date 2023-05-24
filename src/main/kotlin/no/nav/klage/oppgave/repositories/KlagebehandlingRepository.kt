@@ -16,11 +16,9 @@ interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID>, Klag
 
     fun findByIdAndDelbehandlingerAvsluttetIsNotNull(id: UUID): Klagebehandling?
 
-    fun findByDelbehandlingerAvsluttetIsNotNull(): List<Klagebehandling>
+    fun findByDelbehandlingerAvsluttetIsNotNullAndFeilregistreringIsNull(): List<Klagebehandling>
 
-    fun findByKildeReferanseAndYtelse(kildeReferanse: String, ytelse: Ytelse): Klagebehandling?
-
-    fun findByDvhReferanse(dvhReferanse: String): Klagebehandling?
+    fun findByKildeReferanseAndYtelseAndFeilregistreringIsNull(kildeReferanse: String, ytelse: Ytelse): Klagebehandling?
 
     @Deprecated("See getOne")
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)

@@ -24,6 +24,7 @@ import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
+import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.service.*
 import no.nav.klage.oppgave.util.TokenUtil
 import org.assertj.core.api.Assertions.assertThat
@@ -101,6 +102,9 @@ internal class BehandlingAvslutningServiceTest {
 
         @MockkBean(relaxed = true)
         lateinit var klageFssProxyClient: KlageFssProxyClient
+
+        @MockkBean(relaxed = true)
+        lateinit var saksbehandlerRepository: SaksbehandlerRepository
 
         @MockkBean(relaxed = true)
         lateinit var saksbehandlerService: SaksbehandlerService
@@ -191,6 +195,7 @@ internal class BehandlingAvslutningServiceTest {
         ),
         avsenderEnhetFoersteinstans = "0101",
         mottattVedtaksinstans = LocalDate.now(),
+        kakaKvalitetsvurderingId = UUID.randomUUID(),
         kakaKvalitetsvurderingVersion = 2,
     )
 

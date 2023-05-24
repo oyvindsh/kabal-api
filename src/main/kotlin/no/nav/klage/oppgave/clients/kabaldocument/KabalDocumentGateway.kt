@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.clients.kabaldocument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.UpdateTitleInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.BrevmottakerWithJoarkAndDokDistInfo
-import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service

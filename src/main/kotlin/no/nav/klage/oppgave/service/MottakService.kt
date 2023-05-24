@@ -15,7 +15,6 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.config.incrementMottattKlageAnke
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.kodeverk.LovligeTyper
@@ -26,6 +25,7 @@ import no.nav.klage.oppgave.exceptions.OversendtKlageNotValidException
 import no.nav.klage.oppgave.exceptions.PreviousBehandlingNotFinalizedException
 import no.nav.klage.oppgave.gateway.AzureGateway
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
+import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MottakRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -46,6 +46,7 @@ class MottakService(
     private val mottakRepository: MottakRepository,
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val ankebehandlingRepository: AnkebehandlingRepository,
+    private val behandlingRepository: BehandlingRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentService: DokumentService,
     private val norg2Client: Norg2Client,
@@ -141,7 +142,7 @@ class MottakService(
                 Type.KLAGE -> mottakRepository.save(oversendtKlageAnke.toMottak())
                 Type.ANKE -> {
                     val previousHandledKlage =
-                        klagebehandlingRepository.findByKildeReferanseAndYtelse(
+                        klagebehandlingRepository.findByKildeReferanseAndYtelseAndFeilregistreringIsNull(
                             oversendtKlageAnke.kildeReferanse,
                             oversendtKlageAnke.ytelse
                         )
@@ -243,7 +244,7 @@ class MottakService(
             throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
         }
 
-        val existingAnke = ankebehandlingRepository.findByKlagebehandlingId(klagebehandlingId)
+        val existingAnke = ankebehandlingRepository.findByKlagebehandlingIdAndFeilregistreringIsNull(klagebehandlingId)
 
         if (existingAnke != null) {
             val message =
@@ -311,25 +312,33 @@ class MottakService(
     }
 
     fun isDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type): Boolean {
-        return mottakRepository.existsByFagsystemAndKildeReferanseAndType(
-            fagsystem = fagsystem.mapFagsystem(),
+        return isBehandlingDuplicate(
+            fagsystem = fagsystem,
             kildeReferanse = kildeReferanse,
             type = type
         )
     }
 
     private fun validateDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
-        if (mottakRepository.existsByFagsystemAndKildeReferanseAndType(
-                fagsystem = fagsystem.mapFagsystem(),
+        if (isBehandlingDuplicate(
+                fagsystem = fagsystem,
                 kildeReferanse = kildeReferanse,
                 type = type
             )
         ) {
             val message =
-                "Kunne ikke lagre oversendelse grunnet duplikat: kildesystem ${fagsystem.name} og kildereferanse: $kildeReferanse"
+                "Kunne ikke lagre oversendelse grunnet duplikat: kildesystem ${fagsystem.name}, kildereferanse: $kildeReferanse og type: $type"
             logger.warn(message)
             throw DuplicateOversendelseException(message)
         }
+    }
+
+    private fun isBehandlingDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type): Boolean {
+        return behandlingRepository.existsByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
+            fagsystem = fagsystem.mapFagsystem(),
+            kildeReferanse = kildeReferanse,
+            type = type,
+        )
     }
 
     private fun validateOptionalDateTimeNotInFuture(inputDateTime: LocalDateTime?, parameterName: String) {

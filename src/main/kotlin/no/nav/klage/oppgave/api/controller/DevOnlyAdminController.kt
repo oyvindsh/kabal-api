@@ -1,7 +1,5 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
-import no.nav.klage.oppgave.api.view.SearchFullmektigInput
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.service.FullmektigSearchService
 import no.nav.klage.oppgave.util.TokenUtil
@@ -63,14 +61,6 @@ class DevOnlyAdminController(
             logger.warn("Failed to generate missing AnkeITrygderetten", e)
             throw e
         }
-    }
-
-    @Unprotected
-    @PostMapping("/internal/searchfullmektig")
-    fun searchFullmektig(
-        @RequestBody input: SearchFullmektigInput,
-    ): BehandlingDetaljerView.ProsessfullmektigView {
-        return fullmektigSearchService.searchFullmektig(identifikator = input.identifikator, skipAccessControl = true)
     }
 
     @Unprotected

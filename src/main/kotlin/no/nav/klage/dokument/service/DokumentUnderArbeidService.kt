@@ -16,9 +16,9 @@ import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
@@ -427,12 +427,14 @@ class DokumentUnderArbeidService(
     fun slettDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
-        innloggetIdent: String
+        innloggetIdent: String,
     ) {
         val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(dokumentUnderArbeid.behandlingId)
+        val behandling = behandlingService.getBehandling(
+            behandlingId = dokumentUnderArbeid.behandlingId,
+        )
 
         if (dokumentUnderArbeid.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
@@ -512,7 +514,7 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenterNotFinished(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
+    fun findDokumenterNotFinished(behandlingId: UUID): SortedSet<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 

@@ -7,7 +7,6 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -26,6 +25,10 @@ class Ankebehandling(
     val mottakId: UUID? = null,
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
+    @Column(name = "kaka_kvalitetsvurdering_id")
+    var kakaKvalitetsvurderingId: UUID?,
+    @Column(name = "kaka_kvalitetsvurdering_version", nullable = true)
+    val kakaKvalitetsvurderingVersion: Int,
 
 //    Finn ut hvordan dette skal fungere i anker etter hvert
 //    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
@@ -51,14 +54,13 @@ class Ankebehandling(
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
-    kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
     sattPaaVent: LocalDateTime? = null,
+    feilregistrering: Feilregistrering? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -69,8 +71,6 @@ class Ankebehandling(
     mottattKlageinstans = mottattKlageinstans,
     modified = modified,
     created = created,
-    kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
-    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,
@@ -81,6 +81,7 @@ class Ankebehandling(
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
+    feilregistrering = feilregistrering,
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +

@@ -96,6 +96,65 @@ class BehandlingRepositoryTest {
     }
 
     @Test
+    fun `store Klagebehandling with feilregistrering works`() {
+
+        val mottak = Mottak(
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            kildeReferanse = "1234234",
+            sakMottattKaDato = LocalDateTime.now(),
+            fagsystem = Fagsystem.K9,
+            fagsakId = "123",
+            forrigeBehandlendeEnhet = "0101",
+            brukersHenvendelseMottattNavDato = LocalDate.now()
+        )
+
+        mottakRepository.save(mottak)
+
+        val klage = Klagebehandling(
+            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+            sakenGjelder = SakenGjelder(
+                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+                skalMottaKopi = false
+            ),
+            ytelse = Ytelse.OMS_OMP,
+            type = Type.KLAGE,
+            frist = LocalDate.now(),
+            hjemler = mutableSetOf(
+                Hjemmel.FTRL_8_7
+            ),
+            created = LocalDateTime.now(),
+            modified = LocalDateTime.now(),
+            mottattKlageinstans = LocalDateTime.now(),
+            fagsystem = Fagsystem.K9,
+            fagsakId = "123",
+            kildeReferanse = "abc",
+            mottakId = mottak.id,
+            avsenderEnhetFoersteinstans = "0101",
+            mottattVedtaksinstans = LocalDate.now(),
+            delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingVersion = 2,
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
+            feilregistrering = Feilregistrering(
+                navIdent = "navIdent",
+                registered = LocalDateTime.now(),
+                reason = "reason",
+                fagsystem = Fagsystem.K9,
+            )
+        )
+
+        behandlingRepository.save(klage)
+
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        assertThat(
+            behandlingRepository.findById(klage.id).get().feilregistrering!!.navIdent
+        ).isEqualTo(klage.feilregistrering!!.navIdent)
+    }
+
+    @Test
     fun `enhet based query works`() {
 
         val mottak1 = Mottak(
@@ -275,7 +334,7 @@ class BehandlingRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
         val result =
-            behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNull(enhet = ENHET_1)
+            behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet = ENHET_1)
 
         assertThat(result).isEqualTo(listOf(klageTildeltEnhet1))
     }

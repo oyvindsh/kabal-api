@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.*
 
 @ActiveProfiles("local")
 @DataJpaTest
@@ -83,6 +84,7 @@ class MeldingRepositoryTest {
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 

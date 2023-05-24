@@ -71,6 +71,7 @@ class TilgangServiceTest {
                     avsluttet = LocalDateTime.now(),
                 )
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -109,6 +110,7 @@ class TilgangServiceTest {
                     avsluttetAvSaksbehandler = LocalDateTime.now(),
                 )
             ),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -144,6 +146,7 @@ class TilgangServiceTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -176,6 +179,7 @@ class TilgangServiceTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 
@@ -209,6 +213,7 @@ class TilgangServiceTest {
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             delbehandlinger = setOf(Delbehandling()),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
 

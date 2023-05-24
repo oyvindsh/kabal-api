@@ -41,15 +41,6 @@ class AnkeITrygderettenbehandlingService(
         )
     }
 
-    private fun getKakaVersion(): Int {
-        val kvalitetsvurderingVersion = if (LocalDate.now() >= kakaVersion2Date) {
-            2
-        } else {
-            1
-        }
-        return kvalitetsvurderingVersion
-    }
-
     fun createAnkeITrygderettenbehandling(input: AnkeITrygderettenbehandlingInput): AnkeITrygderettenbehandling {
         val ankeITrygderettenbehandling = ankeITrygderettenbehandlingRepository.save(
             AnkeITrygderettenbehandling(
@@ -71,7 +62,6 @@ class AnkeITrygderettenbehandlingService(
                 },
                 sendtTilTrygderetten = input.sendtTilTrygderetten,
                 kjennelseMottatt = null,
-                kakaKvalitetsvurderingVersion = getKakaVersion()
             )
         )
         logger.debug("Created ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id}")

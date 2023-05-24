@@ -29,7 +29,7 @@ class FullmektigSearchController(
     @PostMapping("/searchfullmektig")
     fun searchFullmektig(
         @RequestBody input: SearchFullmektigInput,
-    ): BehandlingDetaljerView.ProsessfullmektigView {
+    ): BehandlingDetaljerView.PartView {
         logMethodDetails(
             ::searchFullmektig.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),

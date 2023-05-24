@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.MedunderskriverFlyt
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -333,6 +332,24 @@ object BehandlingSetters {
             null,
             id,
             tidspunkt
+        )
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Behandling.setFeilregistrering(
+        feilregistrering: Feilregistrering,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val tidspunkt = LocalDateTime.now()
+        modified = tidspunkt
+        this.feilregistrering = feilregistrering
+        val endringslogg = Endringslogginnslag.endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.FEILREGISTRERING,
+            fraVerdi = null,
+            tilVerdi = feilregistrering.toString(),
+            behandlingId = id,
+            tidspunkt = tidspunkt
         )
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }

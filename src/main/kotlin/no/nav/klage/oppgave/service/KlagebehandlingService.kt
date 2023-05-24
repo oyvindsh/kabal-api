@@ -82,9 +82,9 @@ class KlagebehandlingService(
         ytelseId = ytelse.id,
         utfallId = currentDelbehandling().utfall!!.id,
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
-        sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
-        klager = behandlingMapper.getKlagerView(klager),
-        fullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+        sakenGjelder = behandlingMapper.getSakenGjelderViewOld(sakenGjelder),
+        klager = behandlingMapper.getKlagerViewOld(klager),
+        fullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigViewOld(it) },
         tilknyttedeDokumenter = saksdokumenter.map {
             TilknyttetDokument(
                 journalpostId = it.journalpostId,
@@ -104,7 +104,7 @@ class KlagebehandlingService(
     fun findMuligAnkeByPartId(
         partId: String
     ): List<MuligAnke> =
-        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNull()
+        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndFeilregistreringIsNull()
             .filter {
                 it.klager.partId.value == partId &&
                         muligAnkeUtfall.contains(it.currentDelbehandling().utfall)

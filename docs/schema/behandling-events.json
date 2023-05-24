@@ -27,7 +27,8 @@
         "KLAGEBEHANDLING_AVSLUTTET",
         "ANKEBEHANDLING_OPPRETTET",
         "ANKEBEHANDLING_AVSLUTTET",
-        "ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET"
+        "ANKE_I_TRYGDERETTENBEHANDLING_OPPRETTET",
+        "BEHANDLING_FEILREGISTRERT"
       ],
       "description": "Typen event som har skjedd. Matcher et av feltene i BehandlingDetaljer, typen her vil vise hvilket felt som ikke er null. Kan og vil utvides med flere verdier på sikt."
     },

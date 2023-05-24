@@ -2,7 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.Behandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setHjemlerInVedtak
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfallInVedtak
 import no.nav.klage.oppgave.util.getLogger

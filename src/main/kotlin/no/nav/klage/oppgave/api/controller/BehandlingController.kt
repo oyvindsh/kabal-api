@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.controller
 
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
@@ -288,14 +289,14 @@ class BehandlingController(
     @GetMapping("/{behandlingId}/sakengjelder")
     fun getSakenGjelder(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): SakenGjelderWrapped {
+    ): BehandlingDetaljerView.SakenGjelderView {
         logMethodDetails(
             ::getSakenGjelder.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             logger
         )
 
-        return behandlingMapper.toSakenGjelderWrapped(
+        return behandlingMapper.getSakenGjelderView(
             behandlingService.getBehandling(behandlingId).sakenGjelder
         )
     }
@@ -324,5 +325,33 @@ class BehandlingController(
         )
 
         return ModelAndView(/* viewName = */ "redirect:" + behandlingService.getAARegisterUrl(behandlingId))
+    }
+
+    @PostMapping("/{behandlingId}/feilregistrer")
+    fun setBehandlingFeilregistrert(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: FeilregistreringInput,
+    ): FeilregistreringResponse {
+        logMethodDetails(
+            ::setBehandlingFeilregistrert.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        val modifiedBehandling = behandlingService.feilregistrer(
+            behandlingId = behandlingId,
+            reason = input.reason,
+            fagsystem = Fagsystem.KABAL,
+        )
+
+        return FeilregistreringResponse(
+            feilregistrering = BehandlingDetaljerView.FeilregistreringView(
+                navIdent = modifiedBehandling.feilregistrering!!.navIdent,
+                registered = modifiedBehandling.feilregistrering!!.registered,
+                reason = modifiedBehandling.feilregistrering!!.reason,
+                fagsystemId = modifiedBehandling.feilregistrering!!.fagsystem.id
+            ),
+            modified = modifiedBehandling.modified,
+        )
     }
 }

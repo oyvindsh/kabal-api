@@ -10,7 +10,6 @@ import no.nav.klage.oppgave.clients.kabaldocument.model.request.BrevmottakerInpu
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.PartIdInput
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
@@ -77,6 +76,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -121,6 +121,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -164,6 +165,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -212,6 +214,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )
@@ -269,6 +272,7 @@ class KabalDocumentMapperTest {
             ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
+            kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
         )

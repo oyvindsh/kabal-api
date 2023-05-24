@@ -6,7 +6,6 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.*
@@ -69,6 +68,7 @@ class StatistikkTilDVHService(
             it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                     || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
                     || it.felt === Felt.KJENNELSE_MOTTATT
+                    || it.felt === Felt.FEILREGISTRERING
         }
     }
 
@@ -79,6 +79,10 @@ class StatistikkTilDVHService(
 
         return when {
             endringslogginnslag.isEmpty() && type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
+
+            endringslogginnslag.any {
+                it.felt === Felt.FEILREGISTRERING
+            } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
                 it.felt === Felt.KJENNELSE_MOTTATT
@@ -169,9 +173,10 @@ class StatistikkTilDVHService(
             type.navn
         }
 
-    //Resultat should only be relevant if avsluttetAvSaksbehandler
     private fun getResultat(behandling: Behandling): String? =
-        if (behandling.avsluttetAvSaksbehandler != null) {
+        if (behandling.feilregistrering != null) {
+            ExternalUtfall.FEILREGISTRERT.navn
+        } else if (behandling.avsluttetAvSaksbehandler != null) {
             behandling.currentDelbehandling().utfall?.name?.let { ExternalUtfall.valueOf(it).navn }
         } else {
             null
@@ -185,8 +190,16 @@ class StatistikkTilDVHService(
             BehandlingState.MOTTATT -> behandling.mottattKlageinstans
             BehandlingState.TILDELT_SAKSBEHANDLER -> behandling.modified //tildelt eller fradelt
 
-            BehandlingState.AVSLUTTET, BehandlingState.NY_ANKEBEHANDLING_I_KA -> behandling.currentDelbehandling().avsluttetAvSaksbehandler
-                ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
+            BehandlingState.AVSLUTTET, BehandlingState.NY_ANKEBEHANDLING_I_KA -> {
+
+                if (behandling.feilregistrering != null) {
+                    behandling.feilregistrering!!.registered
+                } else {
+                    behandling.currentDelbehandling().avsluttetAvSaksbehandler
+                        ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
+                }
+
+            }
 
             BehandlingState.UKJENT -> {
                 logger.warn("Unknown funksjoneltEndringstidspunkt. Missing state.")

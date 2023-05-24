@@ -1,12 +1,9 @@
-package no.nav.klage.oppgave.domain
+package no.nav.klage.oppgave.domain.klage
 
 import jakarta.persistence.*
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.domain.klage.*
-import no.nav.klage.oppgave.domain.klage.FagsystemConverter
-import no.nav.klage.oppgave.domain.klage.TypeConverter
-import no.nav.klage.oppgave.domain.klage.YtelseConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
@@ -39,10 +36,6 @@ abstract class Behandling(
     open var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     open val created: LocalDateTime = LocalDateTime.now(),
-    @Column(name = "kaka_kvalitetsvurdering_id", nullable = true)
-    open var kakaKvalitetsvurderingId: UUID? = null,
-    @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
-    open var kakaKvalitetsvurderingVersion: Int,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
@@ -89,6 +82,16 @@ abstract class Behandling(
     open var hjemler: Set<Hjemmel> = emptySet(),
     @Column(name = "satt_paa_vent")
     open var sattPaaVent: LocalDateTime? = null,
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "navIdent", column = Column(name = "feilregistrering_nav_ident")),
+            AttributeOverride(name = "registered", column = Column(name = "feilregistrering_registered")),
+            AttributeOverride(name = "reason", column = Column(name = "feilregistrering_reason")),
+            AttributeOverride(name = "fagsystem", column = Column(name = "feilregistrering_fagsystem_id"))
+        ]
+    )
+    open var feilregistrering: Feilregistrering?,
 ) {
     fun currentDelbehandling(): Delbehandling {
         return delbehandlinger.first()
@@ -119,6 +122,7 @@ abstract class Behandling(
      */
     fun getStatus(): Status {
         return when {
+            feilregistrering != null -> Status.FEILREGISTRERT
             isAvsluttet() -> Status.FULLFOERT
             avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
             sattPaaVent != null -> Status.SATT_PAA_VENT
@@ -132,6 +136,6 @@ abstract class Behandling(
     }
 
     enum class Status {
-        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT
+        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT, FEILREGISTRERT
     }
 }

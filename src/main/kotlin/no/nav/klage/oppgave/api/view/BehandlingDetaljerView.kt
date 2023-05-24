@@ -7,15 +7,12 @@ import java.util.*
 
 data class BehandlingDetaljerView(
     val id: UUID,
-    val klageInnsendtdato: LocalDate?,
     val fraNAVEnhet: String?,
     val fraNAVEnhetNavn: String?,
-    val forrigeNAVEnhet: String? = null,
-    val forrigeNAVEnhetNavn: String? = null,
     val mottattVedtaksinstans: LocalDate? = null,
     val sakenGjelder: SakenGjelderView,
-    val klager: KlagerView,
-    val prosessfullmektig: ProsessfullmektigView?,
+    val klager: PartView,
+    val prosessfullmektig: PartView?,
     val tema: String,
     val temaId: String,
     val ytelse: String? = null,
@@ -40,8 +37,6 @@ data class BehandlingDetaljerView(
     val modified: LocalDateTime,
     val created: LocalDateTime,
     val fraSaksbehandlerident: String? = null,
-    val forrigeSaksbehandlerident: String? = null,
-    val forrigeVedtaksDato: LocalDate? = null,
     val resultat: VedtakView?,
     val kommentarFraVedtaksinstans: String?,
     val tilknyttedeDokumenter: Set<TilknyttetDokument>,
@@ -49,12 +44,14 @@ data class BehandlingDetaljerView(
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
     val vergemaalEllerFremtidsfullmakt: Boolean,
-    val kvalitetsvurderingId: UUID?,
+    //TODO can be deleted?
+    val kvalitetsvurderingId: UUID? = null,
+    //TODO make nullable
     val kvalitetsvurderingReference: KvalitetsvurderingReference,
-    val isPossibleToUseDokumentUnderArbeid: Boolean = false,
     val sattPaaVent: LocalDateTime? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
+    val feilregistrering: FeilregistreringView? = null,
 ) {
     data class NavnView(
         val fornavn: String?,
@@ -62,17 +59,17 @@ data class BehandlingDetaljerView(
         val etternavn: String?,
     )
 
-    data class KlagerView(
+    data class KlagerViewOld(
         val person: PersonView?,
         val virksomhet: VirksomhetView?
     )
 
-    data class ProsessfullmektigView(
+    data class ProsessfullmektigViewOld(
         val person: PersonView?,
         val virksomhet: VirksomhetView?
     )
 
-    data class SakenGjelderView(
+    data class SakenGjelderViewOld(
         val person: PersonView?,
         val virksomhet: VirksomhetView?
     )
@@ -92,4 +89,41 @@ data class BehandlingDetaljerView(
         val id: UUID?,
         val version: Int,
     )
+
+    data class FeilregistreringView(
+        val navIdent: String,
+        val registered: LocalDateTime,
+        val reason: String,
+        val fagsystemId: String,
+    )
+
+    interface PartBase {
+        val id: String
+        val name: String?
+    }
+
+    enum class Sex {
+        MANN, KVINNE, UKJENT
+    }
+
+    enum class IdType {
+        FNR, ORGNR
+    }
+
+    interface IdPart {
+        val type: IdType
+    }
+
+    data class PartView(
+        override val id: String,
+        override val name: String?,
+        override val type: IdType
+    ): PartBase, IdPart
+
+    data class SakenGjelderView(
+        override val id: String,
+        override val name: String?,
+        override val type: IdType,
+        val sex: Sex,
+    ): PartBase, IdPart
 }

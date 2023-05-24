@@ -9,12 +9,10 @@ import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.pdl.Person
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class BehandlingMapper(
@@ -44,18 +42,13 @@ class BehandlingMapper(
 
         return BehandlingDetaljerView(
             id = klagebehandling.id,
-            klageInnsendtdato = klagebehandling.innsendt,
             fraNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
             fraNAVEnhetNavn = enhetNavn,
-            forrigeNAVEnhet = klagebehandling.avsenderEnhetFoersteinstans,
-            forrigeNAVEnhetNavn = enhetNavn,
             fraSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
-            forrigeSaksbehandlerident = klagebehandling.avsenderSaksbehandleridentFoersteinstans,
-            forrigeVedtaksDato = null,
             mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
             sakenGjelder = getSakenGjelderView(klagebehandling.sakenGjelder),
-            klager = getKlagerView(klagebehandling.klager),
-            prosessfullmektig = klagebehandling.klager.prosessfullmektig?.let { getProsessfullmektigView(it) },
+            klager = getPartView(klagebehandling.klager),
+            prosessfullmektig = klagebehandling.klager.prosessfullmektig?.let { getPartView(it) },
             tema = klagebehandling.ytelse.toTema().id,
             temaId = klagebehandling.ytelse.toTema().id,
             ytelse = klagebehandling.ytelse.id,
@@ -96,8 +89,8 @@ class BehandlingMapper(
                 id = klagebehandling.kakaKvalitetsvurderingId,
                 version = klagebehandling.kakaKvalitetsvurderingVersion,
             ),
-            isPossibleToUseDokumentUnderArbeid = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = klagebehandling.sattPaaVent,
+            feilregistrering = klagebehandling.feilregistrering.toView()
         )
     }
 
@@ -106,15 +99,12 @@ class BehandlingMapper(
 
         return BehandlingDetaljerView(
             id = ankebehandling.id,
-            klageInnsendtdato = ankebehandling.innsendt,
             fraNAVEnhet = ankebehandling.klageBehandlendeEnhet,
             fraNAVEnhetNavn = forrigeEnhetNavn,
-            forrigeNAVEnhet = ankebehandling.klageBehandlendeEnhet,
-            forrigeNAVEnhetNavn = forrigeEnhetNavn,
             mottattVedtaksinstans = null,
             sakenGjelder = getSakenGjelderView(ankebehandling.sakenGjelder),
-            klager = getKlagerView(ankebehandling.klager),
-            prosessfullmektig = ankebehandling.klager.prosessfullmektig?.let { getProsessfullmektigView(it) },
+            klager = getPartView(ankebehandling.klager),
+            prosessfullmektig = ankebehandling.klager.prosessfullmektig?.let { getPartView(it) },
             tema = ankebehandling.ytelse.toTema().id,
             temaId = ankebehandling.ytelse.toTema().id,
             ytelse = ankebehandling.ytelse.id,
@@ -139,8 +129,6 @@ class BehandlingMapper(
             modified = ankebehandling.modified,
             created = ankebehandling.created,
             fraSaksbehandlerident = null,
-            forrigeSaksbehandlerident = null,
-            forrigeVedtaksDato = ankebehandling.klageVedtaksDato,
             resultat = ankebehandling.currentDelbehandling().mapToVedtakView(),
             kommentarFraVedtaksinstans = null,
             tilknyttedeDokumenter = ankebehandling.saksdokumenter.map {
@@ -158,23 +146,20 @@ class BehandlingMapper(
                 id = ankebehandling.kakaKvalitetsvurderingId,
                 version = ankebehandling.kakaKvalitetsvurderingVersion,
             ),
-            isPossibleToUseDokumentUnderArbeid = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankebehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankebehandling.sattPaaVent,
+            feilregistrering = ankebehandling.feilregistrering.toView(),
         )
     }
 
     fun mapAnkeITrygderettenbehandlingToBehandlingDetaljerView(ankeITrygderettenbehandling: AnkeITrygderettenbehandling): BehandlingDetaljerView {
         return BehandlingDetaljerView(
             id = ankeITrygderettenbehandling.id,
-            klageInnsendtdato = null,
             fraNAVEnhet = null,
             fraNAVEnhetNavn = null,
-            forrigeNAVEnhet = null,
-            forrigeNAVEnhetNavn = null,
             mottattVedtaksinstans = null,
             sakenGjelder = getSakenGjelderView(ankeITrygderettenbehandling.sakenGjelder),
-            klager = getKlagerView(ankeITrygderettenbehandling.klager),
-            prosessfullmektig = ankeITrygderettenbehandling.klager.prosessfullmektig?.let { getProsessfullmektigView(it) },
+            klager = getPartView(ankeITrygderettenbehandling.klager),
+            prosessfullmektig = ankeITrygderettenbehandling.klager.prosessfullmektig?.let { getPartView(it) },
             tema = ankeITrygderettenbehandling.ytelse.toTema().id,
             temaId = ankeITrygderettenbehandling.ytelse.toTema().id,
             ytelse = ankeITrygderettenbehandling.ytelse.id,
@@ -199,8 +184,6 @@ class BehandlingMapper(
             modified = ankeITrygderettenbehandling.modified,
             created = ankeITrygderettenbehandling.created,
             fraSaksbehandlerident = null,
-            forrigeSaksbehandlerident = null,
-            forrigeVedtaksDato = null,
             resultat = ankeITrygderettenbehandling.currentDelbehandling().mapToVedtakView(),
             kommentarFraVedtaksinstans = null,
             tilknyttedeDokumenter = ankeITrygderettenbehandling.saksdokumenter.map {
@@ -213,15 +196,14 @@ class BehandlingMapper(
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            kvalitetsvurderingId = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
             kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
-                id = ankeITrygderettenbehandling.kakaKvalitetsvurderingId,
-                version = ankeITrygderettenbehandling.kakaKvalitetsvurderingVersion,
+                id = null,
+                version = 2,
             ),
-            isPossibleToUseDokumentUnderArbeid = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || ankeITrygderettenbehandling.currentDelbehandling().dokumentEnhetId == null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
+            feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView()
         )
     }
 
@@ -235,59 +217,47 @@ class BehandlingMapper(
         if (sakenGjelder.erPerson()) {
             val person = pdlFacade.getPersonInfo(sakenGjelder.partId.value)
             return BehandlingDetaljerView.SakenGjelderView(
-                person = BehandlingDetaljerView.PersonView(
-                    foedselsnummer = person.foedselsnr,
-                    navn = person.mapNavnToView(),
-                    kjoenn = person.kjoenn,
-                ), virksomhet = null
+                id = person.foedselsnr,
+                name = person.settSammenNavn(),
+                sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
+                    ?: BehandlingDetaljerView.Sex.UKJENT,
+                type = BehandlingDetaljerView.IdType.FNR,
             )
         } else {
-            return BehandlingDetaljerView.SakenGjelderView(
-                person = null,
-                virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = sakenGjelder.partId.value,
-                    navn = eregClient.hentOrganisasjon(sakenGjelder.partId.value)?.navn?.sammensattNavn()
-                )
-            )
+            throw RuntimeException("We don't support where sakenGjelder is virksomhet")
         }
     }
 
-    fun getKlagerView(klager: Klager): BehandlingDetaljerView.KlagerView {
-        if (klager.erPerson()) {
+    fun getPartView(klager: Klager): BehandlingDetaljerView.PartView {
+        return if (klager.erPerson()) {
             val person = pdlFacade.getPersonInfo(klager.partId.value)
-            return BehandlingDetaljerView.KlagerView(
-                person = BehandlingDetaljerView.PersonView(
-                    foedselsnummer = person.foedselsnr,
-                    navn = person.mapNavnToView(),
-                    kjoenn = person.kjoenn,
-                ), virksomhet = null
+            BehandlingDetaljerView.PartView(
+                id = person.foedselsnr,
+                name = person.settSammenNavn(),
+                type = BehandlingDetaljerView.IdType.FNR,
             )
         } else {
-            return BehandlingDetaljerView.KlagerView(
-                person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = klager.partId.value,
-                    navn = eregClient.hentOrganisasjon(klager.partId.value)?.navn?.sammensattNavn()
-                )
+            BehandlingDetaljerView.PartView(
+                id = klager.partId.value,
+                name = eregClient.hentOrganisasjon(klager.partId.value)?.navn?.sammensattNavn(),
+                type = BehandlingDetaljerView.IdType.ORGNR,
             )
         }
     }
 
-    fun getProsessfullmektigView(prosessfullmektig: Prosessfullmektig): BehandlingDetaljerView.ProsessfullmektigView {
-        if (prosessfullmektig.erPerson()) {
+    fun getPartView(prosessfullmektig: Prosessfullmektig): BehandlingDetaljerView.PartView {
+        return if (prosessfullmektig.erPerson()) {
             val person = pdlFacade.getPersonInfo(prosessfullmektig.partId.value)
-            return BehandlingDetaljerView.ProsessfullmektigView(
-                person = BehandlingDetaljerView.PersonView(
-                    foedselsnummer = person.foedselsnr,
-                    navn = person.mapNavnToView(),
-                    kjoenn = person.kjoenn,
-                ), virksomhet = null
+            BehandlingDetaljerView.PartView(
+                id = person.foedselsnr,
+                name = person.settSammenNavn(),
+                type = BehandlingDetaljerView.IdType.FNR,
             )
         } else {
-            return BehandlingDetaljerView.ProsessfullmektigView(
-                person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = prosessfullmektig.partId.value,
-                    navn = eregClient.hentOrganisasjon(prosessfullmektig.partId.value)?.navn?.sammensattNavn()
-                )
+            BehandlingDetaljerView.PartView(
+                id = prosessfullmektig.partId.value,
+                name = eregClient.hentOrganisasjon(prosessfullmektig.partId.value)?.navn?.sammensattNavn(),
+                type = BehandlingDetaljerView.IdType.ORGNR,
             )
         }
     }
@@ -334,17 +304,6 @@ class BehandlingMapper(
         )
     }
 
-    private fun Person?.mapNavnToView(): BehandlingDetaljerView.NavnView? =
-        if (this != null) {
-            BehandlingDetaljerView.NavnView(
-                fornavn = fornavn,
-                mellomnavn = mellomnavn,
-                etternavn = etternavn
-            )
-        } else {
-            null
-        }
-
     fun mapToBehandlingFullfoertView(behandling: Behandling): BehandlingFullfoertView {
         return BehandlingFullfoertView(
             modified = behandling.modified,
@@ -377,12 +336,89 @@ class BehandlingMapper(
         )
     }
 
-    fun toSakenGjelderWrapped(sakenGjelder: SakenGjelder): SakenGjelderWrapped {
-        return SakenGjelderWrapped(
-            sakenGjelder = SakenGjelderWrapped.PersonView(
-                fnr = sakenGjelder.partId.value,
-                navn = pdlFacade.getPersonInfo(sakenGjelder.partId.value).sammensattNavn,
-            ),
-        )
+    private fun Feilregistrering?.toView(): BehandlingDetaljerView.FeilregistreringView? {
+        return this?.let {
+            BehandlingDetaljerView.FeilregistreringView(
+                navIdent = it.navIdent,
+                registered = it.registered,
+                reason = it.reason,
+                fagsystemId = it.fagsystem.id
+            )
+        }
     }
+
+    //All below can be deleted when migration is done
+
+    fun getSakenGjelderViewOld(sakenGjelder: SakenGjelder): BehandlingDetaljerView.SakenGjelderViewOld {
+        if (sakenGjelder.erPerson()) {
+            val person = pdlFacade.getPersonInfo(sakenGjelder.partId.value)
+            return BehandlingDetaljerView.SakenGjelderViewOld(
+                person = BehandlingDetaljerView.PersonView(
+                    foedselsnummer = person.foedselsnr,
+                    navn = person.mapNavnToView(),
+                    kjoenn = person.kjoenn,
+                ), virksomhet = null
+            )
+        } else {
+            return BehandlingDetaljerView.SakenGjelderViewOld(
+                person = null,
+                virksomhet = BehandlingDetaljerView.VirksomhetView(
+                    virksomhetsnummer = sakenGjelder.partId.value,
+                    navn = eregClient.hentOrganisasjon(sakenGjelder.partId.value)?.navn?.sammensattNavn()
+                )
+            )
+        }
+    }
+
+    fun getKlagerViewOld(klager: Klager): BehandlingDetaljerView.KlagerViewOld {
+        if (klager.erPerson()) {
+            val person = pdlFacade.getPersonInfo(klager.partId.value)
+            return BehandlingDetaljerView.KlagerViewOld(
+                person = BehandlingDetaljerView.PersonView(
+                    foedselsnummer = person.foedselsnr,
+                    navn = person.mapNavnToView(),
+                    kjoenn = person.kjoenn,
+                ), virksomhet = null
+            )
+        } else {
+            return BehandlingDetaljerView.KlagerViewOld(
+                person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
+                    virksomhetsnummer = klager.partId.value,
+                    navn = eregClient.hentOrganisasjon(klager.partId.value)?.navn?.sammensattNavn()
+                )
+            )
+        }
+    }
+
+    fun getProsessfullmektigViewOld(prosessfullmektig: Prosessfullmektig): BehandlingDetaljerView.ProsessfullmektigViewOld {
+        if (prosessfullmektig.erPerson()) {
+            val person = pdlFacade.getPersonInfo(prosessfullmektig.partId.value)
+            return BehandlingDetaljerView.ProsessfullmektigViewOld(
+                person = BehandlingDetaljerView.PersonView(
+                    foedselsnummer = person.foedselsnr,
+                    navn = person.mapNavnToView(),
+                    kjoenn = person.kjoenn,
+                ), virksomhet = null
+            )
+        } else {
+            return BehandlingDetaljerView.ProsessfullmektigViewOld(
+                person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
+                    virksomhetsnummer = prosessfullmektig.partId.value,
+                    navn = eregClient.hentOrganisasjon(prosessfullmektig.partId.value)?.navn?.sammensattNavn()
+                )
+            )
+        }
+    }
+
+
+    private fun Person?.mapNavnToView(): BehandlingDetaljerView.NavnView? =
+        if (this != null) {
+            BehandlingDetaljerView.NavnView(
+                fornavn = fornavn,
+                mellomnavn = mellomnavn,
+                etternavn = etternavn
+            )
+        } else {
+            null
+        }
 }

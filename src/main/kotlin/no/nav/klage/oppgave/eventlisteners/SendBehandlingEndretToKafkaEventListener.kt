@@ -1,10 +1,10 @@
 package no.nav.klage.oppgave.eventlisteners
 
 import no.nav.klage.kodeverk.Type
-import no.nav.klage.oppgave.domain.Behandling
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.service.BehandlingEndretKafkaProducer
 import no.nav.klage.oppgave.util.getLogger

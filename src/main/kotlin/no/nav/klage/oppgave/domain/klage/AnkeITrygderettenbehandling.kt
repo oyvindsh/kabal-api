@@ -7,7 +7,6 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -40,14 +39,13 @@ class AnkeITrygderettenbehandling(
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
     //Hovedbehandling
-    kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
     sattPaaVent: LocalDateTime? = null,
+    feilregistrering: Feilregistrering? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -58,8 +56,6 @@ class AnkeITrygderettenbehandling(
     mottattKlageinstans = mottattKlageinstans,
     modified = modified,
     created = created,
-    kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
-    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,
@@ -70,6 +66,7 @@ class AnkeITrygderettenbehandling(
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
+    feilregistrering = feilregistrering
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +

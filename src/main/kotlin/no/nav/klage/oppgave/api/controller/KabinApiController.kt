@@ -6,6 +6,8 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.api.view.kabin.*
+import no.nav.klage.oppgave.clients.ereg.EregClient
+import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
@@ -27,6 +29,8 @@ class KabinApiController(
     private val mottakService: MottakService,
     private val ankebehandlingService: AnkebehandlingService,
     private val dokumentService: DokumentService,
+    private val pdlFacade: PdlFacade,
+    private val eregClient: EregClient,
     private val behandlingMapper: BehandlingMapper,
     private val behandlingService: BehandlingService,
     private val saksbehandlerService: SaksbehandlerService,
@@ -54,8 +58,8 @@ class KabinApiController(
     @PostMapping("/searchpart")
     fun searchPart(
         @RequestBody input: searchPartInput
-    ): BehandlingDetaljerView.ProsessfullmektigView {
-        return fullmektigSearchService.searchFullmektig(input.identifikator)
+    ): BehandlingDetaljerView.ProsessfullmektigViewOld {
+        return fullmektigSearchService.searchFullmektigOld(input.identifikator)
     }
 
     @PostMapping("/completedklagebehandlinger")
@@ -134,8 +138,8 @@ class KabinApiController(
             utfallId = completedKlagebehandling.utfallId,
             vedtakDate = completedKlagebehandling.vedtakDate,
             sakenGjelder = completedKlagebehandling.sakenGjelder,
-            klager = behandlingMapper.getKlagerView(ankebehandling.klager),
-            fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+            klager = behandlingMapper.getKlagerViewOld(ankebehandling.klager),
+            fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigViewOld(it) },
             tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
             mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
             frist = ankebehandling.frist!!,
@@ -167,6 +171,13 @@ class KabinApiController(
             logger = logger
         )
         return mottakService.findMottakBySakenGjelder(sakenGjelder = input.fnr)
+            .filter {
+                when (it.type) {
+                    Type.KLAGE -> klagebehandlingService.getKlagebehandlingFromMottakId(it.id)?.feilregistrering == null
+                    Type.ANKE -> ankebehandlingService.getAnkebehandlingFromMottakId(it.id)?.feilregistrering == null
+                    Type.ANKE_I_TRYGDERETTEN -> true//Ikke relevant for AnkeITrygderetten
+                }
+            }
             .flatMap { it.mottakDokument }
             .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
             .map { it.journalpostId }.toSet().toList()
@@ -217,9 +228,9 @@ class KabinApiController(
             typeId = Type.KLAGE.id,
             behandlingId = klagebehandling.id,
             ytelseId = klagebehandling.ytelse.id,
-            sakenGjelder = behandlingMapper.getSakenGjelderView(klagebehandling.sakenGjelder),
-            klager = behandlingMapper.getKlagerView(klagebehandling.klager),
-            fullmektig = klagebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigView(it) },
+            sakenGjelder = behandlingMapper.getSakenGjelderViewOld(klagebehandling.sakenGjelder),
+            klager = behandlingMapper.getKlagerViewOld(klagebehandling.klager),
+            fullmektig = klagebehandling.klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigViewOld(it) },
             mottattVedtaksinstans = klagebehandling.mottattVedtaksinstans,
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             frist = klagebehandling.frist!!,

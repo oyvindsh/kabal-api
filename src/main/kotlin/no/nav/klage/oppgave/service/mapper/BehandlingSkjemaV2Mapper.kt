@@ -129,6 +129,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         sattPaaVent = sattPaaVent,
         sattPaaVentExpires = sattPaaVent?.plusWeeks(4),
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
+        feilregistrert = feilregistrering?.registered
     )
 }
 
@@ -176,7 +177,8 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         },
         sattPaaVent = sattPaaVent,
         sattPaaVentExpires = sattPaaVent?.plusWeeks(4),
-        status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name)
+        status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
+        feilregistrert = feilregistrering?.registered
     )
 }
 
@@ -211,7 +213,8 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
                 hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
             )
         },
-        status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name)
+        status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
+        feilregistrert = feilregistrering?.registered
     )
 }
 
@@ -252,6 +255,7 @@ data class BehandlingSkjemaV2(
     val sattPaaVent: LocalDateTime? = null,
     val sattPaaVentExpires: LocalDateTime? = null,
     val status: StatusType,
+    val feilregistrert: LocalDateTime?,
 ) {
 
     data class Vedtak(
@@ -260,7 +264,7 @@ data class BehandlingSkjemaV2(
     )
 
     enum class StatusType {
-        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, FULLFOERT, UKJENT, SATT_PAA_VENT
+        IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, FULLFOERT, UKJENT, SATT_PAA_VENT, FEILREGISTRERT
     }
 
     data class Person(

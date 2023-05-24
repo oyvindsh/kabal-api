@@ -7,7 +7,6 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
-import no.nav.klage.oppgave.domain.Behandling
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -33,6 +32,10 @@ class Klagebehandling(
     val mottakId: UUID,
     @Column(name = "dato_innsendt")
     val innsendt: LocalDate? = null,
+    @Column(name = "kaka_kvalitetsvurdering_id")
+    var kakaKvalitetsvurderingId: UUID?,
+    @Column(name = "kaka_kvalitetsvurdering_version", nullable = false)
+    val kakaKvalitetsvurderingVersion: Int,
 
     //Common properties between klage/anke
     id: UUID = UUID.randomUUID(),
@@ -52,16 +55,13 @@ class Klagebehandling(
     tildeling: Tildeling? = null,
     //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
-    //Hovedbehandling
-    //Skal være en kvalitetsvurdering per hovedbehandling, derfor er dette riktig sted.
-    kakaKvalitetsvurderingId: UUID? = null,
-    kakaKvalitetsvurderingVersion: Int,
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
     sattPaaVent: LocalDateTime? = null,
+    feilregistrering: Feilregistrering? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -72,8 +72,6 @@ class Klagebehandling(
     mottattKlageinstans = mottattKlageinstans,
     modified = modified,
     created = created,
-    kakaKvalitetsvurderingId = kakaKvalitetsvurderingId,
-    kakaKvalitetsvurderingVersion = kakaKvalitetsvurderingVersion,
     tildelingHistorikk = tildelingHistorikk,
     tildeling = tildeling,
     frist = frist,
@@ -84,6 +82,7 @@ class Klagebehandling(
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
+    feilregistrering = feilregistrering,
 ) {
 
     override fun toString(): String {
