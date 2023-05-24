@@ -53,37 +53,6 @@ data class BehandlingDetaljerView(
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
 ) {
-    data class NavnView(
-        val fornavn: String?,
-        val mellomnavn: String?,
-        val etternavn: String?,
-    )
-
-    data class KlagerViewOld(
-        val person: PersonView?,
-        val virksomhet: VirksomhetView?
-    )
-
-    data class ProsessfullmektigViewOld(
-        val person: PersonView?,
-        val virksomhet: VirksomhetView?
-    )
-
-    data class SakenGjelderViewOld(
-        val person: PersonView?,
-        val virksomhet: VirksomhetView?
-    )
-
-    data class VirksomhetView(
-        val virksomhetsnummer: String?,
-        val navn: String?,
-    )
-
-    data class PersonView(
-        val foedselsnummer: String?,
-        val navn: NavnView?,
-        val kjoenn: String?,
-    )
 
     data class KvalitetsvurderingReference(
         val id: UUID?,

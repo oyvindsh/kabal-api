@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -349,79 +348,4 @@ class BehandlingMapper(
             )
         }
     }
-
-    //All below can be deleted when migration is done
-
-    fun getSakenGjelderViewOld(sakenGjelder: SakenGjelder): BehandlingDetaljerView.SakenGjelderViewOld {
-        if (sakenGjelder.erPerson()) {
-            val person = pdlFacade.getPersonInfo(sakenGjelder.partId.value)
-            return BehandlingDetaljerView.SakenGjelderViewOld(
-                person = BehandlingDetaljerView.PersonView(
-                    foedselsnummer = person.foedselsnr,
-                    navn = person.mapNavnToView(),
-                    kjoenn = person.kjoenn,
-                ), virksomhet = null
-            )
-        } else {
-            return BehandlingDetaljerView.SakenGjelderViewOld(
-                person = null,
-                virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = sakenGjelder.partId.value,
-                    navn = eregClient.hentOrganisasjon(sakenGjelder.partId.value)?.navn?.sammensattNavn()
-                )
-            )
-        }
-    }
-
-    fun getKlagerViewOld(klager: Klager): BehandlingDetaljerView.KlagerViewOld {
-        if (klager.erPerson()) {
-            val person = pdlFacade.getPersonInfo(klager.partId.value)
-            return BehandlingDetaljerView.KlagerViewOld(
-                person = BehandlingDetaljerView.PersonView(
-                    foedselsnummer = person.foedselsnr,
-                    navn = person.mapNavnToView(),
-                    kjoenn = person.kjoenn,
-                ), virksomhet = null
-            )
-        } else {
-            return BehandlingDetaljerView.KlagerViewOld(
-                person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = klager.partId.value,
-                    navn = eregClient.hentOrganisasjon(klager.partId.value)?.navn?.sammensattNavn()
-                )
-            )
-        }
-    }
-
-    fun getProsessfullmektigViewOld(prosessfullmektig: Prosessfullmektig): BehandlingDetaljerView.ProsessfullmektigViewOld {
-        if (prosessfullmektig.erPerson()) {
-            val person = pdlFacade.getPersonInfo(prosessfullmektig.partId.value)
-            return BehandlingDetaljerView.ProsessfullmektigViewOld(
-                person = BehandlingDetaljerView.PersonView(
-                    foedselsnummer = person.foedselsnr,
-                    navn = person.mapNavnToView(),
-                    kjoenn = person.kjoenn,
-                ), virksomhet = null
-            )
-        } else {
-            return BehandlingDetaljerView.ProsessfullmektigViewOld(
-                person = null, virksomhet = BehandlingDetaljerView.VirksomhetView(
-                    virksomhetsnummer = prosessfullmektig.partId.value,
-                    navn = eregClient.hentOrganisasjon(prosessfullmektig.partId.value)?.navn?.sammensattNavn()
-                )
-            )
-        }
-    }
-
-
-    private fun Person?.mapNavnToView(): BehandlingDetaljerView.NavnView? =
-        if (this != null) {
-            BehandlingDetaljerView.NavnView(
-                fornavn = fornavn,
-                mellomnavn = mellomnavn,
-                etternavn = etternavn
-            )
-        } else {
-            null
-        }
 }
