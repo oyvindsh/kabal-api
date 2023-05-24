@@ -91,7 +91,7 @@ data class BehandlingDetaljerView(
     )
 
     data class FeilregistreringView(
-        val navIdent: String,
+        val feilregistrertAv: SaksbehandlerView,
         val registered: LocalDateTime,
         val reason: String,
         val fagsystemId: String,
