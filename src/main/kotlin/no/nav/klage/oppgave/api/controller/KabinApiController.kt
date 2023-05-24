@@ -171,6 +171,13 @@ class KabinApiController(
             logger = logger
         )
         return mottakService.findMottakBySakenGjelder(sakenGjelder = input.fnr)
+            .filter {
+                when (it.type) {
+                    Type.KLAGE -> klagebehandlingService.getKlagebehandlingFromMottakId(it.id)?.feilregistrering == null
+                    Type.ANKE -> ankebehandlingService.getAnkebehandlingFromMottakId(it.id)?.feilregistrering == null
+                    Type.ANKE_I_TRYGDERETTEN -> true//Ikke relevant for AnkeITrygderetten
+                }
+            }
             .flatMap { it.mottakDokument }
             .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
             .map { it.journalpostId }.toSet().toList()
