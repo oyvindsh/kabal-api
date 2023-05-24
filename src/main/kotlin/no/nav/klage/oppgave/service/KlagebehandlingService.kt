@@ -82,9 +82,9 @@ class KlagebehandlingService(
         ytelseId = ytelse.id,
         utfallId = currentDelbehandling().utfall!!.id,
         vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
-        sakenGjelder = behandlingMapper.getSakenGjelderViewOld(sakenGjelder),
-        klager = behandlingMapper.getKlagerViewOld(klager),
-        fullmektig = klager.prosessfullmektig?.let { behandlingMapper.getProsessfullmektigViewOld(it) },
+        sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
+        klager = behandlingMapper.getPartView(klager),
+        fullmektig = klager.prosessfullmektig?.let { behandlingMapper.getPartView(it) },
         tilknyttedeDokumenter = saksdokumenter.map {
             TilknyttetDokument(
                 journalpostId = it.journalpostId,
