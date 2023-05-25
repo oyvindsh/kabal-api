@@ -83,13 +83,15 @@ class BehandlingMapper(
             fortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = klagebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
-            kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
-                id = klagebehandling.kakaKvalitetsvurderingId,
-                version = klagebehandling.kakaKvalitetsvurderingVersion,
-            ),
+            kvalitetsvurderingReference = if (klagebehandling.feilregistrering == null) {
+                BehandlingDetaljerView.KvalitetsvurderingReference(
+                    id = klagebehandling.kakaKvalitetsvurderingId!!,
+                    version = klagebehandling.kakaKvalitetsvurderingVersion,
+                )
+            } else null,
             sattPaaVent = klagebehandling.sattPaaVent,
-            feilregistrering = klagebehandling.feilregistrering.toView()
+            feilregistrering = klagebehandling.feilregistrering.toView(),
+            kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
         )
     }
 
@@ -140,13 +142,15 @@ class BehandlingMapper(
             fortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
-            kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
-                id = ankebehandling.kakaKvalitetsvurderingId,
-                version = ankebehandling.kakaKvalitetsvurderingVersion,
-            ),
+            kvalitetsvurderingReference = if (ankebehandling.feilregistrering == null) {
+                BehandlingDetaljerView.KvalitetsvurderingReference(
+                    id = ankebehandling.kakaKvalitetsvurderingId!!,
+                    version = ankebehandling.kakaKvalitetsvurderingVersion,
+                )
+            } else null,
             sattPaaVent = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
+            kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
         )
     }
 
@@ -195,14 +199,12 @@ class BehandlingMapper(
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            kvalitetsvurderingReference = BehandlingDetaljerView.KvalitetsvurderingReference(
-                id = null,
-                version = 2,
-            ),
+            kvalitetsvurderingReference = null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
-            feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView()
+            feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
+            kvalitetsvurderingId = null,
         )
     }
 

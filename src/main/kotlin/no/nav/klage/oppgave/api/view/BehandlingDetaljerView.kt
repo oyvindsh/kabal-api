@@ -44,18 +44,17 @@ data class BehandlingDetaljerView(
     val fortrolig: Boolean,
     val strengtFortrolig: Boolean,
     val vergemaalEllerFremtidsfullmakt: Boolean,
-    //TODO can be deleted?
-    val kvalitetsvurderingId: UUID? = null,
-    //TODO make nullable
-    val kvalitetsvurderingReference: KvalitetsvurderingReference,
+    val kvalitetsvurderingReference: KvalitetsvurderingReference?,
     val sattPaaVent: LocalDateTime? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
+    //TODO delete when FE migrated to kvalitetsvurderingReference
+    val kvalitetsvurderingId: UUID?,
 ) {
 
     data class KvalitetsvurderingReference(
-        val id: UUID?,
+        val id: UUID,
         val version: Int,
     )
 
