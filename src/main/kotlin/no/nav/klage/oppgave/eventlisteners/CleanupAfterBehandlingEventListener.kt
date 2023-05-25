@@ -111,6 +111,7 @@ class CleanupAfterBehandlingEventListener(
                     feilregistrert = behandling.feilregistrering!!.registered,
                     navIdent = behandling.feilregistrering!!.navIdent,
                     reason = behandling.feilregistrering!!.reason,
+                    type = behandling.type,
                 )
             )
         )

@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.domain.kafka
 
+import no.nav.klage.kodeverk.Type
 import java.time.LocalDateTime
 import java.util.*
 
@@ -54,4 +55,5 @@ data class BehandlingFeilregistrertDetaljer(
     val feilregistrert: LocalDateTime,
     val navIdent: String,
     val reason: String,
+    val type: Type,
 )
