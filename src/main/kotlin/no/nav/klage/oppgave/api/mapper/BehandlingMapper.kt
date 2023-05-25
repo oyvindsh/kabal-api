@@ -91,7 +91,6 @@ class BehandlingMapper(
             } else null,
             sattPaaVent = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
-            kvalitetsvurderingId = klagebehandling.kakaKvalitetsvurderingId,
         )
     }
 
@@ -150,7 +149,6 @@ class BehandlingMapper(
             } else null,
             sattPaaVent = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
-            kvalitetsvurderingId = ankebehandling.kakaKvalitetsvurderingId,
         )
     }
 
@@ -204,7 +202,6 @@ class BehandlingMapper(
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
-            kvalitetsvurderingId = null,
         )
     }
 

@@ -49,8 +49,6 @@ data class BehandlingDetaljerView(
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
-    //TODO delete when FE migrated to kvalitetsvurderingReference
-    val kvalitetsvurderingId: UUID?,
 ) {
 
     data class KvalitetsvurderingReference(
