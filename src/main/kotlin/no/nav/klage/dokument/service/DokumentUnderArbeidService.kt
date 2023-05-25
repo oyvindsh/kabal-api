@@ -213,9 +213,13 @@ class DokumentUnderArbeidService(
     ): DokumentUnderArbeid {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
-        if (dokument.smartEditorVersion == version) {
-            logger.warn("smartEditorVersion was already set to $version. Was this an error? Returning.")
+        val smartEditorVersion = dokument.smartEditorVersion
+        if (smartEditorVersion == version) {
             return dokument
+        } else if (smartEditorVersion != null) {
+            if (smartEditorVersion > version) {
+                throw DokumentValidationException("Input-versjon er eldre enn lagret versjon på smartdokument.")
+            }
         }
 
         //Sjekker tilgang på behandlingsnivå:
