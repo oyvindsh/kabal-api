@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.clients.pdl.graphql
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.net.URL
 
 fun URL.cleanForGraphql() = readText().replace("[\n\r]", "")
@@ -16,7 +17,9 @@ data class PdlErrorLocation(
     val column: Int?
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class PdlErrorExtension(
     val code: String?,
-    val classification: String
+    val classification: String?,
+    val warnings: List<String>?,
 )
