@@ -49,6 +49,7 @@ data class BehandlingDetaljerView(
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
+    val fagsystemId: String,
 ) {
 
     data class KvalitetsvurderingReference(
