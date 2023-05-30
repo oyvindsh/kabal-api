@@ -112,6 +112,35 @@
         "mottattKlageinstans"
       ]
     },
+    "AnkeITrygderettenbehandlingOpprettetDetaljer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sendtTilTrygderetten": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "utfall": {
+          "type": "string",
+          "enum": [
+            "TRUKKET",
+            "RETUR",
+            "OPPHEVET",
+            "MEDHOLD",
+            "DELVIS_MEDHOLD",
+            "STADFESTELSE",
+            "UGUNST",
+            "AVVIST",
+            "INNSTILLING_STADFESTELSE",
+            "INNSTILLING_AVVIST"
+          ],
+          "description": "Utfallet av behandlingen."
+        }
+      },
+      "required": [
+        "sendtTilTrygderetten"
+      ]
+    },
     "AnkebehandlingAvsluttetDetaljer": {
       "type": "object",
       "additionalProperties": false,
@@ -148,33 +177,38 @@
         "journalpostReferanser"
       ]
     },
-    "AnkeITrygderettenbehandlingOpprettetDetaljer": {
+    "BehandlingFeilregistrertDetaljer": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "sendtTilTrygderetten": {
+        "feilregistrert": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Når behandlingen ble merket som feilregistrert."
         },
-        "utfall": {
+        "navIdent": {
+          "type": "string",
+          "description": "Identen til den som merket behandlingen som feilregistrert."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Årsaken til at behandlingen endte opp som feilregistrert."
+        },
+        "type": {
           "type": "string",
           "enum": [
-            "TRUKKET",
-            "RETUR",
-            "OPPHEVET",
-            "MEDHOLD",
-            "DELVIS_MEDHOLD",
-            "STADFESTELSE",
-            "UGUNST",
-            "AVVIST",
-            "INNSTILLING_STADFESTELSE",
-            "INNSTILLING_AVVIST"
+            "KLAGE",
+            "ANKE",
+            "ANKE_I_TRYGDERETTEN"
           ],
-          "description": "Utfallet av behandlingen."
+          "description": "Type behandling."
         }
       },
       "required": [
-        "sendtTilTrygderetten"
+        "feilregistrert",
+        "navIdent",
+        "reason",
+        "type"
       ]
     }
   }
