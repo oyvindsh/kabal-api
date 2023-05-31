@@ -4,8 +4,8 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.exceptions.EREGOrganizationNotFoundException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -27,27 +27,23 @@ class FullmektigSearchService(
     fun searchFullmektig(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.PartView =
         when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
             PartIdType.PERSON -> {
-                try {
-                    if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
-                        val person = pdlFacade.getPersonInfo(identifikator)
-                        BehandlingDetaljerView.PartView(
-                            id = person.foedselsnr,
-                            name = person.settSammenNavn(),
-                            type = BehandlingDetaljerView.IdType.FNR,
-                        )
-                    } else {
-                        secureLogger.warn("Saksbehandler does not have access to view person")
-                        throw MissingTilgangException("Saksbehandler does not have access to view person")
-                    }
-                } catch (pdlee: PDLErrorException) {
-                    throw RuntimeException("PDL exception", pdlee)
+                if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
+                    val person = pdlFacade.getPersonInfo(identifikator)
+                    BehandlingDetaljerView.PartView(
+                        id = person.foedselsnr,
+                        name = person.settSammenNavn(),
+                        type = BehandlingDetaljerView.IdType.FNR,
+                    )
+                } else {
+                    secureLogger.warn("Saksbehandler does not have access to view person")
+                    throw MissingTilgangException("Saksbehandler does not have access to view person")
                 }
             }
 
             PartIdType.VIRKSOMHET -> {
                 val organisasjon = eregClient.hentOrganisasjon(identifikator)
                 if (organisasjon == null) {
-                    throw RuntimeException("Couldn't find organization: $identifikator in Ereg.")
+                    throw EREGOrganizationNotFoundException("Couldn't find organization: $identifikator in Ereg.")
                 } else {
                     BehandlingDetaljerView.PartView(
                         id = organisasjon.organisasjonsnummer,

@@ -101,6 +101,20 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
+    fun handlePDLPersonNotFoundException(
+        ex: PDLPersonNotFoundException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
+
+    @ExceptionHandler
+    fun handleEREGOrganizationNotFoundException(
+        ex: EREGOrganizationNotFoundException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
+
+    @ExceptionHandler
     fun handleValidationException(
         ex: ValidationException,
         request: NativeWebRequest
