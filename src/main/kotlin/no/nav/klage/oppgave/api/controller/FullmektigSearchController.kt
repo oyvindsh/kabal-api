@@ -38,4 +38,17 @@ class FullmektigSearchController(
 
         return fullmektigSearchService.searchFullmektig(input.identifikator)
     }
+
+    @PostMapping("/searchperson")
+    fun searchPerson(
+        @RequestBody input: SearchFullmektigInput,
+    ): BehandlingDetaljerView.SakenGjelderView {
+        logMethodDetails(
+            ::searchFullmektig.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return fullmektigSearchService.searchPerson(input.identifikator)
+    }
 }
