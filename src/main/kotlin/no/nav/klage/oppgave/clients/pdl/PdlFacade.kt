@@ -5,6 +5,7 @@ import no.nav.klage.oppgave.clients.pdl.graphql.HentPersonResponse
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlClient
 import no.nav.klage.oppgave.clients.pdl.graphql.PdlPerson
 import no.nav.klage.oppgave.exceptions.PDLErrorException
+import no.nav.klage.oppgave.exceptions.PDLPersonNotFoundException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
@@ -46,6 +47,9 @@ class PdlFacade(
         } else {
             logger.warn("Errors returned from PDL or person not found. See securelogs for details.")
             secureLogger.warn("Errors returned for hentPerson($fnr) from PDL: ${this.errors}")
+            if (this.errors?.any { it.extensions.code == "not_found" } == true) {
+                throw PDLPersonNotFoundException("Fant ikke personen i PDL")
+            }
             throw PDLErrorException("Klarte ikke å hente person fra PDL")
         }
 }
