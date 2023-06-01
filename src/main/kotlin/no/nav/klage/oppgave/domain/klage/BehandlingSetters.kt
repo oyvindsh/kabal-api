@@ -119,7 +119,7 @@ object BehandlingSetters {
     }
 
     fun Behandling.setSattPaaVent(
-        nyVerdi: LocalDateTime?,
+        nyVerdi: SattPaaVent?,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
         val gammelSattPaaVent = sattPaaVent

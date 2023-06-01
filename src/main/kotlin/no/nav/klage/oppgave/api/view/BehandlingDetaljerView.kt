@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.api.view
 
 import no.nav.klage.kodeverk.MedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.SattPaaVent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -46,6 +47,7 @@ data class BehandlingDetaljerView(
     val vergemaalEllerFremtidsfullmakt: Boolean,
     val kvalitetsvurderingReference: KvalitetsvurderingReference?,
     val sattPaaVent: LocalDateTime? = null,
+    val sattPaaVentView: SattPaaVent? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,

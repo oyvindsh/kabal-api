@@ -126,8 +126,9 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
                 hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
             )
         },
-        sattPaaVent = sattPaaVent,
-        sattPaaVentExpires = sattPaaVent?.plusWeeks(4),
+        sattPaaVent = sattPaaVent?.start,
+        sattPaaVentExpires = sattPaaVent?.expires,
+        sattPaaVentReason = sattPaaVent?.reason,
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered
     )
@@ -175,8 +176,9 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
                 hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
             )
         },
-        sattPaaVent = sattPaaVent,
-        sattPaaVentExpires = sattPaaVent?.plusWeeks(4),
+        sattPaaVent = sattPaaVent?.start,
+        sattPaaVentExpires = sattPaaVent?.expires,
+        sattPaaVentReason = sattPaaVent?.reason,
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered
     )
@@ -214,7 +216,11 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
             )
         },
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
-        feilregistrert = feilregistrering?.registered
+        feilregistrert = feilregistrering?.registered,
+        sattPaaVent = sattPaaVent?.start,
+        sattPaaVentExpires = sattPaaVent?.expires,
+        sattPaaVentReason = sattPaaVent?.reason,
+
     )
 }
 
@@ -252,8 +258,9 @@ data class BehandlingSkjemaV2(
 
     val saksdokumenter: List<Dokument>,
     val vedtak: Vedtak?,
-    val sattPaaVent: LocalDateTime? = null,
-    val sattPaaVentExpires: LocalDateTime? = null,
+    val sattPaaVent: LocalDate?,
+    val sattPaaVentExpires: LocalDate?,
+    val sattPaaVentReason: String?,
     val status: StatusType,
     val feilregistrert: LocalDateTime?,
 ) {

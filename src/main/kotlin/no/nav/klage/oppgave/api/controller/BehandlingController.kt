@@ -8,6 +8,7 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.klage.SattPaaVent
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -18,6 +19,7 @@ import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
+import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -39,6 +41,7 @@ class BehandlingController(
     fun setSattPaaVent(
         @Parameter(description = "Id til en behandling")
         @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: SattPaaVentInput?
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setSattPaaVent.name,
@@ -46,10 +49,26 @@ class BehandlingController(
             behandlingId,
             logger
         )
+
+        val sattPaaVent = if (input == null) {
+            SattPaaVent(
+                start = LocalDate.now(),
+                expires = LocalDate.now().plusWeeks(4),
+                reason = "Satt på vent"
+
+            )
+        } else {
+            SattPaaVent(
+                start = input.start,
+                expires = input.expires,
+                reason = input.reason
+            )
+        }
+
         val modified = behandlingService.setSattPaaVent(
             behandlingId = behandlingId,
-            setNull = false,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            sattPaaVent = sattPaaVent,
         )
         return BehandlingEditedView(modified = modified)
     }
@@ -67,8 +86,8 @@ class BehandlingController(
         )
         val modified = behandlingService.setSattPaaVent(
             behandlingId = behandlingId,
-            setNull = true,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            sattPaaVent = null
         )
         return BehandlingEditedView(modified = modified)
     }

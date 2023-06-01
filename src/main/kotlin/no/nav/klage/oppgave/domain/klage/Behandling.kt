@@ -80,8 +80,15 @@ abstract class Behandling(
     @Convert(converter = HjemmelConverter::class)
     @Column(name = "id")
     open var hjemler: Set<Hjemmel> = emptySet(),
-    @Column(name = "satt_paa_vent")
-    open var sattPaaVent: LocalDateTime? = null,
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "start", column = Column(name = "satt_paa_vent")),
+            AttributeOverride(name = "expires", column = Column(name = "satt_paa_vent_expires")),
+            AttributeOverride(name = "reason", column = Column(name = "satt_paa_vent_reason")),
+        ]
+    )
+    open var sattPaaVent: SattPaaVent?,
     @Embedded
     @AttributeOverrides(
         value = [
