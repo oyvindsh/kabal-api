@@ -14,7 +14,8 @@ data class SakFromKlanke(
 )
 
 data class SakAssignedInput(
-    val saksbehandlerIdent: String
+    val saksbehandlerIdent: String,
+    val enhetsnummer: String?,
 )
 
 data class HandledInKabalInput(
