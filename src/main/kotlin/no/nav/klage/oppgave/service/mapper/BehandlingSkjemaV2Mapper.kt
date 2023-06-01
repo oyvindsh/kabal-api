@@ -253,9 +253,7 @@ data class BehandlingSkjemaV2(
 
     val saksdokumenter: List<Dokument>,
     val vedtak: Vedtak?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     val sattPaaVent: LocalDateTime? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     val sattPaaVentExpires: LocalDateTime? = null,
     val status: StatusType,
     val feilregistrert: LocalDateTime?,
