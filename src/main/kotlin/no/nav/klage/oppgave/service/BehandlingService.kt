@@ -221,7 +221,7 @@ class BehandlingService(
         behandlingId: UUID,
         tildeltSaksbehandlerIdent: String?,
         enhetId: String?,
-        utfoerendeSaksbehandlerIdent: String
+        utfoerendeSaksbehandlerIdent: String,
     ): Behandling {
         val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
         if (tildeltSaksbehandlerIdent != null) {
@@ -236,6 +236,7 @@ class BehandlingService(
                     sakId = behandling.kildeReferanse,
                     input = SakAssignedInput(
                         saksbehandlerIdent = tildeltSaksbehandlerIdent,
+                        enhetsnummer = enhetId,
                     )
                 )
                 logger.debug("Tildeling av behandling ble registrert i Infotrygd.")
