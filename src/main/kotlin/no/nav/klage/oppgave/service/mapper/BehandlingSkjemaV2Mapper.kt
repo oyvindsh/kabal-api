@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service.mapper
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.klage.kodeverk.Kode
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -252,7 +253,9 @@ data class BehandlingSkjemaV2(
 
     val saksdokumenter: List<Dokument>,
     val vedtak: Vedtak?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     val sattPaaVent: LocalDateTime? = null,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     val sattPaaVentExpires: LocalDateTime? = null,
     val status: StatusType,
     val feilregistrert: LocalDateTime?,
