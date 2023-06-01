@@ -53,4 +53,25 @@ class FullmektigSearchService(
                 }
             }
         }
+
+    fun searchPerson(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.SakenGjelderView =
+        when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
+            PartIdType.PERSON -> {
+                if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
+                    val person = pdlFacade.getPersonInfo(identifikator)
+                    BehandlingDetaljerView.SakenGjelderView(
+                        id = person.foedselsnr,
+                        name = person.settSammenNavn(),
+                        type = BehandlingDetaljerView.IdType.FNR,
+                        sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
+                            ?: BehandlingDetaljerView.Sex.UKJENT,
+                    )
+                } else {
+                    secureLogger.warn("Saksbehandler does not have access to view person")
+                    throw MissingTilgangException("Saksbehandler does not have access to view person")
+                }
+            }
+
+            else -> throw RuntimeException("Invalid part type: " + behandlingService.getPartIdFromIdentifikator(identifikator).type)
+        }
 }
