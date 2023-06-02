@@ -46,7 +46,7 @@ data class BehandlingDetaljerView(
     val strengtFortrolig: Boolean,
     val vergemaalEllerFremtidsfullmakt: Boolean,
     val kvalitetsvurderingReference: KvalitetsvurderingReference?,
-    val sattPaaVent: LocalDateTime? = null,
+    val sattPaaVent: LocalDate? = null,
     val sattPaaVentView: SattPaaVent? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,

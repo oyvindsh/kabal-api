@@ -91,7 +91,7 @@ class BehandlingMapper(
                 )
             } else null,
             //TODO: Remove after FE-adjustment
-            sattPaaVent = klagebehandling.sattPaaVent?.let { LocalDateTime.from(it.start) },
+            sattPaaVent = klagebehandling.sattPaaVent?.start,
             sattPaaVentView = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
@@ -151,7 +151,7 @@ class BehandlingMapper(
                     version = ankebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            sattPaaVent = ankebehandling.sattPaaVent?.let { LocalDateTime.from(it.start) },
+            sattPaaVent = ankebehandling.sattPaaVent?.start,
             sattPaaVentView = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
@@ -204,7 +204,7 @@ class BehandlingMapper(
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingReference = null,
-            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.let { LocalDateTime.from(it.start) },
+            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.start,
             sattPaaVentView = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
