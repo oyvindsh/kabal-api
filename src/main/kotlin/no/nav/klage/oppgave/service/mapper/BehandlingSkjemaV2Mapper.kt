@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service.mapper
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.klage.kodeverk.Kode
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
