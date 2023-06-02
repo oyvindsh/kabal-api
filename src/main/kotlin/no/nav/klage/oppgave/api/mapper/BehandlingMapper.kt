@@ -90,6 +90,7 @@ class BehandlingMapper(
                     version = klagebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
+            //TODO: Remove after FE-adjustment
             sattPaaVent = klagebehandling.sattPaaVent?.let { LocalDateTime.from(it.start) },
             sattPaaVentView = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),

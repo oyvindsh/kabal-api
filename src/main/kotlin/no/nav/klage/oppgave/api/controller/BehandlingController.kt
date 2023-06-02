@@ -59,7 +59,7 @@ class BehandlingController(
             )
         } else {
             SattPaaVent(
-                start = input.start,
+                start = LocalDate.now(),
                 expires = input.expires,
                 reason = input.reason
             )
