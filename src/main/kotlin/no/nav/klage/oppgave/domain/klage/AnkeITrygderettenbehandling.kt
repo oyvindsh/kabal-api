@@ -44,7 +44,7 @@ class AnkeITrygderettenbehandling(
     delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
-    sattPaaVent: LocalDateTime? = null,
+    sattPaaVent: SattPaaVent? = null,
     feilregistrering: Feilregistrering? = null,
 ) : Behandling(
     id = id,

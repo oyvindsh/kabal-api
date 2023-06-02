@@ -268,14 +268,13 @@ class BehandlingService(
 
     fun setSattPaaVent(
         behandlingId: UUID,
-        setNull: Boolean = false,
-        utfoerendeSaksbehandlerIdent: String
+        utfoerendeSaksbehandlerIdent: String,
+        sattPaaVent: SattPaaVent?,
     ): LocalDateTime {
         val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
-        val nyVerdi = if (setNull) null else LocalDateTime.now()
         val event =
             behandling.setSattPaaVent(
-                nyVerdi,
+                sattPaaVent,
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)

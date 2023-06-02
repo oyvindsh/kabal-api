@@ -6,3 +6,7 @@ data class BehandlingDateInput(
     val date: LocalDate
 )
 
+data class SattPaaVentInput(
+    val expires: LocalDate,
+    val reason: String
+)

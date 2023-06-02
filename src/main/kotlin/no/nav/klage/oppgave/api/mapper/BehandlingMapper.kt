@@ -12,6 +12,7 @@ import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class BehandlingMapper(
@@ -89,7 +90,9 @@ class BehandlingMapper(
                     version = klagebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            sattPaaVent = klagebehandling.sattPaaVent,
+            //TODO: Remove after FE-adjustment
+            sattPaaVent = klagebehandling.sattPaaVent?.start,
+            sattPaaVentView = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
         )
@@ -148,7 +151,8 @@ class BehandlingMapper(
                     version = ankebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            sattPaaVent = ankebehandling.sattPaaVent,
+            sattPaaVent = ankebehandling.sattPaaVent?.start,
+            sattPaaVentView = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
         )
@@ -200,7 +204,8 @@ class BehandlingMapper(
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingReference = null,
-            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
+            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.start,
+            sattPaaVentView = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
