@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
@@ -25,7 +26,9 @@ class BehandlingEndretKafkaProducer(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-        private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
+        private val objectMapper = ObjectMapper().registerModule(JavaTimeModule()).configure(
+            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false
+        )
     }
 
     fun sendKlageEndretV2(klagebehandling: Klagebehandling) {
