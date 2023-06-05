@@ -282,7 +282,7 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         sattPaaVent: SattPaaVent?,
     ): LocalDateTime {
-        val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
         val event =
             behandling.setSattPaaVent(
                 sattPaaVent,
