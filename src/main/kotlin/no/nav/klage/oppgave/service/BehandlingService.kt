@@ -242,6 +242,10 @@ class BehandlingService(
                 logger.debug("Tildeling av behandling ble registrert i Infotrygd.")
             }
         } else {
+            if (behandling.medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER) {
+                throw IllegalOperation("Kan ikke fradele behandling sendt til medunderskriver.")
+            }
+
             //if fagsystem is Infotrygd also do this.
             if (behandling.fagsystem == Fagsystem.IT01 && behandling.type != Type.ANKE_I_TRYGDERETTEN) {
                 logger.debug("Fradeling av behandling skal registreres i Infotrygd.")
@@ -253,6 +257,13 @@ class BehandlingService(
                 )
                 logger.debug("Fradeling av behandling ble registrert i Infotrygd.")
             }
+
+            //Fjern på vent-status
+            setSattPaaVent(
+                behandlingId = behandlingId,
+                utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
+                sattPaaVent = null
+            )
         }
 
 
@@ -271,7 +282,7 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         sattPaaVent: SattPaaVent?,
     ): LocalDateTime {
-        val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
         val event =
             behandling.setSattPaaVent(
                 sattPaaVent,

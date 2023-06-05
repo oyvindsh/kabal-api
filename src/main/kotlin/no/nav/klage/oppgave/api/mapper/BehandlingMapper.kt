@@ -12,7 +12,6 @@ import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class BehandlingMapper(
@@ -91,7 +90,7 @@ class BehandlingMapper(
                 )
             } else null,
             //TODO: Remove after FE-adjustment
-            sattPaaVent = klagebehandling.sattPaaVent?.start,
+            sattPaaVent = klagebehandling.sattPaaVent?.from,
             sattPaaVentView = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
@@ -151,7 +150,7 @@ class BehandlingMapper(
                     version = ankebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            sattPaaVent = ankebehandling.sattPaaVent?.start,
+            sattPaaVent = ankebehandling.sattPaaVent?.from,
             sattPaaVentView = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
@@ -204,7 +203,7 @@ class BehandlingMapper(
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingReference = null,
-            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.start,
+            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.from,
             sattPaaVentView = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,

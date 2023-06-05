@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.service.mapper
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import no.nav.klage.kodeverk.Kode
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -127,8 +126,8 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
                 hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
             )
         },
-        sattPaaVent = sattPaaVent?.start,
-        sattPaaVentExpires = sattPaaVent?.expires,
+        sattPaaVent = sattPaaVent?.from,
+        sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered
@@ -177,8 +176,8 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
                 hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
             )
         },
-        sattPaaVent = sattPaaVent?.start,
-        sattPaaVentExpires = sattPaaVent?.expires,
+        sattPaaVent = sattPaaVent?.from,
+        sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered
@@ -218,8 +217,8 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         },
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered,
-        sattPaaVent = sattPaaVent?.start,
-        sattPaaVentExpires = sattPaaVent?.expires,
+        sattPaaVent = sattPaaVent?.from,
+        sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
 
     )

@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 @Embeddable
 data class SattPaaVent(
-    val start: LocalDate,
-    val expires: LocalDate,
+    val from: LocalDate,
+    val to: LocalDate,
     val reason: String,
 )
