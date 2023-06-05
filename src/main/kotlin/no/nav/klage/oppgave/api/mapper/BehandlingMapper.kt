@@ -89,8 +89,8 @@ class BehandlingMapper(
                     version = klagebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
+            sattPaaVent = klagebehandling.sattPaaVent,
             //TODO: Remove after FE-adjustment
-            sattPaaVent = klagebehandling.sattPaaVent?.from,
             sattPaaVentView = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
@@ -150,7 +150,7 @@ class BehandlingMapper(
                     version = ankebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            sattPaaVent = ankebehandling.sattPaaVent?.from,
+            sattPaaVent = ankebehandling.sattPaaVent,
             sattPaaVentView = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
@@ -203,7 +203,7 @@ class BehandlingMapper(
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingReference = null,
-            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.from,
+            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sattPaaVentView = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
