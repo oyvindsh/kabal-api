@@ -744,11 +744,12 @@ class BehandlingService(
 
     fun feilregistrer(behandlingId: UUID, reason: String, fagsystem: Fagsystem): Behandling {
         val navIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        val behandlingForCheck = getBehandling(behandlingId)
 
-        val behandling = if (!saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(navIdent)) {
-            getBehandlingForUpdate(behandlingId = behandlingId)
-        } else {
+        val behandling = if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(navIdent) || behandlingForCheck.tildeling == null) {
             getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+        } else {
+            getBehandlingForUpdate(behandlingId = behandlingId)
         }
 
         return feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)

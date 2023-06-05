@@ -78,7 +78,6 @@ class CleanupAfterBehandlingEventListener(
                 logger.debug("Feilregistrering av behandling ble registrert i Infotrygd.")
             }
 
-            //FIXME add back after we have informed all clients about the change.
             notifyVedtaksinstans(behandling)
         }
     }
