@@ -52,15 +52,15 @@ class BehandlingController(
 
         val sattPaaVent = if (input == null) {
             SattPaaVent(
-                start = LocalDate.now(),
-                expires = LocalDate.now().plusWeeks(4),
+                from = LocalDate.now(),
+                to = LocalDate.now().plusWeeks(4),
                 reason = "Satt på vent"
 
             )
         } else {
             SattPaaVent(
-                start = LocalDate.now(),
-                expires = input.expires,
+                from = LocalDate.now(),
+                to = input.to,
                 reason = input.reason
             )
         }
