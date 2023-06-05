@@ -5,7 +5,6 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
-import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.*
@@ -20,7 +19,6 @@ class BehandlingMapper(
     private val norg2Client: Norg2Client,
     private val eregClient: EregClient,
     private val saksbehandlerRepository: SaksbehandlerRepository,
-    private val kabalDocumentGateway: KabalDocumentGateway
 ) {
 
     companion object {
@@ -90,8 +88,6 @@ class BehandlingMapper(
                 )
             } else null,
             sattPaaVent = klagebehandling.sattPaaVent,
-            //TODO: Remove after FE-adjustment
-            sattPaaVentView = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
         )
@@ -151,7 +147,6 @@ class BehandlingMapper(
                 )
             } else null,
             sattPaaVent = ankebehandling.sattPaaVent,
-            sattPaaVentView = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
         )
@@ -204,7 +199,6 @@ class BehandlingMapper(
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingReference = null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
-            sattPaaVentView = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),

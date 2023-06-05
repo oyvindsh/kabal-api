@@ -47,8 +47,6 @@ data class BehandlingDetaljerView(
     val vergemaalEllerFremtidsfullmakt: Boolean,
     val kvalitetsvurderingReference: KvalitetsvurderingReference?,
     val sattPaaVent: SattPaaVent? = null,
-    //TODO: Remove after FE migrated to above
-    val sattPaaVentView: SattPaaVent? = null,
     val sendtTilTrygderetten: LocalDateTime? = null,
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
