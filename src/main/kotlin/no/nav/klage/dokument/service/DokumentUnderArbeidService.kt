@@ -242,6 +242,15 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
+    fun validateDocumentNotFinalized(
+        dokumentId: UUID
+    ) {
+        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        if (dokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Dokument er allerede ferdigstilt.")
+        }
+    }
+
     fun updateSmartEditorTemplateId(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
