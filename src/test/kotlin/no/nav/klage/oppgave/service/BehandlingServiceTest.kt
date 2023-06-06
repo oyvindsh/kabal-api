@@ -159,6 +159,7 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
             val behandlingId = behandling.id
 
+            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
@@ -203,6 +204,7 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
             val behandlingId = behandling.id
 
+            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
@@ -226,6 +228,7 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
             val behandlingId = behandling.id
 
+            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
@@ -250,6 +253,7 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
             val behandlingId = behandling.id
 
+            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
@@ -278,6 +282,7 @@ class BehandlingServiceTest {
             val behandling = simpleInsert()
             val behandlingId = behandling.id
 
+            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
             every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit

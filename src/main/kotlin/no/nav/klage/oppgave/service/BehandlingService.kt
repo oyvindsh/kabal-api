@@ -458,7 +458,12 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT
     ): Behandling {
-        val behandling = getBehandlingForUpdate(behandlingId)
+        val behandling = if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
+            getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+        } else {
+            getBehandlingForUpdate(behandlingId = behandlingId)
+        }
+
         val event =
             behandling.setMedunderskriverIdentAndMedunderskriverFlyt(
                 medunderskriverIdent,
