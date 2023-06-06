@@ -87,6 +87,20 @@ class KabalSmartEditorApiClient(
             .block()
     }
 
+    fun deleteDocumentAsSystemUser(
+        documentId: UUID
+    ) {
+        kabalSmartEditorApiWebClient.delete()
+            .uri { it.path("/documents/$documentId").build() }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getAppAccessTokenWithKabalSmartEditorApiScope()}"
+            )
+            .retrieve()
+            .bodyToMono<Unit>()
+            .block()
+    }
+
     fun createComment(
         documentId: UUID,
         input: CommentInput

@@ -73,6 +73,12 @@ class TokenUtil(
         return response.accessToken
     }
 
+    fun getAppAccessTokenWithKabalSmartEditorApiScope(): String {
+        val clientProperties = clientConfigurationProperties.registration["kabal-smart-editor-api-maskintilmaskin"]
+        val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
+        return response.accessToken
+    }
+
     fun getAppAccessTokenWithKabalDocumentScope(): String {
         val clientProperties = clientConfigurationProperties.registration["kabal-document-maskintilmaskin"]
         val response = oAuth2AccessTokenService.getAccessToken(clientProperties)
