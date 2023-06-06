@@ -107,6 +107,8 @@ class SmartEditorController(
                 readOnly = false
             )
 
+        dokumentUnderArbeidService.validateDocumentNotFinalized(dokumentId = documentId)
+
         if (input.templateId != null) {
             dokumentUnderArbeidService.updateSmartEditorTemplateId(
                 behandlingId = behandlingId,

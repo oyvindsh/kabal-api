@@ -38,4 +38,8 @@ class DefaultKabalSmartEditorApiGateway(private val kabalSmartEditorApiClient: K
     fun deleteDocument(smartEditorId: UUID) {
         kabalSmartEditorApiClient.deleteDocument(smartEditorId)
     }
+
+    fun deleteDocumentAsSystemUser(smartEditorId: UUID) {
+        kabalSmartEditorApiClient.deleteDocumentAsSystemUser(smartEditorId)
+    }
 }

@@ -242,6 +242,15 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
+    fun validateDocumentNotFinalized(
+        dokumentId: UUID
+    ) {
+        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        if (dokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Dokument er allerede ferdigstilt.")
+        }
+    }
+
     fun updateSmartEditorTemplateId(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
@@ -572,8 +581,24 @@ class DokumentUnderArbeidService(
         )
 
         val now = LocalDateTime.now()
+
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
-        vedlegg.forEach { it.ferdigstillHvisIkkeAlleredeFerdigstilt(now) }
+        if (hovedDokument.smartEditorId != null) {
+            try {
+                smartEditorApiGateway.deleteDocumentAsSystemUser(hovedDokument.smartEditorId!!)
+            } catch(e: Exception) {
+                logger.warn("Couldn't delete hoveddokument from smartEditorApi", e)
+            }
+        }
+
+        vedlegg.forEach {
+            it.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
+            try {
+                smartEditorApiGateway.deleteDocumentAsSystemUser(it.smartEditorId!!)
+            } catch(e: Exception) {
+                logger.warn("Couldn't delete vedlegg from smartEditorApi", e)
+            }
+        }
 
         return hovedDokument
     }
