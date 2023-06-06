@@ -5,7 +5,6 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
-import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.*
@@ -20,7 +19,6 @@ class BehandlingMapper(
     private val norg2Client: Norg2Client,
     private val eregClient: EregClient,
     private val saksbehandlerRepository: SaksbehandlerRepository,
-    private val kabalDocumentGateway: KabalDocumentGateway
 ) {
 
     companion object {
@@ -48,13 +46,9 @@ class BehandlingMapper(
             sakenGjelder = getSakenGjelderView(klagebehandling.sakenGjelder),
             klager = getPartView(klagebehandling.klager),
             prosessfullmektig = klagebehandling.klager.prosessfullmektig?.let { getPartView(it) },
-            tema = klagebehandling.ytelse.toTema().id,
             temaId = klagebehandling.ytelse.toTema().id,
-            ytelse = klagebehandling.ytelse.id,
             ytelseId = klagebehandling.ytelse.id,
-            type = klagebehandling.type.id,
             typeId = klagebehandling.type.id,
-            mottatt = klagebehandling.mottattKlageinstans.toLocalDate(),
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
             avsluttetAvSaksbehandlerDate = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
@@ -67,7 +61,6 @@ class BehandlingMapper(
             medunderskriver = getSaksbehandlerView(klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = klagebehandling.currentDelbehandling().medunderskriverFlyt,
             datoSendtMedunderskriver = klagebehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
-            hjemler = klagebehandling.hjemler.map { it.id },
             hjemmelIdList = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
@@ -89,9 +82,7 @@ class BehandlingMapper(
                     version = klagebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            //TODO: Remove after FE-adjustment
-            sattPaaVent = klagebehandling.sattPaaVent?.from,
-            sattPaaVentView = klagebehandling.sattPaaVent,
+            sattPaaVent = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
         )
@@ -108,13 +99,9 @@ class BehandlingMapper(
             sakenGjelder = getSakenGjelderView(ankebehandling.sakenGjelder),
             klager = getPartView(ankebehandling.klager),
             prosessfullmektig = ankebehandling.klager.prosessfullmektig?.let { getPartView(it) },
-            tema = ankebehandling.ytelse.toTema().id,
             temaId = ankebehandling.ytelse.toTema().id,
-            ytelse = ankebehandling.ytelse.id,
             ytelseId = ankebehandling.ytelse.id,
-            type = ankebehandling.type.id,
             typeId = ankebehandling.type.id,
-            mottatt = ankebehandling.mottattKlageinstans.toLocalDate(),
             mottattKlageinstans = ankebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = ankebehandling.tildeling?.tidspunkt?.toLocalDate(),
             avsluttetAvSaksbehandlerDate = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
@@ -127,7 +114,6 @@ class BehandlingMapper(
             medunderskriver = getSaksbehandlerView(ankebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = ankebehandling.currentDelbehandling().medunderskriverFlyt,
             datoSendtMedunderskriver = ankebehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
-            hjemler = ankebehandling.hjemler.map { it.id },
             hjemmelIdList = ankebehandling.hjemler.map { it.id },
             modified = ankebehandling.modified,
             created = ankebehandling.created,
@@ -150,8 +136,7 @@ class BehandlingMapper(
                     version = ankebehandling.kakaKvalitetsvurderingVersion,
                 )
             } else null,
-            sattPaaVent = ankebehandling.sattPaaVent?.from,
-            sattPaaVentView = ankebehandling.sattPaaVent,
+            sattPaaVent = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
         )
@@ -166,13 +151,9 @@ class BehandlingMapper(
             sakenGjelder = getSakenGjelderView(ankeITrygderettenbehandling.sakenGjelder),
             klager = getPartView(ankeITrygderettenbehandling.klager),
             prosessfullmektig = ankeITrygderettenbehandling.klager.prosessfullmektig?.let { getPartView(it) },
-            tema = ankeITrygderettenbehandling.ytelse.toTema().id,
             temaId = ankeITrygderettenbehandling.ytelse.toTema().id,
-            ytelse = ankeITrygderettenbehandling.ytelse.id,
             ytelseId = ankeITrygderettenbehandling.ytelse.id,
-            type = ankeITrygderettenbehandling.type.id,
             typeId = ankeITrygderettenbehandling.type.id,
-            mottatt = ankeITrygderettenbehandling.mottattKlageinstans.toLocalDate(),
             mottattKlageinstans = ankeITrygderettenbehandling.mottattKlageinstans.toLocalDate(),
             tildelt = ankeITrygderettenbehandling.tildeling?.tidspunkt?.toLocalDate(),
             avsluttetAvSaksbehandlerDate = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
@@ -185,7 +166,6 @@ class BehandlingMapper(
             medunderskriver = getSaksbehandlerView(ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
             medunderskriverFlyt = ankeITrygderettenbehandling.currentDelbehandling().medunderskriverFlyt,
             datoSendtMedunderskriver = ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
-            hjemler = ankeITrygderettenbehandling.hjemler.map { it.id },
             hjemmelIdList = ankeITrygderettenbehandling.hjemler.map { it.id },
             modified = ankeITrygderettenbehandling.modified,
             created = ankeITrygderettenbehandling.created,
@@ -203,8 +183,7 @@ class BehandlingMapper(
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
             kvalitetsvurderingReference = null,
-            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent?.from,
-            sattPaaVentView = ankeITrygderettenbehandling.sattPaaVent,
+            sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
@@ -302,9 +281,7 @@ class BehandlingMapper(
     fun Delbehandling.mapToVedtakView(): VedtakView {
         return VedtakView(
             id = id,
-            utfall = utfall?.id,
             utfallId = utfall?.id,
-            hjemler = hjemler.map { it.id }.toSet(),
             hjemmelIdSet = hjemler.map { it.id }.toSet(),
         )
     }
