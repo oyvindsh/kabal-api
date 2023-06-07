@@ -63,6 +63,20 @@ class DokumentUnderArbeidController(
         )
     }
 
+    @PostMapping("/journalfoertedokumenter")
+    fun addJournalfoerteDokumenterAsVedlegg(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @ModelAttribute input: JournalfoerteDokumenterInput
+    ): List<DokumentView> {
+        logger.debug("Kall mottatt på addJournalfoerteDokumenterAsVedlegg")
+        return dokumentUnderArbeidService.createJournalfoerteDokumenter(
+            parentId = input.parentId,
+            journalfoerteDokumenter = input.journalfoerteDokumenter,
+            behandlingId = behandlingId,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).map { dokumentMapper.mapToDokumentView(it) }
+    }
+
     @PutMapping("/{dokumentId}/dokumenttype")
     fun endreDokumentType(
         @PathVariable("behandlingId") behandlingId: UUID,

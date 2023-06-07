@@ -7,14 +7,22 @@ import java.util.*
 data class DokumentView(
     val id: UUID,
     val tittel: String,
-    val dokumentTypeId: String,
-    val opplastet: LocalDateTime,
+    val dokumentTypeId: String?,
+    val opplastet: LocalDateTime?,
+    val created: LocalDateTime,
+    val type: DokumentUnderArbeidType,
     val isSmartDokument: Boolean,
     val templateId: String?,
     val version: Int?,
     val isMarkertAvsluttet: Boolean,
     val parent: UUID?,
-)
+) {
+    enum class DokumentUnderArbeidType {
+        UPLOADED,
+        SMART,
+        JOURNALFOERT
+    }
+}
 
 data class SmartEditorDocumentView(
     val id: UUID,

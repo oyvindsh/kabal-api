@@ -2,6 +2,7 @@ package no.nav.klage.dokument.service
 
 import jakarta.transaction.Transactional
 import no.nav.klage.dokument.api.view.DocumentValidationResponse
+import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.MellomlagretDokument
@@ -79,14 +80,15 @@ class DokumentUnderArbeidService(
                 smartEditorId = null,
                 smartEditorTemplateId = null,
                 smartEditorVersion = null,
+                journalfoertDokumentReference = null,
             )
         )
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
             fraVerdi = null,
-            tilVerdi = hovedDokument.opplastet.toString(),
-            tidspunkt = hovedDokument.opplastet!!,
+            tilVerdi = hovedDokument.created.toString(),
+            tidspunkt = hovedDokument.created,
             dokumentId = hovedDokument.id,
         )
         return hovedDokument
@@ -126,6 +128,7 @@ class DokumentUnderArbeidService(
                 smartEditorId = smartEditorDocumentId,
                 smartEditorTemplateId = smartEditorTemplateId,
                 smartEditorVersion = smartEditorVersion,
+                journalfoertDokumentReference = null,
             )
         )
         behandling.publishEndringsloggEvent(
@@ -137,6 +140,51 @@ class DokumentUnderArbeidService(
             dokumentId = hovedDokument.id,
         )
         return hovedDokument
+    }
+
+    fun createJournalfoerteDokumenter(
+        parentId: UUID,
+        journalfoerteDokumenter: List<JournalfoertDokumentReference>,
+        behandlingId: UUID,
+        innloggetIdent: String,
+    ): List<DokumentUnderArbeid> {
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        val resultingDocuments = journalfoerteDokumenter.map { journalfoertDokumentReference ->
+            val journalpostInDokarkiv = safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
+
+            val document = DokumentUnderArbeid(
+                mellomlagerId = null,
+                opplastet = journalpostInDokarkiv.datoOpprettet,
+                size = null,
+                name = "Hentes fra SAF",
+                dokumentType = null,
+                behandlingId = behandlingId,
+                smartEditorId = null,
+                smartEditorTemplateId = null,
+                smartEditorVersion = null,
+                parentId = parentId,
+                journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
+                    journalpostId = journalfoertDokumentReference.journalpostId,
+                    dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
+                )
+            )
+
+            behandling.publishEndringsloggEvent(
+                saksbehandlerident = innloggetIdent,
+                felt = Felt.JOURNALFOERT_DOKUMENT_UNDER_ARBEID_OPPRETTET,
+                fraVerdi = null,
+                tilVerdi = document.created.toString(),
+                tidspunkt = document.created,
+                dokumentId = document.id,
+            )
+
+            dokumentUnderArbeidRepository.save(
+                document
+            )
+        }
+
+        return resultingDocuments
     }
 
     fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -168,7 +216,7 @@ class DokumentUnderArbeidService(
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_TYPE,
-            fraVerdi = previousValue.id,
+            fraVerdi = previousValue?.id,
             tilVerdi = dokumentUnderArbeid.modified.toString(),
             tidspunkt = dokumentUnderArbeid.modified,
             dokumentId = dokumentUnderArbeid.id,

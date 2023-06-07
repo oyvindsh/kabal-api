@@ -47,6 +47,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now(), "S123456")
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(LocalDateTime.now())
@@ -74,6 +75,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -91,7 +93,8 @@ class DokumentUnderArbeidRepositoryTest {
                 smartEditorId = null,
                 smartEditorTemplateId = null,
                 smartEditorVersion = null,
-                parentId = hovedDokument.id
+                parentId = hovedDokument.id,
+                journalfoertDokumentReference = null,
             )
         )
 
@@ -116,6 +119,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -134,7 +138,8 @@ class DokumentUnderArbeidRepositoryTest {
                 smartEditorId = null,
                 smartEditorTemplateId = null,
                 smartEditorVersion = null,
-                parentId = hovedDokument.id
+                parentId = hovedDokument.id,
+                journalfoertDokumentReference = null,
             )
         )
 
@@ -165,6 +170,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -198,6 +204,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
         val vedlegg1 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -210,7 +217,8 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
-            parentId = hovedDokument1.id
+            parentId = hovedDokument1.id,
+            journalfoertDokumentReference = null,
         )
         val vedlegg2 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -223,7 +231,8 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
-            parentId = hovedDokument1.id
+            parentId = hovedDokument1.id,
+            journalfoertDokumentReference = null,
         )
 
         val hovedDokument2 = DokumentUnderArbeid(
@@ -237,6 +246,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
 
         val hovedDokument3 = DokumentUnderArbeid(
@@ -250,6 +260,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorId = null,
             smartEditorTemplateId = null,
             smartEditorVersion = null,
+            journalfoertDokumentReference = null,
         )
         dokumentUnderArbeidRepository.save(hovedDokument1)
         dokumentUnderArbeidRepository.save(vedlegg1)

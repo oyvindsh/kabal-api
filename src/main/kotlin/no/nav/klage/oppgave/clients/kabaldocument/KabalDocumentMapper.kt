@@ -37,7 +37,7 @@ class KabalDocumentMapper(
         vedlegg: SortedSet<DokumentUnderArbeid>
     ): DokumentEnhetWithDokumentreferanserInput {
         return DokumentEnhetWithDokumentreferanserInput(
-            brevMottakere = mapBrevmottakere(behandling, hovedDokument.brevmottakertyper, hovedDokument.dokumentType),
+            brevMottakere = mapBrevmottakere(behandling, hovedDokument.brevmottakertyper, hovedDokument.dokumentType!!),
             journalfoeringData = JournalfoeringDataInput(
                 sakenGjelder = PartIdInput(
                     partIdTypeId = behandling.sakenGjelder.partId.type.id,
@@ -50,7 +50,7 @@ class KabalDocumentMapper(
                 enhet = behandling.tildeling!!.enhet!!,
                 behandlingstema = BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS,
                 //Tittel gjelder journalposten, ikke selve dokumentet som lastes opp. Vises i Gosys.
-                tittel = hovedDokument.dokumentType.beskrivelse,
+                tittel = hovedDokument.dokumentType!!.beskrivelse,
                 brevKode = if (hovedDokument.dokumentType == DokumentType.NOTAT) BREVKODE_NOTAT else BREVKODE,
                 tilleggsopplysning = TilleggsopplysningInput(
                     key = KLAGEBEHANDLING_ID_KEY,
@@ -61,7 +61,7 @@ class KabalDocumentMapper(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
                 vedlegg = vedlegg.map { mapDokumentUnderArbeidToDokumentReferanse(it) }
             ),
-            dokumentTypeId = hovedDokument.dokumentType.id,
+            dokumentTypeId = hovedDokument.dokumentType!!.id,
             journalfoerendeSaksbehandlerIdent = hovedDokument.markertFerdigBy!!
         )
     }
