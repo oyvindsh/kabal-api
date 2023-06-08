@@ -59,7 +59,15 @@ class KabalDocumentMapper(
             ),
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
-                vedlegg = vedlegg.map { mapDokumentUnderArbeidToDokumentReferanse(it) }
+                vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+                    .map { mapDokumentUnderArbeidToDokumentReferanse(it) },
+                journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+                    .map {
+                        DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
+                            kildeJournalpostId = it.journalfoertDokumentReference!!.journalpostId,
+                            dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+                        )
+                    },
             ),
             dokumentTypeId = hovedDokument.dokumentType!!.id,
             journalfoerendeSaksbehandlerIdent = hovedDokument.markertFerdigBy!!
