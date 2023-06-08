@@ -1,7 +1,7 @@
 package no.nav.klage.dokument.service
 
 import no.nav.klage.dokument.clients.clamav.ClamAvClient
-import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.exceptions.AttachmentEncryptedException
 import no.nav.klage.dokument.exceptions.AttachmentHasVirusException
 import no.nav.klage.dokument.exceptions.AttachmentIsEmptyException
@@ -22,7 +22,7 @@ class MellomlagretDokumentValidatorService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    fun validateAttachment(fil: MellomlagretDokument) {
+    fun validateAttachment(fil: FysiskDokument) {
         logger.debug("Validating attachment.")
         if (fil.content.isEmpty()) {
             logger.warn("Attachment is empty")
@@ -47,9 +47,9 @@ class MellomlagretDokumentValidatorService(
         logger.debug("Validation successful.")
     }
 
-    private fun MellomlagretDokument.hasVirus() = !clamAvClient.scan(this.content)
+    private fun FysiskDokument.hasVirus() = !clamAvClient.scan(this.content)
 
-    private fun MellomlagretDokument.isEncrypted(): Boolean {
+    private fun FysiskDokument.isEncrypted(): Boolean {
         return try {
             val temp: PDDocument = PDDocument.load(this.content)
             temp.close()
@@ -59,8 +59,8 @@ class MellomlagretDokumentValidatorService(
         }
     }
 
-    private fun MellomlagretDokument.isTooLarge() = this.content.size > maxAttachmentSize.toBytes()
+    private fun FysiskDokument.isTooLarge() = this.content.size > maxAttachmentSize.toBytes()
 
-    private fun MellomlagretDokument.isPDF() =
+    private fun FysiskDokument.isPDF() =
         MediaType.valueOf(Tika().detect(this.content)) == MediaType.APPLICATION_PDF
 }

@@ -17,6 +17,7 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
+import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import org.assertj.core.api.Assertions.assertThat
@@ -54,6 +55,9 @@ internal class DokumentUnderArbeidControllerTest {
 
     @MockkBean
     private lateinit var dokumentUnderArbeidService: DokumentUnderArbeidService
+
+    @MockkBean
+    private lateinit var safClient: SafGraphQlClient
 
     @SpykBean
     private lateinit var dokumentMapper: DokumentMapper
@@ -96,7 +100,8 @@ internal class DokumentUnderArbeidControllerTest {
             modified = LocalDateTime.now(),
             dokumentEnhetId = null,
             parentId = null,
-            id = UUID.randomUUID()
+            id = UUID.randomUUID(),
+            journalfoertDokumentReference = null,
         )
 
 
@@ -165,7 +170,8 @@ internal class DokumentUnderArbeidControllerTest {
             modified = LocalDateTime.now(),
             dokumentEnhetId = null,
             parentId = null,
-            id = UUID.randomUUID()
+            id = UUID.randomUUID(),
+            journalfoertDokumentReference = null,
         )
 
         val json = mockMvc.perform(

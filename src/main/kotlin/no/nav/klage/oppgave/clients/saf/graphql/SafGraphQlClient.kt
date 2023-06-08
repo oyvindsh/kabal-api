@@ -55,7 +55,7 @@ class SafGraphQlClient(
     }
 
     @Retryable
-    fun getJournalpostAsSaksbehandler(journalpostId: String): Journalpost? {
+    fun getJournalpostAsSaksbehandler(journalpostId: String): Journalpost {
         return runWithTimingAndLogging {
             val token = tokenUtil.getSaksbehandlerAccessTokenWithSafScope()
             getJournalpostWithToken(journalpostId, token)
@@ -63,7 +63,7 @@ class SafGraphQlClient(
     }
 
     @Retryable
-    fun getJournalpostAsSystembruker(journalpostId: String): Journalpost? {
+    fun getJournalpostAsSystembruker(journalpostId: String): Journalpost {
         return runWithTimingAndLogging {
             val token = tokenUtil.getAppAccessTokenWithSafScope()
             getJournalpostWithToken(journalpostId, token)
@@ -80,13 +80,14 @@ class SafGraphQlClient(
         .retrieve()
         .bodyToMono<JournalpostResponse>()
         .block()
-        ?.let { logErrorsFromSaf(it, journalpostId); it }
-        ?.let { failOnErrors(it); it }
-        ?.data?.journalpost
+        .let { if (it == null) throw RuntimeException("No response from SAF") ; it }
+        .let { logErrorsFromSaf(it, journalpostId); it }
+        .let { failOnErrors(it); it }
+        .data!!.journalpost!!
 
     private fun failOnErrors(response: JournalpostResponse) {
-        if (response.data == null || response.errors != null && response.errors.map { it.extensions.classification }
-                .contains("ValidationError")) {
+        if (response.data?.journalpost == null || (response.errors != null && response.errors.map { it.extensions.classification }
+                .contains("ValidationError"))) {
             throw RuntimeException("getJournalpost failed")
         }
     }

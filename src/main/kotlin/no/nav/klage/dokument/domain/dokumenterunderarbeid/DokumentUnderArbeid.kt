@@ -34,9 +34,9 @@ open class DokumentUnderArbeid(
     open var smartEditorVersion: Int?,
     @Column(name = "behandling_id")
     open var behandlingId: UUID,
-    @Column(name = "dokument_type")
+    @Column(name = "dokument_type_id")
     @Convert(converter = DokumentTypeConverter::class)
-    open var dokumentType: DokumentType,
+    open var dokumentType: DokumentType?,
     @Column(name = "created")
     open var created: LocalDateTime = LocalDateTime.now(),
     @Column(name = "modified")
@@ -65,6 +65,14 @@ open class DokumentUnderArbeid(
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
     open val journalposter: MutableSet<DokumentUnderArbeidJournalpostId> = mutableSetOf(),
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "journalpostId", column = Column(name = "journalfoert_dokument_journalpost_id")),
+            AttributeOverride(name = "dokumentInfoId", column = Column(name = "journalfoert_dokument_dokument_info_id")),
+        ]
+    )
+    val journalfoertDokumentReference: JournalfoertDokumentReference?
 ) : Comparable<DokumentUnderArbeid> {
 
     override fun compareTo(other: DokumentUnderArbeid): Int =
@@ -109,6 +117,20 @@ open class DokumentUnderArbeid(
             markertFerdig = tidspunkt
             markertFerdigBy = saksbehandlerIdent
             modified = tidspunkt
+        }
+    }
+
+    enum class DokumentUnderArbeidType {
+        UPLOADED,
+        SMART,
+        JOURNALFOERT
+    }
+
+    fun getType(): DokumentUnderArbeidType {
+        return when {
+            smartEditorId != null -> DokumentUnderArbeidType.SMART
+            journalfoertDokumentReference != null -> DokumentUnderArbeidType.JOURNALFOERT
+            else -> DokumentUnderArbeidType.UPLOADED
         }
     }
 

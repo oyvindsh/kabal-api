@@ -63,6 +63,25 @@ class DokumentUnderArbeidController(
         )
     }
 
+    @PostMapping("/journalfoertedokumenter")
+    fun addJournalfoerteDokumenterAsVedlegg(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: JournalfoerteDokumenterInput
+    ): JournalfoerteDokumenterResponse {
+        logger.debug("Kall mottatt på addJournalfoerteDokumenterAsVedlegg")
+        val (added, failed) = dokumentUnderArbeidService.createJournalfoerteDokumenter(
+            parentId = input.parentId,
+            journalfoerteDokumenter = input.journalfoerteDokumenter,
+            behandlingId = behandlingId,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        )
+
+        return JournalfoerteDokumenterResponse(
+            addedJournalfoerteDokumenter = added.map { dokumentMapper.mapToDokumentView(it) },
+            failedJournalfoerteDokumenter = failed
+        )
+    }
+
     @PutMapping("/{dokumentId}/dokumenttype")
     fun endreDokumentType(
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -87,7 +106,7 @@ class DokumentUnderArbeidController(
     ): ResponseEntity<ByteArray> {
         logger.debug("Kall mottatt på getPdf for $dokumentId")
         return dokumentMapper.mapToByteArray(
-            dokumentUnderArbeidService.hentOgMellomlagreDokument(
+            dokumentUnderArbeidService.getFysiskDokument(
                 behandlingId = behandlingId,
                 dokumentId = dokumentId,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()

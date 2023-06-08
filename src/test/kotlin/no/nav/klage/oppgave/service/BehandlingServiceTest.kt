@@ -346,7 +346,8 @@ class BehandlingServiceTest {
                             markertFerdig = null,
                             ferdigstilt = null,
                             dokumentEnhetId = null,
-                            parentId = null
+                            parentId = null,
+                            journalfoertDokumentReference = null,
                         )
                     )
 

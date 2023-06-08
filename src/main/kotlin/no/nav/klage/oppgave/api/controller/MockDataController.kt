@@ -73,7 +73,7 @@ class MockDataController(
                     id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
                 ),
                 fagsak = OversendtSak(
-                    fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
+                    fagsakId = journalpost.sak?.fagsakId ?: "UKJENT",
                     fagsystem = journalpost.sak?.fagsaksystem?.let {
                         try {
                             KildeFagsystem.valueOf(it)
@@ -124,7 +124,7 @@ class MockDataController(
                     )
                 ),
                 fagsak = OversendtSak(
-                    fagsakId = journalpost!!.sak?.fagsakId ?: "UKJENT",
+                    fagsakId = journalpost.sak?.fagsakId ?: "UKJENT",
                     fagsystem = journalpost.sak?.fagsaksystem?.let {
                         try {
                             KildeFagsystem.valueOf(it)
@@ -228,8 +228,8 @@ class MockDataController(
         val journalpostId: String
     )
 
-    private fun createKlanke(type: Type, input: MockInput?): MockDataResponse {
-        val ytelse = if (input == null) Ytelse.SYK_SYK else input.ytelse ?: ytelseTilHjemler.keys.random()
+    private fun createKlanke(type: Type, mockInput: MockInput?): MockDataResponse {
+        val ytelse = if (mockInput == null) Ytelse.SYK_SYK else mockInput.ytelse ?: ytelseTilHjemler.keys.random()
 
         val fnrAndJournalpostId = getFnrAndJournalpostId(ytelse)
 
@@ -239,11 +239,11 @@ class MockDataController(
         val now = LocalDate.now().toEpochDay()
         val dato = LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(lastMonth, now))
 
-        val klager = input?.klager ?: OversendtKlager(
+        val klager = mockInput?.klager ?: OversendtKlager(
             id = OversendtPartId(OversendtPartIdType.PERSON, fnr)
         )
 
-        val sakenGjelder = input?.sakenGjelder
+        val sakenGjelder = mockInput?.sakenGjelder
 
         val oversendtSak = OversendtSak(
             fagsakId = Random.nextInt(from = 1, until = 9999).toString(),
@@ -260,11 +260,11 @@ class MockDataController(
                         klager = klager,
                         fagsak = oversendtSak,
                         sakenGjelder = sakenGjelder,
-                        kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
-                        dvhReferanse = input?.dvhReferanse,
+                        kildeReferanse = mockInput?.kildeReferanse ?: UUID.randomUUID().toString(),
+                        dvhReferanse = mockInput?.dvhReferanse,
                         innsynUrl = "https://nav.no",
                         hjemler = listOf(ytelseTilHjemler[ytelse]!!.random()),
-                        forrigeBehandlendeEnhet = input?.forrigeBehandlendeEnhet ?: "4295", //NAV Klageinstans nord
+                        forrigeBehandlendeEnhet = mockInput?.forrigeBehandlendeEnhet ?: "4295", //NAV Klageinstans nord
                         tilknyttedeJournalposter = listOf(
                             OversendtDokumentReferanse(
                                 MottakDokumentType.BRUKERS_KLAGE,
@@ -298,8 +298,8 @@ class MockDataController(
                     sakenGjelder = sakenGjelder?.toSakenGjelder(),
                     ytelse = ytelse,
                     type = type,
-                    kildeReferanse = input?.kildeReferanse ?: UUID.randomUUID().toString(),
-                    dvhReferanse = input?.dvhReferanse ?: UUID.randomUUID().toString(),
+                    kildeReferanse = mockInput?.kildeReferanse ?: UUID.randomUUID().toString(),
+                    dvhReferanse = mockInput?.dvhReferanse ?: UUID.randomUUID().toString(),
                     fagsystem = Fagsystem.fromNavn(oversendtSak.fagsystem.name),
                     fagsakId = oversendtSak.fagsakId,
                     sakMottattKlageinstans = dato.atStartOfDay(),

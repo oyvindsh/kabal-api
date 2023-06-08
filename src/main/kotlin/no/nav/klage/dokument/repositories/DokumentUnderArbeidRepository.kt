@@ -18,6 +18,8 @@ interface DokumentUnderArbeidRepository : JpaRepository<DokumentUnderArbeid, UUI
 
     fun findByParentIdOrderByCreated(dokumentId: UUID): SortedSet<DokumentUnderArbeid>
 
+    fun findByParentIdAndJournalfoertDokumentReferenceIsNotNull(dokumentId: UUID): Set<DokumentUnderArbeid>
+
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<DokumentUnderArbeid>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId: UUID): SortedSet<DokumentUnderArbeid>

@@ -12,12 +12,18 @@ data class DokumentEnhetWithDokumentreferanserInput(
     data class DokumentInput(
         val hoveddokument: Dokument,
         val vedlegg: List<Dokument>?,
+        val journalfoerteVedlegg: List<JournalfoertDokument>?,
     ) {
         data class Dokument(
             val mellomlagerId: String,
             val opplastet: LocalDateTime,
             val size: Long,
             val name: String
+        )
+
+        data class JournalfoertDokument(
+            val kildeJournalpostId: String,
+            val dokumentInfoId: String,
         )
     }
 }
