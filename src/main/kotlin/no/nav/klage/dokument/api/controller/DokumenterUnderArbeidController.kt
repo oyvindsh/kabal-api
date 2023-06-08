@@ -66,7 +66,7 @@ class DokumentUnderArbeidController(
     @PostMapping("/journalfoertedokumenter")
     fun addJournalfoerteDokumenterAsVedlegg(
         @PathVariable("behandlingId") behandlingId: UUID,
-        @ModelAttribute input: JournalfoerteDokumenterInput
+        @RequestBody input: JournalfoerteDokumenterInput
     ): List<DokumentView> {
         logger.debug("Kall mottatt på addJournalfoerteDokumenterAsVedlegg")
         return dokumentUnderArbeidService.createJournalfoerteDokumenter(
