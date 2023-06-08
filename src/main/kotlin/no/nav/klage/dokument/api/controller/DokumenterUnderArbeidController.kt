@@ -67,14 +67,19 @@ class DokumentUnderArbeidController(
     fun addJournalfoerteDokumenterAsVedlegg(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: JournalfoerteDokumenterInput
-    ): List<DokumentView> {
+    ): JournalfoerteDokumenterResponse {
         logger.debug("Kall mottatt på addJournalfoerteDokumenterAsVedlegg")
-        return dokumentUnderArbeidService.createJournalfoerteDokumenter(
+        val (added, failed) = dokumentUnderArbeidService.createJournalfoerteDokumenter(
             parentId = input.parentId,
             journalfoerteDokumenter = input.journalfoerteDokumenter,
             behandlingId = behandlingId,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        ).map { dokumentMapper.mapToDokumentView(it) }
+        )
+
+        return JournalfoerteDokumenterResponse(
+            addedJournalfoerteDokumenter = added.map { dokumentMapper.mapToDokumentView(it) },
+            failedJournalfoerteDokumenter = failed
+        )
     }
 
     @PutMapping("/{dokumentId}/dokumenttype")

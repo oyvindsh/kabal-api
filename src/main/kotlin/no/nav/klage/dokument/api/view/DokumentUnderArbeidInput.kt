@@ -26,7 +26,7 @@ data class PatchSmartHovedDokumentInput(
 
 data class JournalfoerteDokumenterInput(
     val parentId: UUID,
-    val journalfoerteDokumenter: List<JournalfoertDokumentReference>,
+    val journalfoerteDokumenter: Set<JournalfoertDokumentReference>,
 )
 
 class JournalfoertDokumentReference (

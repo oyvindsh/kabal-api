@@ -146,10 +146,10 @@ class DokumentUnderArbeidService(
 
     fun createJournalfoerteDokumenter(
         parentId: UUID,
-        journalfoerteDokumenter: List<JournalfoertDokumentReference>,
+        journalfoerteDokumenter: Set<JournalfoertDokumentReference>,
         behandlingId: UUID,
         innloggetIdent: String,
-    ): List<DokumentUnderArbeid> {
+    ): Pair<List<DokumentUnderArbeid>, List<JournalfoertDokumentReference>> {
         val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
 
         if (parentDocument.erMarkertFerdig()) {
@@ -158,42 +158,51 @@ class DokumentUnderArbeidService(
 
         val behandling = behandlingService.getBehandling(behandlingId)
 
-        val resultingDocuments = journalfoerteDokumenter.map { journalfoertDokumentReference ->
-            val journalpostInDokarkiv =
-                safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
+        val alreadyAddedDocuments = dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceIsNotNull(parentId).map {
+            JournalfoertDokumentReference(
+                journalpostId = it.journalfoertDokumentReference!!.journalpostId,
+                dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+            )
+        }.toSet()
 
-            val document = DokumentUnderArbeid(
-                mellomlagerId = null,
-                opplastet = journalpostInDokarkiv.datoOpprettet,
-                size = null,
-                name = "Hentes fra SAF",
-                dokumentType = null,
-                behandlingId = behandlingId,
-                smartEditorId = null,
-                smartEditorTemplateId = null,
-                smartEditorVersion = null,
-                parentId = parentId,
-                journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
-                    journalpostId = journalfoertDokumentReference.journalpostId,
-                    dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
+        val (toAdd, failed) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
+
+        val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
+                val journalpostInDokarkiv =
+                    safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
+
+                val document = DokumentUnderArbeid(
+                    mellomlagerId = null,
+                    opplastet = journalpostInDokarkiv.datoOpprettet,
+                    size = null,
+                    name = "Hentes fra SAF",
+                    dokumentType = null,
+                    behandlingId = behandlingId,
+                    smartEditorId = null,
+                    smartEditorTemplateId = null,
+                    smartEditorVersion = null,
+                    parentId = parentId,
+                    journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
+                        journalpostId = journalfoertDokumentReference.journalpostId,
+                        dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
+                    )
                 )
-            )
 
-            behandling.publishEndringsloggEvent(
-                saksbehandlerident = innloggetIdent,
-                felt = Felt.JOURNALFOERT_DOKUMENT_UNDER_ARBEID_OPPRETTET,
-                fraVerdi = null,
-                tilVerdi = document.created.toString(),
-                tidspunkt = document.created,
-                dokumentId = document.id,
-            )
+                behandling.publishEndringsloggEvent(
+                    saksbehandlerident = innloggetIdent,
+                    felt = Felt.JOURNALFOERT_DOKUMENT_UNDER_ARBEID_OPPRETTET,
+                    fraVerdi = null,
+                    tilVerdi = document.created.toString(),
+                    tidspunkt = document.created,
+                    dokumentId = document.id,
+                )
 
-            dokumentUnderArbeidRepository.save(
-                document
-            )
+                dokumentUnderArbeidRepository.save(
+                    document
+                )
         }
 
-        return resultingDocuments
+        return resultingDocuments to failed
     }
 
     fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)

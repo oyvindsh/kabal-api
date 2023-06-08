@@ -5,6 +5,11 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import java.time.LocalDateTime
 import java.util.*
 
+data class JournalfoerteDokumenterResponse(
+    val addedJournalfoerteDokumenter: List<DokumentView>,
+    val failedJournalfoerteDokumenter: List<JournalfoertDokumentReference>,
+)
+
 data class DokumentView(
     val id: UUID,
     val tittel: String,
