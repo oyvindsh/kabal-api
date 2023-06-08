@@ -16,7 +16,9 @@ data class DokumentView(
     val templateId: String?,
     val version: Int?,
     val isMarkertAvsluttet: Boolean,
+    //Deprecated
     val parent: UUID?,
+    val parentId: UUID?,
     val journalfoertDokumentReference: JournalfoertDokumentReference?,
 ) {
     data class JournalfoertDokumentReference (
@@ -34,5 +36,7 @@ data class SmartEditorDocumentView(
     val version: Int?,
     val templateId: String?,
     val dokumentTypeId: String,
+    //Deprecated
     val parent: UUID?,
+    val parentId: UUID?,
 )

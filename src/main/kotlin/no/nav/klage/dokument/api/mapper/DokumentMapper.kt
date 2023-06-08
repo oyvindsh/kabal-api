@@ -51,6 +51,7 @@ class DokumentMapper(
             version = dokumentUnderArbeid.smartEditorVersion,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
             parent = dokumentUnderArbeid.parentId,
+            parentId = dokumentUnderArbeid.parentId,
             type = type,
             journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference?.let {
                 DokumentView.JournalfoertDokumentReference(
@@ -72,6 +73,7 @@ class DokumentMapper(
             templateId = dokumentUnderArbeid.smartEditorTemplateId,
             version = dokumentUnderArbeid.smartEditorVersion,
             parent = dokumentUnderArbeid.parentId,
+            parentId = dokumentUnderArbeid.parentId,
             content = jacksonObjectMapper().readTree(smartEditorDocument.json),
             created = smartEditorDocument.created,
             modified = smartEditorDocument.modified,
