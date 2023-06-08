@@ -150,6 +150,12 @@ class DokumentUnderArbeidService(
         behandlingId: UUID,
         innloggetIdent: String,
     ): List<DokumentUnderArbeid> {
+        val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+
+        if (parentDocument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
+        }
+
         val behandling = behandlingService.getBehandling(behandlingId)
 
         val resultingDocuments = journalfoerteDokumenter.map { journalfoertDokumentReference ->
