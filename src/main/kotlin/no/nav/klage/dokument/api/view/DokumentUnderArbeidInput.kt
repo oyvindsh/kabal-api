@@ -29,7 +29,7 @@ data class JournalfoerteDokumenterInput(
     val journalfoerteDokumenter: Set<JournalfoertDokumentReference>,
 )
 
-class JournalfoertDokumentReference (
+data class JournalfoertDokumentReference (
     val journalpostId: String,
     val dokumentInfoId: String
 )
