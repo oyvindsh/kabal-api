@@ -2,7 +2,7 @@ package no.nav.klage.dokument.service
 
 
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
-import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.oppgave.util.Image2PDF
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.MediaType
@@ -19,7 +19,7 @@ class MellomlagerService(
         private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
     }
 
-    fun uploadDocument(dokument: MellomlagretDokument): String {
+    fun uploadDocument(dokument: FysiskDokument): String {
         return fileApiClient.uploadDocument(
             //If uploaded file is an image, convert to pdf
             bytes = image2PDF.convertIfImage(dokument.content),

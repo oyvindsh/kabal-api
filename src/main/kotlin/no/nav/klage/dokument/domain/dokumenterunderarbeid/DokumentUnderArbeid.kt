@@ -120,4 +120,18 @@ open class DokumentUnderArbeid(
         }
     }
 
+    enum class DokumentUnderArbeidType {
+        UPLOADED,
+        SMART,
+        JOURNALFOERT
+    }
+
+    fun getType(): DokumentUnderArbeidType {
+        return when {
+            smartEditorId != null -> DokumentUnderArbeidType.SMART
+            journalfoertDokumentReference != null -> DokumentUnderArbeidType.JOURNALFOERT
+            else -> DokumentUnderArbeidType.UPLOADED
+        }
+    }
+
 }

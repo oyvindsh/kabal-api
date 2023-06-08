@@ -5,8 +5,8 @@ import no.nav.klage.dokument.api.view.DocumentValidationResponse
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
-import no.nav.klage.dokument.domain.MellomlagretDokument
-import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
+import no.nav.klage.dokument.domain.FysiskDokument
+import no.nav.klage.dokument.domain.PDFDocument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJournalpostId
 import no.nav.klage.dokument.exceptions.DokumentValidationException
@@ -25,6 +25,7 @@ import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.service.BehandlingService
+import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.context.ApplicationEventPublisher
@@ -46,6 +47,7 @@ class DokumentUnderArbeidService(
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val safClient: SafGraphQlClient,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val dokumentService: DokumentService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -56,7 +58,7 @@ class DokumentUnderArbeidService(
     fun opprettOgMellomlagreNyttHoveddokument(
         behandlingId: UUID,
         dokumentType: DokumentType,
-        opplastetFil: MellomlagretDokument?,
+        opplastetFil: FysiskDokument?,
         innloggetIdent: String,
         tittel: String,
     ): DokumentUnderArbeid {
@@ -151,7 +153,8 @@ class DokumentUnderArbeidService(
         val behandling = behandlingService.getBehandling(behandlingId)
 
         val resultingDocuments = journalfoerteDokumenter.map { journalfoertDokumentReference ->
-            val journalpostInDokarkiv = safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
+            val journalpostInDokarkiv =
+                safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
 
             val document = DokumentUnderArbeid(
                 mellomlagerId = null,
@@ -463,24 +466,46 @@ class DokumentUnderArbeidService(
     }
 
 
-    fun hentOgMellomlagreDokument(
+    fun getFysiskDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
         innloggetIdent: String
-    ): MellomlagretDokument {
+    ): FysiskDokument {
         val dokument =
             dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(dokument.behandlingId)
 
-        if (dokument.isStaleSmartEditorDokument()) {
-            mellomlagreNyVersjonAvSmartEditorDokument(dokument)
+        val (content, title) = when (dokument.getType()) {
+            DokumentUnderArbeid.DokumentUnderArbeidType.UPLOADED -> {
+                mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!) to dokument.name
+            }
+
+            DokumentUnderArbeid.DokumentUnderArbeidType.SMART -> {
+                if (dokument.isStaleSmartEditorDokument()) {
+                    mellomlagreNyVersjonAvSmartEditorDokument(dokument).bytes to dokument.name
+                } else mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!) to dokument.name
+            }
+
+            DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT -> {
+                val journalpostInDokarkiv =
+                    safClient.getJournalpostAsSaksbehandler(dokument.journalfoertDokumentReference!!.journalpostId)
+
+                val dokumentInDokarkiv =
+                    journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokument.journalfoertDokumentReference.dokumentInfoId }
+                        ?: throw RuntimeException("Document not found in Dokarkiv")
+
+                dokumentService.getArkivertDokument(
+                    journalpostId = dokument.journalfoertDokumentReference.journalpostId,
+                    dokumentInfoId = dokument.journalfoertDokumentReference.dokumentInfoId,
+                ).bytes to (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF")
+            }
         }
 
-        return OpplastetMellomlagretDokument(
-            title = dokument.name,
-            content = mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!),
+        return FysiskDokument(
+            title = title,
+            content = content,
             contentType = MediaType.APPLICATION_PDF
         )
     }
@@ -634,7 +659,7 @@ class DokumentUnderArbeidService(
         if (hovedDokument.smartEditorId != null) {
             try {
                 smartEditorApiGateway.deleteDocumentAsSystemUser(hovedDokument.smartEditorId!!)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 logger.warn("Couldn't delete hoveddokument from smartEditorApi", e)
             }
         }
@@ -643,7 +668,7 @@ class DokumentUnderArbeidService(
             it.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
             try {
                 smartEditorApiGateway.deleteDocumentAsSystemUser(it.smartEditorId!!)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 logger.warn("Couldn't delete vedlegg from smartEditorApi", e)
             }
         }
@@ -669,7 +694,7 @@ class DokumentUnderArbeidService(
             ?: throw DokumentValidationException("$dokumentId er ikke et smarteditor dokument")
     }
 
-    private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid) {
+    private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid): PDFDocument {
         val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
         val pdfDocument = kabalJsonToPdfClient.getPDFDocument(documentJson)
         val mellomlagerId =
@@ -685,6 +710,8 @@ class DokumentUnderArbeidService(
         dokument.mellomlagerId = mellomlagerId
         dokument.size = pdfDocument.bytes.size.toLong()
         dokument.opplastet = LocalDateTime.now()
+
+        return pdfDocument
     }
 
     private fun DokumentUnderArbeid.isStaleSmartEditorDokument() =

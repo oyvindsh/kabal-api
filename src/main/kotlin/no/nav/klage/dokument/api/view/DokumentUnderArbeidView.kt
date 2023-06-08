@@ -1,6 +1,7 @@
 package no.nav.klage.dokument.api.view
 
 import com.fasterxml.jackson.databind.JsonNode
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import java.time.LocalDateTime
 import java.util.*
 
@@ -10,18 +11,18 @@ data class DokumentView(
     val dokumentTypeId: String?,
     val opplastet: LocalDateTime?,
     val created: LocalDateTime,
-    val type: DokumentUnderArbeidType,
+    val type: DokumentUnderArbeid.DokumentUnderArbeidType,
     val isSmartDokument: Boolean,
     val templateId: String?,
     val version: Int?,
     val isMarkertAvsluttet: Boolean,
     val parent: UUID?,
+    val journalfoertDokumentReference: JournalfoertDokumentReference?,
 ) {
-    enum class DokumentUnderArbeidType {
-        UPLOADED,
-        SMART,
-        JOURNALFOERT
-    }
+    data class JournalfoertDokumentReference (
+        val journalpostId: String,
+        val dokumentInfoId: String,
+    )
 }
 
 data class SmartEditorDocumentView(

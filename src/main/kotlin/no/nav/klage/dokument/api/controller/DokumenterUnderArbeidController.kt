@@ -101,7 +101,7 @@ class DokumentUnderArbeidController(
     ): ResponseEntity<ByteArray> {
         logger.debug("Kall mottatt på getPdf for $dokumentId")
         return dokumentMapper.mapToByteArray(
-            dokumentUnderArbeidService.hentOgMellomlagreDokument(
+            dokumentUnderArbeidService.getFysiskDokument(
                 behandlingId = behandlingId,
                 dokumentId = dokumentId,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()

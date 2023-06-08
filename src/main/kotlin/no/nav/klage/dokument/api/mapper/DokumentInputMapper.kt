@@ -1,7 +1,6 @@
 package no.nav.klage.dokument.api.mapper
 
-import no.nav.klage.dokument.domain.MellomlagretDokument
-import no.nav.klage.dokument.domain.OpplastetMellomlagretDokument
+import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.util.getLogger
 import org.apache.tika.Tika
@@ -21,10 +20,10 @@ class DokumentInputMapper {
         multipartFile: MultipartFile,
         tittel: String?,
         dokumentType: DokumentType
-    ): MellomlagretDokument {
+    ): FysiskDokument {
         val dokumentTittel =
             tittel ?: (dokumentType.defaultFilnavn.also { logger.warn("Filnavn ikke angitt i MultipartFile") })
-        return OpplastetMellomlagretDokument(
+        return FysiskDokument(
             title = dokumentTittel,
             content = multipartFile.bytes,
             contentType = multipartFile.contentType?.let { MediaType.parseMediaType(it) }

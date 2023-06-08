@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
-import no.nav.klage.dokument.domain.MellomlagretDokument
+import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import org.springframework.http.HttpHeaders
@@ -17,19 +17,19 @@ class DokumentMapper(
     private val safClient: SafGraphQlClient
 ) {
 
-    fun mapToByteArray(mellomlagretDokument: MellomlagretDokument): ResponseEntity<ByteArray> =
+    fun mapToByteArray(fysiskDokument: FysiskDokument): ResponseEntity<ByteArray> =
         ResponseEntity(
-            mellomlagretDokument.content,
+            fysiskDokument.content,
             HttpHeaders().apply {
-                contentType = mellomlagretDokument.contentType
-                add("Content-Disposition", "inline; filename=${mellomlagretDokument.title}")
+                contentType = fysiskDokument.contentType
+                add("Content-Disposition", "inline; filename=${fysiskDokument.title}")
             },
             HttpStatus.OK
         )
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
-        val type = getType(dokumentUnderArbeid)
-        val tittel = if (type == DokumentView.DokumentUnderArbeidType.JOURNALFOERT) {
+        val type = dokumentUnderArbeid.getType()
+        val tittel = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
 
@@ -51,16 +51,14 @@ class DokumentMapper(
             version = dokumentUnderArbeid.smartEditorVersion,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
             parent = dokumentUnderArbeid.parentId,
-            type = type
+            type = type,
+            journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference?.let {
+                DokumentView.JournalfoertDokumentReference(
+                    journalpostId = it.journalpostId,
+                    dokumentInfoId = it.dokumentInfoId
+                )
+            }
         )
-    }
-
-    private fun getType(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView.DokumentUnderArbeidType {
-        return when {
-            dokumentUnderArbeid.smartEditorId != null -> DokumentView.DokumentUnderArbeidType.SMART
-            dokumentUnderArbeid.journalfoertDokumentReference != null -> DokumentView.DokumentUnderArbeidType.JOURNALFOERT
-            else -> DokumentView.DokumentUnderArbeidType.UPLOADED
-        }
     }
 
     fun mapToSmartEditorDocumentView(
