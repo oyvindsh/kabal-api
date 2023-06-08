@@ -69,7 +69,7 @@ class DokumentUnderArbeidController(
         @RequestBody input: JournalfoerteDokumenterInput
     ): JournalfoerteDokumenterResponse {
         logger.debug("Kall mottatt på addJournalfoerteDokumenterAsVedlegg")
-        val (added, failed) = dokumentUnderArbeidService.createJournalfoerteDokumenter(
+        val (added, duplicates) = dokumentUnderArbeidService.createJournalfoerteDokumenter(
             parentId = input.parentId,
             journalfoerteDokumenter = input.journalfoerteDokumenter,
             behandlingId = behandlingId,
@@ -78,7 +78,7 @@ class DokumentUnderArbeidController(
 
         return JournalfoerteDokumenterResponse(
             addedJournalfoerteDokumenter = added.map { dokumentMapper.mapToDokumentView(it) },
-            failedJournalfoerteDokumenter = failed
+            duplicateJournalfoerteDokumenter = duplicates
         )
     }
 

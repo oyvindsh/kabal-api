@@ -165,7 +165,7 @@ class DokumentUnderArbeidService(
             )
         }.toSet()
 
-        val (toAdd, failed) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
+        val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
                 val journalpostInDokarkiv =
@@ -202,7 +202,7 @@ class DokumentUnderArbeidService(
                 )
         }
 
-        return resultingDocuments to failed
+        return resultingDocuments to duplicates
     }
 
     fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)

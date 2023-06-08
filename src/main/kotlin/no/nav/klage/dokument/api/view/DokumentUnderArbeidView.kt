@@ -7,7 +7,7 @@ import java.util.*
 
 data class JournalfoerteDokumenterResponse(
     val addedJournalfoerteDokumenter: List<DokumentView>,
-    val failedJournalfoerteDokumenter: List<JournalfoertDokumentReference>,
+    val duplicateJournalfoerteDokumenter: List<JournalfoertDokumentReference>,
 )
 
 data class DokumentView(
