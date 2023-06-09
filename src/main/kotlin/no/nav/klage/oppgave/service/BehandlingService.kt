@@ -76,6 +76,13 @@ class BehandlingService(
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateBehandlingBeforeFinalize(behandling)
 
+        //Clean up sattPaaVent
+        setSattPaaVent(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = innloggetIdent,
+            sattPaaVent = null
+        )
+
         //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
         return markerBehandlingSomAvsluttetAvSaksbehandler(behandling, innloggetIdent)
     }
