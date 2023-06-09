@@ -12,6 +12,7 @@ import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.DocumentToMerge
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.exceptions.DocumentsToMergeReferenceNotFoundException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.DocumentToMergeRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -183,11 +184,12 @@ class DokumentService(
         val referenceId = UUID.randomUUID()
 
         documentToMergeRepository.saveAll(
-            documents.map {
+            documents.mapIndexed { index, it ->
                 DocumentToMerge(
                     referenceId = referenceId,
                     journalpostId = it.journalpostId,
                     dokumentInfoId = it.dokumentInfoId,
+                    index = index,
                     created = LocalDateTime.now(),
                 )
         })
@@ -196,7 +198,12 @@ class DokumentService(
     }
 
     fun mergeDocuments(referenceId: UUID): ByteArray {
-        val documentsToMerge = documentToMergeRepository.findByReferenceId(referenceId)
+        val documentsToMerge = documentToMergeRepository.findByReferenceIdOrderByIndex(referenceId)
+
+        if (documentsToMerge.isEmpty()) {
+            throw DocumentsToMergeReferenceNotFoundException("referenceId $referenceId not found")
+        }
+
         return mergeDocuments(documentsToMerge.map {
             safRestClient.getDokument(
                 journalpostId = it.journalpostId,

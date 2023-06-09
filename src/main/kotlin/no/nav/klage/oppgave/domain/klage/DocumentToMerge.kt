@@ -18,6 +18,8 @@ class DocumentToMerge(
     val journalpostId: String,
     @Column(name = "dokument_info_id")
     val dokumentInfoId: String,
+    @Column(name = "index")
+    val index: Int,
     @Column(name = "created")
     val created: LocalDateTime,
 ) {
@@ -38,7 +40,8 @@ class DocumentToMerge(
     }
 
     override fun toString(): String {
-        return "DocumentToMerge(id=$id, referenceId=$referenceId, journalpostId='$journalpostId', dokumentInfoId='$dokumentInfoId', created=$created)"
+        return "DocumentToMerge(id=$id, referenceId=$referenceId, journalpostId='$journalpostId', dokumentInfoId='$dokumentInfoId', index=$index, created=$created)"
     }
+
 
 }

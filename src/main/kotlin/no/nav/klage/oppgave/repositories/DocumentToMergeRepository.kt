@@ -8,6 +8,6 @@ import java.util.*
 @Repository
 interface DocumentToMergeRepository : JpaRepository<DocumentToMerge, UUID> {
 
-    fun findByReferenceId(referenceId: UUID): Set<DocumentToMerge>
+    fun findByReferenceIdOrderByIndex(referenceId: UUID): Set<DocumentToMerge>
 
 }

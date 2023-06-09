@@ -115,6 +115,13 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
+    fun handleDocumentsToMergeReferenceNotFoundException(
+        ex: DocumentsToMergeReferenceNotFoundException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.NOT_FOUND, ex)
+
+    @ExceptionHandler
     fun handleValidationException(
         ex: ValidationException,
         request: NativeWebRequest

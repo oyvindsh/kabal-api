@@ -74,3 +74,5 @@ class PDLPersonNotFoundException(msg: String) : RuntimeException(msg)
 class EREGOrganizationNotFoundException(msg: String) : RuntimeException(msg)
 
 class AttachmentCouldNotBeConvertedException(override val message: String = "FILE_COULD_NOT_BE_CONVERTED") : RuntimeException()
+
+class DocumentsToMergeReferenceNotFoundException(msg: String) : RuntimeException(msg)
