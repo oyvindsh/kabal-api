@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.oppgave.api.view.UpdateDocumentTitleView
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -13,6 +14,7 @@ import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -88,6 +90,28 @@ class JournalpostController(
         responseHeaders.add("Content-Disposition", "inline")
         return ResponseEntity(
             arkivertDokument.bytes,
+            responseHeaders,
+            HttpStatus.OK
+        )
+    }
+
+    @PostMapping("/mergedocuments")
+    fun setDocumentsToMerge(
+        @RequestBody documents: List<JournalfoertDokumentReference>
+    ): UUID {
+        return dokumentService.storeDocumentsForMerging(documents)
+    }
+
+    @GetMapping("/mergedocuments/{referenceId}")
+    fun getMergedDocuments(
+        @PathVariable referenceId: UUID
+    ): ResponseEntity<ByteArray> {
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add("Content-Disposition", "inline")
+
+        return ResponseEntity(
+            dokumentService.mergeDocuments(referenceId),
             responseHeaders,
             HttpStatus.OK
         )

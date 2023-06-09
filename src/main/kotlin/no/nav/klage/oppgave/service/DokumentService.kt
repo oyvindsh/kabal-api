@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
@@ -8,19 +9,28 @@ import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.DocumentToMerge
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
+import no.nav.klage.oppgave.repositories.DocumentToMergeRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.time.LocalDateTime
+import java.util.*
 
 @Service
 @Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
-    private val safRestClient: SafRestClient
+    private val safRestClient: SafRestClient,
+    private val documentToMergeRepository: DocumentToMergeRepository,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -168,6 +178,52 @@ class DokumentService(
     private fun createSaksdokument(journalpostId: String) =
         fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
+
+    fun storeDocumentsForMerging(documents: List<JournalfoertDokumentReference>): UUID {
+        val referenceId = UUID.randomUUID()
+
+        documentToMergeRepository.saveAll(
+            documents.map {
+                DocumentToMerge(
+                    referenceId = referenceId,
+                    journalpostId = it.journalpostId,
+                    dokumentInfoId = it.dokumentInfoId,
+                    created = LocalDateTime.now(),
+                )
+        })
+
+        return referenceId
+    }
+
+    fun mergeDocuments(referenceId: UUID): ByteArray {
+        val documentsToMerge = documentToMergeRepository.findByReferenceId(referenceId)
+        return mergeDocuments(documentsToMerge.map {
+            safRestClient.getDokument(
+                journalpostId = it.journalpostId,
+                dokumentInfoId = it.dokumentInfoId,
+            ).bytes
+        }).also {
+            try {
+                documentToMergeRepository.deleteAll(documentsToMerge)
+            } catch (e: Exception) {
+                logger.warn("couldn't delete merged documents with referenceId $referenceId", e)
+            }
+        }
+    }
+
+    private fun mergeDocuments(documents: List<ByteArray>): ByteArray {
+        val merger = PDFMergerUtility()
+        val outputStream = ByteArrayOutputStream()
+        merger.destinationStream = outputStream
+
+        documents.forEach {
+            merger.addSource(ByteArrayInputStream(it))
+        }
+
+        merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly())
+
+        return outputStream.toByteArray()
+    }
 }
 
 class DokumentMapper {
