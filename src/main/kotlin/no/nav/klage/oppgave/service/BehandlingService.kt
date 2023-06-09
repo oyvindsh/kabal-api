@@ -76,13 +76,6 @@ class BehandlingService(
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateBehandlingBeforeFinalize(behandling)
 
-        //Clean up sattPaaVent
-        setSattPaaVent(
-            behandlingId = behandlingId,
-            utfoerendeSaksbehandlerIdent = innloggetIdent,
-            sattPaaVent = null
-        )
-
         //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
         return markerBehandlingSomAvsluttetAvSaksbehandler(behandling, innloggetIdent)
     }
@@ -288,8 +281,12 @@ class BehandlingService(
         behandlingId: UUID,
         utfoerendeSaksbehandlerIdent: String,
         sattPaaVent: SattPaaVent?,
+        systemUserContext: Boolean = false
     ): LocalDateTime {
-        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
+        val behandling = getBehandlingForUpdate(
+            behandlingId = behandlingId,
+            systemUserContext = systemUserContext
+        )
         val event =
             behandling.setSattPaaVent(
                 sattPaaVent,

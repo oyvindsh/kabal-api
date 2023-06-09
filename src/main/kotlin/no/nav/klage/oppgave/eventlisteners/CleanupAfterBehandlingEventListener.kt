@@ -19,6 +19,7 @@ import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.repositories.MeldingRepository
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.event.EventListener
@@ -33,7 +34,8 @@ class CleanupAfterBehandlingEventListener(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val ankebehandlingRepository: AnkebehandlingRepository,
-    private val fssProxyClient: KlageFssProxyClient
+    private val fssProxyClient: KlageFssProxyClient,
+    private val behandlingService: BehandlingService,
 ) {
 
     companion object {
@@ -48,6 +50,16 @@ class CleanupAfterBehandlingEventListener(
     @EventListener
     fun cleanupAfterBehandling(behandlingEndretEvent: BehandlingEndretEvent) {
         val behandling = behandlingEndretEvent.behandling
+
+        if (behandling.sattPaaVent != null) {
+            behandlingService.setSattPaaVent(
+                behandlingId = behandling.id,
+                utfoerendeSaksbehandlerIdent = "SYSTEM",
+                sattPaaVent = null,
+                systemUserContext = true,
+            )
+        }
+
         if (behandling.isAvsluttet()) {
             logger.debug("Received behandlingEndretEvent for avsluttet behandling. Deleting meldinger.")
 
