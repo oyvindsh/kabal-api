@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
+import no.nav.klage.oppgave.api.view.ReferenceToMergedDocumentsResponse
 import no.nav.klage.oppgave.api.view.UpdateDocumentTitleView
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -12,12 +13,15 @@ import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.core.io.InputStreamResource
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import kotlin.io.path.inputStream
 
 @RestController
 @Tag(name = "kabal-api")
@@ -98,22 +102,22 @@ class JournalpostController(
     @PostMapping("/mergedocuments")
     fun setDocumentsToMerge(
         @RequestBody documents: List<JournalfoertDokumentReference>
-    ): UUID {
-        return dokumentService.storeDocumentsForMerging(documents)
+    ): ReferenceToMergedDocumentsResponse {
+        return ReferenceToMergedDocumentsResponse(reference = dokumentService.storeDocumentsForMerging(documents))
     }
 
     @GetMapping("/mergedocuments/{referenceId}")
     fun getMergedDocuments(
         @PathVariable referenceId: UUID
-    ): ResponseEntity<ByteArray> {
+    ): ResponseEntity<Resource> {
+        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.APPLICATION_PDF
-        responseHeaders.add("Content-Disposition", "inline")
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
 
-        return ResponseEntity(
-            dokumentService.mergeDocuments(referenceId),
-            responseHeaders,
-            HttpStatus.OK
-        )
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(pathToMergedDocument.toFile().length())
+            .body(InputStreamResource(pathToMergedDocument.inputStream()))
     }
 }
