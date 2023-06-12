@@ -142,18 +142,32 @@ class DokumentUnderArbeidController(
                     innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
                 )
             } else {
-                dokumentUnderArbeidService.kobleVedlegg(
-                    behandlingId = behandlingId,
-                    dokumentId = input.dokumentId,
-                    dokumentIdHovedDokumentSomSkalBliVedlegg = persistentDokumentId,
+                dokumentUnderArbeidService.setParentDocument(
+                    parentId = input.dokumentId,
+                    vedleggIdList = listOf(persistentDokumentId),
                     innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-                )
+                ).first()
             }
             return dokumentMapper.mapToDokumentView(hovedDokument)
         } catch (e: Exception) {
             logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
             throw e
         }
+    }
+
+    @PutMapping("/{parentId}/vedlegg")
+    fun addMultipleVedleggToParent(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("parentId") parentId: UUID,
+        @RequestBody input: DokumentIdListInput
+    ): List<DokumentView> {
+        logger.debug("Kall mottatt på addMultipleVedleggToParent for parent $parentId")
+
+        return dokumentUnderArbeidService.setParentDocument(
+            parentId = parentId,
+            vedleggIdList = input.dokumentIdList,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @GetMapping

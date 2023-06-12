@@ -1,6 +1,7 @@
 package no.nav.klage.dokument.repositories
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -19,6 +20,8 @@ interface DokumentUnderArbeidRepository : JpaRepository<DokumentUnderArbeid, UUI
     fun findByParentIdOrderByCreated(dokumentId: UUID): SortedSet<DokumentUnderArbeid>
 
     fun findByParentIdAndJournalfoertDokumentReferenceIsNotNull(dokumentId: UUID): Set<DokumentUnderArbeid>
+
+    fun findByParentIdAndJournalfoertDokumentReference(parentId: UUID, journalfoertDokumentReference: JournalfoertDokumentReference): List<DokumentUnderArbeid>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<DokumentUnderArbeid>
 
