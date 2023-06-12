@@ -134,80 +134,33 @@ class DokumentUnderArbeidController(
         @RequestBody input: OptionalPersistentDokumentIdInput
     ): DokumentViewWithList {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
-        try {
-            //TODO: Format is temporary, testing purposes.
+        try {            
             return if (input.dokumentId == null) {
-                val dokumentView =
-                    dokumentMapper.mapToDokumentView(
-                        dokumentUnderArbeidService.frikobleVedlegg(
-                            behandlingId = behandlingId,
-                            dokumentId = persistentDokumentId,
-                            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-                        )
-                    )
-                DokumentViewWithList(
-                    id = dokumentView.id,
-                    tittel = dokumentView.tittel,
-                    dokumentTypeId = dokumentView.dokumentTypeId,
-                    opplastet = dokumentView.opplastet,
-                    newOpplastet = dokumentView.newOpplastet,
-                    created = dokumentView.created,
-                    type = dokumentView.type,
-                    isSmartDokument = dokumentView.isSmartDokument,
-                    templateId = dokumentView.templateId,
-                    version = dokumentView.version,
-                    isMarkertAvsluttet = dokumentView.isMarkertAvsluttet,
-                    parent = dokumentView.parent,
-                    parentId = dokumentView.parentId,
-                    journalfoertDokumentReference = dokumentView.journalfoertDokumentReference,
-                    alteredDocuments = listOf(dokumentView)
-                )
+                dokumentMapper.mapToDokumentListView(
+                    dokumentUnderArbeidList = listOf(dokumentUnderArbeidService.frikobleVedlegg(
+                        behandlingId = behandlingId,
+                        dokumentId = persistentDokumentId,
+                        innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                    )),
+                    duplicateJournalfoerteDokumenter = emptyList()
+                )                
             } else {
-                val results =
+                val (alteredDocuments, duplicateJournalfoerteDokumenter) =
                     dokumentUnderArbeidService.setParentDocument(
                         parentId = input.dokumentId,
                         vedleggId = persistentDokumentId,
                         innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
                     )
 
-                val firstResultMapped = dokumentMapper.mapToDokumentView(results.first())
-                DokumentViewWithList(
-                    id = firstResultMapped.id,
-                    tittel = firstResultMapped.tittel,
-                    dokumentTypeId = firstResultMapped.dokumentTypeId,
-                    opplastet = firstResultMapped.opplastet,
-                    newOpplastet = firstResultMapped.newOpplastet,
-                    created = firstResultMapped.created,
-                    type = firstResultMapped.type,
-                    isSmartDokument = firstResultMapped.isSmartDokument,
-                    templateId = firstResultMapped.templateId,
-                    version = firstResultMapped.version,
-                    isMarkertAvsluttet = firstResultMapped.isMarkertAvsluttet,
-                    parent = firstResultMapped.parent,
-                    parentId = firstResultMapped.parentId,
-                    journalfoertDokumentReference = firstResultMapped.journalfoertDokumentReference,
-                    alteredDocuments = results.map { dokumentMapper.mapToDokumentView(it) }
-                )
+                return dokumentMapper.mapToDokumentListView(
+                    dokumentUnderArbeidList = alteredDocuments,
+                    duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter
+                )                
             }
         } catch (e: Exception) {
             logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
             throw e
         }
-    }
-
-    @PutMapping("/{parentId}/vedlegg")
-    fun addMultipleVedleggToParent(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @PathVariable("parentId") parentId: UUID,
-        @RequestBody input: DokumentIdListInput
-    ): List<DokumentView> {
-        logger.debug("Kall mottatt på addMultipleVedleggToParent for parent $parentId")
-
-        return dokumentUnderArbeidService.setParentDocument(
-            parentId = parentId,
-            vedleggId = input.dokumentIdList.first(),
-            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        ).map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @GetMapping

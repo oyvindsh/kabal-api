@@ -49,7 +49,10 @@ data class DokumentViewWithList(
     val parent: UUID?,
     val parentId: UUID?,
     val journalfoertDokumentReference: DokumentView.JournalfoertDokumentReference?,
+
+    //TODO: Keep these two lists when FE uses new version
     val alteredDocuments: List<DokumentView>,
+    val duplicateJournalfoerteDokumenter: List<JournalfoertDokumentReference>,
 )
 
 data class SmartEditorDocumentView(

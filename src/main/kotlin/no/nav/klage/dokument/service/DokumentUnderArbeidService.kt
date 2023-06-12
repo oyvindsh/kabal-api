@@ -569,7 +569,7 @@ class DokumentUnderArbeidService(
         parentId: UUID,
         vedleggId: UUID,
         innloggetIdent: String
-    ): List<DokumentUnderArbeid> {
+    ): Pair<List<DokumentUnderArbeid>, MutableList<JournalfoertDokumentReference>> {
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
@@ -583,8 +583,9 @@ class DokumentUnderArbeidService(
         val vedleggIdList = mutableListOf<UUID>()
         vedleggIdList += vedleggId
         descendants.forEach { vedleggIdList += it.id }
+        val duplicateJournalfoerteDokumenter = mutableListOf<JournalfoertDokumentReference>()
 
-        return vedleggIdList.map { currentVedleggId ->
+        return vedleggIdList.mapNotNull { currentVedleggId ->
             val vedleggDokument =
                 dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
 
@@ -598,12 +599,24 @@ class DokumentUnderArbeidService(
                         journalfoertDokumentReference = vedleggDokument.journalfoertDokumentReference!!,
                     ).isNotEmpty()
                 ) {
-                    throw DokumentValidationException("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
+                    logger.warn("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
+                    duplicateJournalfoerteDokumenter.add(
+                        JournalfoertDokumentReference(
+                            journalpostId = vedleggDokument.journalfoertDokumentReference.journalpostId,
+                            dokumentInfoId = vedleggDokument.journalfoertDokumentReference.dokumentInfoId
+                        )
+                    )
+                    dokumentUnderArbeidRepository.deleteById(currentVedleggId)
+                    null
+                } else {
+                    vedleggDokument.parentId = parentDokument.id
+                    vedleggDokument
                 }
+            } else {
+                vedleggDokument.parentId = parentDokument.id
+                vedleggDokument
             }
-            vedleggDokument.parentId = parentDokument.id
-            vedleggDokument
-        }
+        } to duplicateJournalfoerteDokumenter
     }
 
     fun frikobleVedlegg(

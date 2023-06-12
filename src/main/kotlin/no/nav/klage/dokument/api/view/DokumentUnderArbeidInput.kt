@@ -36,8 +36,6 @@ data class JournalfoertDokumentReference (
 
 data class OptionalPersistentDokumentIdInput(val dokumentId: UUID?)
 
-data class DokumentIdListInput(val dokumentIdList: List<UUID>)
-
 data class DokumentTitleInput(val title: String)
 
 data class DokumentTypeInput(val dokumentTypeId: String)
