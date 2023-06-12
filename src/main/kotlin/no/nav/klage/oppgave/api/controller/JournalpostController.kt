@@ -15,7 +15,7 @@ import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.apache.commons.io.IOUtils
 import org.springframework.core.io.ByteArrayResource
-import org.springframework.core.io.InputStreamResource
+import org.springframework.core.io.PathResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -120,7 +120,7 @@ class JournalpostController(
         return ResponseEntity.ok()
             .headers(responseHeaders)
             .contentLength(pathToMergedDocument.toFile().length())
-            .body(InputStreamResource(pathToMergedDocument.inputStream()))
+            .body(PathResource(pathToMergedDocument))
     }
 
     @GetMapping("/mergedocuments_bytearray/{referenceId}")
