@@ -569,7 +569,7 @@ class DokumentUnderArbeidService(
         parentId: UUID,
         vedleggId: UUID,
         innloggetIdent: String
-    ): Pair<List<DokumentUnderArbeid>, MutableList<JournalfoertDokumentReference>> {
+    ): Pair<List<DokumentUnderArbeid>, MutableSet<JournalfoertDokumentReference>> {
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
@@ -580,12 +580,12 @@ class DokumentUnderArbeidService(
 
         val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(vedleggId)
 
-        val vedleggIdList = mutableListOf<UUID>()
-        vedleggIdList += vedleggId
-        descendants.forEach { vedleggIdList += it.id }
-        val duplicateJournalfoerteDokumenter = mutableListOf<JournalfoertDokumentReference>()
+        val vedleggIdSet = mutableSetOf<UUID>()
+        vedleggIdSet += vedleggId
+        descendants.forEach { vedleggIdSet += it.id }
+        val duplicateJournalfoerteDokumenter = mutableSetOf<JournalfoertDokumentReference>()
 
-        return vedleggIdList.mapNotNull { currentVedleggId ->
+        return vedleggIdSet.mapNotNull { currentVedleggId ->
             val vedleggDokument =
                 dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
 

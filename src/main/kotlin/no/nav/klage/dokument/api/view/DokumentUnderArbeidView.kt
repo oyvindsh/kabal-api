@@ -51,8 +51,8 @@ data class DokumentViewWithList(
     val journalfoertDokumentReference: DokumentView.JournalfoertDokumentReference?,
 
     //TODO: Keep these two lists when FE uses new version
-    val alteredDocuments: List<DokumentView>,
-    val duplicateJournalfoerteDokumenter: List<JournalfoertDokumentReference>,
+    val alteredDocuments: Set<DokumentView>,
+    val duplicateJournalfoerteDokumenter: Set<JournalfoertDokumentReference>,
 )
 
 data class SmartEditorDocumentView(

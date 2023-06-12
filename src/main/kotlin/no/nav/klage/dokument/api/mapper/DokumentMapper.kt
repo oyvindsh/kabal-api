@@ -67,7 +67,7 @@ class DokumentMapper(
 
     fun mapToDokumentListView(
         dokumentUnderArbeidList: List<DokumentUnderArbeid>,
-        duplicateJournalfoerteDokumenter: List<JournalfoertDokumentReference>
+        duplicateJournalfoerteDokumenter: Set<JournalfoertDokumentReference>
     ): DokumentViewWithList {
         val firstDokumentView = mapToDokumentView(dokumentUnderArbeidList.first())
 
@@ -86,7 +86,7 @@ class DokumentMapper(
             parent = firstDokumentView.parent,
             parentId = firstDokumentView.parentId,
             journalfoertDokumentReference = firstDokumentView.journalfoertDokumentReference,
-            alteredDocuments = dokumentUnderArbeidList.map { mapToDokumentView(it) },
+            alteredDocuments = dokumentUnderArbeidList.map { mapToDokumentView(it) }.toSet(),
             duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter,
         )
     }
