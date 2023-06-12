@@ -132,23 +132,63 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @RequestBody input: OptionalPersistentDokumentIdInput
-    ): DokumentView {
+    ): DokumentViewWithList {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
         try {
-            val hovedDokument = if (input.dokumentId == null) {
-                dokumentUnderArbeidService.frikobleVedlegg(
-                    behandlingId = behandlingId,
-                    dokumentId = persistentDokumentId,
-                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            //TODO: Format is temporary, testing purposes.
+            return if (input.dokumentId == null) {
+                val dokumentView =
+                    dokumentMapper.mapToDokumentView(
+                        dokumentUnderArbeidService.frikobleVedlegg(
+                            behandlingId = behandlingId,
+                            dokumentId = persistentDokumentId,
+                            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                        )
+                    )
+                DokumentViewWithList(
+                    id = dokumentView.id,
+                    tittel = dokumentView.tittel,
+                    dokumentTypeId = dokumentView.dokumentTypeId,
+                    opplastet = dokumentView.opplastet,
+                    newOpplastet = dokumentView.newOpplastet,
+                    created = dokumentView.created,
+                    type = dokumentView.type,
+                    isSmartDokument = dokumentView.isSmartDokument,
+                    templateId = dokumentView.templateId,
+                    version = dokumentView.version,
+                    isMarkertAvsluttet = dokumentView.isMarkertAvsluttet,
+                    parent = dokumentView.parent,
+                    parentId = dokumentView.parentId,
+                    journalfoertDokumentReference = dokumentView.journalfoertDokumentReference,
+                    alteredDocuments = listOf(dokumentView)
                 )
             } else {
-                dokumentUnderArbeidService.setParentDocument(
-                    parentId = input.dokumentId,
-                    vedleggIdList = listOf(persistentDokumentId),
-                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-                ).first()
+                val results =
+                    dokumentUnderArbeidService.setParentDocument(
+                        parentId = input.dokumentId,
+                        vedleggId = persistentDokumentId,
+                        innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                    )
+
+                val firstResultMapped = dokumentMapper.mapToDokumentView(results.first())
+                DokumentViewWithList(
+                    id = firstResultMapped.id,
+                    tittel = firstResultMapped.tittel,
+                    dokumentTypeId = firstResultMapped.dokumentTypeId,
+                    opplastet = firstResultMapped.opplastet,
+                    newOpplastet = firstResultMapped.newOpplastet,
+                    created = firstResultMapped.created,
+                    type = firstResultMapped.type,
+                    isSmartDokument = firstResultMapped.isSmartDokument,
+                    templateId = firstResultMapped.templateId,
+                    version = firstResultMapped.version,
+                    isMarkertAvsluttet = firstResultMapped.isMarkertAvsluttet,
+                    parent = firstResultMapped.parent,
+                    parentId = firstResultMapped.parentId,
+                    journalfoertDokumentReference = firstResultMapped.journalfoertDokumentReference,
+                    alteredDocuments = results.map { dokumentMapper.mapToDokumentView(it) }
+                )
             }
-            return dokumentMapper.mapToDokumentView(hovedDokument)
         } catch (e: Exception) {
             logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
             throw e
@@ -165,7 +205,7 @@ class DokumentUnderArbeidController(
 
         return dokumentUnderArbeidService.setParentDocument(
             parentId = parentId,
-            vedleggIdList = input.dokumentIdList,
+            vedleggId = input.dokumentIdList.first(),
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).map { dokumentMapper.mapToDokumentView(it) }
     }

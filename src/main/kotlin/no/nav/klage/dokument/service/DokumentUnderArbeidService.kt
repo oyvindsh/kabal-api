@@ -567,21 +567,26 @@ class DokumentUnderArbeidService(
 
     fun setParentDocument(
         parentId: UUID,
-        vedleggIdList: List<UUID>,
+        vedleggId: UUID,
         innloggetIdent: String
     ): List<DokumentUnderArbeid> {
-        return vedleggIdList.map { vedleggId ->
-            val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+        val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+        //Sjekker tilgang på behandlingsnivå:
+        behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
 
-            //Sjekker tilgang på behandlingsnivå:
-            behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
+        if (parentDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
+        }
 
-            if (parentDokument.erMarkertFerdig()) {
-                throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
-            }
+        val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(vedleggId)
 
+        val vedleggIdList = mutableListOf<UUID>()
+        vedleggIdList += vedleggId
+        descendants.forEach { vedleggIdList += it.id }
+
+        return vedleggIdList.map { currentVedleggId ->
             val vedleggDokument =
-                dokumentUnderArbeidRepository.getReferenceById(vedleggId)
+                dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
 
             if (vedleggDokument.erMarkertFerdig()) {
                 throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
@@ -595,12 +600,6 @@ class DokumentUnderArbeidService(
                 ) {
                     throw DokumentValidationException("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
                 }
-            }
-
-            val vedlegg =
-                dokumentUnderArbeidRepository.findByParentIdOrderByCreated(vedleggDokument.id)
-            if (vedlegg.isNotEmpty()) {
-                throw DokumentValidationException("Et dokument som selv har vedlegg kan ikke bli et vedlegg")
             }
             vedleggDokument.parentId = parentDokument.id
             vedleggDokument

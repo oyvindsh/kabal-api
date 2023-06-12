@@ -33,6 +33,25 @@ data class DokumentView(
     )
 }
 
+data class DokumentViewWithList(
+    val id: UUID,
+    val tittel: String,
+    val dokumentTypeId: String?,
+    val opplastet: LocalDateTime,
+    val newOpplastet: LocalDateTime?,
+    val created: LocalDateTime,
+    val type: DokumentUnderArbeid.DokumentUnderArbeidType,
+    val isSmartDokument: Boolean,
+    val templateId: String?,
+    val version: Int?,
+    val isMarkertAvsluttet: Boolean,
+    //Deprecated
+    val parent: UUID?,
+    val parentId: UUID?,
+    val journalfoertDokumentReference: DokumentView.JournalfoertDokumentReference?,
+    val alteredDocuments: List<DokumentView>,
+)
+
 data class SmartEditorDocumentView(
     val id: UUID,
     val tittel: String,
