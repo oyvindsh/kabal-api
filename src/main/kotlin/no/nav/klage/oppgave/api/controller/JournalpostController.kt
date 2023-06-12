@@ -13,6 +13,8 @@ import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.apache.commons.io.IOUtils
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
@@ -119,5 +121,50 @@ class JournalpostController(
             .headers(responseHeaders)
             .contentLength(pathToMergedDocument.toFile().length())
             .body(InputStreamResource(pathToMergedDocument.inputStream()))
+    }
+
+    @GetMapping("/mergedocuments_bytearray/{referenceId}")
+    fun getMergedDocumentsByteArray(
+        @PathVariable referenceId: UUID
+    ): ResponseEntity<ByteArray> {
+        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
+
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(pathToMergedDocument.toFile().length())
+            .body(IOUtils.toByteArray(pathToMergedDocument.inputStream()))
+    }
+
+    @GetMapping("/mergedocuments_bytearray_resource/{referenceId}")
+    fun getMergedDocumentsByteArrayResource(
+        @PathVariable referenceId: UUID
+    ): ResponseEntity<Resource> {
+        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
+
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(pathToMergedDocument.toFile().length())
+            .body(ByteArrayResource(IOUtils.toByteArray(pathToMergedDocument.inputStream())))
+    }
+
+    @GetMapping("/mergedocuments_bytearray_inmem/{referenceId}")
+    fun getMergedDocumentsByteArrayInMem(
+        @PathVariable referenceId: UUID
+    ): ResponseEntity<ByteArray> {
+        val byteArray = dokumentService.mergeDocumentsInMem(referenceId)
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
+
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(byteArray.size.toLong())
+            .body(byteArray)
     }
 }
