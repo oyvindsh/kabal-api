@@ -158,48 +158,49 @@ class DokumentUnderArbeidService(
 
         val behandling = behandlingService.getBehandling(behandlingId)
 
-        val alreadyAddedDocuments = dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceIsNotNull(parentId).map {
-            JournalfoertDokumentReference(
-                journalpostId = it.journalfoertDokumentReference!!.journalpostId,
-                dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
-            )
-        }.toSet()
+        val alreadyAddedDocuments =
+            dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceIsNotNull(parentId).map {
+                JournalfoertDokumentReference(
+                    journalpostId = it.journalfoertDokumentReference!!.journalpostId,
+                    dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+                )
+            }.toSet()
 
         val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
-                val journalpostInDokarkiv =
-                    safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
+            val journalpostInDokarkiv =
+                safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
 
-                val document = DokumentUnderArbeid(
-                    mellomlagerId = null,
-                    opplastet = journalpostInDokarkiv.datoOpprettet,
-                    size = null,
-                    name = "Hentes fra SAF",
-                    dokumentType = null,
-                    behandlingId = behandlingId,
-                    smartEditorId = null,
-                    smartEditorTemplateId = null,
-                    smartEditorVersion = null,
-                    parentId = parentId,
-                    journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
-                        journalpostId = journalfoertDokumentReference.journalpostId,
-                        dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
-                    )
+            val document = DokumentUnderArbeid(
+                mellomlagerId = null,
+                opplastet = journalpostInDokarkiv.datoOpprettet,
+                size = null,
+                name = "Hentes fra SAF",
+                dokumentType = null,
+                behandlingId = behandlingId,
+                smartEditorId = null,
+                smartEditorTemplateId = null,
+                smartEditorVersion = null,
+                parentId = parentId,
+                journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
+                    journalpostId = journalfoertDokumentReference.journalpostId,
+                    dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
                 )
+            )
 
-                behandling.publishEndringsloggEvent(
-                    saksbehandlerident = innloggetIdent,
-                    felt = Felt.JOURNALFOERT_DOKUMENT_UNDER_ARBEID_OPPRETTET,
-                    fraVerdi = null,
-                    tilVerdi = document.created.toString(),
-                    tidspunkt = document.created,
-                    dokumentId = document.id,
-                )
+            behandling.publishEndringsloggEvent(
+                saksbehandlerident = innloggetIdent,
+                felt = Felt.JOURNALFOERT_DOKUMENT_UNDER_ARBEID_OPPRETTET,
+                fraVerdi = null,
+                tilVerdi = document.created.toString(),
+                tidspunkt = document.created,
+                dokumentId = document.id,
+            )
 
-                dokumentUnderArbeidRepository.save(
-                    document
-                )
+            dokumentUnderArbeidRepository.save(
+                document
+            )
         }
 
         return resultingDocuments to duplicates
@@ -564,36 +565,67 @@ class DokumentUnderArbeidService(
         )
     }
 
-    fun kobleVedlegg(
-        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+    fun setParentDocument(
+        parentId: UUID,
         dokumentId: UUID,
-        dokumentIdHovedDokumentSomSkalBliVedlegg: UUID,
         innloggetIdent: String
-    ): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
-
+    ): Pair<List<DokumentUnderArbeid>, List<DokumentUnderArbeid>> {
+        val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
-        behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
-        //TODO: Skal det lages endringslogg på dette??
+        behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
 
-        if (hovedDokument.erMarkertFerdig()) {
+        if (parentDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
+        }
+
+        val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(dokumentId)
+
+        val dokumentIdSet = mutableSetOf<UUID>()
+        dokumentIdSet += dokumentId
+        dokumentIdSet.addAll(descendants.map { it.id })
+
+        val processedDokumentUnderArbeidOutput = dokumentIdSet.map { currentDokumentId ->
+            setParentInDokumentUnderArbeidAndFindDuplicates(currentDokumentId, parentId)
+        }
+
+        val alteredDocuments = processedDokumentUnderArbeidOutput.mapNotNull { it.first }
+        val duplicateJournalfoerteDokumenterUnderArbeid = processedDokumentUnderArbeidOutput.mapNotNull { it.second }
+
+        duplicateJournalfoerteDokumenterUnderArbeid.forEach {
+            dokumentUnderArbeidRepository.deleteById(it.id)
+        }
+
+        return alteredDocuments to duplicateJournalfoerteDokumenterUnderArbeid
+    }
+
+    private fun setParentInDokumentUnderArbeidAndFindDuplicates(
+        currentDokumentId: UUID,
+        parentId: UUID,
+    ): Pair<DokumentUnderArbeid?, DokumentUnderArbeid?> {
+        val dokumentUnderArbeid =
+            dokumentUnderArbeidRepository.getReferenceById(currentDokumentId)
+
+        if (dokumentUnderArbeid.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
         }
 
-        val hovedDokumentSomSkalBliVedlegg =
-            dokumentUnderArbeidRepository.getReferenceById(dokumentIdHovedDokumentSomSkalBliVedlegg)
-
-        if (hovedDokumentSomSkalBliVedlegg.erMarkertFerdig()) {
-            throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
+        return if (dokumentUnderArbeid.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+            if (dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceAndIdNot(
+                    parentId = parentId,
+                    journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference!!,
+                    id = currentDokumentId,
+                ).isNotEmpty()
+            ) {
+                logger.warn("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
+                null to dokumentUnderArbeid
+            } else {
+                dokumentUnderArbeid.parentId = parentId
+                dokumentUnderArbeid to null
+            }
+        } else {
+            dokumentUnderArbeid.parentId = parentId
+            dokumentUnderArbeid to null
         }
-
-        val vedlegg =
-            dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokumentSomSkalBliVedlegg.id)
-        if (vedlegg.isNotEmpty()) {
-            throw DokumentValidationException("Et dokument som selv har vedlegg kan ikke bli et vedlegg")
-        }
-        hovedDokumentSomSkalBliVedlegg.parentId = hovedDokument.id
-        return hovedDokumentSomSkalBliVedlegg
     }
 
     fun frikobleVedlegg(
