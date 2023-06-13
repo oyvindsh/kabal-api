@@ -142,7 +142,7 @@ class DokumentUnderArbeidController(
                         dokumentId = persistentDokumentId,
                         innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
                     )),
-                    duplicateJournalfoerteDokumenter = emptySet()
+                    duplicateJournalfoerteDokumenter = emptyList()
                 )                
             } else {
                 val (alteredDocuments, duplicateJournalfoerteDokumenter) =

@@ -1,7 +1,9 @@
 package no.nav.klage.dokument.api.mapper
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.klage.dokument.api.view.*
+import no.nav.klage.dokument.api.view.DokumentView
+import no.nav.klage.dokument.api.view.DokumentViewWithList
+import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
@@ -10,7 +12,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class DokumentMapper(
@@ -65,7 +66,7 @@ class DokumentMapper(
 
     fun mapToDokumentListView(
         dokumentUnderArbeidList: List<DokumentUnderArbeid>,
-        duplicateJournalfoerteDokumenter: Set<Pair<UUID, JournalfoertDokumentReference>>
+        duplicateJournalfoerteDokumenter: List<DokumentUnderArbeid>
     ): DokumentViewWithList {
         val firstDokument = dokumentUnderArbeidList.firstOrNull()
         val firstDokumentView = if (firstDokument != null) {
@@ -87,16 +88,8 @@ class DokumentMapper(
             parent = firstDokumentView?.parent,
             parentId = firstDokumentView?.parentId,
             journalfoertDokumentReference = firstDokumentView?.journalfoertDokumentReference,
-            alteredDocuments = dokumentUnderArbeidList.map { mapToDokumentView(it) }.toSet(),
-            duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter.map {
-                DuplicateJournalfoertDokumentView(
-                    dokumentEnhetId = it.first,
-                    journalfoertDokumentReference = DokumentView.JournalfoertDokumentReference(
-                        journalpostId = it.second.journalpostId,
-                        dokumentInfoId = it.second.dokumentInfoId
-                    )
-                )
-            },
+            alteredDocuments = dokumentUnderArbeidList.map { mapToDokumentView(it) },
+            duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter.map { mapToDokumentView(it) },
         )
     }
 

@@ -569,7 +569,7 @@ class DokumentUnderArbeidService(
         parentId: UUID,
         vedleggId: UUID,
         innloggetIdent: String
-    ): Pair<List<DokumentUnderArbeid>, Set<Pair<UUID, JournalfoertDokumentReference>>> {
+    ): Pair<List<DokumentUnderArbeid>, List<DokumentUnderArbeid>> {
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
@@ -579,16 +579,14 @@ class DokumentUnderArbeidService(
         }
 
         val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(vedleggId)
-        logger.debug("descendants: $descendants")
+
         val vedleggIdSet = mutableSetOf<UUID>()
         vedleggIdSet += vedleggId
         descendants.forEach { vedleggIdSet += it.id }
 
-        logger.debug("vedleggIdSet: $vedleggIdSet")
-        val duplicateJournalfoerteDokumenterUnderArbeid = mutableSetOf<DokumentUnderArbeid>()
+        val duplicateJournalfoerteDokumenterUnderArbeid = mutableListOf<DokumentUnderArbeid>()
 
         val alteredDocuments = vedleggIdSet.mapNotNull { currentVedleggId ->
-            logger.debug("currentVedleggId: $currentVedleggId")
             val vedleggDokument =
                 dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
 
@@ -621,13 +619,7 @@ class DokumentUnderArbeidService(
             dokumentUnderArbeidRepository.deleteById(it.id)
         }
 
-        return alteredDocuments to duplicateJournalfoerteDokumenterUnderArbeid.map {
-            it.id to
-                    JournalfoertDokumentReference(
-                        journalpostId = it.journalfoertDokumentReference!!.journalpostId,
-                        dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
-                    )
-        }.toSet()
+        return alteredDocuments to duplicateJournalfoerteDokumenterUnderArbeid
     }
 
     fun frikobleVedlegg(
