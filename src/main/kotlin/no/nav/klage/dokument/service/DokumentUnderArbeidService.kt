@@ -569,7 +569,7 @@ class DokumentUnderArbeidService(
         parentId: UUID,
         vedleggId: UUID,
         innloggetIdent: String
-    ): Pair<List<DokumentUnderArbeid>, MutableSet<JournalfoertDokumentReference>> {
+    ): Pair<List<DokumentUnderArbeid>, Set<JournalfoertDokumentReference>> {
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
@@ -585,9 +585,9 @@ class DokumentUnderArbeidService(
         descendants.forEach { vedleggIdSet += it.id }
 
         logger.debug("vedleggIdSet: $vedleggIdSet")
-        val duplicateJournalfoerteDokumenter = mutableSetOf<JournalfoertDokumentReference>()
+        val duplicateJournalfoerteDokumenterUnderArbeid = mutableSetOf<DokumentUnderArbeid>()
 
-        return vedleggIdSet.mapNotNull { currentVedleggId ->
+        val alteredDocuments = vedleggIdSet.mapNotNull { currentVedleggId ->
             logger.debug("currentVedleggId: $currentVedleggId")
             val vedleggDokument =
                 dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
@@ -603,13 +603,9 @@ class DokumentUnderArbeidService(
                     ).isNotEmpty()
                 ) {
                     logger.warn("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
-                    duplicateJournalfoerteDokumenter.add(
-                        JournalfoertDokumentReference(
-                            journalpostId = vedleggDokument.journalfoertDokumentReference.journalpostId,
-                            dokumentInfoId = vedleggDokument.journalfoertDokumentReference.dokumentInfoId
-                        )
+                    duplicateJournalfoerteDokumenterUnderArbeid.add(
+                        vedleggDokument
                     )
-                    dokumentUnderArbeidRepository.deleteById(currentVedleggId)
                     null
                 } else {
                     vedleggDokument.parentId = parentDokument.id
@@ -619,7 +615,18 @@ class DokumentUnderArbeidService(
                 vedleggDokument.parentId = parentDokument.id
                 vedleggDokument
             }
-        } to duplicateJournalfoerteDokumenter
+        }
+
+        duplicateJournalfoerteDokumenterUnderArbeid.forEach{
+            dokumentUnderArbeidRepository.deleteById(it.id)
+        }
+
+        return alteredDocuments to duplicateJournalfoerteDokumenterUnderArbeid.map {
+            JournalfoertDokumentReference(
+                journalpostId = it.journalfoertDokumentReference!!.journalpostId,
+                dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+            )
+        }.toSet()
     }
 
     fun frikobleVedlegg(
