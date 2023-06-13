@@ -579,13 +579,16 @@ class DokumentUnderArbeidService(
         }
 
         val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(vedleggId)
-
+        logger.debug("descendants: $descendants")
         val vedleggIdSet = mutableSetOf<UUID>()
         vedleggIdSet += vedleggId
         descendants.forEach { vedleggIdSet += it.id }
+
+        logger.debug("vedleggIdSet: $vedleggIdSet")
         val duplicateJournalfoerteDokumenter = mutableSetOf<JournalfoertDokumentReference>()
 
         return vedleggIdSet.mapNotNull { currentVedleggId ->
+            logger.debug("currentVedleggId: $currentVedleggId")
             val vedleggDokument =
                 dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
 
