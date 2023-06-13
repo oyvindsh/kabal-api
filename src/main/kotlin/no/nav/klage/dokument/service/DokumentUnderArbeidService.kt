@@ -610,7 +610,7 @@ class DokumentUnderArbeidService(
         }
 
         return if (vedleggDokument.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
-            if (dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceAndIdIsNot(
+            if (dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceAndIdNot(
                     parentId = parentId,
                     journalfoertDokumentReference = vedleggDokument.journalfoertDokumentReference!!,
                     id = currentVedleggId,
