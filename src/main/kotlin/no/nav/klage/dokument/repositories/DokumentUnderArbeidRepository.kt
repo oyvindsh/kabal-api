@@ -21,7 +21,7 @@ interface DokumentUnderArbeidRepository : JpaRepository<DokumentUnderArbeid, UUI
 
     fun findByParentIdAndJournalfoertDokumentReferenceIsNotNull(dokumentId: UUID): Set<DokumentUnderArbeid>
 
-    fun findByParentIdAndJournalfoertDokumentReference(parentId: UUID, journalfoertDokumentReference: JournalfoertDokumentReference): List<DokumentUnderArbeid>
+    fun findByParentIdAndJournalfoertDokumentReferenceAndIdIsNot(parentId: UUID, journalfoertDokumentReference: JournalfoertDokumentReference, id: UUID): List<DokumentUnderArbeid>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<DokumentUnderArbeid>
 

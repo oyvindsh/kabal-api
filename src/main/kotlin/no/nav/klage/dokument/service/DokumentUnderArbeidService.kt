@@ -584,42 +584,48 @@ class DokumentUnderArbeidService(
         vedleggIdSet += vedleggId
         descendants.forEach { vedleggIdSet += it.id }
 
-        val duplicateJournalfoerteDokumenterUnderArbeid = mutableListOf<DokumentUnderArbeid>()
-
-        val alteredDocuments = vedleggIdSet.mapNotNull { currentVedleggId ->
-            val vedleggDokument =
-                dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
-
-            if (vedleggDokument.erMarkertFerdig()) {
-                throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
-            }
-
-            if (vedleggDokument.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
-                if (dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReference(
-                        parentId = parentId,
-                        journalfoertDokumentReference = vedleggDokument.journalfoertDokumentReference!!,
-                    ).isNotEmpty()
-                ) {
-                    logger.warn("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
-                    duplicateJournalfoerteDokumenterUnderArbeid.add(
-                        vedleggDokument
-                    )
-                    null
-                } else {
-                    vedleggDokument.parentId = parentDokument.id
-                    vedleggDokument
-                }
-            } else {
-                vedleggDokument.parentId = parentDokument.id
-                vedleggDokument
-            }
+        val processedDokumentUnderArbeidOutput = vedleggIdSet.map { currentVedleggId ->
+            setParentInDokumentUnderArbeidAndFindDuplicates(currentVedleggId, parentId)
         }
+
+        val alteredDocuments = processedDokumentUnderArbeidOutput.mapNotNull { it.first }
+        val duplicateJournalfoerteDokumenterUnderArbeid = processedDokumentUnderArbeidOutput.mapNotNull { it.second }
 
         duplicateJournalfoerteDokumenterUnderArbeid.forEach {
             dokumentUnderArbeidRepository.deleteById(it.id)
         }
 
         return alteredDocuments to duplicateJournalfoerteDokumenterUnderArbeid
+    }
+
+    private fun setParentInDokumentUnderArbeidAndFindDuplicates(
+        currentVedleggId: UUID,
+        parentId: UUID,
+    ): Pair<DokumentUnderArbeid?, DokumentUnderArbeid?> {
+        val vedleggDokument =
+            dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
+
+        if (vedleggDokument.erMarkertFerdig()) {
+            throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
+        }
+
+        return if (vedleggDokument.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+            if (dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceAndIdIsNot(
+                    parentId = parentId,
+                    journalfoertDokumentReference = vedleggDokument.journalfoertDokumentReference!!,
+                    id = currentVedleggId,
+                ).isNotEmpty()
+            ) {
+                logger.warn("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
+                null to vedleggDokument
+            } else {
+                vedleggDokument.parentId = parentId
+                vedleggDokument to null
+            }
+        } else {
+            vedleggDokument.parentId = parentId
+            vedleggDokument to null
+        }
     }
 
     fun frikobleVedlegg(
