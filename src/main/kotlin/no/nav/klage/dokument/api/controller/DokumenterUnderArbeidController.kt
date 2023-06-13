@@ -148,7 +148,7 @@ class DokumentUnderArbeidController(
                 val (alteredDocuments, duplicateJournalfoerteDokumenter) =
                     dokumentUnderArbeidService.setParentDocument(
                         parentId = input.dokumentId,
-                        vedleggId = persistentDokumentId,
+                        dokumentId = persistentDokumentId,
                         innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
                     )
 

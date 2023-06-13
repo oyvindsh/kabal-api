@@ -567,7 +567,7 @@ class DokumentUnderArbeidService(
 
     fun setParentDocument(
         parentId: UUID,
-        vedleggId: UUID,
+        dokumentId: UUID,
         innloggetIdent: String
     ): Pair<List<DokumentUnderArbeid>, List<DokumentUnderArbeid>> {
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
@@ -578,14 +578,14 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
         }
 
-        val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(vedleggId)
+        val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(dokumentId)
 
-        val vedleggIdSet = mutableSetOf<UUID>()
-        vedleggIdSet += vedleggId
-        descendants.forEach { vedleggIdSet += it.id }
+        val dokumentIdSet = mutableSetOf<UUID>()
+        dokumentIdSet += dokumentId
+        dokumentIdSet.addAll(descendants.map { it.id })
 
-        val processedDokumentUnderArbeidOutput = vedleggIdSet.map { currentVedleggId ->
-            setParentInDokumentUnderArbeidAndFindDuplicates(currentVedleggId, parentId)
+        val processedDokumentUnderArbeidOutput = dokumentIdSet.map { currentDokumentId ->
+            setParentInDokumentUnderArbeidAndFindDuplicates(currentDokumentId, parentId)
         }
 
         val alteredDocuments = processedDokumentUnderArbeidOutput.mapNotNull { it.first }
@@ -599,32 +599,32 @@ class DokumentUnderArbeidService(
     }
 
     private fun setParentInDokumentUnderArbeidAndFindDuplicates(
-        currentVedleggId: UUID,
+        currentDokumentId: UUID,
         parentId: UUID,
     ): Pair<DokumentUnderArbeid?, DokumentUnderArbeid?> {
-        val vedleggDokument =
-            dokumentUnderArbeidRepository.getReferenceById(currentVedleggId)
+        val dokumentUnderArbeid =
+            dokumentUnderArbeidRepository.getReferenceById(currentDokumentId)
 
-        if (vedleggDokument.erMarkertFerdig()) {
+        if (dokumentUnderArbeid.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble et dokument som er ferdigstilt")
         }
 
-        return if (vedleggDokument.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+        return if (dokumentUnderArbeid.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             if (dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceAndIdNot(
                     parentId = parentId,
-                    journalfoertDokumentReference = vedleggDokument.journalfoertDokumentReference!!,
-                    id = currentVedleggId,
+                    journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference!!,
+                    id = currentDokumentId,
                 ).isNotEmpty()
             ) {
                 logger.warn("Dette journalførte dokumentet er allerede lagt til som vedlegg på dette dokumentet.")
-                null to vedleggDokument
+                null to dokumentUnderArbeid
             } else {
-                vedleggDokument.parentId = parentId
-                vedleggDokument to null
+                dokumentUnderArbeid.parentId = parentId
+                dokumentUnderArbeid to null
             }
         } else {
-            vedleggDokument.parentId = parentId
-            vedleggDokument to null
+            dokumentUnderArbeid.parentId = parentId
+            dokumentUnderArbeid to null
         }
     }
 
