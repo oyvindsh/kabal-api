@@ -569,7 +569,7 @@ class DokumentUnderArbeidService(
         parentId: UUID,
         vedleggId: UUID,
         innloggetIdent: String
-    ): Pair<List<DokumentUnderArbeid>, Set<JournalfoertDokumentReference>> {
+    ): Pair<List<DokumentUnderArbeid>, Set<Pair<UUID, JournalfoertDokumentReference>>> {
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
@@ -617,15 +617,16 @@ class DokumentUnderArbeidService(
             }
         }
 
-        duplicateJournalfoerteDokumenterUnderArbeid.forEach{
+        duplicateJournalfoerteDokumenterUnderArbeid.forEach {
             dokumentUnderArbeidRepository.deleteById(it.id)
         }
 
         return alteredDocuments to duplicateJournalfoerteDokumenterUnderArbeid.map {
-            JournalfoertDokumentReference(
-                journalpostId = it.journalfoertDokumentReference!!.journalpostId,
-                dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
-            )
+            it.id to
+                    JournalfoertDokumentReference(
+                        journalpostId = it.journalfoertDokumentReference!!.journalpostId,
+                        dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+                    )
         }.toSet()
     }
 

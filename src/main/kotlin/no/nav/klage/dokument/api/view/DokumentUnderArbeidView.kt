@@ -34,17 +34,17 @@ data class DokumentView(
 }
 
 data class DokumentViewWithList(
-    val id: UUID,
-    val tittel: String,
+    val id: UUID?,
+    val tittel: String?,
     val dokumentTypeId: String?,
-    val opplastet: LocalDateTime,
+    val opplastet: LocalDateTime?,
     val newOpplastet: LocalDateTime?,
-    val created: LocalDateTime,
-    val type: DokumentUnderArbeid.DokumentUnderArbeidType,
-    val isSmartDokument: Boolean,
+    val created: LocalDateTime?,
+    val type: DokumentUnderArbeid.DokumentUnderArbeidType?,
+    val isSmartDokument: Boolean?,
     val templateId: String?,
     val version: Int?,
-    val isMarkertAvsluttet: Boolean,
+    val isMarkertAvsluttet: Boolean?,
     //Deprecated
     val parent: UUID?,
     val parentId: UUID?,
@@ -52,7 +52,12 @@ data class DokumentViewWithList(
 
     //TODO: Keep these two lists when FE uses new version
     val alteredDocuments: Set<DokumentView>,
-    val duplicateJournalfoerteDokumenter: Set<JournalfoertDokumentReference>,
+    val duplicateJournalfoerteDokumenter: List<DuplicateJournalfoertDokumentView>,
+)
+
+data class DuplicateJournalfoertDokumentView (
+    val dokumentEnhetId: UUID,
+    val journalfoertDokumentReference: DokumentView.JournalfoertDokumentReference
 )
 
 data class SmartEditorDocumentView(
