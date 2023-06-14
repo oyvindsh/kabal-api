@@ -543,18 +543,26 @@ class DokumentUnderArbeidService(
 
         documents.forEach { currentDocument ->
             if (currentDocument.erMarkertFerdig()) {
-                throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
+                logger.warn("Attempting to delete finalized document {}", currentDocument.id)
             }
 
-            if (currentDocument.smartEditorId != null) {
-                smartEditorApiGateway.deleteDocument(currentDocument.smartEditorId!!)
+            try {
+                if (currentDocument.smartEditorId != null) {
+                    smartEditorApiGateway.deleteDocument(currentDocument.smartEditorId!!)
+                }
+            } catch (e: Exception) {
+                logger.warn("Couldn't delete smartEditor document", e)
+            }
+
+            try {
+                if (currentDocument.mellomlagerId != null) {
+                    mellomlagerService.deleteDocument(currentDocument.mellomlagerId!!)
+                }
+            } catch (e: Exception) {
+                logger.warn("Couldn't delete mellomlager document", e)
             }
 
             dokumentUnderArbeidRepository.delete(currentDocument)
-
-            if (currentDocument.mellomlagerId != null) {
-                mellomlagerService.deleteDocument(currentDocument.mellomlagerId!!)
-            }
 
             behandling.publishEndringsloggEvent(
                 saksbehandlerident = innloggetIdent,
