@@ -527,42 +527,44 @@ class DokumentUnderArbeidService(
     }
 
     fun slettDokument(
-        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
         innloggetIdent: String,
     ) {
-        val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        val document = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandling(
-            behandlingId = dokumentUnderArbeid.behandlingId,
+            behandlingId = document.behandlingId,
         )
 
-        if (dokumentUnderArbeid.erMarkertFerdig()) {
-            throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
-        }
+        val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(document.id)
 
-        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(dokumentUnderArbeid.id)
-        if (vedlegg.isNotEmpty()) {
-            throw DokumentValidationException("Kan ikke slette dokument med vedlegg")
-        }
-        if (dokumentUnderArbeid.smartEditorId != null) {
-            smartEditorApiGateway.deleteDocument(dokumentUnderArbeid.smartEditorId!!)
-        }
-        dokumentUnderArbeidRepository.delete(dokumentUnderArbeid)
+        val documents = descendants.plus(document)
 
-        if (dokumentUnderArbeid.mellomlagerId != null) {
-            mellomlagerService.deleteDocument(dokumentUnderArbeid.mellomlagerId!!)
-        }
+        documents.forEach { currentDocument ->
+            if (currentDocument.erMarkertFerdig()) {
+                throw DokumentValidationException("Kan ikke slette et dokument som er ferdigstilt")
+            }
 
-        behandling.publishEndringsloggEvent(
-            saksbehandlerident = innloggetIdent,
-            felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
-            fraVerdi = dokumentUnderArbeid.opplastet.toString(),
-            tilVerdi = null,
-            tidspunkt = LocalDateTime.now(),
-            dokumentId = dokumentUnderArbeid.id,
-        )
+            if (currentDocument.smartEditorId != null) {
+                smartEditorApiGateway.deleteDocument(currentDocument.smartEditorId!!)
+            }
+
+            dokumentUnderArbeidRepository.delete(currentDocument)
+
+            if (currentDocument.mellomlagerId != null) {
+                mellomlagerService.deleteDocument(currentDocument.mellomlagerId!!)
+            }
+
+            behandling.publishEndringsloggEvent(
+                saksbehandlerident = innloggetIdent,
+                felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
+                fraVerdi = currentDocument.opplastet.toString(),
+                tilVerdi = null,
+                tidspunkt = LocalDateTime.now(),
+                dokumentId = currentDocument.id,
+            )
+        }
     }
 
     fun setParentDocument(

@@ -121,7 +121,6 @@ class DokumentUnderArbeidController(
     ) {
         logger.debug("Kall mottatt på deleteDokument for $dokumentId")
         dokumentUnderArbeidService.slettDokument(
-            behandlingId = behandlingId,
             dokumentId = dokumentId,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
