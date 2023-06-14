@@ -13,17 +13,17 @@ import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.apache.commons.io.IOUtils
-import org.springframework.core.io.ByteArrayResource
-import org.springframework.core.io.PathResource
+import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.FileInputStream
+import java.io.InputStream
+import java.nio.file.Files
 import java.util.*
-import kotlin.io.path.inputStream
 
 @RestController
 @Tag(name = "kabal-api")
@@ -120,51 +120,18 @@ class JournalpostController(
         return ResponseEntity.ok()
             .headers(responseHeaders)
             .contentLength(pathToMergedDocument.toFile().length())
-            .body(PathResource(pathToMergedDocument))
+            .body(
+                object : FileSystemResource(pathToMergedDocument) {
+                    override fun getInputStream(): InputStream {
+                        return object : FileInputStream(pathToMergedDocument.toFile()) {
+                            override fun close() {
+                                super.close()
+                                //Override to do this after client has downloaded file
+                                Files.delete(file.toPath())
+                            }
+                        }
+                    }
+                })
     }
 
-    @GetMapping("/mergedocuments_bytearray/{referenceId}")
-    fun getMergedDocumentsByteArray(
-        @PathVariable referenceId: UUID
-    ): ResponseEntity<ByteArray> {
-        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.APPLICATION_PDF
-        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
-
-        return ResponseEntity.ok()
-            .headers(responseHeaders)
-            .contentLength(pathToMergedDocument.toFile().length())
-            .body(IOUtils.toByteArray(pathToMergedDocument.inputStream()))
-    }
-
-    @GetMapping("/mergedocuments_bytearray_resource/{referenceId}")
-    fun getMergedDocumentsByteArrayResource(
-        @PathVariable referenceId: UUID
-    ): ResponseEntity<Resource> {
-        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.APPLICATION_PDF
-        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
-
-        return ResponseEntity.ok()
-            .headers(responseHeaders)
-            .contentLength(pathToMergedDocument.toFile().length())
-            .body(ByteArrayResource(IOUtils.toByteArray(pathToMergedDocument.inputStream())))
-    }
-
-    @GetMapping("/mergedocuments_bytearray_inmem/{referenceId}")
-    fun getMergedDocumentsByteArrayInMem(
-        @PathVariable referenceId: UUID
-    ): ResponseEntity<ByteArray> {
-        val byteArray = dokumentService.mergeDocumentsInMem(referenceId)
-        val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = MediaType.APPLICATION_PDF
-        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
-
-        return ResponseEntity.ok()
-            .headers(responseHeaders)
-            .contentLength(byteArray.size.toLong())
-            .body(byteArray)
-    }
 }

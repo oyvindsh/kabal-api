@@ -22,7 +22,6 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
-import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -215,7 +214,6 @@ class DokumentService(
 
         val documentsWithPaths = documentsToMerge.map {
             val tmpFile = Files.createTempFile("", "")
-            tmpFile.toFile().deleteOnExit()
             it to tmpFile
         }
 
@@ -227,66 +225,23 @@ class DokumentService(
             )
         }.collectList().block()
 
-        documentsWithPaths.forEach {
-            merger.addSource(it.second.toFile())
+        documentsWithPaths.forEach { (_, path) ->
+            merger.addSource(path.toFile())
         }
 
-        merger.mergeDocuments(MemoryUsageSetting.setupTempFileOnly())
+        //just under 256 MB before using file system
+        merger.mergeDocuments(MemoryUsageSetting.setupMixed(250_000_000))
 
-        //clean. TODO delete file with "pathToMergedDocument"
+        //clean tmp files that were downloaded from SAF
         try {
-            documentsWithPaths.forEach {
-                it.second.toFile().delete()
+            documentsWithPaths.forEach { (_, pathToTmpFile) ->
+                pathToTmpFile.toFile().delete()
             }
         } catch (e: Exception) {
             logger.warn("couldn't delete tmp file", e)
         }
 
         return pathToMergedDocument
-    }
-
-    fun mergeDocumentsInMem(referenceId: UUID): ByteArray {
-        val documentsToMerge = documentToMergeRepository.findByReferenceIdOrderByIndex(referenceId)
-
-        if (documentsToMerge.isEmpty()) {
-            throw DocumentsToMergeReferenceNotFoundException("referenceId $referenceId not found")
-        }
-
-        val merger = PDFMergerUtility()
-
-        val outputStream = ByteArrayOutputStream()
-        merger.destinationStream = outputStream
-
-        val documentsWithPaths = documentsToMerge.map {
-            val tmpFile = Files.createTempFile("", "")
-            tmpFile.toFile().deleteOnExit()
-            it to tmpFile
-        }
-
-        Flux.fromIterable(documentsWithPaths).flatMapSequential { (document, path) ->
-            safRestClient.downloadDocumentAsMono(
-                journalpostId = document.journalpostId,
-                dokumentInfoId = document.dokumentInfoId,
-                pathToFile = path,
-            )
-        }.collectList().block()
-
-        documentsWithPaths.forEach {
-            merger.addSource(it.second.toFile())
-        }
-
-        merger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly())
-
-        //clean. TODO delete file with "pathToMergedDocument"
-        try {
-            documentsWithPaths.forEach {
-                it.second.toFile().delete()
-            }
-        } catch (e: Exception) {
-            logger.warn("couldn't delete tmp file", e)
-        }
-
-        return outputStream.toByteArray()
     }
 }
 
