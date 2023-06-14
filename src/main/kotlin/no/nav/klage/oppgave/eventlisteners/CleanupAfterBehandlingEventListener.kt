@@ -86,7 +86,6 @@ class CleanupAfterBehandlingEventListener(
         dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandling.id).forEach {
             try {
                 dokumentUnderArbeidService.slettDokument(
-                    behandlingId = behandling.id,
                     dokumentId = it.id,
                     innloggetIdent = behandling.feilregistrering!!.navIdent,
                 )

@@ -2,6 +2,7 @@ package no.nav.klage.dokument.api.mapper
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.api.view.DokumentView
+import no.nav.klage.dokument.api.view.DokumentViewWithList
 import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
@@ -60,6 +61,35 @@ class DokumentMapper(
                     dokumentInfoId = it.dokumentInfoId
                 )
             }
+        )
+    }
+
+    fun mapToDokumentListView(
+        dokumentUnderArbeidList: List<DokumentUnderArbeid>,
+        duplicateJournalfoerteDokumenter: List<DokumentUnderArbeid>
+    ): DokumentViewWithList {
+        val firstDokument = dokumentUnderArbeidList.firstOrNull()
+        val firstDokumentView = if (firstDokument != null) {
+            mapToDokumentView(dokumentUnderArbeidList.first())
+        } else null
+
+        return DokumentViewWithList(
+            id = firstDokumentView?.id,
+            tittel = firstDokumentView?.tittel,
+            dokumentTypeId = firstDokumentView?.dokumentTypeId,
+            opplastet = firstDokumentView?.opplastet,
+            newOpplastet = firstDokumentView?.newOpplastet,
+            created = firstDokumentView?.created,
+            type = firstDokumentView?.type,
+            isSmartDokument = firstDokumentView?.isSmartDokument,
+            templateId = firstDokumentView?.templateId,
+            version = firstDokumentView?.version,
+            isMarkertAvsluttet = firstDokumentView?.isMarkertAvsluttet,
+            parent = firstDokumentView?.parent,
+            parentId = firstDokumentView?.parentId,
+            journalfoertDokumentReference = firstDokumentView?.journalfoertDokumentReference,
+            alteredDocuments = dokumentUnderArbeidList.map { mapToDokumentView(it) },
+            duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter.map { mapToDokumentView(it) },
         )
     }
 
