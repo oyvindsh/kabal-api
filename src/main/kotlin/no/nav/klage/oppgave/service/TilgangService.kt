@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.Behandling
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
@@ -39,9 +38,6 @@ class TilgangService(
             throw MissingTilgangException("Kun tildelt saksbehandler kan endre behandlingen")
         }
     }
-
-    private fun saksbehandlerHarSkrivetilgang(klagebehandling: Klagebehandling, ident: String): Boolean =
-        ident == klagebehandling.tildeling?.saksbehandlerident
 
     private fun saksbehandlerHarSkrivetilgang(behandling: Behandling, ident: String): Boolean =
         ident == behandling.tildeling?.saksbehandlerident
