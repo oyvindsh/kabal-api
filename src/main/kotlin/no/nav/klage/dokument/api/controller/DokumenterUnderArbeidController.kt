@@ -121,7 +121,6 @@ class DokumentUnderArbeidController(
     ) {
         logger.debug("Kall mottatt på deleteDokument for $dokumentId")
         dokumentUnderArbeidService.slettDokument(
-            behandlingId = behandlingId,
             dokumentId = dokumentId,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
@@ -132,24 +131,31 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @RequestBody input: OptionalPersistentDokumentIdInput
-    ): DokumentView {
+    ): DokumentViewWithList {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
-        try {
-            val hovedDokument = if (input.dokumentId == null) {
-                dokumentUnderArbeidService.frikobleVedlegg(
-                    behandlingId = behandlingId,
-                    dokumentId = persistentDokumentId,
-                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-                )
+        try {            
+            return if (input.dokumentId == null) {
+                dokumentMapper.mapToDokumentListView(
+                    dokumentUnderArbeidList = listOf(dokumentUnderArbeidService.frikobleVedlegg(
+                        behandlingId = behandlingId,
+                        dokumentId = persistentDokumentId,
+                        innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                    )),
+                    duplicateJournalfoerteDokumenter = emptyList()
+                )                
             } else {
-                dokumentUnderArbeidService.kobleVedlegg(
-                    behandlingId = behandlingId,
-                    dokumentId = input.dokumentId,
-                    dokumentIdHovedDokumentSomSkalBliVedlegg = persistentDokumentId,
-                    innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-                )
+                val (alteredDocuments, duplicateJournalfoerteDokumenter) =
+                    dokumentUnderArbeidService.setParentDocument(
+                        parentId = input.dokumentId,
+                        dokumentId = persistentDokumentId,
+                        innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                    )
+
+                return dokumentMapper.mapToDokumentListView(
+                    dokumentUnderArbeidList = alteredDocuments,
+                    duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter
+                )                
             }
-            return dokumentMapper.mapToDokumentView(hovedDokument)
         } catch (e: Exception) {
             logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
             throw e

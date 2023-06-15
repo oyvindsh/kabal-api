@@ -281,6 +281,27 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
+    @PutMapping("/{behandlingId}/klager")
+    fun setKlager(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: KlagerInput,
+    ): BehandlingEditedView {
+        logBehandlingMethodDetails(
+            ::setKlager.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        val modified = behandlingService.setKlager(
+            behandlingId = behandlingId,
+            identifikator = input.identifikator,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        )
+
+        return BehandlingEditedView(modified = modified)
+    }
+
     @GetMapping("/{behandlingId}/potentialsaksbehandlere")
     fun getPotentialSaksbehandlere(
         @PathVariable("behandlingId") behandlingId: UUID,
