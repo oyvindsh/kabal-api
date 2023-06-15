@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.eventlisteners
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
@@ -21,11 +20,10 @@ import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.event.EventListener
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @Service
 class CleanupAfterBehandlingEventListener(
@@ -49,11 +47,8 @@ class CleanupAfterBehandlingEventListener(
         )
     }
 
-    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 2, initialDelay = 6)
-    @SchedulerLock(name = "cleanupMergedDocuments")
+    @Transactional
     fun cleanupMergedDocuments() {
-        logger.debug("cleanupMergedDocuments is called by scheduler")
-
         documentToMergeRepository.deleteByCreatedBefore(LocalDateTime.now().minusWeeks(3))
     }
 

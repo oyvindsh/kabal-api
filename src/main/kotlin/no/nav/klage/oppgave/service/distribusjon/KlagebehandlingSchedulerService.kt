@@ -6,24 +6,34 @@ import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.kafka.EventType
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.FEILET
 import no.nav.klage.oppgave.domain.kafka.UtsendingStatus.IKKE_SENDT
+import no.nav.klage.oppgave.eventlisteners.CleanupAfterBehandlingEventListener
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.KafkaDispatcher
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Service
 class KlagebehandlingSchedulerService(
     private val behandlingService: BehandlingService,
     private val behandlingAvslutningService: BehandlingAvslutningService,
     private val kafkaDispatcher: KafkaDispatcher,
-    private val kakaApiGateway: KakaApiGateway
+    private val kakaApiGateway: KakaApiGateway,
+    private val cleanupAfterBehandlingEventListener: CleanupAfterBehandlingEventListener,
 ) {
 
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 2, initialDelay = 6)
+    @SchedulerLock(name = "cleanupMergedDocuments")
+    fun cleanupMergedDocuments() {
+        logger.debug("cleanupMergedDocuments is called by scheduler")
+        cleanupAfterBehandlingEventListener.cleanupMergedDocuments()
     }
 
     //TODO: Hvorfor vente 4 minutter?
