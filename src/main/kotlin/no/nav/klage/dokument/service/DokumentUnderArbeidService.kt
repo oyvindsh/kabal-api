@@ -580,6 +580,9 @@ class DokumentUnderArbeidService(
         dokumentId: UUID,
         innloggetIdent: String
     ): Pair<List<DokumentUnderArbeid>, List<DokumentUnderArbeid>> {
+        if (parentId == dokumentId) {
+            throw DokumentValidationException("Kan ikke gjøre et dokument til vedlegg for seg selv.")
+        }
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
