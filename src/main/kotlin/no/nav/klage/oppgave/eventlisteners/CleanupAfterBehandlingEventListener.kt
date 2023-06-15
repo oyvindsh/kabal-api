@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.eventlisteners
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
@@ -15,16 +16,16 @@ import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
-import no.nav.klage.oppgave.repositories.KafkaEventRepository
-import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
-import no.nav.klage.oppgave.repositories.MeldingRepository
+import no.nav.klage.oppgave.repositories.*
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.context.event.EventListener
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Service
 class CleanupAfterBehandlingEventListener(
@@ -36,6 +37,7 @@ class CleanupAfterBehandlingEventListener(
     private val ankebehandlingRepository: AnkebehandlingRepository,
     private val fssProxyClient: KlageFssProxyClient,
     private val behandlingService: BehandlingService,
+    private val documentToMergeRepository: DocumentToMergeRepository,
 ) {
 
     companion object {
@@ -47,17 +49,29 @@ class CleanupAfterBehandlingEventListener(
         )
     }
 
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 60, initialDelay = 6)
+    @SchedulerLock(name = "cleanupMergedDocuments")
+    fun cleanupMergedDocuments() {
+        logger.debug("cleanupMergedDocuments is called by scheduler")
+
+        documentToMergeRepository.deleteByCreatedBefore(LocalDateTime.now().minusWeeks(3))
+    }
+
     @EventListener
     fun cleanupAfterBehandling(behandlingEndretEvent: BehandlingEndretEvent) {
         val behandling = behandlingEndretEvent.behandling
 
         if (behandling.sattPaaVent != null) {
-            behandlingService.setSattPaaVent(
-                behandlingId = behandling.id,
-                utfoerendeSaksbehandlerIdent = "SYSTEM",
-                sattPaaVent = null,
-                systemUserContext = true,
-            )
+            try {
+                behandlingService.setSattPaaVent(
+                    behandlingId = behandling.id,
+                    utfoerendeSaksbehandlerIdent = "SYSTEM",
+                    sattPaaVent = null,
+                    systemUserContext = true,
+                )
+            } catch (e: Exception) {
+                logger.error("couldn't cleanup sattPaaVent", e)
+            }
         }
 
         if (behandling.isAvsluttet()) {
