@@ -29,7 +29,7 @@ class KlagebehandlingSchedulerService(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 2, initialDelay = 6)
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 60, initialDelay = 6)
     @SchedulerLock(name = "cleanupMergedDocuments")
     fun cleanupMergedDocuments() {
         logger.debug("cleanupMergedDocuments is called by scheduler")
@@ -37,7 +37,7 @@ class KlagebehandlingSchedulerService(
     }
 
     //TODO: Hvorfor vente 4 minutter?
-    @Scheduled(fixedDelay = 240000, initialDelay = 240000)
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 4, initialDelay = 4)
     @SchedulerLock(name = "avsluttBehandling")
     fun avsluttBehandling() {
         logger.debug("avsluttBehandling is called by scheduler")
@@ -55,7 +55,7 @@ class KlagebehandlingSchedulerService(
         }
     }
 
-    @Scheduled(fixedDelay = 240000, initialDelay = 300000)
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 4, initialDelay = 3)
     @SchedulerLock(name = "dispatchUnsentVedtakToKafka")
     fun dispatchUnsentVedtakToKafka() {
         logger.debug("dispatchUnsentVedtakToKafka is called by scheduler")
@@ -65,7 +65,7 @@ class KlagebehandlingSchedulerService(
         )
     }
 
-    @Scheduled(fixedDelay = 240000, initialDelay = 360000)
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 4, initialDelay = 7)
     @SchedulerLock(name = "dispatchUnsentDVHStatsToKafka")
     fun dispatchUnsentDVHStatsToKafka() {
         logger.debug("dispatchUnsentDVHStatsToKafka is called by scheduler")
@@ -75,7 +75,7 @@ class KlagebehandlingSchedulerService(
         )
     }
 
-    @Scheduled(fixedDelay = 240000, initialDelay = 420000)
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 4, initialDelay = 10)
     @SchedulerLock(name = "dispatchUnsentBehandlingEventsToKafka")
     fun dispatchUnsentBehandlingEventToKafka() {
         logger.debug("dispatchUnsentBehandlingEventToKafka is called by scheduler")
