@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
@@ -8,19 +9,30 @@ import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.DocumentToMerge
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.exceptions.DocumentsToMergeReferenceNotFoundException
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
+import no.nav.klage.oppgave.repositories.DocumentToMergeRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import reactor.core.publisher.Flux
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.LocalDateTime
+import java.util.*
 
 @Service
 @Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
-    private val safRestClient: SafRestClient
+    private val safRestClient: SafRestClient,
+    private val documentToMergeRepository: DocumentToMergeRepository,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -168,6 +180,69 @@ class DokumentService(
     private fun createSaksdokument(journalpostId: String) =
         fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
+
+    fun storeDocumentsForMerging(documents: List<JournalfoertDokumentReference>): UUID {
+        val referenceId = UUID.randomUUID()
+
+        documentToMergeRepository.saveAll(
+            documents.mapIndexed { index, it ->
+                DocumentToMerge(
+                    referenceId = referenceId,
+                    journalpostId = it.journalpostId,
+                    dokumentInfoId = it.dokumentInfoId,
+                    index = index,
+                    created = LocalDateTime.now(),
+                )
+            })
+
+        return referenceId
+    }
+
+    fun mergeDocuments(referenceId: UUID): Path {
+        val documentsToMerge = documentToMergeRepository.findByReferenceIdOrderByIndex(referenceId)
+
+        if (documentsToMerge.isEmpty()) {
+            throw DocumentsToMergeReferenceNotFoundException("referenceId $referenceId not found")
+        }
+
+        val merger = PDFMergerUtility()
+
+        val pathToMergedDocument = Files.createTempFile(null, null)
+        pathToMergedDocument.toFile().deleteOnExit()
+
+        merger.destinationFileName = pathToMergedDocument.toString()
+
+        val documentsWithPaths = documentsToMerge.map {
+            val tmpFile = Files.createTempFile("", "")
+            it to tmpFile
+        }
+
+        Flux.fromIterable(documentsWithPaths).flatMapSequential { (document, path) ->
+            safRestClient.downloadDocumentAsMono(
+                journalpostId = document.journalpostId,
+                dokumentInfoId = document.dokumentInfoId,
+                pathToFile = path,
+            )
+        }.collectList().block()
+
+        documentsWithPaths.forEach { (_, path) ->
+            merger.addSource(path.toFile())
+        }
+
+        //just under 256 MB before using file system
+        merger.mergeDocuments(MemoryUsageSetting.setupMixed(250_000_000))
+
+        //clean tmp files that were downloaded from SAF
+        try {
+            documentsWithPaths.forEach { (_, pathToTmpFile) ->
+                pathToTmpFile.toFile().delete()
+            }
+        } catch (e: Exception) {
+            logger.warn("couldn't delete tmp file", e)
+        }
+
+        return pathToMergedDocument
+    }
 }
 
 class DokumentMapper {

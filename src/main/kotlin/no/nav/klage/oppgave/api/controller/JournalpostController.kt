@@ -3,6 +3,8 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
+import no.nav.klage.oppgave.api.view.ReferenceToMergedDocumentsResponse
 import no.nav.klage.oppgave.api.view.UpdateDocumentTitleView
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
@@ -11,10 +13,16 @@ import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.FileInputStream
+import java.io.InputStream
+import java.nio.file.Files
 import java.util.*
 
 @RestController
@@ -92,4 +100,38 @@ class JournalpostController(
             HttpStatus.OK
         )
     }
+
+    @PostMapping("/mergedocuments")
+    fun setDocumentsToMerge(
+        @RequestBody documents: List<JournalfoertDokumentReference>
+    ): ReferenceToMergedDocumentsResponse {
+        return ReferenceToMergedDocumentsResponse(reference = dokumentService.storeDocumentsForMerging(documents))
+    }
+
+    @GetMapping("/mergedocuments/{referenceId}")
+    fun getMergedDocuments(
+        @PathVariable referenceId: UUID
+    ): ResponseEntity<Resource> {
+        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
+        val responseHeaders = HttpHeaders()
+        responseHeaders.contentType = MediaType.APPLICATION_PDF
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
+
+        return ResponseEntity.ok()
+            .headers(responseHeaders)
+            .contentLength(pathToMergedDocument.toFile().length())
+            .body(
+                object : FileSystemResource(pathToMergedDocument) {
+                    override fun getInputStream(): InputStream {
+                        return object : FileInputStream(pathToMergedDocument.toFile()) {
+                            override fun close() {
+                                super.close()
+                                //Override to do this after client has downloaded file
+                                Files.delete(file.toPath())
+                            }
+                        }
+                    }
+                })
+    }
+
 }
