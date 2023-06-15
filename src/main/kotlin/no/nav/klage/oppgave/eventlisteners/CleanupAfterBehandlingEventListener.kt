@@ -49,7 +49,7 @@ class CleanupAfterBehandlingEventListener(
         )
     }
 
-    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 60, initialDelay = 6)
+    @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 2, initialDelay = 6)
     @SchedulerLock(name = "cleanupMergedDocuments")
     fun cleanupMergedDocuments() {
         logger.debug("cleanupMergedDocuments is called by scheduler")
