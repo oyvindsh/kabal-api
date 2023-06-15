@@ -22,6 +22,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFeilregistrering
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFrist
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setInnsendingshjemler
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setKlager
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
@@ -418,6 +419,24 @@ class BehandlingService(
             behandling.setFullmektig(
                 partId,
                 utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandling.modified
+    }
+
+    fun setKlager(
+        behandlingId: UUID,
+        identifikator: String,
+        utfoerendeSaksbehandlerIdent: String
+    ): LocalDateTime {
+        val behandling = getBehandlingForUpdate(
+            behandlingId
+        )
+
+        val event =
+            behandling.setKlager(
+                nyVerdi = getPartIdFromIdentifikator(identifikator),
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
         return behandling.modified

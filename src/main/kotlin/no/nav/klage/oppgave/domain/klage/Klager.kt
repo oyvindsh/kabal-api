@@ -12,7 +12,7 @@ data class Klager(
             AttributeOverride(name = "value", column = Column(name = "klager_value"))
         ]
     )
-    val partId: PartId,
+    var partId: PartId,
     @Embedded
     @AttributeOverrides(
         value = [
