@@ -202,7 +202,7 @@ object BehandlingSetters {
         nyVerdi: PartId?,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = hjemler
+        val gammelVerdi = klager.prosessfullmektig
         val tidspunkt = LocalDateTime.now()
         if (nyVerdi == null) {
             klager.prosessfullmektig = null
@@ -216,6 +216,27 @@ object BehandlingSetters {
                 Felt.FULLMEKTIG,
                 gammelVerdi.toString(),
                 nyVerdi.toString(),
+                tidspunkt
+            )
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
+    }
+
+    fun Behandling.setKlager(
+        nyVerdi: PartId,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val gammelVerdi = klager
+        val tidspunkt = LocalDateTime.now()
+
+        klager.partId = nyVerdi
+
+        modified = tidspunkt
+        val endringslogg =
+            endringslogg(
+                saksbehandlerident,
+                Felt.KLAGER,
+                gammelVerdi.toString(),
+                klager.toString(),
                 tidspunkt
             )
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
