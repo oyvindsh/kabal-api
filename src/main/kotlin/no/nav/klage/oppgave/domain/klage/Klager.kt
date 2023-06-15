@@ -30,6 +30,5 @@ data class Klager(
 
     fun toSakenGjelder() = SakenGjelder(
         partId = this.partId.copy(),
-        skalMottaKopi = false // Siden denne nå peker på samme som klager trenger ikke brev sendes
     )
 }

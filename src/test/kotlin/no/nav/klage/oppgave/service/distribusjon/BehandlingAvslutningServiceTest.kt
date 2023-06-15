@@ -171,7 +171,6 @@ internal class BehandlingAvslutningServiceTest {
         klager = Klager(partId = PartId(type = PartIdType.PERSON, value = fnr)),
         sakenGjelder = SakenGjelder(
             partId = PartId(type = PartIdType.PERSON, value = fnr),
-            skalMottaKopi = false
         ),
         ytelse = Ytelse.OMS_OMP,
         type = Type.KLAGE,

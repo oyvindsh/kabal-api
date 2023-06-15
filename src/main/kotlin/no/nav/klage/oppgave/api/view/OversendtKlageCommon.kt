@@ -80,7 +80,6 @@ data class OversendtSakenGjelder(
 ) {
     fun toSakenGjelder() = SakenGjelder(
         partId = id.toPartId(),
-        skalMottaKopi = skalMottaKopi
     )
 }
 

@@ -62,7 +62,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
@@ -113,7 +112,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
@@ -172,7 +170,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
@@ -261,7 +258,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
@@ -292,7 +288,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
@@ -323,7 +318,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
@@ -360,7 +354,6 @@ class KlagebehandlingRepositoryTest {
             klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
             sakenGjelder = SakenGjelder(
                 partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
             ),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,

@@ -68,26 +68,7 @@ class DokumentMapper(
         dokumentUnderArbeidList: List<DokumentUnderArbeid>,
         duplicateJournalfoerteDokumenter: List<DokumentUnderArbeid>
     ): DokumentViewWithList {
-        val firstDokument = dokumentUnderArbeidList.firstOrNull()
-        val firstDokumentView = if (firstDokument != null) {
-            mapToDokumentView(dokumentUnderArbeidList.first())
-        } else null
-
         return DokumentViewWithList(
-            id = firstDokumentView?.id,
-            tittel = firstDokumentView?.tittel,
-            dokumentTypeId = firstDokumentView?.dokumentTypeId,
-            opplastet = firstDokumentView?.opplastet,
-            newOpplastet = firstDokumentView?.newOpplastet,
-            created = firstDokumentView?.created,
-            type = firstDokumentView?.type,
-            isSmartDokument = firstDokumentView?.isSmartDokument,
-            templateId = firstDokumentView?.templateId,
-            version = firstDokumentView?.version,
-            isMarkertAvsluttet = firstDokumentView?.isMarkertAvsluttet,
-            parent = firstDokumentView?.parent,
-            parentId = firstDokumentView?.parentId,
-            journalfoertDokumentReference = firstDokumentView?.journalfoertDokumentReference,
             alteredDocuments = dokumentUnderArbeidList.map { mapToDokumentView(it) },
             duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter.map { mapToDokumentView(it) },
         )

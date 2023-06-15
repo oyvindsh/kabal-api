@@ -552,8 +552,6 @@ class MottakService(
             klager = klager,
             sakenGjelder = SakenGjelder(
                 partId = sakenGjelder.toPartId(),
-                //TODO ever used?
-                skalMottaKopi = false
             ),
             innsynUrl = null,
             fagsystem = Fagsystem.of(fagsystemId),
