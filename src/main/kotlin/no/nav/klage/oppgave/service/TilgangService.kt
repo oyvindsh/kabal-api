@@ -28,17 +28,6 @@ class TilgangService(
         private val securelogger = getSecureLogger()
     }
 
-    //TODO: Denne brukes bare i tester, rydd opp ved anledning.
-    fun verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
-        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().avsluttet != null) {
-            throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
-        }
-        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        if (!saksbehandlerHarSkrivetilgang(klagebehandling, ident)) {
-            throw MissingTilgangException("Kun tildelt saksbehandler kan endre klagebehandlingen")
-        }
-    }
-
     fun verifyInnloggetSaksbehandlersSkrivetilgang(behandling: Behandling) {
         if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null ||
             behandling.currentDelbehandling().avsluttet != null
