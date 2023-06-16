@@ -1,11 +1,10 @@
 package no.nav.klage.oppgave.config.problem
 
-import jakarta.servlet.http.HttpServletRequest
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getSecureLogger
-import org.apache.tomcat.util.http.fileupload.impl.SizeException
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -22,45 +21,38 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         private val secureLogger = getSecureLogger()
     }
 
-    @ExceptionHandler
-    fun catchISE(
-        ex: IllegalStateException,
-        request: NativeWebRequest
-    ): ProblemDetail {
-        logger.debug("catching IllegalStateException", ex)
-        try {
-            val nativeRequest = request.nativeRequest
-
-            if (nativeRequest is HttpServletRequest) {
-                logger.debug("dispatcherType = " + nativeRequest.dispatcherType?.name)
-
-                logger.debug("path = " + nativeRequest.pathInfo)
-                logger.debug("requestURI = " + nativeRequest.requestURI)
-
-                if (nativeRequest.isAsyncStarted) {
-                    logger.debug("asyncContext = " + nativeRequest.asyncContext)
-                }
-            }
-        } catch (e: Exception) {
-            logger.warn("problems with handling ISE", e)
-        }
-
-        return create(HttpStatus.INTERNAL_SERVER_ERROR, ex)
-    }
+//    @ExceptionHandler
+//    fun catchISE(
+//        ex: IllegalStateException,
+//        request: NativeWebRequest
+//    ): ProblemDetail {
+//        logger.debug("catching IllegalStateException", ex)
+//        try {
+//            val nativeRequest = request.nativeRequest
+//
+//            if (nativeRequest is HttpServletRequest) {
+//                logger.debug("dispatcherType = " + nativeRequest.dispatcherType?.name)
+//
+//                logger.debug("path = " + nativeRequest.pathInfo)
+//                logger.debug("requestURI = " + nativeRequest.requestURI)
+//
+//                if (nativeRequest.isAsyncStarted) {
+//                    logger.debug("asyncContext = " + nativeRequest.asyncContext)
+//                }
+//            }
+//        } catch (e: Exception) {
+//            logger.warn("problems with handling ISE", e)
+//        }
+//
+//        return create(HttpStatus.INTERNAL_SERVER_ERROR, ex)
+//    }
 
     @ExceptionHandler
     fun handleSizeLimitExceededException(
-        ex: SizeException,
+        ex: SizeLimitExceededException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
-
-    @ExceptionHandler
-    fun handleIllegalStateException(
-        ex: IllegalStateException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
     fun handleOversendtKlageNotValidException(
