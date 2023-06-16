@@ -5,6 +5,7 @@ import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -46,6 +47,13 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
 
         return create(HttpStatus.INTERNAL_SERVER_ERROR, ex)
     }
+
+    @ExceptionHandler
+    fun handleOversendtKlageNotValidException(
+        ex: SizeLimitExceededException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
 
     @ExceptionHandler
     fun handleOversendtKlageNotValidException(
