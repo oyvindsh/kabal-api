@@ -56,21 +56,21 @@ class CleanupAfterBehandlingEventListener(
     fun cleanupAfterBehandling(behandlingEndretEvent: BehandlingEndretEvent) {
         val behandling = behandlingEndretEvent.behandling
 
-        if (behandling.sattPaaVent != null) {
-            try {
-                behandlingService.setSattPaaVent(
-                    behandlingId = behandling.id,
-                    utfoerendeSaksbehandlerIdent = "SYSTEM",
-                    sattPaaVent = null,
-                    systemUserContext = true,
-                )
-            } catch (e: Exception) {
-                logger.error("couldn't cleanup sattPaaVent", e)
-            }
-        }
-
         if (behandling.isAvsluttet()) {
-            logger.debug("Received behandlingEndretEvent for avsluttet behandling. Deleting meldinger.")
+            logger.debug("Received behandlingEndretEvent for avsluttet behandling. Deleting meldinger and sattPaaVent.")
+
+            if (behandling.sattPaaVent != null) {
+                try {
+                    behandlingService.setSattPaaVent(
+                        behandlingId = behandling.id,
+                        utfoerendeSaksbehandlerIdent = "SYSTEM",
+                        sattPaaVent = null,
+                        systemUserContext = true,
+                    )
+                } catch (e: Exception) {
+                    logger.error("couldn't cleanup sattPaaVent", e)
+                }
+            }
 
             meldingRepository.findByBehandlingIdOrderByCreatedDesc(behandlingId = behandling.id)
                 .forEach { melding ->
