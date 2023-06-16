@@ -282,8 +282,12 @@ class BehandlingService(
         behandlingId: UUID,
         utfoerendeSaksbehandlerIdent: String,
         sattPaaVent: SattPaaVent?,
+        systemUserContext: Boolean = false
     ): LocalDateTime {
-        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
+        val behandling = getBehandlingForUpdate(
+            behandlingId = behandlingId,
+            systemUserContext = systemUserContext
+        )
         val event =
             behandling.setSattPaaVent(
                 sattPaaVent,
