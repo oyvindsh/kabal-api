@@ -263,10 +263,10 @@ class BehandlingService(
             setSattPaaVent(
                 behandlingId = behandlingId,
                 utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
-                sattPaaVent = null
+                sattPaaVent = null,
+                systemUserContext = saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent),
             )
         }
-
 
         val event =
             behandling.setTildeling(
