@@ -19,7 +19,7 @@ val verapdfVersion = "1.22.2"
 val klageKodeverkVersion = "1.3.12"
 
 plugins {
-    val kotlinVersion = "1.8.21"
+    val kotlinVersion = "1.8.22"
     id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version kotlinVersion
