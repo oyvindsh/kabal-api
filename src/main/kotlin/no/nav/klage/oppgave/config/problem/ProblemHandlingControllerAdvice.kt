@@ -30,7 +30,7 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         logger.debug("catching IllegalStateException", ex)
 
         if (ex.cause is SizeLimitExceededException) {
-            create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
+            return create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
         }
 
         try {
