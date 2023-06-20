@@ -8,8 +8,6 @@ import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
-import no.nav.klage.oppgave.service.DokumentService
-import no.nav.klage.oppgave.service.SaksbehandlerService
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -58,22 +56,6 @@ class KabinApiService(
             ankebehandling = ankebehandling,
             mottak = mottak,
         )
-    }
-
-    fun getUsedJournalpostIdListForPerson(
-        input: SearchUsedJournalpostIdInput
-    ): List<String> {
-        return mottakService.findMottakBySakenGjelder(sakenGjelder = input.fnr)
-            .filter {
-                when (it.type) {
-                    Type.KLAGE -> klagebehandlingService.getKlagebehandlingFromMottakId(it.id)?.feilregistrering == null
-                    Type.ANKE -> ankebehandlingService.getAnkebehandlingFromMottakId(it.id)?.feilregistrering == null
-                    Type.ANKE_I_TRYGDERETTEN -> true//Ikke relevant for AnkeITrygderetten
-                }
-            }
-            .flatMap { it.mottakDokument }
-            .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
-            .map { it.journalpostId }.toSet().toList()
     }
 
     fun createKlage(

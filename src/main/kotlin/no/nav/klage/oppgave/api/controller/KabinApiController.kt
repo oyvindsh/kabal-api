@@ -132,8 +132,8 @@ class KabinApiController(
             logger = logger
         )
 
-        return kabinApiService.getUsedJournalpostIdListForPerson(
-            input = input
+        return mottakService.getUsedJournalpostIdList(
+            sakenGjelder = input.fnr
         )
     }
 
