@@ -82,5 +82,6 @@ class AuditLogger(
             "suid=${logEvent.navIdent}",
             "duid=${logEvent.personFnr}",
             "sproc=${tracer.currentTraceContext().context()!!.traceId()}}",
+            "msg=${logEvent.message}",
         )
 }
