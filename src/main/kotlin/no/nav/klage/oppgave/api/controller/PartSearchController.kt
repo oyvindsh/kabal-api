@@ -4,8 +4,8 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.service.FullmektigSearchService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
+import no.nav.klage.oppgave.service.PartSearchService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -18,7 +18,7 @@ import java.util.*
 @ProtectedWithClaims(issuer = ISSUER_AAD)
 class PartSearchController(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val fullmektigSearchService: FullmektigSearchService,
+    private val partSearchService: PartSearchService,
 ) {
 
     companion object {
@@ -37,7 +37,7 @@ class PartSearchController(
             logger
         )
 
-        return fullmektigSearchService.searchFullmektig(input.identifikator)
+        return partSearchService.searchPart(input.identifikator)
     }
 
     @PostMapping("/searchpart")
@@ -50,7 +50,7 @@ class PartSearchController(
             logger
         )
 
-        return fullmektigSearchService.searchFullmektig(input.identifikator)
+        return partSearchService.searchPart(input.identifikator)
     }
 
     @PostMapping("/searchperson")
@@ -63,6 +63,6 @@ class PartSearchController(
             logger
         )
 
-        return fullmektigSearchService.searchPerson(input.identifikator)
+        return partSearchService.searchPerson(input.identifikator)
     }
 }
