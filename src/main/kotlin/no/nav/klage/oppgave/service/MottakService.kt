@@ -253,10 +253,10 @@ class MottakService(
             throw DuplicateOversendelseException(message)
         }
 
-        validateDocumentNotDuplicate(ankeJournalpostId, klagebehandling.sakenGjelder.partId.value)
+        validateDocumentNotAlreadyUsed(ankeJournalpostId, klagebehandling.sakenGjelder.partId.value)
     }
 
-    private fun validateDocumentNotDuplicate(journalpostId: String, sakenGjelder: String) {
+    private fun validateDocumentNotAlreadyUsed(journalpostId: String, sakenGjelder: String) {
         if (getUsedJournalpostIdList(sakenGjelder).any { it == journalpostId }) {
             val message =
                 "Journalpost med id $journalpostId har allerede blitt brukt for å opprette klage/anke"
@@ -308,7 +308,7 @@ class MottakService(
     }
 
     fun CreateKlageBasedOnKabinInput.validate() {
-        validateDocumentNotDuplicate(klageJournalpostId, sakenGjelder.value)
+        validateDocumentNotAlreadyUsed(klageJournalpostId, sakenGjelder.value)
         validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
         validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.KLAGE)
         validateJournalpost(klageJournalpostId)
