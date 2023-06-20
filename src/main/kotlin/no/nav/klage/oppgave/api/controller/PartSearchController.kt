@@ -16,7 +16,7 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-class FullmektigSearchController(
+class PartSearchController(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val fullmektigSearchService: FullmektigSearchService,
 ) {
@@ -27,8 +27,9 @@ class FullmektigSearchController(
     }
 
     @PostMapping("/searchfullmektig")
+    @Deprecated("Use /searchpart")
     fun searchFullmektig(
-        @RequestBody input: SearchFullmektigInput,
+        @RequestBody input: IdentifikatorInput,
     ): BehandlingDetaljerView.PartView {
         logMethodDetails(
             ::searchFullmektig.name,
@@ -39,12 +40,25 @@ class FullmektigSearchController(
         return fullmektigSearchService.searchFullmektig(input.identifikator)
     }
 
+    @PostMapping("/searchpart")
+    fun searchPart(
+        @RequestBody input: IdentifikatorInput,
+    ): BehandlingDetaljerView.PartView {
+        logMethodDetails(
+            ::searchPart.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return fullmektigSearchService.searchFullmektig(input.identifikator)
+    }
+
     @PostMapping("/searchperson")
     fun searchPerson(
-        @RequestBody input: SearchFullmektigInput,
+        @RequestBody input: IdentifikatorInput,
     ): BehandlingDetaljerView.SakenGjelderView {
         logMethodDetails(
-            ::searchFullmektig.name,
+            ::searchPerson.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             logger
         )
