@@ -253,21 +253,30 @@ class MottakService(
             throw DuplicateOversendelseException(message)
         }
 
-        if (mottakRepository.findBySakenGjelderOrKlager(klagebehandling.sakenGjelder.partId.value)
-                .flatMap { it.mottakDokument }
-                .any {
-                    it.type in listOf(
-                        MottakDokumentType.BRUKERS_ANKE,
-                        MottakDokumentType.BRUKERS_KLAGE
-                    ) && it.journalpostId == ankeJournalpostId
-                }
-        ) {
+        validateDocumentNotAlreadyUsed(ankeJournalpostId, klagebehandling.sakenGjelder.partId.value)
+    }
+
+    private fun validateDocumentNotAlreadyUsed(journalpostId: String, sakenGjelder: String) {
+        if (getUsedJournalpostIdList(sakenGjelder).any { it == journalpostId }) {
             val message =
-                "Journalpost med id $ankeJournalpostId har allerede blitt brukt for å opprette klage/anke"
+                "Journalpost med id $journalpostId har allerede blitt brukt for å opprette klage/anke"
             logger.warn(message)
             throw DuplicateOversendelseException(message)
         }
+    }
 
+    fun getUsedJournalpostIdList(sakenGjelder: String): List<String> {
+        return mottakRepository.findBySakenGjelderOrKlager(sakenGjelder)
+            .filter {
+                when (it.type) {
+                    Type.KLAGE -> klagebehandlingRepository.findByMottakId(it.id)?.feilregistrering == null
+                    Type.ANKE -> ankebehandlingRepository.findByMottakId(it.id)?.feilregistrering == null
+                    Type.ANKE_I_TRYGDERETTEN -> true//Ikke relevant for AnkeITrygderetten
+                }
+            }
+            .flatMap { it.mottakDokument }
+            .filter { it.type in listOf(MottakDokumentType.BRUKERS_ANKE, MottakDokumentType.BRUKERS_KLAGE) }
+            .map { it.journalpostId }.toSet().toList()
     }
 
     fun OversendtKlageV2.validate() {
@@ -299,6 +308,7 @@ class MottakService(
     }
 
     fun CreateKlageBasedOnKabinInput.validate() {
+        validateDocumentNotAlreadyUsed(klageJournalpostId, sakenGjelder.value)
         validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
         validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.KLAGE)
         validateJournalpost(klageJournalpostId)
