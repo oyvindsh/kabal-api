@@ -5,7 +5,8 @@ data class AuditLogEvent(
     val action: Action = Action.ACCESS,
     val decision: Decision = Decision.PERMIT,
     val personFnr: String?,
-    val logLevel: Level = Level.INFO
+    val logLevel: Level = Level.INFO,
+    val message: String?,
 ) {
     enum class Level {
         INFO, WARN
