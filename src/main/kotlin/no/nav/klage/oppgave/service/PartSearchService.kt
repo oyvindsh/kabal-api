@@ -11,7 +11,7 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 
 @Service
-class FullmektigSearchService(
+class PartSearchService(
     private val eregClient: EregClient,
     private val pdlFacade: PdlFacade,
     private val behandlingService: BehandlingService,
@@ -24,7 +24,7 @@ class FullmektigSearchService(
         private val secureLogger = getSecureLogger()
     }
 
-    fun searchFullmektig(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.PartView =
+    fun searchPart(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.PartView =
         when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
             PartIdType.PERSON -> {
                 if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {

@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.service.AdminService
-import no.nav.klage.oppgave.service.FullmektigSearchService
+import no.nav.klage.oppgave.service.PartSearchService
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
@@ -15,7 +15,7 @@ import java.util.*
 class DevOnlyAdminController(
     private val adminService: AdminService,
     private val tokenUtil: TokenUtil,
-    private val fullmektigSearchService: FullmektigSearchService,
+    private val partSearchService: PartSearchService,
 ) {
 
     companion object {

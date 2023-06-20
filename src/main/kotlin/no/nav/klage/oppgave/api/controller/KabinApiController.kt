@@ -21,7 +21,7 @@ class KabinApiController(
     private val klagebehandlingService: KlagebehandlingService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val mottakService: MottakService,
-    private val fullmektigSearchService: FullmektigSearchService,
+    private val partSearchService: PartSearchService,
     private val kabinApiService: KabinApiService
 ) {
 
@@ -50,14 +50,14 @@ class KabinApiController(
 
     @PostMapping("/searchpart")
     fun searchPart(
-        @RequestBody input: searchPartInput
+        @RequestBody input: IdentifikatorInput
     ): BehandlingDetaljerView.PartView {
         logMethodDetails(
             methodName = ::searchPart.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger
         )
-        return fullmektigSearchService.searchFullmektig(
+        return partSearchService.searchPart(
             identifikator = input.identifikator
         )
     }
