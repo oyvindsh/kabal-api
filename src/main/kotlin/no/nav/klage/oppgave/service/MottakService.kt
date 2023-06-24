@@ -415,8 +415,8 @@ class MottakService(
                 if (!isValidOrgnr(partId.value)) {
                     throw OversendtKlageNotValidException("Ugyldig organisasjonsnummer")
                 }
-                if (!eregClient.organisasjonExists(partId.value)) {
-                    throw OversendtKlageNotValidException("Organisasjonen fins ikke i Ereg")
+                if (!eregClient.isOrganisasjonActive(partId.value)) {
+                    throw OversendtKlageNotValidException("Organisasjonen har opphørt")
                 }
             }
 

@@ -213,25 +213,22 @@ class BehandlingMapper(
     }
 
     fun getPartView(klager: Klager): BehandlingDetaljerView.PartView {
-        return if (klager.erPerson()) {
-            val person = pdlFacade.getPersonInfo(klager.partId.value)
-            BehandlingDetaljerView.PartView(
-                id = person.foedselsnr,
-                name = person.settSammenNavn(),
-                type = BehandlingDetaljerView.IdType.FNR,
-            )
-        } else {
-            BehandlingDetaljerView.PartView(
-                id = klager.partId.value,
-                name = eregClient.hentOrganisasjon(klager.partId.value)?.navn?.sammensattNavn(),
-                type = BehandlingDetaljerView.IdType.ORGNR,
-            )
-        }
+        return getPartView(
+            identificator = klager.partId.value,
+            isPerson = klager.isPerson()
+        )
     }
 
     fun getPartView(prosessfullmektig: Prosessfullmektig): BehandlingDetaljerView.PartView {
-        return if (prosessfullmektig.erPerson()) {
-            val person = pdlFacade.getPersonInfo(prosessfullmektig.partId.value)
+        return getPartView(
+            identificator = prosessfullmektig.partId.value,
+            isPerson = prosessfullmektig.isPerson()
+        )
+    }
+
+    private fun getPartView(identificator: String, isPerson: Boolean): BehandlingDetaljerView.PartView {
+        return if (isPerson) {
+            val person = pdlFacade.getPersonInfo(identificator)
             BehandlingDetaljerView.PartView(
                 id = person.foedselsnr,
                 name = person.settSammenNavn(),
@@ -239,8 +236,8 @@ class BehandlingMapper(
             )
         } else {
             BehandlingDetaljerView.PartView(
-                id = prosessfullmektig.partId.value,
-                name = eregClient.hentOrganisasjon(prosessfullmektig.partId.value)?.navn?.sammensattNavn(),
+                id = identificator,
+                name = eregClient.hentOrganisasjon(identificator).navn.sammensattnavn,
                 type = BehandlingDetaljerView.IdType.ORGNR,
             )
         }

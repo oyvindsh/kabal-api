@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.ereg
 
 
-import io.micrometer.tracing.Tracer
+import no.nav.klage.oppgave.exceptions.EREGOrganizationNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -12,18 +12,17 @@ import org.springframework.web.reactive.function.client.bodyToMono
 @Component
 class EregClient(
     private val eregWebClient: WebClient,
-    private val tracer: Tracer
 ) {
 
     @Value("\${spring.application.name}")
     lateinit var applicationName: String
 
-    fun hentOrganisasjon(orgnummer: String): Organisasjon? {
+    fun hentOrganisasjon(orgnummer: String): Organisasjon {
         return kotlin.runCatching {
             eregWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder
-                        .path("/v1/organisasjon/{orgnummer}")
+                        .path("/v2/organisasjon/{orgnummer}")
                         .queryParam("inkluderHierarki", false)
                         .build(orgnummer)
                 }
@@ -31,13 +30,13 @@ class EregClient(
                 .header("Nav-Consumer-Id", applicationName)
                 .retrieve()
                 .bodyToMono<Organisasjon>()
-                .block()
+                .block() ?: throw EREGOrganizationNotFoundException("Search for organization $orgnummer in Ereg returned null.")
         }.fold(
             onSuccess = { it },
             onFailure = { error ->
                 when (error) {
                     is WebClientResponseException.NotFound -> {
-                        null
+                        throw EREGOrganizationNotFoundException("Couldn't find organization $orgnummer in Ereg.")
                     }
                     else -> throw error
                 }
@@ -46,7 +45,5 @@ class EregClient(
         )
     }
 
-    fun organisasjonExists(orgnummer: String): Boolean {
-        return hentOrganisasjon(orgnummer) != null
-    }
+    fun isOrganisasjonActive(orgnummer: String) = hentOrganisasjon(orgnummer).isActive()
 }

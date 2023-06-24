@@ -4,7 +4,7 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.exceptions.EREGOrganizationNotFoundException
+import no.nav.klage.oppgave.exceptions.EREGOrganizationCeasedException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -42,12 +42,12 @@ class PartSearchService(
 
             PartIdType.VIRKSOMHET -> {
                 val organisasjon = eregClient.hentOrganisasjon(identifikator)
-                if (organisasjon == null) {
-                    throw EREGOrganizationNotFoundException("Couldn't find organization: $identifikator in Ereg.")
+                if (!organisasjon.isActive()) {
+                    throw EREGOrganizationCeasedException("Organization $identifikator does not exist anymore.")
                 } else {
                     BehandlingDetaljerView.PartView(
                         id = organisasjon.organisasjonsnummer,
-                        name = organisasjon.navn.sammensattNavn(),
+                        name = organisasjon.navn.sammensattnavn,
                         type = BehandlingDetaljerView.IdType.ORGNR,
                     )
                 }

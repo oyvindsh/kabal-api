@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
+import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
@@ -57,6 +58,7 @@ class BehandlingService(
     private val arbeidOgInntektClient: ArbeidOgInntektClient,
     private val fssProxyClient: KlageFssProxyClient,
     private val saksbehandlerRepository: SaksbehandlerRepository,
+    private val eregClient: EregClient,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -201,6 +203,17 @@ class BehandlingService(
             }
         }
 
+        if (behandling.klager.prosessfullmektig?.isPerson() == false &&
+            !eregClient.hentOrganisasjon(behandling.klager.prosessfullmektig!!.partId.value).isActive()
+        ) {
+            behandlingValidationErrors.add(
+                InvalidProperty(
+                    field = "fullmektig",
+                    reason = "Fullmektig/organisasjon har opphørt."
+                )
+            )
+        }
+
         if (behandlingValidationErrors.isNotEmpty()) {
             sectionList.add(
                 ValidationSection(
@@ -264,7 +277,9 @@ class BehandlingService(
                 behandlingId = behandlingId,
                 utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
                 sattPaaVent = null,
-                systemUserContext = saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent),
+                systemUserContext = saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(
+                    utfoerendeSaksbehandlerIdent
+                ),
             )
         }
 
@@ -481,11 +496,12 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT
     ): Behandling {
-        val behandling = if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
-            getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
-        } else {
-            getBehandlingForUpdate(behandlingId = behandlingId)
-        }
+        val behandling =
+            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
+                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+            } else {
+                getBehandlingForUpdate(behandlingId = behandlingId)
+            }
 
         val event =
             behandling.setMedunderskriverIdentAndMedunderskriverFlyt(
@@ -774,16 +790,22 @@ class BehandlingService(
         val navIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         val behandlingForCheck = getBehandling(behandlingId)
 
-        val behandling = if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(navIdent) || behandlingForCheck.tildeling == null) {
-            getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
-        } else {
-            getBehandlingForUpdate(behandlingId = behandlingId)
-        }
+        val behandling =
+            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(navIdent) || behandlingForCheck.tildeling == null) {
+                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+            } else {
+                getBehandlingForUpdate(behandlingId = behandlingId)
+            }
 
         return feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
     }
 
-    private fun feilregistrer(behandling: Behandling, navIdent: String, reason: String, fagsystem: Fagsystem): Behandling {
+    private fun feilregistrer(
+        behandling: Behandling,
+        navIdent: String,
+        reason: String,
+        fagsystem: Fagsystem
+    ): Behandling {
         val event = behandling.setFeilregistrering(
             feilregistrering = Feilregistrering(
                 navIdent = navIdent,

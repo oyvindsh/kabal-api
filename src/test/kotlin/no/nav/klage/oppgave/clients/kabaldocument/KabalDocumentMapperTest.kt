@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.klage.kodeverk.*
 import no.nav.klage.oppgave.clients.ereg.EregClient
-import no.nav.klage.oppgave.clients.ereg.Navn
 import no.nav.klage.oppgave.clients.ereg.Organisasjon
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.BrevmottakerInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.PartIdInput
@@ -49,9 +48,9 @@ class KabalDocumentMapperTest {
         )
 
         every { eregClient.hentOrganisasjon(any()) } returns Organisasjon(
-            Navn("navn", null, null, null, null, null),
-            "orgnr",
-            "type"
+            Organisasjon.Navn("navn"),
+            organisasjonsnummer = "orgnr",
+            Organisasjon.OrganisasjonDetaljer(opphoersdato = null)
         )
     }
 

@@ -16,5 +16,5 @@ data class Prosessfullmektig(
     @Column(name = "skal_parten_motta_kopi")
     val skalPartenMottaKopi: Boolean
 ) {
-    fun erPerson() = partId.type == PartIdType.PERSON
+    fun isPerson() = partId.type == PartIdType.PERSON
 }
