@@ -22,7 +22,7 @@ class EregClient(
             eregWebClient.get()
                 .uri { uriBuilder ->
                     uriBuilder
-                        .path("/v2/organisasjon/{orgnummer}")
+                        .path("/organisasjon/{orgnummer}")
                         .queryParam("inkluderHierarki", false)
                         .build(orgnummer)
                 }

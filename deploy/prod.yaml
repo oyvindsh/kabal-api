@@ -8,7 +8,7 @@ externalHosts:
   - host: kafka-schema-registry.nais.adeo.no
   - host: saf.prod-fss-pub.nais.io
   - host: norg2.prod-fss-pub.nais.io
-  - host: ereg-services.intern.nav.no
+  - host: ereg-services.prod-fss-pub.nais.io
   - host: arbeid-og-inntekt.prod-fss-pub.nais.io
   - host: pdl-api.prod-fss-pub.nais.io
     ports:

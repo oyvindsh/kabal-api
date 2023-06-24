@@ -8,7 +8,7 @@ externalHosts:
   - host: kafka-schema-registry.nais-q.adeo.no
   - host: saf.dev-fss-pub.nais.io
   - host: norg2.dev-fss-pub.nais.io
-  - host: ereg-services-q1.dev.intern.nav.no
+  - host: ereg-services-q1.dev-fss-pub.nais.io
   - host: arbeid-og-inntekt-q1.dev-fss-pub.nais.io
   - host: pdl-api.dev-fss-pub.nais.io
     ports:
