@@ -76,6 +76,7 @@ class BehandlingMapper(
             fortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = klagebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
+            dead = klagebehandling.sakenGjelder.isDead(),
             kvalitetsvurderingReference = if (klagebehandling.feilregistrering == null) {
                 BehandlingDetaljerView.KvalitetsvurderingReference(
                     id = klagebehandling.kakaKvalitetsvurderingId!!,
@@ -130,6 +131,7 @@ class BehandlingMapper(
             fortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
+            dead = ankebehandling.sakenGjelder.isDead(),
             kvalitetsvurderingReference = if (ankebehandling.feilregistrering == null) {
                 BehandlingDetaljerView.KvalitetsvurderingReference(
                     id = ankebehandling.kakaKvalitetsvurderingId!!,
@@ -182,6 +184,7 @@ class BehandlingMapper(
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
+            dead = ankeITrygderettenbehandling.sakenGjelder.isDead(),
             kvalitetsvurderingReference = null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
@@ -274,7 +277,15 @@ class BehandlingMapper(
         return if (erVirksomhet()) {
             false
         } else {
-            pdlFacade.getPersonInfo(partId.value).vergemaalEllerFremtidsfullmakt ?: false
+            pdlFacade.getPersonInfo(partId.value).vergemaalEllerFremtidsfullmakt
+        }
+    }
+
+    private fun SakenGjelder.isDead(): Boolean {
+        return if (erVirksomhet()) {
+            false
+        } else {
+            pdlFacade.getPersonInfo(partId.value).doed
         }
     }
 
