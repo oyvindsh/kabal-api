@@ -25,6 +25,9 @@ query($ident: ID!){
                 omfang
                 omfangetErInnenPersonligOmraade
             }
+        },
+        doedsfall {
+            doedsdato
         }
     }
 }

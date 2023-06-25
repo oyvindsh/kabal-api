@@ -36,15 +36,16 @@ class KabalDocumentMapperTest {
     @BeforeAll
     fun setup() {
         every { pdlFacade.getPersonInfo(any()) } returns Person(
-            "fnr",
-            "fornavn",
-            null,
-            "etternavn",
-            null,
-            null,
-            null,
-            null,
-            null
+            foedselsnr = "fnr",
+            fornavn = "fornavn",
+            mellomnavn = null,
+            etternavn = "etternavn",
+            sammensattNavn = null,
+            beskyttelsesbehov = null,
+            kjoenn = null,
+            sivilstand = null,
+            vergemaalEllerFremtidsfullmakt = false,
+            doed = false,
         )
 
         every { eregClient.hentOrganisasjon(any()) } returns Organisasjon(
