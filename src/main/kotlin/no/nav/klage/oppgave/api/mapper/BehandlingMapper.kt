@@ -209,6 +209,7 @@ class BehandlingMapper(
                 sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
                     ?: BehandlingDetaljerView.Sex.UKJENT,
                 type = BehandlingDetaljerView.IdType.FNR,
+                available = !person.doed,
             )
         } else {
             throw RuntimeException("We don't support where sakenGjelder is virksomhet")
@@ -236,12 +237,15 @@ class BehandlingMapper(
                 id = person.foedselsnr,
                 name = person.settSammenNavn(),
                 type = BehandlingDetaljerView.IdType.FNR,
+                available = !person.doed,
             )
         } else {
+            val organisasjon = eregClient.hentOrganisasjon(identificator)
             BehandlingDetaljerView.PartView(
                 id = identificator,
-                name = eregClient.hentOrganisasjon(identificator).navn.sammensattnavn,
+                name = organisasjon.navn.sammensattnavn,
                 type = BehandlingDetaljerView.IdType.ORGNR,
+                available = organisasjon.isActive(),
             )
         }
     }

@@ -85,7 +85,7 @@ class KabalDocumentMapper(
 
     fun mapBrevmottakere(
         behandling: Behandling,
-        brevMottakertyper: MutableSet<Brevmottakertype>,
+        brevMottakertyper: Set<Brevmottakertype>,
         dokumentType: DokumentType
     ): List<BrevmottakerInput> {
         val brevmottakerPartIds = mutableSetOf<PartId>()

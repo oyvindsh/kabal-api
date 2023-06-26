@@ -64,6 +64,7 @@ data class BehandlingDetaljerView(
     interface PartBase {
         val id: String
         val name: String?
+        val available: Boolean
     }
 
     enum class Sex {
@@ -81,13 +82,15 @@ data class BehandlingDetaljerView(
     data class PartView(
         override val id: String,
         override val name: String?,
-        override val type: IdType
+        override val type: IdType,
+        override val available: Boolean,
     ): PartBase, IdPart
 
     data class SakenGjelderView(
         override val id: String,
         override val name: String?,
         override val type: IdType,
+        override val available: Boolean,
         val sex: Sex,
     ): PartBase, IdPart
 }

@@ -4,7 +4,6 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
-import no.nav.klage.oppgave.exceptions.EREGOrganizationCeasedException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -33,6 +32,7 @@ class PartSearchService(
                         id = person.foedselsnr,
                         name = person.settSammenNavn(),
                         type = BehandlingDetaljerView.IdType.FNR,
+                        available = !person.doed,
                     )
                 } else {
                     secureLogger.warn("Saksbehandler does not have access to view person")
@@ -42,15 +42,12 @@ class PartSearchService(
 
             PartIdType.VIRKSOMHET -> {
                 val organisasjon = eregClient.hentOrganisasjon(identifikator)
-                if (!organisasjon.isActive()) {
-                    throw EREGOrganizationCeasedException("Organization $identifikator does not exist anymore.")
-                } else {
-                    BehandlingDetaljerView.PartView(
-                        id = organisasjon.organisasjonsnummer,
-                        name = organisasjon.navn.sammensattnavn,
-                        type = BehandlingDetaljerView.IdType.ORGNR,
-                    )
-                }
+                BehandlingDetaljerView.PartView(
+                    id = organisasjon.organisasjonsnummer,
+                    name = organisasjon.navn.sammensattnavn,
+                    type = BehandlingDetaljerView.IdType.ORGNR,
+                    available = organisasjon.isActive()
+                )
             }
         }
 
@@ -63,6 +60,7 @@ class PartSearchService(
                         id = person.foedselsnr,
                         name = person.settSammenNavn(),
                         type = BehandlingDetaljerView.IdType.FNR,
+                        available = !person.doed,
                         sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
                             ?: BehandlingDetaljerView.Sex.UKJENT,
                     )
