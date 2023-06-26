@@ -65,6 +65,6 @@ data class PdlPerson(
     }
 
     data class Doedsfall(
-        val doedsfall: LocalDate,
+        val doedsdato: LocalDate,
     )
 }
