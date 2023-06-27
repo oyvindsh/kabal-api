@@ -32,7 +32,7 @@ class PartSearchService(
                         id = person.foedselsnr,
                         name = person.settSammenNavn(),
                         type = BehandlingDetaljerView.IdType.FNR,
-                        available = !person.doed,
+                        available = person.doed == null,
                     )
                 } else {
                     secureLogger.warn("Saksbehandler does not have access to view person")
@@ -60,7 +60,7 @@ class PartSearchService(
                         id = person.foedselsnr,
                         name = person.settSammenNavn(),
                         type = BehandlingDetaljerView.IdType.FNR,
-                        available = !person.doed,
+                        available = person.doed == null,
                         sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
                             ?: BehandlingDetaljerView.Sex.UKJENT,
                     )

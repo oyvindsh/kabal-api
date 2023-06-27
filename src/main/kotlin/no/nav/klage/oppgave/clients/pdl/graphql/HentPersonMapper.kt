@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.domain.kodeverk.SivilstandType
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Component
 class HentPersonMapper {
@@ -33,8 +34,17 @@ class HentPersonMapper {
                 .firstOrNull { it.type == PdlPerson.Sivilstand.SivilstandType.GIFT || it.type == PdlPerson.Sivilstand.SivilstandType.REGISTRERT_PARTNER }
                 ?.mapSivilstand(),
             vergemaalEllerFremtidsfullmakt = pdlPerson.vergemaalEllerFremtidsfullmakt.isNotEmpty(),
-            doed = pdlPerson.doedsfall.isNotEmpty(),
+            doed = pdlPerson.doedsfall.firstOrNull()?.doedsdato,
+            fullmakt = isValidFullmakt(pdlPerson.fullmakt.firstOrNull()),
         )
+    }
+
+    private fun isValidFullmakt(fullmakt: PdlPerson.Fullmakt?): Boolean {
+        return if (fullmakt == null) {
+            false
+        } else {
+            LocalDate.now() in fullmakt.gyldigFraOgMed..fullmakt.gyldigTilOgMed
+        }
     }
 
     private fun PdlPerson.Sivilstand.mapSivilstand(): Sivilstand =

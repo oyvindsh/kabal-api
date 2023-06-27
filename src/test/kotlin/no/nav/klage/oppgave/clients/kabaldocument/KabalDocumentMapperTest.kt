@@ -45,7 +45,8 @@ class KabalDocumentMapperTest {
             kjoenn = null,
             sivilstand = null,
             vergemaalEllerFremtidsfullmakt = false,
-            doed = false,
+            doed = null,
+            fullmakt = false,
         )
 
         every { eregClient.hentOrganisasjon(any()) } returns Organisasjon(

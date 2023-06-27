@@ -511,7 +511,7 @@ class DokumentUnderArbeidService(
         mottakere.forEach { mottaker ->
             if (mottaker.partId.partIdTypeId == PartIdType.PERSON.id) {
                 val person = pdlFacade.getPersonInfo(mottaker.partId.value)
-                if (person.doed) {
+                if (person.doed != null) {
                     invalidProperties += InvalidProperty(
                         field = mottaker.partId.value,
                         reason = "Mottaker er død.",

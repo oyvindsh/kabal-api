@@ -11,6 +11,7 @@ import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BehandlingMapper(
@@ -76,7 +77,8 @@ class BehandlingMapper(
             fortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = klagebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = klagebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            dead = klagebehandling.sakenGjelder.isDead(),
+            dead = klagebehandling.sakenGjelder.getDead(),
+            fullmakt = klagebehandling.sakenGjelder.isFullmakt(),
             kvalitetsvurderingReference = if (klagebehandling.feilregistrering == null) {
                 BehandlingDetaljerView.KvalitetsvurderingReference(
                     id = klagebehandling.kakaKvalitetsvurderingId!!,
@@ -131,7 +133,8 @@ class BehandlingMapper(
             fortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankebehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankebehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            dead = ankebehandling.sakenGjelder.isDead(),
+            dead = ankebehandling.sakenGjelder.getDead(),
+            fullmakt = ankebehandling.sakenGjelder.isFullmakt(),
             kvalitetsvurderingReference = if (ankebehandling.feilregistrering == null) {
                 BehandlingDetaljerView.KvalitetsvurderingReference(
                     id = ankebehandling.kakaKvalitetsvurderingId!!,
@@ -184,7 +187,8 @@ class BehandlingMapper(
             fortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovFortrolig(),
             strengtFortrolig = ankeITrygderettenbehandling.sakenGjelder.harBeskyttelsesbehovStrengtFortrolig(),
             vergemaalEllerFremtidsfullmakt = ankeITrygderettenbehandling.sakenGjelder.harVergemaalEllerFremtidsfullmakt(),
-            dead = ankeITrygderettenbehandling.sakenGjelder.isDead(),
+            dead = ankeITrygderettenbehandling.sakenGjelder.getDead(),
+            fullmakt = ankeITrygderettenbehandling.sakenGjelder.isFullmakt(),
             kvalitetsvurderingReference = null,
             sattPaaVent = ankeITrygderettenbehandling.sattPaaVent,
             sendtTilTrygderetten = ankeITrygderettenbehandling.sendtTilTrygderetten,
@@ -209,7 +213,7 @@ class BehandlingMapper(
                 sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
                     ?: BehandlingDetaljerView.Sex.UKJENT,
                 type = BehandlingDetaljerView.IdType.FNR,
-                available = !person.doed,
+                available = person.doed == null,
             )
         } else {
             throw RuntimeException("We don't support where sakenGjelder is virksomhet")
@@ -237,7 +241,7 @@ class BehandlingMapper(
                 id = person.foedselsnr,
                 name = person.settSammenNavn(),
                 type = BehandlingDetaljerView.IdType.FNR,
-                available = !person.doed,
+                available = person.doed == null,
             )
         } else {
             val organisasjon = eregClient.hentOrganisasjon(identificator)
@@ -282,11 +286,19 @@ class BehandlingMapper(
         }
     }
 
-    private fun SakenGjelder.isDead(): Boolean {
+    private fun SakenGjelder.getDead(): LocalDate? {
+        return if (erVirksomhet()) {
+            null
+        } else {
+            pdlFacade.getPersonInfo(partId.value).doed
+        }
+    }
+
+    private fun SakenGjelder.isFullmakt(): Boolean {
         return if (erVirksomhet()) {
             false
         } else {
-            pdlFacade.getPersonInfo(partId.value).doed
+            pdlFacade.getPersonInfo(partId.value).fullmakt
         }
     }
 

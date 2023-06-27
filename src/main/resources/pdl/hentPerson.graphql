@@ -28,6 +28,10 @@ query($ident: ID!){
         },
         doedsfall {
             doedsdato
+        },
+        fullmakt {
+            gyldigFraOgMed
+            gyldigTilOgMed
         }
     }
 }
