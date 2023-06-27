@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients.pdl
 
 import no.nav.klage.oppgave.domain.kodeverk.SivilstandType
+import java.time.LocalDate
 
 data class Person(
     val foedselsnr: String,
@@ -11,7 +12,9 @@ data class Person(
     val beskyttelsesbehov: Beskyttelsesbehov?,
     val kjoenn: String?,
     val sivilstand: Sivilstand?,
-    val vergemaalEllerFremtidsfullmakt: Boolean?,
+    val vergemaalEllerFremtidsfullmakt: Boolean,
+    val doed: LocalDate?,
+    val fullmakt: Boolean,
 ) {
     fun harBeskyttelsesbehovFortrolig() = beskyttelsesbehov == Beskyttelsesbehov.FORTROLIG
 

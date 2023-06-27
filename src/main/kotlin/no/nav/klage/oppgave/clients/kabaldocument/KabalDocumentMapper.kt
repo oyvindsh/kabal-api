@@ -85,7 +85,7 @@ class KabalDocumentMapper(
 
     fun mapBrevmottakere(
         behandling: Behandling,
-        brevMottakertyper: MutableSet<Brevmottakertype>,
+        brevMottakertyper: Set<Brevmottakertype>,
         dokumentType: DokumentType
     ): List<BrevmottakerInput> {
         val brevmottakerPartIds = mutableSetOf<PartId>()
@@ -122,12 +122,11 @@ class KabalDocumentMapper(
             value = partId.value
         )
 
-    private fun getNavn(partId: PartId): String? =
+    private fun getNavn(partId: PartId): String =
         if (partId.type == PartIdType.PERSON) {
             pdlFacade.getPersonInfo(partId.value).settSammenNavn()
         } else {
-            eregClient.hentOrganisasjon(partId.value)?.navn?.sammensattNavn()
+            eregClient.hentOrganisasjon(partId.value).navn.sammensattnavn
         }
-
 
 }

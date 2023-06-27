@@ -6,7 +6,7 @@ SKJERMEDE_BASE_URL: https://skjermede-personer-pip.intern.nav.no
 NORG2_API_V1_URL: https://norg2.prod-fss-pub.nais.io/norg2/api/v1
 PROXY_APP_CLIENT_ID: 981be1fb-1379-465f-bddc-7563197aed84
 
-EREG_URL: https://ereg-services.prod-fss-pub.nais.io/ereg/api
+EREG_URL: https://ereg-services.prod-fss-pub.nais.io/api/v2
 
 VEDTAK_FATTET_TOPIC: klage.vedtak-fattet.v1
 DVH_STATISTIKK_TOPIC: klage.kabal-statistikk.v1

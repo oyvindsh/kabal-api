@@ -24,9 +24,7 @@ data class Klager(
     )
     var prosessfullmektig: Prosessfullmektig? = null
 ) {
-    fun erPerson() = partId.type == PartIdType.PERSON
-
-    fun erVirksomhet() = partId.type == PartIdType.VIRKSOMHET
+    fun isPerson() = partId.type == PartIdType.PERSON
 
     fun toSakenGjelder() = SakenGjelder(
         partId = this.partId.copy(),

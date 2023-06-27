@@ -235,6 +235,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 
@@ -258,6 +260,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 
@@ -280,6 +284,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 
@@ -302,6 +308,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 
@@ -324,6 +332,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 
@@ -348,6 +358,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 
@@ -372,6 +384,8 @@ class TilgangServiceTest {
                 kjoenn = "",
                 sivilstand = null,
                 vergemaalEllerFremtidsfullmakt = false,
+                doed = null,
+                fullmakt = false,
             )
         )
 

@@ -128,6 +128,13 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
+    fun handleEREGOrganizationCeasedException(
+        ex: EREGOrganizationCeasedException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
+
+    @ExceptionHandler
     fun handleDocumentsToMergeReferenceNotFoundException(
         ex: DocumentsToMergeReferenceNotFoundException,
         request: NativeWebRequest

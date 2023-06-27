@@ -1,23 +1,24 @@
 package no.nav.klage.oppgave.clients.ereg
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import java.time.LocalDate
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Organisasjon(
     val navn: Navn,
     val organisasjonsnummer: String,
-    val type: String,
-)
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Navn(
-    val navnelinje1: String?,
-    val navnelinje2: String?,
-    val navnelinje3: String?,
-    val navnelinje4: String?,
-    val navnelinje5: String?,
-    val redigertnavn: String?
+    val organisasjonDetaljer: OrganisasjonDetaljer,
 ) {
-    fun sammensattNavn(): String =
-        listOfNotNull(navnelinje1, navnelinje2, navnelinje3, navnelinje4, navnelinje5).joinToString(separator = " ")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class Navn(
+        val sammensattnavn: String
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class OrganisasjonDetaljer(
+        val opphoersdato: LocalDate?
+    )
+
+    //is "ifAfter" necessary?
+    fun isActive() = organisasjonDetaljer.opphoersdato == null || organisasjonDetaljer.opphoersdato.isAfter(LocalDate.now())
 }

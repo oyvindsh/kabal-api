@@ -25,6 +25,13 @@ query($ident: ID!){
                 omfang
                 omfangetErInnenPersonligOmraade
             }
+        },
+        doedsfall {
+            doedsdato
+        },
+        fullmakt {
+            gyldigFraOgMed
+            gyldigTilOgMed
         }
     }
 }

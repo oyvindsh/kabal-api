@@ -57,7 +57,7 @@ open class DokumentUnderArbeid(
     )
     @Convert(converter = BrevmottakertypeConverter::class)
     @Column(name = "id")
-    open var brevmottakertyper: MutableSet<Brevmottakertype> = mutableSetOf(),
+    open var brevmottakertyper: Set<Brevmottakertype> = mutableSetOf(),
     @Column(name = "parent_id")
     open var parentId: UUID? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)

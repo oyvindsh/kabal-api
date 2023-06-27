@@ -14,7 +14,11 @@ import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.kodeverk.PartIdType
+import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
+import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentMapper
+import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
@@ -24,6 +28,9 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.exceptions.InvalidProperty
+import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
+import no.nav.klage.oppgave.exceptions.ValidationSection
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.DokumentService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -48,6 +55,9 @@ class DokumentUnderArbeidService(
     private val safClient: SafGraphQlClient,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val dokumentService: DokumentService,
+    private val kabalDocumentMapper: KabalDocumentMapper,
+    private val eregClient: EregClient,
+    private val pdlFacade: PdlFacade,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -417,35 +427,19 @@ class DokumentUnderArbeidService(
         ident: String,
         brevmottakertyper: Set<Brevmottakertype>
     ): DokumentUnderArbeid {
-        val documentValidationErrors = validateSmartDokument(dokumentId)
-        if (documentValidationErrors.any { it.errors.isNotEmpty() }) {
-            throw JsonToPdfValidationException(
-                msg = "Validation error from json to pdf",
-                errors = documentValidationErrors
-            )
-        }
-
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
-
-        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isEmpty()) {
-            throw DokumentValidationException("Brevmottakere må være satt")
-        }
-
-        //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
 
-        if (hovedDokument.erMarkertFerdig() || hovedDokument.erFerdigstilt()) {
-            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
-        }
-
-        if (hovedDokument.parentId != null) {
-            throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
-        }
+        validateBeforeFerdig(
+            brevmottakertyper = brevmottakertyper,
+            hovedDokument = hovedDokument,
+            behandling = behandling,
+        )
 
         val now = LocalDateTime.now()
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident)
-        hovedDokument.brevmottakertyper = brevmottakertyper.toMutableSet()
+        hovedDokument.brevmottakertyper = brevmottakertyper
         vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident) }
 
         //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
@@ -481,6 +475,71 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
+    private fun validateBeforeFerdig(
+        brevmottakertyper: Set<Brevmottakertype>,
+        hovedDokument: DokumentUnderArbeid,
+        behandling: Behandling,
+    ) {
+        val documentValidationErrors = validateSmartDokument(hovedDokument.id)
+        if (documentValidationErrors.any { it.errors.isNotEmpty() }) {
+            throw JsonToPdfValidationException(
+                msg = "Validation error from json to pdf",
+                errors = documentValidationErrors
+            )
+        }
+
+        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isEmpty()) {
+            throw DokumentValidationException("Brevmottakere må være satt")
+        }
+
+        if (hovedDokument.erMarkertFerdig() || hovedDokument.erFerdigstilt()) {
+            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
+        }
+
+        if (hovedDokument.parentId != null) {
+            throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
+        }
+
+        val mottakere = kabalDocumentMapper.mapBrevmottakere(
+            behandling = behandling,
+            brevMottakertyper = brevmottakertyper,
+            dokumentType = hovedDokument.dokumentType!!
+        )
+
+        val invalidProperties = mutableListOf<InvalidProperty>()
+
+        mottakere.forEach { mottaker ->
+            if (mottaker.partId.partIdTypeId == PartIdType.PERSON.id) {
+                val person = pdlFacade.getPersonInfo(mottaker.partId.value)
+                if (person.doed != null) {
+                    invalidProperties += InvalidProperty(
+                        field = mottaker.partId.value,
+                        reason = "Mottaker er død.",
+                    )
+                }
+            } else {
+                val organisasjon = eregClient.hentOrganisasjon(mottaker.partId.value)
+                if (!organisasjon.isActive()) {
+                    invalidProperties += InvalidProperty(
+                        field = mottaker.partId.value,
+                        reason = "Organisasjon har opphørt.",
+                    )
+                }
+            }
+        }
+
+        if (invalidProperties.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Ferdigstilling av dokument",
+                sections = listOf(
+                    ValidationSection(
+                        section = "mottakere",
+                        properties = invalidProperties,
+                    )
+                )
+            )
+        }
+    }
 
     fun getFysiskDokument(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..

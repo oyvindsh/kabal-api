@@ -18,16 +18,12 @@ class EregClientConfiguration(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @Value("\${EREG_APIKEY}")
-    private lateinit var apiKey: String
-
     @Value("\${EREG_URL}")
     private lateinit var eregServiceURL: String
 
     @Bean
     fun eregWebClient(): WebClient {
         return webClientBuilder
-            .defaultHeader("x-nav-apiKey", apiKey)
             .baseUrl(eregServiceURL)
             .clientConnector(ReactorClientHttpConnector(HttpClient.newConnection()))
             .build()
