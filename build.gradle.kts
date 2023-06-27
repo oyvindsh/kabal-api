@@ -16,11 +16,11 @@ val jacksonJsonschemaVersion = "1.0.39"
 val pdfboxVersion = "2.0.28"
 val tikaVersion = "2.8.0"
 val verapdfVersion = "1.22.2"
-val klageKodeverkVersion = "1.3.13"
+val klageKodeverkVersion = "1.3.14"
 
 plugins {
     val kotlinVersion = "1.8.22"
-    id("org.springframework.boot") version "3.1.0"
+    id("org.springframework.boot") version "3.1.1"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
