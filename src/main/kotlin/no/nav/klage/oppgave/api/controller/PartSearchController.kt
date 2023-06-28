@@ -26,20 +26,6 @@ class PartSearchController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PostMapping("/searchfullmektig")
-    @Deprecated("Use /searchpart")
-    fun searchFullmektig(
-        @RequestBody input: IdentifikatorInput,
-    ): BehandlingDetaljerView.PartView {
-        logMethodDetails(
-            ::searchFullmektig.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            logger
-        )
-
-        return partSearchService.searchPart(input.identifikator)
-    }
-
     @PostMapping("/searchpart")
     fun searchPart(
         @RequestBody input: IdentifikatorInput,
