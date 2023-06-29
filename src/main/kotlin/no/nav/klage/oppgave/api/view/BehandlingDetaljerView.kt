@@ -66,6 +66,22 @@ data class BehandlingDetaljerView(
         val id: String
         val name: String?
         val available: Boolean
+        val statusList: List<PartStatus>
+    }
+
+    data class PartStatus(
+        val status: Status,
+        val date: LocalDate? = null,
+    ) {
+        enum class Status {
+            DEAD,
+            DELETED,
+            FORTROLIG,
+            STRENGT_FORTROLIG,
+            EGEN_ANSATT,
+            VERGEMAAL,
+            FULLMAKT,
+        }
     }
 
     enum class Sex {
@@ -85,6 +101,7 @@ data class BehandlingDetaljerView(
         override val name: String?,
         override val type: IdType,
         override val available: Boolean,
+        override val statusList: List<PartStatus>,
     ): PartBase, IdPart
 
     data class SakenGjelderView(
@@ -92,6 +109,7 @@ data class BehandlingDetaljerView(
         override val name: String?,
         override val type: IdType,
         override val available: Boolean,
+        override val statusList: List<PartStatus>,
         val sex: Sex,
     ): PartBase, IdPart
 }

@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.PartIdType
+import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -15,6 +16,7 @@ class PartSearchService(
     private val pdlFacade: PdlFacade,
     private val behandlingService: BehandlingService,
     private val tilgangService: TilgangService,
+    private val behandlingMapper: BehandlingMapper,
 ) {
 
     companion object {
@@ -33,6 +35,7 @@ class PartSearchService(
                         name = person.settSammenNavn(),
                         type = BehandlingDetaljerView.IdType.FNR,
                         available = person.doed == null,
+                        statusList = behandlingMapper.getStatusList(person)
                     )
                 } else {
                     secureLogger.warn("Saksbehandler does not have access to view person")
@@ -46,12 +49,16 @@ class PartSearchService(
                     id = organisasjon.organisasjonsnummer,
                     name = organisasjon.navn.sammensattnavn,
                     type = BehandlingDetaljerView.IdType.ORGNR,
-                    available = organisasjon.isActive()
+                    available = organisasjon.isActive(),
+                    statusList = behandlingMapper.getStatusList(organisasjon),
                 )
             }
         }
 
-    fun searchPerson(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.SakenGjelderView =
+    fun searchPerson(
+        identifikator: String,
+        skipAccessControl: Boolean = false
+    ): BehandlingDetaljerView.SakenGjelderView =
         when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
             PartIdType.PERSON -> {
                 if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
@@ -63,6 +70,7 @@ class PartSearchService(
                         available = person.doed == null,
                         sex = person.kjoenn?.let { BehandlingDetaljerView.Sex.valueOf(it) }
                             ?: BehandlingDetaljerView.Sex.UKJENT,
+                        statusList = behandlingMapper.getStatusList(person),
                     )
                 } else {
                     secureLogger.warn("Saksbehandler does not have access to view person")
@@ -70,6 +78,10 @@ class PartSearchService(
                 }
             }
 
-            else -> throw RuntimeException("Invalid part type: " + behandlingService.getPartIdFromIdentifikator(identifikator).type)
+            else -> throw RuntimeException(
+                "Invalid part type: " + behandlingService.getPartIdFromIdentifikator(
+                    identifikator
+                ).type
+            )
         }
 }
