@@ -1,5 +1,6 @@
 package no.nav.klage.oppgave.repositories
 
+import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.domain.klage.Mottak
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -17,5 +18,7 @@ interface MottakRepository : JpaRepository<Mottak, UUID> {
         """
     )
     fun findBySakenGjelderOrKlager(fnr: String): List<Mottak>
+
+    fun findByYtelse(ytelse: Ytelse): List<Mottak>
 
 }
