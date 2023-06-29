@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.repositories.AnkebehandlingRepository
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -35,18 +36,7 @@ class CleanupHjelpemidlerService(
 
         klagebehandlingRepository.findByYtelse(Ytelse.HJE_HJE).forEach { klagebehandling ->
             try {
-                val sak = klageFssProxyClient.getSak(klagebehandling.kildeReferanse)
-                if (sak.tema != Ytelse.HJE_HJE.toTema().navn) {
-                    logString += "Behandling finished: ${klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler}, kilderef: ${klagebehandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
-                    logString += "Documents with wrong tema:\n"
-
-                    dokumentUnderArbeidRepository.findByBehandlingId(klagebehandling.id).filter { it.parentId == null }
-                        .forEach { documentWithWrongTema ->
-                            logString += "temaToSet: ${sak.tema}, journalpostIdList: " + documentWithWrongTema.journalposter.joinToString { it.journalpostId } + "\n"
-                        }
-
-                    logString += "\n\n"
-                }
+                logString += logForBehandling(klagebehandling)
             } catch (e: Exception) {
                 secureLogger.warn(
                     "Exception when logging list of affected journalposts where tema HJE is wrong. BehandlingId: ${klagebehandling.id}",
@@ -55,20 +45,11 @@ class CleanupHjelpemidlerService(
             }
         }
 
-        logString += "\n\n------------------ Anker ---------------------\n"
+        logString += "\n\n--------------- Anker -----------------\n"
 
         ankebehandlingRepository.findByYtelse(Ytelse.HJE_HJE).forEach { ankebehandling ->
             try {
-                val sak = klageFssProxyClient.getSak(ankebehandling.kildeReferanse)
-                if (sak.tema != Ytelse.HJE_HJE.toTema().navn) {
-                    logString += "Behandling finished: ${ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler}, kilderef: ${ankebehandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
-                    logString += "Documents with wrong tema:\n"
-
-                    dokumentUnderArbeidRepository.findByBehandlingId(ankebehandling.id).filter { it.parentId == null }
-                        .forEach { documentWithWrongTema ->
-                            logString += "kilderef: ${ankebehandling.kildeReferanse}, temaToSet: ${sak.tema}, journalpostIdList: " + documentWithWrongTema.journalposter.joinToString { it.journalpostId } + "\n"
-                        }
-                }
+                logString += logForBehandling(ankebehandling)
             } catch (e: Exception) {
                 secureLogger.warn(
                     "Exception when logging list of affected journalposts where tema HJE is wrong. BehandlingId: ${ankebehandling.id}",
@@ -78,6 +59,32 @@ class CleanupHjelpemidlerService(
         }
 
         secureLogger.debug(logString)
+    }
+
+    private fun logForBehandling(behandling: Behandling): String {
+        var logString = ""
+        val sak = klageFssProxyClient.getAnySak(behandling.kildeReferanse)
+        if (sak.tema != Ytelse.HJE_HJE.toTema().navn) {
+            logString += if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null) {
+                "Behandling finished: ${behandling.currentDelbehandling().avsluttetAvSaksbehandler}, kilderef: ${behandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
+            } else {
+                "Behandling not finished. Kilderef: ${behandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
+            }
+
+            val documentCandidates = dokumentUnderArbeidRepository.findByBehandlingId(behandling.id)
+                .filter { it.parentId == null }
+            logString += if (documentCandidates.isEmpty()) {
+                "No documents yet\n"
+            } else {
+                "Documents with wrong tema:\n"
+            }
+            documentCandidates.forEach { documentWithWrongTema ->
+                logString += "journalpostIdList: " + documentWithWrongTema.journalposter.joinToString { it.journalpostId } + "\n"
+            }
+
+            logString += "\n\n"
+        }
+        return logString
     }
 
 }
