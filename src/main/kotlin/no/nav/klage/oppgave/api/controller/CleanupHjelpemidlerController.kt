@@ -1,9 +1,11 @@
 package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.config.SecurityConfiguration
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.service.AdminService
+import no.nav.klage.oppgave.service.CleanupHjelpemidlerService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
-import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getSecureLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -13,23 +15,28 @@ import org.springframework.web.bind.annotation.*
 class CleanupHjelpemidlerController(
     private val adminService: AdminService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val cleanupHjelpemidlerService: CleanupHjelpemidlerService,
 ) {
 
     companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
+        private val secureLogger = getSecureLogger()
     }
 
-    @GetMapping("/internal/cleanup-hje", produces = ["application/json"])
+    @GetMapping("/internal/log-wrong-tema", produces = ["application/json"])
     @ResponseStatus(HttpStatus.OK)
-    fun cleanupHje() {
+    fun logWrongTemaForHjelpemidler() {
+
+        if (!innloggetSaksbehandlerService.isKabalOppgavestyringAlleEnheter()) {
+            throw MissingTilgangException("User does not have the role OppgavestyringAlleEnheter")
+        }
+
         try {
-            logger.info("Cleanup HJE")
+            secureLogger.debug("Log documents that have wrong tema in regards to HJE")
+            cleanupHjelpemidlerService.logJournalpostsWeNeedToPatch()
         } catch (e: Exception) {
-            logger.warn("Failed to cleanup HJE")
+            secureLogger.warn("Failed to log documents that have wrong tema in regards to HJE", e)
             throw e
         }
     }
-
 
 }
