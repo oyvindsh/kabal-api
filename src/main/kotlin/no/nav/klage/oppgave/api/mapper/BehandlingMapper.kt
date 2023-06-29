@@ -5,8 +5,10 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
+import no.nav.klage.oppgave.clients.ereg.Organisasjon
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.pdl.Person
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -214,6 +216,7 @@ class BehandlingMapper(
                     ?: BehandlingDetaljerView.Sex.UKJENT,
                 type = BehandlingDetaljerView.IdType.FNR,
                 available = person.doed == null,
+                statusList = getStatusList(person),
             )
         } else {
             throw RuntimeException("We don't support where sakenGjelder is virksomhet")
@@ -242,6 +245,7 @@ class BehandlingMapper(
                 name = person.settSammenNavn(),
                 type = BehandlingDetaljerView.IdType.FNR,
                 available = person.doed == null,
+                statusList = getStatusList(person),
             )
         } else {
             val organisasjon = eregClient.hentOrganisasjon(identificator)
@@ -250,6 +254,7 @@ class BehandlingMapper(
                 name = organisasjon.navn.sammensattnavn,
                 type = BehandlingDetaljerView.IdType.ORGNR,
                 available = organisasjon.isActive(),
+                statusList = getStatusList(organisasjon),
             )
         }
     }
@@ -353,6 +358,55 @@ class BehandlingMapper(
                 reason = it.reason,
                 fagsystemId = it.fagsystem.id
             )
+        }
+    }
+
+    fun getStatusList(person: Person): List<BehandlingDetaljerView.PartStatus> {
+        val statusList = mutableListOf<BehandlingDetaljerView.PartStatus>()
+
+        if (person.doed != null) {
+            statusList += BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.DEAD,
+                date = person.doed,
+            )
+        }
+        if (person.fullmakt) {
+            statusList += BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.FULLMAKT,
+            )
+        }
+        if (person.vergemaalEllerFremtidsfullmakt) {
+            statusList += BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.VERGEMAAL,
+            )
+        }
+        if (person.harBeskyttelsesbehovFortrolig()) {
+            statusList += BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.FORTROLIG,
+            )
+        }
+        if (person.harBeskyttelsesbehovStrengtFortrolig()) {
+            statusList += BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.STRENGT_FORTROLIG,
+            )
+        }
+        if (egenAnsattService.erEgenAnsatt(person.foedselsnr)) {
+            statusList += BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.EGEN_ANSATT,
+            )
+        }
+
+        return statusList
+    }
+
+    fun getStatusList(organisasjon: Organisasjon): List<BehandlingDetaljerView.PartStatus> {
+        return if (!organisasjon.isActive()) {
+            return listOf(BehandlingDetaljerView.PartStatus(
+                status = BehandlingDetaljerView.PartStatus.Status.DELETED,
+                date = organisasjon.organisasjonDetaljer.opphoersdato,
+            ))
+        } else {
+            emptyList()
         }
     }
 }
