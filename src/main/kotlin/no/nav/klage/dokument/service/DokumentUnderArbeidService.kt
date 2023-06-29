@@ -508,21 +508,14 @@ class DokumentUnderArbeidService(
 
         val invalidProperties = mutableListOf<InvalidProperty>()
 
+        //Could ignore NOTAT here. We'll see.
         mottakere.forEach { mottaker ->
-            if (mottaker.partId.partIdTypeId == PartIdType.PERSON.id) {
-                val person = pdlFacade.getPersonInfo(mottaker.partId.value)
-                if (person.doed != null) {
-                    invalidProperties += InvalidProperty(
-                        field = mottaker.partId.value,
-                        reason = "Mottaker er død.",
-                    )
-                }
-            } else {
+            if (mottaker.partId.partIdTypeId == PartIdType.VIRKSOMHET.id) {
                 val organisasjon = eregClient.hentOrganisasjon(mottaker.partId.value)
                 if (!organisasjon.isActive()) {
                     invalidProperties += InvalidProperty(
                         field = mottaker.partId.value,
-                        reason = "Organisasjon har opphørt.",
+                        reason = "Organisasjon er avviklet.",
                     )
                 }
             }
