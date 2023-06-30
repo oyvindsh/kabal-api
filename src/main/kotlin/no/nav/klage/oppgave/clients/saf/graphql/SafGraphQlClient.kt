@@ -58,6 +58,7 @@ class SafGraphQlClient(
     fun getJournalpostAsSaksbehandler(journalpostId: String): Journalpost {
         return runWithTimingAndLogging {
             val token = tokenUtil.getSaksbehandlerAccessTokenWithSafScope()
+            secureLogger.debug("getJournalpostAsSaksbehandler token: {}", token)
             getJournalpostWithToken(journalpostId, token)
         }
     }
