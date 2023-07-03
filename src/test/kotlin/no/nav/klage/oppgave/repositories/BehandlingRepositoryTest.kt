@@ -329,7 +329,7 @@ class BehandlingRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
         val result =
-            behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet = ENHET_1)
+            behandlingRepository.findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet = ENHET_1)
 
         assertThat(result).isEqualTo(listOf(klageTildeltEnhet1))
     }

@@ -757,7 +757,7 @@ class BehandlingService(
 
     @Transactional(readOnly = true)
     fun findBehandlingerForAvslutning(): List<Pair<UUID, Type>> =
-        behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull()
+        behandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull()
             .map { it.id to it.type }
 
     fun getPotentialSaksbehandlereForBehandling(behandlingId: UUID): Saksbehandlere {
@@ -771,7 +771,7 @@ class BehandlingService(
     }
 
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
-        return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
+        return behandlingRepository.findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
             enhet
         )
     }

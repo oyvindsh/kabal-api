@@ -68,7 +68,7 @@ class KlagebehandlingService(
     fun findCompletedKlagebehandlingById(
         klagebehandlingId: UUID
     ): CompletedKlagebehandling {
-        val behandling = klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId)
+        val behandling = klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId)
         if (behandling != null) {
             behandlingService.checkLeseTilgang(behandling)
             return behandling.toCompletedKlagebehandling()
@@ -104,7 +104,7 @@ class KlagebehandlingService(
     fun findMuligAnkeByPartId(
         partId: String
     ): List<MuligAnke> =
-        klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndFeilregistreringIsNull()
+        klagebehandlingRepository.findByAvsluttetIsNotNullAndFeilregistreringIsNull()
             .filter {
                 it.klager.partId.value == partId &&
                         muligAnkeUtfall.contains(it.utfall)
@@ -116,7 +116,7 @@ class KlagebehandlingService(
         klagebehandlingId: UUID
     ): MuligAnke? {
         val klagebehandling =
-            klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId) ?: return null
+            klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
             klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.utfall)
         ) {

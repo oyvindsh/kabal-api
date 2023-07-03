@@ -17,10 +17,10 @@ interface BehandlingRepository : JpaRepository<Behandling, UUID> {
         type: Type,
     ): Boolean
 
-    fun findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull(): List<Behandling>
+    fun findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull(): List<Behandling>
 
-    @EntityGraph(attributePaths = ["saksdokumenter", "hjemler", "delbehandlinger.hjemler", "delbehandlinger.medunderskriverHistorikk"])
-    fun findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet: String): List<Behandling>
+    @EntityGraph(attributePaths = ["saksdokumenter", "hjemler", "registreringshjemler", "medunderskriverHistorikk"])
+    fun findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet: String): List<Behandling>
 
     @Deprecated("See getOne")
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
