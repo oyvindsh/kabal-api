@@ -26,6 +26,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.random.Random
 
 @Service
 @Transactional
@@ -318,7 +319,7 @@ class DokumentMapper {
                     value = it.verdi,
                 )
             },
-            kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
+            kanal = DokumentReferanse.Kanal.NAV_NO,
             kanalnavn = journalpost.kanalnavn,
             utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
         )
@@ -329,7 +330,24 @@ class DokumentMapper {
     }
 
     private fun getUtsendingsinfo(utsendingsinfo: Utsendingsinfo?): DokumentReferanse.Utsendingsinfo? {
-        if (utsendingsinfo == null) {
+
+        return if (Random.nextBoolean()) {
+            DokumentReferanse.Utsendingsinfo(
+                epostVarselSendt = DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
+                    tittel = "Du har fått brev",
+                    adresse = "test@test.no",
+                    varslingstekst = "Les mer."
+
+                ),
+                smsVarselSendt = null,
+                fysiskpostSendt = null,
+                digitalpostSendt = null
+            )
+        } else {
+            null
+        }
+
+        /*if (utsendingsinfo == null) {
             return null
         }
 
@@ -359,7 +377,7 @@ class DokumentMapper {
                     )
                 } else null,
             )
-        }
+        }*/
     }
 
     private fun getVedlegg(
