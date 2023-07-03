@@ -311,7 +311,10 @@ class DokumentMapper {
                     dato = it.dato,
                     datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
                 )
-            },
+            }?.plus(DokumentReferanse.RelevantDato(
+                dato = LocalDateTime.now(),
+                datotype = DokumentReferanse.RelevantDato.Datotype.DATO_EKSPEDERT
+            )),
             antallRetur = journalpost.antallRetur?.toInt(),
             tilleggsopplysninger = journalpost.tilleggsopplysninger?.map {
                 DokumentReferanse.Tilleggsopplysning(
