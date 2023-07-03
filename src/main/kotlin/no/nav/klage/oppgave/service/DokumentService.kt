@@ -339,7 +339,21 @@ class DokumentMapper {
                 epostVarselSendt = DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
                     tittel = "Du har fått brev",
                     adresse = "test@test.no",
-                    varslingstekst = "Les mer."
+                    varslingstekst = """
+                        <!DOCTYPE html><html><head><title>Melding fra NAV</title></head><body><!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Melding fra NAV</title>
+                    </head>
+                    <body>
+                        <p>Hei!</p>
+                        <p>Du har fått en melding fra NAV.</p>
+                        <p>Logg inn på nav.no for å lese den.</p>
+                        <p>Vennlig hilsen</p>
+                        <p>NAV</p>
+                    </body>
+                </html></body></html>
+                    """.trimIndent()
 
                 ),
                 smsVarselSendt = null,
