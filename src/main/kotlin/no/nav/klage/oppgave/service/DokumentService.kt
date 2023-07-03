@@ -320,7 +320,7 @@ class DokumentMapper {
                 )
             },
             kanal = DokumentReferanse.Kanal.NAV_NO,
-            kanalnavn = journalpost.kanalnavn,
+            kanalnavn = "Nav.no",
             utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
         )
 
