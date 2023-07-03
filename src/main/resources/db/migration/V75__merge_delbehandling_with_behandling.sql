@@ -2,9 +2,9 @@ ALTER TABLE klage.behandling
     ADD COLUMN utfall_id                                  TEXT,
     ADD COLUMN dato_behandling_avsluttet_av_saksbehandler TIMESTAMP,
     ADD COLUMN dato_behandling_avsluttet                  TIMESTAMP,
-    ADD COLUMN medunderskriverident TEXT,
-    ADD COLUMN dato_sendt_medunderskriver TIMESTAMP,
-    ADD COLUMN medunderskriverflyt_id TEXT;
+    ADD COLUMN medunderskriverident                       TEXT,
+    ADD COLUMN dato_sendt_medunderskriver                 TIMESTAMP,
+    ADD COLUMN medunderskriverflyt_id                     TEXT;
 
 
 UPDATE klage.behandling b
@@ -23,18 +23,18 @@ SET dato_behandling_avsluttet = (select d.dato_behandling_avsluttet
 
 UPDATE klage.behandling b
 SET medunderskriverident = (select d.medunderskriverident
-                 from klage.delbehandling d
-                 where d.behandling_id = b.id);
+                            from klage.delbehandling d
+                            where d.behandling_id = b.id);
 
 UPDATE klage.behandling b
 SET dato_sendt_medunderskriver = (select d.dato_sendt_medunderskriver
-                 from klage.delbehandling d
-                 where d.behandling_id = b.id);
+                                  from klage.delbehandling d
+                                  where d.behandling_id = b.id);
 
 UPDATE klage.behandling b
 SET medunderskriverflyt_id = (select d.medunderskriverflyt_id
-                                  from klage.delbehandling d
-                                  where d.behandling_id = b.id);
+                              from klage.delbehandling d
+                              where d.behandling_id = b.id);
 
 
 ALTER TABLE klage.delbehandling_registreringshjemmel
@@ -42,8 +42,8 @@ ALTER TABLE klage.delbehandling_registreringshjemmel
 
 UPDATE klage.delbehandling_registreringshjemmel dr
 SET behandling_id = (select d.behandling_id
-                                 from klage.delbehandling d
-                                 where d.id = dr.delbehandling_id);
+                     from klage.delbehandling d
+                     where d.id = dr.delbehandling_id);
 
 ALTER TABLE klage.delbehandling_registreringshjemmel
     ALTER COLUMN behandling_id SET NOT NULL;
