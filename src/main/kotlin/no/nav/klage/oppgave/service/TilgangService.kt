@@ -30,7 +30,7 @@ class TilgangService(
 
     //TODO: Denne brukes bare i tester, rydd opp ved anledning.
     fun verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling: Klagebehandling) {
-        if (klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null || klagebehandling.currentDelbehandling().avsluttet != null) {
+        if (klagebehandling.avsluttetAvSaksbehandler != null || klagebehandling.avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -40,8 +40,8 @@ class TilgangService(
     }
 
     fun verifyInnloggetSaksbehandlersSkrivetilgang(behandling: Behandling) {
-        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null ||
-            behandling.currentDelbehandling().avsluttet != null
+        if (behandling.avsluttetAvSaksbehandler != null ||
+            behandling.avsluttet != null
         ) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet behandling")
         }
@@ -58,7 +58,7 @@ class TilgangService(
         ident == behandling.tildeling?.saksbehandlerident
 
     fun verifySystembrukersSkrivetilgang(behandling: Behandling) {
-        if (behandling.currentDelbehandling().avsluttet != null) {
+        if (behandling.avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet behandling")
         }
     }
@@ -76,11 +76,11 @@ class TilgangService(
     }
 
     fun verifyInnloggetSaksbehandlerErMedunderskriverAndNotFinalized(behandling: Behandling) {
-        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null || behandling.currentDelbehandling().avsluttet != null) {
+        if (behandling.avsluttetAvSaksbehandler != null || behandling.avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        if (ident != behandling.currentDelbehandling().medunderskriver?.saksbehandlerident) {
+        if (ident != behandling.medunderskriver?.saksbehandlerident) {
             throw MissingTilgangException("Innlogget saksbehandler er ikke medunderskriver")
         }
     }

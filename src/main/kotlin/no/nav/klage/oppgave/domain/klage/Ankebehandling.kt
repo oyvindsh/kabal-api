@@ -1,12 +1,9 @@
 package no.nav.klage.oppgave.domain.klage
 
-import jakarta.persistence.Column
-import jakarta.persistence.DiscriminatorValue
-import jakarta.persistence.Entity
-import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.Ytelse
+import jakarta.persistence.*
+import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -56,11 +53,17 @@ class Ankebehandling(
     //Hovedbehandling
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
-    delbehandlinger: Set<Delbehandling>,
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
     hjemler: Set<Hjemmel> = emptySet(),
     sattPaaVent: SattPaaVent? = null,
     feilregistrering: Feilregistrering? = null,
+    utfall: Utfall? = null,
+    registreringshjemler: MutableSet<Registreringshjemmel> = mutableSetOf(),
+    medunderskriver: MedunderskriverTildeling? = null,
+    medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
+    medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
+    avsluttet: LocalDateTime? = null,
+    avsluttetAvSaksbehandler: LocalDateTime? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -77,11 +80,17 @@ class Ankebehandling(
     fagsakId = fagsakId,
     fagsystem = fagsystem,
     dvhReferanse = dvhReferanse,
-    delbehandlinger = delbehandlinger,
     saksdokumenter = saksdokumenter,
     hjemler = hjemler,
     sattPaaVent = sattPaaVent,
     feilregistrering = feilregistrering,
+    utfall = utfall,
+    registreringshjemler = registreringshjemler,
+    medunderskriver = medunderskriver,
+    medunderskriverFlyt = medunderskriverFlyt,
+    medunderskriverHistorikk = medunderskriverHistorikk,
+    avsluttet = avsluttet,
+    avsluttetAvSaksbehandler = avsluttetAvSaksbehandler,
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +

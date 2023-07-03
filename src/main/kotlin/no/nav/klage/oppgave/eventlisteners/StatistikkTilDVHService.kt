@@ -75,7 +75,7 @@ class StatistikkTilDVHService(
     private fun getBehandlingState(behandlingEndretEvent: BehandlingEndretEvent): BehandlingState {
         val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
         val type = behandlingEndretEvent.behandling.type
-        val utfall = behandlingEndretEvent.behandling.currentDelbehandling().utfall
+        val utfall = behandlingEndretEvent.behandling.utfall
 
         return when {
             endringslogginnslag.isEmpty() && type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
@@ -150,9 +150,9 @@ class StatistikkTilDVHService(
             behandlingStatus = behandlingState,
             behandlingType = getBehandlingTypeName(behandling.type),
             //Means medunderskriver
-            beslutter = behandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
+            beslutter = behandling.medunderskriver?.saksbehandlerident,
             endringstid = getFunksjoneltEndringstidspunkt(behandling, behandlingState),
-            hjemmel = behandling.currentDelbehandling().hjemler.map { it.toSearchableString() },
+            hjemmel = behandling.hjemler.map { it.toSearchableString() },
             klager = getPart(behandling.klager.partId.type, behandling.klager.partId.value),
             opprinneligFagsaksystem = behandling.fagsystem.navn,
             overfoertKA = behandling.mottattKlageinstans.toLocalDate(),
@@ -161,7 +161,7 @@ class StatistikkTilDVHService(
             saksbehandler = behandling.tildeling?.saksbehandlerident,
             saksbehandlerEnhet = behandling.tildeling?.enhet,
             tekniskTid = behandling.modified,
-            vedtaksdato = behandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
+            vedtaksdato = behandling.avsluttetAvSaksbehandler?.toLocalDate(),
             ytelseType = behandling.ytelse.navn,
         )
     }
@@ -177,7 +177,7 @@ class StatistikkTilDVHService(
         if (behandling.feilregistrering != null) {
             ExternalUtfall.FEILREGISTRERT.navn
         } else if (behandling.avsluttetAvSaksbehandler != null) {
-            behandling.currentDelbehandling().utfall?.name?.let { ExternalUtfall.valueOf(it).navn }
+            behandling.utfall?.name?.let { ExternalUtfall.valueOf(it).navn }
         } else {
             null
         }
@@ -195,7 +195,7 @@ class StatistikkTilDVHService(
                 if (behandling.feilregistrering != null) {
                     behandling.feilregistrering!!.registered
                 } else {
-                    behandling.currentDelbehandling().avsluttetAvSaksbehandler
+                    behandling.avsluttetAvSaksbehandler
                         ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
                 }
 
@@ -206,7 +206,7 @@ class StatistikkTilDVHService(
                 LocalDateTime.now()
             }
 
-            BehandlingState.SENDT_TIL_TR -> behandling.currentDelbehandling().avsluttetAvSaksbehandler
+            BehandlingState.SENDT_TIL_TR -> behandling.avsluttetAvSaksbehandler
                 ?: throw RuntimeException("avsluttetAvSaksbehandler mangler")
 
             BehandlingState.MOTTATT_FRA_TR -> {

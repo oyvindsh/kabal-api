@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.service
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.klage.Behandling
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setHjemlerInVedtak
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfallInVedtak
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -51,7 +51,7 @@ class VedtakService(
         )
         //TODO: Versjonssjekk på input
         val event =
-            behandling.setHjemlerInVedtak(hjemler, utfoerendeSaksbehandlerIdent)
+            behandling.setRegistreringshjemler(hjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return behandling
     }

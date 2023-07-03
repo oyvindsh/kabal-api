@@ -109,23 +109,21 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         },
         forrigeBehandlendeEnhet = avsenderEnhetFoersteinstans.let { BehandlingSkjemaV2.Enhet(it) },
         sakMottattKaDato = mottattKlageinstans,
-        avsluttetAvSaksbehandlerTidspunkt = currentDelbehandling().avsluttetAvSaksbehandler,
-        avsluttetTidspunkt = currentDelbehandling().avsluttet,
+        avsluttetAvSaksbehandlerTidspunkt = avsluttetAvSaksbehandler,
+        avsluttetTidspunkt = avsluttet,
         fristDato = frist,
         gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
-        medunderskriver = currentDelbehandling().medunderskriver?.mapToSkjemaV2(),
-        medunderskriverFlytStatus = currentDelbehandling().medunderskriverFlyt.mapToSkjemaV2(),
+        medunderskriver = medunderskriver?.mapToSkjemaV2(),
+        medunderskriverFlytStatus = medunderskriverFlyt.mapToSkjemaV2(),
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
         kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
-        vedtak = delbehandlinger.let { vedtak ->
-            BehandlingSkjemaV2.Vedtak(
-                utfall = vedtak.first().utfall?.mapToSkjemaV2(),
-                hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
-            )
-        },
+        vedtak = BehandlingSkjemaV2.Vedtak(
+            utfall = utfall?.mapToSkjemaV2(),
+            hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
+        ),
         sattPaaVent = sattPaaVent?.from,
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
@@ -159,23 +157,22 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         forrigeVedtaksDato = klageVedtaksDato,
         forrigeBehandlendeEnhet = klageBehandlendeEnhet.let { BehandlingSkjemaV2.Enhet(it) },
         sakMottattKaDato = mottattKlageinstans,
-        avsluttetAvSaksbehandlerTidspunkt = currentDelbehandling().avsluttetAvSaksbehandler,
-        avsluttetTidspunkt = currentDelbehandling().avsluttet,
+        avsluttetAvSaksbehandlerTidspunkt = avsluttetAvSaksbehandler,
+        avsluttetTidspunkt = avsluttet,
         fristDato = frist,
         gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
-        medunderskriver = currentDelbehandling().medunderskriver?.mapToSkjemaV2(),
-        medunderskriverFlytStatus = currentDelbehandling().medunderskriverFlyt.mapToSkjemaV2(),
+        medunderskriver = medunderskriver?.mapToSkjemaV2(),
+        medunderskriverFlytStatus = medunderskriverFlyt.mapToSkjemaV2(),
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
         kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
-        vedtak = delbehandlinger.let { vedtak ->
-            BehandlingSkjemaV2.Vedtak(
-                utfall = vedtak.first().utfall?.mapToSkjemaV2(),
-                hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
-            )
-        },
+        vedtak =
+        BehandlingSkjemaV2.Vedtak(
+            utfall = utfall?.mapToSkjemaV2(),
+            hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
+        ),
         sattPaaVent = sattPaaVent?.from,
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
@@ -198,30 +195,29 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         sakFagsystem = fagsystem.mapToSkjemaV2(),
         sakFagsakId = fagsakId,
         sakMottattKaDato = mottattKlageinstans,
-        avsluttetAvSaksbehandlerTidspunkt = currentDelbehandling().avsluttetAvSaksbehandler,
-        avsluttetTidspunkt = currentDelbehandling().avsluttet,
+        avsluttetAvSaksbehandlerTidspunkt = avsluttetAvSaksbehandler,
+        avsluttetTidspunkt = avsluttet,
         fristDato = frist,
         gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
-        medunderskriver = currentDelbehandling().medunderskriver?.mapToSkjemaV2(),
-        medunderskriverFlytStatus = currentDelbehandling().medunderskriverFlyt.mapToSkjemaV2(),
+        medunderskriver = medunderskriver?.mapToSkjemaV2(),
+        medunderskriverFlytStatus = medunderskriverFlyt.mapToSkjemaV2(),
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
         kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
-        vedtak = delbehandlinger.let { vedtak ->
+        vedtak =
             BehandlingSkjemaV2.Vedtak(
-                utfall = vedtak.first().utfall?.mapToSkjemaV2(),
-                hjemler = vedtak.first().hjemler.map { it.mapToSkjemaV2() },
-            )
-        },
+                utfall = utfall?.mapToSkjemaV2(),
+                hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
+            ),
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered,
         sattPaaVent = sattPaaVent?.from,
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
 
-    )
+        )
 }
 
 data class BehandlingSkjemaV2(

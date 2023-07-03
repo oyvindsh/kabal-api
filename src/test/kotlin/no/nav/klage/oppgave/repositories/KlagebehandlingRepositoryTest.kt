@@ -79,7 +79,6 @@ class KlagebehandlingRepositoryTest {
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -131,7 +130,6 @@ class KlagebehandlingRepositoryTest {
             mottakId = mottak.id,
             mottattVedtaksinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet",
-            delbehandlinger = setOf(Delbehandling()),
             saksdokumenter = mutableSetOf(
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
                 Saksdokument(journalpostId = "REF2", dokumentInfoId = "321"),
@@ -190,7 +188,6 @@ class KlagebehandlingRepositoryTest {
             mottakId = mottak.id,
             mottattVedtaksinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet",
-            delbehandlinger = setOf(Delbehandling()),
             saksdokumenter = mutableSetOf(
                 Saksdokument(journalpostId = "REF1", dokumentInfoId = "123"),
                 Saksdokument(journalpostId = "REF2", dokumentInfoId = "321"),
@@ -278,12 +275,8 @@ class KlagebehandlingRepositoryTest {
             mottakId = mottak1.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(
-                Delbehandling(
-                    avsluttet = LocalDateTime.now(),
-                    utfall = Utfall.STADFESTELSE,
-                )
-            ),
+            avsluttet = LocalDateTime.now(),
+            utfall = Utfall.STADFESTELSE,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -309,12 +302,8 @@ class KlagebehandlingRepositoryTest {
             mottakId = mottak1.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(
-                Delbehandling(
-                    avsluttet = LocalDateTime.now(),
-                    utfall = Utfall.RETUR,
-                )
-            ),
+            avsluttet = LocalDateTime.now(),
+            utfall = Utfall.RETUR,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -340,12 +329,8 @@ class KlagebehandlingRepositoryTest {
             mottakId = mottak2.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(
-                Delbehandling(
-                    avsluttet = LocalDateTime.now(),
-                    utfall = Utfall.STADFESTELSE,
-                )
-            ),
+            avsluttet = LocalDateTime.now(),
+            utfall = Utfall.STADFESTELSE,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -373,7 +358,6 @@ class KlagebehandlingRepositoryTest {
             kakaKvalitetsvurderingVersion = 2,
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
-            delbehandlinger = setOf(),
             frist = LocalDate.now().plusWeeks(12),
         )
 

@@ -83,7 +83,6 @@ class MeldingRepositoryTest {
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )

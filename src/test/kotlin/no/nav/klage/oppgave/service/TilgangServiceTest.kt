@@ -66,11 +66,7 @@ class TilgangServiceTest {
             mottakId = UUID.randomUUID(),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(
-                Delbehandling(
-                    avsluttet = LocalDateTime.now(),
-                )
-            ),
+            avsluttet = LocalDateTime.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -105,11 +101,7 @@ class TilgangServiceTest {
             mottakId = UUID.randomUUID(),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(
-                Delbehandling(
-                    avsluttetAvSaksbehandler = LocalDateTime.now(),
-                )
-            ),
+            avsluttetAvSaksbehandler = LocalDateTime.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -145,7 +137,6 @@ class TilgangServiceTest {
             tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now()),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -178,7 +169,6 @@ class TilgangServiceTest {
             mottakId = UUID.randomUUID(),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )
@@ -212,7 +202,6 @@ class TilgangServiceTest {
             tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now()),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
         )

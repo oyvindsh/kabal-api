@@ -33,14 +33,6 @@ class Delbehandling(
     var modified: LocalDateTime = LocalDateTime.now(),
     @Column(name = "created")
     val created: LocalDateTime = LocalDateTime.now(),
-    //Antageligvis ikke lenger i bruk.
-    @Column(name = "dokument_enhet_id")
-    var dokumentEnhetId: UUID? = null,
-    //Vent med vurdering. Mulig det skal være draft på tvers av delbehandlingerer.
-    @Column(name = "smart_editor_id")
-    var smartEditorId: String? = null,
-    @Column(name = "hovedadressat_journalpost_id")
-    var hovedAdressatJournalpostId: String? = null,
     //Hører hjemme på delbehandlinger
     @Embedded
     @AttributeOverrides(
@@ -85,31 +77,4 @@ class Delbehandling(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
-    fun shouldBeSentToTrygderetten(): Boolean {
-        return utfall in utfallToTrygderetten
-    }
-
-    fun shouldCreateNewAnkebehandling(): Boolean {
-        return utfall in utfallToNewAnkebehandling
-    }
 }
-
-val utfallToNewAnkebehandling = setOf(
-    Utfall.HENVIST
-)
-
-val utfallToTrygderetten = setOf(
-    Utfall.DELVIS_MEDHOLD,
-    Utfall.INNSTILLING_AVVIST,
-    Utfall.INNSTILLING_STADFESTELSE
-)
-
-val utfallWithoutAnkemulighet = setOf(
-    Utfall.RETUR,
-    Utfall.TRUKKET,
-    Utfall.OPPHEVET,
-)
-
-val noRegistringshjemmelNeeded = listOf(Utfall.TRUKKET, Utfall.RETUR)
-val noKvalitetsvurderingNeeded = listOf(Utfall.TRUKKET, Utfall.RETUR, Utfall.UGUNST)

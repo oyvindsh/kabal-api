@@ -23,7 +23,6 @@ class KabalDocumentMapperTest {
 
 
     companion object {
-        private val vedtakId = UUID.randomUUID()
         private val fnr = "12345678910"
         private val fnr2 = "22345678910"
         private val fnr3 = "32345678910"
@@ -70,11 +69,6 @@ class KabalDocumentMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
@@ -115,11 +109,6 @@ class KabalDocumentMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
@@ -159,11 +148,6 @@ class KabalDocumentMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
@@ -208,11 +192,6 @@ class KabalDocumentMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
@@ -266,11 +245,6 @@ class KabalDocumentMapperTest {
             mottattKlageinstans = LocalDateTime.now(),
             ytelse = Ytelse.OMS_OMP,
             type = Type.KLAGE,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    id = vedtakId
-                )
-            ),
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
             kakaKvalitetsvurderingId = UUID.randomUUID(),

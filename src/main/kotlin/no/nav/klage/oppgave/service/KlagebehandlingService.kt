@@ -80,8 +80,8 @@ class KlagebehandlingService(
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
         behandlingId = id,
         ytelseId = ytelse.id,
-        utfallId = currentDelbehandling().utfall!!.id,
-        vedtakDate = currentDelbehandling().avsluttetAvSaksbehandler!!,
+        utfallId = utfall!!.id,
+        vedtakDate = avsluttetAvSaksbehandler!!,
         sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
         klager = behandlingMapper.getPartView(klager),
         fullmektig = klager.prosessfullmektig?.let { behandlingMapper.getPartView(it) },
@@ -107,7 +107,7 @@ class KlagebehandlingService(
         klagebehandlingRepository.findByDelbehandlingerAvsluttetIsNotNullAndFeilregistreringIsNull()
             .filter {
                 it.klager.partId.value == partId &&
-                        muligAnkeUtfall.contains(it.currentDelbehandling().utfall)
+                        muligAnkeUtfall.contains(it.utfall)
             }
             .map { it.toMuligAnke() }
 
@@ -118,7 +118,7 @@ class KlagebehandlingService(
         val klagebehandling =
             klagebehandlingRepository.findByIdAndDelbehandlingerAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
-            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.currentDelbehandling().utfall)
+            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.utfall)
         ) {
             klagebehandling.toMuligAnke()
         } else {
@@ -147,7 +147,6 @@ class KlagebehandlingService(
                 tildeling = null,
                 frist = mottak.generateFrist(),
                 mottakId = mottak.id,
-                delbehandlinger = setOf(Delbehandling()),
                 saksdokumenter = dokumentService.createSaksdokumenterFromJournalpostIdSet(mottak.mottakDokument.map { it.journalpostId }),
                 kakaKvalitetsvurderingId = kakaApiGateway.createKvalitetsvurdering(kvalitetsvurderingVersion = kvalitetsvurderingVersion).kvalitetsvurderingId,
                 kakaKvalitetsvurderingVersion = kvalitetsvurderingVersion,
@@ -188,9 +187,9 @@ class KlagebehandlingService(
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,
         this.ytelse.toTema(),
-        this.currentDelbehandling().utfall!!,
+        this.utfall!!,
         this.innsendt!!,
-        this.currentDelbehandling().avsluttetAvSaksbehandler!!,
+        this.avsluttetAvSaksbehandler!!,
         this.klager.partId.value
     )
 }

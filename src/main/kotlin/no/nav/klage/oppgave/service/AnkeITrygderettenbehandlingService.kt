@@ -9,7 +9,6 @@ import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingInput
-import no.nav.klage.oppgave.domain.klage.Delbehandling
 import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -54,7 +53,6 @@ class AnkeITrygderettenbehandlingService(
                 fagsakId = input.fagsakId,
                 mottattKlageinstans = input.sakMottattKlageinstans,
                 tildeling = null,
-                delbehandlinger = setOf(Delbehandling()),
                 hjemler = if (input.innsendingsHjemler.isNullOrEmpty()) {
                     mutableSetOf(Hjemmel.MANGLER)
                 } else {

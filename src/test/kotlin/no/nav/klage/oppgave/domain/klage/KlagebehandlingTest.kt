@@ -32,7 +32,6 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -55,7 +54,6 @@ internal class KlagebehandlingTest {
                 tildeling = Tildeling(saksbehandlerident = null, tidspunkt = LocalDateTime.now()),
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -78,7 +76,6 @@ internal class KlagebehandlingTest {
                 tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now()),
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(Delbehandling()),
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -100,12 +97,8 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(
-                    Delbehandling(
-                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                        medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
-                    ),
-                ),
+                medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -127,12 +120,8 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(
-                    Delbehandling(
-                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                        medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
-                    )
-                ),
+                medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -154,11 +143,7 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(
-                    Delbehandling(
-                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                    )
-                ),
+                medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -181,11 +166,7 @@ internal class KlagebehandlingTest {
                 tildeling = Tildeling(saksbehandlerident = "abc", tidspunkt = LocalDateTime.now()),
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(
-                    Delbehandling(
-                        medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
-                    )
-                ),
+                medunderskriver = MedunderskriverTildeling(null, LocalDateTime.now()),
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),
@@ -207,12 +188,8 @@ internal class KlagebehandlingTest {
                 type = Type.KLAGE,
                 mottattVedtaksinstans = LocalDate.now(),
                 avsenderEnhetFoersteinstans = enhet,
-                delbehandlinger = setOf(
-                    Delbehandling(
-                        medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
-                        avsluttet = LocalDateTime.now(),
-                    )
-                ),
+                medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now()),
+                avsluttet = LocalDateTime.now(),
                 kakaKvalitetsvurderingId = UUID.randomUUID(),
                 kakaKvalitetsvurderingVersion = 2,
                 frist = LocalDate.now().plusWeeks(12),

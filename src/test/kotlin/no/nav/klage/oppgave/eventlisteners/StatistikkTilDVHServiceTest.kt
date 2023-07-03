@@ -154,7 +154,6 @@ class StatistikkTilDVHServiceTest {
         kakaKvalitetsvurderingVersion = 0,
         created = LocalDateTime.now(),
         modified = LocalDateTime.now(),
-        delbehandlinger = setOf(),
         saksdokumenter = mutableSetOf(),
         hjemler = setOf(),
         sattPaaVent = null
@@ -193,7 +192,6 @@ class StatistikkTilDVHServiceTest {
         kakaKvalitetsvurderingVersion = 0,
         created = LocalDateTime.now(),
         modified = LocalDateTime.now(),
-        delbehandlinger = setOf(),
         saksdokumenter = mutableSetOf(),
         hjemler = setOf(),
         sattPaaVent = null
@@ -228,7 +226,6 @@ class StatistikkTilDVHServiceTest {
         kakaKvalitetsvurderingVersion = 0,
         created = LocalDateTime.now(),
         modified = LocalDateTime.now(),
-        delbehandlinger = setOf(),
         saksdokumenter = mutableSetOf(),
         hjemler = setOf(),
         sattPaaVent = null,
@@ -262,7 +259,6 @@ class StatistikkTilDVHServiceTest {
         tildelingHistorikk = mutableSetOf(),
         created = LocalDateTime.now(),
         modified = LocalDateTime.now(),
-        delbehandlinger = setOf(),
         saksdokumenter = mutableSetOf(),
         hjemler = setOf(),
         sattPaaVent = null,
