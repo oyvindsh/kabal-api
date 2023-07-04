@@ -50,12 +50,12 @@ class BehandlingVedtakController(
     }
 
     @PutMapping("/{behandlingId}/resultat/hjemler")
-    fun setHjemler(
+    fun setRegistreringshjemler(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: VedtakHjemlerInput
     ): VedtakEditedView {
         logBehandlingMethodDetails(
-            ::setHjemler.name,
+            ::setRegistreringshjemler.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
@@ -63,7 +63,7 @@ class BehandlingVedtakController(
         return VedtakEditedView(
             vedtakService.setHjemler(
                 behandlingId = behandlingId,
-                hjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
+                registreringshjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
                     ?: input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
                 utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
             ).modified

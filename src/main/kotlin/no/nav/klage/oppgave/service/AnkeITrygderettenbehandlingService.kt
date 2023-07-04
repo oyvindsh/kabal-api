@@ -67,7 +67,7 @@ class AnkeITrygderettenbehandlingService(
         if (input.registreringsHjemmelSet != null) {
             vedtakService.setHjemler(
                 behandlingId = ankeITrygderettenbehandling.id,
-                hjemler = input.registreringsHjemmelSet,
+                registreringshjemler = input.registreringsHjemmelSet,
                 utfoerendeSaksbehandlerIdent = SYSTEMBRUKER,
                 systemUserContext = true,
             )

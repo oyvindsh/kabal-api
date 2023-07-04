@@ -41,7 +41,7 @@ class VedtakService(
 
     fun setHjemler(
         behandlingId: UUID,
-        hjemler: Set<Registreringshjemmel>,
+        registreringshjemler: Set<Registreringshjemmel>,
         utfoerendeSaksbehandlerIdent: String,
         systemUserContext: Boolean = false
     ): Behandling {
@@ -51,7 +51,7 @@ class VedtakService(
         )
         //TODO: Versjonssjekk på input
         val event =
-            behandling.setRegistreringshjemler(hjemler, utfoerendeSaksbehandlerIdent)
+            behandling.setRegistreringshjemler(registreringshjemler, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return behandling
     }
