@@ -57,8 +57,20 @@ ALTER TABLE klage.delbehandling_registreringshjemmel
 --     DROP COLUMN delbehandling_id;
 
 ALTER TABLE klage.delbehandling_registreringshjemmel
-    RENAME TO behandling_registreringshjemmel;
+    DROP CONSTRAINT vedtak_hjemmel_pkey;
 
+ALTER TABLE klage.delbehandling_registreringshjemmel
+    DROP CONSTRAINT fk_hjemmel_vedtak;
+
+ALTER TABLE klage.delbehandling_registreringshjemmel
+    ALTER COLUMN delbehandling_id DROP NOT NULL;
+
+ALTER TABLE klage.delbehandling_registreringshjemmel
+    ADD CONSTRAINT behandling_registreringshjemmel_pkey
+        PRIMARY KEY (id, behandling_id);
+
+ALTER TABLE klage.delbehandling_registreringshjemmel
+    RENAME TO behandling_registreringshjemmel;
 
 ALTER TABLE klage.medunderskriverhistorikk
     ADD COLUMN behandling_id UUID;
@@ -78,3 +90,9 @@ ALTER TABLE klage.medunderskriverhistorikk
 
 -- ALTER TABLE klage.medunderskriverhistorikk
 --     DROP COLUMN delbehandling_id;
+
+ALTER TABLE klage.medunderskriverhistorikk
+    DROP CONSTRAINT fk_medunderskriverhistorikk_delbehandling;
+
+ALTER TABLE klage.medunderskriverhistorikk
+    ALTER COLUMN delbehandling_id DROP NOT NULL;
