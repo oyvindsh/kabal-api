@@ -53,8 +53,8 @@ ALTER TABLE klage.delbehandling_registreringshjemmel
         FOREIGN KEY (behandling_id)
             REFERENCES klage.behandling (id);
 
-ALTER TABLE klage.delbehandling_registreringshjemmel
-    DROP COLUMN delbehandling_id;
+-- ALTER TABLE klage.delbehandling_registreringshjemmel
+--     DROP COLUMN delbehandling_id;
 
 ALTER TABLE klage.delbehandling_registreringshjemmel
     RENAME TO behandling_registreringshjemmel;
@@ -76,5 +76,5 @@ ALTER TABLE klage.medunderskriverhistorikk
         FOREIGN KEY (behandling_id)
             REFERENCES klage.behandling (id);
 
-ALTER TABLE klage.medunderskriverhistorikk
-    DROP COLUMN delbehandling_id;
+-- ALTER TABLE klage.medunderskriverhistorikk
+--     DROP COLUMN delbehandling_id;
