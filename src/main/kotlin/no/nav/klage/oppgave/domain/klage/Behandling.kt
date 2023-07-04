@@ -60,7 +60,7 @@ abstract class Behandling(
     open val fagsystem: Fagsystem,
     @Column(name = "dvh_referanse")
     open val dvhReferanse: String? = null,
-    //Liste med dokumenter fra Joark. De dokumentene saksbehandler krysser av for havner her. Bør være i delbehandlinger. Kopierer fra forrige når ny delbehandlinger opprettes.
+    //Liste med dokumenter fra Joark. De dokumentene saksbehandler krysser av for havner her. Kopierer fra forrige når ny behandling opprettes.
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
@@ -99,7 +99,7 @@ abstract class Behandling(
     @Column(name = "utfall_id")
     @Convert(converter = UtfallConverter::class)
     var utfall: Utfall? = null,
-    //Registreringshjemler. Overføres til neste delbehandlinger.
+    //Overføres til neste behandling.
     @ElementCollection(targetClass = Registreringshjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "behandling_registreringshjemmel",
@@ -117,11 +117,9 @@ abstract class Behandling(
         ]
     )
     var medunderskriver: MedunderskriverTildeling? = null,
-    //Hører hjemme på delbehandlinger
     @Column(name = "medunderskriverflyt_id")
     @Convert(converter = MedunderskriverflytConverter::class)
     var medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
-    //Hører hjemme på delbehandlinger
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)

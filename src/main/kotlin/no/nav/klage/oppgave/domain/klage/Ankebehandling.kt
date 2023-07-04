@@ -42,15 +42,10 @@ class Ankebehandling(
     dvhReferanse: String? = null,
     fagsystem: Fagsystem,
     fagsakId: String,
-    //Settes automatisk i klage, må kunne justeres i anke. Bør også representeres i delbehandlinger. Må gjøres entydig i anke, hører antageligvis ikke hjemme i felles klasse.
     mottattKlageinstans: LocalDateTime,
-    //Litt usikkert om dette hører mest hjemme her eller på delbehandlinger.
     frist: LocalDate,
-    //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver. Litt om pragmatikken, bør se hva som er enklest å få til.
     tildeling: Tildeling? = null,
-    //Hører hjemme på delbehandlinger, men her er det mer usikkerhet enn for medunderskriver
     tildelingHistorikk: MutableSet<TildelingHistorikk> = mutableSetOf(),
-    //Hovedbehandling
     created: LocalDateTime = LocalDateTime.now(),
     modified: LocalDateTime = LocalDateTime.now(),
     saksdokumenter: MutableSet<Saksdokument> = mutableSetOf(),
@@ -112,31 +107,4 @@ class Ankebehandling(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
-    /*
-    Mulige utfall av første delbehandling:
-
-    HVIS delbehandling er AVSLUTTET
-     OG utfall er en av denne mengden: {STADFESTELSE, AVVIST, ?DELVIS_MEDHOLD?}
-     DA skal innstillingsbrev sendes til bruker
-       OG status skal settes til PÅ VENT
-       OG Ankebehandlingen får en datoverdi for "ventetid påbegynt"
-       "Ventetid påbegynt" er utledet av datoverdi for delbehandling AVSLUTTET
-
-    HVIS delbehandling er AVSLUTTET
-     OG utfall er en av denne mengden: {TRUKKET, OPPHEVET, MEDHOLD, UGUNST}
-     DA skal infobrev sendes til bruker
-       OG status er AVSLUTTET
-       OG Ankbehandlingen anses som ferdig
-
-    RETUR er ikke aktuelt for anker, skal ikke være et valg for saksbehandler
-
-    SEARCH lager en liste med anker på vent basert på statusen PÅ VENT
-
-    Dette fører til opprettelse av andre delbehandling:
-     - Noen trykker på knappen Gjenåpne
-
-     Situasjonen blir at vi har en ankebehandling med en åpen 2. delbehandling
-
-     */
 }
