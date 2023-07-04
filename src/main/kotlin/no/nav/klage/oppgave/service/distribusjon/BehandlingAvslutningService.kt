@@ -82,11 +82,10 @@ class BehandlingAvslutningService(
 
     private fun privateAvsluttBehandling(behandlingId: UUID): Behandling {
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
-        if (behandling.type == Type.ANKE && behandling.currentDelbehandling().shouldBeSentToTrygderetten()) {
+        if (behandling.type == Type.ANKE && behandling.shouldBeSentToTrygderetten()) {
             logger.debug("Anken sendes til trygderetten. Oppretter AnkeITrygderettenbehandling.")
             createAnkeITrygderettenbehandling(behandling)
-        } else if (behandling.type == Type.ANKE_I_TRYGDERETTEN && behandling.currentDelbehandling()
-                .shouldCreateNewAnkebehandling()
+        } else if (behandling.type == Type.ANKE_I_TRYGDERETTEN && behandling.shouldCreateNewAnkebehandling()
         ) {
             logger.debug("Oppretter ny Ankebehandling basert på AnkeITrygderettenbehandling")
             val ankeITrygderettenbehandling = Hibernate.unproxy(behandling) as AnkeITrygderettenbehandling
@@ -135,7 +134,7 @@ class BehandlingAvslutningService(
                         nivaa = SakFinishedInput.Nivaa.KA,
                         typeResultat = SakFinishedInput.TypeResultat.RESULTAT,
                         utfall = SakFinishedInput.Utfall.valueOf(infotrygdKlageutfallToUtfall.entries.find { entry ->
-                            entry.value == behandling.currentDelbehandling().utfall
+                            entry.value == behandling.utfall
                         }!!.key),
                         mottaker = SakFinishedInput.Mottaker.TRYGDEKONTOR,
                         saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
@@ -172,7 +171,7 @@ class BehandlingAvslutningService(
                 BehandlingDetaljer(
                     klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
-                        utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
+                        utfall = ExternalUtfall.valueOf(behandling.utfall!!.name),
                         journalpostReferanser = hoveddokumenter.flatMap { it.journalposter }.map { it.journalpostId }
                     )
                 )
@@ -182,7 +181,7 @@ class BehandlingAvslutningService(
                 BehandlingDetaljer(
                     ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
-                        utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
+                        utfall = ExternalUtfall.valueOf(behandling.utfall!!.name),
                         journalpostReferanser = hoveddokumenter.flatMap { it.journalposter }.map { it.journalpostId }
                     )
                 )
@@ -193,7 +192,7 @@ class BehandlingAvslutningService(
                     ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
                         //TODO: Se på utfallsliste når vi har den endelige for ankeITrygderetten
-                        utfall = ExternalUtfall.valueOf(behandling.currentDelbehandling().utfall!!.name),
+                        utfall = ExternalUtfall.valueOf(behandling.utfall!!.name),
                         journalpostReferanser = hoveddokumenter.flatMap { it.journalposter }.map { it.journalpostId }
                     )
                 )

@@ -181,8 +181,8 @@ class BehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.currentDelbehandling().medunderskriver?.saksbehandlerident).isNull()
-            assertThat(result.currentDelbehandling().medunderskriverHistorikk).hasSize(1)
+            assertThat(result.medunderskriver?.saksbehandlerident).isNull()
+            assertThat(result.medunderskriverHistorikk).hasSize(1)
         }
     }
 
@@ -225,7 +225,7 @@ class BehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
@@ -250,7 +250,7 @@ class BehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
 
         @Test
@@ -279,7 +279,7 @@ class BehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
@@ -309,7 +309,7 @@ class BehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assertThat(result.currentDelbehandling().medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
     }
 
@@ -444,24 +444,19 @@ class BehandlingServiceTest {
             fagsakId = "123",
             kildeReferanse = "abc",
             mottakId = mottak.id,
-            delbehandlinger = setOf(
-                Delbehandling(
-                    utfall = when {
-                        trukket -> Utfall.TRUKKET
-                        utfall -> Utfall.AVVIST
-                        else -> null
-                    },
-                    hjemler = if (hjemler) mutableSetOf(
-                        Registreringshjemmel.ANDRE_TRYGDEAVTALER
-                    ) else mutableSetOf(),
-                    dokumentEnhetId = if (dokumentEnhetId) DOKUMENTENHET_ID else null,
-                    avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
-                )
-            ),
             mottattVedtaksinstans = LocalDate.now(),
             avsenderEnhetFoersteinstans = "enhet",
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
+            utfall = when {
+                trukket -> Utfall.TRUKKET
+                utfall -> Utfall.AVVIST
+                else -> null
+            },
+            registreringshjemler = if (hjemler) mutableSetOf(
+                Registreringshjemmel.ANDRE_TRYGDEAVTALER
+            ) else mutableSetOf(),
+            avsluttetAvSaksbehandler = if (fullfoert) LocalDateTime.now() else null,
         )
 
         behandlingRepository.save(behandling)

@@ -65,17 +65,13 @@ class BehandlingMedunderskriverControllerTest {
         fagsystem = Fagsystem.K9,
         kildeReferanse = "abc",
         mottakId = UUID.randomUUID(),
-        delbehandlinger = setOf(
-            Delbehandling(
-                utfall = Utfall.AVVIST,
-                hjemler = mutableSetOf(
-                    Registreringshjemmel.ARBML_13
-                ),
-                medunderskriver = MedunderskriverTildeling(
-                    saksbehandlerident = "C78901",
-                    tidspunkt = LocalDateTime.now()
-                ),
-            )
+        utfall = Utfall.AVVIST,
+        registreringshjemler = mutableSetOf(
+            Registreringshjemmel.ARBML_13
+        ),
+        medunderskriver = MedunderskriverTildeling(
+            saksbehandlerident = "C78901",
+            tidspunkt = LocalDateTime.now()
         ),
         mottattVedtaksinstans = LocalDate.now(),
         avsenderEnhetFoersteinstans = "0101",
@@ -100,7 +96,7 @@ class BehandlingMedunderskriverControllerTest {
         } returns klagebehandling as Behandling
         every { behandlingMapper.mapToMedunderskriverFlytResponse(klagebehandling as Behandling) } returns MedunderskriverFlytResponse(
             modified = klagebehandling.modified,
-            medunderskriverFlyt =klagebehandling.currentDelbehandling().medunderskriverFlyt,
+            medunderskriverFlyt =klagebehandling.medunderskriverFlyt,
             navn = "Ola Nordmann",
             navIdent = "B54321",
         )

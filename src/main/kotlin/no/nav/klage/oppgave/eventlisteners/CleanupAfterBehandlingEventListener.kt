@@ -56,7 +56,7 @@ class CleanupAfterBehandlingEventListener(
     fun cleanupAfterBehandling(behandlingEndretEvent: BehandlingEndretEvent) {
         val behandling = behandlingEndretEvent.behandling
 
-        if (behandling.isAvsluttet()) {
+        if (behandling.avsluttet != null) {
             logger.debug("Received behandlingEndretEvent for avsluttet behandling. Deleting meldinger and sattPaaVent.")
 
             if (behandling.sattPaaVent != null) {

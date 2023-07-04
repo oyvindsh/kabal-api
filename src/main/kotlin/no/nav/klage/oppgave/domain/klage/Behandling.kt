@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.domain.klage
 import jakarta.persistence.*
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.domain.klage.*
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
@@ -59,12 +60,7 @@ abstract class Behandling(
     open val fagsystem: Fagsystem,
     @Column(name = "dvh_referanse")
     open val dvhReferanse: String? = null,
-    //Her går vi mot en løsning der en behandling har flere delbehandlingerer, som nok er bedre begrep enn vedtak.
-    //Trenger en markering av hvilken delbehandlinger som er den gjeldende.
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
-    open val delbehandlinger: Set<Delbehandling>,
-    //Liste med dokumenter fra Joark. De dokumentene saksbehandler krysser av for havner her. Bør være i delbehandlinger. Kopierer fra forrige når ny delbehandlinger opprettes.
+    //Liste med dokumenter fra Joark. De dokumentene saksbehandler krysser av for havner her. Kopierer fra forrige når ny behandling opprettes.
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
@@ -99,30 +95,44 @@ abstract class Behandling(
         ]
     )
     open var feilregistrering: Feilregistrering?,
-) {
-    fun currentDelbehandling(): Delbehandling {
-        return delbehandlinger.first()
-    }
 
-    var avsluttetAvSaksbehandler: LocalDateTime?
-        get() = currentDelbehandling().avsluttetAvSaksbehandler
-        set(avsluttetAvSaksbehandler) {
-            currentDelbehandling().avsluttetAvSaksbehandler = avsluttetAvSaksbehandler
-        }
+    @Column(name = "utfall_id")
+    @Convert(converter = UtfallConverter::class)
+    var utfall: Utfall? = null,
+    //Overføres til neste behandling.
+    @ElementCollection(targetClass = Registreringshjemmel::class, fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "behandling_registreringshjemmel",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)]
+    )
+    @Convert(converter = RegistreringshjemmelConverter::class)
+    @Column(name = "id")
+    var registreringshjemler: MutableSet<Registreringshjemmel> = mutableSetOf(),
+    @Embedded
+    @AttributeOverrides(
+        value = [
+            AttributeOverride(name = "saksbehandlerident", column = Column(name = "medunderskriverident")),
+            AttributeOverride(name = "tidspunkt", column = Column(name = "dato_sendt_medunderskriver"))
+        ]
+    )
+    var medunderskriver: MedunderskriverTildeling? = null,
+    @Column(name = "medunderskriverflyt_id")
+    @Convert(converter = MedunderskriverflytConverter::class)
+    var medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    @BatchSize(size = 100)
+    val medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
+    @Column(name = "dato_behandling_avsluttet")
+    var avsluttet: LocalDateTime? = null,
+    @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
+    var avsluttetAvSaksbehandler: LocalDateTime? = null,
 
-    fun isAvsluttet() = currentDelbehandling().avsluttet != null
+    ) {
 
-    var medunderskriver: MedunderskriverTildeling?
-        get() = currentDelbehandling().medunderskriver
-        set(medunderskriver) {
-            currentDelbehandling().medunderskriver = medunderskriver
-        }
-
-    var medunderskriverFlyt: MedunderskriverFlyt
-        get() = currentDelbehandling().medunderskriverFlyt
-        set(medunderskriverFlyt) {
-            currentDelbehandling().medunderskriverFlyt = medunderskriverFlyt
-        }
+//    fun isAvsluttet() = avsluttet != null
 
     /**
      * Brukes til ES og statistikk per nå
@@ -130,7 +140,7 @@ abstract class Behandling(
     fun getStatus(): Status {
         return when {
             feilregistrering != null -> Status.FEILREGISTRERT
-            isAvsluttet() -> Status.FULLFOERT
+            avsluttet != null -> Status.FULLFOERT
             avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
             sattPaaVent != null -> Status.SATT_PAA_VENT
             medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> Status.SENDT_TIL_MEDUNDERSKRIVER
@@ -145,4 +155,32 @@ abstract class Behandling(
     enum class Status {
         IKKE_TILDELT, TILDELT, MEDUNDERSKRIVER_VALGT, SENDT_TIL_MEDUNDERSKRIVER, RETURNERT_TIL_SAKSBEHANDLER, AVSLUTTET_AV_SAKSBEHANDLER, SATT_PAA_VENT, FULLFOERT, UKJENT, FEILREGISTRERT
     }
+
+    fun shouldBeSentToTrygderetten(): Boolean {
+        return utfall in utfallToTrygderetten
+    }
+
+    fun shouldCreateNewAnkebehandling(): Boolean {
+        return utfall in utfallToNewAnkebehandling
+    }
 }
+
+
+val utfallToNewAnkebehandling = setOf(
+    Utfall.HENVIST
+)
+
+val utfallToTrygderetten = setOf(
+    Utfall.DELVIS_MEDHOLD,
+    Utfall.INNSTILLING_AVVIST,
+    Utfall.INNSTILLING_STADFESTELSE
+)
+
+val utfallWithoutAnkemulighet = setOf(
+    Utfall.RETUR,
+    Utfall.TRUKKET,
+    Utfall.OPPHEVET,
+)
+
+val noRegistringshjemmelNeeded = listOf(Utfall.TRUKKET, Utfall.RETUR)
+val noKvalitetsvurderingNeeded = listOf(Utfall.TRUKKET, Utfall.RETUR, Utfall.UGUNST)

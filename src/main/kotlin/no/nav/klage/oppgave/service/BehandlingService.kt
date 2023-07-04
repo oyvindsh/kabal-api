@@ -74,7 +74,7 @@ class BehandlingService(
             behandlingId = behandlingId
         )
 
-        if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null) throw BehandlingFinalizedException("Behandlingen er avsluttet")
+        if (behandling.avsluttetAvSaksbehandler != null) throw BehandlingFinalizedException("Behandlingen er avsluttet")
 
         //Forretningsmessige krav før vedtak kan ferdigstilles
         validateBehandlingBeforeFinalize(behandling)
@@ -118,7 +118,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.currentDelbehandling().utfall == null) {
+        if (behandling.utfall == null) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -128,7 +128,7 @@ class BehandlingService(
         }
 
         //TODO: Create test for invalid utfall when such are added
-        if (behandling.currentDelbehandling().utfall != null && behandling.currentDelbehandling().utfall !in typeTilUtfall[behandling.type]!!) {
+        if (behandling.utfall != null && behandling.utfall !in typeTilUtfall[behandling.type]!!) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -137,8 +137,8 @@ class BehandlingService(
             )
         }
 
-        if (behandling.currentDelbehandling().utfall !in noRegistringshjemmelNeeded) {
-            if (behandling.currentDelbehandling().hjemler.isEmpty()) {
+        if (behandling.utfall !in noRegistringshjemmelNeeded) {
+            if (behandling.hjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
                         field = "hjemmel",
@@ -148,7 +148,7 @@ class BehandlingService(
             }
         }
 
-        if (behandling !is AnkeITrygderettenbehandling && behandling.currentDelbehandling().utfall !in noKvalitetsvurderingNeeded) {
+        if (behandling !is AnkeITrygderettenbehandling && behandling.utfall !in noKvalitetsvurderingNeeded) {
             val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
 
             if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
@@ -519,13 +519,13 @@ class BehandlingService(
     ): Behandling {
         val behandling = getBehandling(behandlingId)
 
-        if (behandling.currentDelbehandling().medunderskriver?.saksbehandlerident == null) {
+        if (behandling.medunderskriver?.saksbehandlerident == null) {
             throw BehandlingManglerMedunderskriverException("Behandlingen har ikke registrert noen medunderskriver")
         }
 
-        if (behandling.currentDelbehandling().medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
+        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
             verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
-            if (behandling.currentDelbehandling().medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
+            if (behandling.medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
                 val event = behandling.setMedunderskriverFlyt(
                     MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
                     utfoerendeSaksbehandlerIdent
@@ -534,7 +534,7 @@ class BehandlingService(
             }
         } else {
             checkSkrivetilgang(behandling)
-            if (behandling.currentDelbehandling().medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER) {
+            if (behandling.medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER) {
                 val event = behandling.setMedunderskriverFlyt(
                     OVERSENDT_TIL_MEDUNDERSKRIVER,
                     utfoerendeSaksbehandlerIdent
@@ -719,7 +719,7 @@ class BehandlingService(
     @Transactional(readOnly = true)
     fun getBehandlingForSmartEditor(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Behandling {
         val behandling = behandlingRepository.findById(behandlingId).get()
-        if (behandling.currentDelbehandling().medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
+        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
             verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
         } else {
             checkSkrivetilgang(behandling)
@@ -740,14 +740,14 @@ class BehandlingService(
     private fun saksbehandlerHasTheSmartEditorAccess(
         behandling: Behandling,
         utfoerendeSaksbehandlerIdent: String
-    ) = (behandling.currentDelbehandling().medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER &&
+    ) = (behandling.medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER &&
             behandling.tildeling?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
 
     private fun medunderskriverHasTheSmartEditorAccess(
         behandling: Behandling,
         utfoerendeSaksbehandlerIdent: String
-    ) = (behandling.currentDelbehandling().medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER &&
-            behandling.currentDelbehandling().medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
+    ) = (behandling.medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER &&
+            behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
 
     @Transactional(readOnly = true)
     fun getBehandling(behandlingId: UUID): Behandling =
@@ -757,7 +757,7 @@ class BehandlingService(
 
     @Transactional(readOnly = true)
     fun findBehandlingerForAvslutning(): List<Pair<UUID, Type>> =
-        behandlingRepository.findByDelbehandlingerAvsluttetIsNullAndDelbehandlingerAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull()
+        behandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull()
             .map { it.id to it.type }
 
     fun getPotentialSaksbehandlereForBehandling(behandlingId: UUID): Saksbehandlere {
@@ -771,7 +771,7 @@ class BehandlingService(
     }
 
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
-        return behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
+        return behandlingRepository.findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
             enhet
         )
     }

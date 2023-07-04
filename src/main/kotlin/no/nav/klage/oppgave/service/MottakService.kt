@@ -240,7 +240,7 @@ class MottakService(
         klagebehandlingId: UUID,
         ankeJournalpostId: String,
     ) {
-        if (!klagebehandling.isAvsluttet()) {
+        if (klagebehandling.avsluttet == null) {
             throw PreviousBehandlingNotFinalizedException("Klagebehandling med id $klagebehandlingId er ikke fullført")
         }
 

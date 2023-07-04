@@ -760,9 +760,9 @@ class DokumentUnderArbeidService(
         }
 
         updateJournalposter(
-            behandling.id,
-            hovedDokumentId,
-            HashSet(documentInfoList.map { DokumentUnderArbeidJournalpostId(journalpostId = it.journalpostId.value) })
+            behandlingId = behandling.id,
+            dokumentId = hovedDokumentId,
+            journalpostIdSet = HashSet(documentInfoList.map { DokumentUnderArbeidJournalpostId(journalpostId = it.journalpostId.value) })
         )
 
         val now = LocalDateTime.now()

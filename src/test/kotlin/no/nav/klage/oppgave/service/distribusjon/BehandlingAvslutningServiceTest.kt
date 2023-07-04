@@ -186,17 +186,11 @@ internal class BehandlingAvslutningServiceTest {
         fagsakId = "123",
         kildeReferanse = "abc",
         mottakId = mottak.id,
-        delbehandlinger = setOf(
-            Delbehandling(
-                id = vedtakId,
-                utfall = Utfall.MEDHOLD,
-                dokumentEnhetId = UUID.randomUUID()
-            )
-        ),
         avsenderEnhetFoersteinstans = "0101",
         mottattVedtaksinstans = LocalDate.now(),
         kakaKvalitetsvurderingId = UUID.randomUUID(),
         kakaKvalitetsvurderingVersion = 2,
+        utfall = Utfall.MEDHOLD,
     )
 
     @Test
@@ -227,6 +221,6 @@ internal class BehandlingAvslutningServiceTest {
         behandlingAvslutningService.avsluttBehandling(klagebehandlingId)
 
         val result = klagebehandlingRepository.getReferenceById(klagebehandlingId)
-        assertThat(result.currentDelbehandling().avsluttet).isNotNull
+        assertThat(result.avsluttet).isNotNull
     }
 }

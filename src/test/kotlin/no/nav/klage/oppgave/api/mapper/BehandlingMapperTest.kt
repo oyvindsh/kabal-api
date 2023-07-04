@@ -88,7 +88,6 @@ class BehandlingMapperTest {
             type = Type.KLAGE,
             avsenderEnhetFoersteinstans = "4100",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
             frist = LocalDate.now().plusWeeks(12),
@@ -97,11 +96,11 @@ class BehandlingMapperTest {
 
     private fun getKlagebehandlingWithMedunderskriver(): Klagebehandling {
         return getKlagebehandling().apply {
-            currentDelbehandling().medunderskriver = MedunderskriverTildeling(
+            medunderskriver = MedunderskriverTildeling(
                 MEDUNDERSKRIVER_IDENT,
                 LocalDateTime.now()
             )
-            currentDelbehandling().medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
         }
     }
 }

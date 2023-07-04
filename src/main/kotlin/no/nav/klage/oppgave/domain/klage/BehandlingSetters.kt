@@ -64,14 +64,14 @@ object BehandlingSetters {
         nyVerdiMedunderskriverFlyt: MedunderskriverFlyt,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdiMedunderskriverident = currentDelbehandling().medunderskriver?.saksbehandlerident
-        val gammelVerdiMedunderskriverFlyt = currentDelbehandling().medunderskriverFlyt
+        val gammelVerdiMedunderskriverident = medunderskriver?.saksbehandlerident
+        val gammelVerdiMedunderskriverFlyt = medunderskriverFlyt
         val tidspunkt = LocalDateTime.now()
-        if (currentDelbehandling().medunderskriver != null) {
-            currentDelbehandling().medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = currentDelbehandling().medunderskriver!!.copy()))
+        if (medunderskriver != null) {
+            medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = medunderskriver!!.copy()))
         }
-        currentDelbehandling().medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
-        currentDelbehandling().medunderskriverFlyt = nyVerdiMedunderskriverFlyt
+        medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
+        medunderskriverFlyt = nyVerdiMedunderskriverFlyt
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
@@ -99,10 +99,10 @@ object BehandlingSetters {
         nyMedunderskriverFlyt: MedunderskriverFlyt,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdiMedunderskriverFlyt = currentDelbehandling().medunderskriverFlyt
+        val gammelVerdiMedunderskriverFlyt = medunderskriverFlyt
         val tidspunkt = LocalDateTime.now()
 
-        currentDelbehandling().medunderskriverFlyt = nyMedunderskriverFlyt
+        medunderskriverFlyt = nyMedunderskriverFlyt
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
@@ -242,19 +242,19 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Behandling.setHjemlerInVedtak(
+    fun Behandling.setRegistreringshjemler(
         nyVerdi: Set<Registreringshjemmel>,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = currentDelbehandling().hjemler
+        val gammelVerdi = registreringshjemler
         val tidspunkt = LocalDateTime.now()
-        currentDelbehandling().hjemler = nyVerdi.toMutableSet()
-        currentDelbehandling().modified = tidspunkt
+        registreringshjemler = nyVerdi.toMutableSet()
+        modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident,
-                Felt.HJEMLER_I_VEDTAK,
+                Felt.REGISTRERINGSHJEMLER,
                 gammelVerdi.joinToString { it.id },
                 nyVerdi.joinToString { it.id },
                 tidspunkt
@@ -266,10 +266,10 @@ object BehandlingSetters {
         nyVerdi: Utfall?,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = currentDelbehandling().utfall
+        val gammelVerdi = utfall
         val tidspunkt = LocalDateTime.now()
-        currentDelbehandling().utfall = nyVerdi
-        currentDelbehandling().modified = tidspunkt
+        utfall = nyVerdi
+        modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -285,9 +285,9 @@ object BehandlingSetters {
     fun Behandling.setAvsluttetAvSaksbehandler(
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = currentDelbehandling().avsluttetAvSaksbehandler
+        val gammelVerdi = avsluttetAvSaksbehandler
         val tidspunkt = LocalDateTime.now()
-        currentDelbehandling().avsluttetAvSaksbehandler = tidspunkt
+        avsluttetAvSaksbehandler = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
@@ -303,9 +303,9 @@ object BehandlingSetters {
     fun Behandling.setAvsluttet(
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = currentDelbehandling().avsluttet
+        val gammelVerdi = avsluttet
         val tidspunkt = LocalDateTime.now()
-        currentDelbehandling().avsluttet = tidspunkt
+        avsluttet = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(

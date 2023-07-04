@@ -54,20 +54,20 @@ class BehandlingMapper(
             typeId = klagebehandling.type.id,
             mottattKlageinstans = klagebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = klagebehandling.tildeling?.tidspunkt?.toLocalDate(),
-            avsluttetAvSaksbehandlerDate = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
-            isAvsluttetAvSaksbehandler = klagebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
+            avsluttetAvSaksbehandlerDate = klagebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
+            isAvsluttetAvSaksbehandler = klagebehandling.avsluttetAvSaksbehandler != null,
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandler = getSaksbehandlerView(klagebehandling.tildeling?.saksbehandlerident),
             tildeltSaksbehandlerEnhet = klagebehandling.tildeling?.enhet,
-            medunderskriverident = klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
-            medunderskriver = getSaksbehandlerView(klagebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
-            medunderskriverFlyt = klagebehandling.currentDelbehandling().medunderskriverFlyt,
-            datoSendtMedunderskriver = klagebehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
+            medunderskriverident = klagebehandling.medunderskriver?.saksbehandlerident,
+            medunderskriver = getSaksbehandlerView(klagebehandling.medunderskriver?.saksbehandlerident),
+            medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
+            datoSendtMedunderskriver = klagebehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemmelIdList = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
             created = klagebehandling.created,
-            resultat = klagebehandling.currentDelbehandling().mapToVedtakView(),
+            resultat = klagebehandling.mapToVedtakView(),
             kommentarFraVedtaksinstans = klagebehandling.kommentarFraFoersteinstans,
             tilknyttedeDokumenter = klagebehandling.saksdokumenter.map {
                 TilknyttetDokument(
@@ -109,21 +109,21 @@ class BehandlingMapper(
             typeId = ankebehandling.type.id,
             mottattKlageinstans = ankebehandling.mottattKlageinstans.toLocalDate(),
             tildelt = ankebehandling.tildeling?.tidspunkt?.toLocalDate(),
-            avsluttetAvSaksbehandlerDate = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
-            isAvsluttetAvSaksbehandler = ankebehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
+            avsluttetAvSaksbehandlerDate = ankebehandling.avsluttetAvSaksbehandler?.toLocalDate(),
+            isAvsluttetAvSaksbehandler = ankebehandling.avsluttetAvSaksbehandler != null,
             frist = ankebehandling.frist,
             tildeltSaksbehandlerident = ankebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandler = getSaksbehandlerView(ankebehandling.tildeling?.saksbehandlerident),
             tildeltSaksbehandlerEnhet = ankebehandling.tildeling?.enhet,
-            medunderskriverident = ankebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
-            medunderskriver = getSaksbehandlerView(ankebehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
-            medunderskriverFlyt = ankebehandling.currentDelbehandling().medunderskriverFlyt,
-            datoSendtMedunderskriver = ankebehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
+            medunderskriverident = ankebehandling.medunderskriver?.saksbehandlerident,
+            medunderskriver = getSaksbehandlerView(ankebehandling.medunderskriver?.saksbehandlerident),
+            medunderskriverFlyt = ankebehandling.medunderskriverFlyt,
+            datoSendtMedunderskriver = ankebehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemmelIdList = ankebehandling.hjemler.map { it.id },
             modified = ankebehandling.modified,
             created = ankebehandling.created,
             fraSaksbehandlerident = null,
-            resultat = ankebehandling.currentDelbehandling().mapToVedtakView(),
+            resultat = ankebehandling.mapToVedtakView(),
             kommentarFraVedtaksinstans = null,
             tilknyttedeDokumenter = ankebehandling.saksdokumenter.map {
                 TilknyttetDokument(
@@ -163,21 +163,21 @@ class BehandlingMapper(
             typeId = ankeITrygderettenbehandling.type.id,
             mottattKlageinstans = ankeITrygderettenbehandling.mottattKlageinstans.toLocalDate(),
             tildelt = ankeITrygderettenbehandling.tildeling?.tidspunkt?.toLocalDate(),
-            avsluttetAvSaksbehandlerDate = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler?.toLocalDate(),
-            isAvsluttetAvSaksbehandler = ankeITrygderettenbehandling.currentDelbehandling().avsluttetAvSaksbehandler != null,
+            avsluttetAvSaksbehandlerDate = ankeITrygderettenbehandling.avsluttetAvSaksbehandler?.toLocalDate(),
+            isAvsluttetAvSaksbehandler = ankeITrygderettenbehandling.avsluttetAvSaksbehandler != null,
             frist = ankeITrygderettenbehandling.frist,
             tildeltSaksbehandlerident = ankeITrygderettenbehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandler = getSaksbehandlerView(ankeITrygderettenbehandling.tildeling?.saksbehandlerident),
             tildeltSaksbehandlerEnhet = ankeITrygderettenbehandling.tildeling?.enhet,
-            medunderskriverident = ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.saksbehandlerident,
-            medunderskriver = getSaksbehandlerView(ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.saksbehandlerident),
-            medunderskriverFlyt = ankeITrygderettenbehandling.currentDelbehandling().medunderskriverFlyt,
-            datoSendtMedunderskriver = ankeITrygderettenbehandling.currentDelbehandling().medunderskriver?.tidspunkt?.toLocalDate(),
+            medunderskriverident = ankeITrygderettenbehandling.medunderskriver?.saksbehandlerident,
+            medunderskriver = getSaksbehandlerView(ankeITrygderettenbehandling.medunderskriver?.saksbehandlerident),
+            medunderskriverFlyt = ankeITrygderettenbehandling.medunderskriverFlyt,
+            datoSendtMedunderskriver = ankeITrygderettenbehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemmelIdList = ankeITrygderettenbehandling.hjemler.map { it.id },
             modified = ankeITrygderettenbehandling.modified,
             created = ankeITrygderettenbehandling.created,
             fraSaksbehandlerident = null,
-            resultat = ankeITrygderettenbehandling.currentDelbehandling().mapToVedtakView(),
+            resultat = ankeITrygderettenbehandling.mapToVedtakView(),
             kommentarFraVedtaksinstans = null,
             tilknyttedeDokumenter = ankeITrygderettenbehandling.saksdokumenter.map {
                 TilknyttetDokument(
@@ -307,18 +307,18 @@ class BehandlingMapper(
         }
     }
 
-    fun Delbehandling.mapToVedtakView(): VedtakView {
+    fun Behandling.mapToVedtakView(): VedtakView {
         return VedtakView(
             id = id,
             utfallId = utfall?.id,
-            hjemmelIdSet = hjemler.map { it.id }.toSet(),
+            hjemmelIdSet = registreringshjemler.map { it.id }.toSet(),
         )
     }
 
     fun mapToBehandlingFullfoertView(behandling: Behandling): BehandlingFullfoertView {
         return BehandlingFullfoertView(
             modified = behandling.modified,
-            isAvsluttetAvSaksbehandler = behandling.currentDelbehandling().avsluttetAvSaksbehandler != null
+            isAvsluttetAvSaksbehandler = behandling.avsluttetAvSaksbehandler != null
         )
     }
 
@@ -329,7 +329,7 @@ class BehandlingMapper(
             ) else null,
             navIdent = behandling.medunderskriver?.saksbehandlerident,
             modified = behandling.modified,
-            medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt,
+            medunderskriverFlyt = behandling.medunderskriverFlyt,
         )
     }
 
@@ -337,13 +337,13 @@ class BehandlingMapper(
         return MedunderskriverWrapped(
             medunderskriver = getSaksbehandlerView(behandling.medunderskriver?.saksbehandlerident),
             modified = behandling.modified,
-            medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt,
+            medunderskriverFlyt = behandling.medunderskriverFlyt,
         )
     }
 
     fun mapToMedunderskriverFlytView(behandling: Behandling): MedunderskriverFlytView {
         return MedunderskriverFlytView(
-            medunderskriverFlyt = behandling.currentDelbehandling().medunderskriverFlyt
+            medunderskriverFlyt = behandling.medunderskriverFlyt
         )
     }
 

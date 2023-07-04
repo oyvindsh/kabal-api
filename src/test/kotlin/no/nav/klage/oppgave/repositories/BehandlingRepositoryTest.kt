@@ -82,7 +82,6 @@ class BehandlingRepositoryTest {
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
             kakaKvalitetsvurderingId = UUID.randomUUID()
         )
@@ -133,7 +132,6 @@ class BehandlingRepositoryTest {
             mottakId = mottak.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             feilregistrering = Feilregistrering(
@@ -192,7 +190,6 @@ class BehandlingRepositoryTest {
             mottakId = mottak1.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             tildeling = Tildeling(
@@ -236,7 +233,6 @@ class BehandlingRepositoryTest {
             mottakId = mottak2.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             tildeling = Tildeling(
@@ -280,7 +276,6 @@ class BehandlingRepositoryTest {
             mottakId = mottak3.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling()),
             kakaKvalitetsvurderingVersion = 2,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
         )
@@ -320,7 +315,7 @@ class BehandlingRepositoryTest {
             mottakId = mottak4.id,
             avsenderEnhetFoersteinstans = "0101",
             mottattVedtaksinstans = LocalDate.now(),
-            delbehandlinger = setOf(Delbehandling(avsluttetAvSaksbehandler = LocalDateTime.now())),
+            avsluttetAvSaksbehandler = LocalDateTime.now(),
             kakaKvalitetsvurderingVersion = 2,
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             tildeling = Tildeling(
@@ -334,7 +329,7 @@ class BehandlingRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
         val result =
-            behandlingRepository.findByTildelingEnhetAndDelbehandlingerAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet = ENHET_1)
+            behandlingRepository.findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet = ENHET_1)
 
         assertThat(result).isEqualTo(listOf(klageTildeltEnhet1))
     }

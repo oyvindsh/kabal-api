@@ -65,8 +65,8 @@ class CleanupHjelpemidlerService(
         var logString = ""
         val sak = klageFssProxyClient.getAnySak(behandling.kildeReferanse)
         if (sak.tema != Ytelse.HJE_HJE.toTema().navn) {
-            logString += if (behandling.currentDelbehandling().avsluttetAvSaksbehandler != null) {
-                "Behandling finished: ${behandling.currentDelbehandling().avsluttetAvSaksbehandler}, kilderef: ${behandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
+            logString += if (behandling.avsluttetAvSaksbehandler != null) {
+                "Behandling finished: ${behandling.avsluttetAvSaksbehandler}, kilderef: ${behandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
             } else {
                 "Behandling not finished. Kilderef: ${behandling.kildeReferanse}, temaToSet: ${sak.tema}\n"
             }
