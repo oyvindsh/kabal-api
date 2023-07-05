@@ -48,7 +48,13 @@ data class BehandlingDetaljerView(
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
     val fagsystemId: String,
+    val rol: ROLView?,
 ) {
+
+    data class ROLView(
+        val rol: SaksbehandlerView?,
+        val rolStateId: String,
+    )
 
     data class KvalitetsvurderingReference(
         val id: UUID,

@@ -8,8 +8,9 @@ import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.controller.BehandlingMedunderskriverController
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
-import no.nav.klage.oppgave.api.view.BehandlingMedunderskriveridentInput
-import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
+import no.nav.klage.oppgave.api.view.MedunderskriverWrapped
+import no.nav.klage.oppgave.api.view.SaksbehandlerInput
+import no.nav.klage.oppgave.api.view.SaksbehandlerView
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -94,18 +95,20 @@ class BehandlingMedunderskriverControllerTest {
                 any()
             )
         } returns klagebehandling as Behandling
-        every { behandlingMapper.mapToMedunderskriverFlytResponse(klagebehandling as Behandling) } returns MedunderskriverFlytResponse(
+        every { behandlingMapper.mapToMedunderskriverWrapped(klagebehandling as Behandling) } returns MedunderskriverWrapped(
             modified = klagebehandling.modified,
-            medunderskriverFlyt =klagebehandling.medunderskriverFlyt,
-            navn = "Ola Nordmann",
-            navIdent = "B54321",
+            medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
+            medunderskriver = SaksbehandlerView(
+                navn = "Ola Nordmann",
+                navIdent = "B54321",
+            )
         )
 
-        val input = BehandlingMedunderskriveridentInput(
+        val input = SaksbehandlerInput(
             "A12345"
         )
 
-        mockMvc.put("/behandlinger/$klagebehandlingId/medunderskriverident") {
+        mockMvc.put("/behandlinger/$klagebehandlingId/medunderskriver") {
             contentType = MediaType.APPLICATION_JSON
             content = mapper.writeValueAsString(input)
             accept = MediaType.APPLICATION_JSON
@@ -116,7 +119,7 @@ class BehandlingMedunderskriverControllerTest {
 
     @Test
     fun `putMedunderskriverident with incorrect input should return 400 error`() {
-        mockMvc.put("/behandlinger/$klagebehandlingId/medunderskriverident") {
+        mockMvc.put("/behandlinger/$klagebehandlingId/medunderskriver") {
         }.andExpect {
             status { is4xxClientError() }
         }

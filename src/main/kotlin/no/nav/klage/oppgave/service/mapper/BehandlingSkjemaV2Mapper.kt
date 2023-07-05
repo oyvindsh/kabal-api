@@ -128,7 +128,9 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
-        feilregistrert = feilregistrering?.registered
+        feilregistrert = feilregistrering?.registered,
+        rolIdent = rolIdent,
+        rolStateId = rolState?.id,
     )
 }
 
@@ -177,7 +179,9 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
-        feilregistrert = feilregistrering?.registered
+        feilregistrert = feilregistrering?.registered,
+        rolIdent = rolIdent,
+        rolStateId = rolState?.id,
     )
 }
 
@@ -207,17 +211,19 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak =
-            BehandlingSkjemaV2.Vedtak(
-                utfall = utfall?.mapToSkjemaV2(),
-                hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
-            ),
+        BehandlingSkjemaV2.Vedtak(
+            utfall = utfall?.mapToSkjemaV2(),
+            hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
+        ),
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered,
         sattPaaVent = sattPaaVent?.from,
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
+        rolIdent = rolIdent,
+        rolStateId = rolState?.id
 
-        )
+    )
 }
 
 data class BehandlingSkjemaV2(
@@ -259,6 +265,8 @@ data class BehandlingSkjemaV2(
     val sattPaaVentReason: String?,
     val status: StatusType,
     val feilregistrert: LocalDateTime?,
+    val rolIdent: String?,
+    val rolStateId: String?,
 ) {
 
     data class Vedtak(

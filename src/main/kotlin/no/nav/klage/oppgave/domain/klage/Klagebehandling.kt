@@ -63,6 +63,8 @@ class Klagebehandling(
     medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
     avsluttet: LocalDateTime? = null,
     avsluttetAvSaksbehandler: LocalDateTime? = null,
+    rolIdent: String? = null,
+    rolState: ROLState? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -90,6 +92,8 @@ class Klagebehandling(
     medunderskriverHistorikk = medunderskriverHistorikk,
     avsluttet = avsluttet,
     avsluttetAvSaksbehandler = avsluttetAvSaksbehandler,
+    rolIdent = rolIdent,
+    rolState = rolState,
 ) {
 
     override fun toString(): String {

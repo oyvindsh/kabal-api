@@ -129,10 +129,12 @@ abstract class Behandling(
     var avsluttet: LocalDateTime? = null,
     @Column(name = "dato_behandling_avsluttet_av_saksbehandler")
     var avsluttetAvSaksbehandler: LocalDateTime? = null,
-
+    @Column(name = "rol_ident")
+    var rolIdent: String?,
+    @Column(name = "rol_state_id")
+    @Convert(converter = ROLStateConverter::class)
+    var rolState: ROLState?,
     ) {
-
-//    fun isAvsluttet() = avsluttet != null
 
     /**
      * Brukes til ES og statistikk per nå

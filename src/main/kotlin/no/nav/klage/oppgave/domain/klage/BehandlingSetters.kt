@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.domain.klage
 
 import no.nav.klage.kodeverk.MedunderskriverFlyt
+import no.nav.klage.kodeverk.ROLState
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -113,6 +114,52 @@ object BehandlingSetters {
             gammelVerdiMedunderskriverFlyt.id,
             nyMedunderskriverFlyt.id,
             tidspunkt
+        )?.let { endringslogginnslag.add(it) }
+
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
+    }
+
+    fun Behandling.setROLState(
+        newROLState: ROLState?,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val oldValue = rolState
+        val now = LocalDateTime.now()
+
+        rolState = newROLState
+        modified = now
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.ROL_STATE,
+            fraVerdi = oldValue?.id,
+            tilVerdi = rolState?.id,
+            tidspunkt = now
+        )?.let { endringslogginnslag.add(it) }
+
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
+    }
+
+    fun Behandling.setROLIdent(
+        newROLIdent: String?,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val oldValue = rolIdent
+        val now = LocalDateTime.now()
+
+        rolIdent = newROLIdent
+        modified = now
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.ROL_IDENT,
+            fraVerdi = oldValue,
+            tilVerdi = rolIdent,
+            tidspunkt = now
         )?.let { endringslogginnslag.add(it) }
 
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
