@@ -23,7 +23,7 @@ class DokumentMapper(
             fysiskDokument.content,
             HttpHeaders().apply {
                 contentType = fysiskDokument.contentType
-                add("Content-Disposition", "inline; filename=${fysiskDokument.title}")
+                add("Content-Disposition", "inline; filename=\"${fysiskDokument.title}\"")
             },
             HttpStatus.OK
         )
