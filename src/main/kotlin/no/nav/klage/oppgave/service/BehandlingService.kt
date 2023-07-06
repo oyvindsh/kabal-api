@@ -143,7 +143,7 @@ class BehandlingService(
         }
 
         if (behandling.utfall !in noRegistringshjemmelNeeded) {
-            if (behandling.hjemler.isEmpty()) {
+            if (behandling.registreringshjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
                         field = "hjemmel",

@@ -152,7 +152,7 @@ class StatistikkTilDVHService(
             //Means medunderskriver
             beslutter = behandling.medunderskriver?.saksbehandlerident,
             endringstid = getFunksjoneltEndringstidspunkt(behandling, behandlingState),
-            hjemmel = behandling.hjemler.map { it.toSearchableString() },
+            hjemmel = behandling.registreringshjemler.map { it.toSearchableString() },
             klager = getPart(behandling.klager.partId.type, behandling.klager.partId.value),
             opprinneligFagsaksystem = behandling.fagsystem.navn,
             overfoertKA = behandling.mottattKlageinstans.toLocalDate(),
