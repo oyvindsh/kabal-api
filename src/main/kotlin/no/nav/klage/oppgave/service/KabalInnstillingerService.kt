@@ -2,10 +2,7 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.clients.kabalinnstillinger.KabalInnstillingerClient
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.MedunderskrivereInput
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.SaksbehandlerSearchInput
-import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
+import no.nav.klage.oppgave.clients.kabalinnstillinger.model.*
 import no.nav.klage.oppgave.domain.klage.Behandling
 import org.springframework.stereotype.Service
 
@@ -32,6 +29,14 @@ class KabalInnstillingerService(
                 fnr = behandling.sakenGjelder.partId.value,
                 enhet = behandling.tildeling!!.enhet!!,
                 navIdent = behandling.tildeling!!.saksbehandlerident!!
+            )
+        )
+    }
+
+    fun getPotentialROL(behandling: Behandling): Saksbehandlere {
+        return kabalInnstillingerClient.searchROL(
+            ROLSearchInput(
+                fnr = behandling.sakenGjelder.partId.value,
             )
         )
     }

@@ -47,6 +47,16 @@ class MedunderskriverflytConverter : AttributeConverter<MedunderskriverFlyt, Str
 }
 
 @Converter
+class ROLStateConverter : AttributeConverter<ROLState, String?> {
+
+    override fun convertToDatabaseColumn(entity: ROLState?): String? =
+        entity?.id
+
+    override fun convertToEntityAttribute(id: String?): ROLState? =
+        id?.let { ROLState.of(it) }
+}
+
+@Converter
 class PartIdTypeConverter : AttributeConverter<PartIdType, String?> {
 
     override fun convertToDatabaseColumn(entity: PartIdType?): String? =

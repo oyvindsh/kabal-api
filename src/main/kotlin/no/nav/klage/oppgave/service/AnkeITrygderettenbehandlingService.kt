@@ -22,7 +22,6 @@ import java.util.*
 @Transactional
 class AnkeITrygderettenbehandlingService(
     private val ankeITrygderettenbehandlingRepository: AnkeITrygderettenbehandlingRepository,
-    private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val mottakService: MottakService,
@@ -65,7 +64,7 @@ class AnkeITrygderettenbehandlingService(
         logger.debug("Created ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id}")
 
         if (input.registreringsHjemmelSet != null) {
-            vedtakService.setHjemler(
+            behandlingService.setRegistreringshjemler(
                 behandlingId = ankeITrygderettenbehandling.id,
                 registreringshjemler = input.registreringsHjemmelSet,
                 utfoerendeSaksbehandlerIdent = SYSTEMBRUKER,

@@ -51,7 +51,7 @@ import java.util.*
 
 @ActiveProfiles("local")
 @Import(BehandlingAvslutningServiceTest.MyTestConfiguration::class)
-@SpringBootTest(classes = [KlagebehandlingService::class, BehandlingAvslutningService::class, VedtakService::class, BehandlingService::class, AnkebehandlingService::class])
+@SpringBootTest(classes = [KlagebehandlingService::class, BehandlingAvslutningService::class, BehandlingService::class, AnkebehandlingService::class])
 @EnableJpaRepositories(basePackages = ["no.nav.klage.oppgave.repositories"])
 @EntityScan("no.nav.klage.oppgave.domain")
 @AutoConfigureDataJpa
@@ -141,9 +141,6 @@ internal class BehandlingAvslutningServiceTest {
 
     @SpykBean
     lateinit var behandlingAvslutningService: BehandlingAvslutningService
-
-    @SpykBean
-    lateinit var vedtakService: VedtakService
 
     @MockkBean(relaxed = true)
     lateinit var kabalDocumentGateway: KabalDocumentGateway

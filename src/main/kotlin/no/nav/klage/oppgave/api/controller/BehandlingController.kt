@@ -3,6 +3,9 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Fagsystem
+import no.nav.klage.kodeverk.ROLState
+import no.nav.klage.kodeverk.Utfall
+import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
@@ -328,6 +331,19 @@ class BehandlingController(
         return behandlingService.getPotentialMedunderskrivereForBehandling(behandlingId = behandlingId)
     }
 
+    @GetMapping("/{behandlingId}/potentialrol")
+    fun getPotentialROL(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): Saksbehandlere {
+        logMethodDetails(
+            ::getPotentialROL.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return behandlingService.getPotentialROLForBehandling(behandlingId = behandlingId)
+    }
+
     @GetMapping("/{behandlingId}/sakengjelder")
     fun getSakenGjelder(
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -397,6 +413,87 @@ class BehandlingController(
                 fagsystemId = modifiedBehandling.feilregistrering!!.fagsystem.id
             ),
             modified = modifiedBehandling.modified,
+        )
+    }
+
+    @PutMapping("/{behandlingId}/resultat/utfall")
+    fun setUtfall(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: VedtakUtfallInput
+    ): VedtakEditedView {
+        logBehandlingMethodDetails(
+            ::setUtfall.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        return VedtakEditedView(
+            behandlingService.setUtfall(
+                behandlingId = behandlingId,
+                utfall = input.utfallId?.let { Utfall.of(it) } ?: input.utfall?.let { Utfall.of(it) },
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            ).modified
+        )
+    }
+
+    @PutMapping("/{behandlingId}/resultat/hjemler")
+    fun setRegistreringshjemler(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: VedtakHjemlerInput
+    ): VedtakEditedView {
+        logBehandlingMethodDetails(
+            ::setRegistreringshjemler.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        return VedtakEditedView(
+            behandlingService.setRegistreringshjemler(
+                behandlingId = behandlingId,
+                registreringshjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
+                    ?: input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            ).modified
+        )
+    }
+
+    @PutMapping("/{behandlingId}/rolident")
+    fun setROLIdent(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: SaksbehandlerInput
+    ): BehandlingEditedView {
+        logBehandlingMethodDetails(
+            ::setROLIdent.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        return BehandlingEditedView(
+            behandlingService.setROLIdent(
+                behandlingId = behandlingId,
+                rolIdent = input.navIdent,
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            ).modified
+        )
+    }
+
+    @PutMapping("/{behandlingId}/rolstateid")
+    fun setROLStateId(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: NullableIdInput,
+    ): BehandlingEditedView {
+        logBehandlingMethodDetails(
+            ::setROLStateId.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        return BehandlingEditedView(
+            behandlingService.setROLState(
+                behandlingId = behandlingId,
+                rolState = if (input.id != null) ROLState.of(input.id) else null,
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            ).modified
         )
     }
 }

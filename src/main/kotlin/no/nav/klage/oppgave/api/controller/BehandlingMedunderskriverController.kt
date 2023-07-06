@@ -30,32 +30,13 @@ class BehandlingMedunderskriverController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PutMapping("/{behandlingId}/medunderskriverident")
-    fun putMedunderskriverident(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: BehandlingMedunderskriveridentInput
-    ): MedunderskriverFlytResponse {
-        logBehandlingMethodDetails(
-            ::putMedunderskriverident.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-        val behandling = behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
-            behandlingId,
-            input.medunderskriverident,
-            innloggetSaksbehandlerService.getInnloggetIdent()
-        )
-        return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
-    }
-
     @PutMapping("/{behandlingId}/medunderskriver")
     fun putMedunderskriver(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: SaksbehandlerInput
     ): MedunderskriverWrapped {
         logBehandlingMethodDetails(
-            ::putMedunderskriverident.name,
+            ::putMedunderskriver.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger

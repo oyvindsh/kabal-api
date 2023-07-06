@@ -22,6 +22,10 @@ data class SaksbehandlerSearchInput(
     val fnr: String,
 )
 
+data class ROLSearchInput(
+    val fnr: String,
+)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SaksbehandlerAccess(
     val saksbehandlerIdent: String,

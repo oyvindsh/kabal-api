@@ -23,7 +23,6 @@ class AnkebehandlingService(
     private val klagebehandlingRepository: KlagebehandlingRepository,
     private val kakaApiGateway: KakaApiGateway,
     private val dokumentService: DokumentService,
-    private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")

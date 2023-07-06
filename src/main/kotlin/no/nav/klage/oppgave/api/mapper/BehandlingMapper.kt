@@ -90,7 +90,17 @@ class BehandlingMapper(
             sattPaaVent = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
+            rol = klagebehandling.toROLView(),
         )
+    }
+
+    private fun Behandling.toROLView(): BehandlingDetaljerView.ROLView? {
+        return if (rolState != null) {
+            BehandlingDetaljerView.ROLView(
+                rol = if (rolIdent != null) getSaksbehandlerView(rolIdent!!) else null,
+                rolStateId = rolState!!.id,
+            )
+        } else null
     }
 
     fun mapAnkebehandlingToBehandlingDetaljerView(ankebehandling: Ankebehandling): BehandlingDetaljerView {
@@ -146,6 +156,7 @@ class BehandlingMapper(
             sattPaaVent = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
+            rol = ankebehandling.toROLView(),
         )
     }
 
@@ -197,6 +208,7 @@ class BehandlingMapper(
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
             fagsystemId = ankeITrygderettenbehandling.fagsystem.id,
+            rol = ankeITrygderettenbehandling.toROLView(),
         )
     }
 

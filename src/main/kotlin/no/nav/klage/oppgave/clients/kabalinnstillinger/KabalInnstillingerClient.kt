@@ -9,7 +9,6 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import java.util.*
 
 @Component
 class KabalInnstillingerClient(
@@ -76,5 +75,20 @@ class KabalInnstillingerClient(
             .retrieve()
             .bodyToMono<Saksbehandlere>()
             .block() ?: throw RuntimeException("Could not search saksbehandlere")
+    }
+
+    fun searchROL(input: ROLSearchInput): Saksbehandlere {
+        logger.debug("Searching rol in kabal-innstillinger")
+        return kabalInnstillingerWebClient.post()
+            .uri { it.path("/search/rol").build() }
+            .header(
+                HttpHeaders.AUTHORIZATION,
+                "Bearer ${tokenUtil.getUserAccessTokenWithKabalInnstillingerScope()}"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(input)
+            .retrieve()
+            .bodyToMono<Saksbehandlere>()
+            .block() ?: throw RuntimeException("Could not search rol")
     }
 }

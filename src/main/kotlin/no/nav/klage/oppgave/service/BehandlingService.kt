@@ -4,6 +4,7 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -27,8 +28,12 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setKlager
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlyt
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLIdent
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLState
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfallInVedtak
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtaksinstans
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -770,6 +775,11 @@ class BehandlingService(
         return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
     }
 
+    fun getPotentialROLForBehandling(behandlingId: UUID): Saksbehandlere {
+        val behandling = getBehandling(behandlingId)
+        return kabalInnstillingerService.getPotentialROL(behandling)
+    }
+
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
         return behandlingRepository.findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
             enhet
@@ -815,6 +825,75 @@ class BehandlingService(
             ),
             saksbehandlerident = navIdent,
         )
+        applicationEventPublisher.publishEvent(event)
+        return behandling
+    }
+
+    fun setUtfall(
+        behandlingId: UUID,
+        utfall: Utfall?,
+        utfoerendeSaksbehandlerIdent: String
+    ): Behandling {
+        val behandling = getBehandlingForUpdate(
+            behandlingId
+        )
+        val event =
+            behandling.setUtfallInVedtak(utfall, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return behandling
+    }
+
+    fun setRegistreringshjemler(
+        behandlingId: UUID,
+        registreringshjemler: Set<Registreringshjemmel>,
+        utfoerendeSaksbehandlerIdent: String,
+        systemUserContext: Boolean = false
+    ): Behandling {
+        val behandling = getBehandlingForUpdate(
+            behandlingId = behandlingId,
+            systemUserContext = systemUserContext,
+        )
+        //TODO: Versjonssjekk på input
+        val event =
+            behandling.setRegistreringshjemler(registreringshjemler, utfoerendeSaksbehandlerIdent)
+        applicationEventPublisher.publishEvent(event)
+        return behandling
+    }
+
+    fun setROLState(
+        behandlingId: UUID,
+        rolState: ROLState?,
+        utfoerendeSaksbehandlerIdent: String,
+        systemUserContext: Boolean = false
+    ): Behandling {
+        val behandling = getBehandlingForUpdate(
+            behandlingId = behandlingId,
+            systemUserContext = systemUserContext,
+        )
+        val event =
+            behandling.setROLState(
+                newROLState = rolState,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandling
+    }
+
+    fun setROLIdent(
+        behandlingId: UUID,
+        rolIdent: String?,
+        utfoerendeSaksbehandlerIdent: String,
+        systemUserContext: Boolean = false
+    ): Behandling {
+        val behandling = getBehandlingForUpdate(
+            behandlingId = behandlingId,
+            systemUserContext = systemUserContext,
+        )
+        val event =
+            behandling.setROLIdent(
+                newROLIdent = rolIdent,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
         applicationEventPublisher.publishEvent(event)
         return behandling
     }
