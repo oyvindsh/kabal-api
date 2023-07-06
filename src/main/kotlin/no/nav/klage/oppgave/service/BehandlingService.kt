@@ -775,6 +775,11 @@ class BehandlingService(
         return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
     }
 
+    fun getPotentialROLForBehandling(behandlingId: UUID): Saksbehandlere {
+        val behandling = getBehandling(behandlingId)
+        return kabalInnstillingerService.getPotentialROL(behandling)
+    }
+
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
         return behandlingRepository.findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(
             enhet

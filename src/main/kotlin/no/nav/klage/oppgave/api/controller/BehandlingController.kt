@@ -331,6 +331,19 @@ class BehandlingController(
         return behandlingService.getPotentialMedunderskrivereForBehandling(behandlingId = behandlingId)
     }
 
+    @GetMapping("/{behandlingId}/potentialrol")
+    fun getPotentialROL(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): Saksbehandlere {
+        logMethodDetails(
+            ::getPotentialROL.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        return behandlingService.getPotentialROLForBehandling(behandlingId = behandlingId)
+    }
+
     @GetMapping("/{behandlingId}/sakengjelder")
     fun getSakenGjelder(
         @PathVariable("behandlingId") behandlingId: UUID,
