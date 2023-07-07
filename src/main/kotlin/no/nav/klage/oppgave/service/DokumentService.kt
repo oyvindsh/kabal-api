@@ -148,22 +148,6 @@ class DokumentService(
         return dokumentMapper.mapJournalpostToDokumentReferanse(journalpost = journalpost, behandling = behandling)
     }
 
-    fun getMainDokumentAsSaksbehandler(journalpostId: String): ArkivertDokument {
-        val dokumentInfoId = fetchDokumentInfoIdForJournalpostAsSaksbehandler(journalpostId)
-        return getArkivertDokument(journalpostId, dokumentInfoId.first())
-    }
-
-    fun getMainDokumentTitleAsSaksbehandler(journalpostId: String): String {
-        return try {
-            val journalpost = safGraphQlClient.getJournalpostAsSaksbehandler(journalpostId)
-            val dokumentVariant = journalpost.dokumenter?.filter { harArkivVariantformat(it) }
-            return dokumentVariant?.first()?.dokumentvarianter?.first()?.filnavn!!
-        } catch (e: Exception) {
-            logger.warn("Unable to find journalpost $journalpostId", e)
-            "Unknown"
-        }
-    }
-
     private fun harArkivVariantformat(dokumentInfo: DokumentInfo): Boolean =
         dokumentInfo.dokumentvarianter.any { dv ->
             dv.variantformat == Variantformat.ARKIV

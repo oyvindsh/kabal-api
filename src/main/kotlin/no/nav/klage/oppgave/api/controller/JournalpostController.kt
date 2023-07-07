@@ -93,7 +93,7 @@ class JournalpostController(
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = arkivertDokument.contentType
-        responseHeaders.add("Content-Disposition", "inline")
+        responseHeaders.add("Content-Disposition", "inline; filename=\"${arkivertDokument.filename}\"")
         return ResponseEntity(
             arkivertDokument.bytes,
             responseHeaders,

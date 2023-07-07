@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -52,9 +53,11 @@ class SafRestClient(
                     .toEntity(ByteArray::class.java)
                     .map {
                         val type = it.headers.contentType
+                        val filename = it.headers.contentDisposition.filename
                         ArkivertDokument(
                             bytes = it.body ?: throw RuntimeException("no document data"),
-                            contentType = type ?: throw RuntimeException("no content type")
+                            contentType = type ?: MediaType.APPLICATION_PDF,
+                            filename = filename ?: "no filename",
                         )
                     }
                     .block() ?: throw RuntimeException("no document data returned")

@@ -557,17 +557,11 @@ class DokumentUnderArbeidService(
             }
 
             DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT -> {
-                val journalpostInDokarkiv =
-                    safClient.getJournalpostAsSaksbehandler(dokument.journalfoertDokumentReference!!.journalpostId)
-
-                val dokumentInDokarkiv =
-                    journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokument.journalfoertDokumentReference.dokumentInfoId }
-                        ?: throw RuntimeException("Document not found in Dokarkiv")
-
-                dokumentService.getArkivertDokument(
-                    journalpostId = dokument.journalfoertDokumentReference.journalpostId,
+                val arkivertDokument = dokumentService.getArkivertDokument(
+                    journalpostId = dokument.journalfoertDokumentReference!!.journalpostId,
                     dokumentInfoId = dokument.journalfoertDokumentReference.dokumentInfoId,
-                ).bytes to (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF")
+                )
+                arkivertDokument.bytes to arkivertDokument.filename
             }
         }
 

@@ -104,7 +104,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
     ): ResponseEntity<ByteArray> {
-        logger.debug("Kall mottatt på getPdf for $dokumentId")
+        logger.debug("Kall mottatt på getPdf for {}", dokumentId)
         return dokumentMapper.mapToByteArray(
             dokumentUnderArbeidService.getFysiskDokument(
                 behandlingId = behandlingId,

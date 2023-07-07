@@ -4,5 +4,6 @@ import org.springframework.http.MediaType
 
 data class ArkivertDokument(
     val bytes: ByteArray,
-    val contentType: MediaType
+    val contentType: MediaType,
+    val filename: String,
 )
