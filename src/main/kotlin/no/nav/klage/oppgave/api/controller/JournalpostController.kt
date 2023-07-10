@@ -95,7 +95,7 @@ class JournalpostController(
         responseHeaders.contentType = fysiskDokument.contentType
         responseHeaders.add(
             "Content-Disposition",
-            "inline; filename=\"${fysiskDokument.title}.${fysiskDokument.contentType.subtypeSuffix}\""
+            "inline; filename=\"${fysiskDokument.title}.pdf\""
         )
         return ResponseEntity(
             fysiskDokument.content,

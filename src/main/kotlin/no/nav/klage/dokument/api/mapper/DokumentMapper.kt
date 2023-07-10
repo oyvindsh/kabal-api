@@ -25,7 +25,7 @@ class DokumentMapper(
                 contentType = fysiskDokument.contentType
                 add(
                     "Content-Disposition",
-                    "inline; filename=\"${fysiskDokument.title}.${fysiskDokument.contentType.subtypeSuffix}\""
+                    "inline; filename=\"${fysiskDokument.title}.pdf\""
                 )
             },
             HttpStatus.OK
