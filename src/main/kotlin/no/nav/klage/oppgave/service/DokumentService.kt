@@ -19,13 +19,17 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocumentInformation
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
 import java.util.*
+
 
 @Service
 @Transactional
@@ -152,9 +156,24 @@ class DokumentService(
 
         return FysiskDokument(
             title = documentTitle,
-            content = arkivertDokument.bytes,
+            content = setTitleInPdf(arkivertDokument.bytes, documentTitle),
             contentType = arkivertDokument.contentType
         )
+    }
+
+    fun setTitleInPdf(documentBytes: ByteArray, title: String): ByteArray {
+        val document: PDDocument = PDDocument.load(
+            documentBytes,
+            "",
+            null,
+            null,
+            MemoryUsageSetting.setupMixed(50_000_000)
+        )
+        val info: PDDocumentInformation = document.documentInformation
+        info.title = title
+        val baos = ByteArrayOutputStream()
+        document.save(baos)
+        return baos.toByteArray()
     }
 
     fun getDokumentReferanse(journalpostId: String, behandling: Behandling): DokumentReferanse {
