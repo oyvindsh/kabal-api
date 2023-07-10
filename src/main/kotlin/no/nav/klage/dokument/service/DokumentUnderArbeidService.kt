@@ -567,7 +567,7 @@ class DokumentUnderArbeidService(
 
         return FysiskDokument(
             title = title,
-            content = content,
+            content = dokumentService.changeTitleInPDF(content, title),
             contentType = MediaType.APPLICATION_PDF
         )
     }

@@ -98,7 +98,7 @@ class JournalpostController(
             "inline; filename=\"${fysiskDokument.title}.pdf\""
         )
         return ResponseEntity(
-            fysiskDokument.content,
+            dokumentService.changeTitleInPDF(fysiskDokument.content, fysiskDokument.title),
             responseHeaders,
             HttpStatus.OK
         )

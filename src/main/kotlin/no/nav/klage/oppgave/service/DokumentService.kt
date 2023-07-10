@@ -156,12 +156,12 @@ class DokumentService(
 
         return FysiskDokument(
             title = documentTitle,
-            content = setTitleInPdf(arkivertDokument.bytes, documentTitle),
-            contentType = arkivertDokument.contentType
+            content = arkivertDokument.bytes,
+            contentType = arkivertDokument.contentType,
         )
     }
 
-    fun setTitleInPdf(documentBytes: ByteArray, title: String): ByteArray {
+    fun changeTitleInPDF(documentBytes: ByteArray, title: String): ByteArray {
         val document: PDDocument = PDDocument.load(
             documentBytes,
             "",
