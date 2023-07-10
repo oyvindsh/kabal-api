@@ -53,11 +53,9 @@ class SafRestClient(
                     .toEntity(ByteArray::class.java)
                     .map {
                         val type = it.headers.contentType
-                        val filename = it.headers.contentDisposition.filename
                         ArkivertDokument(
                             bytes = it.body ?: throw RuntimeException("no document data"),
                             contentType = type ?: MediaType.APPLICATION_PDF,
-                            filename = filename ?: "no filename",
                         )
                     }
                     .block() ?: throw RuntimeException("no document data returned")
