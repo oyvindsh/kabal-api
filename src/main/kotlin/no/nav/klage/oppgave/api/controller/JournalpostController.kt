@@ -93,7 +93,10 @@ class JournalpostController(
 
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = fysiskDokument.contentType
-        responseHeaders.add("Content-Disposition", "inline; filename=\"${fysiskDokument.title}\"")
+        responseHeaders.add(
+            "Content-Disposition",
+            "inline; filename=\"${fysiskDokument.title}.${fysiskDokument.contentType.subtypeSuffix}\""
+        )
         return ResponseEntity(
             fysiskDokument.content,
             responseHeaders,
