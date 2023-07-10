@@ -1,12 +1,12 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
+import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.saf.graphql.*
-import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.DocumentToMerge
@@ -32,6 +32,7 @@ import java.util.*
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
     private val safRestClient: SafRestClient,
+    private val safClient: SafGraphQlClient,
     private val documentToMergeRepository: DocumentToMergeRepository,
 ) {
     companion object {
@@ -139,8 +140,21 @@ class DokumentService(
         }
     }
 
-    fun getArkivertDokument(journalpostId: String, dokumentInfoId: String): ArkivertDokument {
-        return safRestClient.getDokument(dokumentInfoId, journalpostId)
+    fun getFysiskDokument(journalpostId: String, dokumentInfoId: String): FysiskDokument {
+        val journalpostInDokarkiv =
+            safClient.getJournalpostAsSaksbehandler(journalpostId)
+
+        val documentTitle =
+            journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
+                ?: throw RuntimeException("Document/title not found in Dokarkiv")
+
+        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId)
+
+        return FysiskDokument(
+            title = documentTitle,
+            content = arkivertDokument.bytes,
+            contentType = arkivertDokument.contentType
+        )
     }
 
     fun getDokumentReferanse(journalpostId: String, behandling: Behandling): DokumentReferanse {

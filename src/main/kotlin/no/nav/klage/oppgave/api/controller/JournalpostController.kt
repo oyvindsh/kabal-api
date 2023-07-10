@@ -86,16 +86,16 @@ class JournalpostController(
             logger = logger,
         )
 
-        val arkivertDokument = dokumentService.getArkivertDokument(
+        val fysiskDokument = dokumentService.getFysiskDokument(
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId
         )
 
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = arkivertDokument.contentType
-        responseHeaders.add("Content-Disposition", "inline; filename=\"${arkivertDokument.filename}\"")
+        responseHeaders.contentType = fysiskDokument.contentType
+        responseHeaders.add("Content-Disposition", "inline; filename=\"${fysiskDokument.title}\"")
         return ResponseEntity(
-            arkivertDokument.bytes,
+            fysiskDokument.content,
             responseHeaders,
             HttpStatus.OK
         )

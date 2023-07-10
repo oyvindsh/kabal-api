@@ -557,11 +557,11 @@ class DokumentUnderArbeidService(
             }
 
             DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT -> {
-                val arkivertDokument = dokumentService.getArkivertDokument(
+                val fysiskDokument = dokumentService.getFysiskDokument(
                     journalpostId = dokument.journalfoertDokumentReference!!.journalpostId,
                     dokumentInfoId = dokument.journalfoertDokumentReference.dokumentInfoId,
                 )
-                arkivertDokument.bytes to arkivertDokument.filename
+                fysiskDokument.content to fysiskDokument.title
             }
         }
 
