@@ -35,7 +35,7 @@ class CleanupAfterBehandlingEventListener(
     private val ankebehandlingRepository: AnkebehandlingRepository,
     private val fssProxyClient: KlageFssProxyClient,
     private val behandlingService: BehandlingService,
-    private val documentToMergeRepository: DocumentToMergeRepository,
+    private val mergedDocumentRepository: MergedDocumentRepository,
 ) {
 
     companion object {
@@ -49,7 +49,7 @@ class CleanupAfterBehandlingEventListener(
 
     @Transactional
     fun cleanupMergedDocuments() {
-        documentToMergeRepository.deleteByCreatedBefore(LocalDateTime.now().minusWeeks(3))
+        mergedDocumentRepository.deleteByCreatedBefore(LocalDateTime.now().minusWeeks(3))
     }
 
     @EventListener

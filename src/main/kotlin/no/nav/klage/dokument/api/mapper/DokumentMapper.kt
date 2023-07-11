@@ -18,18 +18,19 @@ class DokumentMapper(
     private val safClient: SafGraphQlClient
 ) {
 
-    fun mapToByteArray(fysiskDokument: FysiskDokument): ResponseEntity<ByteArray> =
-        ResponseEntity(
+    fun mapToByteArray(fysiskDokument: FysiskDokument): ResponseEntity<ByteArray> {
+        return ResponseEntity(
             fysiskDokument.content,
             HttpHeaders().apply {
                 contentType = fysiskDokument.contentType
                 add(
                     "Content-Disposition",
-                    "inline; filename=\"${fysiskDokument.title}.pdf\""
+                    "inline; filename=\"${fysiskDokument.title.removeSuffix(".pdf")}.pdf\""
                 )
             },
             HttpStatus.OK
         )
+    }
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         val type = dokumentUnderArbeid.getType()

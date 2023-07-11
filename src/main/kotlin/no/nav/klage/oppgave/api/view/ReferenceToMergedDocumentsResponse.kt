@@ -4,4 +4,5 @@ import java.util.*
 
 data class ReferenceToMergedDocumentsResponse(
     val reference: UUID,
+    val title: String,
 )
