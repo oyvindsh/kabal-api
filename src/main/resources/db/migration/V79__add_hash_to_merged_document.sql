@@ -1,3 +1,4 @@
+DELETE FROM klage.document_to_merge;
 DELETE FROM klage.merged_document;
 
 ALTER TABLE klage.merged_document
