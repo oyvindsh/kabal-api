@@ -19,6 +19,8 @@ class MergedDocument(
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 20)
     val documentsToMerge: Set<DocumentToMerge>,
+    @Column(name = "hash")
+    val hash: String,
     @Column(name = "created")
     val created: LocalDateTime,
 ) {
@@ -37,8 +39,7 @@ class MergedDocument(
     }
 
     override fun toString(): String {
-        return "MergedDocument(id=$id, title='$title', documentsToMerge=$documentsToMerge, created=$created)"
+        return "MergedDocument(id=$id, title='$title', documentsToMerge=$documentsToMerge, hash='$hash', created=$created)"
     }
-
 
 }

@@ -11,4 +11,6 @@ interface MergedDocumentRepository : JpaRepository<MergedDocument, UUID> {
 
     fun deleteByCreatedBefore(date: LocalDateTime)
 
+    fun findByHash(hash: String): MergedDocument?
+
 }
