@@ -1,38 +1,40 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
+import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.clients.saf.graphql.*
-import no.nav.klage.oppgave.clients.saf.rest.ArkivertDokument
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
-import no.nav.klage.oppgave.domain.klage.Behandling
-import no.nav.klage.oppgave.domain.klage.DocumentToMerge
-import no.nav.klage.oppgave.domain.klage.Klagebehandling
-import no.nav.klage.oppgave.domain.klage.Saksdokument
-import no.nav.klage.oppgave.exceptions.DocumentsToMergeReferenceNotFoundException
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
-import no.nav.klage.oppgave.repositories.DocumentToMergeRepository
+import no.nav.klage.oppgave.repositories.MergedDocumentRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocumentInformation
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.system.measureTimeMillis
+
 
 @Service
 @Transactional
 class DokumentService(
     private val safGraphQlClient: SafGraphQlClient,
     private val safRestClient: SafRestClient,
-    private val documentToMergeRepository: DocumentToMergeRepository,
+    private val safClient: SafGraphQlClient,
+    private val mergedDocumentRepository: MergedDocumentRepository,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -139,29 +141,45 @@ class DokumentService(
         }
     }
 
-    fun getArkivertDokument(journalpostId: String, dokumentInfoId: String): ArkivertDokument {
-        return safRestClient.getDokument(dokumentInfoId, journalpostId)
+    fun getFysiskDokument(journalpostId: String, dokumentInfoId: String): FysiskDokument {
+        val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId)
+
+        return FysiskDokument(
+            title = getDocumentTitle(journalpostId = journalpostId, dokumentInfoId = dokumentInfoId),
+            content = arkivertDokument.bytes,
+            contentType = arkivertDokument.contentType,
+        )
+    }
+
+    private fun getDocumentTitle(journalpostId: String, dokumentInfoId: String): String {
+        val journalpostInDokarkiv =
+            safClient.getJournalpostAsSaksbehandler(journalpostId)
+
+        return journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
+            ?: throw RuntimeException("Document/title not found in Dokarkiv")
+    }
+
+    fun changeTitleInPDF(documentBytes: ByteArray, title: String): ByteArray {
+        val baos = ByteArrayOutputStream()
+        val timeMillis = measureTimeMillis {
+            val document: PDDocument = PDDocument.load(
+                documentBytes,
+                "",
+                null,
+                null,
+                MemoryUsageSetting.setupMixed(50_000_000)
+            )
+            val info: PDDocumentInformation = document.documentInformation
+            info.title = title
+            document.save(baos)
+        }
+        secureLogger.debug("changeTitleInPDF with title $title took $timeMillis ms")
+        return baos.toByteArray()
     }
 
     fun getDokumentReferanse(journalpostId: String, behandling: Behandling): DokumentReferanse {
         val journalpost = safGraphQlClient.getJournalpostAsSaksbehandler(journalpostId)
         return dokumentMapper.mapJournalpostToDokumentReferanse(journalpost = journalpost, behandling = behandling)
-    }
-
-    fun getMainDokumentAsSaksbehandler(journalpostId: String): ArkivertDokument {
-        val dokumentInfoId = fetchDokumentInfoIdForJournalpostAsSaksbehandler(journalpostId)
-        return getArkivertDokument(journalpostId, dokumentInfoId.first())
-    }
-
-    fun getMainDokumentTitleAsSaksbehandler(journalpostId: String): String {
-        return try {
-            val journalpost = safGraphQlClient.getJournalpostAsSaksbehandler(journalpostId)
-            val dokumentVariant = journalpost.dokumenter?.filter { harArkivVariantformat(it) }
-            return dokumentVariant?.first()?.dokumentvarianter?.first()?.filnavn!!
-        } catch (e: Exception) {
-            logger.warn("Unable to find journalpost $journalpostId", e)
-            "Unknown"
-        }
     }
 
     private fun harArkivVariantformat(dokumentInfo: DokumentInfo): Boolean =
@@ -181,31 +199,41 @@ class DokumentService(
         fetchDokumentInfoIdForJournalpostAsSystembruker(journalpostId)
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
-    fun storeDocumentsForMerging(documents: List<JournalfoertDokumentReference>): UUID {
-        val referenceId = UUID.randomUUID()
-
-        documentToMergeRepository.saveAll(
-            documents.mapIndexed { index, it ->
-                DocumentToMerge(
-                    referenceId = referenceId,
-                    journalpostId = it.journalpostId,
-                    dokumentInfoId = it.dokumentInfoId,
-                    index = index,
-                    created = LocalDateTime.now(),
-                )
-            })
-
-        return referenceId
+    fun storeDocumentsForMerging(documents: List<JournalfoertDokumentReference>): MergedDocument {
+        return mergedDocumentRepository.save(
+            MergedDocument(
+                title = generateTitleForDocumentsToMerge(documents),
+                documentsToMerge = documents.mapIndexed { index, it ->
+                    DocumentToMerge(
+                        journalpostId = it.journalpostId,
+                        dokumentInfoId = it.dokumentInfoId,
+                        index = index,
+                    )
+                }.toSet(),
+                created = LocalDateTime.now()
+            )
+        )
     }
 
-    fun mergeDocuments(referenceId: UUID): Path {
-        val documentsToMerge = documentToMergeRepository.findByReferenceIdOrderByIndex(referenceId)
+    private fun generateTitleForDocumentsToMerge(documents: List<JournalfoertDokumentReference>): String {
+        val numberOfDocumentNamesToShow = 3
+        val truncatedMessage = " ... " + (documents.size - numberOfDocumentNamesToShow) + " til"
 
-        if (documentsToMerge.isEmpty()) {
-            throw DocumentsToMergeReferenceNotFoundException("referenceId $referenceId not found")
-        }
+        return "(${documents.size}) " + documents
+            .joinToString(limit = numberOfDocumentNamesToShow, truncated = truncatedMessage) {
+                getDocumentTitle(journalpostId = it.journalpostId, dokumentInfoId = it.dokumentInfoId)
+            }
+    }
+
+    fun mergeDocuments(id: UUID): Pair<Path, String> {
+        val mergedDocument = mergedDocumentRepository.getReferenceById(id)
+        val documentsToMerge = mergedDocument.documentsToMerge.sortedBy { it.index }
 
         val merger = PDFMergerUtility()
+
+        val pdDocumentInformation = PDDocumentInformation()
+        pdDocumentInformation.title = mergedDocument.title
+        merger.destinationDocumentInformation = pdDocumentInformation
 
         val pathToMergedDocument = Files.createTempFile(null, null)
         pathToMergedDocument.toFile().deleteOnExit()
@@ -241,7 +269,7 @@ class DokumentService(
             logger.warn("couldn't delete tmp file", e)
         }
 
-        return pathToMergedDocument
+        return pathToMergedDocument to mergedDocument.title
     }
 }
 

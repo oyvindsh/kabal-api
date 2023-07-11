@@ -20,7 +20,7 @@ import java.util.*
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class DocumentToMergeRepositoryTest {
+class MergedDocumentRepositoryTest {
 
     companion object {
         @Container
@@ -32,7 +32,7 @@ class DocumentToMergeRepositoryTest {
     lateinit var testEntityManager: TestEntityManager
 
     @Autowired
-    lateinit var documentToMergeRepository: DocumentToMergeRepository
+    lateinit var mergedDocumentRepository: MergedDocumentRepository
 
     @Test
     fun `delete old merged documents works`() {
@@ -40,39 +40,58 @@ class DocumentToMergeRepositoryTest {
 
         val now = LocalDateTime.of(LocalDate.of(2023, 5, 1), LocalTime.MIN)
 
-        val docsToMerge = mutableListOf<DocumentToMerge>()
+        val documentToMergeList = mutableListOf<MergedDocument>()
 
-        val referenceIdToKeep = UUID.randomUUID()
-        docsToMerge += DocumentToMerge(
-            referenceId = referenceIdToKeep,
-            journalpostId = "1",
-            dokumentInfoId = "1",
-            index = 0,
+        val idToKeep = UUID.randomUUID()
+        documentToMergeList += MergedDocument(
+            id = idToKeep,
+            title = "title",
+            documentsToMerge = setOf(
+                DocumentToMerge(
+                    journalpostId = "2",
+                    dokumentInfoId = "2",
+                    index = 0,
+                )
+            ),
             created = now.minusWeeks(thresholdWeeks),
         )
 
-        docsToMerge += DocumentToMerge(
-            referenceId = UUID.randomUUID(),
-            journalpostId = "2",
-            dokumentInfoId = "2",
-            index = 0,
+        documentToMergeList += MergedDocument(
+            title = "title 2",
+            documentsToMerge = setOf(
+                DocumentToMerge(
+                    journalpostId = "3",
+                    dokumentInfoId = "3",
+                    index = 0,
+                ),
+                DocumentToMerge(
+                    journalpostId = "3",
+                    dokumentInfoId = "3",
+                    index = 1,
+                ),
+                DocumentToMerge(
+                    journalpostId = "3",
+                    dokumentInfoId = "3",
+                    index = 2,
+                )
+            ),
             created = now.minusWeeks(thresholdWeeks).minusMinutes(1),
         )
 
-        documentToMergeRepository.saveAll(docsToMerge)
+        mergedDocumentRepository.saveAll(documentToMergeList)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(documentToMergeRepository.findAll()).hasSize(2)
+        assertThat(mergedDocumentRepository.findAll()).hasSize(2)
 
-        documentToMergeRepository.deleteByCreatedBefore(now.minusWeeks(thresholdWeeks))
+        mergedDocumentRepository.deleteByCreatedBefore(now.minusWeeks(thresholdWeeks))
 
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(documentToMergeRepository.findAll()).hasSize(1)
-        assertThat(documentToMergeRepository.findAll().first().referenceId).isEqualTo(referenceIdToKeep)
+        assertThat(mergedDocumentRepository.findAll()).hasSize(1)
+        assertThat(mergedDocumentRepository.findAll().first().id).isEqualTo(idToKeep)
     }
 
 }

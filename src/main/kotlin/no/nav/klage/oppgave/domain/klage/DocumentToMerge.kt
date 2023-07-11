@@ -4,7 +4,6 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -12,16 +11,12 @@ import java.util.*
 class DocumentToMerge(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "reference_id")
-    val referenceId: UUID,
     @Column(name = "journalpost_id")
     val journalpostId: String,
     @Column(name = "dokument_info_id")
     val dokumentInfoId: String,
     @Column(name = "index")
     val index: Int,
-    @Column(name = "created")
-    val created: LocalDateTime,
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -30,9 +25,7 @@ class DocumentToMerge(
 
         other as DocumentToMerge
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {
@@ -40,8 +33,7 @@ class DocumentToMerge(
     }
 
     override fun toString(): String {
-        return "DocumentToMerge(id=$id, referenceId=$referenceId, journalpostId='$journalpostId', dokumentInfoId='$dokumentInfoId', index=$index, created=$created)"
+        return "DocumentToMerge(id=$id, journalpostId='$journalpostId', dokumentInfoId='$dokumentInfoId', index=$index)"
     }
-
 
 }

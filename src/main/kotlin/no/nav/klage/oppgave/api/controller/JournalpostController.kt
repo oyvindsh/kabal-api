@@ -86,16 +86,19 @@ class JournalpostController(
             logger = logger,
         )
 
-        val arkivertDokument = dokumentService.getArkivertDokument(
+        val fysiskDokument = dokumentService.getFysiskDokument(
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId
         )
 
         val responseHeaders = HttpHeaders()
-        responseHeaders.contentType = arkivertDokument.contentType
-        responseHeaders.add("Content-Disposition", "inline")
+        responseHeaders.contentType = fysiskDokument.contentType
+        responseHeaders.add(
+            "Content-Disposition",
+            "inline; filename=\"${fysiskDokument.title.removeSuffix(".pdf")}.pdf\""
+        )
         return ResponseEntity(
-            arkivertDokument.bytes,
+            dokumentService.changeTitleInPDF(fysiskDokument.content, fysiskDokument.title),
             responseHeaders,
             HttpStatus.OK
         )
@@ -105,17 +108,21 @@ class JournalpostController(
     fun setDocumentsToMerge(
         @RequestBody documents: List<JournalfoertDokumentReference>
     ): ReferenceToMergedDocumentsResponse {
-        return ReferenceToMergedDocumentsResponse(reference = dokumentService.storeDocumentsForMerging(documents))
+        val mergedDocument = dokumentService.storeDocumentsForMerging(documents)
+        return ReferenceToMergedDocumentsResponse(
+            reference = mergedDocument.id,
+            title = mergedDocument.title,
+        )
     }
 
     @GetMapping("/mergedocuments/{referenceId}")
     fun getMergedDocuments(
         @PathVariable referenceId: UUID
     ): ResponseEntity<Resource> {
-        val pathToMergedDocument = dokumentService.mergeDocuments(referenceId)
+        val (pathToMergedDocument, title) = dokumentService.mergeDocuments(referenceId)
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.APPLICATION_PDF
-        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=mergedfile.pdf")
+        responseHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"$title.pdf\"")
 
         return ResponseEntity.ok()
             .headers(responseHeaders)
