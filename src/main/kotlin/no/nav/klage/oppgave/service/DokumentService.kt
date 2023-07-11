@@ -219,7 +219,7 @@ class DokumentService(
         val numberOfDocumentNamesToShow = 3
         val truncatedMessage = " ... " + (documents.size - numberOfDocumentNamesToShow) + " til"
 
-        return documents.take(numberOfDocumentNamesToShow)
+        return documents
             .joinToString(limit = numberOfDocumentNamesToShow, truncated = truncatedMessage) {
                 getDocumentTitle(journalpostId = it.journalpostId, dokumentInfoId = it.dokumentInfoId)
             }
@@ -230,7 +230,10 @@ class DokumentService(
         val documentsToMerge = mergedDocument.documentsToMerge.sortedBy { it.index }
 
         val merger = PDFMergerUtility()
-        merger.destinationDocumentInformation.title = mergedDocument.title
+
+        val pdDocumentInformation = PDDocumentInformation()
+        pdDocumentInformation.title = mergedDocument.title
+        merger.destinationDocumentInformation = pdDocumentInformation
 
         val pathToMergedDocument = Files.createTempFile(null, null)
         pathToMergedDocument.toFile().deleteOnExit()
