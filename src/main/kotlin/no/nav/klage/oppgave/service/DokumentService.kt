@@ -219,7 +219,7 @@ class DokumentService(
         val numberOfDocumentNamesToShow = 3
         val truncatedMessage = " ... " + (documents.size - numberOfDocumentNamesToShow) + " til"
 
-        return documents
+        return "(${documents.size}) " + documents
             .joinToString(limit = numberOfDocumentNamesToShow, truncated = truncatedMessage) {
                 getDocumentTitle(journalpostId = it.journalpostId, dokumentInfoId = it.dokumentInfoId)
             }
