@@ -114,7 +114,6 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @ResponseBody
     @GetMapping("/{dokumentId}/title")
     fun getTitle(
         @PathVariable("behandlingId") behandlingId: UUID,
