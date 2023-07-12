@@ -48,7 +48,11 @@ open class DokumentUnderArbeid(
     @Column(name = "dokument_enhet_id")
     open var dokumentEnhetId: UUID? = null,
     @ElementCollection
-    @CollectionTable(name="dokument_under_arbeid_brevmottaker_ident", joinColumns=[JoinColumn(name="dokument_under_arbeid_id")])
+    @CollectionTable(
+        schema = "klage",
+        name = "dokument_under_arbeid_brevmottaker_ident",
+        joinColumns = [JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)]
+    )
     @Column(name="identifikator")
     open var brevmottakerIdents: Set<String> = setOf(),
     @Column(name = "parent_id")
