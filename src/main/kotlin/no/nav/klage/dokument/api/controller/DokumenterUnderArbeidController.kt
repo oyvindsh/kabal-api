@@ -114,6 +114,18 @@ class DokumentUnderArbeidController(
         )
     }
 
+    @ResponseBody
+    @GetMapping("/{dokumentId}/title")
+    fun getTitle(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") dokumentId: UUID,
+    ): Map<String, String> {
+        logger.debug("Kall mottatt på getTitle for {}", dokumentId)
+        return mapOf(
+            "title" to dokumentUnderArbeidService.getDokumentUnderArbeid(dokumentId).name
+        )
+    }
+
     @DeleteMapping("/{dokumentId}")
     fun deleteDokument(
         @PathVariable("behandlingId") behandlingId: UUID,

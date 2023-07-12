@@ -104,6 +104,31 @@ class JournalpostController(
         )
     }
 
+    @Operation(
+        summary = "Henter tittel fra dokumentarkivet",
+        description = "Henter tittel fra dokumentarkivet gitt at saksbehandler har tilgang"
+    )
+    @ResponseBody
+    @GetMapping("/{journalpostId}/dokumenter/{dokumentInfoId}/title")
+    fun getArkivertDokumentTitle(
+        @Parameter(description = "Id til journalpost")
+        @PathVariable journalpostId: String,
+        @Parameter(description = "Id til dokumentInfo")
+        @PathVariable dokumentInfoId: String
+    ): Map<String, String> {
+        logMethodDetails(
+            methodName = ::getArkivertDokumentTitle.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger,
+        )
+        return mapOf(
+            "title" to dokumentService.getDocumentTitle(
+                journalpostId = journalpostId,
+                dokumentInfoId = dokumentInfoId
+            )
+        )
+    }
+
     @PostMapping("/mergedocuments")
     fun setDocumentsToMerge(
         @RequestBody documents: List<JournalfoertDokumentReference>
@@ -115,7 +140,7 @@ class JournalpostController(
         )
     }
 
-    @GetMapping("/mergedocuments/{referenceId}")
+    @GetMapping("/mergedocuments/{referenceId}", "/mergedocuments/{referenceId}/pdf")
     fun getMergedDocuments(
         @PathVariable referenceId: UUID
     ): ResponseEntity<Resource> {
@@ -139,6 +164,15 @@ class JournalpostController(
                         }
                     }
                 })
+    }
+
+    @GetMapping("/mergedocuments/{referenceId}/title")
+    fun getMergedDocumentsTitle(
+        @PathVariable referenceId: UUID
+    ): Map<String, String> {
+        return mapOf(
+            "title" to dokumentService.getMergedDocument(referenceId).title
+        )
     }
 
 }
