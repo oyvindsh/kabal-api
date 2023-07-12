@@ -182,7 +182,8 @@ class DokumentUnderArbeidController(
                 behandlingId = behandlingId,
                 dokumentId = dokumentId,
                 ident = ident,
-                brevmottakertyper = input.brevmottakertypeIds?.map { Brevmottakertype.of(it) }?.toSet() ?: emptySet(),
+                brevmottakertyper = input.brevmottakertypeIds?.map { Brevmottakertype.of(it) }?.toSet(),
+                brevmottakerIdents = input.brevmottakerIdents,
             )
         )
     }

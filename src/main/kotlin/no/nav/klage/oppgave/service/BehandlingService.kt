@@ -39,8 +39,7 @@ import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
-import no.nav.klage.oppgave.util.isValidFnrOrDnr
-import no.nav.klage.oppgave.util.isValidOrgnr
+import no.nav.klage.oppgave.util.getPartIdFromIdentifikator
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -465,35 +464,6 @@ class BehandlingService(
         applicationEventPublisher.publishEvent(event)
         return behandling.modified
     }
-
-    fun getPartIdFromIdentifikator(identifikator: String): PartId =
-        when (identifikator.length) {
-            11 -> {
-                if (isValidFnrOrDnr(identifikator)) {
-                    PartId(
-                        type = PartIdType.PERSON,
-                        value = identifikator
-                    )
-                } else {
-                    throw ValidationException("identifier is not a valid fødselsnummer")
-                }
-            }
-
-            9 -> {
-                if (isValidOrgnr(identifikator)) {
-                    PartId(
-                        type = PartIdType.VIRKSOMHET,
-                        value = identifikator
-                    )
-                } else {
-                    throw ValidationException("identifier is not a valid organisasjonsnummer")
-                }
-            }
-
-            else -> {
-                throw ValidationException("identifier is not a valid. Unknown type.")
-            }
-        }
 
     fun setMedunderskriverIdentAndMedunderskriverFlyt(
         behandlingId: UUID,

@@ -18,6 +18,7 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentMapper
+import no.nav.klage.oppgave.clients.kabaldocument.model.request.BrevmottakerInput
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
@@ -425,13 +426,15 @@ class DokumentUnderArbeidService(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
         ident: String,
-        brevmottakertyper: Set<Brevmottakertype>
+        brevmottakertyper: Set<Brevmottakertype>?,
+        brevmottakerIdents: Set<String>?,
     ): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val behandling = behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
 
         validateBeforeFerdig(
             brevmottakertyper = brevmottakertyper,
+            brevmottakerIdents = brevmottakerIdents,
             hovedDokument = hovedDokument,
             behandling = behandling,
         )
@@ -439,7 +442,14 @@ class DokumentUnderArbeidService(
         val now = LocalDateTime.now()
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident)
-        hovedDokument.brevmottakertyper = brevmottakertyper
+        hovedDokument.brevmottakerIdents = brevmottakerInputs(
+            brevmottakerIdents = brevmottakerIdents,
+            brevmottakertyper = brevmottakertyper,
+            behandling = behandling,
+            hovedDokument = hovedDokument,
+        ).map {
+            it.partId.value
+        }.toSet()
         vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident) }
 
         //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
@@ -463,9 +473,9 @@ class DokumentUnderArbeidService(
 
         behandling.publishEndringsloggEvent(
             saksbehandlerident = ident,
-            felt = Felt.DOKUMENT_UNDER_ARBEID_BREVMOTTAKER_TYPER,
+            felt = Felt.DOKUMENT_UNDER_ARBEID_BREVMOTTAKER_IDENTS,
             fraVerdi = null,
-            tilVerdi = hovedDokument.brevmottakertyper.joinToString { it.id },
+            tilVerdi = hovedDokument.brevmottakerIdents.joinToString { it },
             tidspunkt = LocalDateTime.now(),
             dokumentId = hovedDokument.id,
         )
@@ -476,7 +486,8 @@ class DokumentUnderArbeidService(
     }
 
     private fun validateBeforeFerdig(
-        brevmottakertyper: Set<Brevmottakertype>,
+        brevmottakertyper: Set<Brevmottakertype>?,
+        brevmottakerIdents: Set<String>?,
         hovedDokument: DokumentUnderArbeid,
         behandling: Behandling,
     ) {
@@ -488,7 +499,7 @@ class DokumentUnderArbeidService(
             )
         }
 
-        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isEmpty()) {
+        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isNullOrEmpty() && brevmottakerIdents.isNullOrEmpty()) {
             throw DokumentValidationException("Brevmottakere må være satt")
         }
 
@@ -500,11 +511,7 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
         }
 
-        val mottakere = kabalDocumentMapper.mapBrevmottakere(
-            behandling = behandling,
-            brevMottakertyper = brevmottakertyper,
-            dokumentType = hovedDokument.dokumentType!!
-        )
+        val mottakere = brevmottakerInputs(brevmottakerIdents, behandling, hovedDokument, brevmottakertyper)
 
         val invalidProperties = mutableListOf<InvalidProperty>()
 
@@ -532,6 +539,28 @@ class DokumentUnderArbeidService(
                 )
             )
         }
+    }
+
+    private fun brevmottakerInputs(
+        brevmottakerIdents: Set<String>?,
+        behandling: Behandling,
+        hovedDokument: DokumentUnderArbeid,
+        brevmottakertyper: Set<Brevmottakertype>?
+    ): List<BrevmottakerInput> {
+        val mottakere = if (!brevmottakerIdents.isNullOrEmpty()) {
+            kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
+                behandling = behandling,
+                brevmottakerIdents = brevmottakerIdents,
+                dokumentType = hovedDokument.dokumentType!!
+            )
+        } else {
+            kabalDocumentMapper.mapBrevmottakertypeToBrevmottakerInput(
+                behandling = behandling,
+                brevmottakertyper = brevmottakertyper ?: emptySet(),
+                dokumentType = hovedDokument.dokumentType!!
+            )
+        }
+        return mottakere
     }
 
     fun getFysiskDokument(

@@ -1,5 +1,9 @@
 package no.nav.klage.oppgave.util
 
+import no.nav.klage.kodeverk.PartIdType
+import no.nav.klage.oppgave.domain.klage.PartId
+import no.nav.klage.oppgave.exceptions.ValidationException
+
 fun isValidFnrOrDnr(fnr: String): Boolean {
     if (fnr.length != 11) {
         return false
@@ -40,3 +44,32 @@ fun isValidOrgnr(orgnr: String): Boolean {
         kontrollSiffer == orgnr.substring(8, 9).toInt()
     }
 }
+
+fun getPartIdFromIdentifikator(identifikator: String): PartId =
+    when (identifikator.length) {
+        11 -> {
+            if (isValidFnrOrDnr(identifikator)) {
+                PartId(
+                    type = PartIdType.PERSON,
+                    value = identifikator
+                )
+            } else {
+                throw ValidationException("identifier is not a valid fødselsnummer")
+            }
+        }
+
+        9 -> {
+            if (isValidOrgnr(identifikator)) {
+                PartId(
+                    type = PartIdType.VIRKSOMHET,
+                    value = identifikator
+                )
+            } else {
+                throw ValidationException("identifier is not a valid organisasjonsnummer")
+            }
+        }
+
+        else -> {
+            throw ValidationException("identifier is not a valid. Unknown type.")
+        }
+    }

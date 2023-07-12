@@ -7,6 +7,7 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getPartIdFromIdentifikator
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 
@@ -26,7 +27,7 @@ class PartSearchService(
     }
 
     fun searchPart(identifikator: String, skipAccessControl: Boolean = false): BehandlingDetaljerView.PartView =
-        when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
+        when (getPartIdFromIdentifikator(identifikator).type) {
             PartIdType.PERSON -> {
                 if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
                     val person = pdlFacade.getPersonInfo(identifikator)
@@ -59,7 +60,7 @@ class PartSearchService(
         identifikator: String,
         skipAccessControl: Boolean = false
     ): BehandlingDetaljerView.SakenGjelderView =
-        when (behandlingService.getPartIdFromIdentifikator(identifikator).type) {
+        when (getPartIdFromIdentifikator(identifikator).type) {
             PartIdType.PERSON -> {
                 if (skipAccessControl || tilgangService.harInnloggetSaksbehandlerTilgangTil(identifikator)) {
                     val person = pdlFacade.getPersonInfo(identifikator)
@@ -79,7 +80,7 @@ class PartSearchService(
             }
 
             else -> throw RuntimeException(
-                "Invalid part type: " + behandlingService.getPartIdFromIdentifikator(
+                "Invalid part type: " + getPartIdFromIdentifikator(
                     identifikator
                 ).type
             )

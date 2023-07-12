@@ -1,9 +1,7 @@
 package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import jakarta.persistence.*
-import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
-import no.nav.klage.oppgave.domain.klage.BrevmottakertypeConverter
 import no.nav.klage.oppgave.domain.klage.DokumentTypeConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
@@ -49,15 +47,14 @@ open class DokumentUnderArbeid(
     open var ferdigstilt: LocalDateTime? = null,
     @Column(name = "dokument_enhet_id")
     open var dokumentEnhetId: UUID? = null,
-    @ElementCollection(targetClass = Brevmottakertype::class, fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(
-        name = "dokument_under_arbeid_brevmottaker_type",
         schema = "klage",
-        joinColumns = [JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = true)]
+        name = "dokument_under_arbeid_brevmottaker_ident",
+        joinColumns = [JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)]
     )
-    @Convert(converter = BrevmottakertypeConverter::class)
-    @Column(name = "id")
-    open var brevmottakertyper: Set<Brevmottakertype> = mutableSetOf(),
+    @Column(name="identifikator")
+    open var brevmottakerIdents: Set<String> = setOf(),
     @Column(name = "parent_id")
     open var parentId: UUID? = null,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
