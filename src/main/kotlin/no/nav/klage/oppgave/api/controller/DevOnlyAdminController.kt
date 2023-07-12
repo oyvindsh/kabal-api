@@ -1,7 +1,12 @@
 package no.nav.klage.oppgave.api.controller
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import jakarta.validation.Valid
+import no.nav.klage.oppgave.api.view.ExternalFeilregistreringInput
+import no.nav.klage.oppgave.api.view.mapFagsystem
 import no.nav.klage.oppgave.service.AdminService
-import no.nav.klage.oppgave.service.PartSearchService
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.Unprotected
@@ -15,7 +20,7 @@ import java.util.*
 class DevOnlyAdminController(
     private val adminService: AdminService,
     private val tokenUtil: TokenUtil,
-    private val partSearchService: PartSearchService,
+    private val behandlingService: BehandlingService,
 ) {
 
     companion object {
@@ -91,6 +96,25 @@ class DevOnlyAdminController(
     @GetMapping("/internal/mytoken")
     fun getToken(): String {
         return tokenUtil.getAccessTokenFrontendSent()
+    }
+
+    @Unprotected
+    @Operation(
+        summary = "Feilregistrer sak",
+        description = "Endepunkt for å feilregistrere en klage/anke som ikke skal behandles av klageinstans. Fungerer kun hvis sak ikke er tildelt saksbehandler. Ellers må KA kontaktes."
+    )
+    @PostMapping("/internal/feilregistrering")
+    fun feilregistrer(
+        @Parameter(description = "Feilregistrering")
+        @Valid @RequestBody feilregistrering: ExternalFeilregistreringInput,
+    ) {
+        behandlingService.feilregistrer(
+            type = feilregistrering.type,
+            reason = feilregistrering.reason,
+            navIdent = feilregistrering.navIdent,
+            fagsystem = feilregistrering.fagsystem.mapFagsystem(),
+            kildereferanse = feilregistrering.kildereferanse,
+        )
     }
 
     data class Fnr(val fnr: String)

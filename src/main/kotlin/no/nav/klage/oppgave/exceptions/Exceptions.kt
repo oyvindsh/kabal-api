@@ -64,6 +64,8 @@ class EnhetNotFoundForSaksbehandlerException(msg: String) : RuntimeException(msg
 
 class IllegalOperation(msg: String) : RuntimeException(msg)
 
+class FeilregistreringException(msg: String) : RuntimeException(msg)
+
 /**
  * When PDL-api works, but responds with an error for some reason
  */

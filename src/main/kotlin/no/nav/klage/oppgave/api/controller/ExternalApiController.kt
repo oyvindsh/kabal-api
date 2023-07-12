@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import no.nav.klage.oppgave.api.view.ExternalFeilregistreringInput
 import no.nav.klage.oppgave.api.view.OversendtKlageAnkeV3
 import no.nav.klage.oppgave.api.view.OversendtKlageV2
+import no.nav.klage.oppgave.api.view.mapFagsystem
 import no.nav.klage.oppgave.config.SecurityConfiguration
-import no.nav.klage.oppgave.service.AnkeITrygderettenbehandlingService
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.MottakService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("api")
 class ExternalApiController(
     private val mottakService: MottakService,
-    private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
+    private val behandlingService: BehandlingService,
 ) {
 
     companion object {
@@ -57,5 +59,23 @@ class ExternalApiController(
         @Valid @RequestBody oversendtKlageAnke: OversendtKlageAnkeV3
     ) {
         mottakService.createMottakForKlageAnkeV3(oversendtKlageAnke)
+    }
+
+    @Operation(
+        summary = "Feilregistrer sak",
+        description = "Endepunkt for å feilregistrere en klage/anke som ikke skal behandles av klageinstans. Fungerer kun hvis sak ikke er tildelt saksbehandler. Ellers må KA kontaktes."
+    )
+    @PostMapping("/feilregistrering")
+    fun feilregistrer(
+        @Parameter(description = "Feilregistrering")
+        @Valid @RequestBody feilregistrering: ExternalFeilregistreringInput,
+    ) {
+        behandlingService.feilregistrer(
+            type = feilregistrering.type,
+            reason = feilregistrering.reason,
+            navIdent = feilregistrering.navIdent,
+            fagsystem = feilregistrering.fagsystem.mapFagsystem(),
+            kildereferanse = feilregistrering.kildereferanse,
+        )
     }
 }

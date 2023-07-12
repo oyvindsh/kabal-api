@@ -810,6 +810,41 @@ class BehandlingService(
         return feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
     }
 
+    fun feilregistrer(
+        type: Type,
+        reason: String,
+        fagsystem: Fagsystem,
+        navIdent: String,
+        kildereferanse: String
+    ): Behandling {
+        var candidates = behandlingRepository.findByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
+            fagsystem = fagsystem,
+            kildeReferanse = kildereferanse,
+            type = type,
+        )
+        if (candidates.isEmpty()) {
+            throw FeilregistreringException("Fant ingen saker å feilføre")
+        }
+
+        candidates = candidates.filter { it.avsluttetAvSaksbehandler == null }
+
+        if (candidates.isEmpty()) {
+            throw FeilregistreringException("Kan ikke feilføre fullført sak")
+        }
+
+        candidates = candidates.filter { it.tildeling == null }
+
+        if (candidates.isEmpty()) {
+            throw FeilregistreringException("Kan ikke feilføre tildelt sak. Kontakt KA for feilregistrering.")
+        }
+
+        if (candidates.size > 1) {
+            throw RuntimeException("Ended up with more than one candidate for feilregistrering. Kildereferanse: $kildereferanse")
+        }
+
+        return feilregistrer(behandling = candidates.first(), navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+    }
+
     private fun feilregistrer(
         behandling: Behandling,
         navIdent: String,
