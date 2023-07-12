@@ -104,7 +104,7 @@ class CleanupAfterBehandlingEventListener(
     }
 
     private fun deleteDokumenterUnderBehandling(behandling: Behandling) {
-        dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandling.id).forEach {
+        dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandling.id, checkReadAccess = false).forEach {
             try {
                 dokumentUnderArbeidService.slettDokument(
                     dokumentId = it.id,

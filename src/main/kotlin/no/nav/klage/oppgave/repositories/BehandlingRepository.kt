@@ -11,11 +11,11 @@ import java.util.*
 
 interface BehandlingRepository : JpaRepository<Behandling, UUID> {
 
-    fun existsByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
+    fun findByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
         fagsystem: Fagsystem,
         kildeReferanse: String,
         type: Type,
-    ): Boolean
+    ): List<Behandling>
 
     fun findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull(): List<Behandling>
 

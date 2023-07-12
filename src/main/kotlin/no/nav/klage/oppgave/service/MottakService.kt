@@ -344,11 +344,11 @@ class MottakService(
     }
 
     private fun isBehandlingDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type): Boolean {
-        return behandlingRepository.existsByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
+        return behandlingRepository.findByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
             fagsystem = fagsystem.mapFagsystem(),
             kildeReferanse = kildeReferanse,
             type = type,
-        )
+        ).isNotEmpty()
     }
 
     private fun validateOptionalDateTimeNotInFuture(inputDateTime: LocalDateTime?, parameterName: String) {

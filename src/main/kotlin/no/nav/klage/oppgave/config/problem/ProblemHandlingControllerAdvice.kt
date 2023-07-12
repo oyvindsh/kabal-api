@@ -61,6 +61,13 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.PAYLOAD_TOO_LARGE, ex)
 
     @ExceptionHandler
+    fun handleFeilregistreringException(
+        ex: FeilregistreringException,
+        request: NativeWebRequest
+    ): ProblemDetail =
+        create(HttpStatus.BAD_REQUEST, ex)
+
+    @ExceptionHandler
     fun handleOversendtKlageNotValidException(
         ex: OversendtKlageNotValidException,
         request: NativeWebRequest

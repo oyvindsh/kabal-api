@@ -706,9 +706,11 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenterNotFinished(behandlingId: UUID): SortedSet<DokumentUnderArbeid> {
+    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): SortedSet<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
-        behandlingService.getBehandling(behandlingId)
+        if (checkReadAccess) {
+            behandlingService.getBehandling(behandlingId)
+        }
 
         return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId)
     }
