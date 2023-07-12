@@ -174,6 +174,7 @@ class DokumentService(
             val info: PDDocumentInformation = document.documentInformation
             info.title = title
             document.save(baos)
+            document.close()
         }
         secureLogger.debug("changeTitleInPDF with title $title took $timeMillis ms")
         return baos.toByteArray()
