@@ -53,6 +53,7 @@ class MergedDocumentRepositoryTest {
                     index = 0,
                 )
             ),
+            hash = "a",
             created = now.minusWeeks(thresholdWeeks),
         )
 
@@ -75,6 +76,7 @@ class MergedDocumentRepositoryTest {
                     index = 2,
                 )
             ),
+            hash = "b",
             created = now.minusWeeks(thresholdWeeks).minusMinutes(1),
         )
 

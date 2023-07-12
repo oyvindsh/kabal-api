@@ -21,8 +21,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import java.io.ByteArrayOutputStream
+import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
+import java.security.MessageDigest
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.system.measureTimeMillis
@@ -172,6 +174,7 @@ class DokumentService(
             val info: PDDocumentInformation = document.documentInformation
             info.title = title
             document.save(baos)
+            document.close()
         }
         secureLogger.debug("changeTitleInPDF with title $title took $timeMillis ms")
         return baos.toByteArray()
@@ -200,6 +203,13 @@ class DokumentService(
             .map { Saksdokument(journalpostId = journalpostId, dokumentInfoId = it) }
 
     fun storeDocumentsForMerging(documents: List<JournalfoertDokumentReference>): MergedDocument {
+        val hash = documents.joinToString(separator = "") { it.journalpostId + it.dokumentInfoId }.toMd5Hash()
+
+        val previouslyMergedDocument = mergedDocumentRepository.findByHash(hash)
+        if (previouslyMergedDocument != null) {
+            return previouslyMergedDocument
+        }
+
         return mergedDocumentRepository.save(
             MergedDocument(
                 title = generateTitleForDocumentsToMerge(documents),
@@ -210,9 +220,15 @@ class DokumentService(
                         index = index,
                     )
                 }.toSet(),
+                hash = hash,
                 created = LocalDateTime.now()
             )
         )
+    }
+
+    fun String.toMd5Hash(): String {
+        val md = MessageDigest.getInstance("MD5")
+        return BigInteger(1, md.digest(this.toByteArray())).toString(16).padStart(32, '0')
     }
 
     private fun generateTitleForDocumentsToMerge(documents: List<JournalfoertDokumentReference>): String {
