@@ -10,6 +10,7 @@ import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.getPartIdFromIdentifikator
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
 import java.util.*
@@ -37,7 +38,7 @@ class KabalDocumentMapper(
         vedlegg: SortedSet<DokumentUnderArbeid>
     ): DokumentEnhetWithDokumentreferanserInput {
         return DokumentEnhetWithDokumentreferanserInput(
-            brevMottakere = mapBrevmottakere(behandling, hovedDokument.brevmottakertyper, hovedDokument.dokumentType!!),
+            brevMottakere = mapBrevmottakerIdentToBrevmottakerInput(behandling, hovedDokument.brevmottakerIdents, hovedDokument.dokumentType!!),
             journalfoeringData = JournalfoeringDataInput(
                 sakenGjelder = PartIdInput(
                     partIdTypeId = behandling.sakenGjelder.partId.type.id,
@@ -83,9 +84,9 @@ class KabalDocumentMapper(
         )
     }
 
-    fun mapBrevmottakere(
+    fun mapBrevmottakertypeToBrevmottakerInput(
         behandling: Behandling,
-        brevMottakertyper: Set<Brevmottakertype>,
+        brevmottakertyper: Set<Brevmottakertype>,
         dokumentType: DokumentType
     ): List<BrevmottakerInput> {
         val brevmottakerPartIds = mutableSetOf<PartId>()
@@ -93,20 +94,34 @@ class KabalDocumentMapper(
         if (dokumentType == DokumentType.NOTAT) {
             brevmottakerPartIds.add(behandling.sakenGjelder.partId)
         } else {
-            if (brevMottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
+            if (brevmottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
                 brevmottakerPartIds.add(behandling.klager.prosessfullmektig!!.partId)
             }
 
-            if (brevMottakertyper.contains(Brevmottakertype.KLAGER)) {
+            if (brevmottakertyper.contains(Brevmottakertype.KLAGER)) {
                 brevmottakerPartIds.add(behandling.klager.partId)
             }
 
-            if (brevMottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)) {
+            if (brevmottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)) {
                 brevmottakerPartIds.add(behandling.sakenGjelder.partId)
             }
         }
 
         return brevmottakerPartIds.map { mapPartIdToBrevmottakerInput(it) }
+    }
+
+    fun mapBrevmottakerIdentToBrevmottakerInput(
+        behandling: Behandling,
+        brevmottakerIdents: Set<String>,
+        dokumentType: DokumentType
+    ): List<BrevmottakerInput> {
+        return if (dokumentType == DokumentType.NOTAT) {
+            listOf(mapPartIdToBrevmottakerInput(behandling.sakenGjelder.partId))
+        } else {
+            brevmottakerIdents.map {
+                mapPartIdToBrevmottakerInput(getPartIdFromIdentifikator(it))
+            }
+        }
     }
 
     private fun mapPartIdToBrevmottakerInput(partId: PartId) =

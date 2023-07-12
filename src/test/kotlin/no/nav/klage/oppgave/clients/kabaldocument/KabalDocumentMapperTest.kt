@@ -84,7 +84,7 @@ class KabalDocumentMapperTest {
         )
 
         assertThat(
-            mapper.mapBrevmottakere(
+            mapper.mapBrevmottakertypeToBrevmottakerInput(
                 klagebehandling as Behandling,
                 brevmottakertyper,
                 DokumentType.NOTAT
@@ -123,7 +123,7 @@ class KabalDocumentMapperTest {
             )
         )
         assertThat(
-            mapper.mapBrevmottakere(
+            mapper.mapBrevmottakertypeToBrevmottakerInput(
                 klagebehandling as Behandling,
                 brevmottakertyper,
                 DokumentType.BESLUTNING,
@@ -167,7 +167,7 @@ class KabalDocumentMapperTest {
         )
 
         assertThat(
-            mapper.mapBrevmottakere(
+            mapper.mapBrevmottakertypeToBrevmottakerInput(
                 klagebehandling as Behandling,
                 brevmottakertyper,
                 DokumentType.BREV,
@@ -207,7 +207,7 @@ class KabalDocumentMapperTest {
         )
 
         assertThat(
-            mapper.mapBrevmottakere(
+            mapper.mapBrevmottakertypeToBrevmottakerInput(
                 klagebehandling as Behandling,
                 brevmottakertyper,
                 DokumentType.BREV,
@@ -268,7 +268,7 @@ class KabalDocumentMapperTest {
         )
 
         assertThat(
-            mapper.mapBrevmottakere(
+            mapper.mapBrevmottakertypeToBrevmottakerInput(
                 klagebehandling as Behandling,
                 brevmottakertyper,
                 DokumentType.VEDTAK,
