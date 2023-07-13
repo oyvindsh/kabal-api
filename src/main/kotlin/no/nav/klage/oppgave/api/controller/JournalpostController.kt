@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
+import no.nav.klage.oppgave.api.view.DocumentTitle
 import no.nav.klage.oppgave.api.view.ReferenceToMergedDocumentsResponse
 import no.nav.klage.oppgave.api.view.UpdateDocumentTitleView
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
@@ -104,6 +105,31 @@ class JournalpostController(
         )
     }
 
+    @Operation(
+        summary = "Henter tittel fra dokumentarkivet",
+        description = "Henter tittel fra dokumentarkivet gitt at saksbehandler har tilgang"
+    )
+    @ResponseBody
+    @GetMapping("/{journalpostId}/dokumenter/{dokumentInfoId}/title")
+    fun getArkivertDokumentTitle(
+        @Parameter(description = "Id til journalpost")
+        @PathVariable journalpostId: String,
+        @Parameter(description = "Id til dokumentInfo")
+        @PathVariable dokumentInfoId: String
+    ): DocumentTitle {
+        logMethodDetails(
+            methodName = ::getArkivertDokumentTitle.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger,
+        )
+        return DocumentTitle(
+            title = dokumentService.getDocumentTitle(
+                journalpostId = journalpostId,
+                dokumentInfoId = dokumentInfoId
+            )
+        )
+    }
+
     @PostMapping("/mergedocuments")
     fun setDocumentsToMerge(
         @RequestBody documents: List<JournalfoertDokumentReference>
@@ -115,7 +141,7 @@ class JournalpostController(
         )
     }
 
-    @GetMapping("/mergedocuments/{referenceId}")
+    @GetMapping("/mergedocuments/{referenceId}", "/mergedocuments/{referenceId}/pdf")
     fun getMergedDocuments(
         @PathVariable referenceId: UUID
     ): ResponseEntity<Resource> {
@@ -139,6 +165,13 @@ class JournalpostController(
                         }
                     }
                 })
+    }
+
+    @GetMapping("/mergedocuments/{referenceId}/title")
+    fun getMergedDocumentsTitle(
+        @PathVariable referenceId: UUID
+    ): DocumentTitle {
+        return DocumentTitle(title = dokumentService.getMergedDocument(referenceId).title)
     }
 
 }
