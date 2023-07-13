@@ -9,6 +9,7 @@ import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.ytelseTilHjemler
 import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.kabin.CreateAnkeBasedOnCompleteKabinInput
 import no.nav.klage.oppgave.api.view.kabin.CreateAnkeBasedOnKabinInput
 import no.nav.klage.oppgave.api.view.kabin.CreateKlageBasedOnKabinInput
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -215,6 +216,27 @@ class MottakService(
     }
 
     @Transactional
+    fun createAnkeMottakFromCompleteKabinInput(input: CreateAnkeBasedOnCompleteKabinInput): UUID {
+        secureLogger.debug("Prøver å lage mottak fra anke fra Kabin: {}", input)
+
+        input.validate()
+
+        val mottak = mottakRepository.save(input.toMottak())
+
+        secureLogger.debug("Har lagret følgende mottak basert på en CreateAnkeBasedOnCompleteKabinInput: {}", mottak)
+        logger.debug("Har lagret mottak {}, publiserer nå event", mottak.id)
+
+        publishEventAndUpdateMetrics(
+            mottak = mottak,
+            kilde = mottak.fagsystem.name,
+            ytelse = mottak.ytelse.navn,
+            type = mottak.type.navn,
+        )
+
+        return mottak.id
+    }
+
+    @Transactional
     fun createKlageMottakFromKabinInput(klageInput: CreateKlageBasedOnKabinInput): UUID {
         secureLogger.debug("Prøver å lage mottak fra klage fra Kabin: {}", klageInput)
 
@@ -317,6 +339,19 @@ class MottakService(
         fullmektig?.let { validatePartId(it.toPartId()) }
         validateDateNotInFuture(brukersHenvendelseMottattNav, ::brukersHenvendelseMottattNav.name)
         validateDateNotInFuture(sakMottattKa, ::sakMottattKa.name)
+        validateKildeReferanse(kildereferanse)
+        validateEnhet(forrigeBehandlendeEnhet)
+    }
+
+    fun CreateAnkeBasedOnCompleteKabinInput.validate() {
+        validateDocumentNotAlreadyUsed(ankeJournalpostId, sakenGjelder.value)
+        validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
+        validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.ANKE)
+        validateJournalpost(ankeJournalpostId)
+        klager?.toPartId()?.let { validatePartId(it) }
+        validatePartId(sakenGjelder.toPartId())
+        fullmektig?.let { validatePartId(it.toPartId()) }
+        validateDateNotInFuture(mottattNav, ::mottattNav.name)
         validateKildeReferanse(kildereferanse)
         validateEnhet(forrigeBehandlendeEnhet)
     }
@@ -584,6 +619,59 @@ class MottakService(
             frist = frist,
             ytelse = Ytelse.of(ytelseId),
             forrigeBehandlingId = forrigeBehandlingId,
+            sentFrom = Mottak.Sender.KABIN,
+        )
+    }
+
+    fun CreateAnkeBasedOnCompleteKabinInput.toMottak(): Mottak {
+        val prosessfullmektig = if (fullmektig != null) {
+            Prosessfullmektig(
+                partId = fullmektig.toPartId(),
+                skalPartenMottaKopi = true
+            )
+        } else {
+            null
+        }
+
+        val klager = if (klager != null) {
+            Klager(
+                partId = klager.toPartId(),
+                prosessfullmektig = prosessfullmektig
+            )
+        } else {
+            Klager(
+                partId = sakenGjelder.toPartId(),
+                prosessfullmektig = prosessfullmektig
+            )
+        }
+
+        return Mottak(
+            type = Type.ANKE,
+            klager = klager,
+            sakenGjelder = SakenGjelder(
+                partId = sakenGjelder.toPartId(),
+                //TODO ever used?
+                skalMottaKopi = false
+            ),
+            innsynUrl = null,
+            fagsystem = Fagsystem.of(fagsystemId),
+            fagsakId = fagsakId,
+            kildeReferanse = kildereferanse,
+            dvhReferanse = null,
+            hjemler = hjemmelIdList?.map { MottakHjemmel(hjemmelId = it) }?.toSet(),
+            forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
+            mottakDokument = mutableSetOf(
+                MottakDokument(
+                    type = MottakDokumentType.BRUKERS_ANKE,
+                    journalpostId = ankeJournalpostId
+                )
+            ),
+            innsendtDato = mottattNav,
+            brukersHenvendelseMottattNavDato = mottattNav,
+            sakMottattKaDato = mottattNav.atStartOfDay(),
+            frist = mottattNav.plusWeeks(fristInWeeks.toLong()),
+            ytelse = Ytelse.of(ytelseId),
+            forrigeBehandlingId = null,
             sentFrom = Mottak.Sender.KABIN,
         )
     }

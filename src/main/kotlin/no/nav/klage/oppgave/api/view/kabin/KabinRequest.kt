@@ -39,6 +39,37 @@ data class CreateAnkeBasedOnKabinInput(
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+data class CreateAnkeBasedOnCompleteKabinInput(
+    val sakenGjelder: OversendtPartId,
+    val klager: OversendtPartId?,
+    val fullmektig: OversendtPartId?,
+    val fagsakId: String,
+    val fagsystemId: String,
+    val hjemmelIdList: List<String>?,
+    val forrigeBehandlendeEnhet: String,
+    val ankeJournalpostId: String,
+    val mottattNav: LocalDate,
+    val fristInWeeks: Int,
+    val ytelseId: String,
+    val kildereferanse: String,
+    val saksbehandlerIdent: String?,
+) {
+    data class OversendtPartId(
+        val type: OversendtPartIdType,
+        val value: String
+    )
+
+    fun OversendtPartId.toPartId(): PartId {
+        return PartId(
+            type = PartIdType.of(type.name),
+            value = value
+        )
+    }
+
+    enum class OversendtPartIdType { PERSON, VIRKSOMHET }
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class CreateKlageBasedOnKabinInput(
     val sakenGjelder: OversendtPartId,
     val klager: OversendtPartId?,

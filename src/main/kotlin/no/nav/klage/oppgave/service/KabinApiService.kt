@@ -39,6 +39,22 @@ class KabinApiService(
         return CreatedAnkeResponse(mottakId = mottakId)
     }
 
+    fun createAnkeFromCompleteKabinInput(input: CreateAnkeBasedOnCompleteKabinInput): CreatedAnkeResponse {
+        val mottakId = mottakService.createAnkeMottakFromCompleteKabinInput(input = input)
+        if (input.saksbehandlerIdent != null) {
+            val ankebehandling = ankebehandlingService.getAnkebehandlingFromMottakId(mottakId)
+            behandlingService.setSaksbehandler(
+                behandlingId = ankebehandling!!.id,
+                tildeltSaksbehandlerIdent = input.saksbehandlerIdent,
+                enhetId = saksbehandlerService.getEnhetForSaksbehandler(
+                    input.saksbehandlerIdent
+                ).enhetId,
+                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            )
+        }
+        return CreatedAnkeResponse(mottakId = mottakId)
+    }
+
     fun getCreatedAnkebehandlingStatus(
         mottakId: UUID
     ): CreatedAnkebehandlingStatusForKabin {

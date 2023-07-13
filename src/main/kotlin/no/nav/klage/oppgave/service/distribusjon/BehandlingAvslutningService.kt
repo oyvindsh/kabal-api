@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
-import no.nav.klage.kodeverk.DokumentType
-import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.Type
-import no.nav.klage.kodeverk.infotrygdKlageutfallToUtfall
+import no.nav.klage.kodeverk.*
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFinishedInput
 import no.nav.klage.oppgave.domain.kafka.*
@@ -85,6 +82,23 @@ class BehandlingAvslutningService(
         if (behandling.type == Type.ANKE && behandling.shouldBeSentToTrygderetten()) {
             logger.debug("Anken sendes til trygderetten. Oppretter AnkeITrygderettenbehandling.")
             createAnkeITrygderettenbehandling(behandling)
+            //if fagsystem is Infotrygd also do this.
+            if (behandling.fagsystem == Fagsystem.IT01) {
+                logger.debug("Vi informerer Infotrygd om innstilling til Trygderetten.")
+                fssProxyClient.setToFinished(
+                    sakId = behandling.kildeReferanse,
+                    SakFinishedInput(
+                        status = SakFinishedInput.Status.VIDERESENDT_TR,
+                        nivaa = SakFinishedInput.Nivaa.KA,
+                        typeResultat = SakFinishedInput.TypeResultat.INNSTILLING_2,
+                        utfall = SakFinishedInput.Utfall.valueOf(ankeutfallToInfotrygdutfall[behandling.utfall!!]!!),
+                        mottaker = SakFinishedInput.Mottaker.TRYGDERETTEN,
+                        saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
+                    )
+                )
+                logger.debug("Vi har informert Infotrygd om innstilling til Trygderetten.")
+            }
+
         } else if (behandling.type == Type.ANKE_I_TRYGDERETTEN && behandling.shouldCreateNewAnkebehandling()
         ) {
             logger.debug("Oppretter ny Ankebehandling basert på AnkeITrygderettenbehandling")
@@ -126,7 +140,7 @@ class BehandlingAvslutningService(
 
             //if fagsystem is Infotrygd also do this.
             if (behandling.fagsystem == Fagsystem.IT01) {
-                logger.debug("Klagen som er avsluttet skal sendes tilbake til Infotrygd.")
+                logger.debug("Behandlingen som er avsluttet skal sendes tilbake til Infotrygd.")
                 fssProxyClient.setToFinished(
                     sakId = behandling.kildeReferanse,
                     SakFinishedInput(
@@ -140,7 +154,7 @@ class BehandlingAvslutningService(
                         saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
                     )
                 )
-                logger.debug("Klagen som er avsluttet ble sendt tilbake til Infotrygd.")
+                logger.debug("Behandlingen som er avsluttet ble sendt tilbake til Infotrygd.")
             }
         }
 

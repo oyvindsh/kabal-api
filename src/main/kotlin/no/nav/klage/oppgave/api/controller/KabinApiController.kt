@@ -107,6 +107,21 @@ class KabinApiController(
         )
     }
 
+    @PostMapping("/createankefrominput")
+    fun createAnkeFromInput(
+        @RequestBody input: CreateAnkeBasedOnCompleteKabinInput
+    ): CreatedAnkeResponse {
+        logMethodDetails(
+            methodName = ::createAnkeFromInput.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger
+        )
+
+        return kabinApiService.createAnkeFromCompleteKabinInput(
+            input = input
+        )
+    }
+
     @GetMapping("/anker/{mottakId}/status")
     fun getCreatedAnkebehandlingStatus(
         @PathVariable mottakId: UUID
