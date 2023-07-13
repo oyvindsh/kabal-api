@@ -22,7 +22,7 @@ class KlagebehandlingRepositoryCustomImpl : KlagebehandlingRepositoryCustom {
             AND k.utfall NOT IN :utfallWithoutAnkemulighet
             AND k.fagsystem != :infotrygdFagsystem
             AND k.sakenGjelder.partId.value = :sakenGjelder
-            AND (SELECT COUNT(a) FROM Ankebehandling a WHERE a.klagebehandlingId = k.id) = 0
+            AND (SELECT COUNT(a) FROM Ankebehandling a WHERE a.klagebehandlingId = k.id AND a.feilregistrering = null) = 0
         """,
             Klagebehandling::class.java
         )
