@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
+import no.nav.klage.oppgave.api.view.DocumentTitle
 import no.nav.klage.oppgave.api.view.ReferenceToMergedDocumentsResponse
 import no.nav.klage.oppgave.api.view.UpdateDocumentTitleView
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
@@ -115,14 +116,14 @@ class JournalpostController(
         @PathVariable journalpostId: String,
         @Parameter(description = "Id til dokumentInfo")
         @PathVariable dokumentInfoId: String
-    ): Map<String, String> {
+    ): DocumentTitle {
         logMethodDetails(
             methodName = ::getArkivertDokumentTitle.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger,
         )
-        return mapOf(
-            "title" to dokumentService.getDocumentTitle(
+        return DocumentTitle(
+            title = dokumentService.getDocumentTitle(
                 journalpostId = journalpostId,
                 dokumentInfoId = dokumentInfoId
             )
@@ -169,10 +170,8 @@ class JournalpostController(
     @GetMapping("/mergedocuments/{referenceId}/title")
     fun getMergedDocumentsTitle(
         @PathVariable referenceId: UUID
-    ): Map<String, String> {
-        return mapOf(
-            "title" to dokumentService.getMergedDocument(referenceId).title
-        )
+    ): DocumentTitle {
+        return DocumentTitle(title = dokumentService.getMergedDocument(referenceId).title)
     }
 
 }
