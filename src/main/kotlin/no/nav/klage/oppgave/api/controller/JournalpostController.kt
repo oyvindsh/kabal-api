@@ -141,7 +141,7 @@ class JournalpostController(
         )
     }
 
-    @GetMapping("/mergedocuments/{referenceId}", "/mergedocuments/{referenceId}/pdf")
+    @GetMapping( "/mergedocuments/{referenceId}/pdf")
     fun getMergedDocuments(
         @PathVariable referenceId: UUID
     ): ResponseEntity<Resource> {
