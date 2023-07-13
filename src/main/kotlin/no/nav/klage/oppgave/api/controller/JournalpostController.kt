@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
-import no.nav.klage.oppgave.api.view.DocumentTitle
-import no.nav.klage.oppgave.api.view.ReferenceToMergedDocumentsResponse
-import no.nav.klage.oppgave.api.view.UpdateDocumentTitleView
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.DokumentService
@@ -110,19 +108,21 @@ class JournalpostController(
         description = "Henter tittel fra dokumentarkivet gitt at saksbehandler har tilgang"
     )
     @ResponseBody
-    @GetMapping("/{journalpostId}/dokumenter/{dokumentInfoId}/title")
-    fun getArkivertDokumentTitle(
+    @GetMapping("/{journalpostId}/dokumenter/{dokumentInfoId}", "/{journalpostId}/dokumenter/{dokumentInfoId}/title")
+    fun getArkivertDokumentMetadata(
         @Parameter(description = "Id til journalpost")
         @PathVariable journalpostId: String,
         @Parameter(description = "Id til dokumentInfo")
         @PathVariable dokumentInfoId: String
-    ): DocumentTitle {
+    ): JournalfoertDokumentMetadata {
         logMethodDetails(
-            methodName = ::getArkivertDokumentTitle.name,
+            methodName = ::getArkivertDokumentMetadata.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger,
         )
-        return DocumentTitle(
+        return JournalfoertDokumentMetadata(
+            journalpostId = journalpostId,
+            dokumentInfoId = dokumentInfoId,
             title = dokumentService.getDocumentTitle(
                 journalpostId = journalpostId,
                 dokumentInfoId = dokumentInfoId
@@ -134,6 +134,12 @@ class JournalpostController(
     fun setDocumentsToMerge(
         @RequestBody documents: List<JournalfoertDokumentReference>
     ): ReferenceToMergedDocumentsResponse {
+        logMethodDetails(
+            methodName = ::setDocumentsToMerge.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger,
+        )
+
         val mergedDocument = dokumentService.storeDocumentsForMerging(documents)
         return ReferenceToMergedDocumentsResponse(
             reference = mergedDocument.id,
@@ -145,6 +151,12 @@ class JournalpostController(
     fun getMergedDocuments(
         @PathVariable referenceId: UUID
     ): ResponseEntity<Resource> {
+        logMethodDetails(
+            methodName = ::getMergedDocuments.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger,
+        )
+
         val (pathToMergedDocument, title) = dokumentService.mergeDocuments(referenceId)
         val responseHeaders = HttpHeaders()
         responseHeaders.contentType = MediaType.APPLICATION_PDF
@@ -167,11 +179,26 @@ class JournalpostController(
                 })
     }
 
-    @GetMapping("/mergedocuments/{referenceId}/title")
-    fun getMergedDocumentsTitle(
+    @GetMapping("/mergedocuments/{referenceId}", "/mergedocuments/{referenceId}/title")
+    fun getMergedDocumentsMetadata(
         @PathVariable referenceId: UUID
-    ): DocumentTitle {
-        return DocumentTitle(title = dokumentService.getMergedDocument(referenceId).title)
-    }
+    ): MergedDocumentsMetadata {
+        logMethodDetails(
+            methodName = ::getMergedDocumentsMetadata.name,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger = logger,
+        )
 
+        val mergedDocument = dokumentService.getMergedDocument(referenceId)
+        return MergedDocumentsMetadata(
+            mergedDocumentId = mergedDocument.id,
+            title = mergedDocument.title,
+            archivedDocuments = mergedDocument.documentsToMerge.map {
+                MergedDocumentsMetadata.JournalfoertDokument(
+                    journalpostId = it.journalpostId,
+                    dokumentInfoId = it.dokumentInfoId,
+                )
+            }
+        )
+    }
 }

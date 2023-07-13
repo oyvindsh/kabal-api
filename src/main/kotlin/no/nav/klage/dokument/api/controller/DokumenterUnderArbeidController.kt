@@ -11,7 +11,7 @@ import no.nav.klage.dokument.domain.Event
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
-import no.nav.klage.oppgave.api.view.DocumentTitle
+import no.nav.klage.oppgave.api.view.DokumentUnderArbeidMetadata
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -115,14 +115,18 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @GetMapping("/{dokumentId}/title")
-    fun getTitle(
+    @GetMapping("/{dokumentId}", "/{dokumentId}/title")
+    fun getMetadata(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
-    ): DocumentTitle {
-        logger.debug("Kall mottatt på getTitle for {}", dokumentId)
+    ): DokumentUnderArbeidMetadata {
+        logger.debug("Kall mottatt på getMetadata for {}", dokumentId)
 
-        return DocumentTitle(title = dokumentUnderArbeidService.getDokumentUnderArbeid(dokumentId).name)
+        return DokumentUnderArbeidMetadata(
+            behandlingId = behandlingId,
+            documentId = dokumentId,
+            title = dokumentUnderArbeidService.getDokumentUnderArbeid(dokumentId).name
+        )
     }
 
     @DeleteMapping("/{dokumentId}")
