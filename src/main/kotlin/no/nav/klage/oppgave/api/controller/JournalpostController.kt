@@ -104,10 +104,9 @@ class JournalpostController(
     }
 
     @Operation(
-        summary = "Henter tittel fra dokumentarkivet",
-        description = "Henter tittel fra dokumentarkivet gitt at saksbehandler har tilgang"
+        summary = "Henter noe metadata fra dokumentarkivet",
+        description = "Henter noe metadata fra dokumentarkivet gitt at saksbehandler har tilgang"
     )
-    @ResponseBody
     @GetMapping("/{journalpostId}/dokumenter/{dokumentInfoId}", "/{journalpostId}/dokumenter/{dokumentInfoId}/title")
     fun getArkivertDokumentMetadata(
         @Parameter(description = "Id til journalpost")
