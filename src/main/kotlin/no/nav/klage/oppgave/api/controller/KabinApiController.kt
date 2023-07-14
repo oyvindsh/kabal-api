@@ -107,12 +107,12 @@ class KabinApiController(
         )
     }
 
-    @PostMapping("/createankefrominput")
-    fun createAnkeFromInput(
+    @PostMapping("/createankefromcompleteinput")
+    fun createAnkeFromCompleteInput(
         @RequestBody input: CreateAnkeBasedOnCompleteKabinInput
     ): CreatedAnkeResponse {
         logMethodDetails(
-            methodName = ::createAnkeFromInput.name,
+            methodName = ::createAnkeFromCompleteInput.name,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger
         )

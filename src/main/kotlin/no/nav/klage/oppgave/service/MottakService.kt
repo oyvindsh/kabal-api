@@ -331,7 +331,7 @@ class MottakService(
 
     fun CreateKlageBasedOnKabinInput.validate() {
         validateDocumentNotAlreadyUsed(klageJournalpostId, sakenGjelder.value)
-        validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
+        validateYtelseAndHjemler(Ytelse.of(ytelseId), listOf(Hjemmel.of(hjemmelId)))
         validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.KLAGE)
         validateJournalpost(klageJournalpostId)
         klager?.toPartId()?.let { validatePartId(it) }
@@ -345,7 +345,7 @@ class MottakService(
 
     fun CreateAnkeBasedOnCompleteKabinInput.validate() {
         validateDocumentNotAlreadyUsed(ankeJournalpostId, sakenGjelder.value)
-        validateYtelseAndHjemler(Ytelse.of(ytelseId), hjemmelIdList?.map { Hjemmel.of(it) })
+        validateYtelseAndHjemler(Ytelse.of(ytelseId), listOf(Hjemmel.of(hjemmelId)))
         validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.ANKE)
         validateJournalpost(ankeJournalpostId)
         klager?.toPartId()?.let { validatePartId(it) }
@@ -559,7 +559,7 @@ class MottakService(
             innsendtDato = input.mottattNav,
             brukersHenvendelseMottattNavDato = input.mottattNav,
             sakMottattKaDato = input.mottattNav.atStartOfDay(),
-            frist = input.mottattNav.plusWeeks(input.fristInWeeks.toLong()),
+            frist = input.frist,
             created = LocalDateTime.now(),
             modified = LocalDateTime.now(),
             ytelse = ytelse,
@@ -605,7 +605,7 @@ class MottakService(
             fagsakId = fagsakId,
             kildeReferanse = kildereferanse,
             dvhReferanse = null,
-            hjemler = hjemmelIdList?.map { MottakHjemmel(hjemmelId = it) }?.toSet(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = hjemmelId)),
             forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
             mottakDokument = mutableSetOf(
                 MottakDokument(
@@ -658,7 +658,7 @@ class MottakService(
             fagsakId = fagsakId,
             kildeReferanse = kildereferanse,
             dvhReferanse = null,
-            hjemler = hjemmelIdList?.map { MottakHjemmel(hjemmelId = it) }?.toSet(),
+            hjemler = setOf(MottakHjemmel(hjemmelId = hjemmelId)),
             forrigeBehandlendeEnhet = forrigeBehandlendeEnhet,
             mottakDokument = mutableSetOf(
                 MottakDokument(
@@ -669,7 +669,7 @@ class MottakService(
             innsendtDato = mottattNav,
             brukersHenvendelseMottattNavDato = mottattNav,
             sakMottattKaDato = mottattNav.atStartOfDay(),
-            frist = mottattNav.plusWeeks(fristInWeeks.toLong()),
+            frist = frist,
             ytelse = Ytelse.of(ytelseId),
             forrigeBehandlingId = null,
             sentFrom = Mottak.Sender.KABIN,
