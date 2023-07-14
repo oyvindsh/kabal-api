@@ -133,16 +133,6 @@ class DokumentService(
         }
     }
 
-    fun fetchDokumentInfoIdForJournalpostAsSaksbehandler(journalpostId: String): List<String> {
-        return try {
-            val journalpost = safGraphQlClient.getJournalpostAsSaksbehandler(journalpostId)
-            journalpost.dokumenter?.filter { harArkivVariantformat(it) }?.map { it.dokumentInfoId } ?: emptyList()
-        } catch (e: Exception) {
-            logger.warn("Unable to find journalpost $journalpostId", e)
-            emptyList()
-        }
-    }
-
     fun getFysiskDokument(journalpostId: String, dokumentInfoId: String): FysiskDokument {
         val arkivertDokument = safRestClient.getDokument(dokumentInfoId, journalpostId)
 
@@ -153,7 +143,7 @@ class DokumentService(
         )
     }
 
-    private fun getDocumentTitle(journalpostId: String, dokumentInfoId: String): String {
+    fun getDocumentTitle(journalpostId: String, dokumentInfoId: String): String {
         val journalpostInDokarkiv =
             safClient.getJournalpostAsSaksbehandler(journalpostId)
 
@@ -287,6 +277,8 @@ class DokumentService(
 
         return pathToMergedDocument to mergedDocument.title
     }
+
+    fun getMergedDocument(id: UUID) = mergedDocumentRepository.getReferenceById(id)
 }
 
 class DokumentMapper {

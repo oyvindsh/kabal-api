@@ -11,6 +11,7 @@ import no.nav.klage.dokument.domain.Event
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.oppgave.api.view.DokumentUnderArbeidMetadata
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -114,6 +115,20 @@ class DokumentUnderArbeidController(
         )
     }
 
+    @GetMapping("/{dokumentId}", "/{dokumentId}/title")
+    fun getMetadata(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") dokumentId: UUID,
+    ): DokumentUnderArbeidMetadata {
+        logger.debug("Kall mottatt på getMetadata for {}", dokumentId)
+
+        return DokumentUnderArbeidMetadata(
+            behandlingId = behandlingId,
+            documentId = dokumentId,
+            title = dokumentUnderArbeidService.getDokumentUnderArbeid(dokumentId).name
+        )
+    }
+
     @DeleteMapping("/{dokumentId}")
     fun deleteDokument(
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -133,16 +148,18 @@ class DokumentUnderArbeidController(
         @RequestBody input: OptionalPersistentDokumentIdInput
     ): DokumentViewWithList {
         logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
-        try {            
+        try {
             return if (input.dokumentId == null) {
                 dokumentMapper.mapToDokumentListView(
-                    dokumentUnderArbeidList = listOf(dokumentUnderArbeidService.frikobleVedlegg(
-                        behandlingId = behandlingId,
-                        dokumentId = persistentDokumentId,
-                        innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-                    )),
+                    dokumentUnderArbeidList = listOf(
+                        dokumentUnderArbeidService.frikobleVedlegg(
+                            behandlingId = behandlingId,
+                            dokumentId = persistentDokumentId,
+                            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+                        )
+                    ),
                     duplicateJournalfoerteDokumenter = emptyList()
-                )                
+                )
             } else {
                 val (alteredDocuments, duplicateJournalfoerteDokumenter) =
                     dokumentUnderArbeidService.setParentDocument(
@@ -154,7 +171,7 @@ class DokumentUnderArbeidController(
                 return dokumentMapper.mapToDokumentListView(
                     dokumentUnderArbeidList = alteredDocuments,
                     duplicateJournalfoerteDokumenter = duplicateJournalfoerteDokumenter
-                )                
+                )
             }
         } catch (e: Exception) {
             logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)

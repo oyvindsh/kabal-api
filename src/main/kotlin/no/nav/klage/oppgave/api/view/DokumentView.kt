@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.view
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 
 data class DokumenterResponse(
     val dokumenter: List<DokumentReferanse>,
@@ -195,3 +196,26 @@ data class DokumentReferanse(
 }
 
 data class TilknyttetDokument(val journalpostId: String, val dokumentInfoId: String)
+
+data class JournalfoertDokumentMetadata(
+    val journalpostId: String,
+    val dokumentInfoId: String,
+    val title: String,
+)
+
+data class DokumentUnderArbeidMetadata(
+    val behandlingId: UUID,
+    val documentId: UUID,
+    val title: String,
+)
+
+data class MergedDocumentsMetadata(
+    val mergedDocumentId: UUID,
+    val title: String,
+    val archivedDocuments: List<JournalfoertDokument>,
+) {
+    data class JournalfoertDokument(
+        val journalpostId: String,
+        val dokumentInfoId: String,
+    )
+}
