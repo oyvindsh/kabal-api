@@ -1,14 +1,17 @@
 package no.nav.klage.oppgave.service
 
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.kodeverk.infotrygdKlageutfallToUtfall
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.kabin.*
+import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.domain.klage.Mottak
 import no.nav.klage.oppgave.domain.klage.MottakDokumentType
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -20,7 +23,8 @@ class KabinApiService(
     private val ankebehandlingService: AnkebehandlingService,
     private val behandlingService: BehandlingService,
     private val klagebehandlingService: KlagebehandlingService,
-    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService
+    private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val klageFssProxyClient: KlageFssProxyClient
 ) {
 
     fun createAnke(input: CreateAnkeBasedOnKabinInput): CreatedAnkeResponse {
@@ -64,14 +68,24 @@ class KabinApiService(
         val ankebehandling = ankebehandlingService.getAnkebehandlingFromMottakId(mottakId)
             ?: throw BehandlingNotFoundException("anke not found")
 
-        val completedKlagebehandling =
-            klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
-
-        return getCreatedAnkebehandlingStatusForKabin(
-            completedKlagebehandling = completedKlagebehandling,
-            ankebehandling = ankebehandling,
-            mottak = mottak,
-        )
+        return if (ankebehandling.klagebehandlingId != null) {
+            val completedKlagebehandling =
+                klagebehandlingService.findCompletedKlagebehandlingById(ankebehandling.klagebehandlingId!!)
+            getCreatedAnkebehandlingStatusForKabin(
+                ankebehandling = ankebehandling,
+                mottak = mottak,
+                utfallId = completedKlagebehandling.utfallId,
+                vedtakDate = completedKlagebehandling.vedtakDate,
+            )
+        } else {
+            val klageInInfotrygd = klageFssProxyClient.getSak(sakId = ankebehandling.kildeReferanse)
+            getCreatedAnkebehandlingStatusForKabin(
+                ankebehandling = ankebehandling,
+                mottak = mottak,
+                utfallId = infotrygdKlageutfallToUtfall[klageInInfotrygd.utfall]!!.id,
+                vedtakDate = klageInInfotrygd.vedtaksdato.atStartOfDay(),
+            )
+        }
     }
 
     fun createKlage(
@@ -107,27 +121,23 @@ class KabinApiService(
     }
 
     private fun getCreatedAnkebehandlingStatusForKabin(
-        completedKlagebehandling: CompletedKlagebehandling,
         ankebehandling: Ankebehandling,
         mottak: Mottak,
+        utfallId: String,
+        vedtakDate: LocalDateTime,
     ): CreatedAnkebehandlingStatusForKabin {
         return CreatedAnkebehandlingStatusForKabin(
             typeId = Type.ANKE.id,
-            behandlingId = completedKlagebehandling.behandlingId,
-            ytelseId = completedKlagebehandling.ytelseId,
-            utfallId = completedKlagebehandling.utfallId,
-            vedtakDate = completedKlagebehandling.vedtakDate,
+            ytelseId = ankebehandling.ytelse.id,
+            utfallId = utfallId,
+            vedtakDate = vedtakDate,
             sakenGjelder = behandlingMapper.getSakenGjelderView(ankebehandling.sakenGjelder),
             klager = behandlingMapper.getPartView(ankebehandling.klager),
             fullmektig = ankebehandling.klager.prosessfullmektig?.let { behandlingMapper.getPartView(it) },
-            tilknyttedeDokumenter = completedKlagebehandling.tilknyttedeDokumenter,
             mottattNav = ankebehandling.mottattKlageinstans.toLocalDate(),
             frist = ankebehandling.frist!!,
-            sakFagsakId = completedKlagebehandling.fagsakId,
-            fagsakId = completedKlagebehandling.fagsakId,
-            sakFagsystem = completedKlagebehandling.fagsystem,
-            fagsystem = completedKlagebehandling.fagsystem,
-            fagsystemId = completedKlagebehandling.fagsystemId,
+            fagsakId = ankebehandling.fagsakId,
+            fagsystemId = ankebehandling.fagsystem.id,
             journalpost = dokumentService.getDokumentReferanse(
                 journalpostId = mottak.mottakDokument.find { it.type == MottakDokumentType.BRUKERS_ANKE }!!.journalpostId,
                 behandling = ankebehandling
