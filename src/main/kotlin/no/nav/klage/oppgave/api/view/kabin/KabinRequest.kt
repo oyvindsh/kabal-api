@@ -24,7 +24,7 @@ data class IsDuplicateInput(
 data class CreateAnkeBasedOnKabinInput(
     val klagebehandlingId: UUID,
     val mottattNav: LocalDate,
-    val fristInWeeks: Int,
+    val frist: LocalDate,
     val klager: OversendtPartId?,
     val fullmektig: OversendtPartId?,
     val ankeDocumentJournalpostId: String,
@@ -39,13 +39,44 @@ data class CreateAnkeBasedOnKabinInput(
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+data class CreateAnkeBasedOnCompleteKabinInput(
+    val sakenGjelder: OversendtPartId,
+    val klager: OversendtPartId?,
+    val fullmektig: OversendtPartId?,
+    val fagsakId: String,
+    val fagsystemId: String,
+    val hjemmelId: String,
+    val forrigeBehandlendeEnhet: String,
+    val ankeJournalpostId: String,
+    val mottattNav: LocalDate,
+    val frist: LocalDate,
+    val ytelseId: String,
+    val kildereferanse: String,
+    val saksbehandlerIdent: String?,
+) {
+    data class OversendtPartId(
+        val type: OversendtPartIdType,
+        val value: String
+    )
+
+    fun OversendtPartId.toPartId(): PartId {
+        return PartId(
+            type = PartIdType.of(type.name),
+            value = value
+        )
+    }
+
+    enum class OversendtPartIdType { PERSON, VIRKSOMHET }
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class CreateKlageBasedOnKabinInput(
     val sakenGjelder: OversendtPartId,
     val klager: OversendtPartId?,
     val fullmektig: OversendtPartId?,
     val fagsakId: String,
     val fagsystemId: String,
-    val hjemmelIdList: List<String>?,
+    val hjemmelId: String,
     val forrigeBehandlendeEnhet: String,
     val klageJournalpostId: String,
     val brukersHenvendelseMottattNav: LocalDate,
