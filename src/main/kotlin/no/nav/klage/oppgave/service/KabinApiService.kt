@@ -157,7 +157,6 @@ class KabinApiService(
     ): CreatedKlagebehandlingStatusForKabin {
         return CreatedKlagebehandlingStatusForKabin(
             typeId = Type.KLAGE.id,
-            behandlingId = klagebehandling.id,
             ytelseId = klagebehandling.ytelse.id,
             sakenGjelder = behandlingMapper.getSakenGjelderView(klagebehandling.sakenGjelder),
             klager = behandlingMapper.getPartView(klagebehandling.klager),

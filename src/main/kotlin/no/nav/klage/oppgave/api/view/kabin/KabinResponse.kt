@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.view.kabin
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.oppgave.api.view.BehandlingDetaljerView
 import no.nav.klage.oppgave.api.view.DokumentReferanse
-import no.nav.klage.oppgave.api.view.TilknyttetDokument
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -17,10 +16,7 @@ data class CompletedKlagebehandling(
     val sakenGjelder: BehandlingDetaljerView.SakenGjelderView,
     val klager: BehandlingDetaljerView.PartView,
     val fullmektig: BehandlingDetaljerView.PartView?,
-    val tilknyttedeDokumenter: List<TilknyttetDokument>,
-    val sakFagsakId: String,
     val fagsakId: String,
-    val sakFagsystem: Fagsystem,
     val fagsystem: Fagsystem,
     val fagsystemId: String,
     val klageBehandlendeEnhet: String,
@@ -54,7 +50,6 @@ data class CreatedAnkebehandlingStatusForKabin(
 
 data class CreatedKlagebehandlingStatusForKabin(
     val typeId: String,
-    val behandlingId: UUID,
     val ytelseId: String,
     val sakenGjelder: BehandlingDetaljerView.SakenGjelderView,
     val klager: BehandlingDetaljerView.PartView,
