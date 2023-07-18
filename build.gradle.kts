@@ -16,7 +16,7 @@ val jacksonJsonschemaVersion = "1.0.39"
 val pdfboxVersion = "2.0.28"
 val tikaVersion = "2.8.0"
 val verapdfVersion = "1.22.2"
-val klageKodeverkVersion = "1.5.1"
+val klageKodeverkVersion = "1.5.5"
 
 plugins {
     val kotlinVersion = "1.9.0"
@@ -34,7 +34,6 @@ repositories {
     mavenCentral()
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven("https://packages.confluent.io/maven/")
-//    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -75,7 +74,7 @@ dependencies {
 
     implementation("org.redundent:kotlin-xml-builder:$kotlinXmlBuilderVersion")
 
-    implementation("com.github.navikt:klage-kodeverk:$klageKodeverkVersion")
+    implementation("no.nav.klage:klage-kodeverk:$klageKodeverkVersion")
 
     implementation("no.nav.security:token-validation-spring:$tokenValidationVersion")
     implementation("no.nav.security:token-client-spring:$tokenValidationVersion")
