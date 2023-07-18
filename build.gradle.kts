@@ -16,7 +16,7 @@ val jacksonJsonschemaVersion = "1.0.39"
 val pdfboxVersion = "2.0.28"
 val tikaVersion = "2.8.0"
 val verapdfVersion = "1.22.2"
-val klageKodeverkVersion = "1.4.0"
+val klageKodeverkVersion = "1.5.1"
 
 plugins {
     val kotlinVersion = "1.9.0"
@@ -34,7 +34,7 @@ repositories {
     mavenCentral()
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     maven("https://packages.confluent.io/maven/")
-    maven("https://jitpack.io")
+//    maven("https://jitpack.io")
 }
 
 dependencies {
