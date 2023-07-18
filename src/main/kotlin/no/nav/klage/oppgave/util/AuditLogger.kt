@@ -38,11 +38,11 @@ class AuditLogger(
         /*
         Arena, Bisys etc
          */
-        val deviceVendor = applicationName
+        val deviceVendor = "klage og anke"
         /*
         The name of the log that originated the event. Auditlog, leselogg, ABAC-Audit, Sporingslogg
          */
-        val deviceProduct = "auditLog"
+        val deviceProduct = applicationName
         /*
         The version of the logformat. 1.0
          */
