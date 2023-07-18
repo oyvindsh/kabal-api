@@ -21,7 +21,7 @@ class SaksbehandlerService(
     }
 
     fun getEnhetForSaksbehandler(navIdent: String): Enhet {
-        return azureGateway.getDataOmInnloggetSaksbehandler().enhet
+        return azureGateway.getPersonligDataOmSaksbehandlerMedIdent(navIdent = navIdent).enhet
     }
 
     fun getNameForIdent(it: String) =
