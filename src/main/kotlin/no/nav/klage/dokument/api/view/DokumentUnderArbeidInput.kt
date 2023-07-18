@@ -42,5 +42,5 @@ data class DokumentTypeInput(val dokumentTypeId: String)
 
 data class FerdigstillDokumentInput(
     val brevmottakertypeIds: Set<String>?,
-    val brevmottakerIdents: Set<String>?
+    val brevmottakerIds: Set<String>?
 )

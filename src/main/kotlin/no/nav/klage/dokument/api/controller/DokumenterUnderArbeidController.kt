@@ -200,7 +200,7 @@ class DokumentUnderArbeidController(
                 dokumentId = dokumentId,
                 ident = ident,
                 brevmottakertyper = input.brevmottakertypeIds?.map { Brevmottakertype.of(it) }?.toSet(),
-                brevmottakerIdents = input.brevmottakerIdents,
+                brevmottakerIdents = input.brevmottakerIds,
             )
         )
     }
