@@ -43,13 +43,10 @@ class BehandlingAvslutningService(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-        private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
         private val objectMapperBehandlingEvents = ObjectMapper().registerModule(JavaTimeModule()).configure(
             SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false
         );
         const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
-        const val SYSTEM_JOURNALFOERENDE_ENHET = "9999"
-
     }
 
     @Transactional
@@ -165,12 +162,12 @@ class BehandlingAvslutningService(
     }
 
     private fun createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling: AnkeITrygderettenbehandling) {
-        logger.debug("Creating ankebehandling based on behandling with id ${ankeITrygderettenbehandling.id}")
+        logger.debug("Creating ankebehandling based on behandling with id {}", ankeITrygderettenbehandling.id)
         ankebehandlingService.createAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
     }
 
     private fun createAnkeITrygderettenbehandling(behandling: Behandling) {
-        logger.debug("Creating ankeITrygderettenbehandling based on behandling with id ${behandling.id}")
+        logger.debug("Creating ankeITrygderettenbehandling based on behandling with id {}", behandling.id)
         ankeITrygderettenbehandlingService.createAnkeITrygderettenbehandling(
             behandling.createAnkeITrygderettenbehandlingInput()
         )

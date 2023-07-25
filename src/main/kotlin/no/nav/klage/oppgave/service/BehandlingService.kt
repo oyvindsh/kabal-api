@@ -653,7 +653,12 @@ class BehandlingService(
             val foundSaksdokument =
                 behandling.saksdokumenter.find { it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId }
             if (foundSaksdokument != null) {
-                logger.debug("Dokument (journalpost: $journalpostId dokumentInfoId: $dokumentInfoId) is already connected to behandling ${behandling.id}, doing nothing")
+                logger.debug(
+                    "Dokument (journalpost: {} dokumentInfoId: {}) is already connected to behandling {}, doing nothing",
+                    journalpostId,
+                    dokumentInfoId,
+                    behandling.id
+                )
             } else {
                 val saksdokument = Saksdokument(
                     journalpostId = journalpostId,

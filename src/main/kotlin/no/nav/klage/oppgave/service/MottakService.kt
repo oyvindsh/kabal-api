@@ -148,7 +148,7 @@ class MottakService(
                             oversendtKlageAnke.ytelse
                         )
                     if (previousHandledKlage != null) {
-                        logger.debug("Fant tidligere behandlet klage i Kabal, med id ${previousHandledKlage.id}")
+                        logger.debug(/* msg = */ "Fant tidligere behandlet klage i Kabal, med id ${previousHandledKlage.id}")
                         if (oversendtKlageAnke.dvhReferanse != previousHandledKlage.dvhReferanse) {
                             val message =
                                 "Tidligere behandlet klage har annen dvhReferanse enn innsendt anke."

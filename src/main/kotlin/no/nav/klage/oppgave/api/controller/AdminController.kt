@@ -1,6 +1,5 @@
 package no.nav.klage.oppgave.api.controller
 
-import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.gateway.AzureGateway
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController
 class AdminController(
     private val adminService: AdminService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val eregClient: EregClient,
     private val azureGateway: AzureGateway,
 ) {
 

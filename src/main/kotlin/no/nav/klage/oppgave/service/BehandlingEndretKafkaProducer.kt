@@ -44,7 +44,7 @@ class BehandlingEndretKafkaProducer(
                 json
             ).get()
             logger.info("Klage endret sent to Kafka")
-            secureLogger.debug("Klage endret for klagebehandling ${klagebehandling.id} sent to kafka ($result)")
+            secureLogger.debug("Klage endret for klagebehandling {} sent to kafka ({})", klagebehandling.id, result)
         }.onFailure {
             val errorMessage =
                 "Could not send klage endret to Kafka. Need to resend klagebehandling ${klagebehandling.id} manually. Check secure logs for more information."
@@ -62,7 +62,7 @@ class BehandlingEndretKafkaProducer(
                 ankebehandling.mapToSkjemaV2().toJson()
             ).get()
             logger.info("Anke endret sent to Kafka")
-            secureLogger.debug("Anke endret for ankebehandling ${ankebehandling.id} sent to kafka ($result)")
+            secureLogger.debug("Anke endret for ankebehandling {} sent to kafka ({})", ankebehandling.id, result)
         }.onFailure {
             val errorMessage =
                 "Could not send anke endret to Kafka. Need to resend ankebehandling ${ankebehandling.id} manually. Check secure logs for more information."
@@ -80,7 +80,11 @@ class BehandlingEndretKafkaProducer(
                 ankeITrygderettenbehandling.mapToSkjemaV2().toJson()
             ).get()
             logger.info("Anke i trygderetten endret sent to Kafka")
-            secureLogger.debug("Anke i trygderetten endret for ankebehandling ${ankeITrygderettenbehandling.id} sent to kafka ($result)")
+            secureLogger.debug(
+                "Anke i trygderetten endret for ankebehandling {} sent to kafka ({})",
+                ankeITrygderettenbehandling.id,
+                result
+            )
         }.onFailure {
             val errorMessage =
                 "Could not send anke i trygderetten endret to Kafka. Need to resend ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id} manually. Check secure logs for more information."
@@ -97,7 +101,7 @@ class BehandlingEndretKafkaProducer(
         runCatching {
             val result = aivenKafkaTemplate.send(topicV2, behandlingId.toString(), null).get()
             logger.info("Behandling deleted sent to Kafka")
-            secureLogger.debug("Behandling deleted sent to Kafka ($result)")
+            secureLogger.debug("Behandling deleted sent to Kafka ({})", result)
         }.onFailure {
             val errorMessage =
                 "Could not send klage deleted to Kafka. Need to resend behandling $behandlingId manually. Check secure logs for more information."

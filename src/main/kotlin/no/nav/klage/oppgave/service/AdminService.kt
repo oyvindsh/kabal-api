@@ -40,8 +40,6 @@ class AdminService(
 ) {
 
     companion object {
-        private const val TWO_SECONDS = 2000L
-
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
@@ -77,7 +75,7 @@ class AdminService(
 
     /** only for use in dev */
     fun deleteBehandlingInDev(behandlingId: UUID) {
-        logger.debug("Delete test data in dev: attempt to delete behandling with id $behandlingId")
+        logger.debug("Delete test data in dev: attempt to delete behandling with id {}", behandlingId)
         val dokumenterUnderBehandling = dokumentUnderArbeidRepository.findByBehandlingId(behandlingId)
 
         for (dub in dokumenterUnderBehandling) {
@@ -192,7 +190,12 @@ class AdminService(
 
         filteredEvents.forEach {
             if (ankeITrygderettenbehandlingRepository.existsById(it.behandlingId)) {
-                logger.debug("BEFORE: Modifying kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
+                logger.debug(
+                    "BEFORE: Modifying kafka event {}, behandling_id {}, payload: {}",
+                    it.id,
+                    it.behandlingId,
+                    it.jsonPayload
+                )
                 var parsedStatistikkTilDVH = objectMapper.readValue(it.jsonPayload, StatistikkTilDVH::class.java)
                 parsedStatistikkTilDVH = parsedStatistikkTilDVH.copy(
                     ansvarligEnhetKode = TR_ENHET,
@@ -200,7 +203,12 @@ class AdminService(
                 )
                 it.jsonPayload = objectMapper.writeValueAsString(parsedStatistikkTilDVH)
                 it.status = UtsendingStatus.IKKE_SENDT
-                logger.debug("AFTER: Modified kafka event ${it.id}, behandling_id ${it.behandlingId}, payload: ${it.jsonPayload}")
+                logger.debug(
+                    "AFTER: Modified kafka event {}, behandling_id {}, payload: {}",
+                    it.id,
+                    it.behandlingId,
+                    it.jsonPayload
+                )
             }
         }
     }

@@ -23,17 +23,11 @@ data class DokumentReferanse(
     val vedlegg: MutableList<VedleggReferanse> = mutableListOf(),
     val journalposttype: Journalposttype?,
     val journalstatus: Journalstatus?,
-    val behandlingstema: String?,
-    val behandlingstemanavn: String?,
     val sak: Sak?,
     val avsenderMottaker: AvsenderMottaker?,
-    val journalfoerendeEnhet: String?,
-    val journalfortAvNavn: String?,
     val opprettetAvNavn: String?,
     val datoOpprettet: LocalDateTime,
     val relevanteDatoer: List<RelevantDato>?,
-    val antallRetur: Int?,
-    val tilleggsopplysninger: List<Tilleggsopplysning>?,
     val kanal: Kanal,
     val kanalnavn: String,
     val utsendingsinfo: Utsendingsinfo?,
@@ -161,12 +155,7 @@ data class DokumentReferanse(
             DATO_LEST,
         }
     }
-
-    data class Tilleggsopplysning(
-        val key: String,
-        val value: String,
-    )
-
+    
     data class Utsendingsinfo(
         val epostVarselSendt: EpostVarselSendt?,
         val smsVarselSendt: SmsVarselSendt?,

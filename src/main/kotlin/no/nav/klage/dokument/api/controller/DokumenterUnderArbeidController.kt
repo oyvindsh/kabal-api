@@ -134,7 +134,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
     ) {
-        logger.debug("Kall mottatt på deleteDokument for $dokumentId")
+        logger.debug("Kall mottatt på deleteDokument for {}", dokumentId)
         dokumentUnderArbeidService.slettDokument(
             dokumentId = dokumentId,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -147,7 +147,7 @@ class DokumentUnderArbeidController(
         @PathVariable("dokumentId") persistentDokumentId: UUID,
         @RequestBody input: OptionalPersistentDokumentIdInput
     ): DokumentViewWithList {
-        logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for $persistentDokumentId")
+        logger.debug("Kall mottatt på kobleEllerFrikobleVedlegg for {}", persistentDokumentId)
         try {
             return if (input.dokumentId == null) {
                 dokumentMapper.mapToDokumentListView(

@@ -62,7 +62,7 @@ class MeldingService(
 
             meldingRepository.delete(melding)
 
-            logger.debug("melding ($meldingId) deleted by $innloggetIdent")
+            logger.debug("melding ({}) deleted by {}", meldingId, innloggetIdent)
 
             publishInternalEvent(melding = melding, type = "message_deleted")
         } catch (enfe: EntityNotFoundException) {
@@ -84,7 +84,7 @@ class MeldingService(
             melding.modified = LocalDateTime.now()
 
             meldingRepository.save(melding)
-            logger.debug("melding ($meldingId) modified by $innloggetIdent")
+            logger.debug("melding ({}) modified by {}", meldingId, innloggetIdent)
 
             publishInternalEvent(melding = melding, type = "message_modified")
 

@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.api.controller
 
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.service.CleanupHjelpemidlerService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getSecureLogger
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
 class CleanupHjelpemidlerController(
-    private val adminService: AdminService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val cleanupHjelpemidlerService: CleanupHjelpemidlerService,
 ) {

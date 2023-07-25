@@ -65,13 +65,17 @@ class AnkebehandlingService(
                 klagebehandlingId = mottak.forrigeBehandlingId,
             )
         )
-        logger.debug("Created ankebehandling ${ankebehandling.id} for mottak ${mottak.id}")
+        logger.debug("Created ankebehandling {} for mottak {}", ankebehandling.id, mottak.id)
 
         if (mottak.forrigeBehandlingId != null) {
             val klagebehandling = klagebehandlingRepository.getReferenceById(mottak.forrigeBehandlingId)
             val klagebehandlingDokumenter = klagebehandling.saksdokumenter
 
-            logger.debug("Adding saksdokumenter from klagebehandling ${mottak.forrigeBehandlingId} to ankebehandling ${ankebehandling.id}")
+            logger.debug(
+                "Adding saksdokumenter from klagebehandling {} to ankebehandling {}",
+                mottak.forrigeBehandlingId,
+                ankebehandling.id
+            )
             klagebehandlingDokumenter.forEach {
                 behandlingService.connectDokumentToBehandling(
                     behandlingId = ankebehandling.id,
@@ -125,7 +129,11 @@ class AnkebehandlingService(
                 klageBehandlendeEnhet = ankeITrygderettenbehandling.tildeling?.enhet!!,
             )
         )
-        logger.debug("Created ankebehandling ${ankebehandling.id} from ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id}")
+        logger.debug(
+            "Created ankebehandling {} from ankeITrygderettenbehandling {}",
+            ankebehandling.id,
+            ankeITrygderettenbehandling.id
+        )
 
         ankeITrygderettenbehandling.saksdokumenter.forEach {
             behandlingService.connectDokumentToBehandling(

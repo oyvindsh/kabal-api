@@ -23,24 +23,16 @@ data class JournalpostDataWrapper(val journalpost: Journalpost?)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Journalpost(
     val journalpostId: String,
-    val tittel: String?,
     val journalposttype: Journalposttype?,
     val journalstatus: Journalstatus?,
     val tema: Tema?,
-    val temanavn: String?,
-    val behandlingstema: String?,
-    val behandlingstemanavn: String?,
     val sak: Sak?,
     val avsenderMottaker: AvsenderMottaker?,
-    val journalfoerendeEnhet: String?,
-    val journalfortAvNavn: String?,
     val opprettetAvNavn: String?,
     val skjerming: String?,
     val datoOpprettet: LocalDateTime,
     val dokumenter: List<DokumentInfo>?,
     val relevanteDatoer: List<RelevantDato>?,
-    val antallRetur: String?,
-    val tilleggsopplysninger: List<Tilleggsopplysning>?,
     val kanal: Kanal,
     val kanalnavn: String,
     val utsendingsinfo: Utsendingsinfo?,
@@ -108,11 +100,6 @@ enum class Kanal {
     DPVS,
     UKJENT,
 }
-
-data class Tilleggsopplysning(
-    val nokkel: String,
-    val verdi: String,
-)
 
 data class RelevantDato(
     val dato: LocalDateTime,
