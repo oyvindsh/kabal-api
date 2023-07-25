@@ -29,7 +29,7 @@ class EnhetController(
     ): List<String> {
         verifyKabalInnsynEgenEnhet()
         logger.debug(
-            "{} is requested by ident {} for klagebehandlingId {}",
+            "{} is requested by ident {}",
             ::getRelevantYtelser.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
         )

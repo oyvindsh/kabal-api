@@ -15,7 +15,10 @@ class StatistikkTilDVHEventListener(private val statistikkTilDVHService: Statist
 
     @EventListener
     fun behandlingEndretEventToDVH(behandlingEndretEvent: BehandlingEndretEvent) {
-        logger.debug("Received BehandlingEndretEvent for behandlingId ${behandlingEndretEvent.behandling.id} in StatistikkTilDVHEventListener")
+        logger.debug(
+            "Received BehandlingEndretEvent for behandlingId {} in StatistikkTilDVHEventListener",
+            behandlingEndretEvent.behandling.id
+        )
         statistikkTilDVHService.process(behandlingEndretEvent)
     }
 }

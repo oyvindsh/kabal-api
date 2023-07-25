@@ -146,7 +146,7 @@ class KlagebehandlingService(
                 kommentarFraFoersteinstans = mottak.kommentar
             )
         )
-        logger.debug("Created klagebehandling ${klagebehandling.id} for mottak ${mottak.id}")
+        logger.debug("Created klagebehandling {} for mottak {}", klagebehandling.id, mottak.id)
         applicationEventPublisher.publishEvent(
             BehandlingEndretEvent(
                 behandling = klagebehandling,

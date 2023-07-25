@@ -32,7 +32,7 @@ class KafkaDispatcher(
     lateinit var behandlingEventTopic: String
 
     fun dispatchEventsToKafka(type: EventType, utsendingStatusList: List<UtsendingStatus>) {
-        logger.debug("dispatchUnsentEventsToKafka for type: $type, and statuses: $utsendingStatusList")
+        logger.debug("dispatchUnsentEventsToKafka for type: {}, and statuses: {}", type, utsendingStatusList)
         kafkaEventRepository.getAllByStatusInAndTypeOrderByCreated(utsendingStatusList, type)
             .forEach { event ->
                 runCatching {

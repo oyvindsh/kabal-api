@@ -313,8 +313,6 @@ class DokumentMapper {
             journalstatus = if (journalpost.journalstatus != null) {
                 DokumentReferanse.Journalstatus.valueOf(journalpost.journalstatus.name)
             } else null,
-            behandlingstema = journalpost.behandlingstema,
-            behandlingstemanavn = journalpost.behandlingstemanavn,
             sak = if (journalpost.sak != null) {
                 DokumentReferanse.Sak(
                     datoOpprettet = journalpost.sak.datoOpprettet,
@@ -337,21 +335,12 @@ class DokumentMapper {
                     navn = journalpost.avsenderMottaker.navn,
                 )
             },
-            journalfoerendeEnhet = journalpost.journalfoerendeEnhet,
-            journalfortAvNavn = journalpost.journalfortAvNavn,
             opprettetAvNavn = journalpost.opprettetAvNavn,
             datoOpprettet = journalpost.datoOpprettet,
             relevanteDatoer = journalpost.relevanteDatoer?.map {
                 DokumentReferanse.RelevantDato(
                     dato = it.dato,
                     datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
-                )
-            },
-            antallRetur = journalpost.antallRetur?.toInt(),
-            tilleggsopplysninger = journalpost.tilleggsopplysninger?.map {
-                DokumentReferanse.Tilleggsopplysning(
-                    key = it.nokkel,
-                    value = it.verdi,
                 )
             },
             kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),

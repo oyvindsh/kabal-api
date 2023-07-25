@@ -6,35 +6,19 @@ class OppgaveNotFoundException(msg: String) : RuntimeException(msg)
 
 class JournalpostNotFoundException(msg: String) : ValidationException(msg)
 
-class DocumentNotFoundInStorageException(msg: String) : ValidationException(msg)
-
-class UtfallNotSetException(msg: String) : ValidationException(msg)
-
-class JournalpostFinalizationException(msg: String) : RuntimeException(msg)
-
 class BehandlingNotFoundException(msg: String) : RuntimeException(msg)
 
 class VedtakNotFoundException(msg: String) : RuntimeException(msg)
 
 class ResultatDokumentNotFoundException(msg: String) : RuntimeException(msg)
 
-class BrevmottakerNotFoundException(msg: String) : RuntimeException(msg)
-
 class MeldingNotFoundException(msg: String) : RuntimeException(msg)
 
 class SaksdokumentNotFoundException(msg: String) : RuntimeException(msg)
 
-class VedtakFinalizedException(msg: String) : RuntimeException(msg)
-
 class BehandlingFinalizedException(msg: String) : RuntimeException(msg)
 
 open class ValidationException(msg: String) : RuntimeException(msg)
-
-class OppgaveIdWrongFormatException(msg: String) : ValidationException(msg)
-
-class OppgaveVersjonWrongFormatException(msg: String) : ValidationException(msg)
-
-class BehandlingsidWrongFormatException(msg: String) : ValidationException(msg)
 
 class NotMatchingUserException(msg: String) : RuntimeException(msg)
 

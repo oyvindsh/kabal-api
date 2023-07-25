@@ -26,7 +26,7 @@ class SendBehandlingEndretToKafkaEventListener(private val behandlingEndretKafka
     @EventListener
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun indexKlagebehandling(behandlingEndretEvent: BehandlingEndretEvent) {
-        logger.debug("Received BehandlingEndretEvent for behandlingId ${behandlingEndretEvent.behandling.id}")
+        logger.debug("Received BehandlingEndretEvent for behandlingId {}", behandlingEndretEvent.behandling.id)
         val behandling = Hibernate.unproxy(behandlingEndretEvent.behandling) as Behandling
         try {
             when (behandling.type) {

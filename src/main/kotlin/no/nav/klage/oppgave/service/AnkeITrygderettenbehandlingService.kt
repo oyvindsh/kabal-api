@@ -12,10 +12,8 @@ import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingInput
 import no.nav.klage.oppgave.repositories.AnkeITrygderettenbehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.util.getLogger
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -24,11 +22,7 @@ class AnkeITrygderettenbehandlingService(
     private val ankeITrygderettenbehandlingRepository: AnkeITrygderettenbehandlingRepository,
     private val behandlingService: BehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val mottakService: MottakService,
-    private val dokumentService: DokumentService,
     private val kafkaEventRepository: KafkaEventRepository,
-    @Value("#{T(java.time.LocalDate).parse('\${KAKA_VERSION_2_DATE}')}")
-    private val kakaVersion2Date: LocalDate,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -61,7 +55,7 @@ class AnkeITrygderettenbehandlingService(
                 kjennelseMottatt = null,
             )
         )
-        logger.debug("Created ankeITrygderettenbehandling ${ankeITrygderettenbehandling.id}")
+        logger.debug("Created ankeITrygderettenbehandling {}", ankeITrygderettenbehandling.id)
 
         if (input.registreringsHjemmelSet != null) {
             behandlingService.setRegistreringshjemler(

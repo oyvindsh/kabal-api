@@ -8,7 +8,6 @@ import no.nav.klage.oppgave.domain.events.MottakLagretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.Ankebehandling
 import no.nav.klage.oppgave.domain.klage.Behandling
-import no.nav.klage.oppgave.repositories.BehandlingRepository
 import no.nav.klage.oppgave.repositories.KafkaEventRepository
 import no.nav.klage.oppgave.service.AnkebehandlingService
 import no.nav.klage.oppgave.service.KlagebehandlingService
@@ -21,7 +20,6 @@ import java.util.*
 class CreateBehandlingFromMottakEventListener(
     private val klagebehandlingService: KlagebehandlingService,
     private val ankebehandlingService: AnkebehandlingService,
-    private val behandlingRepository: BehandlingRepository,
     private val kafkaEventRepository: KafkaEventRepository,
 ) {
 
@@ -35,7 +33,10 @@ class CreateBehandlingFromMottakEventListener(
 
     @EventListener
     fun createBehandling(mottakLagretEvent: MottakLagretEvent): Behandling {
-        logger.debug("Received MottakLagretEvent for mottak ${mottakLagretEvent.mottak.id} in CreateKlagebehandlingFromMottakEventListener")
+        logger.debug(
+            "Received MottakLagretEvent for mottak {} in CreateKlagebehandlingFromMottakEventListener",
+            mottakLagretEvent.mottak.id
+        )
         val mottakId = mottakLagretEvent.mottak.id
         //TODO
 //        if (behandlingRepository.findByMottakId(mottakId) != null) {

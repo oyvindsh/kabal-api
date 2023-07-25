@@ -16,7 +16,10 @@ class StoreEndringsloggEventListener(private val endringsloggRepository: Endring
 
     @EventListener
     fun storeEndringslogg(behandlingEndretEvent: BehandlingEndretEvent) {
-        logger.debug("Received BehandlingEndretEvent for behandlingId ${behandlingEndretEvent.behandling.id} in StoreEndringsloggEventListener")
+        logger.debug(
+            "Received BehandlingEndretEvent for behandlingId {} in StoreEndringsloggEventListener",
+            behandlingEndretEvent.behandling.id
+        )
         if (behandlingEndretEvent.endringslogginnslag.isNotEmpty()) {
             endringsloggRepository.saveAll(behandlingEndretEvent.endringslogginnslag)
         }

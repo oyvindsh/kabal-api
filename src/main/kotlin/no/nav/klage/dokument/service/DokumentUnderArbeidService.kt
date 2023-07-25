@@ -19,7 +19,6 @@ import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentMapper
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.BrevmottakerInput
-import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
@@ -58,7 +57,6 @@ class DokumentUnderArbeidService(
     private val dokumentService: DokumentService,
     private val kabalDocumentMapper: KabalDocumentMapper,
     private val eregClient: EregClient,
-    private val pdlFacade: PdlFacade,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -407,9 +405,9 @@ class DokumentUnderArbeidService(
     }
 
     private fun validateSingleDocument(dokument: DokumentUnderArbeid): DocumentValidationResponse {
-        logger.debug("Getting json document, dokumentId: ${dokument.id}")
+        logger.debug("Getting json document, dokumentId: {}", dokument.id)
         val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
-        logger.debug("Validating json document in kabalJsontoPdf, dokumentId: ${dokument.id}")
+        logger.debug("Validating json document in kabalJsontoPdf, dokumentId: {}", dokument.id)
         val response = kabalJsonToPdfClient.validateJsonDocument(documentJson)
         return DocumentValidationResponse(
             dokumentId = dokument.id.toString(),
