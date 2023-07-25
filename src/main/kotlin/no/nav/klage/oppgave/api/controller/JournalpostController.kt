@@ -103,6 +103,20 @@ class JournalpostController(
         )
     }
 
+    //TODO: Hent direkte fra en dokumenttjeneste
+    @Operation(
+        summary = "Hent informasjon om et dokument for en gitt journalpost for en gitt behandling"
+    )
+    @GetMapping("/{journalpostId}", produces = ["application/json"])
+    fun fetchDokumentReferanse(
+        @Parameter(description = "Id til behandlingen i vårt system")
+        @PathVariable("journalpostId") journalpostId: String,
+    ): DokumentReferanse {
+        return dokumentService.fetchDokumentReferanse(
+            journalpostId = journalpostId
+        )
+    }
+
     @Operation(
         summary = "Henter noe metadata fra dokumentarkivet",
         description = "Henter noe metadata fra dokumentarkivet gitt at saksbehandler har tilgang"

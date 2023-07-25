@@ -5,7 +5,6 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.JournalpostIdListResponse
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
@@ -548,14 +547,6 @@ class BehandlingService(
             behandling = behandling,
             pageSize = pageSize,
             previousPageRef = previousPageRef
-        )
-    }
-
-    fun fetchDokumentReferanse(
-        journalpostId: String,
-    ): DokumentReferanse {
-        return dokumentService.fetchDokumentReferanse(
-            journalpostId = journalpostId
         )
     }
 
