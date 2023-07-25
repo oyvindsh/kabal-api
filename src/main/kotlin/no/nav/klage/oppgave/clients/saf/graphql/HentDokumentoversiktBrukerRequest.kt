@@ -12,6 +12,17 @@ data class DokumentoversiktBrukerVariables(
     val etter: String?,
 )
 
+data class HentJournalpostIdListForBrukerQuery(
+    val query: String,
+    val variables: JournalpostIdListForBrukerVariables
+)
+
+data class JournalpostIdListForBrukerVariables(
+    val brukerId: BrukerId,
+    val foerste: Int,
+    val etter: String?,
+)
+
 data class BrukerId(val id: String, val type: BrukerIdType = BrukerIdType.FNR)
 enum class BrukerIdType { FNR }
 
@@ -33,6 +44,28 @@ fun hentDokumentoversiktBrukerQuery(
         DokumentoversiktBrukerVariables(
             BrukerId(fnr),
             if (tema.isNullOrEmpty()) null else tema,
+            pageSize,
+            previousPageRef
+        )
+    )
+}
+
+fun hentJournalpostIdListForBrukerQuery(
+    fnr: String,
+    pageSize: Int,
+    previousPageRef: String?
+): HentJournalpostIdListForBrukerQuery {
+    val journalpostProperties = HentJournalpostGraphqlQuery::class.java.getResource("/saf/journalpostId.txt")
+        .readText()
+    val query =
+        HentJournalpostIdListForBrukerQuery::class.java.getResource("/saf/getJournalpostIdListForBruker.graphql")
+            .readText()
+            .replace("<replace>", journalpostProperties)
+            .replace("[\n\r]", "")
+    return HentJournalpostIdListForBrukerQuery(
+        query,
+        JournalpostIdListForBrukerVariables(
+            BrukerId(fnr),
             pageSize,
             previousPageRef
         )

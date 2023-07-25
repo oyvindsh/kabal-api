@@ -6,9 +6,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Tema
-import no.nav.klage.oppgave.api.view.BehandlingEditedView
-import no.nav.klage.oppgave.api.view.DokumenterResponse
-import no.nav.klage.oppgave.api.view.TilknyttetDokument
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -52,6 +50,37 @@ class BehandlingDokumentController(
             temaer = temaer?.map { Tema.of(it) } ?: emptyList(),
             pageSize = pageSize,
             previousPageRef = previousPageRef
+        )
+    }
+
+    @Operation(
+        summary = "Hent liste over dokumenter for brukeren som behandlingen gjelder"
+    )
+    @GetMapping("/{behandlingId}/journalpostidlist", produces = ["application/json"])
+    fun fetchJournalpostIdList(
+        @Parameter(description = "Id til behandlingen i vårt system")
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestParam(required = false, name = "antall", defaultValue = "10") pageSize: Int,
+        @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
+    ): JournalpostIdListResponse {
+        return behandlingService.fetchJournalpostIdList(
+            behandlingId = behandlingId,
+            pageSize = pageSize,
+            previousPageRef = previousPageRef
+        )
+    }
+
+    //TODO: Hent direkte fra en dokumenttjeneste
+    @Operation(
+        summary = "Hent informasjon om et dokument for en gitt journalpost for en gitt behandling"
+    )
+    @GetMapping("/journalposter/{journalpostid}", produces = ["application/json"])
+    fun fetchDokumentReferanse(
+        @Parameter(description = "Id til behandlingen i vårt system")
+        @PathVariable("journalpostId") journalpostId: String,
+    ): DokumentReferanse {
+        return behandlingService.fetchDokumentReferanse(
+            journalpostId = journalpostId,
         )
     }
 

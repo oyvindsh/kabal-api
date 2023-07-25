@@ -5,6 +5,8 @@ import java.time.LocalDateTime
 
 data class DokumentoversiktBrukerResponse(val data: DokumentoversiktBrukerDataWrapper?, val errors: List<Error>?)
 
+data class JournalpostIdListForBrukerResponse(val data: JournalpostIdListForBrukerDataWrapper?, val errors: List<Error>?)
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Error(val message: String, val extensions: Extensions)
 
@@ -12,7 +14,11 @@ data class Extensions(val classification: String)
 
 data class DokumentoversiktBrukerDataWrapper(val dokumentoversiktBruker: DokumentoversiktBruker)
 
+data class JournalpostIdListForBrukerDataWrapper(val dokumentoversiktBruker: JournalpostIdListForBruker)
+
 data class DokumentoversiktBruker(val journalposter: List<Journalpost>, val sideInfo: SideInfo)
+
+data class JournalpostIdListForBruker(val journalposter: List<JournalpostIdWrapper>, val sideInfo: SideInfo)
 
 data class SideInfo(val sluttpeker: String?, val finnesNesteSide: Boolean, val antall: Int, val totaltAntall: Int)
 
@@ -36,6 +42,11 @@ data class Journalpost(
     val kanal: Kanal,
     val kanalnavn: String,
     val utsendingsinfo: Utsendingsinfo?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class JournalpostIdWrapper(
+    val journalpostId: String,
 )
 
 data class AvsenderMottaker(

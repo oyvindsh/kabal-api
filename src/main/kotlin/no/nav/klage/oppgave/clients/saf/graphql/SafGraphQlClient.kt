@@ -55,6 +55,37 @@ class SafGraphQlClient(
     }
 
     @Retryable
+    fun getJournalpostIdListForBruker(
+        fnr: String,
+        pageSize: Int,
+        previousPageRef: String? = null
+    ): JournalpostIdListForBruker {
+        val start = System.currentTimeMillis()
+        return runWithTimingAndLogging {
+            safWebClient.post()
+                .uri("graphql")
+                .header(
+                    HttpHeaders.AUTHORIZATION,
+                    "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
+                )
+                .bodyValue(hentJournalpostIdListForBrukerQuery(fnr, pageSize, previousPageRef))
+                .retrieve()
+                .bodyToMono<JournalpostIdListForBrukerResponse>()
+                .block()
+                ?.let { logErrorsFromSaf(it, fnr, pageSize, previousPageRef); it }
+                ?.let { failOnErrors(it); it }
+                ?.data!!.dokumentoversiktBruker.also {
+                    logger.debug(
+                        "DokumentoversiktBruker: antall: {}, ms: {}, dato/tid: {}",
+                        it.sideInfo.totaltAntall,
+                        System.currentTimeMillis() - start,
+                        LocalDateTime.now()
+                    )
+                }
+        }
+    }
+
+    @Retryable
     fun getJournalpostAsSaksbehandler(journalpostId: String): Journalpost {
         return runWithTimingAndLogging {
             val token = tokenUtil.getSaksbehandlerAccessTokenWithSafScope()
@@ -99,8 +130,26 @@ class SafGraphQlClient(
         }
     }
 
+    private fun failOnErrors(response: JournalpostIdListForBrukerResponse) {
+        if (response.data == null || response.errors != null) {
+            throw RuntimeException("getJournalpostIdListForBruker failed")
+        }
+    }
+
     private fun logErrorsFromSaf(
         response: DokumentoversiktBrukerResponse,
+        fnr: String,
+        pageSize: Int,
+        previousPageRef: String?
+    ) {
+        if (response.errors != null) {
+            logger.error("Error from SAF, see securelogs")
+            secureLogger.error("Error from SAF when making call with following parameters: fnr=$fnr, pagesize=$pageSize, previousPageRef=$previousPageRef. Error is ${response.errors}")
+        }
+    }
+
+    private fun logErrorsFromSaf(
+        response: JournalpostIdListForBrukerResponse,
         fnr: String,
         pageSize: Int,
         previousPageRef: String?

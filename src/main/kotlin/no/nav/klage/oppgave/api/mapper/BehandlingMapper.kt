@@ -89,6 +89,9 @@ class BehandlingMapper(
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
             rol = klagebehandling.toROLView(),
+            relevantDocumentIdList = klagebehandling.saksdokumenter.map {
+                it.dokumentInfoId
+            }.toSet()
         )
     }
 
@@ -153,6 +156,9 @@ class BehandlingMapper(
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
             rol = ankebehandling.toROLView(),
+            relevantDocumentIdList = ankebehandling.saksdokumenter.map {
+                it.dokumentInfoId
+            }.toSet()
         )
     }
 
@@ -203,6 +209,9 @@ class BehandlingMapper(
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
             fagsystemId = ankeITrygderettenbehandling.fagsystem.id,
             rol = ankeITrygderettenbehandling.toROLView(),
+            relevantDocumentIdList = ankeITrygderettenbehandling.saksdokumenter.map {
+                it.dokumentInfoId
+            }.toSet()
         )
     }
 

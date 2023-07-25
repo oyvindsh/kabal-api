@@ -5,7 +5,9 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
+import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.JournalpostIdListResponse
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
@@ -528,7 +530,33 @@ class BehandlingService(
         previousPageRef: String?
     ): DokumenterResponse {
         val behandling = getBehandling(behandlingId)
-        return dokumentService.fetchDokumentlisteForBehandling(behandling, temaer, pageSize, previousPageRef)
+        return dokumentService.fetchDokumentlisteForBehandling(
+            behandling = behandling,
+            temaer = temaer,
+            pageSize = pageSize,
+            previousPageRef = previousPageRef
+        )
+    }
+
+    fun fetchJournalpostIdList(
+        behandlingId: UUID,
+        pageSize: Int,
+        previousPageRef: String?
+    ): JournalpostIdListResponse {
+        val behandling = getBehandling(behandlingId)
+        return dokumentService.fetchJournalpostIdList(
+            behandling = behandling,
+            pageSize = pageSize,
+            previousPageRef = previousPageRef
+        )
+    }
+
+    fun fetchDokumentReferanse(
+        journalpostId: String,
+    ): DokumentReferanse {
+        return dokumentService.fetchDokumentReferanse(
+            journalpostId = journalpostId
+        )
     }
 
     fun fetchJournalposterConnectedToBehandling(behandlingId: UUID): DokumenterResponse {

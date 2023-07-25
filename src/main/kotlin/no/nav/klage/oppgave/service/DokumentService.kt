@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.JournalpostIdListResponse
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.*
@@ -88,6 +89,49 @@ class DokumentService(
         } else {
             return DokumenterResponse(dokumenter = emptyList(), pageReference = null, antall = 0, totaltAntall = 0)
         }
+    }
+
+    fun fetchJournalpostIdList(
+        behandling: Behandling,
+        pageSize: Int,
+        previousPageRef: String?
+    ): JournalpostIdListResponse {
+        if (behandling.sakenGjelder.erPerson()) {
+            val journalpostIdListForBruker: JournalpostIdListForBruker =
+                safGraphQlClient.getJournalpostIdListForBruker(
+                    behandling.sakenGjelder.partId.value,
+                    pageSize,
+                    previousPageRef
+                )
+
+
+            return JournalpostIdListResponse(
+                journalpostIdList = journalpostIdListForBruker.journalposter.map {
+                    it.journalpostId
+                },
+                pageReference = if (journalpostIdListForBruker.sideInfo.finnesNesteSide) {
+                    journalpostIdListForBruker.sideInfo.sluttpeker
+                } else {
+                    null
+                },
+                antall = journalpostIdListForBruker.sideInfo.antall,
+                totaltAntall = journalpostIdListForBruker.sideInfo.totaltAntall
+            )
+        } else {
+            return JournalpostIdListResponse(
+                journalpostIdList = emptyList(),
+                pageReference = null,
+                antall = 0,
+                totaltAntall = 0
+            )
+        }
+    }
+
+    fun fetchDokumentReferanse(
+        journalpostId: String,
+    ): DokumentReferanse {
+        val journalpost = safGraphQlClient.getJournalpostAsSaksbehandler(journalpostId = journalpostId)
+        return dokumentMapper.mapJournalpostToDokumentReferanse(journalpost)
     }
 
     private fun mapTema(temaer: List<Tema>): List<no.nav.klage.oppgave.clients.saf.graphql.Tema> =
@@ -353,6 +397,66 @@ class DokumentMapper {
         return dokumentReferanse
     }
 
+    fun mapJournalpostToDokumentReferanse(
+        journalpost: Journalpost,
+    ): DokumentReferanse {
+
+        val hoveddokument = journalpost.dokumenter?.firstOrNull()
+            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
+
+        val dokumentReferanse = DokumentReferanse(
+            tittel = hoveddokument.tittel,
+            tema = Tema.fromNavn(journalpost.tema?.name).id,
+            temaId = Tema.fromNavn(journalpost.tema?.name).id,
+            registrert = journalpost.datoOpprettet.toLocalDate(),
+            dokumentInfoId = hoveddokument.dokumentInfoId,
+            journalpostId = journalpost.journalpostId,
+            harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
+            valgt = false,
+            journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
+            journalstatus = if (journalpost.journalstatus != null) {
+                DokumentReferanse.Journalstatus.valueOf(journalpost.journalstatus.name)
+            } else null,
+            sak = if (journalpost.sak != null) {
+                DokumentReferanse.Sak(
+                    datoOpprettet = journalpost.sak.datoOpprettet,
+                    fagsakId = journalpost.sak.fagsakId,
+                    fagsaksystem = journalpost.sak.fagsaksystem,
+                    fagsystemId = journalpost.sak.fagsaksystem?.let { Fagsystem.fromNavn(it).id }
+                )
+            } else null,
+            avsenderMottaker = if (journalpost.avsenderMottaker == null ||
+                (journalpost.avsenderMottaker.id == null ||
+                        journalpost.avsenderMottaker.type == null)
+            ) {
+                null
+            } else {
+                DokumentReferanse.AvsenderMottaker(
+                    id = journalpost.avsenderMottaker.id,
+                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
+                        journalpost.avsenderMottaker.type.name
+                    ),
+                    navn = journalpost.avsenderMottaker.navn,
+                )
+            },
+            opprettetAvNavn = journalpost.opprettetAvNavn,
+            datoOpprettet = journalpost.datoOpprettet,
+            relevanteDatoer = journalpost.relevanteDatoer?.map {
+                DokumentReferanse.RelevantDato(
+                    dato = it.dato,
+                    datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
+                )
+            },
+            kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
+            kanalnavn = journalpost.kanalnavn,
+            utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
+        )
+
+        dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost))
+
+        return dokumentReferanse
+    }
+
     private fun getUtsendingsinfo(utsendingsinfo: Utsendingsinfo?): DokumentReferanse.Utsendingsinfo? {
         if (utsendingsinfo == null) {
             return null
@@ -422,6 +526,23 @@ class DokumentMapper {
                         journalpost.journalpostId,
                         vedlegg.dokumentInfoId
                     )
+                )
+            } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun getVedlegg(
+        journalpost: Journalpost,
+    ): List<DokumentReferanse.VedleggReferanse> {
+        return if ((journalpost.dokumenter?.size ?: 0) > 1) {
+            journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
+                DokumentReferanse.VedleggReferanse(
+                    tittel = vedlegg.tittel,
+                    dokumentInfoId = vedlegg.dokumentInfoId,
+                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
+                    valgt = false,
                 )
             } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
         } else {
