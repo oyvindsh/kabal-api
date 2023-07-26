@@ -47,6 +47,11 @@ data class Journalpost(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SimpleJournalpost(
     val journalpostId: String,
+    val journalposttype: Journalposttype?,
+    val tema: Tema?,
+    val sak: Sak?,
+    val avsenderMottaker: AvsenderMottaker?,
+    val datoOpprettet: LocalDateTime,
     val dokumenter: List<SimpleDokumentInfo>?,
 )
 

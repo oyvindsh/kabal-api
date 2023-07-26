@@ -12,12 +12,29 @@ data class DokumenterResponse(
 )
 
 data class JournalpostIdListResponse(
-    val journalpostList: List<JournalpostReference>,
+    val journalpostList: List<SimpleJournalpostReference>,
     val journalpostCount: Int,
     val vedleggCount: Int,
+    val sakList: List<DokumentReferanse.Sak>,
+    val avsenderMottakerList: List<DokumentReferanse.AvsenderMottaker>,
+    val temaIdList: List<String>,
+    val journalposttypeList: List<DokumentReferanse.Journalposttype>,
+    val fromDate: LocalDate?,
+    val toDate: LocalDate?,
 )
 
 data class JournalpostReference(
+    val journalpostId: String,
+    val dokumentInfoId: String,
+    val sak: DokumentReferanse.Sak?,
+    val avsenderMottaker: DokumentReferanse.AvsenderMottaker?,
+    val temaId: String?,
+    val journalposttype: DokumentReferanse.Journalposttype?,
+    val vedlegg: List<String>,
+    val registrert: LocalDate,
+)
+
+data class SimpleJournalpostReference(
     val journalpostId: String,
     val dokumentInfoId: String,
     val vedlegg: List<String>,

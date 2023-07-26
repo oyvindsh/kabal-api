@@ -4,10 +4,7 @@ import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
-import no.nav.klage.oppgave.api.view.DokumentReferanse
-import no.nav.klage.oppgave.api.view.DokumenterResponse
-import no.nav.klage.oppgave.api.view.JournalpostIdListResponse
-import no.nav.klage.oppgave.api.view.JournalpostReference
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.*
@@ -112,30 +109,74 @@ class DokumentService(
             val vedleggCount = journalpostList.sumOf { it.vedlegg.size }
 
             return JournalpostIdListResponse(
-                journalpostList = journalpostList,
+                journalpostList = journalpostList.map {
+                    SimpleJournalpostReference(
+                        journalpostId = it.journalpostId,
+                        dokumentInfoId = it.dokumentInfoId,
+                        vedlegg = it.vedlegg
+                    )
+                },
                 journalpostCount = journalpostList.size,
-                vedleggCount = vedleggCount
+                vedleggCount = vedleggCount,
+                sakList = journalpostList.mapNotNull { it.sak }.toSet().toList(),
+                avsenderMottakerList = journalpostList.mapNotNull { it.avsenderMottaker }.toSet().toList(),
+                temaIdList = journalpostList.mapNotNull { it.temaId }.toSet().toList(),
+                journalposttypeList = journalpostList.mapNotNull { it.journalposttype }.toSet().toList(),
+                fromDate = journalpostList.minOf { it.registrert },
+                toDate = journalpostList.maxOf { it.registrert },
             )
         } else {
             return JournalpostIdListResponse(
-                journalpostList = emptyList(),
+                journalpostList = listOf(),
                 journalpostCount = 0,
                 vedleggCount = 0,
+                sakList = listOf(),
+                avsenderMottakerList = listOf(),
+                temaIdList = listOf(),
+                journalposttypeList = listOf(),
+                fromDate = null,
+                toDate = null,
             )
         }
     }
 
     fun mapSimpleJournalpostToJournalpostReference(
-        simpleJournalpost: SimpleJournalpost,
+        journalpost: SimpleJournalpost,
     ): JournalpostReference {
 
-        val hoveddokument = simpleJournalpost.dokumenter?.firstOrNull()
-            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${simpleJournalpost.journalpostId}")
+        val hoveddokument = journalpost.dokumenter?.firstOrNull()
+            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
 
         val journalpostReference = JournalpostReference(
             dokumentInfoId = hoveddokument.dokumentInfoId,
-            journalpostId = simpleJournalpost.journalpostId,
-            vedlegg = simpleJournalpost.dokumenter.subList(1, simpleJournalpost.dokumenter.size).map {
+            journalpostId = journalpost.journalpostId,
+            registrert = journalpost.datoOpprettet.toLocalDate(),
+            journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
+
+            sak = if (journalpost.sak != null) {
+                DokumentReferanse.Sak(
+                    datoOpprettet = journalpost.sak.datoOpprettet,
+                    fagsakId = journalpost.sak.fagsakId,
+                    fagsaksystem = journalpost.sak.fagsaksystem,
+                    fagsystemId = journalpost.sak.fagsaksystem?.let { Fagsystem.fromNavn(it).id }
+                )
+            } else null,
+            avsenderMottaker = if (journalpost.avsenderMottaker == null ||
+                (journalpost.avsenderMottaker.id == null ||
+                        journalpost.avsenderMottaker.type == null)
+            ) {
+                null
+            } else {
+                DokumentReferanse.AvsenderMottaker(
+                    id = journalpost.avsenderMottaker.id,
+                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
+                        journalpost.avsenderMottaker.type.name
+                    ),
+                    navn = journalpost.avsenderMottaker.navn,
+                )
+            },
+            temaId = Tema.fromNavn(journalpost.tema?.name).id,
+            vedlegg = journalpost.dokumenter.subList(1, journalpost.dokumenter.size).map {
                 it.dokumentInfoId
             }
         )

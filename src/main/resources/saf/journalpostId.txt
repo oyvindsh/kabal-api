@@ -1,4 +1,19 @@
 journalpostId
+journalposttype
+tema
+datoOpprettet
+sak {
+    datoOpprettet
+    fagsakId
+    fagsaksystem
+}
+avsenderMottaker {
+    id
+    type
+    navn
+    land
+    erLikBruker
+}
 dokumenter {
     dokumentInfoId
 }
