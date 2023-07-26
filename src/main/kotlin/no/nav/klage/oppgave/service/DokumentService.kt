@@ -7,6 +7,7 @@ import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.JournalpostIdListResponse
+import no.nav.klage.oppgave.api.view.JournalpostReference
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.*
@@ -97,34 +98,49 @@ class DokumentService(
         previousPageRef: String?
     ): JournalpostIdListResponse {
         if (behandling.sakenGjelder.erPerson()) {
-            val journalpostIdListForBruker: JournalpostIdListForBruker =
+            val simpleJournalpostListForBruker: SimpleJournalpostListForBruker =
                 safGraphQlClient.getJournalpostIdListForBruker(
                     behandling.sakenGjelder.partId.value,
                     pageSize,
                     previousPageRef
                 )
 
+            val journalpostList = simpleJournalpostListForBruker.journalposter.map {
+                mapSimpleJournalpostToJournalpostReference(it)
+            }
+
+            val vedleggCount = journalpostList.sumOf { it.vedlegg.size }
 
             return JournalpostIdListResponse(
-                journalpostIdList = journalpostIdListForBruker.journalposter.map {
-                    it.journalpostId
-                },
-                pageReference = if (journalpostIdListForBruker.sideInfo.finnesNesteSide) {
-                    journalpostIdListForBruker.sideInfo.sluttpeker
-                } else {
-                    null
-                },
-                antall = journalpostIdListForBruker.sideInfo.antall,
-                totaltAntall = journalpostIdListForBruker.sideInfo.totaltAntall
+                journalpostList = journalpostList,
+                journalpostCount = journalpostList.size,
+                vedleggCount = vedleggCount
             )
         } else {
             return JournalpostIdListResponse(
-                journalpostIdList = emptyList(),
-                pageReference = null,
-                antall = 0,
-                totaltAntall = 0
+                journalpostList = emptyList(),
+                journalpostCount = 0,
+                vedleggCount = 0,
             )
         }
+    }
+
+    fun mapSimpleJournalpostToJournalpostReference(
+        simpleJournalpost: SimpleJournalpost,
+    ): JournalpostReference {
+
+        val hoveddokument = simpleJournalpost.dokumenter?.firstOrNull()
+            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${simpleJournalpost.journalpostId}")
+
+        val journalpostReference = JournalpostReference(
+            dokumentInfoId = hoveddokument.dokumentInfoId,
+            journalpostId = simpleJournalpost.journalpostId,
+            vedlegg = simpleJournalpost.dokumenter.subList(1, simpleJournalpost.dokumenter.size).map {
+                it.dokumentInfoId
+            }
+        )
+
+        return journalpostReference
     }
 
     fun fetchDokumentReferanse(

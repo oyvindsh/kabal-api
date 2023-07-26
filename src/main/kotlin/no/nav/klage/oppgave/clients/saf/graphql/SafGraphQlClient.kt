@@ -59,7 +59,7 @@ class SafGraphQlClient(
         fnr: String,
         pageSize: Int,
         previousPageRef: String? = null
-    ): JournalpostIdListForBruker {
+    ): SimpleJournalpostListForBruker {
         val start = System.currentTimeMillis()
         return runWithTimingAndLogging {
             safWebClient.post()

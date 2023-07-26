@@ -14,11 +14,11 @@ data class Extensions(val classification: String)
 
 data class DokumentoversiktBrukerDataWrapper(val dokumentoversiktBruker: DokumentoversiktBruker)
 
-data class JournalpostIdListForBrukerDataWrapper(val dokumentoversiktBruker: JournalpostIdListForBruker)
+data class JournalpostIdListForBrukerDataWrapper(val dokumentoversiktBruker: SimpleJournalpostListForBruker)
 
 data class DokumentoversiktBruker(val journalposter: List<Journalpost>, val sideInfo: SideInfo)
 
-data class JournalpostIdListForBruker(val journalposter: List<JournalpostIdWrapper>, val sideInfo: SideInfo)
+data class SimpleJournalpostListForBruker(val journalposter: List<SimpleJournalpost>, val sideInfo: SideInfo)
 
 data class SideInfo(val sluttpeker: String?, val finnesNesteSide: Boolean, val antall: Int, val totaltAntall: Int)
 
@@ -45,8 +45,14 @@ data class Journalpost(
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class JournalpostIdWrapper(
+data class SimpleJournalpost(
     val journalpostId: String,
+    val dokumenter: List<SimpleDokumentInfo>?,
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SimpleDokumentInfo(
+    val dokumentInfoId: String,
 )
 
 data class AvsenderMottaker(

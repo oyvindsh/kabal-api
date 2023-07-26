@@ -12,10 +12,15 @@ data class DokumenterResponse(
 )
 
 data class JournalpostIdListResponse(
-    val journalpostIdList: List<String>,
-    val pageReference: String? = null,
-    val antall: Int,
-    val totaltAntall: Int
+    val journalpostList: List<JournalpostReference>,
+    val journalpostCount: Int,
+    val vedleggCount: Int,
+)
+
+data class JournalpostReference(
+    val journalpostId: String,
+    val dokumentInfoId: String,
+    val vedlegg: List<String>,
 )
 
 data class DokumentReferanse(
