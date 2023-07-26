@@ -60,7 +60,7 @@ class BehandlingDokumentController(
     fun fetchJournalpostIdList(
         @Parameter(description = "Id til behandlingen i vårt system")
         @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestParam(required = false, name = "antall", defaultValue = "10") pageSize: Int,
+        @RequestParam(required = false, name = "antall", defaultValue = "50000") pageSize: Int,
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
     ): JournalpostIdListResponse {
         return behandlingService.fetchJournalpostIdList(
