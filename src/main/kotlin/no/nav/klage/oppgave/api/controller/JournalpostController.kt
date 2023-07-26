@@ -103,7 +103,6 @@ class JournalpostController(
         )
     }
 
-    //TODO: Hent direkte fra en dokumenttjeneste
     @Operation(
         summary = "Hent informasjon om et dokument for en gitt journalpost for en gitt behandling"
     )
@@ -133,13 +132,9 @@ class JournalpostController(
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger,
         )
-        return JournalfoertDokumentMetadata(
+        return dokumentService.getJournalfoertDokumentMetadata(
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId,
-            title = dokumentService.getDocumentTitle(
-                journalpostId = journalpostId,
-                dokumentInfoId = dokumentInfoId
-            )
         )
     }
 

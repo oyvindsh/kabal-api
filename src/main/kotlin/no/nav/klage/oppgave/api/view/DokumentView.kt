@@ -219,6 +219,7 @@ data class JournalfoertDokumentMetadata(
     val journalpostId: String,
     val dokumentInfoId: String,
     val title: String,
+    val harTilgangTilArkivvariant: Boolean,
 )
 
 data class DokumentUnderArbeidMetadata(

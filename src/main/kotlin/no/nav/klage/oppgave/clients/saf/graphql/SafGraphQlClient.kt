@@ -76,7 +76,7 @@ class SafGraphQlClient(
                 ?.let { failOnErrors(it); it }
                 ?.data!!.dokumentoversiktBruker.also {
                     logger.debug(
-                        "DokumentoversiktBruker: antall: {}, ms: {}, dato/tid: {}",
+                        "JournalpostIdListForBruker: antall: {}, ms: {}, dato/tid: {}",
                         it.sideInfo.totaltAntall,
                         System.currentTimeMillis() - start,
                         LocalDateTime.now()

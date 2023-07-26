@@ -252,6 +252,21 @@ class DokumentService(
             ?: throw RuntimeException("Document/title not found in Dokarkiv")
     }
 
+    fun getJournalfoertDokumentMetadata(journalpostId: String, dokumentInfoId: String): JournalfoertDokumentMetadata {
+        val journalpostInDokarkiv =
+            safClient.getJournalpostAsSaksbehandler(journalpostId)
+
+        return JournalfoertDokumentMetadata(
+            journalpostId = journalpostId,
+            dokumentInfoId = dokumentInfoId,
+            title = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
+                ?: throw RuntimeException("Document/title not found in Dokarkiv"),
+            harTilgangTilArkivvariant = harTilgangTilArkivvariant(
+                journalpostInDokarkiv.dokumenter.find { it.dokumentInfoId == dokumentInfoId }
+            )
+        )
+    }
+
     fun changeTitleInPDF(documentBytes: ByteArray, title: String): ByteArray {
         val baos = ByteArrayOutputStream()
         val timeMillis = measureTimeMillis {
@@ -380,6 +395,11 @@ class DokumentService(
     }
 
     fun getMergedDocument(id: UUID) = mergedDocumentRepository.getReferenceById(id)
+
+    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
+        dokumentInfo?.dokumentvarianter?.any { dv ->
+            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
+        } == true
 }
 
 class DokumentMapper {
