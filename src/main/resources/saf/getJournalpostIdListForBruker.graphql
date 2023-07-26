@@ -1,6 +1,8 @@
-query($brukerId: BrukerIdInput!, $foerste: Int, $etter: String) {
+query($brukerId: BrukerIdInput!, $tema: [Tema!], $journalposttyper: [Journalposttype!] $foerste: Int, $etter: String) {
     dokumentoversiktBruker(
         brukerId: $brukerId,
+        tema: $tema,
+        journalposttyper: $journalposttyper
         journalstatuser: [FERDIGSTILT,JOURNALFOERT,EKSPEDERT, MOTTATT],
         foerste: $foerste,
         etter: $etter) {

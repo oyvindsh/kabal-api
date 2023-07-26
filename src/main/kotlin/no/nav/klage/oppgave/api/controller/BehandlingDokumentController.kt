@@ -47,7 +47,7 @@ class BehandlingDokumentController(
     ): DokumenterResponse {
         return behandlingService.fetchDokumentlisteForBehandling(
             behandlingId = behandlingId,
-            temaer = temaer?.map { Tema.of(it) } ?: emptyList(),
+            tema = temaer?.map { Tema.of(it) } ?: emptyList(),
             pageSize = pageSize,
             previousPageRef = previousPageRef
         )
@@ -62,11 +62,15 @@ class BehandlingDokumentController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestParam(required = false, name = "antall", defaultValue = "50000") pageSize: Int,
         @RequestParam(required = false, name = "forrigeSide") previousPageRef: String? = null,
+        @RequestParam(required = false, name = "temaIdList") temaIdList: List<String>? = emptyList(),
+        @RequestParam(required = false, name = "journalposttyper") journalposttyper: List<DokumentReferanse.Journalposttype>? = emptyList()
     ): JournalpostIdListResponse {
         return behandlingService.fetchJournalpostIdList(
             behandlingId = behandlingId,
             pageSize = pageSize,
-            previousPageRef = previousPageRef
+            previousPageRef = previousPageRef,
+            tema = temaIdList?.map { Tema.of(it) } ?: emptyList(),
+            journalposttyper = journalposttyper ?: emptyList(),
         )
     }
 

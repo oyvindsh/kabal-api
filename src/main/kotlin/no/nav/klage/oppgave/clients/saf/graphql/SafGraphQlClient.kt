@@ -37,7 +37,12 @@ class SafGraphQlClient(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
                 )
-                .bodyValue(hentDokumentoversiktBrukerQuery(fnr, tema, pageSize, previousPageRef))
+                .bodyValue(hentDokumentoversiktBrukerQuery(
+                    fnr = fnr,
+                    tema = tema,
+                    pageSize = pageSize,
+                    previousPageRef = previousPageRef
+                ))
                 .retrieve()
                 .bodyToMono<DokumentoversiktBrukerResponse>()
                 .block()
@@ -58,7 +63,9 @@ class SafGraphQlClient(
     fun getJournalpostIdListForBruker(
         fnr: String,
         pageSize: Int,
-        previousPageRef: String? = null
+        previousPageRef: String? = null,
+        tema: List<Tema>,
+        journalposttyper: List<Journalposttype>
     ): SimpleJournalpostListForBruker {
         val start = System.currentTimeMillis()
         return runWithTimingAndLogging {
@@ -68,7 +75,13 @@ class SafGraphQlClient(
                     HttpHeaders.AUTHORIZATION,
                     "Bearer ${tokenUtil.getSaksbehandlerAccessTokenWithSafScope()}"
                 )
-                .bodyValue(hentJournalpostIdListForBrukerQuery(fnr, pageSize, previousPageRef))
+                .bodyValue(hentJournalpostIdListForBrukerQuery(
+                    fnr = fnr,
+                    tema = tema,
+                    journalposttyper = journalposttyper,
+                    pageSize = pageSize,
+                    previousPageRef = previousPageRef,
+                ))
                 .retrieve()
                 .bodyToMono<JournalpostIdListForBrukerResponse>()
                 .block()

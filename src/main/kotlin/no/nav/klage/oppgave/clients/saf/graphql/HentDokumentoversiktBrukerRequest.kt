@@ -21,6 +21,8 @@ data class JournalpostIdListForBrukerVariables(
     val brukerId: BrukerId,
     val foerste: Int,
     val etter: String?,
+    val tema: List<Tema>?,
+    val journalposttyper: List<Journalposttype>?,
 )
 
 data class BrukerId(val id: String, val type: BrukerIdType = BrukerIdType.FNR)
@@ -42,10 +44,10 @@ fun hentDokumentoversiktBrukerQuery(
     return HentDokumentoversiktBrukerGraphqlQuery(
         query,
         DokumentoversiktBrukerVariables(
-            BrukerId(fnr),
-            if (tema.isNullOrEmpty()) null else tema,
-            pageSize,
-            previousPageRef
+            brukerId = BrukerId(fnr),
+            tema = if (tema.isNullOrEmpty()) null else tema,
+            foerste = pageSize,
+            etter = previousPageRef
         )
     )
 }
@@ -53,7 +55,9 @@ fun hentDokumentoversiktBrukerQuery(
 fun hentJournalpostIdListForBrukerQuery(
     fnr: String,
     pageSize: Int,
-    previousPageRef: String?
+    previousPageRef: String?,
+    tema: List<Tema>,
+    journalposttyper: List<Journalposttype>,
 ): HentJournalpostIdListForBrukerQuery {
     val journalpostProperties = HentJournalpostGraphqlQuery::class.java.getResource("/saf/journalpostId.txt")
         .readText()
@@ -65,9 +69,11 @@ fun hentJournalpostIdListForBrukerQuery(
     return HentJournalpostIdListForBrukerQuery(
         query,
         JournalpostIdListForBrukerVariables(
-            BrukerId(fnr),
-            pageSize,
-            previousPageRef
+            brukerId = BrukerId(fnr),
+            tema = if (tema.isNullOrEmpty()) null else tema,
+            journalposttyper = if (journalposttyper.isNullOrEmpty()) null else journalposttyper,
+            foerste = pageSize,
+            etter = previousPageRef
         )
     )
 }

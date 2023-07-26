@@ -46,17 +46,17 @@ class DokumentService(
 
     fun fetchDokumentlisteForBehandling(
         behandling: Behandling,
-        temaer: List<Tema>,
+        tema: List<Tema>,
         pageSize: Int,
         previousPageRef: String?
     ): DokumenterResponse {
         if (behandling.sakenGjelder.erPerson()) {
             val dokumentoversiktBruker: DokumentoversiktBruker =
                 safGraphQlClient.getDokumentoversiktBruker(
-                    behandling.sakenGjelder.partId.value,
-                    mapTema(temaer),
-                    pageSize,
-                    previousPageRef
+                    fnr = behandling.sakenGjelder.partId.value,
+                    tema = mapTema(tema),
+                    pageSize = pageSize,
+                    previousPageRef = previousPageRef
                 )
 
             //Attempt to track down elusive bug with repeated documents
@@ -68,7 +68,7 @@ class DokumentService(
                     }. " + "\nFull list: ${
                         dokumentoversiktBruker.journalposter.joinToString { it.journalpostId }
                     }" + "\nParams: fnr: ${behandling.sakenGjelder.partId.value}, behandlingId: ${behandling.id}, " +
-                            "temaer: ${temaer.joinToString()}, pageSize: $pageSize, previousPageRef: $previousPageRef"
+                            "temaer: ${tema.joinToString()}, pageSize: $pageSize, previousPageRef: $previousPageRef"
                 )
             }
 
@@ -92,14 +92,18 @@ class DokumentService(
     fun fetchJournalpostIdList(
         behandling: Behandling,
         pageSize: Int,
-        previousPageRef: String?
+        previousPageRef: String?,
+        tema: List<Tema>,
+        journalposttyper: List<DokumentReferanse.Journalposttype>
     ): JournalpostIdListResponse {
         if (behandling.sakenGjelder.erPerson()) {
             val simpleJournalpostListForBruker: SimpleJournalpostListForBruker =
                 safGraphQlClient.getJournalpostIdListForBruker(
-                    behandling.sakenGjelder.partId.value,
-                    pageSize,
-                    previousPageRef
+                    fnr = behandling.sakenGjelder.partId.value,
+                    tema = mapTema(tema),
+                    journalposttyper = mapJournalposttyper(journalposttyper),
+                    pageSize = pageSize,
+                    previousPageRef = previousPageRef
                 )
 
             val journalpostList = simpleJournalpostListForBruker.journalposter.map {
@@ -193,6 +197,9 @@ class DokumentService(
 
     private fun mapTema(temaer: List<Tema>): List<no.nav.klage.oppgave.clients.saf.graphql.Tema> =
         temaer.map { tema -> no.nav.klage.oppgave.clients.saf.graphql.Tema.valueOf(tema.name) }
+
+    private fun mapJournalposttyper(journalposttyper: List<DokumentReferanse.Journalposttype>): List<no.nav.klage.oppgave.clients.saf.graphql.Journalposttype> =
+        journalposttyper.map { journalposttype -> no.nav.klage.oppgave.clients.saf.graphql.Journalposttype.valueOf(journalposttype.name) }
 
     fun fetchJournalposterConnectedToBehandling(behandling: Behandling): DokumenterResponse {
         val dokumentReferanser = behandling.saksdokumenter.groupBy { it.journalpostId }.keys
