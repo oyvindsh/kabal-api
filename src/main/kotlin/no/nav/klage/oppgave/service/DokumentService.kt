@@ -91,8 +91,8 @@ class DokumentService(
                 avsenderMottakerList = dokumentReferanseList.mapNotNull { it.avsenderMottaker }.toSet().toList(),
                 temaIdList = dokumentReferanseList.mapNotNull { it.temaId }.toSet().toList(),
                 journalposttypeList = dokumentReferanseList.mapNotNull { it.journalposttype }.toSet().toList(),
-                fromDate = dokumentReferanseList.minOf { it.registrert },
-                toDate = dokumentReferanseList.maxOf { it.registrert },
+                fromDate = dokumentReferanseList.minOfOrNull { it.registrert },
+                toDate = dokumentReferanseList.maxOfOrNull { it.registrert },
             )
         } else {
             return DokumenterResponse(
