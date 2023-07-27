@@ -531,11 +531,6 @@ class BehandlingService(
         return dokumentService.fetchDokumentlisteForBehandling(behandling, temaer, pageSize, previousPageRef)
     }
 
-    fun fetchJournalposterConnectedToBehandling(behandlingId: UUID): DokumenterResponse {
-        val behandling = getBehandling(behandlingId)
-        return dokumentService.fetchJournalposterConnectedToBehandling(behandling)
-    }
-
     fun connectDokumentToBehandling(
         behandlingId: UUID,
         journalpostId: String,

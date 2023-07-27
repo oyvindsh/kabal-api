@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.view.JournalfoertDokumentMetadata
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
 import no.nav.klage.oppgave.domain.klage.*
@@ -73,37 +74,44 @@ class DokumentService(
                 )
             }
 
+            val dokumentReferanseList = dokumentoversiktBruker.journalposter.map { journalpost ->
+                dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, behandling)
+            }
+
             return DokumenterResponse(
-                dokumenter = dokumentoversiktBruker.journalposter.map { journalpost ->
-                    dokumentMapper.mapJournalpostToDokumentReferanse(journalpost, behandling)
-                },
+                dokumenter = dokumentReferanseList,
                 pageReference = if (dokumentoversiktBruker.sideInfo.finnesNesteSide) {
                     dokumentoversiktBruker.sideInfo.sluttpeker
                 } else {
                     null
                 },
                 antall = dokumentoversiktBruker.sideInfo.antall,
-                totaltAntall = dokumentoversiktBruker.sideInfo.totaltAntall
+                totaltAntall = dokumentoversiktBruker.sideInfo.totaltAntall,
+                sakList = dokumentReferanseList.mapNotNull { it.sak }.toSet().toList(),
+                avsenderMottakerList = dokumentReferanseList.mapNotNull { it.avsenderMottaker }.toSet().toList(),
+                temaIdList = dokumentReferanseList.mapNotNull { it.temaId }.toSet().toList(),
+                journalposttypeList = dokumentReferanseList.mapNotNull { it.journalposttype }.toSet().toList(),
+                fromDate = dokumentReferanseList.minOf { it.registrert },
+                toDate = dokumentReferanseList.maxOf { it.registrert },
             )
         } else {
-            return DokumenterResponse(dokumenter = emptyList(), pageReference = null, antall = 0, totaltAntall = 0)
+            return DokumenterResponse(
+                dokumenter = emptyList(),
+                pageReference = null,
+                antall = 0,
+                totaltAntall = 0,
+                sakList = listOf(),
+                avsenderMottakerList = listOf(),
+                temaIdList = listOf(),
+                journalposttypeList = listOf(),
+                fromDate = null,
+                toDate = null,
+            )
         }
     }
 
     private fun mapTema(temaer: List<Tema>): List<no.nav.klage.oppgave.clients.saf.graphql.Tema> =
         temaer.map { tema -> no.nav.klage.oppgave.clients.saf.graphql.Tema.valueOf(tema.name) }
-
-    fun fetchJournalposterConnectedToBehandling(behandling: Behandling): DokumenterResponse {
-        val dokumentReferanser = behandling.saksdokumenter.groupBy { it.journalpostId }.keys
-            .map { safGraphQlClient.getJournalpostAsSaksbehandler(it) }
-            .map { dokumentMapper.mapJournalpostToDokumentReferanse(it, behandling) }
-        return DokumenterResponse(
-            dokumenter = dokumentReferanser.sortedByDescending { it.registrert },
-            pageReference = null,
-            antall = dokumentReferanser.size,
-            totaltAntall = dokumentReferanser.size
-        )
-    }
 
     fun validateJournalpostExists(journalpostId: String) {
         try {
@@ -149,6 +157,21 @@ class DokumentService(
 
         return journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
             ?: throw RuntimeException("Document/title not found in Dokarkiv")
+    }
+
+    fun getJournalfoertDokumentMetadata(journalpostId: String, dokumentInfoId: String): JournalfoertDokumentMetadata {
+        val journalpostInDokarkiv =
+            safClient.getJournalpostAsSaksbehandler(journalpostId)
+
+        return JournalfoertDokumentMetadata(
+            journalpostId = journalpostId,
+            dokumentInfoId = dokumentInfoId,
+            title = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
+                ?: throw RuntimeException("Document/title not found in Dokarkiv"),
+            harTilgangTilArkivvariant = harTilgangTilArkivvariant(
+                journalpostInDokarkiv.dokumenter.find { it.dokumentInfoId == dokumentInfoId }
+            )
+        )
     }
 
     fun changeTitleInPDF(documentBytes: ByteArray, title: String): ByteArray {
@@ -279,6 +302,11 @@ class DokumentService(
     }
 
     fun getMergedDocument(id: UUID) = mergedDocumentRepository.getReferenceById(id)
+
+    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
+        dokumentInfo?.dokumentvarianter?.any { dv ->
+            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
+        } == true
 }
 
 class DokumentMapper {

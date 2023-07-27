@@ -47,6 +47,7 @@ data class BehandlingDetaljerView(
     val feilregistrering: FeilregistreringView? = null,
     val fagsystemId: String,
     val rol: ROLView?,
+    val relevantDocumentIdList: Set<String>,
 ) {
 
     data class ROLView(
