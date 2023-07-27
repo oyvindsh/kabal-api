@@ -8,7 +8,13 @@ data class DokumenterResponse(
     val dokumenter: List<DokumentReferanse>,
     val pageReference: String? = null,
     val antall: Int,
-    val totaltAntall: Int
+    val totaltAntall: Int,
+    val sakList: List<DokumentReferanse.Sak>,
+    val avsenderMottakerList: List<DokumentReferanse.AvsenderMottaker>,
+    val temaIdList: List<String>,
+    val journalposttypeList: List<DokumentReferanse.Journalposttype>,
+    val fromDate: LocalDate?,
+    val toDate: LocalDate?,
 )
 
 data class DokumentReferanse(
@@ -190,6 +196,7 @@ data class JournalfoertDokumentMetadata(
     val journalpostId: String,
     val dokumentInfoId: String,
     val title: String,
+    val harTilgangTilArkivvariant: Boolean,
 )
 
 data class DokumentUnderArbeidMetadata(

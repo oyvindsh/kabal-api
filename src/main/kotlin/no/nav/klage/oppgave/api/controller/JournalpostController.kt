@@ -119,13 +119,9 @@ class JournalpostController(
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             logger = logger,
         )
-        return JournalfoertDokumentMetadata(
+        return dokumentService.getJournalfoertDokumentMetadata(
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId,
-            title = dokumentService.getDocumentTitle(
-                journalpostId = journalpostId,
-                dokumentInfoId = dokumentInfoId
-            )
         )
     }
 

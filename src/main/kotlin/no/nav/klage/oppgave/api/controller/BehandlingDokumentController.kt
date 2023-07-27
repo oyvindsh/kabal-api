@@ -55,18 +55,6 @@ class BehandlingDokumentController(
         )
     }
 
-    @Operation(
-        summary = "Henter metadata om dokumenter knyttet til en behandling",
-        description = "Henter metadata om dokumenter knyttet til en behandling. Berikes med data fra SAF."
-    )
-    @GetMapping("/{id}/dokumenttilknytninger", produces = ["application/json"])
-    fun fetchConnectedDokumenter(
-        @Parameter(description = "Id til behandlingen i vårt system")
-        @PathVariable("id") behandlingId: UUID
-    ): DokumenterResponse {
-        return behandlingService.fetchJournalposterConnectedToBehandling(behandlingId)
-    }
-
     @PostMapping("/{id}/dokumenttilknytninger")
     fun setTilknyttetDokument(
         @PathVariable("id") behandlingId: UUID,
