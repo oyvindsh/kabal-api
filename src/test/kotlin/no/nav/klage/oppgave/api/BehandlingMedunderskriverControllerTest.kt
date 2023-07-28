@@ -94,8 +94,7 @@ class BehandlingMedunderskriverControllerTest {
                 any(),
                 any()
             )
-        } returns klagebehandling as Behandling
-        every { behandlingMapper.mapToMedunderskriverWrapped(klagebehandling as Behandling) } returns MedunderskriverWrapped(
+        } returns MedunderskriverWrapped(
             modified = klagebehandling.modified,
             medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
             medunderskriver = SaksbehandlerView(

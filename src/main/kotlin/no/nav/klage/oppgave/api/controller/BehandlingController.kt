@@ -11,10 +11,8 @@ import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.domain.klage.SattPaaVent
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
-import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -22,7 +20,6 @@ import no.nav.klage.oppgave.util.logMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
-import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -33,7 +30,6 @@ class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val saksbehandlerService: SaksbehandlerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -44,7 +40,7 @@ class BehandlingController(
     fun setSattPaaVent(
         @Parameter(description = "Id til en behandling")
         @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: SattPaaVentInput?
+        @RequestBody input: SattPaaVentInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setSattPaaVent.name,
@@ -53,25 +49,10 @@ class BehandlingController(
             logger
         )
 
-        val sattPaaVent = if (input == null) {
-            SattPaaVent(
-                from = LocalDate.now(),
-                to = LocalDate.now().plusWeeks(4),
-                reason = "Satt på vent"
-
-            )
-        } else {
-            SattPaaVent(
-                from = LocalDate.now(),
-                to = input.to,
-                reason = input.reason
-            )
-        }
-
         val modified = behandlingService.setSattPaaVent(
             behandlingId = behandlingId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-            sattPaaVent = sattPaaVent,
+            input = input,
         )
         return BehandlingEditedView(modified = modified)
     }
@@ -90,7 +71,7 @@ class BehandlingController(
         val modified = behandlingService.setSattPaaVent(
             behandlingId = behandlingId,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
-            sattPaaVent = null
+            input = null
         )
         return BehandlingEditedView(modified = modified)
     }
@@ -234,11 +215,7 @@ class BehandlingController(
             logger
         )
 
-        behandlingService.validateBehandlingBeforeFinalize(
-            behandlingService.getBehandling(
-                behandlingId
-            )
-        )
+        behandlingService.validateBehandlingBeforeFinalize(behandlingId)
         return ValidationPassedResponse()
     }
 
@@ -396,23 +373,10 @@ class BehandlingController(
             logger
         )
 
-        val modifiedBehandling = behandlingService.feilregistrer(
+        return behandlingService.feilregistrer(
             behandlingId = behandlingId,
             reason = input.reason,
             fagsystem = Fagsystem.KABAL,
-        )
-
-        return FeilregistreringResponse(
-            feilregistrering = BehandlingDetaljerView.FeilregistreringView(
-                feilregistrertAv = SaksbehandlerView(
-                    navIdent = modifiedBehandling.feilregistrering!!.navIdent,
-                    navn = saksbehandlerService.getNameForIdent(modifiedBehandling.feilregistrering!!.navIdent)
-                ),
-                registered = modifiedBehandling.feilregistrering!!.registered,
-                reason = modifiedBehandling.feilregistrering!!.reason,
-                fagsystemId = modifiedBehandling.feilregistrering!!.fagsystem.id
-            ),
-            modified = modifiedBehandling.modified,
         )
     }
 
@@ -420,41 +384,43 @@ class BehandlingController(
     fun setUtfall(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: VedtakUtfallInput
-    ): VedtakEditedView {
+    ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setUtfall.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
-        return VedtakEditedView(
-            behandlingService.setUtfall(
-                behandlingId = behandlingId,
-                utfall = input.utfallId?.let { Utfall.of(it) } ?: input.utfall?.let { Utfall.of(it) },
-                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            ).modified
-        )
+
+        val modified = behandlingService.setUtfall(
+            behandlingId = behandlingId,
+            utfall = input.utfallId?.let { Utfall.of(it) } ?: input.utfall?.let { Utfall.of(it) },
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).modified
+
+        return BehandlingEditedView(modified = modified)
     }
 
     @PutMapping("/{behandlingId}/resultat/hjemler")
     fun setRegistreringshjemler(
         @PathVariable("behandlingId") behandlingId: UUID,
         @RequestBody input: VedtakHjemlerInput
-    ): VedtakEditedView {
+    ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setRegistreringshjemler.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
-        return VedtakEditedView(
-            behandlingService.setRegistreringshjemler(
-                behandlingId = behandlingId,
-                registreringshjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
-                    ?: input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
-                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            ).modified
-        )
+
+        val modified = behandlingService.setRegistreringshjemler(
+            behandlingId = behandlingId,
+            registreringshjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
+                ?: input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).modified
+
+        return BehandlingEditedView(modified = modified)
     }
 
     @PutMapping("/{behandlingId}/rolident")
@@ -468,13 +434,14 @@ class BehandlingController(
             behandlingId,
             logger
         )
-        return BehandlingEditedView(
-            behandlingService.setROLIdent(
-                behandlingId = behandlingId,
-                rolIdent = input.navIdent,
-                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            ).modified
-        )
+
+        val modified = behandlingService.setROLIdent(
+            behandlingId = behandlingId,
+            rolIdent = input.navIdent,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).modified
+
+        return BehandlingEditedView(modified = modified)
     }
 
     @PutMapping("/{behandlingId}/rolstateid")
@@ -488,12 +455,13 @@ class BehandlingController(
             behandlingId,
             logger
         )
-        return BehandlingEditedView(
-            behandlingService.setROLState(
-                behandlingId = behandlingId,
-                rolState = if (input.id != null) ROLState.of(input.id) else null,
-                utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-            ).modified
-        )
+
+        val modified = behandlingService.setROLState(
+            behandlingId = behandlingId,
+            rolState = if (input.id != null) ROLState.of(input.id) else null,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).modified
+
+        return BehandlingEditedView(modified = modified)
     }
 }
