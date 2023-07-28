@@ -315,7 +315,7 @@ class BehandlingServiceTest {
 
     @Test
     fun `Forsøk på ferdigstilling av behandling som allerede er avsluttet av saksbehandler skal ikke lykkes`() {
-        val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
+        val behandling = simpleInsert(fullfoert = true)
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
         every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
         every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
@@ -365,7 +365,7 @@ class BehandlingServiceTest {
 
         @Test
         fun `Forsøk på avslutting av behandling som ikke har utfall skal ikke lykkes`() {
-            val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = false)
+            val behandling = simpleInsert(fullfoert = false, utfall = false)
             every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
             every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
 
@@ -377,7 +377,7 @@ class BehandlingServiceTest {
         @Test
         fun `Forsøk på avslutting av behandling som ikke har hjemler skal ikke lykkes`() {
             val behandling =
-                simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = true, hjemler = false)
+                simpleInsert(fullfoert = false, utfall = true, hjemler = false)
             every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
             every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
 
@@ -389,7 +389,6 @@ class BehandlingServiceTest {
         @Test
         fun `Forsøk på avslutting av behandling som er trukket og som ikke har hjemler skal lykkes`() {
             val behandling = simpleInsert(
-                dokumentEnhetId = true,
                 fullfoert = false,
                 utfall = true,
                 hjemler = false,
@@ -403,7 +402,6 @@ class BehandlingServiceTest {
     }
 
     private fun simpleInsert(
-        dokumentEnhetId: Boolean = false,
         fullfoert: Boolean = false,
         utfall: Boolean = true,
         hjemler: Boolean = true,

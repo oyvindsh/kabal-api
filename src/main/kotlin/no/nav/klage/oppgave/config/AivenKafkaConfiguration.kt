@@ -82,6 +82,7 @@ class AivenKafkaConfiguration(
         factory.consumerFactory = egenAnsattConsumerFactory()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
         factory.containerProperties.idleEventInterval = 3000L
+        //TODO: Finn en bedre håndtering.
         factory.setErrorHandler { thrownException, data ->
             logger.error("Could not deserialize record. See secure logs for details.")
             secureLogger.error("Could not deserialize record: $data", thrownException)
