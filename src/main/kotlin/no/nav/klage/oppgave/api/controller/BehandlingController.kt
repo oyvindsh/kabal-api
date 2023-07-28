@@ -28,7 +28,7 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping(value = ["/klagebehandlinger", "/behandlinger"])
+@RequestMapping("/behandlinger")
 class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
