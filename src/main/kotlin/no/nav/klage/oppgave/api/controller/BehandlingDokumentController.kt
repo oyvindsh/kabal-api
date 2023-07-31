@@ -1,7 +1,5 @@
 package no.nav.klage.oppgave.api.controller
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -22,7 +20,7 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping(value = ["/klagebehandlinger", "/behandlinger"])
+@RequestMapping("/behandlinger")
 class BehandlingDokumentController(
     private val behandlingService: BehandlingService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
@@ -32,8 +30,6 @@ class BehandlingDokumentController(
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-
-        val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     }
 
     @Operation(

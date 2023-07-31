@@ -5,7 +5,8 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.api.view.DokumenterResponse
+import no.nav.klage.oppgave.api.mapper.BehandlingMapper
+import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Medunderskrivere
@@ -63,6 +64,8 @@ class BehandlingService(
     private val fssProxyClient: KlageFssProxyClient,
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val eregClient: EregClient,
+    private val saksbehandlerService: SaksbehandlerService,
+    private val behandlingMapper: BehandlingMapper
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -81,7 +84,7 @@ class BehandlingService(
         if (behandling.avsluttetAvSaksbehandler != null) throw BehandlingFinalizedException("Behandlingen er avsluttet")
 
         //Forretningsmessige krav før vedtak kan ferdigstilles
-        validateBehandlingBeforeFinalize(behandling)
+        validateBehandlingBeforeFinalize(behandlingId)
 
         //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
         return markerBehandlingSomAvsluttetAvSaksbehandler(behandling, innloggetIdent)
@@ -96,7 +99,8 @@ class BehandlingService(
         return behandling
     }
 
-    fun validateBehandlingBeforeFinalize(behandling: Behandling) {
+    fun validateBehandlingBeforeFinalize(behandlingId: UUID) {
+        val behandling = getBehandling(behandlingId)
         val dokumentValidationErrors = mutableListOf<InvalidProperty>()
         val behandlingValidationErrors = mutableListOf<InvalidProperty>()
         val sectionList = mutableListOf<ValidationSection>()
@@ -240,7 +244,7 @@ class BehandlingService(
         tildeltSaksbehandlerIdent: String?,
         enhetId: String?,
         utfoerendeSaksbehandlerIdent: String,
-    ): Behandling {
+    ): SaksbehandlerViewWrapped {
         val behandling = getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
         if (tildeltSaksbehandlerIdent != null) {
             //Denne sjekken gjøres kun når det er en tildeling:
@@ -280,10 +284,10 @@ class BehandlingService(
             setSattPaaVent(
                 behandlingId = behandlingId,
                 utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
-                sattPaaVent = null,
                 systemUserContext = saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(
                     utfoerendeSaksbehandlerIdent
                 ),
+                input = null,
             )
         }
 
@@ -294,15 +298,56 @@ class BehandlingService(
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
-        return behandling
+        return getSaksbehandlerViewWrapped(behandling)
+    }
+
+    fun getSaksbehandler(behandlingId: UUID): SaksbehandlerViewWrapped {
+        return getSaksbehandlerViewWrapped(getBehandling((behandlingId)))
+    }
+
+    private fun getSaksbehandlerViewWrapped(behandling: Behandling): SaksbehandlerViewWrapped {
+        return SaksbehandlerViewWrapped(
+            saksbehandler = getSaksbehandlerView(behandling),
+            modified = behandling.modified,
+        )
+    }
+
+    private fun getSaksbehandlerView(behandling: Behandling): SaksbehandlerView? {
+        val saksbehandlerView = if (behandling.tildeling?.saksbehandlerident == null) {
+            null
+        } else {
+            SaksbehandlerView(
+                navIdent = behandling.tildeling?.saksbehandlerident!!,
+                navn = saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!),
+            )
+        }
+        return saksbehandlerView
+    }
+
+    fun getMedunderskriver(behandlingId: UUID): MedunderskriverWrapped {
+        val behandling = getBehandling(behandlingId)
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
+    }
+
+    fun getMedunderskriverFlyt(behandlingId: UUID): MedunderskriverFlytView {
+        val behandling = getBehandling(behandlingId)
+        return behandlingMapper.mapToMedunderskriverFlytView(behandling)
     }
 
     fun setSattPaaVent(
         behandlingId: UUID,
         utfoerendeSaksbehandlerIdent: String,
-        sattPaaVent: SattPaaVent?,
-        systemUserContext: Boolean = false
+        systemUserContext: Boolean = false,
+        input: SattPaaVentInput?
     ): LocalDateTime {
+        val sattPaaVent = if (input != null) {
+            SattPaaVent(
+                from = LocalDate.now(),
+                to = input.to,
+                reason = input.reason
+            )
+        } else null
+
         val behandling = getBehandlingForUpdate(
             behandlingId = behandlingId,
             systemUserContext = systemUserContext
@@ -470,7 +515,7 @@ class BehandlingService(
         medunderskriverIdent: String?,
         utfoerendeSaksbehandlerIdent: String,
         medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT
-    ): Behandling {
+    ): MedunderskriverWrapped {
         val behandling =
             if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
                 getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
@@ -485,13 +530,13 @@ class BehandlingService(
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
-        return behandling
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
     fun switchMedunderskriverFlyt(
         behandlingId: UUID,
         utfoerendeSaksbehandlerIdent: String
-    ): Behandling {
+    ): MedunderskriverFlytResponse {
         val behandling = getBehandling(behandlingId)
 
         if (behandling.medunderskriver?.saksbehandlerident == null) {
@@ -518,7 +563,7 @@ class BehandlingService(
             }
         }
 
-        return behandling
+        return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
     }
 
     fun fetchDokumentlisteForBehandling(
@@ -766,7 +811,7 @@ class BehandlingService(
         return arbeidOgInntektClient.getAARegisterUrl(behandling.sakenGjelder.partId.value)
     }
 
-    fun feilregistrer(behandlingId: UUID, reason: String, fagsystem: Fagsystem): Behandling {
+    fun feilregistrer(behandlingId: UUID, reason: String, fagsystem: Fagsystem): FeilregistreringResponse {
         val navIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         val behandlingForCheck = getBehandling(behandlingId)
 
@@ -777,7 +822,20 @@ class BehandlingService(
                 getBehandlingForUpdate(behandlingId = behandlingId)
             }
 
-        return feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+        val modifiedBehandling = feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+
+        return FeilregistreringResponse(
+            feilregistrering = BehandlingDetaljerView.FeilregistreringView(
+                feilregistrertAv = SaksbehandlerView(
+                    navIdent = modifiedBehandling.feilregistrering!!.navIdent,
+                    navn = saksbehandlerService.getNameForIdent(modifiedBehandling.feilregistrering!!.navIdent)
+                ),
+                registered = modifiedBehandling.feilregistrering!!.registered,
+                reason = modifiedBehandling.feilregistrering!!.reason,
+                fagsystemId = modifiedBehandling.feilregistrering!!.fagsystem.id
+            ),
+            modified = modifiedBehandling.modified,
+        )
     }
 
     fun feilregistrer(
@@ -812,7 +870,12 @@ class BehandlingService(
             throw RuntimeException("Ended up with more than one candidate for feilregistrering. Kildereferanse: $kildereferanse")
         }
 
-        return feilregistrer(behandling = candidates.first(), navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+        return feilregistrer(
+            behandling = candidates.first(),
+            navIdent = navIdent,
+            reason = reason,
+            fagsystem = fagsystem
+        )
     }
 
     private fun feilregistrer(

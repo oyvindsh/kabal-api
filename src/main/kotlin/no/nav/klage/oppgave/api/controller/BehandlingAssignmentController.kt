@@ -4,11 +4,11 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
+import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -33,9 +33,14 @@ class BehandlingAssignmentController(
         @PathVariable("id") behandlingId: UUID,
         @RequestBody saksbehandlerInput: SaksbehandlerInput
     ): SaksbehandlerViewWrapped {
-        logger.debug("setSaksbehandler is requested for behandling: {}", behandlingId)
+        logBehandlingMethodDetails(
+            ::setSaksbehandler.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
 
-        val behandling = behandlingService.setSaksbehandler(
+        return behandlingService.setSaksbehandler(
             behandlingId = behandlingId,
             tildeltSaksbehandlerIdent = saksbehandlerInput.navIdent,
             enhetId = if (saksbehandlerInput.navIdent != null) saksbehandlerService.getEnhetForSaksbehandler(
@@ -43,7 +48,6 @@ class BehandlingAssignmentController(
             ).enhetId else null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return getSaksbehandlerViewWrapped(behandling = behandling)
     }
 
     @GetMapping("/behandlinger/{id}/saksbehandler")
@@ -51,29 +55,13 @@ class BehandlingAssignmentController(
         @Parameter(description = "Id til en behandling")
         @PathVariable("id") behandlingId: UUID,
     ): SaksbehandlerViewWrapped {
-        logger.debug("getSaksbehandler is requested for behandling: {}", behandlingId)
-
-        val behandling = behandlingService.getBehandling(behandlingId)
-
-        return getSaksbehandlerViewWrapped(behandling)
-    }
-
-    private fun getSaksbehandlerViewWrapped(behandling: Behandling): SaksbehandlerViewWrapped {
-        return SaksbehandlerViewWrapped(
-            saksbehandler = getSaksbehandlerView(behandling),
-            modified = behandling.modified,
+        logBehandlingMethodDetails(
+            ::getSaksbehandler.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
         )
-    }
 
-    private fun getSaksbehandlerView(behandling: Behandling): SaksbehandlerView? {
-        val saksbehandlerView = if (behandling.tildeling?.saksbehandlerident == null) {
-            null
-        } else {
-            SaksbehandlerView(
-                navIdent = behandling.tildeling?.saksbehandlerident!!,
-                navn = saksbehandlerService.getNameForIdent(behandling.tildeling?.saksbehandlerident!!),
-            )
-        }
-        return saksbehandlerView
+        return behandlingService.getSaksbehandler(behandlingId)
     }
 }

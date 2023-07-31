@@ -64,8 +64,8 @@ class CleanupAfterBehandlingEventListener(
                     behandlingService.setSattPaaVent(
                         behandlingId = behandling.id,
                         utfoerendeSaksbehandlerIdent = "SYSTEM",
-                        sattPaaVent = null,
                         systemUserContext = true,
+                        input = null,
                     )
                 } catch (e: Exception) {
                     logger.error("couldn't cleanup sattPaaVent", e)

@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.*
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
@@ -18,9 +17,8 @@ import java.util.*
 @RestController
 @Tag(name = "kabal-api")
 @ProtectedWithClaims(issuer = ISSUER_AAD)
-@RequestMapping(value = ["/klagebehandlinger", "/behandlinger"])
+@RequestMapping("/behandlinger")
 class BehandlingMedunderskriverController(
-    private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val behandlingService: BehandlingService,
 ) {
@@ -41,12 +39,11 @@ class BehandlingMedunderskriverController(
             behandlingId,
             logger
         )
-        val behandling = behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+        return behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
             behandlingId,
             input.navIdent,
             innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
     @Operation(
@@ -65,11 +62,10 @@ class BehandlingMedunderskriverController(
             logger
         )
 
-        val behandling = behandlingService.switchMedunderskriverFlyt(
+        return behandlingService.switchMedunderskriverFlyt(
             behandlingId,
             innloggetSaksbehandlerService.getInnloggetIdent()
         )
-        return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
     }
 
     @GetMapping("/{behandlingId}/medunderskriver")
@@ -82,8 +78,7 @@ class BehandlingMedunderskriverController(
             behandlingId,
             logger
         )
-        val behandling = behandlingService.getBehandling(behandlingId)
-        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
+        return behandlingService.getMedunderskriver(behandlingId)
     }
 
     //TODO remove when frontend is updated and using /medunderskriver
@@ -97,7 +92,6 @@ class BehandlingMedunderskriverController(
             behandlingId,
             logger
         )
-        val behandling = behandlingService.getBehandling(behandlingId)
-        return behandlingMapper.mapToMedunderskriverFlytView(behandling)
+        return behandlingService.getMedunderskriverFlyt(behandlingId)
     }
 }

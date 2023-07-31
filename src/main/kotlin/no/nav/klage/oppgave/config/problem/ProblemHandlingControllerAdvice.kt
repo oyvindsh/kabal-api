@@ -75,24 +75,6 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
-    fun handleKlagebehandlingSamtidigEndretException(
-        ex: KlagebehandlingSamtidigEndretException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.CONFLICT, ex)
-
-    @ExceptionHandler
-    fun handleOversendtKlageReceivedBeforeException(
-        ex: OversendtKlageReceivedBeforeException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.CONFLICT, ex)
-
-    @ExceptionHandler
-    fun handleOppgaveNotFound(ex: OppgaveNotFoundException, request: NativeWebRequest): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
-
-    @ExceptionHandler
     fun handleBehandlingNotFound(
         ex: BehandlingNotFoundException,
         request: NativeWebRequest
@@ -100,22 +82,8 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
-    fun handleVedtakNotFound(
-        ex: VedtakNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
-
-    @ExceptionHandler
     fun handleMeldingNotFound(
         ex: MeldingNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
-
-    @ExceptionHandler
-    fun handleSaksdokumentNotFound(
-        ex: SaksdokumentNotFoundException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.NOT_FOUND, ex)
@@ -130,20 +98,6 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     fun handleEREGOrganizationNotFoundException(
         ex: EREGOrganizationNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
-
-    @ExceptionHandler
-    fun handleEREGOrganizationCeasedException(
-        ex: EREGOrganizationCeasedException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.BAD_REQUEST, ex)
-
-    @ExceptionHandler
-    fun handleDocumentsToMergeReferenceNotFoundException(
-        ex: DocumentsToMergeReferenceNotFoundException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.NOT_FOUND, ex)
@@ -174,25 +128,6 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.FORBIDDEN, ex)
 
     @ExceptionHandler
-    fun handleNotMatchingUser(ex: NotMatchingUserException, request: NativeWebRequest): ProblemDetail =
-        create(HttpStatus.FORBIDDEN, ex)
-
-    @ExceptionHandler
-    fun handleFeatureNotEnabled(ex: FeatureNotEnabledException, request: NativeWebRequest): ProblemDetail =
-        create(HttpStatus.FORBIDDEN, ex)
-
-    @ExceptionHandler
-    fun handleNoSaksbehandlerRoleEnabled(
-        ex: NoSaksbehandlerRoleException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.FORBIDDEN, ex)
-
-    @ExceptionHandler
-    fun handleNotOwnEnhet(ex: NotOwnEnhetException, request: NativeWebRequest): ProblemDetail =
-        create(HttpStatus.FORBIDDEN, ex)
-
-    @ExceptionHandler
     fun handleResponseStatusException(
         ex: WebClientResponseException,
         request: NativeWebRequest
@@ -214,25 +149,11 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
         create(HttpStatus.BAD_REQUEST, ex)
 
     @ExceptionHandler
-    fun handleBehandlingManglerTildelingException(
-        ex: BehandlingManglerTildelingException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.BAD_REQUEST, ex)
-
-    @ExceptionHandler
     fun handleBehandlingFinalizedException(
         ex: BehandlingFinalizedException,
         request: NativeWebRequest
     ): ProblemDetail =
         create(HttpStatus.BAD_REQUEST, ex)
-
-    @ExceptionHandler
-    fun handleResultatDokumentNotFoundException(
-        ex: ResultatDokumentNotFoundException,
-        request: NativeWebRequest
-    ): ProblemDetail =
-        create(HttpStatus.NOT_FOUND, ex)
 
     @ExceptionHandler
     fun handleEnhetNotFoundForSaksbehandlerException(

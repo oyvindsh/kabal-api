@@ -8,6 +8,9 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
+import no.nav.klage.oppgave.api.mapper.BehandlingMapper
+import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
+import no.nav.klage.oppgave.api.view.MedunderskriverWrapped
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -104,14 +107,21 @@ class BehandlingServiceTest {
     @MockkBean
     lateinit var eregClient: EregClient
 
+    @MockkBean
+    lateinit var behandlingMapper: BehandlingMapper
+
     lateinit var behandlingService: BehandlingService
 
     private val SAKSBEHANDLER_IDENT = "SAKSBEHANDLER_IDENT"
     private val MEDUNDERSKRIVER_IDENT = "MEDUNDERSKRIVER_IDENT"
     private val DOKUMENTENHET_ID = UUID.randomUUID()
 
+    lateinit var behandlingId: UUID
+
     @BeforeEach
     fun setup() {
+        val behandling = simpleInsert()
+        behandlingId = behandling.id
         behandlingService = BehandlingService(
             behandlingRepository = behandlingRepository,
             tilgangService = tilgangService,
@@ -124,8 +134,28 @@ class BehandlingServiceTest {
             arbeidOgInntektClient = arbeidOgInntektClient,
             fssProxyClient = fssProxyClient,
             saksbehandlerRepository = saksbehandlerRepository,
-            eregClient = eregClient
+            eregClient = eregClient,
+            saksbehandlerService = saksbehandlerService,
+            behandlingMapper = behandlingMapper,
         )
+        every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
+        every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
+        every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
+        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
+        every { behandlingMapper.mapToMedunderskriverWrapped(any()) } returns MedunderskriverWrapped(
+            medunderskriver = null,
+            modified = LocalDateTime.now(),
+            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+        )
+        every { behandlingMapper.mapToMedunderskriverFlytResponse(any()) } returns MedunderskriverFlytResponse(
+            navn = null,
+            navIdent = null,
+            modified = LocalDateTime.now(),
+            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+        )
+        every { kakaApiGateway.getValidationErrors(any()) } returns emptyList()
+        every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
     }
 
     @Nested
@@ -133,8 +163,6 @@ class BehandlingServiceTest {
         @Test
         fun `getBehandlingForUpdate ok`() {
             val behandling = simpleInsert()
-
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
 
             assertThat(
                 behandlingService.getBehandlingForUpdate(
@@ -148,7 +176,6 @@ class BehandlingServiceTest {
         fun `getBehandlingForUpdate sjekker skrivetilgang, fanger riktig exception`() {
             val behandling = simpleInsert()
 
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
             every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) }.throws(
                 BehandlingAvsluttetException("")
             )
@@ -161,28 +188,22 @@ class BehandlingServiceTest {
     inner class SetMedunderskriverIdent {
         @Test
         fun `setMedunderskriverIdent kan sette medunderskriver til null`() {
-            val behandling = simpleInsert()
-            val behandlingId = behandling.id
-
-            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
-            every { tilgangService.verifyInnloggetSaksbehandlersTilgangTil(any()) } returns Unit
-            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
-
-
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT
             )
 
-            val result = behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
                 behandlingId,
                 null,
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.medunderskriver?.saksbehandlerident).isNull()
-            assertThat(result.medunderskriverHistorikk).hasSize(1)
+            val output = behandlingRepository.getReferenceById(behandlingId)
+
+            assertThat(output.medunderskriver?.saksbehandlerident).isNull()
+            assertThat(output.medunderskriverHistorikk).hasSize(1)
         }
     }
 
@@ -190,12 +211,6 @@ class BehandlingServiceTest {
     inner class SwitchMedunderskriverFlyt {
         @Test
         fun `switchMedunderskriverFlyt gir forventet feil når bruker er saksbehandler og medunderskriver ikke er satt`() {
-            val behandling = simpleInsert()
-            val behandlingId = behandling.id
-
-            every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
-            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-
             assertThrows<BehandlingManglerMedunderskriverException> {
                 behandlingService.switchMedunderskriverFlyt(
                     behandlingId,
@@ -206,37 +221,24 @@ class BehandlingServiceTest {
 
         @Test
         fun `switchMedunderskriverFlyt gir forventet status når bruker er saksbehandler og medunderskriver er satt`() {
-            val behandling = simpleInsert()
-            val behandlingId = behandling.id
-
-            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
-            every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
-            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
-
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT
             )
 
-            val result = behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlyt(
                 behandlingId,
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            val output = behandlingRepository.getReferenceById(behandlingId)
+            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
         fun `switchMedunderskriverFlyt gir forventet status når bruker er medunderskriver`() {
-            val behandling = simpleInsert()
-            val behandlingId = behandling.id
-
-            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
-            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
                 behandlingId,
@@ -245,24 +247,18 @@ class BehandlingServiceTest {
                 MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
             )
 
-            val result = behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlyt(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            val output = behandlingRepository.getReferenceById(behandlingId)
+
+            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
 
         @Test
         fun `flere kall til switchMedunderskriverFlyt fra saksbehandler er idempotent`() {
-            val behandling = simpleInsert()
-            val behandlingId = behandling.id
-
-            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
-            every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
-            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
-
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
@@ -274,23 +270,19 @@ class BehandlingServiceTest {
                 SAKSBEHANDLER_IDENT
             )
 
-            val result = behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlyt(
                 behandlingId,
                 SAKSBEHANDLER_IDENT
             )
 
-            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            val output = behandlingRepository.getReferenceById(behandlingId)
+
+            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
         }
 
         @Test
         fun `flere kall til switchMedunderskriverFlyt fra medunderskriver er idempotent`() {
-            val behandling = simpleInsert()
-            val behandlingId = behandling.id
-
-            every { saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(any()) } returns false
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
-            every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
-            every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
             behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
                 behandlingId,
@@ -304,20 +296,20 @@ class BehandlingServiceTest {
                 MEDUNDERSKRIVER_IDENT
             )
 
-            val result = behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlyt(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT
             )
 
-            assertThat(result.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            val output = behandlingRepository.getReferenceById(behandlingId)
+
+            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
         }
     }
 
     @Test
     fun `Forsøk på ferdigstilling av behandling som allerede er avsluttet av saksbehandler skal ikke lykkes`() {
-        val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = true)
-        every { innloggetSaksbehandlerService.getInnloggetIdent() } returns SAKSBEHANDLER_IDENT
-        every { tilgangService.harInnloggetSaksbehandlerTilgangTil(any()) } returns true
+        val behandling = simpleInsert(fullfoert = true)
         every { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(behandling) } returns Unit
 
         assertThrows<BehandlingFinalizedException> {
@@ -330,7 +322,6 @@ class BehandlingServiceTest {
 
     @Nested
     inner class ValidateBehandlingBeforeFinalize {
-
         @Test
         fun `Forsøk på avslutting av behandling som har uferdige dokumenter skal ikke lykkes`() {
             val behandling = simpleInsert()
@@ -356,54 +347,44 @@ class BehandlingServiceTest {
                         )
                     )
 
-            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
-
             assertThrows<SectionedValidationErrorWithDetailsException> {
-                behandlingService.validateBehandlingBeforeFinalize(behandling)
+                behandlingService.validateBehandlingBeforeFinalize(behandling.id)
             }
         }
 
         @Test
         fun `Forsøk på avslutting av behandling som ikke har utfall skal ikke lykkes`() {
-            val behandling = simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = false)
-            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
-            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+            val behandling = simpleInsert(fullfoert = false, utfall = false)
 
             assertThrows<SectionedValidationErrorWithDetailsException> {
-                behandlingService.validateBehandlingBeforeFinalize(behandling)
+                behandlingService.validateBehandlingBeforeFinalize(behandling.id)
             }
         }
 
         @Test
         fun `Forsøk på avslutting av behandling som ikke har hjemler skal ikke lykkes`() {
             val behandling =
-                simpleInsert(dokumentEnhetId = true, fullfoert = false, utfall = true, hjemler = false)
-            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
-            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
+                simpleInsert(fullfoert = false, utfall = true, hjemler = false)
 
             assertThrows<SectionedValidationErrorWithDetailsException> {
-                behandlingService.validateBehandlingBeforeFinalize(behandling)
+                behandlingService.validateBehandlingBeforeFinalize(behandling.id)
             }
         }
 
         @Test
         fun `Forsøk på avslutting av behandling som er trukket og som ikke har hjemler skal lykkes`() {
             val behandling = simpleInsert(
-                dokumentEnhetId = true,
                 fullfoert = false,
                 utfall = true,
                 hjemler = false,
                 trukket = true
             )
-            every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
-            every { kakaApiGateway.getValidationErrors(behandling) } returns emptyList()
 
-            behandlingService.validateBehandlingBeforeFinalize(behandling)
+            behandlingService.validateBehandlingBeforeFinalize(behandling.id)
         }
     }
 
     private fun simpleInsert(
-        dokumentEnhetId: Boolean = false,
         fullfoert: Boolean = false,
         utfall: Boolean = true,
         hjemler: Boolean = true,
