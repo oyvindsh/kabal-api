@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.view
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.PartIdType
-import no.nav.klage.kodeverk.hjemmel.LovKilde
 import no.nav.klage.oppgave.domain.klage.*
 
 
@@ -27,45 +26,6 @@ fun KildeFagsystem.mapFagsystem(): Fagsystem =
         KildeFagsystem.OMSORGSPENGER -> Fagsystem.OMSORGSPENGER
         KildeFagsystem.MANUELL -> Fagsystem.MANUELL
     }
-
-class HjemmelFraFoersteInstans private constructor(
-    @Schema(
-        required = false,
-        example = "9"
-    )
-    val kapittel: Int?,
-    @Schema(
-        required = false,
-        example = "1"
-    )
-    val paragraf: Int?,
-    @Schema(
-        required = true
-    )
-    val lov: Lov
-) {
-    constructor(lov: Lov, kapittel: Int, paragraf: Int) : this(kapittel, paragraf, lov)
-
-    override fun toString(): String {
-        if (kapittel != null && paragraf != null) {
-            return "$lov $kapittel-$paragraf"
-        } else if (kapittel != null) {
-            return "$lov $kapittel"
-        } else {
-            return "$lov"
-        }
-    }
-
-    enum class Lov {
-        FOLKETRYGDLOVEN, FORVALTNINGSLOVEN
-    }
-
-    fun Lov.toLovKilde(): LovKilde =
-        when (this) {
-            Lov.FOLKETRYGDLOVEN -> LovKilde.FOLKETRYGDLOVEN
-            Lov.FORVALTNINGSLOVEN -> LovKilde.FORVALTNINGSLOVEN
-        }
-}
 
 data class OversendtSakenGjelder(
     @Schema(

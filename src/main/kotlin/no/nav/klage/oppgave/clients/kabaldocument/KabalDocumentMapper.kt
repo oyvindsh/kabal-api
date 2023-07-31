@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -84,41 +83,15 @@ class KabalDocumentMapper(
         )
     }
 
-    fun mapBrevmottakertypeToBrevmottakerInput(
-        behandling: Behandling,
-        brevmottakertyper: Set<Brevmottakertype>,
-        dokumentType: DokumentType
-    ): List<BrevmottakerInput> {
-        val brevmottakerPartIds = mutableSetOf<PartId>()
-
-        if (dokumentType == DokumentType.NOTAT) {
-            brevmottakerPartIds.add(behandling.sakenGjelder.partId)
-        } else {
-            if (brevmottakertyper.contains(Brevmottakertype.PROSESSFULLMEKTIG)) {
-                brevmottakerPartIds.add(behandling.klager.prosessfullmektig!!.partId)
-            }
-
-            if (brevmottakertyper.contains(Brevmottakertype.KLAGER)) {
-                brevmottakerPartIds.add(behandling.klager.partId)
-            }
-
-            if (brevmottakertyper.contains(Brevmottakertype.SAKEN_GJELDER)) {
-                brevmottakerPartIds.add(behandling.sakenGjelder.partId)
-            }
-        }
-
-        return brevmottakerPartIds.map { mapPartIdToBrevmottakerInput(it) }
-    }
-
     fun mapBrevmottakerIdentToBrevmottakerInput(
         behandling: Behandling,
-        brevmottakerIdents: Set<String>,
+        brevmottakerIdents: Set<String>?,
         dokumentType: DokumentType
     ): List<BrevmottakerInput> {
         return if (dokumentType == DokumentType.NOTAT) {
             listOf(mapPartIdToBrevmottakerInput(behandling.sakenGjelder.partId))
         } else {
-            brevmottakerIdents.map {
+            brevmottakerIdents!!.map {
                 mapPartIdToBrevmottakerInput(getPartIdFromIdentifikator(it))
             }
         }

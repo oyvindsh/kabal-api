@@ -1,8 +1,6 @@
 package no.nav.klage.oppgave.domain.kodeverk
 
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.persistence.AttributeConverter
-import jakarta.persistence.Converter
 
 @Schema
 enum class SivilstandType(override val id: String, override val navn: String, override val beskrivelse: String) : Kode {
@@ -27,15 +25,4 @@ enum class SivilstandType(override val id: String, override val navn: String, ov
                 ?: throw IllegalArgumentException("No SivilstandType with $navn exists")
         }
     }
-}
-
-
-@Converter
-class SivilstandTypeConverter : AttributeConverter<SivilstandType, String?> {
-
-    override fun convertToDatabaseColumn(entity: SivilstandType?): String? =
-        entity?.id
-
-    override fun convertToEntityAttribute(id: String?): SivilstandType? =
-        id?.let { SivilstandType.of(it) }
 }

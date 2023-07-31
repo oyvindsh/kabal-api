@@ -45,7 +45,7 @@ class BehandlingAvslutningService(
         private val secureLogger = getSecureLogger()
         private val objectMapperBehandlingEvents = ObjectMapper().registerModule(JavaTimeModule()).configure(
             SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false
-        );
+        )
         const val SYSTEMBRUKER = "SYSTEMBRUKER" //TODO ??
     }
 

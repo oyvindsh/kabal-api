@@ -167,7 +167,7 @@ class AnkebehandlingService(
     }
 
     private fun createHjemmelSetFromMottak(hjemler: Set<MottakHjemmel>?): MutableSet<Hjemmel> =
-        if (hjemler == null || hjemler.isEmpty()) {
+        if (hjemler.isNullOrEmpty()) {
             mutableSetOf(Hjemmel.MANGLER)
         } else {
             hjemler.map { Hjemmel.of(it.hjemmelId) }.toMutableSet()

@@ -5,7 +5,6 @@ import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.oppgave.util.Image2PDF
 import no.nav.klage.oppgave.util.getLogger
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,7 +15,6 @@ class MellomlagerService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
-        private val standardMediaTypeInGCS = MediaType.valueOf("application/pdf")
     }
 
     fun uploadDocument(dokument: FysiskDokument): String {

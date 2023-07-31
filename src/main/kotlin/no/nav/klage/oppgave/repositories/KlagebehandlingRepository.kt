@@ -12,8 +12,6 @@ import java.util.*
 @Repository
 interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID>, KlagebehandlingRepositoryCustom {
 
-    fun findByYtelse(ytelse: Ytelse): List<Klagebehandling>
-
     fun findByMottakId(mottakId: UUID): Klagebehandling?
 
     fun findByIdAndAvsluttetIsNotNull(id: UUID): Klagebehandling?

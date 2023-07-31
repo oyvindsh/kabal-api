@@ -25,7 +25,7 @@ internal class EgenAnsattKafkaConsumerTest {
         every { recordMock.partition() } returns 2
         every { recordMock.topic() } returns "whatever"
 
-        val kafkaOppgaveConsumer = EgenAnsattKafkaConsumer(egenAnsattService, mockk())
+        val kafkaOppgaveConsumer = EgenAnsattKafkaConsumer(egenAnsattService)
 
         kafkaOppgaveConsumer.listen(recordMock)
 
@@ -45,7 +45,7 @@ internal class EgenAnsattKafkaConsumerTest {
         every { recordMock.partition() } returns 2
         every { recordMock.topic() } returns "whatever"
 
-        val kafkaOppgaveConsumer = EgenAnsattKafkaConsumer(egenAnsattService, mockk())
+        val kafkaOppgaveConsumer = EgenAnsattKafkaConsumer(egenAnsattService)
 
         kafkaOppgaveConsumer.listen(recordMock)
 
@@ -65,7 +65,7 @@ internal class EgenAnsattKafkaConsumerTest {
         every { recordMock.partition() } returns 2
         every { recordMock.topic() } returns "whatever"
 
-        val kafkaOppgaveConsumer = EgenAnsattKafkaConsumer(egenAnsattService, mockk())
+        val kafkaOppgaveConsumer = EgenAnsattKafkaConsumer(egenAnsattService)
 
         kafkaOppgaveConsumer.listen(recordMock)
 

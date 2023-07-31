@@ -12,7 +12,6 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJou
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
-import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -424,14 +423,12 @@ class DokumentUnderArbeidService(
         behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
         dokumentId: UUID,
         ident: String,
-        brevmottakertyper: Set<Brevmottakertype>?,
         brevmottakerIdents: Set<String>?,
     ): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val behandling = behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
 
         validateBeforeFerdig(
-            brevmottakertyper = brevmottakertyper,
             brevmottakerIdents = brevmottakerIdents,
             hovedDokument = hovedDokument,
             behandling = behandling,
@@ -442,7 +439,6 @@ class DokumentUnderArbeidService(
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident)
         hovedDokument.brevmottakerIdents = brevmottakerInputs(
             brevmottakerIdents = brevmottakerIdents,
-            brevmottakertyper = brevmottakertyper,
             behandling = behandling,
             hovedDokument = hovedDokument,
         ).map {
@@ -484,7 +480,6 @@ class DokumentUnderArbeidService(
     }
 
     private fun validateBeforeFerdig(
-        brevmottakertyper: Set<Brevmottakertype>?,
         brevmottakerIdents: Set<String>?,
         hovedDokument: DokumentUnderArbeid,
         behandling: Behandling,
@@ -497,7 +492,7 @@ class DokumentUnderArbeidService(
             )
         }
 
-        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakertyper.isNullOrEmpty() && brevmottakerIdents.isNullOrEmpty()) {
+        if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakerIdents.isNullOrEmpty()) {
             throw DokumentValidationException("Brevmottakere må være satt")
         }
 
@@ -509,7 +504,7 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
         }
 
-        val mottakere = brevmottakerInputs(brevmottakerIdents, behandling, hovedDokument, brevmottakertyper)
+        val mottakere = brevmottakerInputs(brevmottakerIdents, behandling, hovedDokument)
 
         val invalidProperties = mutableListOf<InvalidProperty>()
 
@@ -543,22 +538,13 @@ class DokumentUnderArbeidService(
         brevmottakerIdents: Set<String>?,
         behandling: Behandling,
         hovedDokument: DokumentUnderArbeid,
-        brevmottakertyper: Set<Brevmottakertype>?
     ): List<BrevmottakerInput> {
-        val mottakere = if (!brevmottakerIdents.isNullOrEmpty()) {
-            kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
-                behandling = behandling,
-                brevmottakerIdents = brevmottakerIdents,
-                dokumentType = hovedDokument.dokumentType!!
-            )
-        } else {
-            kabalDocumentMapper.mapBrevmottakertypeToBrevmottakerInput(
-                behandling = behandling,
-                brevmottakertyper = brevmottakertyper ?: emptySet(),
-                dokumentType = hovedDokument.dokumentType!!
-            )
-        }
-        return mottakere
+
+        return kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
+            behandling = behandling,
+            brevmottakerIdents = brevmottakerIdents,
+            dokumentType = hovedDokument.dokumentType!!
+        )
     }
 
     fun getFysiskDokument(

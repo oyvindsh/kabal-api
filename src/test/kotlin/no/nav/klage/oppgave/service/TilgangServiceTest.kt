@@ -36,11 +36,10 @@ class TilgangServiceTest {
 
     private val tilgangService =
         TilgangService(
-            pdlFacade,
-            egenAnsattService,
-            innloggetSaksbehandlerService,
-            saksbehandlerRepository,
-            saksbehandlerService
+            pdlFacade = pdlFacade,
+            egenAnsattService = egenAnsattService,
+            innloggetSaksbehandlerService = innloggetSaksbehandlerService,
+            saksbehandlerService = saksbehandlerService
         )
 
     @Test

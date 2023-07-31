@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import no.nav.klage.oppgave.config.PartitionFinder
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component
 @Component
 class EgenAnsattKafkaConsumer(
     private val egenAnsattService: EgenAnsattService,
-    private val egenAnsattFinder: PartitionFinder<String, String>
 ) {
 
     companion object {
