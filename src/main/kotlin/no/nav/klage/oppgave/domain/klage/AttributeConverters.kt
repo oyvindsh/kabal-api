@@ -7,16 +7,6 @@ import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 
 @Converter
-class BrevmottakertypeConverter : AttributeConverter<Brevmottakertype, String?> {
-
-    override fun convertToDatabaseColumn(entity: Brevmottakertype?): String? =
-        entity?.id
-
-    override fun convertToEntityAttribute(id: String?): Brevmottakertype? =
-        id?.let { Brevmottakertype.of(it) }
-}
-
-@Converter
 class DokumentTypeConverter : AttributeConverter<DokumentType, String?> {
 
     override fun convertToDatabaseColumn(entity: DokumentType?): String? =

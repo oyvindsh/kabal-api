@@ -95,10 +95,10 @@ class MicrosoftGraphClient(
 
         return data.flatMap {
             it.value ?: emptyList()
-        }.mapNotNull {
+        }.associate {
             secureLogger.debug("Display name: {}", it)
             it.onPremisesSamAccountName to it.displayName
-        }.toMap()
+        }
     }
 
     private fun getDisplayNames(navIdents: String): Mono<AzureSlimUserList> {
@@ -134,7 +134,7 @@ class MicrosoftGraphClient(
             .bodyToMono<AzureGroupMemberList>().block()?.value
             ?: throw RuntimeException("AzureAD data about group members nav idents could not be fetched")
         return azureGroupMember.map { secureLogger.debug("Group member {}", it); it }
-            .mapNotNull { it.onPremisesSamAccountName }
+            .map { it.onPremisesSamAccountName }
     }
 
     @Retryable

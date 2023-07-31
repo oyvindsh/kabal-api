@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service
 class PartSearchService(
     private val eregClient: EregClient,
     private val pdlFacade: PdlFacade,
-    private val behandlingService: BehandlingService,
     private val tilgangService: TilgangService,
     private val behandlingMapper: BehandlingMapper,
 ) {

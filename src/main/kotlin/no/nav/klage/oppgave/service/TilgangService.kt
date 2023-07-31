@@ -7,7 +7,6 @@ import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Klagebehandling
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
-import no.nav.klage.oppgave.repositories.SaksbehandlerRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
@@ -17,7 +16,6 @@ class TilgangService(
     private val pdlFacade: PdlFacade,
     private val egenAnsattService: EgenAnsattService,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
-    private val saksbehandlerRepository: SaksbehandlerRepository,
     private val saksbehandlerService: SaksbehandlerService,
 
     ) {

@@ -9,7 +9,6 @@ import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.*
 import no.nav.klage.dokument.domain.Event
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
-import no.nav.klage.kodeverk.Brevmottakertype
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.api.view.DokumentUnderArbeidMetadata
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
@@ -199,7 +198,6 @@ class DokumentUnderArbeidController(
                 behandlingId = behandlingId,
                 dokumentId = dokumentId,
                 ident = ident,
-                brevmottakertyper = input.brevmottakertypeIds?.map { Brevmottakertype.of(it) }?.toSet(),
                 brevmottakerIdents = input.brevmottakerIds,
             )
         )

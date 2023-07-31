@@ -677,8 +677,4 @@ class MottakService(
     }
 
     fun getMottak(mottakId: UUID): Mottak? = mottakRepository.getReferenceById(mottakId)
-
-    fun findMottakBySakenGjelder(sakenGjelder: String): List<Mottak> {
-        return mottakRepository.findBySakenGjelderOrKlager(sakenGjelder)
-    }
 }

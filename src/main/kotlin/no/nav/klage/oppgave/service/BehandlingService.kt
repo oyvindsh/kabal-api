@@ -748,28 +748,6 @@ class BehandlingService(
     }
 
     @Transactional(readOnly = true)
-    fun verifyWriteAccessForSmartEditorDocument(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String) {
-        val behandling = behandlingRepository.findById(behandlingId).get()
-        if (!(medunderskriverHasTheSmartEditorAccess(behandling, utfoerendeSaksbehandlerIdent) ||
-                    saksbehandlerHasTheSmartEditorAccess(behandling, utfoerendeSaksbehandlerIdent))
-        ) {
-            throw MissingTilgangException("Not assigned to write to document")
-        }
-    }
-
-    private fun saksbehandlerHasTheSmartEditorAccess(
-        behandling: Behandling,
-        utfoerendeSaksbehandlerIdent: String
-    ) = (behandling.medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER &&
-            behandling.tildeling?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
-
-    private fun medunderskriverHasTheSmartEditorAccess(
-        behandling: Behandling,
-        utfoerendeSaksbehandlerIdent: String
-    ) = (behandling.medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER &&
-            behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent)
-
-    @Transactional(readOnly = true)
     fun getBehandling(behandlingId: UUID): Behandling =
         behandlingRepository.findById(behandlingId)
             .orElseThrow { BehandlingNotFoundException("Behandling med id $behandlingId ikke funnet") }

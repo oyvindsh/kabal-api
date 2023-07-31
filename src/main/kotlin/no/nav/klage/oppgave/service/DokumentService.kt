@@ -9,7 +9,10 @@ import no.nav.klage.oppgave.api.view.DokumenterResponse
 import no.nav.klage.oppgave.api.view.JournalfoertDokumentMetadata
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.clients.saf.rest.SafRestClient
-import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.DocumentToMerge
+import no.nav.klage.oppgave.domain.klage.MergedDocument
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.MergedDocumentRepository
 import no.nav.klage.oppgave.util.getLogger
@@ -412,27 +415,6 @@ class DokumentMapper {
                     )
                 } else null,
             )
-        }
-    }
-
-    private fun getVedlegg(
-        journalpost: Journalpost,
-        klagebehandling: Klagebehandling
-    ): List<DokumentReferanse.VedleggReferanse> {
-        return if ((journalpost.dokumenter?.size ?: 0) > 1) {
-            journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
-                DokumentReferanse.VedleggReferanse(
-                    tittel = vedlegg.tittel,
-                    dokumentInfoId = vedlegg.dokumentInfoId,
-                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
-                    valgt = klagebehandling.saksdokumenter.containsDokument(
-                        journalpost.journalpostId,
-                        vedlegg.dokumentInfoId
-                    )
-                )
-            } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
-        } else {
-            emptyList()
         }
     }
 
