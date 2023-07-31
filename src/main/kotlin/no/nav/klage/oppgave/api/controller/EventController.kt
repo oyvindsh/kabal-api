@@ -3,9 +3,9 @@ package no.nav.klage.oppgave.api.controller
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.dokument.domain.Event
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
 import no.nav.klage.oppgave.config.SecurityConfiguration
+import no.nav.klage.oppgave.domain.kafka.Event
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.MediaType

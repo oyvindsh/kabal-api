@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.klage.dokument.domain.Event
+import no.nav.klage.oppgave.domain.kafka.Event
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.beans.factory.annotation.Value
