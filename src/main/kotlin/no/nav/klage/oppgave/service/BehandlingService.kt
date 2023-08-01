@@ -34,7 +34,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfallInVedtak
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfall
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtaksinstans
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -884,7 +884,7 @@ class BehandlingService(
             behandlingId
         )
         val event =
-            behandling.setUtfallInVedtak(utfall, utfoerendeSaksbehandlerIdent)
+            behandling.setUtfall(utfall, utfoerendeSaksbehandlerIdent)
         applicationEventPublisher.publishEvent(event)
         return behandling
     }

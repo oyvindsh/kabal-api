@@ -309,7 +309,7 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Behandling.setUtfallInVedtak(
+    fun Behandling.setUtfall(
         nyVerdi: Utfall?,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
