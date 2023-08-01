@@ -17,6 +17,7 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.listener.CommonLoggingErrorHandler
 import org.springframework.kafka.listener.ContainerProperties
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 import reactor.kafka.receiver.KafkaReceiver
@@ -24,6 +25,7 @@ import reactor.kafka.receiver.ReceiverOptions
 import reactor.kafka.receiver.internals.DefaultKafkaReceiver
 import java.time.Duration
 import java.util.*
+
 
 @Configuration
 class AivenKafkaConfiguration(
@@ -82,12 +84,7 @@ class AivenKafkaConfiguration(
         factory.consumerFactory = egenAnsattConsumerFactory()
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
         factory.containerProperties.idleEventInterval = 3000L
-        //TODO: Finn en bedre håndtering.
-        factory.setErrorHandler { thrownException, data ->
-            logger.error("Could not deserialize record. See secure logs for details.")
-            secureLogger.error("Could not deserialize record: $data", thrownException)
-        }
-
+        factory.setCommonErrorHandler(CommonLoggingErrorHandler())
         //Retry consumer/listener even if authorization fails at first
         factory.setContainerCustomizer { container ->
             container.containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(10L))

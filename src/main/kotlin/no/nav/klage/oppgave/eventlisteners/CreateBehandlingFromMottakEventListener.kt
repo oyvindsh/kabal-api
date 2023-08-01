@@ -37,12 +37,6 @@ class CreateBehandlingFromMottakEventListener(
             "Received MottakLagretEvent for mottak {} in CreateKlagebehandlingFromMottakEventListener",
             mottakLagretEvent.mottak.id
         )
-        val mottakId = mottakLagretEvent.mottak.id
-        //TODO
-//        if (behandlingRepository.findByMottakId(mottakId) != null) {
-//            logger.error("We already have a behandling for mottak ${mottakId}. This is not supposed to happen.")
-//            throw RuntimeException("We already have a behandling for mottak $mottakId")
-//        }
 
         return when (mottakLagretEvent.mottak.type) {
             Type.KLAGE -> klagebehandlingService.createKlagebehandlingFromMottak(mottakLagretEvent.mottak)
