@@ -8,20 +8,20 @@ val springRetryVersion = "2.0.2"
 val springMockkVersion = "4.0.2"
 val springDocVersion = "2.1.0"
 val testContainersVersion = "1.18.3"
-val shedlockVersion = "5.5.0"
+val shedlockVersion = "5.6.0"
 val archunitVersion = "1.0.1"
 val kotlinXmlBuilderVersion = "1.9.0"
 val logbackSyslog4jVersion = "1.0.0"
 val jacksonJsonschemaVersion = "1.0.39"
-val pdfboxVersion = "2.0.28"
+val pdfboxVersion = "2.0.29"
 val tikaVersion = "2.8.0"
-val verapdfVersion = "1.22.2"
-val klageKodeverkVersion = "1.5.5"
+val verapdfVersion = "1.24.1"
+val klageKodeverkVersion = "1.5.7"
 
 plugins {
     val kotlinVersion = "1.9.0"
-    id("org.springframework.boot") version "3.1.1"
-    id("io.spring.dependency-management") version "1.1.0"
+    id("org.springframework.boot") version "3.1.2"
+    id("io.spring.dependency-management") version "1.1.2"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
