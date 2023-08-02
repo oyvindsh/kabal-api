@@ -17,7 +17,7 @@ object AnkeITrygderettenbehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.SENDT_TIL_TRYGDERETTEN,
+                felt = Felt.SENDT_TIL_TRYGDERETTEN_TIDSPUNKT,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = nyVerdi.toString(),
                 behandlingId = this.id,
@@ -40,7 +40,7 @@ object AnkeITrygderettenbehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.KJENNELSE_MOTTATT,
+                felt = Felt.KJENNELSE_MOTTATT_TIDSPUNKT,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = nyVerdi.toString(),
                 behandlingId = this.id,

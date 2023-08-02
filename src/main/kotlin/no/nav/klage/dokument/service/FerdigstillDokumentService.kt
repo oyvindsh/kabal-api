@@ -1,10 +1,10 @@
 package no.nav.klage.dokument.service
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import no.nav.klage.dokument.domain.Event
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
+import no.nav.klage.oppgave.domain.kafka.Event
 import no.nav.klage.oppgave.service.KafkaInternalEventService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger

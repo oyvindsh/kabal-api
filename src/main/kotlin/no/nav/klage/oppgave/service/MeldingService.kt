@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.persistence.EntityNotFoundException
-import no.nav.klage.dokument.domain.Event
 import no.nav.klage.oppgave.api.mapper.MeldingMapper
+import no.nav.klage.oppgave.domain.kafka.Event
 import no.nav.klage.oppgave.domain.klage.Melding
 import no.nav.klage.oppgave.exceptions.MeldingNotFoundException
 import no.nav.klage.oppgave.exceptions.MissingTilgangException

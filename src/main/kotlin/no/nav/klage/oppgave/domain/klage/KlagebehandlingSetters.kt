@@ -18,7 +18,7 @@ object KlagebehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.DATO_MOTTATT_FOERSTEINSTANS,
+                felt = Felt.MOTTATT_FOERSTEINSTANS_DATO,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = nyVerdi.toString(),
                 behandlingId = this.id,

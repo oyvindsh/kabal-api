@@ -1,4 +1,4 @@
-package no.nav.klage.dokument.domain
+package no.nav.klage.oppgave.domain.kafka
 
 /**
  * SSE for subscribing clients

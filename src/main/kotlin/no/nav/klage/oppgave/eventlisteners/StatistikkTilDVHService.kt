@@ -66,8 +66,8 @@ class StatistikkTilDVHService(
             true
         } else behandlingEndretEvent.endringslogginnslag.any {
             it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
-                    || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
-                    || it.felt === Felt.KJENNELSE_MOTTATT
+                    || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
+                    || it.felt === Felt.KJENNELSE_MOTTATT_TIDSPUNKT
                     || it.felt === Felt.FEILREGISTRERING
         }
     }
@@ -85,31 +85,31 @@ class StatistikkTilDVHService(
             } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
-                it.felt === Felt.KJENNELSE_MOTTATT
+                it.felt === Felt.KJENNELSE_MOTTATT_TIDSPUNKT
                         && type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.MOTTATT_FRA_TR
 
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> BehandlingState.TILDELT_SAKSBEHANDLER
 
             endringslogginnslag.any {
-                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE
                         && utfall !in utfallToTrygderetten
             } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
-                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE_I_TRYGDERETTEN
                         && utfall in utfallToNewAnkebehandling
             } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
 
             endringslogginnslag.any {
-                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type != Type.ANKE
             } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
-                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE
                         && utfall in utfallToTrygderetten
             } -> BehandlingState.SENDT_TIL_TR
