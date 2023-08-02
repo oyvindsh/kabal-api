@@ -40,7 +40,7 @@ object BehandlingSetters {
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.TILDELT,
+            felt = Felt.TILDELT_TIDSPUNKT,
             fraVerdi = gammelVerdiTidspunkt?.format(DateTimeFormatter.ISO_LOCAL_DATE),
             tilVerdi = tidspunkt.format(DateTimeFormatter.ISO_LOCAL_DATE),
             tidspunkt = tidspunkt
@@ -54,7 +54,13 @@ object BehandlingSetters {
             tidspunkt = tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
-        endringslogg(saksbehandlerident, Felt.TILDELT_ENHET, gammelVerdiEnhet, nyVerdiEnhet, tidspunkt)
+        endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.TILDELT_ENHET,
+            fraVerdi = gammelVerdiEnhet,
+            tilVerdi = nyVerdiEnhet,
+            tidspunkt = tidspunkt
+        )
             ?.let { endringslogginnslag.add(it) }
 
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
@@ -79,7 +85,7 @@ object BehandlingSetters {
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.MEDUNDERSKRIVERFLYT,
+            felt = Felt.MEDUNDERSKRIVERFLYT_ID,
             fraVerdi = gammelVerdiMedunderskriverFlyt.id,
             tilVerdi = nyVerdiMedunderskriverFlyt.id,
             tidspunkt = tidspunkt
@@ -110,7 +116,7 @@ object BehandlingSetters {
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.MEDUNDERSKRIVERFLYT,
+            felt = Felt.MEDUNDERSKRIVERFLYT_ID,
             fraVerdi = gammelVerdiMedunderskriverFlyt.id,
             tilVerdi = nyMedunderskriverFlyt.id,
             tidspunkt = tidspunkt
@@ -133,7 +139,7 @@ object BehandlingSetters {
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.ROL_STATE,
+            felt = Felt.ROL_STATE_ID,
             fraVerdi = oldValue?.id,
             tilVerdi = rolState?.id,
             tidspunkt = now
@@ -199,7 +205,7 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.DATO_MOTTATT_KLAGEINSTANS,
+                felt = Felt.MOTTATT_KLAGEINSTANS_TIDSPUNKT,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = nyVerdi.toString(),
                 tidspunkt = tidspunkt
@@ -218,7 +224,7 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.FRIST,
+                felt = Felt.FRIST_DATO,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = nyVerdi.toString(),
                 tidspunkt = tidspunkt
@@ -237,9 +243,9 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.HJEMMEL,
-                fraVerdi = gammelVerdi.toString(),
-                tilVerdi = nyVerdi.toString(),
+                felt = Felt.INNSENDINGSHJEMLER_ID_LIST,
+                fraVerdi = gammelVerdi.joinToString { it.id },
+                tilVerdi = nyVerdi.joinToString { it.id },
                 tidspunkt = tidspunkt
             )
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
@@ -301,7 +307,7 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.REGISTRERINGSHJEMLER,
+                felt = Felt.REGISTRERINGSHJEMLER_ID_LIST,
                 fraVerdi = gammelVerdi.joinToString { it.id },
                 tilVerdi = nyVerdi.joinToString { it.id },
                 tidspunkt = tidspunkt
@@ -321,9 +327,9 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.UTFALL,
-                fraVerdi = gammelVerdi.toString(),
-                tilVerdi = nyVerdi.toString(),
+                felt = Felt.UTFALL_ID,
+                fraVerdi = gammelVerdi?.id,
+                tilVerdi = nyVerdi?.id,
                 tidspunkt = tidspunkt
             )
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
@@ -339,7 +345,7 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.AVSLUTTET_AV_SAKSBEHANDLER,
+                felt = Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = tidspunkt.toString(),
                 tidspunkt = tidspunkt
@@ -357,7 +363,7 @@ object BehandlingSetters {
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.AVSLUTTET,
+                felt = Felt.AVSLUTTET_TIDSPUNKT,
                 fraVerdi = gammelVerdi.toString(),
                 tilVerdi = tidspunkt.toString(),
                 tidspunkt = tidspunkt
@@ -377,7 +383,7 @@ object BehandlingSetters {
                 saksbehandlerident = saksbehandlerident,
                 felt = Felt.SAKSDOKUMENT,
                 fraVerdi = null,
-                tilVerdi = saksdokument.dokumentInfoId,
+                tilVerdi = saksdokument.toString(),
                 behandlingId = id,
                 tidspunkt = tidspunkt
             )
@@ -396,7 +402,7 @@ object BehandlingSetters {
         val endringslogg = Endringslogginnslag.endringslogg(
             saksbehandlerident = saksbehandlerident,
             felt = Felt.SAKSDOKUMENT,
-            fraVerdi = saksdokument.dokumentInfoId,
+            fraVerdi = saksdokument.toString(),
             tilVerdi = null,
             behandlingId = id,
             tidspunkt = tidspunkt
