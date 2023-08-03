@@ -44,187 +44,62 @@ class TilgangServiceTest {
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet`() {
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = UUID.randomUUID(),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-            avsluttet = LocalDateTime.now(),
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            kakaKvalitetsvurderingVersion = 2,
-        )
+        val klagebehandling = getKlagebehandling()
+        klagebehandling.avsluttet = LocalDateTime.now()
 
         assertThrows<BehandlingAvsluttetException> {
             tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(
-                klage
+                klagebehandling
             )
         }
     }
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved avsluttet av saksbehandler`() {
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = UUID.randomUUID(),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-            avsluttetAvSaksbehandler = LocalDateTime.now(),
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            kakaKvalitetsvurderingVersion = 2,
-        )
+        val klagebehandling = getKlagebehandling()
+        klagebehandling.avsluttetAvSaksbehandler = LocalDateTime.now()
 
         assertThrows<BehandlingAvsluttetException> {
             tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(
-                klage
+                klagebehandling
             )
         }
     }
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil ved annen tildelt saksbehandler`() {
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = UUID.randomUUID(),
-            tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now()),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            kakaKvalitetsvurderingVersion = 2,
-        )
+        val klagebehandling = getKlagebehandling()
+        klagebehandling.tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now())
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z654321")
 
-        assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }
+        assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) }
     }
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir feil når ingen har tildelt`() {
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = UUID.randomUUID(),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            kakaKvalitetsvurderingVersion = 2,
-        )
+        val klagebehandling = getKlagebehandling()
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z654321")
 
-        assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage) }
+        assertThrows<MissingTilgangException> { tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling) }
     }
 
     @Test
     fun `verifySaksbehandlersSkrivetilgang gir ok ved samme ident`() {
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = UUID.randomUUID(),
-            tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now()),
-            avsenderEnhetFoersteinstans = "4100",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            kakaKvalitetsvurderingVersion = 2,
-        )
+        val klagebehandling = getKlagebehandling()
+        klagebehandling.tildeling = Tildeling(saksbehandlerident = "Z123456", enhet = "", tidspunkt = LocalDateTime.now())
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() }.returns("Z123456")
 
-        assertThat(tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klage)).isEqualTo(Unit)
+        assertThat(tilgangService.verifyInnloggetSaksbehandlersSkrivetilgang(klagebehandling)).isEqualTo(Unit)
     }
 
     @Test
     fun `harSaksbehandlerTilgangTil gir false på fortrolig`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
+            getPerson().copy(
+                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG
             )
         )
 
@@ -238,18 +113,8 @@ class TilgangServiceTest {
     @Test
     fun `harSaksbehandlerTilgangTil gir false på strengt fortrolig`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = Beskyttelsesbehov.STRENGT_FORTROLIG,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
+            getPerson().copy(
+                beskyttelsesbehov = Beskyttelsesbehov.STRENGT_FORTROLIG
             )
         )
 
@@ -262,19 +127,7 @@ class TilgangServiceTest {
     @Test
     fun `harSaksbehandlerTilgangTil gir false på egen ansatt`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = null,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
-            )
+            getPerson()
         )
 
         every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(false)
@@ -286,19 +139,7 @@ class TilgangServiceTest {
     @Test
     fun `harSaksbehandlerTilgangTil gir true på egen ansatt når saksbehandler har egenAnsatt rettigheter`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = null,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
-            )
+            getPerson()
         )
 
         every { innloggetSaksbehandlerService.kanBehandleEgenAnsatt() }.returns(true)
@@ -310,18 +151,8 @@ class TilgangServiceTest {
     @Test
     fun `harSaksbehandlerTilgangTil gir true på fortrolig når saksbehandler har fortrolig rettigheter`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
+            getPerson().copy(
+                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG
             )
         )
 
@@ -336,18 +167,8 @@ class TilgangServiceTest {
     @Test
     fun `harSaksbehandlerTilgangTil gir false på fortrolig når saksbehandler har strengt fortrolig rettigheter`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
+            getPerson().copy(
+                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG
             )
         )
 
@@ -362,18 +183,8 @@ class TilgangServiceTest {
     @Test
     fun `harSaksbehandlerTilgangTil gir true på fortrolig kombinert med egen ansatt når saksbehandler har fortrolig rettigheter men ikke egen ansatt`() {
         every { pdlFacade.getPersonInfo(any()) }.returns(
-            Person(
-                foedselsnr = "",
-                fornavn = "",
-                mellomnavn = "",
-                etternavn = "",
-                sammensattNavn = "",
-                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG,
-                kjoenn = "",
-                sivilstand = null,
-                vergemaalEllerFremtidsfullmakt = false,
-                doed = null,
-                fullmakt = false,
+            getPerson().copy(
+                beskyttelsesbehov = Beskyttelsesbehov.FORTROLIG
             )
         )
 
@@ -385,3 +196,43 @@ class TilgangServiceTest {
         assertThat(tilgangService.harInnloggetSaksbehandlerTilgangTil("")).isEqualTo(true)
     }
 }
+
+
+fun getKlagebehandling(): Klagebehandling = Klagebehandling(
+    klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+    sakenGjelder = SakenGjelder(
+        partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+        skalMottaKopi = false
+    ),
+    ytelse = Ytelse.OMS_OMP,
+    type = Type.KLAGE,
+    frist = LocalDate.now(),
+    hjemler = mutableSetOf(
+        Hjemmel.FTRL_8_7
+    ),
+    created = LocalDateTime.now(),
+    modified = LocalDateTime.now(),
+    mottattKlageinstans = LocalDateTime.now(),
+    fagsystem = Fagsystem.K9,
+    fagsakId = "123",
+    kildeReferanse = "abc",
+    mottakId = UUID.randomUUID(),
+    avsenderEnhetFoersteinstans = "4100",
+    mottattVedtaksinstans = LocalDate.now(),
+    kakaKvalitetsvurderingId = UUID.randomUUID(),
+    kakaKvalitetsvurderingVersion = 2,
+)
+
+fun getPerson(): Person = Person(
+    foedselsnr = "",
+    fornavn = "",
+    mellomnavn = "",
+    etternavn = "",
+    sammensattNavn = "",
+    beskyttelsesbehov = null,
+    kjoenn = "",
+    sivilstand = null,
+    vergemaalEllerFremtidsfullmakt = false,
+    doed = null,
+    fullmakt = false,
+)

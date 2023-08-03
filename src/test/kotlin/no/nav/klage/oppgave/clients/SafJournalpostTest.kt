@@ -133,24 +133,6 @@ internal class SafJournalpostTest {
     """
 
     @Language("json")
-    fun journalpostIkkeFunnetResponse() = """
-    {
-      "errors": [
-        {
-          "message": "Journalpost med journalpostId=189898989891 ikke funnet.",
-          "locations": [],
-          "extensions": {
-            "classification": "DataFetchingException"
-          }
-        }
-      ],
-      "data": {
-        "journalpost": null
-      }
-    }
-    """
-
-    @Language("json")
     fun journalpostValidationErrorResponse() = """
     {
       "errors": [

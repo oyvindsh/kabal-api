@@ -47,44 +47,10 @@ class BehandlingRepositoryTest {
     @Test
     fun `store Klagebehandling works`() {
 
-        val mottak = Mottak(
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            kildeReferanse = "1234234",
-            sakMottattKaDato = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
-        )
-
+        val mottak = getMottak()
         mottakRepository.save(mottak)
 
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = mottak.id,
-            avsenderEnhetFoersteinstans = "0101",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingVersion = 2,
-            kakaKvalitetsvurderingId = UUID.randomUUID()
-        )
+        val klage = getKlagebehandling(mottak.id)
 
         behandlingRepository.save(klage)
 
@@ -97,232 +63,53 @@ class BehandlingRepositoryTest {
     @Test
     fun `store Klagebehandling with feilregistrering works`() {
 
-        val mottak = Mottak(
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            kildeReferanse = "1234234",
-            sakMottattKaDato = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
-        )
-
+        val mottak = getMottak()
         mottakRepository.save(mottak)
 
-        val klage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
+        val klagebehandling = getKlagebehandling(mottak.id)
+
+        klagebehandling.feilregistrering = Feilregistrering(
+            navIdent = "navIdent",
+            registered = LocalDateTime.now(),
+            reason = "reason",
             fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = mottak.id,
-            avsenderEnhetFoersteinstans = "0101",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingVersion = 2,
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            feilregistrering = Feilregistrering(
-                navIdent = "navIdent",
-                registered = LocalDateTime.now(),
-                reason = "reason",
-                fagsystem = Fagsystem.K9,
-            )
         )
 
-        behandlingRepository.save(klage)
+        behandlingRepository.save(klagebehandling)
 
         testEntityManager.flush()
         testEntityManager.clear()
 
         assertThat(
-            behandlingRepository.findById(klage.id).get().feilregistrering!!.navIdent
-        ).isEqualTo(klage.feilregistrering!!.navIdent)
+            behandlingRepository.findById(klagebehandling.id).get().feilregistrering!!.navIdent
+        ).isEqualTo(klagebehandling.feilregistrering!!.navIdent)
     }
 
     @Test
     fun `enhet based query works`() {
 
-        val mottak1 = Mottak(
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            kildeReferanse = "1234234",
-            sakMottattKaDato = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+        val mottak1 = getMottak()
+        val mottak2 = getMottak()
+        val mottak3 = getMottak()
+        val mottak4 = getMottak()
+        mottakRepository.saveAll(listOf(mottak1, mottak2, mottak3, mottak4))
+
+        val klageTildeltEnhet1 = getKlagebehandling(mottak1.id)
+        klageTildeltEnhet1.tildeling = Tildeling(
+            saksbehandlerident = "1", enhet = ENHET_1, tidspunkt = LocalDateTime.now()
         )
 
-        mottakRepository.save(mottak1)
-
-        val klageTildeltEnhet1 = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = mottak1.id,
-            avsenderEnhetFoersteinstans = "0101",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingVersion = 2,
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            tildeling = Tildeling(
-                saksbehandlerident = "1", enhet = ENHET_1, tidspunkt = LocalDateTime.now()
-
-            )
+        val klageTildeltEnhet2 = getKlagebehandling(mottak2.id)
+        klageTildeltEnhet2.tildeling = Tildeling(
+            saksbehandlerident = "1", enhet = ENHET_2, tidspunkt = LocalDateTime.now()
         )
 
-        val mottak2 = Mottak(
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            kildeReferanse = "1234234",
-            sakMottattKaDato = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+        val klageUtenTildeling = getKlagebehandling(mottak3.id)
+        val fullfoertKlage = getKlagebehandling(mottak4.id)
+        fullfoertKlage.tildeling = Tildeling(
+            saksbehandlerident = "1", enhet = ENHET_1, tidspunkt = LocalDateTime.now()
         )
-
-        mottakRepository.save(mottak2)
-
-        val klageTildeltEnhet2 = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = mottak2.id,
-            avsenderEnhetFoersteinstans = "0101",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingVersion = 2,
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            tildeling = Tildeling(
-                saksbehandlerident = "1", enhet = ENHET_2, tidspunkt = LocalDateTime.now()
-
-            )
-        )
-
-        val mottak3 = Mottak(
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            kildeReferanse = "1234234",
-            sakMottattKaDato = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
-        )
-
-        mottakRepository.save(mottak3)
-
-        val klageUtenTildeling = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = mottak3.id,
-            avsenderEnhetFoersteinstans = "0101",
-            mottattVedtaksinstans = LocalDate.now(),
-            kakaKvalitetsvurderingVersion = 2,
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-        )
-
-        val mottak4 = Mottak(
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            kildeReferanse = "1234234",
-            sakMottattKaDato = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            forrigeBehandlendeEnhet = "0101",
-            brukersHenvendelseMottattNavDato = LocalDate.now()
-        )
-
-        mottakRepository.save(mottak4)
-
-        val fullfoertKlage = Klagebehandling(
-            klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
-            sakenGjelder = SakenGjelder(
-                partId = PartId(type = PartIdType.PERSON, value = "23452354"),
-                skalMottaKopi = false
-            ),
-            ytelse = Ytelse.OMS_OMP,
-            type = Type.KLAGE,
-            frist = LocalDate.now(),
-            hjemler = mutableSetOf(
-                Hjemmel.FTRL_8_7
-            ),
-            created = LocalDateTime.now(),
-            modified = LocalDateTime.now(),
-            mottattKlageinstans = LocalDateTime.now(),
-            fagsystem = Fagsystem.K9,
-            fagsakId = "123",
-            kildeReferanse = "abc",
-            mottakId = mottak4.id,
-            avsenderEnhetFoersteinstans = "0101",
-            mottattVedtaksinstans = LocalDate.now(),
-            avsluttetAvSaksbehandler = LocalDateTime.now(),
-            kakaKvalitetsvurderingVersion = 2,
-            kakaKvalitetsvurderingId = UUID.randomUUID(),
-            tildeling = Tildeling(
-                saksbehandlerident = "1", enhet = ENHET_1, tidspunkt = LocalDateTime.now()
-            ),
-
-            )
+        fullfoertKlage.avsluttetAvSaksbehandler = LocalDateTime.now()
 
         behandlingRepository.saveAll(listOf(klageTildeltEnhet1, klageTildeltEnhet2, klageUtenTildeling, fullfoertKlage))
 
@@ -333,4 +120,42 @@ class BehandlingRepositoryTest {
 
         assertThat(result).isEqualTo(listOf(klageTildeltEnhet1))
     }
+
+    fun getMottak(): Mottak = Mottak(
+        ytelse = Ytelse.OMS_OMP,
+        type = Type.KLAGE,
+        klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+        kildeReferanse = "1234234",
+        sakMottattKaDato = LocalDateTime.now(),
+        fagsystem = Fagsystem.K9,
+        fagsakId = "123",
+        forrigeBehandlendeEnhet = "0101",
+        brukersHenvendelseMottattNavDato = LocalDate.now()
+    )
+
+    fun getKlagebehandling(mottakId: UUID) = Klagebehandling(
+        klager = Klager(partId = PartId(type = PartIdType.PERSON, value = "23452354")),
+        sakenGjelder = SakenGjelder(
+            partId = PartId(type = PartIdType.PERSON, value = "23452354"),
+            skalMottaKopi = false
+        ),
+        ytelse = Ytelse.OMS_OMP,
+        type = Type.KLAGE,
+        frist = LocalDate.now(),
+        hjemler = mutableSetOf(
+            Hjemmel.FTRL_8_7
+        ),
+        created = LocalDateTime.now(),
+        modified = LocalDateTime.now(),
+        mottattKlageinstans = LocalDateTime.now(),
+        fagsystem = Fagsystem.K9,
+        fagsakId = "123",
+        kildeReferanse = "abc",
+        mottakId = mottakId,
+        avsenderEnhetFoersteinstans = "0101",
+        mottattVedtaksinstans = LocalDate.now(),
+        kakaKvalitetsvurderingVersion = 2,
+        kakaKvalitetsvurderingId = UUID.randomUUID()
+    )
+
 }
