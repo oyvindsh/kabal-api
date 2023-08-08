@@ -719,13 +719,13 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): SortedSet<DokumentUnderArbeid> {
+    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): List<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         if (checkReadAccess) {
             behandlingService.getBehandling(behandlingId)
         }
 
-        return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId)
+        return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
     }
 
     fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {

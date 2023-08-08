@@ -271,12 +271,12 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        assertThat(dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreated(behandlingId)).containsExactly(
-            vedlegg2,
-            hovedDokument2,
-            vedlegg1,
+        assertThat(dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)).containsExactly(
+            hovedDokument3,
             hovedDokument1,
-            hovedDokument3
+            vedlegg1,
+            hovedDokument2,
+            vedlegg2,
         )
     }
 
