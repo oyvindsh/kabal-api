@@ -89,7 +89,6 @@ class DokumentUnderArbeidService(
                 behandlingId = behandlingId,
                 smartEditorId = null,
                 smartEditorTemplateId = null,
-                smartEditorVersion = null,
                 journalfoertDokumentReference = null,
             )
         )
@@ -109,7 +108,6 @@ class DokumentUnderArbeidService(
         dokumentType: DokumentType,
         json: String?,
         smartEditorTemplateId: String?,
-        smartEditorVersion: Int?,
         innloggetIdent: String,
         tittel: String,
     ): DokumentUnderArbeid {
@@ -137,7 +135,6 @@ class DokumentUnderArbeidService(
                 behandlingId = behandlingId,
                 smartEditorId = smartEditorDocumentId,
                 smartEditorTemplateId = smartEditorTemplateId,
-                smartEditorVersion = smartEditorVersion,
                 journalfoertDokumentReference = null,
             )
         )
@@ -189,7 +186,6 @@ class DokumentUnderArbeidService(
                 behandlingId = behandlingId,
                 smartEditorId = null,
                 smartEditorTemplateId = null,
-                smartEditorVersion = null,
                 parentId = parentId,
                 journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
                     journalpostId = journalfoertDokumentReference.journalpostId,
@@ -274,43 +270,6 @@ class DokumentUnderArbeidService(
             felt = Felt.DOKUMENT_UNDER_ARBEID_NAME,
             fraVerdi = oldValue,
             tilVerdi = dokument.name,
-            tidspunkt = LocalDateTime.now(),
-            dokumentId = dokument.id,
-        )
-        return dokument
-    }
-
-    fun updateSmartEditorVersion(
-        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
-        dokumentId: UUID,
-        version: Int,
-        innloggetIdent: String
-    ): DokumentUnderArbeid {
-        val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
-
-        val smartEditorVersion = dokument.smartEditorVersion
-        if (smartEditorVersion == version) {
-            return dokument
-        } else if (smartEditorVersion != null) {
-            if (smartEditorVersion > version) {
-                throw DokumentValidationException("Input-versjon er eldre enn lagret versjon på smartdokument.")
-            }
-        }
-
-        //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(dokument.behandlingId)
-
-        if (dokument.erMarkertFerdig()) {
-            throw DokumentValidationException("Kan ikke endre smartEditorVersion på et dokument som er ferdigstilt")
-        }
-
-        val oldValue = dokument.smartEditorVersion
-        dokument.smartEditorVersion = version
-        behandling.publishEndringsloggEvent(
-            saksbehandlerident = innloggetIdent,
-            felt = Felt.SMARTDOKUMENT_VERSION,
-            fraVerdi = oldValue?.toString(),
-            tilVerdi = dokument.smartEditorVersion?.toString(),
             tidspunkt = LocalDateTime.now(),
             dokumentId = dokument.id,
         )
