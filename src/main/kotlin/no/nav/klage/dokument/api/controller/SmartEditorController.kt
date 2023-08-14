@@ -13,7 +13,6 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.CommentO
 import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
-import no.nav.klage.oppgave.exceptions.ValidationException
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
@@ -48,9 +47,10 @@ class SmartEditorController(
     ): SmartEditorDocumentView {
         logger.debug("Kall mottatt på createSmartHoveddokument")
 
-        if (body.version != null) {
-            throw ValidationException("Du har en gammel versjon av Kabal. Last på nytt. Teknisk: version skal ikke lenger sendes.")
-        }
+        //TODO add back
+//        if (body.version != null) {
+//            throw ValidationException("Du har en gammel versjon av Kabal. Last på nytt. Teknisk: version skal ikke lenger sendes.")
+//        }
 
         val dokumentUnderArbeid = dokumentUnderArbeidService.opprettSmartdokument(
             behandlingId = behandlingId,
@@ -107,9 +107,10 @@ class SmartEditorController(
         @RequestBody input: PatchSmartHovedDokumentInput,
     ): SmartEditorDocumentView {
 
-        if (input.version != null) {
-            throw ValidationException("Du har en gammel versjon av Kabal. Last på nytt. Teknisk: version skal ikke lenger sendes.")
-        }
+        //TODO add back
+//        if (input.version != null) {
+//            throw ValidationException("Du har en gammel versjon av Kabal. Last på nytt. Teknisk: version skal ikke lenger sendes.")
+//        }
 
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
