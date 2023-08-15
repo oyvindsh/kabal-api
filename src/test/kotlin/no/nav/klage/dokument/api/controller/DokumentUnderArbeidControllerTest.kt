@@ -92,7 +92,6 @@ internal class DokumentUnderArbeidControllerTest {
             behandlingId = behandlingId,
             smartEditorId = null,
             smartEditorTemplateId = null,
-            smartEditorVersion = null,
             dokumentType = DokumentType.BREV,
             markertFerdig = null,
             ferdigstilt = null,
@@ -132,7 +131,7 @@ internal class DokumentUnderArbeidControllerTest {
                 content = jacksonObjectMapper().readTree("{ \"json\": \"is cool\" }"),
                 tittel = "Tittel",
                 templateId = "template",
-                version = 1,
+                version = null,
             )
 
         every { dokumentUnderArbeidService.getSmartEditorId(any(), any()) } returns smartEditorDocumentId
@@ -152,7 +151,6 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
                 any(),
-                any(),
             )
         } returns DokumentUnderArbeid(
             mellomlagerId = "mellomlagerId",
@@ -162,7 +160,6 @@ internal class DokumentUnderArbeidControllerTest {
             behandlingId = behandlingId,
             smartEditorId = UUID.randomUUID(),
             smartEditorTemplateId = "template",
-            smartEditorVersion = 1,
             dokumentType = DokumentType.BREV,
             markertFerdig = null,
             ferdigstilt = null,

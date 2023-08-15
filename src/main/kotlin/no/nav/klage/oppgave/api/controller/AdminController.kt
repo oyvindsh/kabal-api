@@ -95,6 +95,18 @@ class AdminController(
         }
     }
 
+    @PostMapping("/internal/migratetables")
+    fun migrateTablesInSmartdocuments() {
+        logger.debug("migrateTablesInSmartdocuments is called")
+        krevAdminTilgang()
+
+        try {
+            adminService.migrateTablesInSmartdocuments()
+        } catch (e: Exception) {
+            logger.warn("Failed to migrateTablesInSmartdocuments", e)
+            throw e
+        }
+    }
 
     data class Fnr(val fnr: String)
 

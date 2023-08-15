@@ -20,7 +20,6 @@ data class DokumentView(
     val type: DokumentUnderArbeid.DokumentUnderArbeidType,
     val isSmartDokument: Boolean,
     val templateId: String?,
-    val version: Int?,
     val isMarkertAvsluttet: Boolean,
     //Deprecated
     val parent: UUID?,
@@ -43,7 +42,6 @@ data class DokumentViewWithList(
     val type: DokumentUnderArbeid.DokumentUnderArbeidType?,
     val isSmartDokument: Boolean?,
     val templateId: String?,
-    val version: Int?,
     val isMarkertAvsluttet: Boolean?,
     //Deprecated
     val parent: UUID?,
@@ -61,7 +59,6 @@ data class SmartEditorDocumentView(
     val content: JsonNode,
     val created: LocalDateTime,
     val modified: LocalDateTime,
-    val version: Int?,
     val templateId: String?,
     val dokumentTypeId: String,
     //Deprecated
