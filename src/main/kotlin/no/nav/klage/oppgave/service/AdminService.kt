@@ -245,7 +245,7 @@ fun migrateTables(fromJsonString: String?, secureLogger: Logger?): String {
     secureLogger?.debug("fromJsonString: $fromJsonString")
 
     val jsonNode = jacksonObjectMapper().readTree(fromJsonString)
-    val tableNodes = traverseNodes(jsonNode, mutableSetOf())
+    val tableNodes = traverseNodesAndGetTables(jsonNode, mutableSetOf())
 
     if (tableNodes.size > 1) {
         secureLogger?.debug("fromJsonString had more than one table: ${tableNodes.size}")
@@ -266,7 +266,7 @@ fun migrateTables(fromJsonString: String?, secureLogger: Logger?): String {
     return newJsonString
 }
 
-fun traverseNodes(root: JsonNode, tableSet: MutableSet<JsonNode>): Set<JsonNode> {
+fun traverseNodesAndGetTables(root: JsonNode, tableSet: MutableSet<JsonNode>): Set<JsonNode> {
     if (root.isObject) {
         val fieldNames = root.fieldNames().asSequence().toList()
         fieldNames.forEach {
@@ -276,13 +276,13 @@ fun traverseNodes(root: JsonNode, tableSet: MutableSet<JsonNode>): Set<JsonNode>
                 tableSet.add(root)
             }
 
-            traverseNodes(fieldValue, tableSet)
+            traverseNodesAndGetTables(fieldValue, tableSet)
         }
     } else if (root.isArray) {
         val arrayNode: ArrayNode = root as ArrayNode
         for (i in 0 until arrayNode.size()) {
             val arrayElement: JsonNode = arrayNode.get(i)
-            traverseNodes(arrayElement, tableSet)
+            traverseNodesAndGetTables(arrayElement, tableSet)
         }
     } else {
         // JsonNode root represents a single value field
