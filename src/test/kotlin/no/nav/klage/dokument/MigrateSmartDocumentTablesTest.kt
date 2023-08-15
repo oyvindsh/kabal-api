@@ -14,6 +14,14 @@ class MigrateSmartDocumentTablesTest {
         )).isEqualToIgnoringWhitespace(expectedJsonString)
     }
 
+    @Test
+    fun `migrate tables is idempotent`() {
+        assertThat(migrateTables(
+            fromJsonString = expectedJsonString,
+            secureLogger = null
+        )).isEqualToIgnoringWhitespace(expectedJsonString)
+    }
+
 }
 
 val initialJsonString = """
@@ -34,78 +42,6 @@ val initialJsonString = """
                     {
                         "type": "tbody",
                         "children": [
-                            {
-                                "type": "tr",
-                                "children": [
-                                    {
-                                        "type": "td",
-                                        "children": [
-                                            {
-                                                "type": "p",
-                                                "align": "left",
-                                                "children": [
-                                                    {
-                                                        "text": "1"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "td",
-                                        "children": [
-                                            {
-                                                "type": "p",
-                                                "align": "left",
-                                                "children": [
-                                                    {
-                                                        "text": "2"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "td",
-                                        "children": [
-                                            {
-                                                "type": "p",
-                                                "children": [
-                                                    {
-                                                        "text": "3"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "td",
-                                        "children": [
-                                            {
-                                                "type": "p",
-                                                "children": [
-                                                    {
-                                                        "text": "4"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "td",
-                                        "children": [
-                                            {
-                                                "type": "p",
-                                                "children": [
-                                                    {
-                                                        "text": "5"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
                             {
                                 "type": "tr",
                                 "children": [
@@ -221,78 +157,6 @@ val expectedJsonString = """
             {
                 "type": "table",
                 "children": [
-                    {
-                        "type": "tr",
-                        "children": [
-                            {
-                                "type": "td",
-                                "children": [
-                                    {
-                                        "type": "p",
-                                        "align": "left",
-                                        "children": [
-                                            {
-                                                "text": "1"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "td",
-                                "children": [
-                                    {
-                                        "type": "p",
-                                        "align": "left",
-                                        "children": [
-                                            {
-                                                "text": "2"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "td",
-                                "children": [
-                                    {
-                                        "type": "p",
-                                        "children": [
-                                            {
-                                                "text": "3"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "td",
-                                "children": [
-                                    {
-                                        "type": "p",
-                                        "children": [
-                                            {
-                                                "text": "4"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "td",
-                                "children": [
-                                    {
-                                        "type": "p",
-                                        "children": [
-                                            {
-                                                "text": "5"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
                     {
                         "type": "tr",
                         "children": [

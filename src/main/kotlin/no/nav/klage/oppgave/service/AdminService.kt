@@ -251,8 +251,13 @@ fun migrateTables(fromJsonString: String?, secureLogger: Logger?): String {
         secureLogger?.debug("fromJsonString had more than one table: ${tableNodes.size}")
     }
 
-    tableNodes.forEach { tableNode ->
+    for (tableNode in tableNodes) {
         val tableChildren = tableNode.path("children") as ArrayNode
+
+        if (tableChildren.size() > 1 || tableChildren.first().path("type").asText() != "tbody") {
+            break
+        }
+
         val tbodyChildrenToMove = tableChildren.first().path("children") as ArrayNode
         tableChildren.addAll(tbodyChildrenToMove)
         val indexOfTbody = tableChildren.indexOfFirst { it.path("type").asText() == "tbody" }
