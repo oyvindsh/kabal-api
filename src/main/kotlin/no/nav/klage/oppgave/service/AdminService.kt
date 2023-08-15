@@ -1,7 +1,10 @@
 package no.nav.klage.oppgave.service
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
@@ -15,6 +18,7 @@ import no.nav.klage.oppgave.eventlisteners.StatistikkTilDVHService.Companion.TR_
 import no.nav.klage.oppgave.repositories.*
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.slf4j.Logger
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -36,7 +40,8 @@ class AdminService(
     private val fileApiClient: FileApiClient,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val endringsloggRepository: EndringsloggRepository,
-    private val skjermedeApiClient: SkjermedeApiClient
+    private val skjermedeApiClient: SkjermedeApiClient,
+    private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
 ) {
 
     companion object {
@@ -212,4 +217,76 @@ class AdminService(
             }
         }
     }
+
+    fun migrateTablesInSmartdocuments() {
+        val documents =
+            dokumentUnderArbeidRepository.findByMarkertFerdigIsNullAndSmartEditorIdNotNull()
+
+        secureLogger.debug("found ${documents.size} dokumenterUnderArbeid")
+
+        val candidates = documents.map {
+            kabalSmartEditorApiClient.getDocument(it.smartEditorId!!)
+        }.filter { smartDocument ->
+            smartDocument.json?.contains("table") ?: false
+        }
+
+        secureLogger.debug("found ${candidates.size} candidates for migration of table")
+
+        candidates.forEach { smartDocument ->
+            kabalSmartEditorApiClient.updateDocument(smartDocument.id, migrateTables(
+                fromJsonString = smartDocument.json,
+                secureLogger = secureLogger
+            ))
+        }
+    }
+}
+
+fun migrateTables(fromJsonString: String?, secureLogger: Logger?): String {
+    secureLogger?.debug("fromJsonString: $fromJsonString")
+
+    val jsonNode = jacksonObjectMapper().readTree(fromJsonString)
+    val tableNodes = traverseNodes(jsonNode, mutableSetOf())
+
+    if (tableNodes.size > 1) {
+        secureLogger?.debug("fromJsonString had more than one table: ${tableNodes.size}")
+    }
+
+    tableNodes.forEach { tableNode ->
+        val tableChildren = tableNode.path("children") as ArrayNode
+        val tbodyChildrenToMove = tableChildren.first().path("children") as ArrayNode
+        tableChildren.addAll(tbodyChildrenToMove)
+        val indexOfTbody = tableChildren.indexOfFirst { it.path("type").asText() == "tbody" }
+        tableChildren.remove(indexOfTbody)
+    }
+
+    val newJsonString = jsonNode.toPrettyString()
+
+    secureLogger?.debug("toJsonString: $newJsonString")
+
+    return newJsonString
+}
+
+fun traverseNodes(root: JsonNode, tableSet: MutableSet<JsonNode>): Set<JsonNode> {
+    if (root.isObject) {
+        val fieldNames = root.fieldNames().asSequence().toList()
+        fieldNames.forEach {
+            val fieldValue: JsonNode = root.get(it)
+
+            if (fieldValue.asText() == "table") {
+                tableSet.add(root)
+            }
+
+            traverseNodes(fieldValue, tableSet)
+        }
+    } else if (root.isArray) {
+        val arrayNode: ArrayNode = root as ArrayNode
+        for (i in 0 until arrayNode.size()) {
+            val arrayElement: JsonNode = arrayNode.get(i)
+            traverseNodes(arrayElement, tableSet)
+        }
+    } else {
+        // JsonNode root represents a single value field
+    }
+
+    return tableSet
 }
