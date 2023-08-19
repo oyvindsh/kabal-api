@@ -96,8 +96,7 @@ class BehandlingAvslutningService(
                 logger.debug("Vi har informert Infotrygd om innstilling til Trygderetten.")
             }
 
-        } else if (behandling.type == Type.ANKE_I_TRYGDERETTEN && behandling.shouldCreateNewAnkebehandling()
-        ) {
+        } else if (behandling.type == Type.ANKE_I_TRYGDERETTEN && (Hibernate.unproxy(behandling) as AnkeITrygderettenbehandling).shouldCreateNewAnkebehandling()) {
             logger.debug("Oppretter ny Ankebehandling basert på AnkeITrygderettenbehandling")
             val ankeITrygderettenbehandling = Hibernate.unproxy(behandling) as AnkeITrygderettenbehandling
             createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)

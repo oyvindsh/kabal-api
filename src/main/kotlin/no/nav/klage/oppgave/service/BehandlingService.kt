@@ -15,8 +15,10 @@ import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.HandledInKabalInput
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakAssignedInput
+import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setKjennelseMottatt
+import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setNyAnkebehandlingKA
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setSendtTilTrygderetten
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.removeSaksdokument
@@ -65,7 +67,7 @@ class BehandlingService(
     private val saksbehandlerRepository: SaksbehandlerRepository,
     private val eregClient: EregClient,
     private val saksbehandlerService: SaksbehandlerService,
-    private val behandlingMapper: BehandlingMapper
+    private val behandlingMapper: BehandlingMapper,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -126,7 +128,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfall == null) {
+        if (behandling.utfall == null && !isNyAnkebehandlingKA(behandling)) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -145,7 +147,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfall !in noRegistringshjemmelNeeded) {
+        if (behandling.utfall !in noRegistringshjemmelNeeded && !isNyAnkebehandlingKA(behandling)) {
             if (behandling.registreringshjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -189,7 +191,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling is AnkeITrygderettenbehandling) {
+        if (behandling is AnkeITrygderettenbehandling && !isNyAnkebehandlingKA(behandling)) {
             if (behandling.kjennelseMottatt == null) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -238,6 +240,9 @@ class BehandlingService(
             )
         }
     }
+
+    private fun isNyAnkebehandlingKA(behandling: Behandling) =
+        (behandling is AnkeITrygderettenbehandling && behandling.nyBehandlingKA != null)
 
     fun setSaksbehandler(
         behandlingId: UUID,
@@ -446,6 +451,22 @@ class BehandlingService(
             val event =
                 behandling.setKjennelseMottatt(date, utfoerendeSaksbehandlerIdent)
             applicationEventPublisher.publishEvent(event)
+            return behandling.modified
+        } else throw IllegalOperation("Dette feltet kan bare settes i ankesaker i Trygderetten")
+    }
+
+    fun setNyAnkebehandlingKA(
+        behandlingId: UUID,
+        utfoerendeSaksbehandlerIdent: String
+    ): LocalDateTime {
+        val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
+
+        if (behandling is AnkeITrygderettenbehandling) {
+            val eventNyBehandling = behandling.setNyAnkebehandlingKA(LocalDateTime.now(), utfoerendeSaksbehandlerIdent)
+            val eventAvsluttetAvSaksbehandler = behandling.setAvsluttetAvSaksbehandler(utfoerendeSaksbehandlerIdent)
+            val endringslogginnslag = eventNyBehandling.endringslogginnslag + eventAvsluttetAvSaksbehandler.endringslogginnslag
+            applicationEventPublisher.publishEvent(BehandlingEndretEvent(behandling = behandling, endringslogginnslag = endringslogginnslag))
+
             return behandling.modified
         } else throw IllegalOperation("Dette feltet kan bare settes i ankesaker i Trygderetten")
     }

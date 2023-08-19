@@ -108,7 +108,6 @@ class AnkebehandlingService(
     fun createAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling: AnkeITrygderettenbehandling): Ankebehandling {
         val kvalitetsvurderingVersion = getKakaVersion()
 
-
         val ankebehandling = ankebehandlingRepository.save(
             Ankebehandling(
                 klager = ankeITrygderettenbehandling.klager.copy(),

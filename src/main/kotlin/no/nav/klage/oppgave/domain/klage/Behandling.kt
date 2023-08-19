@@ -4,7 +4,6 @@ import jakarta.persistence.*
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
-import no.nav.klage.oppgave.domain.klage.*
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
@@ -163,7 +162,11 @@ abstract class Behandling(
     }
 
     fun shouldCreateNewAnkebehandling(): Boolean {
-        return utfall in utfallToNewAnkebehandling
+        return if (this is AnkeITrygderettenbehandling) {
+            nyBehandlingKA != null || utfall in utfallToNewAnkebehandling
+        } else {
+            false
+        }
     }
 }
 
