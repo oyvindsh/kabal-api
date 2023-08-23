@@ -17,6 +17,9 @@ class AnkeITrygderettenbehandling(
     var sendtTilTrygderetten: LocalDateTime,
     @Column(name = "kjennelse_mottatt")
     var kjennelseMottatt: LocalDateTime? = null,
+    /** Tatt over av KA mens den er i TR */
+    @Column(name = "ny_behandling_ka")
+    var nyBehandlingKA: LocalDateTime? = null,
 
     //Common properties
     id: UUID = UUID.randomUUID(),

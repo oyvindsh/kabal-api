@@ -69,6 +69,7 @@ class StatistikkTilDVHService(
                     || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                     || it.felt === Felt.KJENNELSE_MOTTATT_TIDSPUNKT
                     || it.felt === Felt.FEILREGISTRERING
+                    || it.felt === Felt.NY_ANKEBEHANDLING_KA
         }
     }
 
@@ -101,6 +102,11 @@ class StatistikkTilDVHService(
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE_I_TRYGDERETTEN
                         && utfall in utfallToNewAnkebehandling
+            } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
+
+            endringslogginnslag.any {
+                it.felt === Felt.NY_ANKEBEHANDLING_KA
+                        && type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
 
             endringslogginnslag.any {

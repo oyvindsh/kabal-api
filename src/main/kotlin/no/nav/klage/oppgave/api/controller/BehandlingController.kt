@@ -464,4 +464,22 @@ class BehandlingController(
 
         return BehandlingEditedView(modified = modified)
     }
+
+    @PostMapping("/{behandlingId}/nyankebehandlingka")
+    fun nyAnkebehandlingKA(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ) {
+        logMethodDetails(
+            ::nyAnkebehandlingKA.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            logger
+        )
+
+        behandlingService.validateBehandlingBeforeFinalize(behandlingId)
+
+        behandlingService.setNyAnkebehandlingKA(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        )
+    }
 }

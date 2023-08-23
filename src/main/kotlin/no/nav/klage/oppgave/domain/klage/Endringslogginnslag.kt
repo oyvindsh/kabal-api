@@ -104,4 +104,5 @@ enum class Felt {
     KLAGER,
     ROL_STATE_ID,
     ROL_IDENT,
+    NY_ANKEBEHANDLING_KA,
 }
