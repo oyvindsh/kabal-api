@@ -128,7 +128,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfall == null && !isNyAnkebehandlingKA(behandling)) {
+        if (behandling.utfall == null) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -147,7 +147,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfall !in noRegistringshjemmelNeeded && !isNyAnkebehandlingKA(behandling)) {
+        if (behandling.utfall !in noRegistringshjemmelNeeded) {
             if (behandling.registreringshjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -191,7 +191,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling is AnkeITrygderettenbehandling && !isNyAnkebehandlingKA(behandling)) {
+        if (behandling is AnkeITrygderettenbehandling) {
             if (behandling.kjennelseMottatt == null) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -241,8 +241,131 @@ class BehandlingService(
         }
     }
 
-    private fun isNyAnkebehandlingKA(behandling: Behandling) =
-        (behandling is AnkeITrygderettenbehandling && behandling.nyBehandlingKA != null)
+    fun validateAnkeITrygderettenbehandlingBeforeNyAnkebehandling(behandlingId: UUID) {
+        val behandling = getBehandling(behandlingId) as AnkeITrygderettenbehandling
+        val dokumentValidationErrors = mutableListOf<InvalidProperty>()
+        val behandlingValidationErrors = mutableListOf<InvalidProperty>()
+        val sectionList = mutableListOf<ValidationSection>()
+
+        val unfinishedDocuments =
+            dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(behandling.id)
+
+        if (unfinishedDocuments.isNotEmpty()) {
+            dokumentValidationErrors.add(
+                InvalidProperty(
+                    field = "underArbeid",
+                    reason = "Kan ikke lukke behandling. Ferdigstill eller slett alle dokumenter under arbeid."
+                )
+            )
+        }
+
+        if (dokumentValidationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "dokumenter",
+                    properties = dokumentValidationErrors
+                )
+            )
+        }
+
+        fun getErrorText(prop: String) = "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
+
+        if (behandling.utfall != null) {
+            if (behandling.utfall == Utfall.HENVIST) {
+                behandlingValidationErrors.add(
+                    InvalidProperty(
+                        field = "utfall",
+                        reason = "Kan ikke lukke behandling. Dersom resultatet fra Trygderetten er «Henvist», må du først fullføre registrering av resultatet fra Trygderetten før du kan starte ny behandling. Når du trykker «Fullfør», vil Kabal opprette en ny ankeoppgave for deg."
+                    )
+                )
+            } else {
+                behandlingValidationErrors.add(
+                    InvalidProperty(
+                        field = "utfall",
+                        reason = getErrorText("utfall")
+                    )
+                )
+            }
+        }
+
+        if (behandling.registreringshjemler.isNotEmpty()) {
+            behandlingValidationErrors.add(
+                InvalidProperty(
+                    field = "hjemmel",
+                    reason = getErrorText("hjemler")
+                )
+            )
+        }
+
+        if (behandling.kjennelseMottatt != null) {
+            behandlingValidationErrors.add(
+                InvalidProperty(
+                    field = "kjennelseMottatt",
+                    reason = getErrorText("kjennelse mottatt")
+                )
+            )
+        }
+
+        if (behandlingValidationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "behandling",
+                    properties = behandlingValidationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = sectionList
+            )
+        }
+    }
+
+    fun validateFeilregistrering(behandlingId: UUID) {
+        val behandling = getBehandling(behandlingId)
+        val dokumentValidationErrors = mutableListOf<InvalidProperty>()
+        val behandlingValidationErrors = mutableListOf<InvalidProperty>()
+        val sectionList = mutableListOf<ValidationSection>()
+
+        val unfinishedDocuments =
+            dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(behandling.id)
+
+        if (unfinishedDocuments.isNotEmpty()) {
+            dokumentValidationErrors.add(
+                InvalidProperty(
+                    field = "underArbeid",
+                    reason = "Ferdigstill eller slett alle dokumenter under arbeid."
+                )
+            )
+        }
+
+        if (dokumentValidationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "dokumenter",
+                    properties = dokumentValidationErrors
+                )
+            )
+        }
+
+        if (behandlingValidationErrors.isNotEmpty()) {
+            sectionList.add(
+                ValidationSection(
+                    section = "behandling",
+                    properties = behandlingValidationErrors
+                )
+            )
+        }
+
+        if (sectionList.isNotEmpty()) {
+            throw SectionedValidationErrorWithDetailsException(
+                title = "Validation error",
+                sections = sectionList
+            )
+        }
+    }
 
     fun setSaksbehandler(
         behandlingId: UUID,
@@ -464,8 +587,14 @@ class BehandlingService(
         if (behandling is AnkeITrygderettenbehandling) {
             val eventNyBehandling = behandling.setNyAnkebehandlingKA(LocalDateTime.now(), utfoerendeSaksbehandlerIdent)
             val eventAvsluttetAvSaksbehandler = behandling.setAvsluttetAvSaksbehandler(utfoerendeSaksbehandlerIdent)
-            val endringslogginnslag = eventNyBehandling.endringslogginnslag + eventAvsluttetAvSaksbehandler.endringslogginnslag
-            applicationEventPublisher.publishEvent(BehandlingEndretEvent(behandling = behandling, endringslogginnslag = endringslogginnslag))
+            val endringslogginnslag =
+                eventNyBehandling.endringslogginnslag + eventAvsluttetAvSaksbehandler.endringslogginnslag
+            applicationEventPublisher.publishEvent(
+                BehandlingEndretEvent(
+                    behandling = behandling,
+                    endringslogginnslag = endringslogginnslag
+                )
+            )
 
             return behandling.modified
         } else throw IllegalOperation("Dette feltet kan bare settes i ankesaker i Trygderetten")
@@ -821,7 +950,8 @@ class BehandlingService(
                 getBehandlingForUpdate(behandlingId = behandlingId)
             }
 
-        val modifiedBehandling = feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
+        val modifiedBehandling =
+            feilregistrer(behandling = behandling, navIdent = navIdent, reason = reason, fagsystem = fagsystem)
 
         return FeilregistreringResponse(
             feilregistrering = BehandlingDetaljerView.FeilregistreringView(
