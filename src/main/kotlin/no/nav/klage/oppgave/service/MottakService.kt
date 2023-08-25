@@ -620,6 +620,7 @@ class MottakService(
             ytelse = Ytelse.of(ytelseId),
             forrigeBehandlingId = forrigeBehandlingId,
             sentFrom = Mottak.Sender.KABIN,
+            kommentar = null,
         )
     }
 
@@ -673,6 +674,7 @@ class MottakService(
             ytelse = Ytelse.of(ytelseId),
             forrigeBehandlingId = null,
             sentFrom = Mottak.Sender.KABIN,
+            kommentar = null,
         )
     }
 

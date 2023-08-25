@@ -57,7 +57,8 @@ class MottakRepositoryTest {
                 )
             ),
             sakMottattKaDato = LocalDateTime.now(),
-            brukersHenvendelseMottattNavDato = LocalDate.now()
+            brukersHenvendelseMottattNavDato = LocalDate.now(),
+            kommentar = null,
         )
 
         mottakRepository.save(mottak)
