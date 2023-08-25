@@ -161,7 +161,7 @@ class BehandlingController(
     @PutMapping("/{behandlingId}/kjennelsemottatt")
     fun setKjennelseMottatt(
         @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: BehandlingDateInput
+        @RequestBody input: BehandlingDateNullableInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setKjennelseMottatt.name,
@@ -172,7 +172,7 @@ class BehandlingController(
 
         val modified = behandlingService.setKjennelseMottatt(
             behandlingId = behandlingId,
-            date = input.date.atStartOfDay(),
+            date = input.date?.atStartOfDay(),
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 

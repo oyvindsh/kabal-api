@@ -563,7 +563,7 @@ class BehandlingService(
 
     fun setKjennelseMottatt(
         behandlingId: UUID,
-        date: LocalDateTime,
+        date: LocalDateTime?,
         utfoerendeSaksbehandlerIdent: String
     ): LocalDateTime {
         val behandling = getBehandlingForUpdate(

@@ -30,7 +30,7 @@ object AnkeITrygderettenbehandlingSetters {
     }
 
     fun AnkeITrygderettenbehandling.setKjennelseMottatt(
-        nyVerdi: LocalDateTime,
+        nyVerdi: LocalDateTime?,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
         val gammelVerdi = kjennelseMottatt
