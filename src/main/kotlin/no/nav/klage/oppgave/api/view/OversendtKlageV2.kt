@@ -112,5 +112,6 @@ fun OversendtKlageV2.toMottak() = Mottak(
     brukersHenvendelseMottattNavDato = mottattFoersteinstans,
     sakMottattKaDato = oversendtKaDato ?: LocalDateTime.now(),
     frist = frist,
-    ytelse = ytelse
+    ytelse = ytelse,
+    kommentar = kommentar,
 )

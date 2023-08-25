@@ -128,5 +128,6 @@ fun OversendtKlageAnkeV3.toMottak(forrigeBehandlingId: UUID? = null) = Mottak(
     },
     frist = frist,
     ytelse = ytelse,
-    forrigeBehandlingId = forrigeBehandlingId
+    forrigeBehandlingId = forrigeBehandlingId,
+    kommentar = kommentar,
 )
