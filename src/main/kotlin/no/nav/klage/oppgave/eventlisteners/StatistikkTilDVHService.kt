@@ -67,7 +67,6 @@ class StatistikkTilDVHService(
         } else behandlingEndretEvent.endringslogginnslag.any {
             it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                     || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
-                    || it.felt === Felt.KJENNELSE_MOTTATT_TIDSPUNKT
                     || it.felt === Felt.FEILREGISTRERING
                     || it.felt === Felt.NY_ANKEBEHANDLING_KA
         }
@@ -75,8 +74,9 @@ class StatistikkTilDVHService(
 
     private fun getBehandlingState(behandlingEndretEvent: BehandlingEndretEvent): BehandlingState {
         val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
-        val type = behandlingEndretEvent.behandling.type
-        val utfall = behandlingEndretEvent.behandling.utfall
+        val behandling = behandlingEndretEvent.behandling
+        val type = behandling.type
+        val utfall = behandling.utfall
 
         return when {
             endringslogginnslag.isEmpty() && type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
@@ -86,7 +86,12 @@ class StatistikkTilDVHService(
             } -> BehandlingState.AVSLUTTET
 
             endringslogginnslag.any {
-                it.felt === Felt.KJENNELSE_MOTTATT_TIDSPUNKT
+                it.felt === Felt.NY_ANKEBEHANDLING_KA
+                        && type == Type.ANKE_I_TRYGDERETTEN
+            } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
+
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.MOTTATT_FRA_TR
 
@@ -102,11 +107,6 @@ class StatistikkTilDVHService(
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE_I_TRYGDERETTEN
                         && utfall in utfallToNewAnkebehandling
-            } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
-
-            endringslogginnslag.any {
-                it.felt === Felt.NY_ANKEBEHANDLING_KA
-                        && type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
 
             endringslogginnslag.any {
