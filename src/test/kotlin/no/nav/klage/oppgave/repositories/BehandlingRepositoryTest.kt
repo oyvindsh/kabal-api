@@ -130,7 +130,8 @@ class BehandlingRepositoryTest {
         fagsystem = Fagsystem.K9,
         fagsakId = "123",
         forrigeBehandlendeEnhet = "0101",
-        brukersHenvendelseMottattNavDato = LocalDate.now()
+        brukersHenvendelseMottattNavDato = LocalDate.now(),
+        kommentar = null,
     )
 
     fun getKlagebehandling(mottakId: UUID) = Klagebehandling(

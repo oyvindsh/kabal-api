@@ -64,7 +64,7 @@ class Mottak(
     @Column(name = "ytelse_id")
     val ytelse: Ytelse,
     @Column(name = "kommentar")
-    val kommentar: String? = null,
+    val kommentar: String?,
     @Column(name = "forrige_behandling_id")
     val forrigeBehandlingId: UUID? = null,
     @Column(name = "sent_from")
