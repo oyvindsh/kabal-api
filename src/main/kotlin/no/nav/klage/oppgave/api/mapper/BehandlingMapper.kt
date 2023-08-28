@@ -91,7 +91,8 @@ class BehandlingMapper(
             rol = klagebehandling.toROLView(),
             relevantDocumentIdList = klagebehandling.saksdokumenter.map {
                 it.dokumentInfoId
-            }.toSet()
+            }.toSet(),
+            saksnummer = klagebehandling.fagsakId,
         )
     }
 
@@ -158,7 +159,8 @@ class BehandlingMapper(
             rol = ankebehandling.toROLView(),
             relevantDocumentIdList = ankebehandling.saksdokumenter.map {
                 it.dokumentInfoId
-            }.toSet()
+            }.toSet(),
+            saksnummer = ankebehandling.fagsakId,
         )
     }
 
@@ -211,7 +213,8 @@ class BehandlingMapper(
             rol = ankeITrygderettenbehandling.toROLView(),
             relevantDocumentIdList = ankeITrygderettenbehandling.saksdokumenter.map {
                 it.dokumentInfoId
-            }.toSet()
+            }.toSet(),
+            saksnummer = ankeITrygderettenbehandling.fagsakId,
         )
     }
 
