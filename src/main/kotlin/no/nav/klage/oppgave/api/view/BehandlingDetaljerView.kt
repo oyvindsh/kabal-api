@@ -48,6 +48,7 @@ data class BehandlingDetaljerView(
     val fagsystemId: String,
     val rol: ROLView?,
     val relevantDocumentIdList: Set<String>,
+    val saksnummer: String,
 ) {
 
     data class ROLView(
