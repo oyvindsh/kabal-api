@@ -99,8 +99,8 @@ class BehandlingMapper(
     private fun Behandling.toROLView(): BehandlingDetaljerView.ROLView? {
         return if (rolState != null) {
             BehandlingDetaljerView.ROLView(
-                rol = if (rolIdent != null) getSaksbehandlerView(rolIdent!!) else null,
-                rolStateId = rolState!!.id,
+                navIdent = if (rolIdent != null) rolIdent!! else null,
+                stateId = rolState!!.id,
             )
         } else null
     }

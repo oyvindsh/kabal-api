@@ -52,8 +52,8 @@ data class BehandlingDetaljerView(
 ) {
 
     data class ROLView(
-        val rol: SaksbehandlerView?,
-        val rolStateId: String,
+        val navIdent: String?,
+        val stateId: String,
     )
 
     data class KvalitetsvurderingReference(
