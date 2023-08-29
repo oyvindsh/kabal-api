@@ -96,10 +96,11 @@ class DevOnlyAdminController(
     @GetMapping("/internal/mytokens")
     fun getTokens(): Map<String, String> {
         return mapOf(
-            "getAccessTokenFrontendSent" to tokenUtil.getAccessTokenFrontendSent(),
-            "getSaksbehandlerAccessTokenWithGraphScope" to tokenUtil.getSaksbehandlerAccessTokenWithGraphScope(),
-            "getSaksbehandlerAccessTokenWithSafScope" to tokenUtil.getSaksbehandlerAccessTokenWithSafScope(),
-            "getSaksbehandlerAccessTokenWithPdlScope" to tokenUtil.getSaksbehandlerAccessTokenWithPdlScope(),
+            "\ngetAccessTokenFrontendSent\n" to tokenUtil.getAccessTokenFrontendSent(),
+            "\ngetSaksbehandlerAccessTokenWithGraphScope\n" to tokenUtil.getSaksbehandlerAccessTokenWithGraphScope(),
+            "\ngetSaksbehandlerAccessTokenWithSafScope\n" to tokenUtil.getSaksbehandlerAccessTokenWithSafScope(),
+            "\ngetSaksbehandlerAccessTokenWithPdlScope\n" to tokenUtil.getSaksbehandlerAccessTokenWithPdlScope(),
+            "\ngetAppAccessTokenWithGraphScope\n" to tokenUtil.getAppAccessTokenWithGraphScope(),
         )
     }
 
