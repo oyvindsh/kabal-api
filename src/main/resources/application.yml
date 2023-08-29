@@ -49,7 +49,7 @@ server:
       enabled: false
   shutdown: graceful
 
-navCallIdName: Nav-Callid
+navCallIdName: nav-callid
 
 management:
   health:
