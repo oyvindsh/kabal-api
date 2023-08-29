@@ -35,13 +35,28 @@ class CustomTraceFilter(
     ) {
         logger.debug("All baggage: ${tracer.allBaggage}")
         logger.debug("currentTraceContext: ${tracer.currentTraceContext()}")
+        logger.debug("context: ${tracer.currentTraceContext().context()}")
+        logger.debug("specific baggage: ${tracer.getBaggage(navCallIdName)}")
         logger.debug("currentSpan: ${tracer.currentSpan()}")
 
-        //Create if not exists
-        tracer.createBaggageInScope(navCallIdName, tracer.currentTraceContext().context()!!.traceId())
+        if (tracer.getBaggage(navCallIdName) != null) {
+            logger.debug("specific baggage wasn't null")
+            //Create if not exists
+            tracer.createBaggageInScope(navCallIdName, tracer.currentTraceContext().context()!!.traceId())
 
-        //also add this, since some services require that version/spelling
-        tracer.createBaggageInScope("Nav-Call-Id", tracer.currentTraceContext().context()!!.traceId())
+            //also add this, since some services require that version/spelling
+            tracer.createBaggageInScope("Nav-Call-Id", tracer.currentTraceContext().context()!!.traceId())
+        } else {
+            logger.debug("specific baggage was null")
+
+            //Create if not exists
+            tracer.createBaggageInScope(navCallIdName, tracer.currentTraceContext().context()!!.traceId())
+
+            //also add this, since some services require that version/spelling
+            tracer.createBaggageInScope("Nav-Call-Id", tracer.currentTraceContext().context()!!.traceId())
+        }
+
+        logger.debug("baggage after handling: ${tracer.getBaggage(navCallIdName)}")
 
         chain.doFilter(request, response)
     }
