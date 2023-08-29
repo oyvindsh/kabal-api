@@ -66,6 +66,8 @@ management:
     tags:
       application: ${spring.application.name}
   tracing:
+    sampling:
+      probability: 1.0
     baggage:
       remote-fields:
         - ${navCallIdName}

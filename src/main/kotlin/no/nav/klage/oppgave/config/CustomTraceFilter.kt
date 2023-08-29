@@ -33,6 +33,10 @@ class CustomTraceFilter(
         request: ServletRequest?, response: ServletResponse,
         chain: FilterChain
     ) {
+        logger.debug("All baggage: ${tracer.allBaggage}")
+        logger.debug("currentTraceContext: ${tracer.currentTraceContext()}")
+        logger.debug("currentSpan: ${tracer.currentSpan()}")
+
         //Create if not exists
         tracer.createBaggageInScope(navCallIdName, tracer.currentTraceContext().context()!!.traceId())
 
