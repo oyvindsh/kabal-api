@@ -789,9 +789,16 @@ class BehandlingService(
         return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
     }
 
-    fun getPotentialROLForBehandling(behandlingId: UUID): Saksbehandlere {
+    fun getPotentialROLForBehandling(behandlingId: UUID): Rols {
         val behandling = getBehandling(behandlingId)
-        return kabalInnstillingerService.getPotentialROL(behandling)
+        return Rols(
+            rols = kabalInnstillingerService.getPotentialROL(behandling).saksbehandlere.map {
+                Rols.Rol(
+                    navIdent = it.navIdent,
+                    navn = it.navn,
+                )
+            }
+        )
     }
 
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {

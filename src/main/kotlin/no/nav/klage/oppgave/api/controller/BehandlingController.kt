@@ -313,7 +313,7 @@ class BehandlingController(
     @GetMapping("/{behandlingId}/potentialrol")
     fun getPotentialROL(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): Saksbehandlere {
+    ): Rols {
         logMethodDetails(
             ::getPotentialROL.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),

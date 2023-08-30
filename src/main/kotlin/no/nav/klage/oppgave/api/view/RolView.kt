@@ -8,3 +8,7 @@ data class RolEditedView(
     val rolStateId: String?,
     val modified: LocalDateTime,
 )
+
+data class Rols(val rols: List<Rol>) {
+    data class Rol(val navIdent: String, val navn: String)
+}
