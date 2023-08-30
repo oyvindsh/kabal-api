@@ -9,7 +9,7 @@ import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
-import no.nav.klage.oppgave.api.view.MedunderskriverFlytResponse
+import no.nav.klage.oppgave.api.view.MedunderskriverFlowStateResponse
 import no.nav.klage.oppgave.api.view.MedunderskriverWrapped
 import no.nav.klage.oppgave.clients.arbeidoginntekt.ArbeidOgInntektClient
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
@@ -146,13 +146,13 @@ class BehandlingServiceTest {
         every { behandlingMapper.mapToMedunderskriverWrapped(any()) } returns MedunderskriverWrapped(
             medunderskriver = null,
             modified = LocalDateTime.now(),
-            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+            medunderskriverFlowState = FlowState.SENT,
         )
-        every { behandlingMapper.mapToMedunderskriverFlytResponse(any()) } returns MedunderskriverFlytResponse(
+        every { behandlingMapper.mapToMedunderskriverFlowStateResponse(any()) } returns MedunderskriverFlowStateResponse(
             navn = null,
             navIdent = null,
             modified = LocalDateTime.now(),
-            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER,
+            medunderskriverFlowState = FlowState.SENT
         )
         every { kakaApiGateway.getValidationErrors(any()) } returns emptyList()
         every { dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(any()) } returns emptySortedSet()
@@ -188,13 +188,13 @@ class BehandlingServiceTest {
     inner class SetMedunderskriverIdent {
         @Test
         fun `setMedunderskriverIdent kan sette medunderskriver til null`() {
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT
             )
 
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 behandlingId,
                 null,
                 SAKSBEHANDLER_IDENT
@@ -208,11 +208,11 @@ class BehandlingServiceTest {
     }
 
     @Nested
-    inner class SwitchMedunderskriverFlyt {
+    inner class SwitchMedunderskriverFlowState {
         @Test
-        fun `switchMedunderskriverFlyt gir forventet feil når bruker er saksbehandler og medunderskriver ikke er satt`() {
+        fun `switchMedunderskriverFlowState gir forventet feil når bruker er saksbehandler og medunderskriver ikke er satt`() {
             assertThrows<BehandlingManglerMedunderskriverException> {
-                behandlingService.switchMedunderskriverFlyt(
+                behandlingService.switchMedunderskriverFlowState(
                     behandlingId,
                     SAKSBEHANDLER_IDENT
                 )
@@ -220,90 +220,90 @@ class BehandlingServiceTest {
         }
 
         @Test
-        fun `switchMedunderskriverFlyt gir forventet status når bruker er saksbehandler og medunderskriver er satt`() {
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+        fun `switchMedunderskriverFlowState gir forventet status når bruker er saksbehandler og medunderskriver er satt`() {
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT
             )
 
-            behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlowState(
                 behandlingId,
                 SAKSBEHANDLER_IDENT
             )
 
             val output = behandlingRepository.getReferenceById(behandlingId)
-            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(output.medunderskriverFlowState).isEqualTo(FlowState.SENT)
         }
 
         @Test
-        fun `switchMedunderskriverFlyt gir forventet status når bruker er medunderskriver`() {
+        fun `switchMedunderskriverFlowState gir forventet status når bruker er medunderskriver`() {
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
 
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT,
-                MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+                FlowState.SENT,
             )
 
-            behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT
             )
 
             val output = behandlingRepository.getReferenceById(behandlingId)
 
-            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(output.medunderskriverFlowState).isEqualTo(FlowState.RETURNED)
         }
 
         @Test
-        fun `flere kall til switchMedunderskriverFlyt fra saksbehandler er idempotent`() {
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+        fun `flere kall til switchMedunderskriverFlowState fra saksbehandler er idempotent`() {
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT
             )
 
-            behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlowState(
                 behandlingId,
                 SAKSBEHANDLER_IDENT
             )
 
-            behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlowState(
                 behandlingId,
                 SAKSBEHANDLER_IDENT
             )
 
             val output = behandlingRepository.getReferenceById(behandlingId)
 
-            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+            assertThat(output.medunderskriverFlowState).isEqualTo(FlowState.SENT)
         }
 
         @Test
-        fun `flere kall til switchMedunderskriverFlyt fra medunderskriver er idempotent`() {
+        fun `flere kall til switchMedunderskriverFlowState fra medunderskriver er idempotent`() {
             every { innloggetSaksbehandlerService.getInnloggetIdent() } returns MEDUNDERSKRIVER_IDENT
 
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT,
                 SAKSBEHANDLER_IDENT,
-                MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+                FlowState.SENT,
             )
 
-            behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT
             )
 
-            behandlingService.switchMedunderskriverFlyt(
+            behandlingService.switchMedunderskriverFlowState(
                 behandlingId,
                 MEDUNDERSKRIVER_IDENT
             )
 
             val output = behandlingRepository.getReferenceById(behandlingId)
 
-            assertThat(output.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER)
+            assertThat(output.medunderskriverFlowState).isEqualTo(FlowState.RETURNED)
         }
     }
 

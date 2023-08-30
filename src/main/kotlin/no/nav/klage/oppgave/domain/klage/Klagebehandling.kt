@@ -59,12 +59,12 @@ class Klagebehandling(
     utfall: Utfall? = null,
     registreringshjemler: MutableSet<Registreringshjemmel> = mutableSetOf(),
     medunderskriver: MedunderskriverTildeling? = null,
-    medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
+    medunderskriverFlowState: FlowState = FlowState.NOT_SENT,
     medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
     avsluttet: LocalDateTime? = null,
     avsluttetAvSaksbehandler: LocalDateTime? = null,
     rolIdent: String? = null,
-    rolState: ROLState? = null,
+    rolFlowState: FlowState = FlowState.NOT_SENT,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -88,12 +88,12 @@ class Klagebehandling(
     utfall = utfall,
     registreringshjemler = registreringshjemler,
     medunderskriver = medunderskriver,
-    medunderskriverFlyt = medunderskriverFlyt,
+    medunderskriverFlowState = medunderskriverFlowState,
     medunderskriverHistorikk = medunderskriverHistorikk,
     avsluttet = avsluttet,
     avsluttetAvSaksbehandler = avsluttetAvSaksbehandler,
     rolIdent = rolIdent,
-    rolState = rolState,
+    rolFlowState = rolFlowState,
 ) {
 
     override fun toString(): String {

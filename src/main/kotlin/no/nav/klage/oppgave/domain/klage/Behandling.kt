@@ -116,9 +116,9 @@ abstract class Behandling(
         ]
     )
     var medunderskriver: MedunderskriverTildeling? = null,
-    @Column(name = "medunderskriverflyt_id")
-    @Convert(converter = MedunderskriverflytConverter::class)
-    var medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
+    @Column(name = "medunderskriver_flow_state_id")
+    @Convert(converter = FlowStateConverter::class)
+    var medunderskriverFlowState: FlowState = FlowState.NOT_SENT,
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
@@ -130,9 +130,9 @@ abstract class Behandling(
     var avsluttetAvSaksbehandler: LocalDateTime? = null,
     @Column(name = "rol_ident")
     var rolIdent: String?,
-    @Column(name = "rol_state_id")
-    @Convert(converter = ROLStateConverter::class)
-    var rolState: ROLState?,
+    @Column(name = "rol_flow_state_id")
+    @Convert(converter = FlowStateConverter::class)
+    var rolFlowState: FlowState = FlowState.NOT_SENT,
     ) {
 
     /**
@@ -144,8 +144,8 @@ abstract class Behandling(
             avsluttet != null -> Status.FULLFOERT
             avsluttetAvSaksbehandler != null -> Status.AVSLUTTET_AV_SAKSBEHANDLER
             sattPaaVent != null -> Status.SATT_PAA_VENT
-            medunderskriverFlyt == MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER -> Status.SENDT_TIL_MEDUNDERSKRIVER
-            medunderskriverFlyt == MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER -> Status.RETURNERT_TIL_SAKSBEHANDLER
+            medunderskriverFlowState == FlowState.SENT -> Status.SENDT_TIL_MEDUNDERSKRIVER
+            medunderskriverFlowState == FlowState.RETURNED -> Status.RETURNERT_TIL_SAKSBEHANDLER
             medunderskriver?.saksbehandlerident != null -> Status.MEDUNDERSKRIVER_VALGT
             tildeling?.saksbehandlerident != null -> Status.TILDELT
             tildeling?.saksbehandlerident == null -> Status.IKKE_TILDELT

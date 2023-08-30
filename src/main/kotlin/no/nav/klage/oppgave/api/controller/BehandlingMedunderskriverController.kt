@@ -3,7 +3,10 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.MedunderskriverFlowStateResponse
+import no.nav.klage.oppgave.api.view.MedunderskriverFlowStateView
+import no.nav.klage.oppgave.api.view.MedunderskriverWrapped
+import no.nav.klage.oppgave.api.view.SaksbehandlerInput
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
@@ -39,7 +42,7 @@ class BehandlingMedunderskriverController(
             behandlingId,
             logger
         )
-        return behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+        return behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
             behandlingId,
             input.navIdent,
             innloggetSaksbehandlerService.getInnloggetIdent()
@@ -51,18 +54,18 @@ class BehandlingMedunderskriverController(
         description = "Flytter fra saksbehandler til medunderskriver dersom saksbehandler utfører, flytter til saksbehandler med returnert-status dersom medunderskriver utfører."
     )
     @PostMapping("/{behandlingId}/send")
-    fun switchMedunderskriverFlyt(
+    fun switchMedunderskriverFlowState(
         @Parameter(description = "Id til behandlingen i vårt system")
         @PathVariable("behandlingId") behandlingId: UUID
-    ): MedunderskriverFlytResponse {
+    ): MedunderskriverFlowStateResponse {
         logKlagebehandlingMethodDetails(
-            ::switchMedunderskriverFlyt.name,
+            ::switchMedunderskriverFlowState.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
 
-        return behandlingService.switchMedunderskriverFlyt(
+        return behandlingService.switchMedunderskriverFlowState(
             behandlingId,
             innloggetSaksbehandlerService.getInnloggetIdent()
         )
@@ -81,17 +84,17 @@ class BehandlingMedunderskriverController(
         return behandlingService.getMedunderskriver(behandlingId)
     }
 
-    //TODO remove when frontend is updated and using /medunderskriver
-    @GetMapping("/{id}/medunderskriverflyt")
-    fun getMedunderskriverFlyt(
+    //TODO remove when frontend is updated and using /medunderskriver. Remove when we have events..
+    @GetMapping("/{id}/medunderskriverflowstate")
+    fun getMedunderskriverFlowState(
         @PathVariable("id") behandlingId: UUID
-    ): MedunderskriverFlytView {
+    ): MedunderskriverFlowStateView {
         logBehandlingMethodDetails(
-            ::getMedunderskriverFlyt.name,
+            ::getMedunderskriverFlowState.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
-        return behandlingService.getMedunderskriverFlyt(behandlingId)
+        return behandlingService.getMedunderskriverFlowState(behandlingId)
     }
 }

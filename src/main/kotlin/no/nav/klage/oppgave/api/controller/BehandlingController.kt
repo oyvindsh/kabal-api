@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.ROLState
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
@@ -446,26 +445,26 @@ class BehandlingController(
         return RolEditedView(
             navIdent = behandling.rolIdent,
             navn = if (behandling.rolIdent != null) saksbehandlerService.getNameForIdent(behandling.rolIdent!!) else null,
-            rolStateId = behandling.rolState?.id,
+            rolFlowState = behandling.rolFlowState,
             modified = behandling.modified,
         )
     }
 
-    @PutMapping("/{behandlingId}/rolstateid")
-    fun setROLStateId(
+    @PutMapping("/{behandlingId}/rolflowstate")
+    fun setROLFlowState(
         @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: NullableIdInput,
+        @RequestBody input: FlowStateInput,
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
-            ::setROLStateId.name,
+            ::setROLFlowState.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
 
-        val modified = behandlingService.setROLState(
+        val modified = behandlingService.setROLFlowState(
             behandlingId = behandlingId,
-            rolState = if (input.id != null) ROLState.of(input.id) else null,
+            flowState = input.flowState,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).modified
 

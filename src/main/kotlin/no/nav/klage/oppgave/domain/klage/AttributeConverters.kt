@@ -27,23 +27,13 @@ class FagsystemConverter : AttributeConverter<Fagsystem, String?> {
 }
 
 @Converter
-class MedunderskriverflytConverter : AttributeConverter<MedunderskriverFlyt, String?> {
+class FlowStateConverter : AttributeConverter<FlowState, String?> {
 
-    override fun convertToDatabaseColumn(entity: MedunderskriverFlyt?): String? =
+    override fun convertToDatabaseColumn(entity: FlowState?): String? =
         entity?.id
 
-    override fun convertToEntityAttribute(id: String?): MedunderskriverFlyt? =
-        id?.let { MedunderskriverFlyt.of(it) }
-}
-
-@Converter
-class ROLStateConverter : AttributeConverter<ROLState, String?> {
-
-    override fun convertToDatabaseColumn(entity: ROLState?): String? =
-        entity?.id
-
-    override fun convertToEntityAttribute(id: String?): ROLState? =
-        id?.let { ROLState.of(it) }
+    override fun convertToEntityAttribute(id: String?): FlowState? =
+        id?.let { FlowState.of(it) }
 }
 
 @Converter

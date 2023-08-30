@@ -57,7 +57,7 @@ internal class KlagebehandlingTest {
         fun `status SENDT_TIL_MEDUNDERSKRIVER`() {
             val klagebehandling = getKlagebehandling()
             klagebehandling.medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now())
-            klagebehandling.medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+            klagebehandling.medunderskriverFlowState = FlowState.SENT
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.SENDT_TIL_MEDUNDERSKRIVER)
         }
 
@@ -65,7 +65,7 @@ internal class KlagebehandlingTest {
         fun `status RETURNERT_TIL_SAKSBEHANDLER`() {
             val klagebehandling = getKlagebehandling()
             klagebehandling.medunderskriver = MedunderskriverTildeling("abc123", LocalDateTime.now())
-            klagebehandling.medunderskriverFlyt = MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER
+            klagebehandling.medunderskriverFlowState = FlowState.RETURNED
             assertThat(klagebehandling.getStatus()).isEqualTo(Behandling.Status.RETURNERT_TIL_SAKSBEHANDLER)
         }
 

@@ -88,7 +88,7 @@ class BehandlingMedunderskriverControllerTest {
     @Test
     fun `putMedunderskriverident with correct input should return ok`() {
         every {
-            behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandlingService.setMedunderskriverIdentAndMedunderskriverFlowState(
                 any(),
                 any(),
                 any(),
@@ -96,7 +96,7 @@ class BehandlingMedunderskriverControllerTest {
             )
         } returns MedunderskriverWrapped(
             modified = klagebehandling.modified,
-            medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
+            medunderskriverFlowState = klagebehandling.medunderskriverFlowState,
             medunderskriver = SaksbehandlerView(
                 navn = "Ola Nordmann",
                 navIdent = "B54321",

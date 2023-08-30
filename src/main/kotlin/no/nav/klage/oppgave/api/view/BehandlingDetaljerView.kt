@@ -1,6 +1,6 @@
 package no.nav.klage.oppgave.api.view
 
-import no.nav.klage.kodeverk.MedunderskriverFlyt
+import no.nav.klage.kodeverk.FlowState
 import no.nav.klage.oppgave.domain.klage.SattPaaVent
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,8 +24,6 @@ data class BehandlingDetaljerView(
     val frist: LocalDate? = null,
     val tildeltSaksbehandlerident: String? = null,
     val tildeltSaksbehandlerEnhet: String? = null,
-    val medunderskriverident: String? = null,
-    val medunderskriverFlyt: MedunderskriverFlyt,
     val datoSendtMedunderskriver: LocalDate?,
     val hjemmelIdList: List<String>,
     val modified: LocalDateTime,
@@ -46,14 +44,15 @@ data class BehandlingDetaljerView(
     val kjennelseMottatt: LocalDateTime? = null,
     val feilregistrering: FeilregistreringView? = null,
     val fagsystemId: String,
-    val rol: ROLView?,
+    val rol: CombinedMedunderskriverAndROLView?,
+    val medunderskriver: CombinedMedunderskriverAndROLView,
     val relevantDocumentIdList: Set<String>,
     val saksnummer: String,
 ) {
 
-    data class ROLView(
+    data class CombinedMedunderskriverAndROLView(
         val navIdent: String?,
-        val stateId: String,
+        val flowState: FlowState,
     )
 
     data class KvalitetsvurderingReference(

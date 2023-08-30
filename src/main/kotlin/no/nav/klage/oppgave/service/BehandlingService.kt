@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
-import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
@@ -28,11 +27,11 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFrist
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setInnsendingshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setKlager
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlyt
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlowState
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlowState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLFlowState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLIdent
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
@@ -269,7 +268,7 @@ class BehandlingService(
                 logger.debug("Tildeling av behandling ble registrert i Infotrygd.")
             }
         } else {
-            if (behandling.medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER) {
+            if (behandling.medunderskriverFlowState == FlowState.SENT) {
                 throw IllegalOperation("Kan ikke fradele behandling sendt til medunderskriver.")
             }
 
@@ -334,9 +333,9 @@ class BehandlingService(
         return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
-    fun getMedunderskriverFlyt(behandlingId: UUID): MedunderskriverFlytView {
+    fun getMedunderskriverFlowState(behandlingId: UUID): MedunderskriverFlowStateView {
         val behandling = getBehandling(behandlingId)
-        return behandlingMapper.mapToMedunderskriverFlytView(behandling)
+        return behandlingMapper.mapToMedunderskriverFlowStateView(behandling)
     }
 
     fun setSattPaaVent(
@@ -531,11 +530,11 @@ class BehandlingService(
         return behandling.modified
     }
 
-    fun setMedunderskriverIdentAndMedunderskriverFlyt(
+    fun setMedunderskriverIdentAndMedunderskriverFlowState(
         behandlingId: UUID,
         medunderskriverIdent: String?,
         utfoerendeSaksbehandlerIdent: String,
-        medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT
+        medunderskriverFlowState: FlowState = FlowState.NOT_SENT
     ): MedunderskriverWrapped {
         val behandling =
             if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
@@ -545,19 +544,19 @@ class BehandlingService(
             }
 
         val event =
-            behandling.setMedunderskriverIdentAndMedunderskriverFlyt(
+            behandling.setMedunderskriverIdentAndMedunderskriverFlowState(
                 medunderskriverIdent,
-                medunderskriverFlyt,
+                medunderskriverFlowState,
                 utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
         return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
-    fun switchMedunderskriverFlyt(
+    fun switchMedunderskriverFlowState(
         behandlingId: UUID,
         utfoerendeSaksbehandlerIdent: String
-    ): MedunderskriverFlytResponse {
+    ): MedunderskriverFlowStateResponse {
         val behandling = getBehandling(behandlingId)
 
         if (behandling.medunderskriver?.saksbehandlerident == null) {
@@ -566,25 +565,25 @@ class BehandlingService(
 
         if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
             verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
-            if (behandling.medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
-                val event = behandling.setMedunderskriverFlyt(
-                    MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
+            if (behandling.medunderskriverFlowState != FlowState.RETURNED) {
+                val event = behandling.setMedunderskriverFlowState(
+                    FlowState.RETURNED,
                     utfoerendeSaksbehandlerIdent
                 )
                 applicationEventPublisher.publishEvent(event)
             }
         } else {
             checkSkrivetilgang(behandling)
-            if (behandling.medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER) {
-                val event = behandling.setMedunderskriverFlyt(
-                    OVERSENDT_TIL_MEDUNDERSKRIVER,
+            if (behandling.medunderskriverFlowState != FlowState.SENT) {
+                val event = behandling.setMedunderskriverFlowState(
+                    FlowState.SENT,
                     utfoerendeSaksbehandlerIdent
                 )
                 applicationEventPublisher.publishEvent(event)
             }
         }
 
-        return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
+        return behandlingMapper.mapToMedunderskriverFlowStateResponse(behandling)
     }
 
     fun fetchDokumentlisteForBehandling(
@@ -934,9 +933,9 @@ class BehandlingService(
         return behandling
     }
 
-    fun setROLState(
+    fun setROLFlowState(
         behandlingId: UUID,
-        rolState: ROLState?,
+        flowState: FlowState,
         utfoerendeSaksbehandlerIdent: String,
         systemUserContext: Boolean = false
     ): Behandling {
@@ -945,8 +944,8 @@ class BehandlingService(
             systemUserContext = systemUserContext,
         )
         val event =
-            behandling.setROLState(
-                newROLState = rolState,
+            behandling.setROLFlowState(
+                newROLFlowStateState = flowState,
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)

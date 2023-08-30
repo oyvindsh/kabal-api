@@ -1,7 +1,6 @@
 package no.nav.klage.oppgave.domain.klage
 
-import no.nav.klage.kodeverk.MedunderskriverFlyt
-import no.nav.klage.kodeverk.ROLState
+import no.nav.klage.kodeverk.FlowState
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -66,28 +65,28 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Behandling.setMedunderskriverIdentAndMedunderskriverFlyt(
+    fun Behandling.setMedunderskriverIdentAndMedunderskriverFlowState(
         nyVerdiMedunderskriverident: String?,
-        nyVerdiMedunderskriverFlyt: MedunderskriverFlyt,
+        nyVerdiMedunderskriverFlowState: FlowState,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
         val gammelVerdiMedunderskriverident = medunderskriver?.saksbehandlerident
-        val gammelVerdiMedunderskriverFlyt = medunderskriverFlyt
+        val gammelVerdiMedunderskriverFlowState = medunderskriverFlowState
         val tidspunkt = LocalDateTime.now()
         if (medunderskriver != null) {
             medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = medunderskriver!!.copy()))
         }
         medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
-        medunderskriverFlyt = nyVerdiMedunderskriverFlyt
+        medunderskriverFlowState = nyVerdiMedunderskriverFlowState
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.MEDUNDERSKRIVERFLYT_ID,
-            fraVerdi = gammelVerdiMedunderskriverFlyt.id,
-            tilVerdi = nyVerdiMedunderskriverFlyt.id,
+            felt = Felt.MEDUNDERSKRIVER_FLOW_STATE_ID,
+            fraVerdi = gammelVerdiMedunderskriverFlowState.id,
+            tilVerdi = nyVerdiMedunderskriverFlowState.id,
             tidspunkt = tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
@@ -102,46 +101,46 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Behandling.setMedunderskriverFlyt(
-        nyMedunderskriverFlyt: MedunderskriverFlyt,
+    fun Behandling.setMedunderskriverFlowState(
+        nyMedunderskriverFlowState: FlowState,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdiMedunderskriverFlyt = medunderskriverFlyt
+        val gammelVerdiMedunderskriverFlowState = medunderskriverFlowState
         val tidspunkt = LocalDateTime.now()
 
-        medunderskriverFlyt = nyMedunderskriverFlyt
+        medunderskriverFlowState = nyMedunderskriverFlowState
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.MEDUNDERSKRIVERFLYT_ID,
-            fraVerdi = gammelVerdiMedunderskriverFlyt.id,
-            tilVerdi = nyMedunderskriverFlyt.id,
+            felt = Felt.MEDUNDERSKRIVER_FLOW_STATE_ID,
+            fraVerdi = gammelVerdiMedunderskriverFlowState.id,
+            tilVerdi = nyMedunderskriverFlowState.id,
             tidspunkt = tidspunkt
         )?.let { endringslogginnslag.add(it) }
 
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Behandling.setROLState(
-        newROLState: ROLState?,
+    fun Behandling.setROLFlowState(
+        newROLFlowStateState: FlowState,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val oldValue = rolState
+        val oldValue = rolFlowState
         val now = LocalDateTime.now()
 
-        rolState = newROLState
+        rolFlowState = newROLFlowStateState
         modified = now
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
 
         endringslogg(
             saksbehandlerident = saksbehandlerident,
-            felt = Felt.ROL_STATE_ID,
-            fraVerdi = oldValue?.id,
-            tilVerdi = rolState?.id,
+            felt = Felt.ROL_FLOW_STATE_ID,
+            fraVerdi = oldValue.id,
+            tilVerdi = rolFlowState.id,
             tidspunkt = now
         )?.let { endringslogginnslag.add(it) }
 

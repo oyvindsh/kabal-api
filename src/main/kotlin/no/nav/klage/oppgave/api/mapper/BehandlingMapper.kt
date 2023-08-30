@@ -59,8 +59,6 @@ class BehandlingMapper(
             frist = klagebehandling.frist,
             tildeltSaksbehandlerident = klagebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandlerEnhet = klagebehandling.tildeling?.enhet,
-            medunderskriverident = klagebehandling.medunderskriver?.saksbehandlerident,
-            medunderskriverFlyt = klagebehandling.medunderskriverFlyt,
             datoSendtMedunderskriver = klagebehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemmelIdList = klagebehandling.hjemler.map { it.id },
             modified = klagebehandling.modified,
@@ -88,21 +86,27 @@ class BehandlingMapper(
             sattPaaVent = klagebehandling.sattPaaVent,
             feilregistrering = klagebehandling.feilregistrering.toView(),
             fagsystemId = klagebehandling.fagsystem.id,
-            rol = klagebehandling.toROLView(),
             relevantDocumentIdList = klagebehandling.saksdokumenter.map {
                 it.dokumentInfoId
             }.toSet(),
             saksnummer = klagebehandling.fagsakId,
+            rol = klagebehandling.toROLView(),
+            medunderskriver = klagebehandling.toMedunderskriverView(),
         )
     }
 
-    private fun Behandling.toROLView(): BehandlingDetaljerView.ROLView? {
-        return if (rolState != null) {
-            BehandlingDetaljerView.ROLView(
-                navIdent = if (rolIdent != null) rolIdent!! else null,
-                stateId = rolState!!.id,
-            )
-        } else null
+    private fun Behandling.toROLView(): BehandlingDetaljerView.CombinedMedunderskriverAndROLView {
+       return BehandlingDetaljerView.CombinedMedunderskriverAndROLView(
+            navIdent = rolIdent,
+            flowState = rolFlowState,
+        )
+    }
+
+    private fun Behandling.toMedunderskriverView(): BehandlingDetaljerView.CombinedMedunderskriverAndROLView {
+        return BehandlingDetaljerView.CombinedMedunderskriverAndROLView(
+            navIdent = medunderskriver?.saksbehandlerident,
+            flowState = medunderskriverFlowState,
+        )
     }
 
     fun mapAnkebehandlingToBehandlingDetaljerView(ankebehandling: Ankebehandling): BehandlingDetaljerView {
@@ -126,8 +130,6 @@ class BehandlingMapper(
             frist = ankebehandling.frist,
             tildeltSaksbehandlerident = ankebehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandlerEnhet = ankebehandling.tildeling?.enhet,
-            medunderskriverident = ankebehandling.medunderskriver?.saksbehandlerident,
-            medunderskriverFlyt = ankebehandling.medunderskriverFlyt,
             datoSendtMedunderskriver = ankebehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemmelIdList = ankebehandling.hjemler.map { it.id },
             modified = ankebehandling.modified,
@@ -156,11 +158,12 @@ class BehandlingMapper(
             sattPaaVent = ankebehandling.sattPaaVent,
             feilregistrering = ankebehandling.feilregistrering.toView(),
             fagsystemId = ankebehandling.fagsystem.id,
-            rol = ankebehandling.toROLView(),
             relevantDocumentIdList = ankebehandling.saksdokumenter.map {
                 it.dokumentInfoId
             }.toSet(),
             saksnummer = ankebehandling.fagsakId,
+            rol = ankebehandling.toROLView(),
+            medunderskriver = ankebehandling.toMedunderskriverView(),
         )
     }
 
@@ -183,8 +186,6 @@ class BehandlingMapper(
             frist = ankeITrygderettenbehandling.frist,
             tildeltSaksbehandlerident = ankeITrygderettenbehandling.tildeling?.saksbehandlerident,
             tildeltSaksbehandlerEnhet = ankeITrygderettenbehandling.tildeling?.enhet,
-            medunderskriverident = ankeITrygderettenbehandling.medunderskriver?.saksbehandlerident,
-            medunderskriverFlyt = ankeITrygderettenbehandling.medunderskriverFlyt,
             datoSendtMedunderskriver = ankeITrygderettenbehandling.medunderskriver?.tidspunkt?.toLocalDate(),
             hjemmelIdList = ankeITrygderettenbehandling.hjemler.map { it.id },
             modified = ankeITrygderettenbehandling.modified,
@@ -210,11 +211,12 @@ class BehandlingMapper(
             kjennelseMottatt = ankeITrygderettenbehandling.kjennelseMottatt,
             feilregistrering = ankeITrygderettenbehandling.feilregistrering.toView(),
             fagsystemId = ankeITrygderettenbehandling.fagsystem.id,
-            rol = ankeITrygderettenbehandling.toROLView(),
             relevantDocumentIdList = ankeITrygderettenbehandling.saksdokumenter.map {
                 it.dokumentInfoId
             }.toSet(),
             saksnummer = ankeITrygderettenbehandling.fagsakId,
+            rol = null,
+            medunderskriver = ankeITrygderettenbehandling.toMedunderskriverView(),
         )
     }
 
@@ -340,14 +342,14 @@ class BehandlingMapper(
         )
     }
 
-    fun mapToMedunderskriverFlytResponse(behandling: Behandling): MedunderskriverFlytResponse {
-        return MedunderskriverFlytResponse(
+    fun mapToMedunderskriverFlowStateResponse(behandling: Behandling): MedunderskriverFlowStateResponse {
+        return MedunderskriverFlowStateResponse(
             navn = if (behandling.medunderskriver?.saksbehandlerident != null) saksbehandlerRepository.getNameForSaksbehandler(
                 behandling.medunderskriver?.saksbehandlerident!!
             ) else null,
             navIdent = behandling.medunderskriver?.saksbehandlerident,
             modified = behandling.modified,
-            medunderskriverFlyt = behandling.medunderskriverFlyt,
+            medunderskriverFlowState = behandling.medunderskriverFlowState,
         )
     }
 
@@ -355,13 +357,13 @@ class BehandlingMapper(
         return MedunderskriverWrapped(
             medunderskriver = getSaksbehandlerView(behandling.medunderskriver?.saksbehandlerident),
             modified = behandling.modified,
-            medunderskriverFlyt = behandling.medunderskriverFlyt,
+            medunderskriverFlowState = behandling.medunderskriverFlowState,
         )
     }
 
-    fun mapToMedunderskriverFlytView(behandling: Behandling): MedunderskriverFlytView {
-        return MedunderskriverFlytView(
-            medunderskriverFlyt = behandling.medunderskriverFlyt
+    fun mapToMedunderskriverFlowStateView(behandling: Behandling): MedunderskriverFlowStateView {
+        return MedunderskriverFlowStateView(
+            flowState = behandling.medunderskriverFlowState
         )
     }
 
