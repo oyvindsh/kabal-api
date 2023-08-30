@@ -189,6 +189,7 @@ class DokumentService(
             )
             val info: PDDocumentInformation = document.documentInformation
             info.title = title
+            document.isAllSecurityToBeRemoved = true
             document.save(baos)
             document.close()
         }
