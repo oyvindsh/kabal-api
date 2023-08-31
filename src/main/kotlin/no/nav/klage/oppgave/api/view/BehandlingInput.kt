@@ -6,6 +6,10 @@ data class BehandlingDateInput(
     val date: LocalDate
 )
 
+data class BehandlingDateNullableInput(
+    val date: LocalDate?
+)
+
 data class SattPaaVentInput(
     val to: LocalDate,
     val reason: String
