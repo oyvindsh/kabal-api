@@ -17,7 +17,10 @@ import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.MergedDocumentRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.io.RandomAccessReadBuffer
+import org.apache.pdfbox.io.RandomAccessStreamCache.StreamCacheCreateFunction
 import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentInformation
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
@@ -177,16 +181,17 @@ class DokumentService(
         )
     }
 
+    @Throws(IOException::class)
+    private fun getMixedMemorySettingsForPDFBox(bytes: Long): StreamCacheCreateFunction {
+        return MemoryUsageSetting.setupMixed(bytes).streamCache
+    }
+
     fun changeTitleInPDF(documentBytes: ByteArray, title: String): ByteArray {
         val baos = ByteArrayOutputStream()
         val timeMillis = measureTimeMillis {
-            val document: PDDocument = PDDocument.load(
-                documentBytes,
-                "",
-                null,
-                null,
-                MemoryUsageSetting.setupMixed(50_000_000)
-            )
+            val document: PDDocument =
+                Loader.loadPDF(RandomAccessReadBuffer(documentBytes), getMixedMemorySettingsForPDFBox(50_000_000))
+
             val info: PDDocumentInformation = document.documentInformation
             info.title = title
             document.isAllSecurityToBeRemoved = true
@@ -291,7 +296,7 @@ class DokumentService(
         }
 
         //just under 256 MB before using file system
-        merger.mergeDocuments(MemoryUsageSetting.setupMixed(250_000_000))
+        merger.mergeDocuments(getMixedMemorySettingsForPDFBox(250_000_000))
 
         //clean tmp files that were downloaded from SAF
         try {
