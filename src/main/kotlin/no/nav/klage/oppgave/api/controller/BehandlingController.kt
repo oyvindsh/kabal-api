@@ -161,7 +161,7 @@ class BehandlingController(
     @PutMapping("/{behandlingId}/kjennelsemottatt")
     fun setKjennelseMottatt(
         @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: BehandlingDateInput
+        @RequestBody input: BehandlingDateNullableInput
     ): BehandlingEditedView {
         logBehandlingMethodDetails(
             ::setKjennelseMottatt.name,
@@ -172,7 +172,7 @@ class BehandlingController(
 
         val modified = behandlingService.setKjennelseMottatt(
             behandlingId = behandlingId,
-            date = input.date.atStartOfDay(),
+            date = input.date?.atStartOfDay(),
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
@@ -204,7 +204,7 @@ class BehandlingController(
      * Valgfri validering før innsending/fullføring.
      * Gjøres uansett ved fullføring av behandlingen.
      */
-    @GetMapping("/{behandlingId}/validate")
+    @GetMapping("/{behandlingId}/validate", "/{behandlingId}/validate/fullfoer")
     fun validate(
         @PathVariable("behandlingId") behandlingId: UUID
     ): ValidationPassedResponse {
@@ -216,6 +216,42 @@ class BehandlingController(
         )
 
         behandlingService.validateBehandlingBeforeFinalize(behandlingId)
+        return ValidationPassedResponse()
+    }
+
+    /**
+     * Valgfri validering før feilregistrering.
+     */
+    @GetMapping("/{behandlingId}/validate/feilregistrer")
+    fun validateFeilregistrering(
+        @PathVariable("behandlingId") behandlingId: UUID
+    ): ValidationPassedResponse {
+        logKlagebehandlingMethodDetails(
+            ::validateFeilregistrering.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        behandlingService.validateFeilregistrering(behandlingId)
+        return ValidationPassedResponse()
+    }
+
+    /**
+     * Valgfri validering før ny ankebehandling.
+     */
+    @GetMapping("/{behandlingId}/validate/nyankebehandling")
+    fun validateAnkebehandling(
+        @PathVariable("behandlingId") behandlingId: UUID
+    ): ValidationPassedResponse {
+        logKlagebehandlingMethodDetails(
+            ::validateAnkebehandling.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        behandlingService.validateAnkeITrygderettenbehandlingBeforeNyAnkebehandling(behandlingId)
         return ValidationPassedResponse()
     }
 
@@ -475,7 +511,7 @@ class BehandlingController(
             logger
         )
 
-        behandlingService.validateBehandlingBeforeFinalize(behandlingId)
+        behandlingService.validateAnkeITrygderettenbehandlingBeforeNyAnkebehandling(behandlingId)
 
         behandlingService.setNyAnkebehandlingKA(
             behandlingId = behandlingId,
