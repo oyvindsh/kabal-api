@@ -7,11 +7,11 @@ data class MedunderskriverFlowStateResponse (
     val navn: String?,
     val navIdent: String?,
     val modified: LocalDateTime,
-    val medunderskriverFlowState: FlowState,
+    val flowState: FlowState,
 )
 
 data class MedunderskriverWrapped (
-    val medunderskriver: SaksbehandlerView?,
+    val navIdent: String?,
     val modified: LocalDateTime,
-    val medunderskriverFlowState: FlowState,
+    val flowState: FlowState,
 )

@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.mapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import no.nav.klage.kodeverk.*
-import no.nav.klage.oppgave.api.view.SaksbehandlerView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
@@ -54,7 +53,7 @@ class BehandlingMapperTest {
         val viewResult = behandlingMapper.mapToMedunderskriverWrapped(klagebehandling)
         val flytViewResult = behandlingMapper.mapToMedunderskriverFlowStateView(klagebehandling)
 
-        assertThat(viewResult.medunderskriver?.navIdent).isNull()
+        assertThat(viewResult.navIdent).isNull()
         assertThat(flytViewResult.flowState).isEqualTo(FlowState.NOT_SENT)
     }
 
@@ -66,12 +65,7 @@ class BehandlingMapperTest {
         val viewResult = behandlingMapper.mapToMedunderskriverWrapped(klagebehandling)
         val flytViewResult = behandlingMapper.mapToMedunderskriverFlowStateView(klagebehandling)
 
-        assertThat(viewResult.medunderskriver).isEqualTo(
-            SaksbehandlerView(
-                navIdent = MEDUNDERSKRIVER_IDENT,
-                navn = MEDUNDERSKRIVER_NAVN
-            )
-        )
+        assertThat(viewResult.navIdent).isEqualTo(MEDUNDERSKRIVER_IDENT)
         assertThat(flytViewResult.flowState).isEqualTo(FlowState.SENT)
     }
 

@@ -349,20 +349,20 @@ class BehandlingMapper(
             ) else null,
             navIdent = behandling.medunderskriver?.saksbehandlerident,
             modified = behandling.modified,
-            medunderskriverFlowState = behandling.medunderskriverFlowState,
+            flowState = behandling.medunderskriverFlowState,
         )
     }
 
     fun mapToMedunderskriverWrapped(behandling: Behandling): MedunderskriverWrapped {
         return MedunderskriverWrapped(
-            medunderskriver = getSaksbehandlerView(behandling.medunderskriver?.saksbehandlerident),
+            navIdent = behandling.medunderskriver?.saksbehandlerident,
             modified = behandling.modified,
-            medunderskriverFlowState = behandling.medunderskriverFlowState,
+            flowState = behandling.medunderskriverFlowState,
         )
     }
 
-    fun mapToMedunderskriverFlowStateView(behandling: Behandling): MedunderskriverFlowStateView {
-        return MedunderskriverFlowStateView(
+    fun mapToMedunderskriverFlowStateView(behandling: Behandling): FlowStateView {
+        return FlowStateView(
             flowState = behandling.medunderskriverFlowState
         )
     }

@@ -460,53 +460,6 @@ class BehandlingController(
         return BehandlingEditedView(modified = modified)
     }
 
-    @PutMapping("/{behandlingId}/rolident")
-    fun setROLIdent(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: SaksbehandlerInput
-    ): RolEditedView {
-        logBehandlingMethodDetails(
-            ::setROLIdent.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-
-        val behandling = behandlingService.setROLIdent(
-            behandlingId = behandlingId,
-            rolIdent = input.navIdent,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        )
-
-        return RolEditedView(
-            navIdent = behandling.rolIdent,
-            navn = if (behandling.rolIdent != null) saksbehandlerService.getNameForIdent(behandling.rolIdent!!) else null,
-            rolFlowState = behandling.rolFlowState,
-            modified = behandling.modified,
-        )
-    }
-
-    @PutMapping("/{behandlingId}/rolflowstate")
-    fun setROLFlowState(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: FlowStateInput,
-    ): BehandlingEditedView {
-        logBehandlingMethodDetails(
-            ::setROLFlowState.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-
-        val modified = behandlingService.setROLFlowState(
-            behandlingId = behandlingId,
-            flowState = input.flowState,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        ).modified
-
-        return BehandlingEditedView(modified = modified)
-    }
-
     @PostMapping("/{behandlingId}/nyankebehandlingka")
     fun nyAnkebehandlingKA(
         @PathVariable("behandlingId") behandlingId: UUID,

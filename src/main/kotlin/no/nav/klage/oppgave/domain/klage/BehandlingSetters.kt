@@ -17,7 +17,8 @@ object BehandlingSetters {
         saksbehandlerident: String
     ): BehandlingEndretEvent {
         if (!(nyVerdiSaksbehandlerident == null && nyVerdiEnhet == null) &&
-            !(nyVerdiSaksbehandlerident != null && nyVerdiEnhet != null)) {
+            !(nyVerdiSaksbehandlerident != null && nyVerdiEnhet != null)
+        ) {
             error("saksbehandler and enhet must both be set (or null)")
         }
 
@@ -65,42 +66,6 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
-    fun Behandling.setMedunderskriverIdentAndMedunderskriverFlowState(
-        nyVerdiMedunderskriverident: String?,
-        nyVerdiMedunderskriverFlowState: FlowState,
-        saksbehandlerident: String
-    ): BehandlingEndretEvent {
-        val gammelVerdiMedunderskriverident = medunderskriver?.saksbehandlerident
-        val gammelVerdiMedunderskriverFlowState = medunderskriverFlowState
-        val tidspunkt = LocalDateTime.now()
-        if (medunderskriver != null) {
-            medunderskriverHistorikk.add(MedunderskriverHistorikk(medunderskriver = medunderskriver!!.copy()))
-        }
-        medunderskriver = MedunderskriverTildeling(nyVerdiMedunderskriverident, tidspunkt)
-        medunderskriverFlowState = nyVerdiMedunderskriverFlowState
-        modified = tidspunkt
-
-        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
-
-        endringslogg(
-            saksbehandlerident = saksbehandlerident,
-            felt = Felt.MEDUNDERSKRIVER_FLOW_STATE_ID,
-            fraVerdi = gammelVerdiMedunderskriverFlowState.id,
-            tilVerdi = nyVerdiMedunderskriverFlowState.id,
-            tidspunkt = tidspunkt
-        )?.let { endringslogginnslag.add(it) }
-
-        endringslogg(
-            saksbehandlerident = saksbehandlerident,
-            felt = Felt.MEDUNDERSKRIVERIDENT,
-            fraVerdi = gammelVerdiMedunderskriverident,
-            tilVerdi = nyVerdiMedunderskriverident,
-            tidspunkt = tidspunkt
-        )?.let { endringslogginnslag.add(it) }
-
-        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
-    }
-
     fun Behandling.setMedunderskriverFlowState(
         nyMedunderskriverFlowState: FlowState,
         saksbehandlerident: String
@@ -118,6 +83,32 @@ object BehandlingSetters {
             felt = Felt.MEDUNDERSKRIVER_FLOW_STATE_ID,
             fraVerdi = gammelVerdiMedunderskriverFlowState.id,
             tilVerdi = nyMedunderskriverFlowState.id,
+            tidspunkt = tidspunkt
+        )?.let { endringslogginnslag.add(it) }
+
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
+    }
+
+    fun Behandling.setMedunderskriverNavIdent(
+        nyMedunderskriverNavIdent: String?,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val gammelVerdiMedunderskriverNavIdent = medunderskriver?.saksbehandlerident
+        val tidspunkt = LocalDateTime.now()
+
+        medunderskriver = MedunderskriverTildeling(
+            saksbehandlerident = nyMedunderskriverNavIdent,
+            tidspunkt = tidspunkt,
+        )
+        modified = tidspunkt
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.MEDUNDERSKRIVERIDENT,
+            fraVerdi = gammelVerdiMedunderskriverNavIdent,
+            tilVerdi = nyMedunderskriverNavIdent,
             tidspunkt = tidspunkt
         )?.let { endringslogginnslag.add(it) }
 

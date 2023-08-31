@@ -28,7 +28,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setInnsendingshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setKlager
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlowState
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlowState
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverNavIdent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLFlowState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLIdent
@@ -456,7 +456,7 @@ class BehandlingService(
         return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
-    fun getMedunderskriverFlowState(behandlingId: UUID): MedunderskriverFlowStateView {
+    fun getMedunderskriverFlowState(behandlingId: UUID): FlowStateView {
         val behandling = getBehandling(behandlingId)
         return behandlingMapper.mapToMedunderskriverFlowStateView(behandling)
     }
@@ -659,11 +659,10 @@ class BehandlingService(
         return behandling.modified
     }
 
-    fun setMedunderskriverIdentAndMedunderskriverFlowState(
+    fun setMedunderskriverFlowState(
         behandlingId: UUID,
-        medunderskriverIdent: String?,
         utfoerendeSaksbehandlerIdent: String,
-        medunderskriverFlowState: FlowState = FlowState.NOT_SENT
+        flowState: FlowState,
     ): MedunderskriverWrapped {
         val behandling =
             if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
@@ -673,10 +672,30 @@ class BehandlingService(
             }
 
         val event =
-            behandling.setMedunderskriverIdentAndMedunderskriverFlowState(
-                medunderskriverIdent,
-                medunderskriverFlowState,
-                utfoerendeSaksbehandlerIdent
+            behandling.setMedunderskriverFlowState(
+                nyMedunderskriverFlowState = flowState,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
+    }
+
+    fun setMedunderskriverNavIdent(
+        behandlingId: UUID,
+        utfoerendeSaksbehandlerIdent: String,
+        navIdent: String?,
+    ): MedunderskriverWrapped {
+        val behandling =
+            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
+                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+            } else {
+                getBehandlingForUpdate(behandlingId = behandlingId)
+            }
+
+        val event =
+            behandling.setMedunderskriverNavIdent(
+                nyMedunderskriverNavIdent = navIdent,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
         return behandlingMapper.mapToMedunderskriverWrapped(behandling)
