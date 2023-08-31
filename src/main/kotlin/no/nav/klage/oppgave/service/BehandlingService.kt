@@ -267,7 +267,8 @@ class BehandlingService(
             )
         }
 
-        fun getErrorText(prop: String) = "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
+        fun getErrorText(prop: String) =
+            "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
 
         if (behandling.utfall != null) {
             if (behandling.utfall == Utfall.HENVIST) {
@@ -664,12 +665,10 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         flowState: FlowState,
     ): MedunderskriverWrapped {
-        val behandling =
-            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
-                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
-            } else {
-                getBehandlingForUpdate(behandlingId = behandlingId)
-            }
+        val behandling = getBehandlingForWriteAllowROLAndMU(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
+        )
 
         val event =
             behandling.setMedunderskriverFlowState(
@@ -698,7 +697,10 @@ class BehandlingService(
 
                 getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
             } else {
-                getBehandlingForUpdate(behandlingId = behandlingId)
+                getBehandlingForWriteAllowROLAndMU(
+                    behandlingId = behandlingId,
+                    utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                )
             }
 
         val event =
@@ -881,7 +883,7 @@ class BehandlingService(
     }
 
     @Transactional(readOnly = true)
-    fun getBehandlingForSmartEditor(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Behandling {
+    fun getBehandlingForWriteAllowROLAndMU(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Behandling {
         val behandling = behandlingRepository.findById(behandlingId).get()
         if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent || behandling.rolIdent == utfoerendeSaksbehandlerIdent) {
             verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
@@ -1064,9 +1066,9 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         systemUserContext: Boolean = false
     ): Behandling {
-        val behandling = getBehandlingForUpdate(
+        val behandling = getBehandlingForWriteAllowROLAndMU(
             behandlingId = behandlingId,
-            systemUserContext = systemUserContext,
+            utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
         )
         val event =
             behandling.setROLFlowState(
@@ -1091,7 +1093,10 @@ class BehandlingService(
                 }
                 getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
             } else {
-                getBehandlingForUpdate(behandlingId = behandlingId)
+                getBehandlingForWriteAllowROLAndMU(
+                    behandlingId = behandlingId,
+                    utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                )
             }
 
         val event =

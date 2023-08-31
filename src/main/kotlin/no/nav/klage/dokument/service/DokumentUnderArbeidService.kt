@@ -764,7 +764,7 @@ class DokumentUnderArbeidService(
         if (readOnly) {
             behandlingService.getBehandling(dokumentUnderArbeid.behandlingId)
         } else {
-            behandlingService.getBehandlingForSmartEditor(
+            behandlingService.getBehandlingForWriteAllowROLAndMU(
                 behandlingId = dokumentUnderArbeid.behandlingId,
                 utfoerendeSaksbehandlerIdent = ident,
             )

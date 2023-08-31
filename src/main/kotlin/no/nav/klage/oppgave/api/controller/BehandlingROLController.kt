@@ -6,6 +6,7 @@ import no.nav.klage.oppgave.api.view.FlowStateView
 import no.nav.klage.oppgave.api.view.RolView
 import no.nav.klage.oppgave.api.view.SaksbehandlerInput
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
+import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.service.SaksbehandlerService
@@ -42,12 +43,7 @@ class BehandlingROLController(
         )
         val behandling = behandlingService.getBehandling(behandlingId)
 
-        return RolView(
-            navIdent = behandling.rolIdent,
-            navn = if (behandling.rolIdent != null) saksbehandlerService.getNameForIdent(behandling.rolIdent!!) else null,
-            flowState = behandling.rolFlowState,
-            modified = behandling.modified,
-        )
+        return behandling.toRolView()
     }
 
     @GetMapping("/{id}/rolflowstate")
@@ -81,12 +77,7 @@ class BehandlingROLController(
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         )
 
-        return RolView(
-            navIdent = behandling.rolIdent,
-            navn = if (behandling.rolIdent != null) saksbehandlerService.getNameForIdent(behandling.rolIdent!!) else null,
-            flowState = behandling.rolFlowState,
-            modified = behandling.modified,
-        )
+        return behandling.toRolView()
     }
 
     @PutMapping("/{behandlingId}/rolflowstate")
@@ -106,11 +97,13 @@ class BehandlingROLController(
             flowState = input.flowState,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent())
 
-        return RolView(
-            navIdent = behandling.rolIdent,
-            navn = if (behandling.rolIdent != null) saksbehandlerService.getNameForIdent(behandling.rolIdent!!) else null,
-            flowState = behandling.rolFlowState,
-            modified = behandling.modified,
-        )
+        return behandling.toRolView()
     }
+
+    private fun Behandling.toRolView() = RolView(
+        navIdent = rolIdent,
+        navn = if (rolIdent != null) saksbehandlerService.getNameForIdent(rolIdent!!) else null,
+        flowState = rolFlowState,
+        modified = modified,
+    )
 }
