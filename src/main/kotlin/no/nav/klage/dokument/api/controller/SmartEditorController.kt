@@ -41,6 +41,27 @@ class SmartEditorController(
         private val secureLogger = getSecureLogger()
     }
 
+    @GetMapping
+    fun findSmartDokumenter(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): List<SmartEditorDocumentView> {
+        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
+        return dokumentUnderArbeidService.getSmartDokumenterUnderArbeid(behandlingId = behandlingId, ident = ident)
+            .map {
+                val smartEditorId =
+                    dokumentUnderArbeidService.getSmartEditorId(
+                        dokumentId = it.id,
+                        readOnly = true
+                    )
+
+                val smartEditorDocument = kabalSmartEditorApiClient.getDocument(smartEditorId)
+                dokumentMapper.mapToSmartEditorDocumentView(
+                    dokumentUnderArbeid = it,
+                    smartEditorDocument = smartEditorDocument
+                )
+            }
+    }
+
     @PostMapping
     fun createSmartHoveddokument(
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -73,27 +94,6 @@ class SmartEditorController(
             dokumentUnderArbeid = dokumentUnderArbeid,
             smartEditorDocument = smartEditorDocument,
         )
-    }
-
-    @GetMapping
-    fun findSmartDokumenter(
-        @PathVariable("behandlingId") behandlingId: UUID,
-    ): List<SmartEditorDocumentView> {
-        val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        return dokumentUnderArbeidService.getSmartDokumenterUnderArbeid(behandlingId = behandlingId, ident = ident)
-            .map {
-                val smartEditorId =
-                    dokumentUnderArbeidService.getSmartEditorId(
-                        dokumentId = it.id,
-                        readOnly = false
-                    )
-
-                val smartEditorDocument = kabalSmartEditorApiClient.getDocument(smartEditorId)
-                dokumentMapper.mapToSmartEditorDocumentView(
-                    dokumentUnderArbeid = it,
-                    smartEditorDocument = smartEditorDocument
-                )
-            }
     }
 
     @Operation(

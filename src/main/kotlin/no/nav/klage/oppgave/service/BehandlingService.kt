@@ -822,9 +822,9 @@ class BehandlingService(
         )
     }
 
-    //TODO: Se om ansvar for sjekk av medunderskriver og finalize kan deles opp.
+    //TODO: Se om ansvar for sjekk av medunderskriver/rol og finalize kan deles opp.
     private fun verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling: Behandling) {
-        tilgangService.verifyInnloggetSaksbehandlerErMedunderskriverAndNotFinalized(behandling)
+        tilgangService.verifyInnloggetSaksbehandlerIsMedunderskriverOrROLAndNotFinalized(behandling)
     }
 
     private fun addDokument(
@@ -883,7 +883,7 @@ class BehandlingService(
     @Transactional(readOnly = true)
     fun getBehandlingForSmartEditor(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Behandling {
         val behandling = behandlingRepository.findById(behandlingId).get()
-        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
+        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent || behandling.rolIdent == utfoerendeSaksbehandlerIdent) {
             verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
         } else {
             checkSkrivetilgang(behandling)

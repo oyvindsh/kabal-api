@@ -73,13 +73,13 @@ class TilgangService(
         }
     }
 
-    fun verifyInnloggetSaksbehandlerErMedunderskriverAndNotFinalized(behandling: Behandling) {
+    fun verifyInnloggetSaksbehandlerIsMedunderskriverOrROLAndNotFinalized(behandling: Behandling) {
         if (behandling.avsluttetAvSaksbehandler != null || behandling.avsluttet != null) {
             throw BehandlingAvsluttetException("Kan ikke endre avsluttet klagebehandling")
         }
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
-        if (ident != behandling.medunderskriver?.saksbehandlerident) {
-            throw MissingTilgangException("Innlogget saksbehandler er ikke medunderskriver")
+        if (ident != behandling.medunderskriver?.saksbehandlerident && ident != behandling.rolIdent) {
+            throw MissingTilgangException("Innlogget saksbehandler er ikke medunderskriver eller ROL")
         }
     }
 
