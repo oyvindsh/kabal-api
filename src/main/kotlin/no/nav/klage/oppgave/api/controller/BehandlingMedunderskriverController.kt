@@ -85,7 +85,7 @@ class BehandlingMedunderskriverController(
     }
 
     //TODO remove when frontend is updated and using /medunderskriver. Remove when we have events..
-    @GetMapping("/{id}/medunderskriverflowstate")
+    @GetMapping(value = ["/{id}/medunderskriverflowstate", "/{id}/medunderskriverflyt"])
     fun getMedunderskriverFlowState(
         @PathVariable("id") behandlingId: UUID
     ): MedunderskriverFlowStateView {
