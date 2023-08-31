@@ -68,7 +68,6 @@ class StatistikkTilDVHService(
             it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT
                     || it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                     || it.felt === Felt.FEILREGISTRERING
-                    || it.felt === Felt.NY_ANKEBEHANDLING_KA
         }
     }
 
@@ -93,6 +92,12 @@ class StatistikkTilDVHService(
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
                         && type == Type.ANKE_I_TRYGDERETTEN
+                        && utfall in utfallToNewAnkebehandling
+            } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
+
+            endringslogginnslag.any {
+                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
+                        && type == Type.ANKE_I_TRYGDERETTEN
             } -> BehandlingState.MOTTATT_FRA_TR
 
             endringslogginnslag.any { it.felt === Felt.TILDELT_SAKSBEHANDLERIDENT } -> BehandlingState.TILDELT_SAKSBEHANDLER
@@ -102,12 +107,6 @@ class StatistikkTilDVHService(
                         && type == Type.ANKE
                         && utfall !in utfallToTrygderetten
             } -> BehandlingState.AVSLUTTET
-
-            endringslogginnslag.any {
-                it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
-                        && type == Type.ANKE_I_TRYGDERETTEN
-                        && utfall in utfallToNewAnkebehandling
-            } -> BehandlingState.NY_ANKEBEHANDLING_I_KA
 
             endringslogginnslag.any {
                 it.felt === Felt.AVSLUTTET_AV_SAKSBEHANDLER_TIDSPUNKT
@@ -135,7 +134,12 @@ class StatistikkTilDVHService(
                 BehandlingState.NY_ANKEBEHANDLING_I_KA,
             )
         ) {
-            TR_ENHET
+            behandling as AnkeITrygderettenbehandling
+            if (behandling.nyBehandlingKA != null) {
+                behandling.tildeling!!.enhet
+            } else {
+                TR_ENHET
+            }
         } else {
             null
         }
