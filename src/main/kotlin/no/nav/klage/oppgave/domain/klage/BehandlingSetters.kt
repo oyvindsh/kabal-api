@@ -100,6 +100,11 @@ object BehandlingSetters {
             saksbehandlerident = nyMedunderskriverNavIdent,
             tidspunkt = tidspunkt,
         )
+
+        if (medunderskriverFlowState == FlowState.RETURNED || nyMedunderskriverNavIdent == null) {
+            medunderskriverFlowState = FlowState.NOT_SENT
+        }
+
         modified = tidspunkt
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
@@ -147,6 +152,10 @@ object BehandlingSetters {
 
         rolIdent = newROLIdent
         modified = now
+
+        if (rolFlowState == FlowState.RETURNED) {
+            rolFlowState = FlowState.NOT_SENT
+        }
 
         val endringslogginnslag = mutableListOf<Endringslogginnslag>()
 
