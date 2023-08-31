@@ -93,9 +93,15 @@ class DevOnlyAdminController(
     }
 
     @Unprotected
-    @GetMapping("/internal/mytoken")
-    fun getToken(): String {
-        return tokenUtil.getAccessTokenFrontendSent()
+    @GetMapping("/internal/mytokens")
+    fun getTokens(): Map<String, String> {
+        return mapOf(
+            "\ngetAccessTokenFrontendSent\n" to tokenUtil.getAccessTokenFrontendSent(),
+            "\ngetSaksbehandlerAccessTokenWithGraphScope\n" to tokenUtil.getSaksbehandlerAccessTokenWithGraphScope(),
+            "\ngetSaksbehandlerAccessTokenWithSafScope\n" to tokenUtil.getSaksbehandlerAccessTokenWithSafScope(),
+            "\ngetSaksbehandlerAccessTokenWithPdlScope\n" to tokenUtil.getSaksbehandlerAccessTokenWithPdlScope(),
+            "\ngetAppAccessTokenWithGraphScope\n" to tokenUtil.getAppAccessTokenWithGraphScope(),
+        )
     }
 
     @Unprotected

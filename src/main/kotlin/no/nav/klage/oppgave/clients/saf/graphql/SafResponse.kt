@@ -154,6 +154,7 @@ enum class Tema {
     AAP, //Arbeidsavklaringspenger
     AAR, //Aa-registeret
     AGR, //Ajourhold - Grunnopplysninger
+    ARS, //Arbeidsrådgivning – skjermet
     BAR, //Barnetrygd
     BID, //Bidrag
     BIL, //Bil
