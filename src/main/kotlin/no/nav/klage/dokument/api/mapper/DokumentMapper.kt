@@ -7,7 +7,9 @@ import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.oppgave.clients.saf.graphql.DokumentInfo
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.clients.saf.graphql.Variantformat
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,7 +36,7 @@ class DokumentMapper(
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         val type = dokumentUnderArbeid.getType()
-        val tittel = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+        val (tittel, tilgang) = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
 
@@ -42,8 +44,9 @@ class DokumentMapper(
                 journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
                     ?: throw RuntimeException("Document not found in Dokarkiv")
 
-            dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF"
-        } else dokumentUnderArbeid.name
+            val harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv)
+            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF") to harTilgangTilArkivvariant
+        } else dokumentUnderArbeid.name to true
 
         return DokumentView(
             id = dokumentUnderArbeid.id,
@@ -61,7 +64,8 @@ class DokumentMapper(
             journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference?.let {
                 DokumentView.JournalfoertDokumentReference(
                     journalpostId = it.journalpostId,
-                    dokumentInfoId = it.dokumentInfoId
+                    dokumentInfoId = it.dokumentInfoId,
+                    harTilgangTilArkivvariant = tilgang
                 )
             }
         )
@@ -111,4 +115,9 @@ class DokumentMapper(
             modified = smartEditorDocument.modified,
         )
     }
+
+    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo): Boolean =
+        dokumentInfo?.dokumentvarianter?.any { dv ->
+            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
+        } == true
 }
