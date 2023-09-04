@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.domain.FysiskDokument
-import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
@@ -45,12 +45,12 @@ class DokumentService(
     private val safRestClient: SafRestClient,
     private val safClient: SafGraphQlClient,
     private val mergedDocumentRepository: MergedDocumentRepository,
+    private val dokumentMapper: DokumentMapper,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-        private val dokumentMapper = DokumentMapper()
     }
 
     fun fetchDokumentlisteForBehandling(
@@ -175,7 +175,7 @@ class DokumentService(
             dokumentInfoId = dokumentInfoId,
             title = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
                 ?: throw RuntimeException("Document/title not found in Dokarkiv"),
-            harTilgangTilArkivvariant = harTilgangTilArkivvariant(
+            harTilgangTilArkivvariant = dokumentMapper.harTilgangTilArkivvariant(
                 journalpostInDokarkiv.dokumenter.find { it.dokumentInfoId == dokumentInfoId }
             )
         )
@@ -311,147 +311,4 @@ class DokumentService(
     }
 
     fun getMergedDocument(id: UUID) = mergedDocumentRepository.getReferenceById(id)
-
-    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
-        dokumentInfo?.dokumentvarianter?.any { dv ->
-            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
-        } == true
-}
-
-class DokumentMapper {
-
-    companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
-    }
-
-    //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
-    fun mapJournalpostToDokumentReferanse(
-        journalpost: Journalpost,
-        behandling: Behandling
-    ): DokumentReferanse {
-
-        val hoveddokument = journalpost.dokumenter?.firstOrNull()
-            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
-
-        val dokumentReferanse = DokumentReferanse(
-            tittel = hoveddokument.tittel,
-            tema = Tema.fromNavn(journalpost.tema?.name).id,
-            temaId = Tema.fromNavn(journalpost.tema?.name).id,
-            registrert = journalpost.datoOpprettet.toLocalDate(),
-            dokumentInfoId = hoveddokument.dokumentInfoId,
-            journalpostId = journalpost.journalpostId,
-            harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
-            valgt = behandling.saksdokumenter.containsDokument(
-                journalpost.journalpostId,
-                hoveddokument.dokumentInfoId
-            ),
-            journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
-            journalstatus = if (journalpost.journalstatus != null) {
-                DokumentReferanse.Journalstatus.valueOf(journalpost.journalstatus.name)
-            } else null,
-            sak = if (journalpost.sak != null) {
-                DokumentReferanse.Sak(
-                    datoOpprettet = journalpost.sak.datoOpprettet,
-                    fagsakId = journalpost.sak.fagsakId,
-                    fagsaksystem = journalpost.sak.fagsaksystem,
-                    fagsystemId = journalpost.sak.fagsaksystem?.let { Fagsystem.fromNavn(it).id }
-                )
-            } else null,
-            avsenderMottaker = if (journalpost.avsenderMottaker == null ||
-                (journalpost.avsenderMottaker.id == null ||
-                        journalpost.avsenderMottaker.type == null)
-            ) {
-                null
-            } else {
-                DokumentReferanse.AvsenderMottaker(
-                    id = journalpost.avsenderMottaker.id,
-                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
-                        journalpost.avsenderMottaker.type.name
-                    ),
-                    navn = journalpost.avsenderMottaker.navn,
-                )
-            },
-            opprettetAvNavn = journalpost.opprettetAvNavn,
-            datoOpprettet = journalpost.datoOpprettet,
-            relevanteDatoer = journalpost.relevanteDatoer?.map {
-                DokumentReferanse.RelevantDato(
-                    dato = it.dato,
-                    datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
-                )
-            },
-            kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
-            kanalnavn = journalpost.kanalnavn,
-            utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
-        )
-
-        dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost, behandling))
-
-        return dokumentReferanse
-    }
-
-    private fun getUtsendingsinfo(utsendingsinfo: Utsendingsinfo?): DokumentReferanse.Utsendingsinfo? {
-        if (utsendingsinfo == null) {
-            return null
-        }
-
-        return with(utsendingsinfo) {
-            DokumentReferanse.Utsendingsinfo(
-                epostVarselSendt = if (epostVarselSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
-                        tittel = epostVarselSendt.tittel,
-                        adresse = epostVarselSendt.adresse,
-                        varslingstekst = epostVarselSendt.varslingstekst,
-                    )
-                } else null,
-                smsVarselSendt = if (smsVarselSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.SmsVarselSendt(
-                        adresse = smsVarselSendt.adresse,
-                        varslingstekst = smsVarselSendt.varslingstekst,
-                    )
-                } else null,
-                fysiskpostSendt = if (fysiskpostSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.FysiskpostSendt(
-                        adressetekstKonvolutt = fysiskpostSendt.adressetekstKonvolutt,
-                    )
-                } else null,
-                digitalpostSendt = if (digitalpostSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.DigitalpostSendt(
-                        adresse = digitalpostSendt.adresse,
-                    )
-                } else null,
-            )
-        }
-    }
-
-    private fun getVedlegg(
-        journalpost: Journalpost,
-        behandling: Behandling
-    ): List<DokumentReferanse.VedleggReferanse> {
-        return if ((journalpost.dokumenter?.size ?: 0) > 1) {
-            journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
-                DokumentReferanse.VedleggReferanse(
-                    tittel = vedlegg.tittel,
-                    dokumentInfoId = vedlegg.dokumentInfoId,
-                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
-                    valgt = behandling.saksdokumenter.containsDokument(
-                        journalpost.journalpostId,
-                        vedlegg.dokumentInfoId
-                    )
-                )
-            } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
-        } else {
-            emptyList()
-        }
-    }
-
-    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
-        dokumentInfo?.dokumentvarianter?.any { dv ->
-            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
-        } == true
-
-    private fun MutableSet<Saksdokument>.containsDokument(journalpostId: String, dokumentInfoId: String) =
-        any {
-            it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId
-        }
 }

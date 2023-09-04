@@ -7,7 +7,12 @@ import no.nav.klage.dokument.api.view.SmartEditorDocumentView
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.kodeverk.Fagsystem
+import no.nav.klage.kodeverk.Tema
+import no.nav.klage.oppgave.api.view.DokumentReferanse
+import no.nav.klage.oppgave.clients.saf.graphql.*
+import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.Saksdokument
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,7 +20,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class DokumentMapper(
-    private val safClient: SafGraphQlClient
+    private val safClient: SafGraphQlClient,
 ) {
 
     fun mapToByteArray(fysiskDokument: FysiskDokument): ResponseEntity<ByteArray> {
@@ -34,7 +39,7 @@ class DokumentMapper(
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         val type = dokumentUnderArbeid.getType()
-        val tittel = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+        val (tittel, tilgang) = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
 
@@ -42,8 +47,9 @@ class DokumentMapper(
                 journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
                     ?: throw RuntimeException("Document not found in Dokarkiv")
 
-            dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF"
-        } else dokumentUnderArbeid.name
+            val harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv)
+            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF") to harTilgangTilArkivvariant
+        } else dokumentUnderArbeid.name to true
 
         return DokumentView(
             id = dokumentUnderArbeid.id,
@@ -61,7 +67,8 @@ class DokumentMapper(
             journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference?.let {
                 DokumentView.JournalfoertDokumentReference(
                     journalpostId = it.journalpostId,
-                    dokumentInfoId = it.dokumentInfoId
+                    dokumentInfoId = it.dokumentInfoId,
+                    harTilgangTilArkivvariant = tilgang
                 )
             }
         )
@@ -111,4 +118,134 @@ class DokumentMapper(
             modified = smartEditorDocument.modified,
         )
     }
+
+    //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
+    fun mapJournalpostToDokumentReferanse(
+        journalpost: Journalpost,
+        behandling: Behandling
+    ): DokumentReferanse {
+
+        val hoveddokument = journalpost.dokumenter?.firstOrNull()
+            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
+
+        val dokumentReferanse = DokumentReferanse(
+            tittel = hoveddokument.tittel,
+            tema = Tema.fromNavn(journalpost.tema?.name).id,
+            temaId = Tema.fromNavn(journalpost.tema?.name).id,
+            registrert = journalpost.datoOpprettet.toLocalDate(),
+            dokumentInfoId = hoveddokument.dokumentInfoId,
+            journalpostId = journalpost.journalpostId,
+            harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
+            valgt = behandling.saksdokumenter.containsDokument(
+                journalpost.journalpostId,
+                hoveddokument.dokumentInfoId
+            ),
+            journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
+            journalstatus = if (journalpost.journalstatus != null) {
+                DokumentReferanse.Journalstatus.valueOf(journalpost.journalstatus.name)
+            } else null,
+            sak = if (journalpost.sak != null) {
+                DokumentReferanse.Sak(
+                    datoOpprettet = journalpost.sak.datoOpprettet,
+                    fagsakId = journalpost.sak.fagsakId,
+                    fagsaksystem = journalpost.sak.fagsaksystem,
+                    fagsystemId = journalpost.sak.fagsaksystem?.let { Fagsystem.fromNavn(it).id }
+                )
+            } else null,
+            avsenderMottaker = if (journalpost.avsenderMottaker == null ||
+                (journalpost.avsenderMottaker.id == null ||
+                        journalpost.avsenderMottaker.type == null)
+            ) {
+                null
+            } else {
+                DokumentReferanse.AvsenderMottaker(
+                    id = journalpost.avsenderMottaker.id,
+                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
+                        journalpost.avsenderMottaker.type.name
+                    ),
+                    navn = journalpost.avsenderMottaker.navn,
+                )
+            },
+            opprettetAvNavn = journalpost.opprettetAvNavn,
+            datoOpprettet = journalpost.datoOpprettet,
+            relevanteDatoer = journalpost.relevanteDatoer?.map {
+                DokumentReferanse.RelevantDato(
+                    dato = it.dato,
+                    datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
+                )
+            },
+            kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
+            kanalnavn = journalpost.kanalnavn,
+            utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
+        )
+
+        dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost, behandling))
+
+        return dokumentReferanse
+    }
+
+    private fun getUtsendingsinfo(utsendingsinfo: Utsendingsinfo?): DokumentReferanse.Utsendingsinfo? {
+        if (utsendingsinfo == null) {
+            return null
+        }
+
+        return with(utsendingsinfo) {
+            DokumentReferanse.Utsendingsinfo(
+                epostVarselSendt = if (epostVarselSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
+                        tittel = epostVarselSendt.tittel,
+                        adresse = epostVarselSendt.adresse,
+                        varslingstekst = epostVarselSendt.varslingstekst,
+                    )
+                } else null,
+                smsVarselSendt = if (smsVarselSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.SmsVarselSendt(
+                        adresse = smsVarselSendt.adresse,
+                        varslingstekst = smsVarselSendt.varslingstekst,
+                    )
+                } else null,
+                fysiskpostSendt = if (fysiskpostSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.FysiskpostSendt(
+                        adressetekstKonvolutt = fysiskpostSendt.adressetekstKonvolutt,
+                    )
+                } else null,
+                digitalpostSendt = if (digitalpostSendt != null) {
+                    DokumentReferanse.Utsendingsinfo.DigitalpostSendt(
+                        adresse = digitalpostSendt.adresse,
+                    )
+                } else null,
+            )
+        }
+    }
+
+    private fun getVedlegg(
+        journalpost: Journalpost,
+        behandling: Behandling
+    ): List<DokumentReferanse.VedleggReferanse> {
+        return if ((journalpost.dokumenter?.size ?: 0) > 1) {
+            journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
+                DokumentReferanse.VedleggReferanse(
+                    tittel = vedlegg.tittel,
+                    dokumentInfoId = vedlegg.dokumentInfoId,
+                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
+                    valgt = behandling.saksdokumenter.containsDokument(
+                        journalpost.journalpostId,
+                        vedlegg.dokumentInfoId
+                    )
+                )
+            } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
+        } else {
+            emptyList()
+        }
+    }
+
+    fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
+        dokumentInfo?.dokumentvarianter?.any { dv ->
+            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
+        } == true
+
+    private fun MutableSet<Saksdokument>.containsDokument(journalpostId: String, dokumentInfoId: String) =
+        any {
+            it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId
+        }
 }
