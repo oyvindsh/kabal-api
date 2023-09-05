@@ -113,7 +113,7 @@ data class DokumentInfo(
     val brevkode: String?,
     val skjerming: String?,
     val dokumentvarianter: List<Dokumentvariant>,
-    val datoFerdigstilt: LocalDateTime,
+    val datoFerdigstilt: LocalDateTime?,
 )
 
 data class Dokumentvariant(
