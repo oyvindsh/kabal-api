@@ -23,7 +23,6 @@ data class DokumentReferanse(
     val tittel: String?,
     val tema: String?,
     val temaId: String?,
-    val registrert: LocalDate,
     val harTilgangTilArkivvariant: Boolean,
     val valgt: Boolean,
     val vedlegg: MutableList<VedleggReferanse> = mutableListOf(),
@@ -33,6 +32,7 @@ data class DokumentReferanse(
     val avsenderMottaker: AvsenderMottaker?,
     val opprettetAvNavn: String?,
     val datoOpprettet: LocalDateTime,
+    val datoFerdigstilt: LocalDateTime,
     val relevanteDatoer: List<RelevantDato>?,
     val kanal: Kanal,
     val kanalnavn: String,
@@ -131,7 +131,8 @@ data class DokumentReferanse(
         val dokumentInfoId: String,
         val tittel: String?,
         val harTilgangTilArkivvariant: Boolean,
-        val valgt: Boolean
+        val valgt: Boolean,
+        val datoFerdigstilt: LocalDateTime,
     )
 
     enum class Journalposttype {

@@ -39,25 +39,25 @@ class DokumentMapper(
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         val type = dokumentUnderArbeid.getType()
-        val (tittel, tilgang) = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+
+        val dokumentInDokarkiv = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
 
-            val dokumentInDokarkiv =
                 journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
                     ?: throw RuntimeException("Document not found in Dokarkiv")
+        } else null
 
-            val harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv)
-            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF") to harTilgangTilArkivvariant
-        } else dokumentUnderArbeid.name to true
+        val tittel = if (dokumentInDokarkiv != null) {
+            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF")
+        } else dokumentUnderArbeid.name
 
         return DokumentView(
             id = dokumentUnderArbeid.id,
             tittel = tittel,
             dokumentTypeId = dokumentUnderArbeid.dokumentType?.id,
             created = dokumentUnderArbeid.created,
-            opplastet = dokumentUnderArbeid.created,
-            newOpplastet = dokumentUnderArbeid.opplastet,
+            modified = dokumentUnderArbeid.modified,
             isSmartDokument = dokumentUnderArbeid.smartEditorId != null,
             templateId = dokumentUnderArbeid.smartEditorTemplateId,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
@@ -68,7 +68,9 @@ class DokumentMapper(
                 DokumentView.JournalfoertDokumentReference(
                     journalpostId = it.journalpostId,
                     dokumentInfoId = it.dokumentInfoId,
-                    harTilgangTilArkivvariant = tilgang
+                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv!!),
+                    datoFerdigstilt = dokumentInDokarkiv.datoFerdigstilt
+
                 )
             }
         )
@@ -87,9 +89,8 @@ class DokumentMapper(
             id = firstDokumentView?.id,
             tittel = firstDokumentView?.tittel,
             dokumentTypeId = firstDokumentView?.dokumentTypeId,
-            opplastet = firstDokumentView?.opplastet,
-            newOpplastet = firstDokumentView?.newOpplastet,
             created = firstDokumentView?.created,
+            modified = firstDokumentView?.modified,
             type = firstDokumentView?.type,
             isSmartDokument = firstDokumentView?.isSmartDokument,
             templateId = firstDokumentView?.templateId,
@@ -132,7 +133,6 @@ class DokumentMapper(
             tittel = hoveddokument.tittel,
             tema = Tema.fromNavn(journalpost.tema?.name).id,
             temaId = Tema.fromNavn(journalpost.tema?.name).id,
-            registrert = journalpost.datoOpprettet.toLocalDate(),
             dokumentInfoId = hoveddokument.dokumentInfoId,
             journalpostId = journalpost.journalpostId,
             harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
@@ -168,6 +168,7 @@ class DokumentMapper(
             },
             opprettetAvNavn = journalpost.opprettetAvNavn,
             datoOpprettet = journalpost.datoOpprettet,
+            datoFerdigstilt = hoveddokument.datoFerdigstilt,
             relevanteDatoer = journalpost.relevanteDatoer?.map {
                 DokumentReferanse.RelevantDato(
                     dato = it.dato,
@@ -231,7 +232,8 @@ class DokumentMapper(
                     valgt = behandling.saksdokumenter.containsDokument(
                         journalpost.journalpostId,
                         vedlegg.dokumentInfoId
-                    )
+                    ),
+                    datoFerdigstilt = vedlegg.datoFerdigstilt,
                 )
             } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
         } else {
@@ -239,10 +241,10 @@ class DokumentMapper(
         }
     }
 
-    fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
-        dokumentInfo?.dokumentvarianter?.any { dv ->
+    fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo): Boolean =
+        dokumentInfo.dokumentvarianter.any { dv ->
             dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
-        } == true
+        }
 
     private fun MutableSet<Saksdokument>.containsDokument(journalpostId: String, dokumentInfoId: String) =
         any {

@@ -98,8 +98,8 @@ class DokumentService(
                 avsenderMottakerList = dokumentReferanseList.mapNotNull { it.avsenderMottaker }.toSet().toList(),
                 temaIdList = dokumentReferanseList.mapNotNull { it.temaId }.toSet().toList(),
                 journalposttypeList = dokumentReferanseList.mapNotNull { it.journalposttype }.toSet().toList(),
-                fromDate = dokumentReferanseList.minOfOrNull { it.registrert },
-                toDate = dokumentReferanseList.maxOfOrNull { it.registrert },
+                fromDate = dokumentReferanseList.minOfOrNull { it.datoOpprettet }?.toLocalDate(),
+                toDate = dokumentReferanseList.maxOfOrNull { it.datoOpprettet }?.toLocalDate(),
             )
         } else {
             return DokumenterResponse(
@@ -170,14 +170,13 @@ class DokumentService(
         val journalpostInDokarkiv =
             safClient.getJournalpostAsSaksbehandler(journalpostId)
 
+        val dokumentInfo = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }
         return JournalfoertDokumentMetadata(
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId,
-            title = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
+            title = dokumentInfo?.tittel
                 ?: throw RuntimeException("Document/title not found in Dokarkiv"),
-            harTilgangTilArkivvariant = dokumentMapper.harTilgangTilArkivvariant(
-                journalpostInDokarkiv.dokumenter.find { it.dokumentInfoId == dokumentInfoId }
-            )
+            harTilgangTilArkivvariant = dokumentMapper.harTilgangTilArkivvariant(dokumentInfo)
         )
     }
 
