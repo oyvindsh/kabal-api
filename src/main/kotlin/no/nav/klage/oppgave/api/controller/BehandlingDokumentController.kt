@@ -66,7 +66,9 @@ class BehandlingDokumentController(
             behandlingId = behandlingId,
             journalpostId = input.journalpostId,
             dokumentInfoId = input.dokumentInfoId,
-            saksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            saksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            systemUserContext = false,
+            ignoreCheckSkrivetilgang = false,
         )
         return BehandlingEditedView(modified = modified)
     }
