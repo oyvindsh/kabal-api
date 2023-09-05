@@ -32,7 +32,6 @@ data class DokumentReferanse(
     val avsenderMottaker: AvsenderMottaker?,
     val opprettetAvNavn: String?,
     val datoOpprettet: LocalDateTime,
-    val datoFerdigstilt: LocalDateTime?,
     val relevanteDatoer: List<RelevantDato>?,
     val kanal: Kanal,
     val kanalnavn: String,
@@ -133,7 +132,6 @@ data class DokumentReferanse(
         val tittel: String?,
         val harTilgangTilArkivvariant: Boolean,
         val valgt: Boolean,
-        val datoFerdigstilt: LocalDateTime?,
         val originalJournalpostId: String?,
     )
 

@@ -40,12 +40,23 @@ class DokumentMapper(
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         val type = dokumentUnderArbeid.getType()
 
+        var journalfoertDokumentReference: DokumentView.JournalfoertDokumentReference? = null
+
         val dokumentInDokarkiv = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
-
+            val dokumentInDokarkiv =
                 journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
                     ?: throw RuntimeException("Document not found in Dokarkiv")
+
+            journalfoertDokumentReference =
+                DokumentView.JournalfoertDokumentReference(
+                    journalpostId = journalpostInDokarkiv.journalpostId,
+                    dokumentInfoId = dokumentInDokarkiv.dokumentInfoId,
+                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv),
+                    datoOpprettet = journalpostInDokarkiv.datoOpprettet,
+                )
+            dokumentInDokarkiv
         } else null
 
         val tittel = if (dokumentInDokarkiv != null) {
@@ -64,15 +75,7 @@ class DokumentMapper(
             parent = dokumentUnderArbeid.parentId,
             parentId = dokumentUnderArbeid.parentId,
             type = type,
-            journalfoertDokumentReference = dokumentUnderArbeid.journalfoertDokumentReference?.let {
-                DokumentView.JournalfoertDokumentReference(
-                    journalpostId = it.journalpostId,
-                    dokumentInfoId = it.dokumentInfoId,
-                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv!!),
-                    datoFerdigstilt = dokumentInDokarkiv.datoFerdigstilt
-
-                )
-            }
+            journalfoertDokumentReference = journalfoertDokumentReference,
         )
     }
 
@@ -168,7 +171,6 @@ class DokumentMapper(
             },
             opprettetAvNavn = journalpost.opprettetAvNavn,
             datoOpprettet = journalpost.datoOpprettet,
-            datoFerdigstilt = hoveddokument.datoFerdigstilt,
             relevanteDatoer = journalpost.relevanteDatoer?.map {
                 DokumentReferanse.RelevantDato(
                     dato = it.dato,
@@ -234,7 +236,6 @@ class DokumentMapper(
                         journalpost.journalpostId,
                         vedlegg.dokumentInfoId
                     ),
-                    datoFerdigstilt = vedlegg.datoFerdigstilt,
                     originalJournalpostId = vedlegg.originalJournalpostId,
                 )
             } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
