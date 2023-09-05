@@ -178,6 +178,7 @@ class DokumentMapper(
             kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
             kanalnavn = journalpost.kanalnavn,
             utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
+            originalJournalpostId = hoveddokument.originalJournalpostId,
         )
 
         dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost, behandling))
@@ -234,6 +235,7 @@ class DokumentMapper(
                         vedlegg.dokumentInfoId
                     ),
                     datoFerdigstilt = vedlegg.datoFerdigstilt,
+                    originalJournalpostId = vedlegg.originalJournalpostId,
                 )
             } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
         } else {

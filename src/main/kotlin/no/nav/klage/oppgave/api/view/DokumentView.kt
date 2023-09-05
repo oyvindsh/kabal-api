@@ -37,6 +37,7 @@ data class DokumentReferanse(
     val kanal: Kanal,
     val kanalnavn: String,
     val utsendingsinfo: Utsendingsinfo?,
+    val originalJournalpostId: String?,
 ) {
 
     enum class Kanal {
@@ -133,6 +134,7 @@ data class DokumentReferanse(
         val harTilgangTilArkivvariant: Boolean,
         val valgt: Boolean,
         val datoFerdigstilt: LocalDateTime?,
+        val originalJournalpostId: String?,
     )
 
     enum class Journalposttype {

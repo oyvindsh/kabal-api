@@ -114,6 +114,7 @@ data class DokumentInfo(
     val skjerming: String?,
     val dokumentvarianter: List<Dokumentvariant>,
     val datoFerdigstilt: LocalDateTime?,
+    val originalJournalpostId: String?,
 )
 
 data class Dokumentvariant(
