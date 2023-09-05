@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.controller
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.klage.kodeverk.Fagsystem
-import no.nav.klage.kodeverk.ROLState
 import no.nav.klage.kodeverk.Utfall
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
@@ -13,6 +12,7 @@ import no.nav.klage.oppgave.clients.kabalinnstillinger.model.Saksbehandlere
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
+import no.nav.klage.oppgave.service.SaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
 import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
@@ -30,6 +30,7 @@ class BehandlingController(
     private val behandlingService: BehandlingService,
     private val behandlingMapper: BehandlingMapper,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
+    private val saksbehandlerService: SaksbehandlerService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -347,7 +348,7 @@ class BehandlingController(
     @GetMapping("/{behandlingId}/potentialrol")
     fun getPotentialROL(
         @PathVariable("behandlingId") behandlingId: UUID,
-    ): Saksbehandlere {
+    ): Rols {
         logMethodDetails(
             ::getPotentialROL.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
@@ -453,48 +454,6 @@ class BehandlingController(
             behandlingId = behandlingId,
             registreringshjemler = input.hjemmelIdSet?.map { Registreringshjemmel.of(it) }?.toSet()
                 ?: input.hjemler?.map { Registreringshjemmel.of(it) }?.toSet() ?: emptySet(),
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        ).modified
-
-        return BehandlingEditedView(modified = modified)
-    }
-
-    @PutMapping("/{behandlingId}/rolident")
-    fun setROLIdent(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: SaksbehandlerInput
-    ): BehandlingEditedView {
-        logBehandlingMethodDetails(
-            ::setROLIdent.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-
-        val modified = behandlingService.setROLIdent(
-            behandlingId = behandlingId,
-            rolIdent = input.navIdent,
-            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
-        ).modified
-
-        return BehandlingEditedView(modified = modified)
-    }
-
-    @PutMapping("/{behandlingId}/rolstateid")
-    fun setROLStateId(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: NullableIdInput,
-    ): BehandlingEditedView {
-        logBehandlingMethodDetails(
-            ::setROLStateId.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-
-        val modified = behandlingService.setROLState(
-            behandlingId = behandlingId,
-            rolState = if (input.id != null) ROLState.of(input.id) else null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).modified
 

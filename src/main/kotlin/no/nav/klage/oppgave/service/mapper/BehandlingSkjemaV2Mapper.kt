@@ -114,7 +114,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         fristDato = frist,
         gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
         medunderskriver = medunderskriver?.mapToSkjemaV2(),
-        medunderskriverFlytStatus = medunderskriverFlyt.mapToSkjemaV2(),
+        medunderskriverFlowStateId = medunderskriverFlowState.id,
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
@@ -130,7 +130,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered,
         rolIdent = rolIdent,
-        rolStateId = rolState?.id,
+        rolFlowStateId = rolFlowState.id,
     )
 }
 
@@ -164,7 +164,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         fristDato = frist,
         gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
         medunderskriver = medunderskriver?.mapToSkjemaV2(),
-        medunderskriverFlytStatus = medunderskriverFlyt.mapToSkjemaV2(),
+        medunderskriverFlowStateId = medunderskriverFlowState.id,
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
@@ -181,7 +181,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),
         feilregistrert = feilregistrering?.registered,
         rolIdent = rolIdent,
-        rolStateId = rolState?.id,
+        rolFlowStateId = rolFlowState.id,
     )
 }
 
@@ -204,7 +204,7 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         fristDato = frist,
         gjeldendeTildeling = tildeling?.mapToSkjemaV2(),
         medunderskriver = medunderskriver?.mapToSkjemaV2(),
-        medunderskriverFlytStatus = medunderskriverFlyt.mapToSkjemaV2(),
+        medunderskriverFlowStateId = medunderskriverFlowState.id,
         hjemler = hjemler.map { it.mapToSkjemaV2() },
         opprettetTidspunkt = created,
         sistEndretTidspunkt = modified,
@@ -221,7 +221,7 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
         rolIdent = rolIdent,
-        rolStateId = rolState?.id
+        rolFlowStateId = rolFlowState.id
 
     )
 }
@@ -252,7 +252,7 @@ data class BehandlingSkjemaV2(
     val fristDato: LocalDate?,
     val gjeldendeTildeling: TildeltSaksbehandler?,
     val medunderskriver: TildeltMedunderskriver?,
-    val medunderskriverFlytStatus: Kode,
+    val medunderskriverFlowStateId: String,
     val hjemler: List<Kode>,
     val opprettetTidspunkt: LocalDateTime,
     val sistEndretTidspunkt: LocalDateTime,
@@ -266,7 +266,7 @@ data class BehandlingSkjemaV2(
     val status: StatusType,
     val feilregistrert: LocalDateTime?,
     val rolIdent: String?,
-    val rolStateId: String?,
+    val rolFlowStateId: String,
 ) {
 
     data class Vedtak(

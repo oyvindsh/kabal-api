@@ -3,7 +3,6 @@ package no.nav.klage.oppgave.api.mapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import no.nav.klage.kodeverk.*
-import no.nav.klage.oppgave.api.view.SaksbehandlerView
 import no.nav.klage.oppgave.clients.egenansatt.EgenAnsattService
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
@@ -49,30 +48,25 @@ class BehandlingMapperTest {
     private val MEDUNDERSKRIVER_NAVN = "MEDUNDERSKRIVER_NAVN"
 
     @Test
-    fun `mapToMedunderskriverWrapped og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt ikke er satt`() {
+    fun `mapToMedunderskriverWrapped og mapToMedunderskriverFlowStateView gir forventet resultat når medunderskriver og medunderskriverFlowState ikke er satt`() {
         val klagebehandling = getKlagebehandling()
         val viewResult = behandlingMapper.mapToMedunderskriverWrapped(klagebehandling)
-        val flytViewResult = behandlingMapper.mapToMedunderskriverFlytView(klagebehandling)
+        val flytViewResult = behandlingMapper.mapToMedunderskriverFlowStateView(klagebehandling)
 
-        assertThat(viewResult.medunderskriver?.navIdent).isNull()
-        assertThat(flytViewResult.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.IKKE_SENDT)
+        assertThat(viewResult.navIdent).isNull()
+        assertThat(flytViewResult.flowState).isEqualTo(FlowState.NOT_SENT)
     }
 
     @Test
-    fun `mapToMedunderskriverWrapped og mapToMedunderskriverFlytView gir forventet resultat når medunderskriver og medunderskriverFlyt er satt`() {
+    fun `mapToMedunderskriverWrapped og mapToMedunderskriverFlowStateView gir forventet resultat når medunderskriver og medunderskriverFlowState er satt`() {
         val klagebehandling = getKlagebehandlingWithMedunderskriver()
         every { saksbehandlerRepository.getNameForSaksbehandler(any()) } returns MEDUNDERSKRIVER_NAVN
 
         val viewResult = behandlingMapper.mapToMedunderskriverWrapped(klagebehandling)
-        val flytViewResult = behandlingMapper.mapToMedunderskriverFlytView(klagebehandling)
+        val flytViewResult = behandlingMapper.mapToMedunderskriverFlowStateView(klagebehandling)
 
-        assertThat(viewResult.medunderskriver).isEqualTo(
-            SaksbehandlerView(
-                navIdent = MEDUNDERSKRIVER_IDENT,
-                navn = MEDUNDERSKRIVER_NAVN
-            )
-        )
-        assertThat(flytViewResult.medunderskriverFlyt).isEqualTo(MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER)
+        assertThat(viewResult.navIdent).isEqualTo(MEDUNDERSKRIVER_IDENT)
+        assertThat(flytViewResult.flowState).isEqualTo(FlowState.SENT)
     }
 
     private fun getKlagebehandling(): Klagebehandling {
@@ -100,7 +94,7 @@ class BehandlingMapperTest {
                 MEDUNDERSKRIVER_IDENT,
                 LocalDateTime.now()
             )
-            medunderskriverFlyt = MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
+            medunderskriverFlowState = FlowState.SENT
         }
     }
 }

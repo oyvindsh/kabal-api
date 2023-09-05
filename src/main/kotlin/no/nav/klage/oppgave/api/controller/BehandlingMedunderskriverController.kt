@@ -1,15 +1,14 @@
 package no.nav.klage.oppgave.api.controller
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.FlowStateView
+import no.nav.klage.oppgave.api.view.MedunderskriverWrapped
+import no.nav.klage.oppgave.api.view.SaksbehandlerInput
 import no.nav.klage.oppgave.config.SecurityConfiguration.Companion.ISSUER_AAD
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.logBehandlingMethodDetails
-import no.nav.klage.oppgave.util.logKlagebehandlingMethodDetails
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -28,46 +27,6 @@ class BehandlingMedunderskriverController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
-    @PutMapping("/{behandlingId}/medunderskriver")
-    fun putMedunderskriver(
-        @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: SaksbehandlerInput
-    ): MedunderskriverWrapped {
-        logBehandlingMethodDetails(
-            ::putMedunderskriver.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-        return behandlingService.setMedunderskriverIdentAndMedunderskriverFlyt(
-            behandlingId,
-            input.navIdent,
-            innloggetSaksbehandlerService.getInnloggetIdent()
-        )
-    }
-
-    @Operation(
-        summary = "Flytter behandlingen mellom saksbehandler og medunderskriver.",
-        description = "Flytter fra saksbehandler til medunderskriver dersom saksbehandler utfører, flytter til saksbehandler med returnert-status dersom medunderskriver utfører."
-    )
-    @PostMapping("/{behandlingId}/send")
-    fun switchMedunderskriverFlyt(
-        @Parameter(description = "Id til behandlingen i vårt system")
-        @PathVariable("behandlingId") behandlingId: UUID
-    ): MedunderskriverFlytResponse {
-        logKlagebehandlingMethodDetails(
-            ::switchMedunderskriverFlyt.name,
-            innloggetSaksbehandlerService.getInnloggetIdent(),
-            behandlingId,
-            logger
-        )
-
-        return behandlingService.switchMedunderskriverFlyt(
-            behandlingId,
-            innloggetSaksbehandlerService.getInnloggetIdent()
-        )
-    }
-
     @GetMapping("/{behandlingId}/medunderskriver")
     fun getMedunderskriver(
         @PathVariable("behandlingId") behandlingId: UUID
@@ -81,17 +40,52 @@ class BehandlingMedunderskriverController(
         return behandlingService.getMedunderskriver(behandlingId)
     }
 
-    //TODO remove when frontend is updated and using /medunderskriver
-    @GetMapping("/{id}/medunderskriverflyt")
-    fun getMedunderskriverFlyt(
+    @GetMapping("/{id}/medunderskriverflowstate")
+    fun getMedunderskriverFlowState(
         @PathVariable("id") behandlingId: UUID
-    ): MedunderskriverFlytView {
+    ): FlowStateView {
         logBehandlingMethodDetails(
-            ::getMedunderskriverFlyt.name,
+            ::getMedunderskriverFlowState.name,
             innloggetSaksbehandlerService.getInnloggetIdent(),
             behandlingId,
             logger
         )
-        return behandlingService.getMedunderskriverFlyt(behandlingId)
+        return behandlingService.getMedunderskriverFlowState(behandlingId)
+    }
+
+    @PutMapping("/{id}/medunderskriverflowstate")
+    fun setMedunderskriverFlowState(
+        @PathVariable("id") behandlingId: UUID,
+        @RequestBody medunderskriverFlowStateView: FlowStateView,
+    ): MedunderskriverWrapped {
+        logBehandlingMethodDetails(
+            ::setMedunderskriverFlowState.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        return behandlingService.setMedunderskriverFlowState(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            flowState = medunderskriverFlowStateView.flowState,
+        )
+    }
+
+    @PutMapping("/{id}/medunderskrivernavident")
+    fun setMedunderskriverNavIdent(
+        @PathVariable("id") behandlingId: UUID,
+        @RequestBody medunderskriverNavIdent: SaksbehandlerInput,
+    ): MedunderskriverWrapped {
+        logBehandlingMethodDetails(
+            ::setMedunderskriverNavIdent.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+        return behandlingService.setMedunderskriverNavIdent(
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            navIdent = medunderskriverNavIdent.navIdent,
+            behandlingId = behandlingId
+        )
     }
 }

@@ -113,7 +113,7 @@ internal class SafDokumentoversiktBrukerTest {
                       "tittel": "MASKERT_FELT",
                       "brevkode": "NAV 08-07.04 D",
                       "dokumentstatus": null,
-                      "datoFerdigstilt": null,
+                      "datoFerdigstilt": "2020-12-14T12:22:03",
                       "originalJournalpostId": "492330029",
                       "skjerming": null,
                       "dokumentvarianter": [

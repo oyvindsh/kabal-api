@@ -14,9 +14,8 @@ data class DokumentView(
     val id: UUID,
     val tittel: String,
     val dokumentTypeId: String?,
-    val opplastet: LocalDateTime,
-    val newOpplastet: LocalDateTime?,
     val created: LocalDateTime,
+    val modified: LocalDateTime,
     val type: DokumentUnderArbeid.DokumentUnderArbeidType,
     val isSmartDokument: Boolean,
     val templateId: String?,
@@ -29,6 +28,8 @@ data class DokumentView(
     data class JournalfoertDokumentReference (
         val journalpostId: String,
         val dokumentInfoId: String,
+        val harTilgangTilArkivvariant: Boolean,
+        val datoOpprettet: LocalDateTime,
     )
 }
 
@@ -36,9 +37,8 @@ data class DokumentViewWithList(
     val id: UUID?,
     val tittel: String?,
     val dokumentTypeId: String?,
-    val opplastet: LocalDateTime?,
-    val newOpplastet: LocalDateTime?,
     val created: LocalDateTime?,
+    val modified: LocalDateTime?,
     val type: DokumentUnderArbeid.DokumentUnderArbeidType?,
     val isSmartDokument: Boolean?,
     val templateId: String?,

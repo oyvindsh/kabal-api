@@ -1,8 +1,8 @@
 package no.nav.klage.oppgave.service
 
+import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.domain.FysiskDokument
-import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.api.view.DokumenterResponse
@@ -17,7 +17,10 @@ import no.nav.klage.oppgave.exceptions.JournalpostNotFoundException
 import no.nav.klage.oppgave.repositories.MergedDocumentRepository
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.apache.pdfbox.Loader
 import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.io.RandomAccessReadBuffer
+import org.apache.pdfbox.io.RandomAccessStreamCache.StreamCacheCreateFunction
 import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentInformation
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
@@ -41,12 +45,12 @@ class DokumentService(
     private val safRestClient: SafRestClient,
     private val safClient: SafGraphQlClient,
     private val mergedDocumentRepository: MergedDocumentRepository,
+    private val dokumentMapper: DokumentMapper,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
         private val secureLogger = getSecureLogger()
-        private val dokumentMapper = DokumentMapper()
     }
 
     fun fetchDokumentlisteForBehandling(
@@ -94,8 +98,8 @@ class DokumentService(
                 avsenderMottakerList = dokumentReferanseList.mapNotNull { it.avsenderMottaker }.toSet().toList(),
                 temaIdList = dokumentReferanseList.mapNotNull { it.temaId }.toSet().toList(),
                 journalposttypeList = dokumentReferanseList.mapNotNull { it.journalposttype }.toSet().toList(),
-                fromDate = dokumentReferanseList.minOfOrNull { it.registrert },
-                toDate = dokumentReferanseList.maxOfOrNull { it.registrert },
+                fromDate = dokumentReferanseList.minOfOrNull { it.datoOpprettet }?.toLocalDate(),
+                toDate = dokumentReferanseList.maxOfOrNull { it.datoOpprettet }?.toLocalDate(),
             )
         } else {
             return DokumenterResponse(
@@ -166,27 +170,27 @@ class DokumentService(
         val journalpostInDokarkiv =
             safClient.getJournalpostAsSaksbehandler(journalpostId)
 
+        val dokumentInfo = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }
         return JournalfoertDokumentMetadata(
             journalpostId = journalpostId,
             dokumentInfoId = dokumentInfoId,
-            title = journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentInfoId }?.tittel
+            title = dokumentInfo?.tittel
                 ?: throw RuntimeException("Document/title not found in Dokarkiv"),
-            harTilgangTilArkivvariant = harTilgangTilArkivvariant(
-                journalpostInDokarkiv.dokumenter.find { it.dokumentInfoId == dokumentInfoId }
-            )
+            harTilgangTilArkivvariant = dokumentMapper.harTilgangTilArkivvariant(dokumentInfo)
         )
+    }
+
+    @Throws(IOException::class)
+    private fun getMixedMemorySettingsForPDFBox(bytes: Long): StreamCacheCreateFunction {
+        return MemoryUsageSetting.setupMixed(bytes).streamCache
     }
 
     fun changeTitleInPDF(documentBytes: ByteArray, title: String): ByteArray {
         val baos = ByteArrayOutputStream()
         val timeMillis = measureTimeMillis {
-            val document: PDDocument = PDDocument.load(
-                documentBytes,
-                "",
-                null,
-                null,
-                MemoryUsageSetting.setupMixed(50_000_000)
-            )
+            val document: PDDocument =
+                Loader.loadPDF(RandomAccessReadBuffer(documentBytes), getMixedMemorySettingsForPDFBox(50_000_000))
+
             val info: PDDocumentInformation = document.documentInformation
             info.title = title
             document.isAllSecurityToBeRemoved = true
@@ -291,7 +295,7 @@ class DokumentService(
         }
 
         //just under 256 MB before using file system
-        merger.mergeDocuments(MemoryUsageSetting.setupMixed(250_000_000))
+        merger.mergeDocuments(getMixedMemorySettingsForPDFBox(250_000_000))
 
         //clean tmp files that were downloaded from SAF
         try {
@@ -306,147 +310,4 @@ class DokumentService(
     }
 
     fun getMergedDocument(id: UUID) = mergedDocumentRepository.getReferenceById(id)
-
-    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
-        dokumentInfo?.dokumentvarianter?.any { dv ->
-            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
-        } == true
-}
-
-class DokumentMapper {
-
-    companion object {
-        @Suppress("JAVA_CLASS_ON_COMPANION")
-        private val logger = getLogger(javaClass.enclosingClass)
-    }
-
-    //TODO: Har ikke tatt høyde for skjerming, ref https://confluence.adeo.no/pages/viewpage.action?pageId=320364687
-    fun mapJournalpostToDokumentReferanse(
-        journalpost: Journalpost,
-        behandling: Behandling
-    ): DokumentReferanse {
-
-        val hoveddokument = journalpost.dokumenter?.firstOrNull()
-            ?: throw RuntimeException("Could not find hoveddokument for journalpost ${journalpost.journalpostId}")
-
-        val dokumentReferanse = DokumentReferanse(
-            tittel = hoveddokument.tittel,
-            tema = Tema.fromNavn(journalpost.tema?.name).id,
-            temaId = Tema.fromNavn(journalpost.tema?.name).id,
-            registrert = journalpost.datoOpprettet.toLocalDate(),
-            dokumentInfoId = hoveddokument.dokumentInfoId,
-            journalpostId = journalpost.journalpostId,
-            harTilgangTilArkivvariant = harTilgangTilArkivvariant(hoveddokument),
-            valgt = behandling.saksdokumenter.containsDokument(
-                journalpost.journalpostId,
-                hoveddokument.dokumentInfoId
-            ),
-            journalposttype = DokumentReferanse.Journalposttype.valueOf(journalpost.journalposttype!!.name),
-            journalstatus = if (journalpost.journalstatus != null) {
-                DokumentReferanse.Journalstatus.valueOf(journalpost.journalstatus.name)
-            } else null,
-            sak = if (journalpost.sak != null) {
-                DokumentReferanse.Sak(
-                    datoOpprettet = journalpost.sak.datoOpprettet,
-                    fagsakId = journalpost.sak.fagsakId,
-                    fagsaksystem = journalpost.sak.fagsaksystem,
-                    fagsystemId = journalpost.sak.fagsaksystem?.let { Fagsystem.fromNavn(it).id }
-                )
-            } else null,
-            avsenderMottaker = if (journalpost.avsenderMottaker == null ||
-                (journalpost.avsenderMottaker.id == null ||
-                        journalpost.avsenderMottaker.type == null)
-            ) {
-                null
-            } else {
-                DokumentReferanse.AvsenderMottaker(
-                    id = journalpost.avsenderMottaker.id,
-                    type = DokumentReferanse.AvsenderMottaker.AvsenderMottakerIdType.valueOf(
-                        journalpost.avsenderMottaker.type.name
-                    ),
-                    navn = journalpost.avsenderMottaker.navn,
-                )
-            },
-            opprettetAvNavn = journalpost.opprettetAvNavn,
-            datoOpprettet = journalpost.datoOpprettet,
-            relevanteDatoer = journalpost.relevanteDatoer?.map {
-                DokumentReferanse.RelevantDato(
-                    dato = it.dato,
-                    datotype = DokumentReferanse.RelevantDato.Datotype.valueOf(it.datotype.name)
-                )
-            },
-            kanal = DokumentReferanse.Kanal.valueOf(journalpost.kanal.name),
-            kanalnavn = journalpost.kanalnavn,
-            utsendingsinfo = getUtsendingsinfo(journalpost.utsendingsinfo),
-        )
-
-        dokumentReferanse.vedlegg.addAll(getVedlegg(journalpost, behandling))
-
-        return dokumentReferanse
-    }
-
-    private fun getUtsendingsinfo(utsendingsinfo: Utsendingsinfo?): DokumentReferanse.Utsendingsinfo? {
-        if (utsendingsinfo == null) {
-            return null
-        }
-
-        return with(utsendingsinfo) {
-            DokumentReferanse.Utsendingsinfo(
-                epostVarselSendt = if (epostVarselSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.EpostVarselSendt(
-                        tittel = epostVarselSendt.tittel,
-                        adresse = epostVarselSendt.adresse,
-                        varslingstekst = epostVarselSendt.varslingstekst,
-                    )
-                } else null,
-                smsVarselSendt = if (smsVarselSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.SmsVarselSendt(
-                        adresse = smsVarselSendt.adresse,
-                        varslingstekst = smsVarselSendt.varslingstekst,
-                    )
-                } else null,
-                fysiskpostSendt = if (fysiskpostSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.FysiskpostSendt(
-                        adressetekstKonvolutt = fysiskpostSendt.adressetekstKonvolutt,
-                    )
-                } else null,
-                digitalpostSendt = if (digitalpostSendt != null) {
-                    DokumentReferanse.Utsendingsinfo.DigitalpostSendt(
-                        adresse = digitalpostSendt.adresse,
-                    )
-                } else null,
-            )
-        }
-    }
-
-    private fun getVedlegg(
-        journalpost: Journalpost,
-        behandling: Behandling
-    ): List<DokumentReferanse.VedleggReferanse> {
-        return if ((journalpost.dokumenter?.size ?: 0) > 1) {
-            journalpost.dokumenter?.subList(1, journalpost.dokumenter.size)?.map { vedlegg ->
-                DokumentReferanse.VedleggReferanse(
-                    tittel = vedlegg.tittel,
-                    dokumentInfoId = vedlegg.dokumentInfoId,
-                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(vedlegg),
-                    valgt = behandling.saksdokumenter.containsDokument(
-                        journalpost.journalpostId,
-                        vedlegg.dokumentInfoId
-                    )
-                )
-            } ?: throw RuntimeException("could not create VedleggReferanser from dokumenter")
-        } else {
-            emptyList()
-        }
-    }
-
-    private fun harTilgangTilArkivvariant(dokumentInfo: DokumentInfo?): Boolean =
-        dokumentInfo?.dokumentvarianter?.any { dv ->
-            dv.variantformat == Variantformat.ARKIV && dv.saksbehandlerHarTilgang
-        } == true
-
-    private fun MutableSet<Saksdokument>.containsDokument(journalpostId: String, dokumentInfoId: String) =
-        any {
-            it.journalpostId == journalpostId && it.dokumentInfoId == dokumentInfoId
-        }
 }

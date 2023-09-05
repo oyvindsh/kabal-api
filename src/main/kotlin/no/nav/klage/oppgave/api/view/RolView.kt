@@ -3,15 +3,13 @@ package no.nav.klage.oppgave.api.view
 import no.nav.klage.kodeverk.FlowState
 import java.time.LocalDateTime
 
-data class MedunderskriverFlowStateResponse (
-    val navn: String?,
+data class RolView(
     val navIdent: String?,
-    val modified: LocalDateTime,
+    val navn: String?,
     val flowState: FlowState,
+    val modified: LocalDateTime,
 )
 
-data class MedunderskriverWrapped (
-    val navIdent: String?,
-    val modified: LocalDateTime,
-    val flowState: FlowState,
-)
+data class Rols(val rols: List<Rol>) {
+    data class Rol(val navIdent: String, val navn: String)
+}

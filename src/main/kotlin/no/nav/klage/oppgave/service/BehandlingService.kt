@@ -2,7 +2,6 @@ package no.nav.klage.oppgave.service
 
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
-import no.nav.klage.kodeverk.MedunderskriverFlyt.OVERSENDT_TIL_MEDUNDERSKRIVER
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
 import no.nav.klage.oppgave.api.mapper.BehandlingMapper
@@ -28,11 +27,11 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFrist
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setInnsendingshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setKlager
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlyt
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverIdentAndMedunderskriverFlyt
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverFlowState
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverNavIdent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLFlowState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLIdent
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
@@ -268,7 +267,8 @@ class BehandlingService(
             )
         }
 
-        fun getErrorText(prop: String) = "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
+        fun getErrorText(prop: String) =
+            "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
 
         if (behandling.utfall != null) {
             if (behandling.utfall == Utfall.HENVIST) {
@@ -392,7 +392,7 @@ class BehandlingService(
                 logger.debug("Tildeling av behandling ble registrert i Infotrygd.")
             }
         } else {
-            if (behandling.medunderskriverFlyt == OVERSENDT_TIL_MEDUNDERSKRIVER) {
+            if (behandling.medunderskriverFlowState == FlowState.SENT) {
                 throw IllegalOperation("Kan ikke fradele behandling sendt til medunderskriver.")
             }
 
@@ -457,9 +457,9 @@ class BehandlingService(
         return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
-    fun getMedunderskriverFlyt(behandlingId: UUID): MedunderskriverFlytView {
+    fun getMedunderskriverFlowState(behandlingId: UUID): FlowStateView {
         val behandling = getBehandling(behandlingId)
-        return behandlingMapper.mapToMedunderskriverFlytView(behandling)
+        return behandlingMapper.mapToMedunderskriverFlowStateView(behandling)
     }
 
     fun setSattPaaVent(
@@ -660,60 +660,56 @@ class BehandlingService(
         return behandling.modified
     }
 
-    fun setMedunderskriverIdentAndMedunderskriverFlyt(
+    fun setMedunderskriverFlowState(
         behandlingId: UUID,
-        medunderskriverIdent: String?,
         utfoerendeSaksbehandlerIdent: String,
-        medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT
+        flowState: FlowState,
     ): MedunderskriverWrapped {
-        val behandling =
-            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
-                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
-            } else {
-                getBehandlingForUpdate(behandlingId = behandlingId)
-            }
+        val behandling = getBehandlingForWriteAllowROLAndMU(
+            behandlingId = behandlingId,
+            utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
+        )
 
         val event =
-            behandling.setMedunderskriverIdentAndMedunderskriverFlyt(
-                medunderskriverIdent,
-                medunderskriverFlyt,
-                utfoerendeSaksbehandlerIdent
+            behandling.setMedunderskriverFlowState(
+                nyMedunderskriverFlowState = flowState,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
         return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
-    fun switchMedunderskriverFlyt(
+    fun setMedunderskriverNavIdent(
         behandlingId: UUID,
-        utfoerendeSaksbehandlerIdent: String
-    ): MedunderskriverFlytResponse {
-        val behandling = getBehandling(behandlingId)
+        utfoerendeSaksbehandlerIdent: String,
+        navIdent: String?,
+    ): MedunderskriverWrapped {
+        val behandling =
+            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
+                val behandling = getBehandling(behandlingId)
+                if (behandling.medunderskriverFlowState != FlowState.SENT && behandling.tildeling?.saksbehandlerident != utfoerendeSaksbehandlerIdent) {
+                    throw MissingTilgangException("OppgavestyringAlleEnheter har ikke lov til å endre medunderskriver når den ikke er sent.")
+                }
 
-        if (behandling.medunderskriver?.saksbehandlerident == null) {
-            throw BehandlingManglerMedunderskriverException("Behandlingen har ikke registrert noen medunderskriver")
-        }
+                if (behandling.tildeling?.saksbehandlerident != utfoerendeSaksbehandlerIdent && navIdent == null) {
+                    throw MissingTilgangException("Kun saksbehandler har lov til å nullstille medunderskriver.")
+                }
 
-        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
-            verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
-            if (behandling.medunderskriverFlyt != MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER) {
-                val event = behandling.setMedunderskriverFlyt(
-                    MedunderskriverFlyt.RETURNERT_TIL_SAKSBEHANDLER,
-                    utfoerendeSaksbehandlerIdent
+                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+            } else {
+                getBehandlingForWriteAllowROLAndMU(
+                    behandlingId = behandlingId,
+                    utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
                 )
-                applicationEventPublisher.publishEvent(event)
             }
-        } else {
-            checkSkrivetilgang(behandling)
-            if (behandling.medunderskriverFlyt != OVERSENDT_TIL_MEDUNDERSKRIVER) {
-                val event = behandling.setMedunderskriverFlyt(
-                    OVERSENDT_TIL_MEDUNDERSKRIVER,
-                    utfoerendeSaksbehandlerIdent
-                )
-                applicationEventPublisher.publishEvent(event)
-            }
-        }
 
-        return behandlingMapper.mapToMedunderskriverFlytResponse(behandling)
+        val event =
+            behandling.setMedunderskriverNavIdent(
+                nyMedunderskriverNavIdent = navIdent,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandlingMapper.mapToMedunderskriverWrapped(behandling)
     }
 
     fun fetchDokumentlisteForBehandling(
@@ -731,11 +727,12 @@ class BehandlingService(
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String,
-        systemUserContext: Boolean = false
+        systemUserContext: Boolean = false,
+        ignoreCheckSkrivetilgang: Boolean,
     ): LocalDateTime {
         val behandling = getBehandlingForUpdate(
             behandlingId = behandlingId,
-            ignoreCheckSkrivetilgang = systemUserContext,
+            ignoreCheckSkrivetilgang = ignoreCheckSkrivetilgang,
             systemUserContext = systemUserContext,
         )
         if (systemUserContext) {
@@ -828,9 +825,9 @@ class BehandlingService(
         )
     }
 
-    //TODO: Se om ansvar for sjekk av medunderskriver og finalize kan deles opp.
+    //TODO: Se om ansvar for sjekk av medunderskriver/rol og finalize kan deles opp.
     private fun verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling: Behandling) {
-        tilgangService.verifyInnloggetSaksbehandlerErMedunderskriverAndNotFinalized(behandling)
+        tilgangService.verifyInnloggetSaksbehandlerIsMedunderskriverOrROLAndNotFinalized(behandling)
     }
 
     private fun addDokument(
@@ -887,9 +884,9 @@ class BehandlingService(
     }
 
     @Transactional(readOnly = true)
-    fun getBehandlingForSmartEditor(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Behandling {
+    fun getBehandlingForWriteAllowROLAndMU(behandlingId: UUID, utfoerendeSaksbehandlerIdent: String): Behandling {
         val behandling = behandlingRepository.findById(behandlingId).get()
-        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent) {
+        if (behandling.medunderskriver?.saksbehandlerident == utfoerendeSaksbehandlerIdent || behandling.rolIdent == utfoerendeSaksbehandlerIdent) {
             verifyMedunderskriverStatusAndBehandlingNotFinalized(behandling)
         } else {
             checkSkrivetilgang(behandling)
@@ -918,9 +915,16 @@ class BehandlingService(
         return kabalInnstillingerService.getPotentialMedunderskrivere(behandling)
     }
 
-    fun getPotentialROLForBehandling(behandlingId: UUID): Saksbehandlere {
+    fun getPotentialROLForBehandling(behandlingId: UUID): Rols {
         val behandling = getBehandling(behandlingId)
-        return kabalInnstillingerService.getPotentialROL(behandling)
+        return Rols(
+            rols = kabalInnstillingerService.getPotentialROL(behandling).saksbehandlere.map {
+                Rols.Rol(
+                    navIdent = it.navIdent,
+                    navn = it.navn,
+                )
+            }
+        )
     }
 
     fun getAllBehandlingerForEnhet(enhet: String): List<Behandling> {
@@ -1057,19 +1061,19 @@ class BehandlingService(
         return behandling
     }
 
-    fun setROLState(
+    fun setROLFlowState(
         behandlingId: UUID,
-        rolState: ROLState?,
+        flowState: FlowState,
         utfoerendeSaksbehandlerIdent: String,
         systemUserContext: Boolean = false
     ): Behandling {
-        val behandling = getBehandlingForUpdate(
+        val behandling = getBehandlingForWriteAllowROLAndMU(
             behandlingId = behandlingId,
-            systemUserContext = systemUserContext,
+            utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
         )
         val event =
-            behandling.setROLState(
-                newROLState = rolState,
+            behandling.setROLFlowState(
+                newROLFlowStateState = flowState,
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)
@@ -1082,10 +1086,20 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         systemUserContext: Boolean = false
     ): Behandling {
-        val behandling = getBehandlingForUpdate(
-            behandlingId = behandlingId,
-            systemUserContext = systemUserContext,
-        )
+        val behandling =
+            if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
+                val behandling = getBehandling(behandlingId)
+                if (behandling.rolFlowState != FlowState.SENT && behandling.tildeling?.saksbehandlerident != utfoerendeSaksbehandlerIdent) {
+                    throw MissingTilgangException("OppgavestyringAlleEnheter har ikke lov til å endre ROL når den ikke er sent.")
+                }
+                getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+            } else {
+                getBehandlingForWriteAllowROLAndMU(
+                    behandlingId = behandlingId,
+                    utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                )
+            }
+
         val event =
             behandling.setROLIdent(
                 newROLIdent = rolIdent,

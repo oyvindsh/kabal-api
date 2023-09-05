@@ -7,6 +7,8 @@ import no.nav.klage.dokument.exceptions.AttachmentHasVirusException
 import no.nav.klage.dokument.exceptions.AttachmentIsEmptyException
 import no.nav.klage.dokument.exceptions.AttachmentTooLargeException
 import no.nav.klage.oppgave.util.getLogger
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.io.RandomAccessReadBuffer
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException
 import org.apache.tika.Tika
@@ -51,7 +53,7 @@ class MellomlagretDokumentValidatorService(
 
     private fun FysiskDokument.isEncrypted(): Boolean {
         return try {
-            val temp: PDDocument = PDDocument.load(this.content)
+            val temp: PDDocument = Loader.loadPDF(RandomAccessReadBuffer(this.content))
             temp.close()
             false
         } catch (ipe: InvalidPasswordException) {

@@ -112,7 +112,9 @@ data class DokumentInfo(
     val tittel: String?,
     val brevkode: String?,
     val skjerming: String?,
-    val dokumentvarianter: List<Dokumentvariant>
+    val dokumentvarianter: List<Dokumentvariant>,
+    val datoFerdigstilt: LocalDateTime?,
+    val originalJournalpostId: String?,
 )
 
 data class Dokumentvariant(

@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.domain.klage
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.DiscriminatorValue
+import jakarta.persistence.Entity
 import no.nav.klage.kodeverk.*
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.Registreringshjemmel
@@ -55,12 +57,12 @@ class Ankebehandling(
     utfall: Utfall? = null,
     registreringshjemler: MutableSet<Registreringshjemmel> = mutableSetOf(),
     medunderskriver: MedunderskriverTildeling? = null,
-    medunderskriverFlyt: MedunderskriverFlyt = MedunderskriverFlyt.IKKE_SENDT,
+    medunderskriverFlowState: FlowState = FlowState.NOT_SENT,
     medunderskriverHistorikk: MutableSet<MedunderskriverHistorikk> = mutableSetOf(),
     avsluttet: LocalDateTime? = null,
     avsluttetAvSaksbehandler: LocalDateTime? = null,
     rolIdent: String? = null,
-    rolState: ROLState? = null,
+    rolFlowState: FlowState = FlowState.NOT_SENT,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -84,12 +86,12 @@ class Ankebehandling(
     utfall = utfall,
     registreringshjemler = registreringshjemler,
     medunderskriver = medunderskriver,
-    medunderskriverFlyt = medunderskriverFlyt,
+    medunderskriverFlowState = medunderskriverFlowState,
     medunderskriverHistorikk = medunderskriverHistorikk,
     avsluttet = avsluttet,
     avsluttetAvSaksbehandler = avsluttetAvSaksbehandler,
     rolIdent = rolIdent,
-    rolState = rolState,
+    rolFlowState = rolFlowState,
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +
