@@ -73,6 +73,7 @@ class AnkeITrygderettenbehandlingService(
                 dokumentInfoId = it.dokumentInfoId,
                 saksbehandlerIdent = SYSTEMBRUKER,
                 systemUserContext = true,
+                ignoreCheckSkrivetilgang = true,
             )
         }
 

@@ -727,11 +727,12 @@ class BehandlingService(
         journalpostId: String,
         dokumentInfoId: String,
         saksbehandlerIdent: String,
-        systemUserContext: Boolean = false
+        systemUserContext: Boolean = false,
+        ignoreCheckSkrivetilgang: Boolean,
     ): LocalDateTime {
         val behandling = getBehandlingForUpdate(
             behandlingId = behandlingId,
-            ignoreCheckSkrivetilgang = systemUserContext,
+            ignoreCheckSkrivetilgang = ignoreCheckSkrivetilgang,
             systemUserContext = systemUserContext,
         )
         if (systemUserContext) {

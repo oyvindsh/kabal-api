@@ -163,13 +163,16 @@ class DokumentUnderArbeidService(
 
         val behandling = behandlingService.getBehandling(behandlingId)
 
+        val isCurrentROL = behandling.rolIdent == innloggetIdent
+
         journalfoerteDokumenter.forEach{
             behandlingService.connectDokumentToBehandling(
                 behandlingId = behandlingId,
                 journalpostId = it.journalpostId,
                 dokumentInfoId = it.dokumentInfoId,
                 saksbehandlerIdent = innloggetIdent,
-                systemUserContext = false
+                systemUserContext = false,
+                ignoreCheckSkrivetilgang = isCurrentROL,
             )
         }
 
@@ -612,8 +615,16 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke gjøre et dokument til vedlegg for seg selv.")
         }
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+
+        val behandling = behandlingService.getBehandling(parentDokument.behandlingId)
+
+        val isCurrentROL = behandling.rolIdent == innloggetIdent
+
         //Sjekker tilgang på behandlingsnivå:
-        behandlingService.getBehandlingForUpdate(parentDokument.behandlingId)
+        behandlingService.getBehandlingForUpdate(
+            behandlingId = parentDokument.behandlingId,
+            ignoreCheckSkrivetilgang = isCurrentROL
+        )
 
         if (parentDokument.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
@@ -670,14 +681,21 @@ class DokumentUnderArbeidService(
     }
 
     fun frikobleVedlegg(
-        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+        behandlingId: UUID,
         dokumentId: UUID,
         innloggetIdent: String
     ): DokumentUnderArbeid {
         val vedlegg = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        val isCurrentROL = behandling.rolIdent == innloggetIdent
+
         //Sjekker tilgang på behandlingsnivå:
-        behandlingService.getBehandlingForUpdate(vedlegg.behandlingId)
+        behandlingService.getBehandlingForUpdate(
+            behandlingId = vedlegg.behandlingId,
+            ignoreCheckSkrivetilgang = isCurrentROL
+        )
         //TODO: Skal det lages endringslogg på dette??
 
         if (vedlegg.erMarkertFerdig()) {

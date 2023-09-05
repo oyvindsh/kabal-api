@@ -83,6 +83,7 @@ class AnkebehandlingService(
                     dokumentInfoId = it.dokumentInfoId,
                     saksbehandlerIdent = SYSTEMBRUKER,
                     systemUserContext = true,
+                    ignoreCheckSkrivetilgang = true,
                 )
             }
         }
@@ -141,6 +142,7 @@ class AnkebehandlingService(
                 dokumentInfoId = it.dokumentInfoId,
                 saksbehandlerIdent = SYSTEMBRUKER,
                 systemUserContext = true,
+                ignoreCheckSkrivetilgang = true,
             )
         }
 
