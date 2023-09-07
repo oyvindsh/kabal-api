@@ -143,6 +143,29 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
     }
 
+    fun Behandling.setROLReturnedDate(
+        setNull: Boolean,
+        saksbehandlerident: String
+    ): BehandlingEndretEvent {
+        val oldValue = rolReturnedDate
+        val now = LocalDateTime.now()
+
+        rolReturnedDate = if (setNull) null else now
+        modified = now
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        endringslogg(
+            saksbehandlerident = saksbehandlerident,
+            felt = Felt.ROL_RETURNED_TIDSPUNKT,
+            fraVerdi = oldValue.toString(),
+            tilVerdi = rolReturnedDate.toString(),
+            tidspunkt = now
+        )?.let { endringslogginnslag.add(it) }
+
+        return BehandlingEndretEvent(behandling = this, endringslogginnslag = endringslogginnslag)
+    }
+
     fun Behandling.setROLIdent(
         newROLIdent: String?,
         saksbehandlerident: String

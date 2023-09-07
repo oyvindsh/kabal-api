@@ -51,6 +51,7 @@ class AnkeITrygderettenbehandling(
     avsluttetAvSaksbehandler: LocalDateTime? = null,
     rolIdent: String? = null,
     rolFlowState: FlowState = FlowState.NOT_SENT,
+    rolReturnedDate: LocalDateTime? = null,
 ) : Behandling(
     id = id,
     klager = klager,
@@ -80,6 +81,7 @@ class AnkeITrygderettenbehandling(
     avsluttetAvSaksbehandler = avsluttetAvSaksbehandler,
     rolIdent = rolIdent,
     rolFlowState = rolFlowState,
+    rolReturnedDate = rolReturnedDate,
 ) {
     override fun toString(): String {
         return "Ankebehandling(id=$id, " +

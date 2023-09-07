@@ -131,6 +131,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         feilregistrert = feilregistrering?.registered,
         rolIdent = rolIdent,
         rolFlowStateId = rolFlowState.id,
+        returnertFraROLTidspunkt = rolReturnedDate,
     )
 }
 
@@ -182,6 +183,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         feilregistrert = feilregistrering?.registered,
         rolIdent = rolIdent,
         rolFlowStateId = rolFlowState.id,
+        returnertFraROLTidspunkt = rolReturnedDate,
     )
 }
 
@@ -221,7 +223,8 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         sattPaaVentExpires = sattPaaVent?.to,
         sattPaaVentReason = sattPaaVent?.reason,
         rolIdent = rolIdent,
-        rolFlowStateId = rolFlowState.id
+        rolFlowStateId = rolFlowState.id,
+        returnertFraROLTidspunkt = rolReturnedDate,
 
     )
 }
@@ -248,6 +251,7 @@ data class BehandlingSkjemaV2(
     //Nytt navn på mottattKlageinstansTidspunkt
     val sakMottattKaDato: LocalDateTime,
     val avsluttetAvSaksbehandlerTidspunkt: LocalDateTime?,
+    val returnertFraROLTidspunkt: LocalDateTime?,
     val avsluttetTidspunkt: LocalDateTime?,
     val fristDato: LocalDate?,
     val gjeldendeTildeling: TildeltSaksbehandler?,

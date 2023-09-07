@@ -133,6 +133,8 @@ abstract class Behandling(
     @Column(name = "rol_flow_state_id")
     @Convert(converter = FlowStateConverter::class)
     var rolFlowState: FlowState = FlowState.NOT_SENT,
+    @Column(name = "rol_returned_date")
+    var rolReturnedDate: LocalDateTime?,
     ) {
 
     /**

@@ -32,6 +32,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMedunderskriverNav
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setMottattKlageinstans
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLFlowState
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLIdent
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setROLReturnedDate
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjemler
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
@@ -1071,12 +1072,21 @@ class BehandlingService(
             behandlingId = behandlingId,
             utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent,
         )
-        val event =
+
+        val event1 =
             behandling.setROLFlowState(
                 newROLFlowStateState = flowState,
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
-        applicationEventPublisher.publishEvent(event)
+        applicationEventPublisher.publishEvent(event1)
+
+        val event2 =
+            behandling.setROLReturnedDate(
+                setNull = flowState != FlowState.RETURNED,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event2)
+
         return behandling
     }
 
