@@ -269,8 +269,14 @@ class DokumentUnderArbeidService(
 
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
+        val behandlingForCheck = behandlingService.getBehandling(dokument.behandlingId)
+        val isCurrentROL = behandlingForCheck.rolIdent == innloggetIdent
+
         //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(dokument.behandlingId)
+        val behandling = behandlingService.getBehandlingForUpdate(
+            behandlingId = dokument.behandlingId,
+            ignoreCheckSkrivetilgang = isCurrentROL
+        )
 
         if (dokument.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke endre tittel på et dokument som er ferdigstilt")
