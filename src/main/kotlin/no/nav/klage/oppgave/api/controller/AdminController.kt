@@ -8,10 +8,7 @@ import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @ProtectedWithClaims(issuer = SecurityConfiguration.ISSUER_AAD)
@@ -106,6 +103,14 @@ class AdminController(
             logger.warn("Failed to migrateTablesInSmartdocuments", e)
             throw e
         }
+    }
+
+    @GetMapping("/internal/invalidregistreringshjemler")
+    fun getInvalidRegistreringshjemler() {
+        logger.debug("getInvalidRegistreringshjemler is called")
+        krevAdminTilgang()
+
+        adminService.logInvalidRegistreringshjemler()
     }
 
     data class Fnr(val fnr: String)

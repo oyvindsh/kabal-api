@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import jakarta.transaction.Transactional
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
+import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemlerV2
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.kafka.*
 import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandling
@@ -58,9 +59,15 @@ class AnkeITrygderettenbehandlingService(
         logger.debug("Created ankeITrygderettenbehandling {}", ankeITrygderettenbehandling.id)
 
         if (input.registreringsHjemmelSet != null) {
+
+            //TODO: Oppdater om det kommer ny versjon
+            val washedRegistreringshjemmelSet = input.registreringsHjemmelSet.filter {
+                ytelseTilRegistreringshjemlerV2[input.ytelse]?.contains(it) ?: false
+            }.toSet()
+
             behandlingService.setRegistreringshjemler(
                 behandlingId = ankeITrygderettenbehandling.id,
-                registreringshjemler = input.registreringsHjemmelSet,
+                registreringshjemler = washedRegistreringshjemmelSet,
                 utfoerendeSaksbehandlerIdent = SYSTEMBRUKER,
                 systemUserContext = true,
             )

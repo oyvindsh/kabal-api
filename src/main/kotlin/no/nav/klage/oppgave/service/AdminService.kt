@@ -8,6 +8,7 @@ import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClie
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.Type
+import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemlerV2
 import no.nav.klage.oppgave.clients.skjermede.SkjermedeApiClient
 import no.nav.klage.oppgave.domain.kafka.BehandlingState
 import no.nav.klage.oppgave.domain.kafka.EventType
@@ -32,6 +33,7 @@ import java.util.*
 class AdminService(
     private val kafkaDispatcher: KafkaDispatcher,
     private val behandlingRepository: BehandlingRepository,
+    private val klagebehandlingRepository: KlagebehandlingRepository,
     private val ankebehandlingRepository: AnkebehandlingRepository,
     private val ankeITrygderettenbehandlingRepository: AnkeITrygderettenbehandlingRepository,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
@@ -233,11 +235,39 @@ class AdminService(
         secureLogger.debug("found ${candidates.size} candidates for migration of table")
 
         candidates.forEach { smartDocument ->
-            kabalSmartEditorApiClient.updateDocument(smartDocument.id, migrateTables(
-                fromJsonString = smartDocument.json,
-                secureLogger = secureLogger
-            ))
+            kabalSmartEditorApiClient.updateDocument(
+                smartDocument.id, migrateTables(
+                    fromJsonString = smartDocument.json,
+                    secureLogger = secureLogger
+                )
+            )
         }
+    }
+
+    fun logInvalidRegistreringshjemler() {
+        val unfinishedBehandlinger = behandlingRepository.findByAvsluttetAvSaksbehandlerIsNull()
+        val ytelseAndHjemmelPairSet = unfinishedBehandlinger.map { it.ytelse to it.registreringshjemler }.toSet()
+        val (_, invalidHjemler) = ytelseAndHjemmelPairSet.partition { pair ->
+            pair.second.any { ytelseTilRegistreringshjemlerV2[pair.first]?.contains(it) ?: false }
+        }
+        val filteredInvalidHjemler = invalidHjemler.filter { it.second.isNotEmpty() }
+        secureLogger.debug("Invalid registreringshjemler in unfinished behandlinger: {}", filteredInvalidHjemler)
+
+        val klagebehandlinger = klagebehandlingRepository.findByKakaKvalitetsvurderingVersionIs(2)
+        val klageYtelseAndHjemmelPairSet = klagebehandlinger.map { it.ytelse to it.registreringshjemler }.toSet()
+        val (_, klageinvalidHjemler) = klageYtelseAndHjemmelPairSet.partition { pair ->
+            pair.second.any { ytelseTilRegistreringshjemlerV2[pair.first]?.contains(it) ?: false }
+        }
+        val filteredKlageInvalidHjemler = klageinvalidHjemler.filter { it.second.isNotEmpty() }
+        secureLogger.debug("Invalid registreringshjemler in klagebehandlinger v2: {}", filteredKlageInvalidHjemler)
+
+        val ankebehandlinger = ankebehandlingRepository.findByKakaKvalitetsvurderingVersionIs(2)
+        val ankeYtelseAndHjemmelPairSet = ankebehandlinger.map { it.ytelse to it.registreringshjemler }.toSet()
+        val (_, ankeinvalidHjemler) = ankeYtelseAndHjemmelPairSet.partition { pair ->
+            pair.second.any { ytelseTilRegistreringshjemlerV2[pair.first]?.contains(it) ?: false }
+        }
+        val filteredAnkeInvalidHjemler = ankeinvalidHjemler.filter { it.second.isNotEmpty() }
+        secureLogger.debug("Invalid registreringshjemler in ankebehandlinger v2: {}", filteredAnkeInvalidHjemler)
     }
 }
 

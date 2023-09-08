@@ -20,6 +20,8 @@ interface KlagebehandlingRepository : JpaRepository<Klagebehandling, UUID>, Klag
 
     fun findByKildeReferanseAndYtelseAndFeilregistreringIsNull(kildeReferanse: String, ytelse: Ytelse): Klagebehandling?
 
+    fun findByKakaKvalitetsvurderingVersionIs(version: Int): List<Klagebehandling>
+
     @Deprecated("See getOne")
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     override fun getOne(id: UUID): Klagebehandling

@@ -19,6 +19,8 @@ interface BehandlingRepository : JpaRepository<Behandling, UUID> {
 
     fun findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNullAndFeilregistreringIsNull(): List<Behandling>
 
+    fun findByAvsluttetAvSaksbehandlerIsNull(): List<Behandling>
+
     @EntityGraph(attributePaths = ["saksdokumenter", "hjemler", "registreringshjemler", "medunderskriverHistorikk"])
     fun findByTildelingEnhetAndAvsluttetAvSaksbehandlerIsNullAndFeilregistreringIsNull(enhet: String): List<Behandling>
 
