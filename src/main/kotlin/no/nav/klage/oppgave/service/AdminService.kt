@@ -246,43 +246,28 @@ class AdminService(
 
     fun logInvalidRegistreringshjemler() {
         val unfinishedBehandlinger = behandlingRepository.findByAvsluttetAvSaksbehandlerIsNull()
-        secureLogger.debug("unfinishedBehandlinger size: " + unfinishedBehandlinger.size)
         val ytelseAndHjemmelPairSet = unfinishedBehandlinger.map { it.ytelse to it.registreringshjemler }.toSet()
-        secureLogger.debug("ytelseAndHjemmelPairSet size: " + ytelseAndHjemmelPairSet.size)
         val (_, invalidHjemler) = ytelseAndHjemmelPairSet.partition { pair ->
             pair.second.any { ytelseTilRegistreringshjemlerV2[pair.first]?.contains(it) ?: false }
         }
-        secureLogger.debug("invalidHjemler: $invalidHjemler")
-        val invalidYtelserAndHjemlerSet = invalidHjemler.toSet()
-        secureLogger.debug(
-            "Invalid registreringshjemler in unfinished behandlinger: " + invalidYtelserAndHjemlerSet.forEach { it.second }
-        )
+        val filteredInvalidHjemler = invalidHjemler.filter { it.second.isNotEmpty() }
+        secureLogger.debug("Invalid registreringshjemler in unfinished behandlinger: {}", filteredInvalidHjemler)
 
         val klagebehandlinger = klagebehandlingRepository.findByKakaKvalitetsvurderingVersionIs(2)
-        secureLogger.debug("klagebehandlinger size: " + klagebehandlinger.size)
         val klageYtelseAndHjemmelPairSet = klagebehandlinger.map { it.ytelse to it.registreringshjemler }.toSet()
-        secureLogger.debug("klageYtelseAndHjemmelPairSet size: " + klageYtelseAndHjemmelPairSet.size)
         val (_, klageinvalidHjemler) = klageYtelseAndHjemmelPairSet.partition { pair ->
             pair.second.any { ytelseTilRegistreringshjemlerV2[pair.first]?.contains(it) ?: false }
         }
-        secureLogger.debug("klageinvalidHjemler: $klageinvalidHjemler")
-        val klageinvalidYtelserAndHjemlerSet = klageinvalidHjemler.toSet()
-        secureLogger.debug(
-            "Invalid registreringshjemler in klagebehandlinger v2: " + klageinvalidYtelserAndHjemlerSet.forEach { it.second }
-        )
+        val filteredKlageInvalidHjemler = klageinvalidHjemler.filter { it.second.isNotEmpty() }
+        secureLogger.debug("Invalid registreringshjemler in klagebehandlinger v2: {}", filteredKlageInvalidHjemler)
 
         val ankebehandlinger = ankebehandlingRepository.findByKakaKvalitetsvurderingVersionIs(2)
-        secureLogger.debug("ankebehandlinger size: " + ankebehandlinger.size)
         val ankeYtelseAndHjemmelPairSet = ankebehandlinger.map { it.ytelse to it.registreringshjemler }.toSet()
-        secureLogger.debug("ankeYtelseAndHjemmelPairSet size: " + ankeYtelseAndHjemmelPairSet.size)
         val (_, ankeinvalidHjemler) = ankeYtelseAndHjemmelPairSet.partition { pair ->
             pair.second.any { ytelseTilRegistreringshjemlerV2[pair.first]?.contains(it) ?: false }
         }
-        secureLogger.debug("ankeinvalidHjemler: $ankeinvalidHjemler")
-        val ankeinvalidYtelserAndHjemlerSet = ankeinvalidHjemler.toSet()
-        secureLogger.debug(
-            "Invalid registreringshjemler in ankebehandlinger v2: " + ankeinvalidYtelserAndHjemlerSet.forEach { it.second }
-        )
+        val filteredAnkeInvalidHjemler = ankeinvalidHjemler.filter { it.second.isNotEmpty() }
+        secureLogger.debug("Invalid registreringshjemler in ankebehandlinger v2: {}", filteredAnkeInvalidHjemler)
     }
 }
 
