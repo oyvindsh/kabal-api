@@ -1107,13 +1107,18 @@ class BehandlingService(
                 if (behandlingForCheck.rolFlowState == FlowState.SENT && behandlingForCheck.rolIdent == null) {
                     if (innloggetSaksbehandlerService.isRol()) {
                         getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+                    } else {
+                        getBehandlingForWriteAllowROLAndMU(
+                            behandlingId = behandlingId,
+                            utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                        )
                     }
+                } else {
+                    getBehandlingForWriteAllowROLAndMU(
+                        behandlingId = behandlingId,
+                        utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                    )
                 }
-
-                getBehandlingForWriteAllowROLAndMU(
-                    behandlingId = behandlingId,
-                    utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
-                )
             }
 
         val event =
