@@ -12,6 +12,8 @@ class InnloggetSaksbehandlerService(
 
     fun getInnloggetIdent() = tokenUtil.getIdent()
 
+    fun isRol(): Boolean = saksbehandlerRepository.isROL(tokenUtil.getIdent())
+
     fun isKabalAdmin(): Boolean = saksbehandlerRepository.hasKabalAdminRole(tokenUtil.getIdent())
 
     fun isKabalOppgavestyringAlleEnheter(): Boolean = saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(tokenUtil.getIdent())

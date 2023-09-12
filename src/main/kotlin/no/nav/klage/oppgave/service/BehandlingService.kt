@@ -1096,18 +1096,29 @@ class BehandlingService(
         utfoerendeSaksbehandlerIdent: String,
         systemUserContext: Boolean = false
     ): Behandling {
+        val behandlingForCheck = getBehandling(behandlingId)
         val behandling =
             if (saksbehandlerRepository.hasKabalOppgavestyringAlleEnheterRole(utfoerendeSaksbehandlerIdent)) {
-                val behandling = getBehandling(behandlingId)
-                if (behandling.rolFlowState != FlowState.SENT && behandling.tildeling?.saksbehandlerident != utfoerendeSaksbehandlerIdent) {
+                if (behandlingForCheck.rolFlowState != FlowState.SENT && behandlingForCheck.tildeling?.saksbehandlerident != utfoerendeSaksbehandlerIdent) {
                     throw MissingTilgangException("OppgavestyringAlleEnheter har ikke lov til å endre ROL når den ikke er sent.")
                 }
                 getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
             } else {
-                getBehandlingForWriteAllowROLAndMU(
-                    behandlingId = behandlingId,
-                    utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
-                )
+                if (behandlingForCheck.rolFlowState == FlowState.SENT && behandlingForCheck.rolIdent == null) {
+                    if (innloggetSaksbehandlerService.isRol()) {
+                        getBehandlingForUpdate(behandlingId = behandlingId, ignoreCheckSkrivetilgang = true)
+                    } else {
+                        getBehandlingForWriteAllowROLAndMU(
+                            behandlingId = behandlingId,
+                            utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                        )
+                    }
+                } else {
+                    getBehandlingForWriteAllowROLAndMU(
+                        behandlingId = behandlingId,
+                        utfoerendeSaksbehandlerIdent = utfoerendeSaksbehandlerIdent
+                    )
+                }
             }
 
         val event =
