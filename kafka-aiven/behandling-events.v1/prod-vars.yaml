@@ -22,3 +22,6 @@ acl:
   - team: klage
     application: klage-kafka-manager
     access: read
+  - team: etterlatte
+    application: etterlatte-klage
+    access: read
