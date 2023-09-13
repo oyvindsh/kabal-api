@@ -32,6 +32,9 @@ inboundApplications:
   - application: familie-klage
     namespace: teamfamilie
     cluster: dev-gcp
+  - application: etterlatte-klage
+    namespace: etterlatte
+    access: dev-gcp
 springProfile: dev-gcp
 tenant: trygdeetaten.no
 db_tier: db-custom-1-3840
