@@ -41,6 +41,14 @@ class DokumentUnderArbeidController(
         private val logger = getLogger(javaClass.enclosingClass)
     }
 
+    @GetMapping
+    fun findHovedDokumenter(
+        @PathVariable("behandlingId") behandlingId: UUID,
+    ): List<DokumentView> {
+        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId)
+            .map { dokumentMapper.mapToDokumentView(it) }
+    }
+
     @PostMapping("/fil")
     fun createAndUploadHoveddokument(
         @PathVariable("behandlingId") behandlingId: UUID,
@@ -176,14 +184,6 @@ class DokumentUnderArbeidController(
             logger.error("Feilet under kobling av dokument $persistentDokumentId med ${input.dokumentId}", e)
             throw e
         }
-    }
-
-    @GetMapping
-    fun findHovedDokumenter(
-        @PathVariable("behandlingId") behandlingId: UUID,
-    ): List<DokumentView> {
-        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId)
-            .map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @PostMapping("/{dokumentid}/ferdigstill")

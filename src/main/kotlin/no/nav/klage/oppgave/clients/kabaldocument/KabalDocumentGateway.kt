@@ -29,9 +29,9 @@ class KabalDocumentGateway(
         return UUID.fromString(
             kabalDocumentClient.createDokumentEnhetWithDokumentreferanser(
                 kabalDocumentMapper.mapBehandlingToDokumentEnhetWithDokumentreferanser(
-                    behandling,
-                    hovedDokument,
-                    vedlegg
+                    behandling = behandling,
+                    hovedDokument = hovedDokument,
+                    vedlegg = vedlegg
                 )
             ).id
         )

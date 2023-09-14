@@ -58,14 +58,18 @@ class KabalDocumentMapper(
                 )
             ),
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
-                hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
+                hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument, 0),
                 vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .map { mapDokumentUnderArbeidToDokumentReferanse(it) },
+                    .mapIndexed { index, currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
+                        dokument = currentVedlegg,
+                        index = index
+                    ) },
                 journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .map {
+                    .mapIndexed { index, currentVedlegg ->
                         DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
-                            kildeJournalpostId = it.journalfoertDokumentReference!!.journalpostId,
-                            dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+                            kildeJournalpostId = currentVedlegg.journalfoertDokumentReference!!.journalpostId,
+                            dokumentInfoId = currentVedlegg.journalfoertDokumentReference.dokumentInfoId,
+                            index = index
                         )
                     },
             ),
@@ -74,12 +78,13 @@ class KabalDocumentMapper(
         )
     }
 
-    private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
+    private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid, index: Int): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
         return DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
             mellomlagerId = dokument.mellomlagerId!!,
             opplastet = dokument.opplastet!!,
             size = dokument.size!!,
             name = dokument.name,
+            index = index
         )
     }
 
