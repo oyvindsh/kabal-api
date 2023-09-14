@@ -45,7 +45,8 @@ class DokumentUnderArbeidController(
     fun findHovedDokumenter(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
-        return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId)
+        val allDokumenterUnderArbeid = dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId)
+        return dokumentMapper.getSortedDokumentViewList(allDokumenterUnderArbeid)
     }
 
     @PostMapping("/fil")

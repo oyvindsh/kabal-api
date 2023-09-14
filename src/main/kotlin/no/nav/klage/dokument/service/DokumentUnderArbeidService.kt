@@ -3,7 +3,6 @@ package no.nav.klage.dokument.service
 import jakarta.transaction.Transactional
 import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DocumentValidationResponse
-import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
@@ -715,22 +714,13 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): List<DokumentView> {
+    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): List<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         if (checkReadAccess) {
             behandlingService.getBehandling(behandlingId)
         }
 
-        val allDokumenterUnderArbeid =
-            dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
-
-        val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
-            it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
-        }
-
-        return dokumenterUnderArbeid.map { dokumentMapper.mapToDokumentView(it) }
-            .sortedBy { it.created } + journalfoerteDokumenterUnderArbeid.map { dokumentMapper.mapToDokumentView(it) }
-            .sortedBy { it.journalfoertDokumentReference?.datoOpprettet }
+        return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
     }
 
     fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
