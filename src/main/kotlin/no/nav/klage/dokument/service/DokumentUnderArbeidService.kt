@@ -1,7 +1,9 @@
 package no.nav.klage.dokument.service
 
 import jakarta.transaction.Transactional
+import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DocumentValidationResponse
+import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
@@ -55,6 +57,7 @@ class DokumentUnderArbeidService(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val dokumentService: DokumentService,
     private val kabalDocumentMapper: KabalDocumentMapper,
+    private val dokumentMapper: DokumentMapper,
     private val eregClient: EregClient,
 ) {
     companion object {
@@ -165,7 +168,7 @@ class DokumentUnderArbeidService(
 
         val isCurrentROL = behandling.rolIdent == innloggetIdent
 
-        journalfoerteDokumenter.forEach{
+        journalfoerteDokumenter.forEach {
             behandlingService.connectDokumentToBehandling(
                 behandlingId = behandlingId,
                 journalpostId = it.journalpostId,
@@ -712,18 +715,22 @@ class DokumentUnderArbeidService(
         return vedlegg
     }
 
-    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): List<DokumentUnderArbeid> {
+    fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): List<DokumentView> {
         //Sjekker tilgang på behandlingsnivå:
         if (checkReadAccess) {
             behandlingService.getBehandling(behandlingId)
         }
 
-        val allDokumenterUnderArbeid = dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
+        val allDokumenterUnderArbeid =
+            dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
+
         val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
-        return dokumenterUnderArbeid.sortedBy { it.opplastet } + journalfoerteDokumenterUnderArbeid.sortedBy { it.opplastet }
+        return dokumenterUnderArbeid.map { dokumentMapper.mapToDokumentView(it) }
+            .sortedBy { it.created } + journalfoerteDokumenterUnderArbeid.map { dokumentMapper.mapToDokumentView(it) }
+            .sortedBy { it.journalfoertDokumentReference?.datoOpprettet }
     }
 
     fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {

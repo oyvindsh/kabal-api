@@ -46,7 +46,6 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
     ): List<DokumentView> {
         return dokumentUnderArbeidService.findDokumenterNotFinished(behandlingId = behandlingId)
-            .map { dokumentMapper.mapToDokumentView(it) }
     }
 
     @PostMapping("/fil")
