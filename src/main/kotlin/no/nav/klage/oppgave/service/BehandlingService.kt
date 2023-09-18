@@ -77,7 +77,8 @@ class BehandlingService(
 
     fun ferdigstillBehandling(
         behandlingId: UUID,
-        innloggetIdent: String
+        innloggetIdent: String,
+        nyBehandling: Boolean
     ): Behandling {
         val behandling = getBehandlingForUpdate(
             behandlingId = behandlingId
@@ -86,7 +87,11 @@ class BehandlingService(
         if (behandling.avsluttetAvSaksbehandler != null) throw BehandlingFinalizedException("Behandlingen er avsluttet")
 
         //Forretningsmessige krav før vedtak kan ferdigstilles
-        validateBehandlingBeforeFinalize(behandlingId)
+        validateBehandlingBeforeFinalize(behandlingId = behandlingId, nyBehandling = nyBehandling)
+
+        if (nyBehandling) {
+            return setNyAnkebehandlingKA(behandlingId, innloggetIdent)
+        }
 
         //Her settes en markør som så brukes async i kallet klagebehandlingRepository.findByAvsluttetIsNullAndAvsluttetAvSaksbehandlerIsNotNull
         return markerBehandlingSomAvsluttetAvSaksbehandler(behandling, innloggetIdent)
@@ -101,11 +106,21 @@ class BehandlingService(
         return behandling
     }
 
-    fun validateBehandlingBeforeFinalize(behandlingId: UUID) {
+    fun validateBehandlingBeforeFinalize(behandlingId: UUID, nyBehandling: Boolean) {
         val behandling = getBehandling(behandlingId)
         val dokumentValidationErrors = mutableListOf<InvalidProperty>()
         val behandlingValidationErrors = mutableListOf<InvalidProperty>()
         val sectionList = mutableListOf<ValidationSection>()
+
+        if (nyBehandling) {
+            if (behandling is AnkeITrygderettenbehandling) {
+                if (behandling.utfall != Utfall.OPPHEVET) {
+                    throw IllegalOperation("Ny ankebehandling kan kun opprettes hvis utfall er 'Opphevet'.")
+                }
+            } else {
+                throw IllegalOperation("Ny ankebehandling kan kun brukes på en Anke i trygderetten-sak.")
+            }
+        }
 
         val unfinishedDocuments =
             dokumentUnderArbeidRepository.findByBehandlingIdAndMarkertFerdigIsNull(behandling.id)
@@ -582,7 +597,7 @@ class BehandlingService(
     fun setNyAnkebehandlingKA(
         behandlingId: UUID,
         utfoerendeSaksbehandlerIdent: String
-    ): LocalDateTime {
+    ): Behandling {
         val behandling = getBehandlingForUpdate(behandlingId = behandlingId)
 
         if (behandling is AnkeITrygderettenbehandling) {
@@ -597,7 +612,7 @@ class BehandlingService(
                 )
             )
 
-            return behandling.modified
+            return behandling
         } else throw IllegalOperation("Dette feltet kan bare settes i ankesaker i Trygderetten")
     }
 

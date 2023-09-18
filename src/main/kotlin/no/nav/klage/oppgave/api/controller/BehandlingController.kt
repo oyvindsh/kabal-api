@@ -79,7 +79,8 @@ class BehandlingController(
 
     @PostMapping("/{behandlingId}/fullfoer")
     fun fullfoerBehandling(
-        @PathVariable("behandlingId") behandlingId: UUID
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestParam(value = "nybehandling", required = false) nyBehandling: Boolean = false
     ): BehandlingFullfoertView {
         logKlagebehandlingMethodDetails(
             ::fullfoerBehandling.name,
@@ -89,8 +90,9 @@ class BehandlingController(
         )
 
         val klagebehandling = behandlingService.ferdigstillBehandling(
-            behandlingId,
-            innloggetSaksbehandlerService.getInnloggetIdent()
+            behandlingId = behandlingId,
+            innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
+            nyBehandling = nyBehandling,
         )
         return behandlingMapper.mapToBehandlingFullfoertView(klagebehandling)
     }
@@ -216,7 +218,7 @@ class BehandlingController(
             logger
         )
 
-        behandlingService.validateBehandlingBeforeFinalize(behandlingId)
+        behandlingService.validateBehandlingBeforeFinalize(behandlingId, false)
         return ValidationPassedResponse()
     }
 
