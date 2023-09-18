@@ -42,9 +42,9 @@ class DokumentMapper(
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
-        return dokumenterUnderArbeid.sortedBy { it.created }
+        return dokumenterUnderArbeid.sortedByDescending { it.created }
             .map { mapToDokumentView(it) } + journalfoerteDokumenterUnderArbeid.map { mapToDokumentView(it) }
-            .sortedBy { it.journalfoertDokumentReference?.datoOpprettet }
+            .sortedByDescending { it.journalfoertDokumentReference?.datoOpprettet }
     }
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {

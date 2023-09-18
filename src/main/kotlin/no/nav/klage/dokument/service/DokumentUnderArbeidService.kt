@@ -1,7 +1,6 @@
 package no.nav.klage.dokument.service
 
 import jakarta.transaction.Transactional
-import no.nav.klage.dokument.api.mapper.DokumentMapper
 import no.nav.klage.dokument.api.view.DocumentValidationResponse
 import no.nav.klage.dokument.api.view.JournalfoertDokumentReference
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
@@ -56,7 +55,6 @@ class DokumentUnderArbeidService(
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
     private val dokumentService: DokumentService,
     private val kabalDocumentMapper: KabalDocumentMapper,
-    private val dokumentMapper: DokumentMapper,
     private val eregClient: EregClient,
 ) {
     companion object {
