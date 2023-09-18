@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.*
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.util.getLogger
@@ -17,7 +18,8 @@ import java.util.*
 @Service
 class KabalDocumentMapper(
     private val pdlFacade: PdlFacade,
-    private val eregClient: EregClient
+    private val eregClient: EregClient,
+    private val safClient: SafGraphQlClient,
 ) {
 
     companion object {
@@ -60,11 +62,17 @@ class KabalDocumentMapper(
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument, 0),
                 vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+                    .sortedByDescending { it.modified }
                     .mapIndexed { index, currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
                         dokument = currentVedlegg,
                         index = index
                     ) },
                 journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+                    .sortedByDescending {
+                        val journalpostInDokarkiv =
+                            safClient.getJournalpostAsSystembruker(it.journalfoertDokumentReference!!.journalpostId)
+                        journalpostInDokarkiv.datoOpprettet
+                    }
                     .mapIndexed { index, currentVedlegg ->
                         DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
                             kildeJournalpostId = currentVedlegg.journalfoertDokumentReference!!.journalpostId,

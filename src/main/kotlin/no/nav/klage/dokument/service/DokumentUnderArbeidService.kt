@@ -732,7 +732,6 @@ class DokumentUnderArbeidService(
 
     fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
-        //TODO: Finn ut hva som er riktig sorteringsnøkkel på vedlegg.
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         //Denne er alltid sann
         if (hovedDokument.dokumentEnhetId == null) {
