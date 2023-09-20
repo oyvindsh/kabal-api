@@ -43,7 +43,7 @@ class DokumentMapper(
         }
 
         //TODO: Finn ut hva vi skal sortere smartdokumenter på. Created, modified, navn?
-        return dokumenterUnderArbeid.sortedByDescending { it.modified }
+        return dokumenterUnderArbeid.sortedByDescending { it.created }
             .map { mapToDokumentView(it) } + journalfoerteDokumenterUnderArbeid.map { mapToDokumentView(it) }
             .sortedByDescending { it.journalfoertDokumentReference?.datoOpprettet }
     }

@@ -62,7 +62,7 @@ class KabalDocumentMapper(
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument, 0),
                 vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .sortedByDescending { it.modified }
+                    .sortedByDescending { it.created }
                     .mapIndexed { index, currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
                         dokument = currentVedlegg,
                         index = index
