@@ -287,20 +287,31 @@ class BehandlingService(
             "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
 
         if (behandling.utfall != null) {
-            if (behandling.utfall == Utfall.HENVIST) {
-                behandlingValidationErrors.add(
-                    InvalidProperty(
-                        field = "utfall",
-                        reason = "Kan ikke lukke behandling. Dersom resultatet fra Trygderetten er «Henvist», må du først fullføre registrering av resultatet fra Trygderetten før du kan starte ny behandling. Når du trykker «Fullfør», vil Kabal opprette en ny ankeoppgave for deg."
+            when (behandling.utfall) {
+                Utfall.HENVIST -> {
+                    behandlingValidationErrors.add(
+                        InvalidProperty(
+                            field = "utfall",
+                            reason = "Kan ikke lukke behandling. Dersom resultatet fra Trygderetten er «Henvist», må du først fullføre registrering av resultatet fra Trygderetten før du kan starte ny behandling. Når du trykker «Fullfør», vil Kabal opprette en ny ankeoppgave for deg."
+                        )
                     )
-                )
-            } else {
-                behandlingValidationErrors.add(
-                    InvalidProperty(
-                        field = "utfall",
-                        reason = getErrorText("utfall")
+                }
+                Utfall.OPPHEVET -> {
+                    behandlingValidationErrors.add(
+                        InvalidProperty(
+                            field = "utfall",
+                            reason = "Kan ikke lukke behandling. Dersom resultatet fra Trygderetten er «Opphevet», må du først fullføre registrering av resultatet fra Trygderetten før du kan starte ny behandling. Når du trykker «Fullfør», vil du få mulighet til å opprette en ny ankeoppgave."
+                        )
                     )
-                )
+                }
+                else -> {
+                    behandlingValidationErrors.add(
+                        InvalidProperty(
+                            field = "utfall",
+                            reason = getErrorText("utfall")
+                        )
+                    )
+                }
             }
         }
 
