@@ -18,7 +18,7 @@ data class DokumentEnhetWithDokumentreferanserInput(
             val mellomlagerId: String,
             val opplastet: LocalDateTime,
             val size: Long,
-            val name: String
+            val name: String,
         )
 
         data class JournalfoertDokument(

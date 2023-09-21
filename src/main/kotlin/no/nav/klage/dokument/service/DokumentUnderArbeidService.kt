@@ -165,7 +165,7 @@ class DokumentUnderArbeidService(
 
         val isCurrentROL = behandling.rolIdent == innloggetIdent
 
-        journalfoerteDokumenter.forEach{
+        journalfoerteDokumenter.forEach {
             behandlingService.connectDokumentToBehandling(
                 behandlingId = behandlingId,
                 journalpostId = it.journalpostId,
@@ -737,7 +737,11 @@ class DokumentUnderArbeidService(
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
             val behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
-            val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(behandling, hovedDokument, vedlegg)
+            val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(
+                behandling = behandling,
+                hovedDokument = hovedDokument,
+                vedlegg = vedlegg
+            )
             hovedDokument.dokumentEnhetId = dokumentEnhetId
         }
         return hovedDokument

@@ -6,6 +6,7 @@ import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.*
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
+import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.PartId
 import no.nav.klage.oppgave.util.getLogger
@@ -17,7 +18,8 @@ import java.util.*
 @Service
 class KabalDocumentMapper(
     private val pdlFacade: PdlFacade,
-    private val eregClient: EregClient
+    private val eregClient: EregClient,
+    private val safClient: SafGraphQlClient,
 ) {
 
     companion object {
@@ -60,12 +62,20 @@ class KabalDocumentMapper(
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
                 vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .map { mapDokumentUnderArbeidToDokumentReferanse(it) },
+                    .sortedByDescending { it.created }
+                    .map { currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
+                        dokument = currentVedlegg,
+                    ) },
                 journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .map {
+                    .sortedByDescending {
+                        val journalpostInDokarkiv =
+                            safClient.getJournalpostAsSystembruker(it.journalfoertDokumentReference!!.journalpostId)
+                        journalpostInDokarkiv.datoOpprettet
+                    }
+                    .map { currentVedlegg ->
                         DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
-                            kildeJournalpostId = it.journalfoertDokumentReference!!.journalpostId,
-                            dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
+                            kildeJournalpostId = currentVedlegg.journalfoertDokumentReference!!.journalpostId,
+                            dokumentInfoId = currentVedlegg.journalfoertDokumentReference.dokumentInfoId,
                         )
                     },
             ),

@@ -37,6 +37,16 @@ class DokumentMapper(
         )
     }
 
+    fun getSortedDokumentViewList(allDokumenterUnderArbeid: List<DokumentUnderArbeid>): List<DokumentView> {
+        val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
+            it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
+        }
+
+        return dokumenterUnderArbeid.sortedByDescending { it.created }
+            .map { mapToDokumentView(it) } + journalfoerteDokumenterUnderArbeid.map { mapToDokumentView(it) }
+            .sortedByDescending { it.journalfoertDokumentReference?.datoOpprettet }
+    }
+
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
         val type = dokumentUnderArbeid.getType()
 
