@@ -60,12 +60,11 @@ class KabalDocumentMapper(
                 )
             ),
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
-                hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument, 0),
+                hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
                 vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
                     .sortedByDescending { it.created }
-                    .mapIndexed { index, currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
+                    .map { currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
                         dokument = currentVedlegg,
-                        index = index
                     ) },
                 journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
                     .sortedByDescending {
@@ -73,11 +72,10 @@ class KabalDocumentMapper(
                             safClient.getJournalpostAsSystembruker(it.journalfoertDokumentReference!!.journalpostId)
                         journalpostInDokarkiv.datoOpprettet
                     }
-                    .mapIndexed { index, currentVedlegg ->
+                    .map { currentVedlegg ->
                         DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
                             kildeJournalpostId = currentVedlegg.journalfoertDokumentReference!!.journalpostId,
                             dokumentInfoId = currentVedlegg.journalfoertDokumentReference.dokumentInfoId,
-                            index = index
                         )
                     },
             ),
@@ -86,13 +84,12 @@ class KabalDocumentMapper(
         )
     }
 
-    private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid, index: Int): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
+    private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
         return DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
             mellomlagerId = dokument.mellomlagerId!!,
             opplastet = dokument.opplastet!!,
             size = dokument.size!!,
             name = dokument.name,
-            index = index
         )
     }
 
