@@ -2,6 +2,7 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import jakarta.persistence.*
 import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import no.nav.klage.oppgave.domain.klage.DokumentTypeConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
@@ -72,7 +73,7 @@ open class DokumentUnderArbeid(
     open var creatorIdent: String,
     @Column(name = "creator_role")
     @Enumerated(EnumType.STRING)
-    open var creatorRole: CreatorRole,
+    open var creatorRole: BehandlingRole,
 ) : Comparable<DokumentUnderArbeid> {
 
     override fun compareTo(other: DokumentUnderArbeid): Int =
@@ -124,11 +125,6 @@ open class DokumentUnderArbeid(
         UPLOADED,
         SMART,
         JOURNALFOERT
-    }
-
-    enum class CreatorRole {
-        KABAL_SAKSBEHANDLING,
-        KABAL_ROL;
     }
 
     fun getType(): DokumentUnderArbeidType {

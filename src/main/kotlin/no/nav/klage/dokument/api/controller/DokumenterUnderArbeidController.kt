@@ -67,6 +67,7 @@ class DokumentUnderArbeidController(
                 opplastetFil = opplastetFil,
                 innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
                 tittel = opplastetFil.title,
+                parentId = input.parentId,
             )
         )
     }

@@ -3,6 +3,7 @@ package no.nav.klage.dokument.repositories
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
+import no.nav.klage.oppgave.domain.klage.BehandlingRole.KABAL_SAKSBEHANDLING
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,7 +49,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(LocalDateTime.now(), "S123456")
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(LocalDateTime.now())
@@ -77,7 +78,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -97,7 +98,7 @@ class DokumentUnderArbeidRepositoryTest {
                 parentId = hovedDokument.id,
                 journalfoertDokumentReference = null,
                 creatorIdent = "null",
-                creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+                creatorRole = KABAL_SAKSBEHANDLING,
             )
         )
 
@@ -123,7 +124,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -144,7 +145,7 @@ class DokumentUnderArbeidRepositoryTest {
                 parentId = hovedDokument.id,
                 journalfoertDokumentReference = null,
                 creatorIdent = "null",
-                creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+                creatorRole = KABAL_SAKSBEHANDLING,
             )
         )
 
@@ -176,7 +177,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         dokumentUnderArbeidRepository.save(hovedDokument)
 
@@ -211,7 +212,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         val vedlegg1 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -226,7 +227,7 @@ class DokumentUnderArbeidRepositoryTest {
             parentId = hovedDokument1.id,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         val vedlegg2 = DokumentUnderArbeid(
             mellomlagerId = UUID.randomUUID().toString(),
@@ -241,7 +242,7 @@ class DokumentUnderArbeidRepositoryTest {
             parentId = hovedDokument1.id,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
 
         val hovedDokument2 = DokumentUnderArbeid(
@@ -256,7 +257,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
 
         val hovedDokument3 = DokumentUnderArbeid(
@@ -271,7 +272,7 @@ class DokumentUnderArbeidRepositoryTest {
             smartEditorTemplateId = null,
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = KABAL_SAKSBEHANDLING,
         )
         dokumentUnderArbeidRepository.save(hovedDokument1)
         dokumentUnderArbeidRepository.save(vedlegg1)

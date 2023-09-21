@@ -18,6 +18,7 @@ import no.nav.klage.dokument.service.DokumentUnderArbeidService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.clients.events.KafkaEventClient
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
+import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.InnloggetSaksbehandlerService
 import org.assertj.core.api.Assertions.assertThat
@@ -83,6 +84,7 @@ internal class DokumentUnderArbeidControllerTest {
                 any(),
                 any(),
                 any(),
+                any(),
             )
         } returns DokumentUnderArbeid(
             mellomlagerId = "mellomlagerId",
@@ -102,7 +104,7 @@ internal class DokumentUnderArbeidControllerTest {
             id = UUID.randomUUID(),
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = BehandlingRole.KABAL_SAKSBEHANDLING,
         )
 
 
@@ -174,7 +176,7 @@ internal class DokumentUnderArbeidControllerTest {
             id = UUID.randomUUID(),
             journalfoertDokumentReference = null,
             creatorIdent = "null",
-            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+            creatorRole = BehandlingRole.KABAL_SAKSBEHANDLING,
         )
 
         val json = mockMvc.perform(

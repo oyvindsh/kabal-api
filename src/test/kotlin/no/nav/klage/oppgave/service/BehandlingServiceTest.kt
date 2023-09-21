@@ -19,6 +19,7 @@ import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.BehandlingRole.KABAL_SAKSBEHANDLING
 import no.nav.klage.oppgave.exceptions.BehandlingAvsluttetException
 import no.nav.klage.oppgave.exceptions.BehandlingFinalizedException
 import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
@@ -339,7 +340,7 @@ class BehandlingServiceTest {
                             parentId = null,
                             journalfoertDokumentReference = null,
                             creatorIdent = "null",
-                            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
+                            creatorRole = KABAL_SAKSBEHANDLING,
                         )
                     )
 

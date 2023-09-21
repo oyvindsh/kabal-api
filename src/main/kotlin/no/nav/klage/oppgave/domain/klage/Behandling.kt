@@ -172,6 +172,14 @@ abstract class Behandling(
     }
 }
 
+enum class BehandlingRole {
+    KABAL_SAKSBEHANDLING,
+    KABAL_ROL,
+    KABAL_MEDUNDERSKRIVER,
+    NONE,
+    ;
+}
+
 
 val utfallToNewAnkebehandling = setOf(
     Utfall.HENVIST

@@ -22,11 +22,8 @@ import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
-import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
-import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
-import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.InvalidProperty
 import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
@@ -70,9 +67,16 @@ class DokumentUnderArbeidService(
         opplastetFil: FysiskDokument?,
         innloggetIdent: String,
         tittel: String,
+        parentId: UUID?,
     ): DokumentUnderArbeid {
         //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        if (behandlingRole == BehandlingRole.KABAL_ROL && parentId == null) {
+            throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
+        }
 
         if (opplastetFil == null) {
             throw DokumentValidationException("No file uploaded")
@@ -80,6 +84,7 @@ class DokumentUnderArbeidService(
 
         attachmentValidator.validateAttachment(opplastetFil)
         val mellomlagerId = mellomlagerService.uploadDocument(opplastetFil)
+
         val hovedDokument = dokumentUnderArbeidRepository.save(
             DokumentUnderArbeid(
                 mellomlagerId = mellomlagerId,
@@ -92,7 +97,8 @@ class DokumentUnderArbeidService(
                 smartEditorTemplateId = null,
                 journalfoertDokumentReference = null,
                 creatorIdent = innloggetIdent,
-                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent)
+                creatorRole = behandlingRole,
+                parentId = parentId,
             )
         )
         behandling.publishEndringsloggEvent(
@@ -116,7 +122,15 @@ class DokumentUnderArbeidService(
         parentId: UUID?,
     ): DokumentUnderArbeid {
         //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        if (behandlingRole == BehandlingRole.KABAL_ROL && parentId == null) {
+            throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
+        }
+
+        validateCanCreateDocuments(behandlingRole)
 
         if (json == null) {
             throw DokumentValidationException("Ingen json angitt")
@@ -141,7 +155,7 @@ class DokumentUnderArbeidService(
                 smartEditorTemplateId = smartEditorTemplateId,
                 journalfoertDokumentReference = null,
                 creatorIdent = innloggetIdent,
-                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent),
+                creatorRole = behandlingRole,
                 parentId = parentId,
             )
         )
@@ -193,6 +207,9 @@ class DokumentUnderArbeidService(
 
         val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+        validateCanCreateDocuments(behandlingRole)
+
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
@@ -212,7 +229,7 @@ class DokumentUnderArbeidService(
                     dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
                 ),
                 creatorIdent = innloggetIdent,
-                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent)
+                creatorRole = behandlingRole
             )
 
             behandling.publishEndringsloggEvent(
@@ -232,14 +249,19 @@ class DokumentUnderArbeidService(
         return resultingDocuments to duplicates
     }
 
-    private fun getCreatorRoleOrThrowException(
-        behandling: Behandling,
-        innloggetIdent: String
-    ) = if (behandling.rolIdent == innloggetIdent) {
-        DokumentUnderArbeid.CreatorRole.KABAL_ROL
-    } else if (behandling.tildeling?.saksbehandlerident == innloggetIdent) {
-        DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING
-    } else throw MissingTilgangException("Kun ROL eller saksbehandler kan opprette dokumenter")
+    private fun Behandling.getRoleInBehandling(innloggetIdent: String) = if (rolIdent == innloggetIdent) {
+        BehandlingRole.KABAL_ROL
+    } else if (tildeling?.saksbehandlerident == innloggetIdent) {
+        BehandlingRole.KABAL_SAKSBEHANDLING
+    } else if (medunderskriver?.saksbehandlerident == innloggetIdent) {
+        BehandlingRole.KABAL_MEDUNDERSKRIVER
+    } else BehandlingRole.NONE
+
+    private fun validateCanCreateDocuments(behandlingRole: BehandlingRole) {
+        if (behandlingRole !in listOf(BehandlingRole.KABAL_ROL, BehandlingRole.KABAL_SAKSBEHANDLING)) {
+            throw MissingTilgangException("Kun ROL eller saksbehandler kan opprette dokumenter")
+        }
+    }
 
     fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
@@ -289,16 +311,10 @@ class DokumentUnderArbeidService(
 
         val behandlingForCheck = behandlingService.getBehandling(dokument.behandlingId)
 
-        if (behandlingForCheck.tildeling?.saksbehandlerident == innloggetIdent) {
-            if (dokument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING) {
-                throw MissingTilgangException("Saksbehandlere har ikke anledning til å endre tittel på dokumenter opprettet av ROL.")
-            }
-        } else if (behandlingForCheck.rolIdent == innloggetIdent) {
-            if (dokument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_ROL) {
-                throw MissingTilgangException("ROL har ikke anledning til å endre tittel på dokumenter opprettet av saksbehandlere.")
-            }
-        } else {
-            throw MissingTilgangException("Kun tildelt ROL eller saksbehandler kan endre tittel på dokumenter.")
+        val behandlingRole = behandlingForCheck.getRoleInBehandling(innloggetIdent)
+
+        if (dokument.creatorRole != behandlingRole) {
+            throw MissingTilgangException("$behandlingRole har ikke anledning til å endre tittel på dette dokumentet eiet av ${dokument.creatorRole}.")
         }
 
         val isCurrentROL = behandlingForCheck.rolIdent == innloggetIdent
@@ -338,16 +354,22 @@ class DokumentUnderArbeidService(
 
         val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
 
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
         when (dokument.creatorRole) {
-            DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING -> {
-                if (!(behandling.tildeling?.saksbehandlerident == innloggetIdent || behandling.medunderskriver?.saksbehandlerident == innloggetIdent)) {
+            BehandlingRole.KABAL_SAKSBEHANDLING -> {
+                if (behandlingRole !in listOf(BehandlingRole.KABAL_SAKSBEHANDLING, BehandlingRole.KABAL_MEDUNDERSKRIVER)) {
                     throw MissingTilgangException("Kun saksbehandler eller medunderskriver kan skrive i dette dokumentet.")
                 }
             }
-            DokumentUnderArbeid.CreatorRole.KABAL_ROL -> {
-                if (behandling.rolIdent != innloggetIdent) {
+            BehandlingRole.KABAL_ROL -> {
+                if (behandlingRole != BehandlingRole.KABAL_ROL) {
                     throw MissingTilgangException("Kun ROL kan skrive i dette dokumentet.")
                 }
+            }
+
+            else -> {
+                throw RuntimeException("A document was created by non valid role: ${dokument.creatorRole}")
             }
         }
     }
@@ -626,18 +648,11 @@ class DokumentUnderArbeidService(
 
         val documents = descendants.plus(document)
 
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
         documents.forEach { currentDocument ->
-            //can delete?
-            if (behandling.tildeling?.saksbehandlerident == innloggetIdent) {
-                if (currentDocument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING) {
-                    throw MissingTilgangException("Saksbehandlere har ikke anledning til å slette dokumenter opprettet av ROL.")
-                }
-            } else if (behandling.rolIdent == innloggetIdent) {
-                if (currentDocument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_ROL) {
-                    throw MissingTilgangException("ROL har ikke anledning til å slette dokumenter opprettet av saksbehandlere.")
-                }
-            } else {
-                throw MissingTilgangException("Kun tildelt ROL eller saksbehandler kan slette dokumenter.")
+            if (currentDocument.creatorRole != behandlingRole) {
+                throw MissingTilgangException("$behandlingRole har ikke anledning til å slette dokumentet eiet av ${currentDocument.creatorRole}.")
             }
         }
 
