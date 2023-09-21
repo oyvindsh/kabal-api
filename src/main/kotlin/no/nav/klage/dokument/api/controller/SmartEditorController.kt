@@ -80,6 +80,7 @@ class SmartEditorController(
             smartEditorTemplateId = body.templateId,
             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent(),
             tittel = body.tittel ?: DokumentType.VEDTAK.defaultFilnavn,
+            parentId = body.parentId,
         )
 
         val smartEditorId =

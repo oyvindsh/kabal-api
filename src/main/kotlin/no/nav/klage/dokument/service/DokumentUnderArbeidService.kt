@@ -113,6 +113,7 @@ class DokumentUnderArbeidService(
         smartEditorTemplateId: String?,
         innloggetIdent: String,
         tittel: String,
+        parentId: UUID?,
     ): DokumentUnderArbeid {
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
@@ -140,7 +141,8 @@ class DokumentUnderArbeidService(
                 smartEditorTemplateId = smartEditorTemplateId,
                 journalfoertDokumentReference = null,
                 creatorIdent = innloggetIdent,
-                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent)
+                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent),
+                parentId = parentId,
             )
         )
         behandling.publishEndringsloggEvent(

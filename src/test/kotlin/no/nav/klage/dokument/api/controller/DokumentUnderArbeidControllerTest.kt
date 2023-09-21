@@ -134,6 +134,7 @@ internal class DokumentUnderArbeidControllerTest {
                 tittel = "Tittel",
                 templateId = "template",
                 version = null,
+                parentId = null,
             )
 
         every { dokumentUnderArbeidService.getSmartEditorId(any(), any()) } returns smartEditorDocumentId
@@ -147,6 +148,7 @@ internal class DokumentUnderArbeidControllerTest {
 
         every {
             dokumentUnderArbeidService.opprettSmartdokument(
+                any(),
                 any(),
                 any(),
                 any(),
