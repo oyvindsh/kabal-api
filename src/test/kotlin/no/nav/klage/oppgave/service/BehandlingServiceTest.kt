@@ -338,6 +338,8 @@ class BehandlingServiceTest {
                             dokumentEnhetId = null,
                             parentId = null,
                             journalfoertDokumentReference = null,
+                            creatorIdent = "null",
+                            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
                         )
                     )
 

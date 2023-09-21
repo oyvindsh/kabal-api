@@ -28,6 +28,7 @@ import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
 import no.nav.klage.oppgave.domain.klage.Felt
 import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.InvalidProperty
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
 import no.nav.klage.oppgave.exceptions.ValidationSection
 import no.nav.klage.oppgave.service.BehandlingService
@@ -49,7 +50,7 @@ class DokumentUnderArbeidService(
     private val smartEditorApiGateway: DefaultKabalSmartEditorApiGateway,
     private val kabalJsonToPdfClient: KabalJsonToPdfClient,
     private val behandlingService: BehandlingService,
-    private val dokumentEnhetService: KabalDocumentGateway,
+    private val kabalDocumentGateway: KabalDocumentGateway,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val safClient: SafGraphQlClient,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
@@ -90,6 +91,8 @@ class DokumentUnderArbeidService(
                 smartEditorId = null,
                 smartEditorTemplateId = null,
                 journalfoertDokumentReference = null,
+                creatorIdent = innloggetIdent,
+                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent)
             )
         )
         behandling.publishEndringsloggEvent(
@@ -136,6 +139,8 @@ class DokumentUnderArbeidService(
                 smartEditorId = smartEditorDocumentId,
                 smartEditorTemplateId = smartEditorTemplateId,
                 journalfoertDokumentReference = null,
+                creatorIdent = innloggetIdent,
+                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent)
             )
         )
         behandling.publishEndringsloggEvent(
@@ -203,7 +208,9 @@ class DokumentUnderArbeidService(
                 journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
                     journalpostId = journalfoertDokumentReference.journalpostId,
                     dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
-                )
+                ),
+                creatorIdent = innloggetIdent,
+                creatorRole = getCreatorRoleOrThrowException(behandling, innloggetIdent)
             )
 
             behandling.publishEndringsloggEvent(
@@ -222,6 +229,15 @@ class DokumentUnderArbeidService(
 
         return resultingDocuments to duplicates
     }
+
+    private fun getCreatorRoleOrThrowException(
+        behandling: Behandling,
+        innloggetIdent: String
+    ) = if (behandling.rolIdent == innloggetIdent) {
+        DokumentUnderArbeid.CreatorRole.KABAL_ROL
+    } else if (behandling.tildeling?.saksbehandlerident == innloggetIdent) {
+        DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING
+    } else throw MissingTilgangException("Kun ROL eller saksbehandler kan opprette dokumenter")
 
     fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
@@ -270,6 +286,19 @@ class DokumentUnderArbeidService(
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         val behandlingForCheck = behandlingService.getBehandling(dokument.behandlingId)
+
+        if (behandlingForCheck.tildeling?.saksbehandlerident == innloggetIdent) {
+            if (dokument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING) {
+                throw MissingTilgangException("Saksbehandlere har ikke anledning til å endre tittel på dokumenter opprettet av ROL.")
+            }
+        } else if (behandlingForCheck.rolIdent == innloggetIdent) {
+            if (dokument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_ROL) {
+                throw MissingTilgangException("ROL har ikke anledning til å endre tittel på dokumenter opprettet av saksbehandlere.")
+            }
+        } else {
+            throw MissingTilgangException("Kun tildelt ROL eller saksbehandler kan endre tittel på dokumenter.")
+        }
+
         val isCurrentROL = behandlingForCheck.rolIdent == innloggetIdent
 
         //Sjekker tilgang på behandlingsnivå:
@@ -295,12 +324,29 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
-    fun validateDocumentNotFinalized(
-        dokumentId: UUID
+    fun validateDocument(
+        dokumentId: UUID,
     ) {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         if (dokument.erMarkertFerdig()) {
             throw DokumentValidationException("Dokument er allerede ferdigstilt.")
+        }
+
+        val behandling = behandlingService.getBehandling(dokument.behandlingId)
+
+        val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+
+        when (dokument.creatorRole) {
+            DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING -> {
+                if (!(behandling.tildeling?.saksbehandlerident == innloggetIdent || behandling.medunderskriver?.saksbehandlerident == innloggetIdent)) {
+                    throw MissingTilgangException("Kun saksbehandler eller medunderskriver kan skrive i dette dokumentet.")
+                }
+            }
+            DokumentUnderArbeid.CreatorRole.KABAL_ROL -> {
+                if (behandling.rolIdent != innloggetIdent) {
+                    throw MissingTilgangException("Kun ROL kan skrive i dette dokumentet.")
+                }
+            }
         }
     }
 
@@ -579,6 +625,21 @@ class DokumentUnderArbeidService(
         val documents = descendants.plus(document)
 
         documents.forEach { currentDocument ->
+            //can delete?
+            if (behandling.tildeling?.saksbehandlerident == innloggetIdent) {
+                if (currentDocument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING) {
+                    throw MissingTilgangException("Saksbehandlere har ikke anledning til å slette dokumenter opprettet av ROL.")
+                }
+            } else if (behandling.rolIdent == innloggetIdent) {
+                if (currentDocument.creatorRole != DokumentUnderArbeid.CreatorRole.KABAL_ROL) {
+                    throw MissingTilgangException("ROL har ikke anledning til å slette dokumenter opprettet av saksbehandlere.")
+                }
+            } else {
+                throw MissingTilgangException("Kun tildelt ROL eller saksbehandler kan slette dokumenter.")
+            }
+        }
+
+        documents.forEach { currentDocument ->
             if (currentDocument.erMarkertFerdig()) {
                 logger.warn("Attempting to delete finalized document {}", currentDocument.id)
             }
@@ -622,14 +683,9 @@ class DokumentUnderArbeidService(
         }
         val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
 
-        val behandling = behandlingService.getBehandling(parentDokument.behandlingId)
-
-        val isCurrentROL = behandling.rolIdent == innloggetIdent
-
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(
             behandlingId = parentDokument.behandlingId,
-            ignoreCheckSkrivetilgang = isCurrentROL
         )
 
         if (parentDokument.erMarkertFerdig()) {
@@ -693,14 +749,9 @@ class DokumentUnderArbeidService(
     ): DokumentUnderArbeid {
         val vedlegg = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
-        val behandling = behandlingService.getBehandling(behandlingId)
-
-        val isCurrentROL = behandling.rolIdent == innloggetIdent
-
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(
             behandlingId = vedlegg.behandlingId,
-            ignoreCheckSkrivetilgang = isCurrentROL
         )
         //TODO: Skal det lages endringslogg på dette??
 
@@ -737,7 +788,7 @@ class DokumentUnderArbeidService(
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
             val behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
-            val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(
+            val dokumentEnhetId = kabalDocumentGateway.createKomplettDokumentEnhet(
                 behandling = behandling,
                 hovedDokument = hovedDokument,
                 vedlegg = vedlegg
@@ -752,7 +803,7 @@ class DokumentUnderArbeidService(
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
         val documentInfoList =
-            dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
+            kabalDocumentGateway.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
 
         documentInfoList.forEach { documentInfo ->
             val journalpost = safClient.getJournalpostAsSystembruker(documentInfo.journalpostId.value)

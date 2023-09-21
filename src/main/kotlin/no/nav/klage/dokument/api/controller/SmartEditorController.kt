@@ -117,7 +117,7 @@ class SmartEditorController(
                 readOnly = false
             )
 
-        dokumentUnderArbeidService.validateDocumentNotFinalized(dokumentId = dokumentId)
+        dokumentUnderArbeidService.validateDocument(dokumentId = dokumentId)
 
         if (input.templateId != null) {
             dokumentUnderArbeidService.updateSmartEditorTemplateId(
@@ -165,7 +165,9 @@ class SmartEditorController(
         @PathVariable("dokumentId") documentId: UUID,
         @RequestBody commentInput: CommentInput
     ): CommentOutput {
-        //TODO: Skal hvem som helst få kommentere?
+
+        dokumentUnderArbeidService.validateDocument(documentId)
+
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
                 dokumentId = documentId,
@@ -185,6 +187,9 @@ class SmartEditorController(
         @PathVariable("commentId") commentId: UUID,
         @RequestBody modifyCommentInput: ModifyCommentInput
     ): CommentOutput {
+
+        dokumentUnderArbeidService.validateDocument(documentId)
+
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
                 dokumentId = documentId,
@@ -225,7 +230,8 @@ class SmartEditorController(
         @PathVariable("commentId") commentId: UUID,
         @RequestBody commentInput: CommentInput,
     ): CommentOutput {
-        //TODO: Skal hvem som helst få kommentere?
+        dokumentUnderArbeidService.validateDocument(documentId)
+
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
                 dokumentId = documentId,
@@ -262,6 +268,8 @@ class SmartEditorController(
         @PathVariable("dokumentId") documentId: UUID,
         @PathVariable("commentId") commentId: UUID
     ) {
+        dokumentUnderArbeidService.validateDocument(documentId)
+
         val smartEditorId =
             dokumentUnderArbeidService.getSmartEditorId(
                 dokumentId = documentId,

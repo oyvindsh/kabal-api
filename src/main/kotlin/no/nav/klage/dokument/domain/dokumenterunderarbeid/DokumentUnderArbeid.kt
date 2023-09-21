@@ -67,7 +67,12 @@ open class DokumentUnderArbeid(
             AttributeOverride(name = "dokumentInfoId", column = Column(name = "journalfoert_dokument_dokument_info_id")),
         ]
     )
-    val journalfoertDokumentReference: JournalfoertDokumentReference?
+    val journalfoertDokumentReference: JournalfoertDokumentReference?,
+    @Column(name = "creator_ident")
+    open var creatorIdent: String,
+    @Column(name = "creator_role")
+    @Enumerated(EnumType.STRING)
+    open var creatorRole: CreatorRole,
 ) : Comparable<DokumentUnderArbeid> {
 
     override fun compareTo(other: DokumentUnderArbeid): Int =
@@ -119,6 +124,11 @@ open class DokumentUnderArbeid(
         UPLOADED,
         SMART,
         JOURNALFOERT
+    }
+
+    enum class CreatorRole {
+        KABAL_SAKSBEHANDLING,
+        KABAL_ROL;
     }
 
     fun getType(): DokumentUnderArbeidType {

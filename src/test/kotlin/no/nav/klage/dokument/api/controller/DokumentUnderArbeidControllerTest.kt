@@ -101,6 +101,8 @@ internal class DokumentUnderArbeidControllerTest {
             parentId = null,
             id = UUID.randomUUID(),
             journalfoertDokumentReference = null,
+            creatorIdent = "null",
+            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
         )
 
 
@@ -169,6 +171,8 @@ internal class DokumentUnderArbeidControllerTest {
             parentId = null,
             id = UUID.randomUUID(),
             journalfoertDokumentReference = null,
+            creatorIdent = "null",
+            creatorRole = DokumentUnderArbeid.CreatorRole.KABAL_SAKSBEHANDLING,
         )
 
         val json = mockMvc.perform(
