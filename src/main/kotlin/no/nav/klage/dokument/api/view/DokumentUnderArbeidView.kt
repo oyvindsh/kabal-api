@@ -24,6 +24,8 @@ data class DokumentView(
     val parent: UUID?,
     val parentId: UUID?,
     val journalfoertDokumentReference: JournalfoertDokumentReference?,
+    val creatorIdent: String,
+    val creatorRole: DokumentUnderArbeid.CreatorRole,
 ) {
     data class JournalfoertDokumentReference (
         val journalpostId: String,
@@ -64,4 +66,6 @@ data class SmartEditorDocumentView(
     //Deprecated
     val parent: UUID?,
     val parentId: UUID?,
+    val creatorIdent: String,
+    val creatorRole: DokumentUnderArbeid.CreatorRole,
 )

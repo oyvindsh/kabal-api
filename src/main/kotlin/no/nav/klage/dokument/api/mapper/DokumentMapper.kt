@@ -86,6 +86,8 @@ class DokumentMapper(
             parentId = dokumentUnderArbeid.parentId,
             type = type,
             journalfoertDokumentReference = journalfoertDokumentReference,
+            creatorIdent = dokumentUnderArbeid.creatorIdent,
+            creatorRole = dokumentUnderArbeid.creatorRole,
         )
     }
 
@@ -130,6 +132,8 @@ class DokumentMapper(
             content = jacksonObjectMapper().readTree(smartEditorDocument.json),
             created = smartEditorDocument.created,
             modified = smartEditorDocument.modified,
+            creatorIdent = dokumentUnderArbeid.creatorIdent,
+            creatorRole = dokumentUnderArbeid.creatorRole,
         )
     }
 
