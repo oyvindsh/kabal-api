@@ -14,6 +14,7 @@ import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
+import no.nav.klage.kodeverk.Template
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentMapper
@@ -69,13 +70,21 @@ class DokumentUnderArbeidService(
         tittel: String,
         parentId: UUID?,
     ): DokumentUnderArbeid {
-        //Sjekker tilgang på behandlingsnivå:
+        //Sjekker lesetilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandling(behandlingId)
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
 
         if (behandlingRole == BehandlingRole.KABAL_ROL && parentId == null) {
             throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
+        }
+
+        if (parentId != null && behandlingRole == BehandlingRole.KABAL_ROL) {
+            val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+
+            if (parentDocument.smartEditorTemplateId != Template.ROL_NOTAT.id) {
+                throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
+            }
         }
 
         if (opplastetFil == null) {
@@ -85,7 +94,7 @@ class DokumentUnderArbeidService(
         attachmentValidator.validateAttachment(opplastetFil)
         val mellomlagerId = mellomlagerService.uploadDocument(opplastetFil)
 
-        val hovedDokument = dokumentUnderArbeidRepository.save(
+        val document = dokumentUnderArbeidRepository.save(
             DokumentUnderArbeid(
                 mellomlagerId = mellomlagerId,
                 opplastet = LocalDateTime.now(),
@@ -105,11 +114,11 @@ class DokumentUnderArbeidService(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
             fraVerdi = null,
-            tilVerdi = hovedDokument.created.toString(),
-            tidspunkt = hovedDokument.created,
-            dokumentId = hovedDokument.id,
+            tilVerdi = document.created.toString(),
+            tidspunkt = document.created,
+            dokumentId = document.id,
         )
-        return hovedDokument
+        return document
     }
 
     fun opprettSmartdokument(
@@ -121,13 +130,21 @@ class DokumentUnderArbeidService(
         tittel: String,
         parentId: UUID?,
     ): DokumentUnderArbeid {
-        //Sjekker tilgang på behandlingsnivå:
+        //Sjekker lesetilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandling(behandlingId)
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
 
         if (behandlingRole == BehandlingRole.KABAL_ROL && parentId == null) {
             throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
+        }
+
+        if (parentId != null && behandlingRole == BehandlingRole.KABAL_ROL) {
+            val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+
+            if (parentDocument.smartEditorTemplateId != Template.ROL_NOTAT.id) {
+                throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
+            }
         }
 
         validateCanCreateDocuments(behandlingRole)
@@ -698,14 +715,22 @@ class DokumentUnderArbeidService(
         if (parentId == dokumentId) {
             throw DokumentValidationException("Kan ikke gjøre et dokument til vedlegg for seg selv.")
         }
-        val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+        val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
 
-        //Sjekker tilgang på behandlingsnivå:
-        behandlingService.getBehandlingForUpdate(
-            behandlingId = parentDokument.behandlingId,
+        val behandling = behandlingService.getBehandling(
+            behandlingId = parentDocument.behandlingId,
         )
 
-        if (parentDokument.erMarkertFerdig()) {
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        if (!(behandlingRole == BehandlingRole.KABAL_ROL && parentDocument.smartEditorTemplateId == Template.ROL_NOTAT.id)) {
+            //Sjekker generell tilgang på behandlingsnivå:
+            behandlingService.getBehandlingForUpdate(
+                behandlingId = parentDocument.behandlingId,
+            )
+        }
+
+        if (parentDocument.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
         }
 
