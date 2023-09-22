@@ -238,7 +238,7 @@ class ProblemHandlingControllerAdvice : ResponseEntityExceptionHandler() {
             exception = ex
         )
 
-        return ProblemDetail.forStatusAndDetail(httpStatus, errorMessage).apply {
+        return ProblemDetail.forStatus(httpStatus).apply {
             title = errorMessage
         }
     }
