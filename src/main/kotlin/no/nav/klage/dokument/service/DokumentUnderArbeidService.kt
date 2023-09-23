@@ -75,17 +75,10 @@ class DokumentUnderArbeidService(
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
 
-        if (behandlingRole == BehandlingRole.KABAL_ROL && parentId == null) {
-            throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
-        }
-
-        if (parentId != null && behandlingRole == BehandlingRole.KABAL_ROL) {
-            val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
-
-            if (parentDocument.smartEditorTemplateId != Template.ROL_NOTAT.id) {
-                throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
-            }
-        }
+        validateCanCreateDocuments(
+            behandlingRole = behandlingRole,
+            parentDocument = if (parentId != null) dokumentUnderArbeidRepository.getReferenceById(parentId) else null
+        )
 
         if (opplastetFil == null) {
             throw DokumentValidationException("No file uploaded")
@@ -135,19 +128,10 @@ class DokumentUnderArbeidService(
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
 
-        if (behandlingRole == BehandlingRole.KABAL_ROL && parentId == null) {
-            throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
-        }
-
-        if (parentId != null && behandlingRole == BehandlingRole.KABAL_ROL) {
-            val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
-
-            if (parentDocument.smartEditorTemplateId != Template.ROL_NOTAT.id) {
-                throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
-            }
-        }
-
-        validateCanCreateDocuments(behandlingRole)
+        validateCanCreateDocuments(
+            behandlingRole = behandlingRole,
+            parentDocument = if (parentId != null) dokumentUnderArbeidRepository.getReferenceById(parentId) else null
+        )
 
         if (json == null) {
             throw DokumentValidationException("Ingen json angitt")
@@ -225,7 +209,10 @@ class DokumentUnderArbeidService(
         val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
-        validateCanCreateDocuments(behandlingRole)
+        validateCanCreateDocuments(
+            behandlingRole,
+            if (parentId != null) dokumentUnderArbeidRepository.getReferenceById(parentId) else null
+        )
 
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
             val journalpostInDokarkiv =
@@ -274,9 +261,19 @@ class DokumentUnderArbeidService(
         BehandlingRole.KABAL_MEDUNDERSKRIVER
     } else BehandlingRole.NONE
 
-    private fun validateCanCreateDocuments(behandlingRole: BehandlingRole) {
+    private fun validateCanCreateDocuments(behandlingRole: BehandlingRole, parentDocument: DokumentUnderArbeid?) {
         if (behandlingRole !in listOf(BehandlingRole.KABAL_ROL, BehandlingRole.KABAL_SAKSBEHANDLING)) {
             throw MissingTilgangException("Kun ROL eller saksbehandler kan opprette dokumenter")
+        }
+
+        if (behandlingRole == BehandlingRole.KABAL_ROL && parentDocument == null) {
+            throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
+        }
+
+        if (parentDocument != null && behandlingRole == BehandlingRole.KABAL_ROL) {
+            if (parentDocument.smartEditorTemplateId != Template.ROL_QUESTIONS.id) {
+                throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
+            }
         }
     }
 
@@ -723,7 +720,7 @@ class DokumentUnderArbeidService(
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
 
-        if (!(behandlingRole == BehandlingRole.KABAL_ROL && parentDocument.smartEditorTemplateId == Template.ROL_NOTAT.id)) {
+        if (!(behandlingRole == BehandlingRole.KABAL_ROL && parentDocument.smartEditorTemplateId == Template.ROL_QUESTIONS.id)) {
             //Sjekker generell tilgang på behandlingsnivå:
             behandlingService.getBehandlingForUpdate(
                 behandlingId = parentDocument.behandlingId,
