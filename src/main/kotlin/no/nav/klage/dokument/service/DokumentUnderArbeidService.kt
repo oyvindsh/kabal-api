@@ -209,9 +209,10 @@ class DokumentUnderArbeidService(
         val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
         val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
         validateCanCreateDocuments(
-            behandlingRole,
-            if (parentId != null) dokumentUnderArbeidRepository.getReferenceById(parentId) else null
+            behandlingRole = behandlingRole,
+            parentDocument = parentDocument
         )
 
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
