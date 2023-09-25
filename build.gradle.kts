@@ -45,6 +45,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.11")
+    implementation("org.apache.tomcat.embed:tomcat-embed-el:10.1.11")
+    implementation("org.apache.tomcat:tomcat-annotations-api:10.1.11")
+    implementation("org.apache.tomcat.embed:tomcat-embed-websocket:10.1.11")
+
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("javax.cache:cache-api")
     implementation("org.ehcache:ehcache:3.10.8")
