@@ -14,6 +14,7 @@ import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
+import no.nav.klage.kodeverk.Template
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentMapper
@@ -22,12 +23,10 @@ import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
 import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
-import no.nav.klage.oppgave.domain.klage.Behandling
+import no.nav.klage.oppgave.domain.klage.*
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
-import no.nav.klage.oppgave.domain.klage.Endringslogginnslag
-import no.nav.klage.oppgave.domain.klage.Felt
-import no.nav.klage.oppgave.domain.klage.Saksdokument
 import no.nav.klage.oppgave.exceptions.InvalidProperty
+import no.nav.klage.oppgave.exceptions.MissingTilgangException
 import no.nav.klage.oppgave.exceptions.SectionedValidationErrorWithDetailsException
 import no.nav.klage.oppgave.exceptions.ValidationSection
 import no.nav.klage.oppgave.service.BehandlingService
@@ -49,7 +48,7 @@ class DokumentUnderArbeidService(
     private val smartEditorApiGateway: DefaultKabalSmartEditorApiGateway,
     private val kabalJsonToPdfClient: KabalJsonToPdfClient,
     private val behandlingService: BehandlingService,
-    private val dokumentEnhetService: KabalDocumentGateway,
+    private val kabalDocumentGateway: KabalDocumentGateway,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val safClient: SafGraphQlClient,
     private val innloggetSaksbehandlerService: InnloggetSaksbehandlerService,
@@ -69,9 +68,17 @@ class DokumentUnderArbeidService(
         opplastetFil: FysiskDokument?,
         innloggetIdent: String,
         tittel: String,
+        parentId: UUID?,
     ): DokumentUnderArbeid {
-        //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
+        //Sjekker lesetilgang på behandlingsnivå:
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        validateCanCreateDocuments(
+            behandlingRole = behandlingRole,
+            parentDocument = if (parentId != null) dokumentUnderArbeidRepository.getReferenceById(parentId) else null
+        )
 
         if (opplastetFil == null) {
             throw DokumentValidationException("No file uploaded")
@@ -79,7 +86,8 @@ class DokumentUnderArbeidService(
 
         attachmentValidator.validateAttachment(opplastetFil)
         val mellomlagerId = mellomlagerService.uploadDocument(opplastetFil)
-        val hovedDokument = dokumentUnderArbeidRepository.save(
+
+        val document = dokumentUnderArbeidRepository.save(
             DokumentUnderArbeid(
                 mellomlagerId = mellomlagerId,
                 opplastet = LocalDateTime.now(),
@@ -90,17 +98,20 @@ class DokumentUnderArbeidService(
                 smartEditorId = null,
                 smartEditorTemplateId = null,
                 journalfoertDokumentReference = null,
+                creatorIdent = innloggetIdent,
+                creatorRole = behandlingRole,
+                parentId = parentId,
             )
         )
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
             fraVerdi = null,
-            tilVerdi = hovedDokument.created.toString(),
-            tidspunkt = hovedDokument.created,
-            dokumentId = hovedDokument.id,
+            tilVerdi = document.created.toString(),
+            tidspunkt = document.created,
+            dokumentId = document.id,
         )
-        return hovedDokument
+        return document
     }
 
     fun opprettSmartdokument(
@@ -110,9 +121,17 @@ class DokumentUnderArbeidService(
         smartEditorTemplateId: String?,
         innloggetIdent: String,
         tittel: String,
+        parentId: UUID?,
     ): DokumentUnderArbeid {
-        //Sjekker tilgang på behandlingsnivå:
-        val behandling = behandlingService.getBehandlingForUpdate(behandlingId)
+        //Sjekker lesetilgang på behandlingsnivå:
+        val behandling = behandlingService.getBehandling(behandlingId)
+
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        validateCanCreateDocuments(
+            behandlingRole = behandlingRole,
+            parentDocument = if (parentId != null) dokumentUnderArbeidRepository.getReferenceById(parentId) else null
+        )
 
         if (json == null) {
             throw DokumentValidationException("Ingen json angitt")
@@ -136,6 +155,9 @@ class DokumentUnderArbeidService(
                 smartEditorId = smartEditorDocumentId,
                 smartEditorTemplateId = smartEditorTemplateId,
                 journalfoertDokumentReference = null,
+                creatorIdent = innloggetIdent,
+                creatorRole = behandlingRole,
+                parentId = parentId,
             )
         )
         behandling.publishEndringsloggEvent(
@@ -186,6 +208,13 @@ class DokumentUnderArbeidService(
 
         val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        validateCanCreateDocuments(
+            behandlingRole = behandlingRole,
+            parentDocument = parentDocument
+        )
+
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
@@ -203,7 +232,9 @@ class DokumentUnderArbeidService(
                 journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
                     journalpostId = journalfoertDokumentReference.journalpostId,
                     dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
-                )
+                ),
+                creatorIdent = innloggetIdent,
+                creatorRole = behandlingRole
             )
 
             behandling.publishEndringsloggEvent(
@@ -221,6 +252,30 @@ class DokumentUnderArbeidService(
         }
 
         return resultingDocuments to duplicates
+    }
+
+    private fun Behandling.getRoleInBehandling(innloggetIdent: String) = if (rolIdent == innloggetIdent) {
+        BehandlingRole.KABAL_ROL
+    } else if (tildeling?.saksbehandlerident == innloggetIdent) {
+        BehandlingRole.KABAL_SAKSBEHANDLING
+    } else if (medunderskriver?.saksbehandlerident == innloggetIdent) {
+        BehandlingRole.KABAL_MEDUNDERSKRIVER
+    } else BehandlingRole.NONE
+
+    private fun validateCanCreateDocuments(behandlingRole: BehandlingRole, parentDocument: DokumentUnderArbeid?) {
+        if (behandlingRole !in listOf(BehandlingRole.KABAL_ROL, BehandlingRole.KABAL_SAKSBEHANDLING)) {
+            throw MissingTilgangException("Kun ROL eller saksbehandler kan opprette dokumenter")
+        }
+
+        if (behandlingRole == BehandlingRole.KABAL_ROL && parentDocument == null) {
+            throw MissingTilgangException("ROL kan ikke opprette hoveddokumenter.")
+        }
+
+        if (parentDocument != null && behandlingRole == BehandlingRole.KABAL_ROL) {
+            if (parentDocument.smartEditorTemplateId != Template.ROL_QUESTIONS.id) {
+                throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
+            }
+        }
     }
 
     fun getDokumentUnderArbeid(dokumentId: UUID) = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
@@ -270,6 +325,13 @@ class DokumentUnderArbeidService(
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
         val behandlingForCheck = behandlingService.getBehandling(dokument.behandlingId)
+
+        val behandlingRole = behandlingForCheck.getRoleInBehandling(innloggetIdent)
+
+        if (dokument.creatorRole != behandlingRole) {
+            throw MissingTilgangException("$behandlingRole har ikke anledning til å endre tittel på dette dokumentet eiet av ${dokument.creatorRole}.")
+        }
+
         val isCurrentROL = behandlingForCheck.rolIdent == innloggetIdent
 
         //Sjekker tilgang på behandlingsnivå:
@@ -295,12 +357,35 @@ class DokumentUnderArbeidService(
         return dokument
     }
 
-    fun validateDocumentNotFinalized(
-        dokumentId: UUID
+    fun validateDocument(
+        dokumentId: UUID,
     ) {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         if (dokument.erMarkertFerdig()) {
             throw DokumentValidationException("Dokument er allerede ferdigstilt.")
+        }
+
+        val behandling = behandlingService.getBehandling(dokument.behandlingId)
+
+        val innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        when (dokument.creatorRole) {
+            BehandlingRole.KABAL_SAKSBEHANDLING -> {
+                if (behandlingRole !in listOf(BehandlingRole.KABAL_SAKSBEHANDLING, BehandlingRole.KABAL_MEDUNDERSKRIVER)) {
+                    throw MissingTilgangException("Kun saksbehandler eller medunderskriver kan skrive i dette dokumentet.")
+                }
+            }
+            BehandlingRole.KABAL_ROL -> {
+                if (behandlingRole != BehandlingRole.KABAL_ROL) {
+                    throw MissingTilgangException("Kun ROL kan skrive i dette dokumentet.")
+                }
+            }
+
+            else -> {
+                throw RuntimeException("A document was created by non valid role: ${dokument.creatorRole}")
+            }
         }
     }
 
@@ -578,6 +663,14 @@ class DokumentUnderArbeidService(
 
         val documents = descendants.plus(document)
 
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        documents.forEach { currentDocument ->
+            if (currentDocument.creatorRole != behandlingRole) {
+                throw MissingTilgangException("$behandlingRole har ikke anledning til å slette dokumentet eiet av ${currentDocument.creatorRole}.")
+            }
+        }
+
         documents.forEach { currentDocument ->
             if (currentDocument.erMarkertFerdig()) {
                 logger.warn("Attempting to delete finalized document {}", currentDocument.id)
@@ -620,19 +713,22 @@ class DokumentUnderArbeidService(
         if (parentId == dokumentId) {
             throw DokumentValidationException("Kan ikke gjøre et dokument til vedlegg for seg selv.")
         }
-        val parentDokument = dokumentUnderArbeidRepository.getReferenceById(parentId)
+        val parentDocument = dokumentUnderArbeidRepository.getReferenceById(parentId)
 
-        val behandling = behandlingService.getBehandling(parentDokument.behandlingId)
-
-        val isCurrentROL = behandling.rolIdent == innloggetIdent
-
-        //Sjekker tilgang på behandlingsnivå:
-        behandlingService.getBehandlingForUpdate(
-            behandlingId = parentDokument.behandlingId,
-            ignoreCheckSkrivetilgang = isCurrentROL
+        val behandling = behandlingService.getBehandling(
+            behandlingId = parentDocument.behandlingId,
         )
 
-        if (parentDokument.erMarkertFerdig()) {
+        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
+
+        if (!(behandlingRole == BehandlingRole.KABAL_ROL && parentDocument.smartEditorTemplateId == Template.ROL_QUESTIONS.id)) {
+            //Sjekker generell tilgang på behandlingsnivå:
+            behandlingService.getBehandlingForUpdate(
+                behandlingId = parentDocument.behandlingId,
+            )
+        }
+
+        if (parentDocument.erMarkertFerdig()) {
             throw DokumentValidationException("Kan ikke koble til et dokument som er ferdigstilt")
         }
 
@@ -693,14 +789,9 @@ class DokumentUnderArbeidService(
     ): DokumentUnderArbeid {
         val vedlegg = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
-        val behandling = behandlingService.getBehandling(behandlingId)
-
-        val isCurrentROL = behandling.rolIdent == innloggetIdent
-
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandlingForUpdate(
             behandlingId = vedlegg.behandlingId,
-            ignoreCheckSkrivetilgang = isCurrentROL
         )
         //TODO: Skal det lages endringslogg på dette??
 
@@ -737,7 +828,7 @@ class DokumentUnderArbeidService(
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
             val behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
-            val dokumentEnhetId = dokumentEnhetService.createKomplettDokumentEnhet(
+            val dokumentEnhetId = kabalDocumentGateway.createKomplettDokumentEnhet(
                 behandling = behandling,
                 hovedDokument = hovedDokument,
                 vedlegg = vedlegg
@@ -752,7 +843,7 @@ class DokumentUnderArbeidService(
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
         val documentInfoList =
-            dokumentEnhetService.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
+            kabalDocumentGateway.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
 
         documentInfoList.forEach { documentInfo ->
             val journalpost = safClient.getJournalpostAsSystembruker(documentInfo.journalpostId.value)

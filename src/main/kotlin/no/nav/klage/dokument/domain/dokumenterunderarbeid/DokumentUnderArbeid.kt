@@ -2,6 +2,7 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import jakarta.persistence.*
 import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import no.nav.klage.oppgave.domain.klage.DokumentTypeConverter
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicUpdate
@@ -67,7 +68,12 @@ open class DokumentUnderArbeid(
             AttributeOverride(name = "dokumentInfoId", column = Column(name = "journalfoert_dokument_dokument_info_id")),
         ]
     )
-    val journalfoertDokumentReference: JournalfoertDokumentReference?
+    val journalfoertDokumentReference: JournalfoertDokumentReference?,
+    @Column(name = "creator_ident")
+    open var creatorIdent: String,
+    @Column(name = "creator_role")
+    @Enumerated(EnumType.STRING)
+    open var creatorRole: BehandlingRole,
 ) : Comparable<DokumentUnderArbeid> {
 
     override fun compareTo(other: DokumentUnderArbeid): Int =

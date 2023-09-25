@@ -8,6 +8,7 @@ import java.util.*
 data class FilInput(
     val file: MultipartFile,
     val dokumentTypeId: String = DokumentType.NOTAT.id,
+    val parentId: UUID?,
 )
 
 data class SmartHovedDokumentInput(
@@ -16,6 +17,7 @@ data class SmartHovedDokumentInput(
     val tittel: String?,
     val dokumentTypeId: String? = null,
     val version: Int?,
+    val parentId: UUID?,
 )
 
 data class PatchSmartHovedDokumentInput(

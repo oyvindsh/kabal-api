@@ -2,6 +2,7 @@ package no.nav.klage.dokument.api.view
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import java.time.LocalDateTime
 import java.util.*
 
@@ -24,6 +25,8 @@ data class DokumentView(
     val parent: UUID?,
     val parentId: UUID?,
     val journalfoertDokumentReference: JournalfoertDokumentReference?,
+    val creatorIdent: String,
+    val creatorRole: BehandlingRole,
 ) {
     data class JournalfoertDokumentReference (
         val journalpostId: String,
@@ -64,4 +67,6 @@ data class SmartEditorDocumentView(
     //Deprecated
     val parent: UUID?,
     val parentId: UUID?,
+    val creatorIdent: String,
+    val creatorRole: BehandlingRole,
 )
