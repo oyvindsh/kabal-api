@@ -12,13 +12,13 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJou
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
+import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Template
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentGateway
 import no.nav.klage.oppgave.clients.kabaldocument.KabalDocumentMapper
-import no.nav.klage.oppgave.clients.kabaldocument.model.request.BrevmottakerInput
 import no.nav.klage.oppgave.clients.saf.graphql.Journalpost
 import no.nav.klage.oppgave.clients.saf.graphql.SafGraphQlClient
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
@@ -55,6 +55,8 @@ class DokumentUnderArbeidService(
     private val dokumentService: DokumentService,
     private val kabalDocumentMapper: KabalDocumentMapper,
     private val eregClient: EregClient,
+    private val innholdsfortegnelseRepository: InnholdsfortegnelseRepository,
+    private val innholdsfortegnelseService: InnholdsfortegnelseService,
 ) {
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
@@ -111,6 +113,7 @@ class DokumentUnderArbeidService(
             tidspunkt = document.created,
             dokumentId = document.id,
         )
+
         return document
     }
 
@@ -168,6 +171,7 @@ class DokumentUnderArbeidService(
             tidspunkt = hovedDokument.created,
             dokumentId = hovedDokument.id,
         )
+
         return hovedDokument
     }
 
@@ -312,6 +316,7 @@ class DokumentUnderArbeidService(
             tidspunkt = dokumentUnderArbeid.modified,
             dokumentId = dokumentUnderArbeid.id,
         )
+
         return dokumentUnderArbeid
     }
 
@@ -373,10 +378,15 @@ class DokumentUnderArbeidService(
 
         when (dokument.creatorRole) {
             BehandlingRole.KABAL_SAKSBEHANDLING -> {
-                if (behandlingRole !in listOf(BehandlingRole.KABAL_SAKSBEHANDLING, BehandlingRole.KABAL_MEDUNDERSKRIVER)) {
+                if (behandlingRole !in listOf(
+                        BehandlingRole.KABAL_SAKSBEHANDLING,
+                        BehandlingRole.KABAL_MEDUNDERSKRIVER
+                    )
+                ) {
                     throw MissingTilgangException("Kun saksbehandler eller medunderskriver kan skrive i dette dokumentet.")
                 }
             }
+
             BehandlingRole.KABAL_ROL -> {
                 if (behandlingRole != BehandlingRole.KABAL_ROL) {
                     throw MissingTilgangException("Kun ROL kan skrive i dette dokumentet.")
@@ -496,28 +506,33 @@ class DokumentUnderArbeidService(
             hovedDokument = hovedDokument,
             behandling = behandling,
         )
-
-        val now = LocalDateTime.now()
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
-        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident)
-        hovedDokument.brevmottakerIdents = brevmottakerInputs(
-            brevmottakerIdents = brevmottakerIdents,
-            behandling = behandling,
-            hovedDokument = hovedDokument,
-        ).map {
-            it.partId.value
-        }.toSet()
-        vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident) }
 
-        //Etter at et dokument er markert som ferdig skal det ikke kunne endres. Vi henter derfor en snapshot av tilstanden slik den er nå
-        if (hovedDokument.smartEditorId != null) {
-            mellomlagreNyVersjonAvSmartEditorDokument(hovedDokument)
+        if (hovedDokument.smartEditorId != null && hovedDokument.isStaleSmartEditorDokument()) {
+            mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(hovedDokument)
         }
         vedlegg.forEach {
-            if (it.smartEditorId != null) {
-                mellomlagreNyVersjonAvSmartEditorDokument(it)
+            if (it.smartEditorId != null && it.isStaleSmartEditorDokument()) {
+                mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(it)
             }
         }
+
+        val now = LocalDateTime.now()
+        hovedDokument.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident)
+        val mapBrevmottakerIdentToBrevmottakerInput = kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
+            behandling = behandling,
+            brevmottakerIdents = brevmottakerIdents,
+            dokumentType = hovedDokument.dokumentType!!
+        )
+        hovedDokument.brevmottakerIdents = mapBrevmottakerIdentToBrevmottakerInput.map {
+            it.partId.value
+        }.toSet()
+
+        vedlegg.forEach { it.markerFerdigHvisIkkeAlleredeMarkertFerdig(tidspunkt = now, saksbehandlerIdent = ident) }
+
+        innholdsfortegnelseService.saveInnholdsfortegnelse(
+            dokumentId,
+            mapBrevmottakerIdentToBrevmottakerInput.map { it.navn })
 
         behandling.publishEndringsloggEvent(
             saksbehandlerident = ident,
@@ -567,7 +582,12 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
         }
 
-        val mottakere = brevmottakerInputs(brevmottakerIdents, behandling, hovedDokument)
+
+        val mottakere = kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
+            behandling = behandling,
+            brevmottakerIdents = brevmottakerIdents,
+            dokumentType = hovedDokument.dokumentType!!
+        )
 
         val invalidProperties = mutableListOf<InvalidProperty>()
 
@@ -597,16 +617,23 @@ class DokumentUnderArbeidService(
         }
     }
 
-    private fun brevmottakerInputs(
-        brevmottakerIdents: Set<String>?,
-        behandling: Behandling,
-        hovedDokument: DokumentUnderArbeid,
-    ): List<BrevmottakerInput> {
+    fun getInnholdsfortegnelseAsFysiskDokument(
+        behandlingId: UUID, //Kan brukes i finderne for å "være sikker", men er egentlig overflødig..
+        hoveddokumentId: UUID,
+        innloggetIdent: String
+    ): FysiskDokument {
+        //Sjekker tilgang på behandlingsnivå:
+        behandlingService.getBehandling(behandlingId)
 
-        return kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
-            behandling = behandling,
-            brevmottakerIdents = brevmottakerIdents,
-            dokumentType = hovedDokument.dokumentType!!
+        val title = "Innholdsfortegnelse"
+
+        return FysiskDokument(
+            title = title,
+            content = dokumentService.changeTitleInPDF(
+                documentBytes = innholdsfortegnelseService.getInnholdsfortegnelseAsPdf(hoveddokumentId),
+                title = title
+            ),
+            contentType = MediaType.APPLICATION_PDF
         )
     }
 
@@ -628,7 +655,7 @@ class DokumentUnderArbeidService(
 
             DokumentUnderArbeid.DokumentUnderArbeidType.SMART -> {
                 if (dokument.isStaleSmartEditorDokument()) {
-                    mellomlagreNyVersjonAvSmartEditorDokument(dokument).bytes to dokument.name
+                    mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(dokument).bytes to dokument.name
                 } else mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!) to dokument.name
             }
 
@@ -800,6 +827,7 @@ class DokumentUnderArbeidService(
         }
 
         vedlegg.parentId = null
+
         return vedlegg
     }
 
@@ -903,7 +931,7 @@ class DokumentUnderArbeidService(
             ?: throw DokumentValidationException("$dokumentId er ikke et smarteditor dokument")
     }
 
-    private fun mellomlagreNyVersjonAvSmartEditorDokument(dokument: DokumentUnderArbeid): PDFDocument {
+    private fun mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(dokument: DokumentUnderArbeid): PDFDocument {
         val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
         val pdfDocument = kabalJsonToPdfClient.getPDFDocument(documentJson)
         val mellomlagerId =
@@ -924,7 +952,7 @@ class DokumentUnderArbeidService(
     }
 
     private fun DokumentUnderArbeid.isStaleSmartEditorDokument() =
-        this.smartEditorId != null && !this.erMarkertFerdig() && smartEditorApiGateway.isMellomlagretDokumentStale(
+        this.smartEditorId != null && smartEditorApiGateway.isMellomlagretDokumentStale(
             smartEditorId = this.smartEditorId!!,
             sistOpplastet = this.opplastet
         )

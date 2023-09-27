@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -20,6 +21,7 @@ class KabalDocumentMapper(
     private val pdlFacade: PdlFacade,
     private val eregClient: EregClient,
     private val safClient: SafGraphQlClient,
+    private val innholdsfortegnelseRepository: InnholdsfortegnelseRepository,
 ) {
 
     companion object {
@@ -38,6 +40,29 @@ class KabalDocumentMapper(
         hovedDokument: DokumentUnderArbeid,
         vedlegg: SortedSet<DokumentUnderArbeid>
     ): DokumentEnhetWithDokumentreferanserInput {
+
+        val innholdsfortegnelseDocument = if (vedlegg.size > 1) {
+            val innholdsfortegnelse =
+                innholdsfortegnelseRepository.findByHoveddokumentId(hoveddokumentId = hovedDokument.id)
+            DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
+                mellomlagerId = innholdsfortegnelse?.mellomlagerId!!,
+                opplastet = innholdsfortegnelse.modified,
+                size = 0,
+                name = "Innholdsfortegnelse"
+            )
+        } else null
+
+        val vedleggMapped = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+            .sortedByDescending { it.created }
+            .map { currentVedlegg ->
+                mapDokumentUnderArbeidToDokumentReferanse(
+                    dokument = currentVedlegg,
+                )
+            }.toMutableList()
+        if (innholdsfortegnelseDocument != null) {
+           vedleggMapped.add(0, innholdsfortegnelseDocument)
+        }
+
         return DokumentEnhetWithDokumentreferanserInput(
             brevMottakere = mapBrevmottakerIdentToBrevmottakerInput(behandling, hovedDokument.brevmottakerIdents, hovedDokument.dokumentType!!),
             journalfoeringData = JournalfoeringDataInput(
@@ -61,11 +86,7 @@ class KabalDocumentMapper(
             ),
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
-                vedlegg = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .sortedByDescending { it.created }
-                    .map { currentVedlegg -> mapDokumentUnderArbeidToDokumentReferanse(
-                        dokument = currentVedlegg,
-                    ) },
+                vedlegg = vedleggMapped,
                 journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
                     .sortedByDescending {
                         val journalpostInDokarkiv =

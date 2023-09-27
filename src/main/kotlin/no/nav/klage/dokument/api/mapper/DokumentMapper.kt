@@ -4,23 +4,28 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.DokumentViewWithList
 import no.nav.klage.dokument.api.view.SmartEditorDocumentView
+import no.nav.klage.dokument.clients.kabaljsontopdf.InnholdsfortegnelseRequest
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
 import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
+import no.nav.klage.oppgave.service.BehandlingService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Component
 class DokumentMapper(
     private val safClient: SafGraphQlClient,
+    private val behandlingService: BehandlingService,
 ) {
 
     fun mapToByteArray(fysiskDokument: FysiskDokument): ResponseEntity<ByteArray> {
@@ -43,8 +48,73 @@ class DokumentMapper(
         }
 
         return dokumenterUnderArbeid.sortedByDescending { it.created }
-            .map { mapToDokumentView(it) } + journalfoerteDokumenterUnderArbeid.map { mapToDokumentView(it) }
-            .sortedByDescending { it.journalfoertDokumentReference?.datoOpprettet }
+            .map { mapToDokumentView(it) }
+            .plus(journalfoerteDokumenterUnderArbeid
+                .map { mapToDokumentView(it) }
+                .sortedByDescending { it.journalfoertDokumentReference?.datoOpprettet })
+    }
+
+    fun getSortedDokumentViewListForInnholdsfortegnelse(
+        allDokumenterUnderArbeid: List<DokumentUnderArbeid>,
+        mottakere: List<String>
+    ): List<InnholdsfortegnelseRequest.Document> {
+        val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
+            it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
+        }
+
+        return dokumenterUnderArbeid.sortedByDescending { it.created }
+            .map { mapToInnholdsfortegnelseRequestDocument(it, mottakere) }
+            .plus(journalfoerteDokumenterUnderArbeid
+                .map { mapToInnholdsfortegnelseRequestDocument(it) }
+                .sortedByDescending { it.dato })
+    }
+
+    fun mapToInnholdsfortegnelseRequestDocument(dokumentUnderArbeid: DokumentUnderArbeid, mottakere: List<String> = emptyList()): InnholdsfortegnelseRequest.Document {
+        val behandling = behandlingService.getBehandlingForReadWithoutCheckForAccess(dokumentUnderArbeid.behandlingId)
+
+        val (journalpost, dokumentInDokarkiv) = if (dokumentUnderArbeid.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+            val journalpostInDokarkiv =
+                safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
+            val dokumentInDokarkiv =
+                journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
+                    ?: throw RuntimeException("Document not found in Dokarkiv")
+
+            journalpostInDokarkiv to dokumentInDokarkiv
+        } else null to null
+
+        val tittel = if (dokumentInDokarkiv != null) {
+            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF")
+        } else dokumentUnderArbeid.name
+
+        val tema = if (dokumentInDokarkiv != null) {
+            Tema.fromNavn(journalpost?.tema?.name).navn
+        } else behandling.ytelse.toTema().navn
+
+        val type = if (dokumentInDokarkiv != null) {
+            (journalpost?.journalposttype?.name ?: "Type ikke funnet i SAF")
+        } else if (dokumentUnderArbeid.dokumentType == DokumentType.NOTAT) "N" else "U"
+
+        val saksnummer = if (dokumentInDokarkiv != null) {
+            (journalpost?.sak?.fagsakId ?: "Saksnummer ikke funnet i SAF")
+        } else behandling.fagsakId
+
+        //TODO check Gosys if we can get other dates, such as 'ferdigstilt' etc.
+        val dato = if (dokumentInDokarkiv != null) {
+            journalpost!!.datoOpprettet.toLocalDate()
+        } else LocalDate.now()
+
+        val avsenderMottaker = if (dokumentInDokarkiv != null) {
+            journalpost?.avsenderMottaker?.navn ?: "N/A"
+        } else mottakere.joinToString()
+
+        return InnholdsfortegnelseRequest.Document(
+            tittel = tittel,
+            tema = tema,
+            dato = dato,
+            avsenderMottaker = avsenderMottaker,
+            saksnummer = saksnummer,
+            type = type
+        )
     }
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {

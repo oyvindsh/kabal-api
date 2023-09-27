@@ -137,6 +137,36 @@ class DokumentUnderArbeidController(
         )
     }
 
+    @GetMapping("/{dokumentId}/innholdsfortegnelse")
+    fun getMetadataForInnholdsfortegnelse(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("dokumentId") dokumentId: UUID,
+    ): DokumentUnderArbeidMetadata {
+        logger.debug("Kall mottatt på getMetadataForInnholdsfortegnelse for {}", dokumentId)
+
+        return DokumentUnderArbeidMetadata(
+            behandlingId = behandlingId,
+            documentId = dokumentId,
+            title = "Innholdsfortegnelse"
+        )
+    }
+
+    @GetMapping("/{hoveddokumentId}/innholdsfortegnelse/pdf")
+    @ResponseBody
+    fun getInnholdsfortegnelsePdf(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @PathVariable("hoveddokumentId") hoveddokumentId: UUID,
+    ): ResponseEntity<ByteArray> {
+        logger.debug("Kall mottatt på getInnholdsfortegnelsePdf for {}", hoveddokumentId)
+        return dokumentMapper.mapToByteArray(
+            dokumentUnderArbeidService.getInnholdsfortegnelseAsFysiskDokument(
+                behandlingId = behandlingId,
+                hoveddokumentId = hoveddokumentId,
+                innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+            )
+        )
+    }
+
     @DeleteMapping("/{dokumentId}")
     fun deleteDokument(
         @PathVariable("behandlingId") behandlingId: UUID,
