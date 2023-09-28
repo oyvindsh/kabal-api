@@ -2,13 +2,13 @@ package no.nav.klage.dokument.clients.kabaljsontopdf
 
 import io.micrometer.tracing.Tracer
 import no.nav.klage.dokument.clients.kabaljsontopdf.domain.DocumentValidationResponse
+import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRequest
 import no.nav.klage.dokument.domain.PDFDocument
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import java.time.LocalDate
 
 
 @Component
@@ -68,17 +68,4 @@ class KabalJsonToPdfClient(
             .bodyToMono<DocumentValidationResponse>()
             .block() ?: throw RuntimeException("Response null")
     }
-}
-
-data class InnholdsfortegnelseRequest(
-    val documentList: List<Document>,
-) {
-    data class Document(
-        val tittel: String,
-        val tema: String,
-        val dato: LocalDate,
-        val avsenderMottaker: String,
-        val saksnummer: String,
-        val type: String,
-    )
 }

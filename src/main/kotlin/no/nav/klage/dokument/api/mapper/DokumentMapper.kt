@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.api.view.DokumentView
 import no.nav.klage.dokument.api.view.DokumentViewWithList
 import no.nav.klage.dokument.api.view.SmartEditorDocumentView
-import no.nav.klage.dokument.clients.kabaljsontopdf.InnholdsfortegnelseRequest
+import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRequest
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
@@ -57,19 +57,21 @@ class DokumentMapper(
     fun getSortedDokumentViewListForInnholdsfortegnelse(
         allDokumenterUnderArbeid: List<DokumentUnderArbeid>,
         mottakere: List<String>
-    ): List<InnholdsfortegnelseRequest.Document> {
+    ): Pair<List<InnholdsfortegnelseRequest.Document>, List<InnholdsfortegnelseRequest.Document>> {
         val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
         return dokumenterUnderArbeid.sortedByDescending { it.created }
-            .map { mapToInnholdsfortegnelseRequestDocument(it, mottakere) }
-            .plus(journalfoerteDokumenterUnderArbeid
-                .map { mapToInnholdsfortegnelseRequestDocument(it) }
-                .sortedByDescending { it.dato })
+            .map { mapToInnholdsfortegnelseRequestDocument(it, mottakere) } to journalfoerteDokumenterUnderArbeid
+            .map { mapToInnholdsfortegnelseRequestDocument(it) }
+            .sortedByDescending { it.dato }
     }
 
-    fun mapToInnholdsfortegnelseRequestDocument(dokumentUnderArbeid: DokumentUnderArbeid, mottakere: List<String> = emptyList()): InnholdsfortegnelseRequest.Document {
+    fun mapToInnholdsfortegnelseRequestDocument(
+        dokumentUnderArbeid: DokumentUnderArbeid,
+        mottakere: List<String> = emptyList()
+    ): InnholdsfortegnelseRequest.Document {
         val behandling = behandlingService.getBehandlingForReadWithoutCheckForAccess(dokumentUnderArbeid.behandlingId)
 
         val (journalpost, dokumentInDokarkiv) = if (dokumentUnderArbeid.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {

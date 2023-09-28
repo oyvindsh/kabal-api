@@ -1,8 +1,8 @@
 package no.nav.klage.dokument.service
 
 import no.nav.klage.dokument.api.mapper.DokumentMapper
-import no.nav.klage.dokument.clients.kabaljsontopdf.InnholdsfortegnelseRequest
 import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
+import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRequest
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
@@ -64,11 +64,18 @@ class InnholdsfortegnelseService(
 
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(dokumentUnderArbeidId)
 
-        val documentList = dokumentMapper.getSortedDokumentViewListForInnholdsfortegnelse(vedlegg.toList(), mottakere)
+        val (dokumenterUnderArbeid, journalfoerteDokumenter) = dokumentMapper.getSortedDokumentViewListForInnholdsfortegnelse(
+            allDokumenterUnderArbeid = vedlegg.toList(),
+            mottakere = mottakere,
+        )
 
-        //TODO implement
         val pdfDocument =
-            kabalJsonToPdfClient.getInnholdsfortegnelse(InnholdsfortegnelseRequest(documentList = documentList))
+            kabalJsonToPdfClient.getInnholdsfortegnelse(
+                InnholdsfortegnelseRequest(
+                    dokumenterUnderArbeid = dokumenterUnderArbeid,
+                    journalfoerteDokumenter = journalfoerteDokumenter
+                )
+            )
 
         return pdfDocument.bytes
     }
