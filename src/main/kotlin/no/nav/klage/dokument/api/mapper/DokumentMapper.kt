@@ -15,7 +15,6 @@ import no.nav.klage.oppgave.api.view.DokumentReferanse
 import no.nav.klage.oppgave.clients.saf.graphql.*
 import no.nav.klage.oppgave.domain.klage.Behandling
 import no.nav.klage.oppgave.domain.klage.Saksdokument
-import no.nav.klage.oppgave.service.BehandlingService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +24,6 @@ import java.time.LocalDate
 @Component
 class DokumentMapper(
     private val safClient: SafGraphQlClient,
-    private val behandlingService: BehandlingService,
 ) {
 
     fun mapToByteArray(fysiskDokument: FysiskDokument): ResponseEntity<ByteArray> {
@@ -56,24 +54,28 @@ class DokumentMapper(
 
     fun getSortedDokumentViewListForInnholdsfortegnelse(
         allDokumenterUnderArbeid: List<DokumentUnderArbeid>,
-        mottakere: List<String>
+        mottakere: List<String>,
+        behandling: Behandling,
     ): Pair<List<InnholdsfortegnelseRequest.Document>, List<InnholdsfortegnelseRequest.Document>> {
         val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
         return dokumenterUnderArbeid.sortedByDescending { it.created }
-            .map { mapToInnholdsfortegnelseRequestDocument(it, mottakere) } to journalfoerteDokumenterUnderArbeid
-            .map { mapToInnholdsfortegnelseRequestDocument(it) }
+            .map { mapToInnholdsfortegnelseRequestDocument(
+                dokumentUnderArbeid = it,
+                mottakere = mottakere,
+                behandling = behandling
+            ) } to journalfoerteDokumenterUnderArbeid
+            .map { mapToInnholdsfortegnelseRequestDocument(dokumentUnderArbeid = it, behandling = behandling) }
             .sortedByDescending { it.dato }
     }
 
     fun mapToInnholdsfortegnelseRequestDocument(
         dokumentUnderArbeid: DokumentUnderArbeid,
-        mottakere: List<String> = emptyList()
+        mottakere: List<String> = emptyList(),
+        behandling: Behandling,
     ): InnholdsfortegnelseRequest.Document {
-        val behandling = behandlingService.getBehandlingForReadWithoutCheckForAccess(dokumentUnderArbeid.behandlingId)
-
         val (journalpost, dokumentInDokarkiv) = if (dokumentUnderArbeid.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)

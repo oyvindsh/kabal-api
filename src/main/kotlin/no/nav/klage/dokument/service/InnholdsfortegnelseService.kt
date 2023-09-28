@@ -6,6 +6,7 @@ import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRe
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
+import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,7 +21,7 @@ class InnholdsfortegnelseService(
     private val mellomlagerService: MellomlagerService,
     private val kabalJsonToPdfClient: KabalJsonToPdfClient,
     private val innholdsfortegnelseRepository: InnholdsfortegnelseRepository,
-
+    private val behandlingService: BehandlingService,
     ) {
 
     companion object {
@@ -67,6 +68,7 @@ class InnholdsfortegnelseService(
         val (dokumenterUnderArbeid, journalfoerteDokumenter) = dokumentMapper.getSortedDokumentViewListForInnholdsfortegnelse(
             allDokumenterUnderArbeid = vedlegg.toList(),
             mottakere = mottakere,
+            behandling = behandlingService.getBehandlingForReadWithoutCheckForAccess(document.behandlingId),
         )
 
         val pdfDocument =
