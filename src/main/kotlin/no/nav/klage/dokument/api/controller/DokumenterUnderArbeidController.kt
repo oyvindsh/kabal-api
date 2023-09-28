@@ -137,7 +137,7 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @GetMapping("/{dokumentId}/innholdsfortegnelse")
+    @GetMapping("/{dokumentId}/vedleggsoversikt")
     fun getMetadataForInnholdsfortegnelse(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentId") dokumentId: UUID,
@@ -151,7 +151,7 @@ class DokumentUnderArbeidController(
         )
     }
 
-    @GetMapping("/{hoveddokumentId}/innholdsfortegnelse/pdf")
+    @GetMapping("/{hoveddokumentId}/vedleggsoversikt/pdf")
     @ResponseBody
     fun getInnholdsfortegnelsePdf(
         @PathVariable("behandlingId") behandlingId: UUID,
