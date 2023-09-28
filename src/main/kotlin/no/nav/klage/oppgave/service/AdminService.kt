@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
+import no.nav.klage.dokument.service.InnholdsfortegnelseService
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.hjemmel.ytelseTilRegistreringshjemlerV2
 import no.nav.klage.oppgave.clients.skjermede.SkjermedeApiClient
@@ -44,6 +45,7 @@ class AdminService(
     private val endringsloggRepository: EndringsloggRepository,
     private val skjermedeApiClient: SkjermedeApiClient,
     private val kabalSmartEditorApiClient: KabalSmartEditorApiClient,
+    private val innholdsfortegnelseService: InnholdsfortegnelseService,
 ) {
 
     companion object {
@@ -83,17 +85,25 @@ class AdminService(
     /** only for use in dev */
     fun deleteBehandlingInDev(behandlingId: UUID) {
         logger.debug("Delete test data in dev: attempt to delete behandling with id {}", behandlingId)
-        val dokumenterUnderBehandling = dokumentUnderArbeidRepository.findByBehandlingId(behandlingId)
+        val dokumenterUnderArbeid = dokumentUnderArbeidRepository.findByBehandlingId(behandlingId)
 
-        for (dub in dokumenterUnderBehandling) {
+        for (dua in dokumenterUnderArbeid) {
             try {
-                fileApiClient.deleteDocument(id = dub.mellomlagerId!!, systemUser = true)
+                fileApiClient.deleteDocument(id = dua.mellomlagerId!!, systemUser = true)
             } catch (e: Exception) {
                 logger.warn("Delete test data in dev: Could not delete from file api")
             }
+
+            try {
+                if (dua.parentId == null) {
+                    innholdsfortegnelseService.deleteInnholdsfortegnelse(dua.id)
+                }
+            } catch (e: Exception) {
+                logger.warn("Couldn't delete innholdsfortegnelse. May be b/c there never was one.")
+            }
         }
 
-        dokumentUnderArbeidRepository.deleteAll(dokumenterUnderBehandling)
+        dokumentUnderArbeidRepository.deleteAll(dokumenterUnderArbeid)
 
         endringsloggRepository.deleteAll(endringsloggRepository.findByBehandlingIdOrderByTidspunktDesc(behandlingId))
 

@@ -82,4 +82,8 @@ class InnholdsfortegnelseService(
 
         return pdfDocument.bytes
     }
+
+    fun deleteInnholdsfortegnelse(hoveddokumentId: UUID) {
+        innholdsfortegnelseRepository.delete(innholdsfortegnelseRepository.findByHoveddokumentId(hoveddokumentId)!!)
+    }
 }
