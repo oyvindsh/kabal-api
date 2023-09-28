@@ -69,6 +69,7 @@ class InnholdsfortegnelseService(
             allDokumenterUnderArbeid = vedlegg.toList(),
             mottakere = mottakere,
             behandling = behandlingService.getBehandlingForReadWithoutCheckForAccess(document.behandlingId),
+            hoveddokument = document,
         )
 
         val pdfDocument =

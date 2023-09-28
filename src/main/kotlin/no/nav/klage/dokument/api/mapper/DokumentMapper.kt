@@ -19,7 +19,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Component
 class DokumentMapper(
@@ -56,68 +56,60 @@ class DokumentMapper(
         allDokumenterUnderArbeid: List<DokumentUnderArbeid>,
         mottakere: List<String>,
         behandling: Behandling,
+        hoveddokument: DokumentUnderArbeid,
     ): Pair<List<InnholdsfortegnelseRequest.Document>, List<InnholdsfortegnelseRequest.Document>> {
         val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
         return dokumenterUnderArbeid.sortedByDescending { it.created }
-            .map { mapToInnholdsfortegnelseRequestDocument(
+            .map { mapToInnholdsfortegnelseRequestDocumentFromDokumentUnderArbeid(
                 dokumentUnderArbeid = it,
                 mottakere = mottakere,
-                behandling = behandling
+                behandling = behandling,
+                hoveddokument = hoveddokument,
             ) } to journalfoerteDokumenterUnderArbeid
-            .map { mapToInnholdsfortegnelseRequestDocument(dokumentUnderArbeid = it, behandling = behandling) }
-            .sortedByDescending { it.dato }
+            .map { mapToInnholdsfortegnelseRequestDocumentFromJournalfoertDokument(dokumentUnderArbeid = it, behandling = behandling) }
+            .sortedByDescending { it.opprettet }
     }
 
-    fun mapToInnholdsfortegnelseRequestDocument(
+    fun mapToInnholdsfortegnelseRequestDocumentFromJournalfoertDokument(
         dokumentUnderArbeid: DokumentUnderArbeid,
         mottakere: List<String> = emptyList(),
         behandling: Behandling,
     ): InnholdsfortegnelseRequest.Document {
-        val (journalpost, dokumentInDokarkiv) = if (dokumentUnderArbeid.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
-            val journalpostInDokarkiv =
-                safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
-            val dokumentInDokarkiv =
-                journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
-                    ?: throw RuntimeException("Document not found in Dokarkiv")
-
-            journalpostInDokarkiv to dokumentInDokarkiv
-        } else null to null
-
-        val tittel = if (dokumentInDokarkiv != null) {
-            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF")
-        } else dokumentUnderArbeid.name
-
-        val tema = if (dokumentInDokarkiv != null) {
-            Tema.fromNavn(journalpost?.tema?.name).navn
-        } else behandling.ytelse.toTema().navn
-
-        val type = if (dokumentInDokarkiv != null) {
-            (journalpost?.journalposttype?.name ?: "Type ikke funnet i SAF")
-        } else if (dokumentUnderArbeid.dokumentType == DokumentType.NOTAT) "N" else "U"
-
-        val saksnummer = if (dokumentInDokarkiv != null) {
-            (journalpost?.sak?.fagsakId ?: "Saksnummer ikke funnet i SAF")
-        } else behandling.fagsakId
-
-        //TODO check Gosys if we can get other dates, such as 'ferdigstilt' etc.
-        val dato = if (dokumentInDokarkiv != null) {
-            journalpost!!.datoOpprettet.toLocalDate()
-        } else LocalDate.now()
-
-        val avsenderMottaker = if (dokumentInDokarkiv != null) {
-            journalpost?.avsenderMottaker?.navn ?: "N/A"
-        } else mottakere.joinToString()
+        if (dokumentUnderArbeid.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+            error("Document must be JOURNALFOERT")
+        }
+        val journalpost =
+            safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
+        val dokumentInDokarkiv =
+            journalpost.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
+                ?: throw RuntimeException("Document not found in Dokarkiv")
 
         return InnholdsfortegnelseRequest.Document(
-            tittel = tittel,
-            tema = tema,
-            dato = dato,
-            avsenderMottaker = avsenderMottaker,
-            saksnummer = saksnummer,
-            type = type
+            tittel = dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF",
+            tema = Tema.fromNavn(journalpost.tema?.name).navn,
+            opprettet = journalpost.datoOpprettet,
+            avsenderMottaker = journalpost.avsenderMottaker?.navn ?: "",
+            saksnummer = journalpost.sak?.fagsakId ?: "Saksnummer ikke funnet i SAF",
+            type = journalpost.journalposttype?.name ?: "Type ikke funnet i SAF"
+        )
+    }
+
+    fun mapToInnholdsfortegnelseRequestDocumentFromDokumentUnderArbeid(
+        dokumentUnderArbeid: DokumentUnderArbeid,
+        mottakere: List<String> = emptyList(),
+        behandling: Behandling,
+        hoveddokument: DokumentUnderArbeid,
+    ): InnholdsfortegnelseRequest.Document {
+        return InnholdsfortegnelseRequest.Document(
+            tittel = dokumentUnderArbeid.name,
+            tema = behandling.ytelse.toTema().navn,
+            opprettet = LocalDateTime.now(),
+            avsenderMottaker = mottakere.joinToString(),
+            saksnummer = behandling.fagsakId,
+            type = if (hoveddokument.dokumentType == DokumentType.NOTAT) "N" else "U"
         )
     }
 
