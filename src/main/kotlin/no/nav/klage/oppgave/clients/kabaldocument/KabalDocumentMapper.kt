@@ -1,7 +1,7 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -21,7 +21,6 @@ class KabalDocumentMapper(
     private val pdlFacade: PdlFacade,
     private val eregClient: EregClient,
     private val safClient: SafGraphQlClient,
-    private val innholdsfortegnelseRepository: InnholdsfortegnelseRepository,
 ) {
 
     companion object {
@@ -38,12 +37,11 @@ class KabalDocumentMapper(
     fun mapBehandlingToDokumentEnhetWithDokumentreferanser(
         behandling: Behandling,
         hovedDokument: DokumentUnderArbeid,
-        vedlegg: SortedSet<DokumentUnderArbeid>
+        vedlegg: SortedSet<DokumentUnderArbeid>,
+        innholdsfortegnelse: Innholdsfortegnelse?,
     ): DokumentEnhetWithDokumentreferanserInput {
 
         val innholdsfortegnelseDocument = if (vedlegg.size > 1) {
-            val innholdsfortegnelse =
-                innholdsfortegnelseRepository.findByHoveddokumentId(hoveddokumentId = hovedDokument.id)
             DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
                 mellomlagerId = innholdsfortegnelse?.mellomlagerId!!,
                 opplastet = innholdsfortegnelse.modified,

@@ -12,7 +12,6 @@ import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJou
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
-import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Template
@@ -55,7 +54,6 @@ class DokumentUnderArbeidService(
     private val dokumentService: DokumentService,
     private val kabalDocumentMapper: KabalDocumentMapper,
     private val eregClient: EregClient,
-    private val innholdsfortegnelseRepository: InnholdsfortegnelseRepository,
     private val innholdsfortegnelseService: InnholdsfortegnelseService,
 ) {
     companion object {
@@ -859,7 +857,8 @@ class DokumentUnderArbeidService(
             val dokumentEnhetId = kabalDocumentGateway.createKomplettDokumentEnhet(
                 behandling = behandling,
                 hovedDokument = hovedDokument,
-                vedlegg = vedlegg
+                vedlegg = vedlegg,
+                innholdsfortegnelse = innholdsfortegnelseService.getInnholdsfortegnelse(hovedDokumentId)
             )
             hovedDokument.dokumentEnhetId = dokumentEnhetId
         }

@@ -1,6 +1,7 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
 import no.nav.klage.oppgave.clients.kabaldocument.model.request.UpdateTitleInput
 import no.nav.klage.oppgave.clients.kabaldocument.model.response.BrevmottakerWithJoarkAndDokDistInfo
 import no.nav.klage.oppgave.domain.klage.Behandling
@@ -24,14 +25,16 @@ class KabalDocumentGateway(
     fun createKomplettDokumentEnhet(
         behandling: Behandling,
         hovedDokument: DokumentUnderArbeid,
-        vedlegg: SortedSet<DokumentUnderArbeid>
+        vedlegg: SortedSet<DokumentUnderArbeid>,
+        innholdsfortegnelse: Innholdsfortegnelse?,
     ): UUID {
         return UUID.fromString(
             kabalDocumentClient.createDokumentEnhetWithDokumentreferanser(
                 kabalDocumentMapper.mapBehandlingToDokumentEnhetWithDokumentreferanser(
                     behandling = behandling,
                     hovedDokument = hovedDokument,
-                    vedlegg = vedlegg
+                    vedlegg = vedlegg,
+                    innholdsfortegnelse = innholdsfortegnelse,
                 )
             ).id
         )

@@ -8,10 +8,12 @@ import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
 import no.nav.klage.oppgave.util.getLogger
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
 
 @Service
+@Transactional
 class InnholdsfortegnelseService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
     private val dokumentMapper: DokumentMapper,
@@ -24,6 +26,10 @@ class InnholdsfortegnelseService(
     companion object {
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
+    }
+
+    fun getInnholdsfortegnelse(hoveddokumentId: UUID): Innholdsfortegnelse? {
+        return innholdsfortegnelseRepository.findByHoveddokumentId(hoveddokumentId)
     }
 
     fun saveInnholdsfortegnelse(dokumentUnderArbeidId: UUID, mottakere: List<String>) {
