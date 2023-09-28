@@ -45,11 +45,12 @@ class DokumentMapper(
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
-        return dokumenterUnderArbeid.sortedByDescending { it.created }
+        return dokumenterUnderArbeid.sortedWith(compareBy({ it.created }, { it.name })).reversed()
             .map { mapToDokumentView(it) }
             .plus(journalfoerteDokumenterUnderArbeid
                 .map { mapToDokumentView(it) }
-                .sortedByDescending { it.journalfoertDokumentReference?.datoOpprettet })
+                .sortedWith(compareBy({it.journalfoertDokumentReference?.datoOpprettet}, {it.tittel})).reversed()
+            )
     }
 
     fun getSortedDokumentViewListForInnholdsfortegnelse(
@@ -62,15 +63,22 @@ class DokumentMapper(
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
-        return dokumenterUnderArbeid.sortedByDescending { it.created }
-            .map { mapToInnholdsfortegnelseRequestDocumentFromDokumentUnderArbeid(
-                dokumentUnderArbeid = it,
-                mottakere = mottakere,
-                behandling = behandling,
-                hoveddokument = hoveddokument,
-            ) } to journalfoerteDokumenterUnderArbeid
-            .map { mapToInnholdsfortegnelseRequestDocumentFromJournalfoertDokument(dokumentUnderArbeid = it, behandling = behandling) }
-            .sortedByDescending { it.opprettet }
+        return dokumenterUnderArbeid.sortedWith(compareBy({ it.created }, { it.name })).reversed()
+            .map {
+                mapToInnholdsfortegnelseRequestDocumentFromDokumentUnderArbeid(
+                    dokumentUnderArbeid = it,
+                    mottakere = mottakere,
+                    behandling = behandling,
+                    hoveddokument = hoveddokument,
+                )
+            } to journalfoerteDokumenterUnderArbeid
+            .map {
+                mapToInnholdsfortegnelseRequestDocumentFromJournalfoertDokument(
+                    dokumentUnderArbeid = it,
+                    behandling = behandling
+                )
+            }
+            .sortedWith(compareBy({it.opprettet}, {it.tittel})).reversed()
     }
 
     fun mapToInnholdsfortegnelseRequestDocumentFromJournalfoertDokument(

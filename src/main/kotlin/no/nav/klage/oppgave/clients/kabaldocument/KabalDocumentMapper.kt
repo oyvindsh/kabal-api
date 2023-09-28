@@ -51,18 +51,50 @@ class KabalDocumentMapper(
         } else null
 
         val vedleggMapped = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-            .sortedByDescending { it.created }
+            .sortedWith(compareBy({ it.created }, { it.name })).reversed()
             .map { currentVedlegg ->
                 mapDokumentUnderArbeidToDokumentReferanse(
                     dokument = currentVedlegg,
                 )
             }.toMutableList()
         if (innholdsfortegnelseDocument != null) {
-           vedleggMapped.add(0, innholdsfortegnelseDocument)
+            vedleggMapped.add(0, innholdsfortegnelseDocument)
         }
 
+        val journalfoerteVedlegg =
+            vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+                .sortedWith { document1, document2 ->
+                    val journalpostInDokarkiv1 =
+                        safClient.getJournalpostAsSystembruker(document1.journalfoertDokumentReference!!.journalpostId)
+
+                    val journalpostInDokarkiv2 =
+                        safClient.getJournalpostAsSystembruker(document2.journalfoertDokumentReference!!.journalpostId)
+
+                    val dokumentInDokarkiv1 =
+                        journalpostInDokarkiv1.dokumenter?.find { it.dokumentInfoId == document1.journalfoertDokumentReference.dokumentInfoId }
+                            ?: throw RuntimeException("Document not found in Dokarkiv")
+
+                    val dokumentInDokarkiv2 =
+                        journalpostInDokarkiv2.dokumenter?.find { it.dokumentInfoId == document2.journalfoertDokumentReference.dokumentInfoId }
+                            ?: throw RuntimeException("Document not found in Dokarkiv")
+
+                    val dateCompare =
+                        journalpostInDokarkiv2.datoOpprettet.compareTo(journalpostInDokarkiv1.datoOpprettet)
+                    if (dateCompare != 0) {
+                        dateCompare
+                    } else {
+                        (dokumentInDokarkiv2.tittel ?: "Tittel ikke funnet i SAF").compareTo(
+                            dokumentInDokarkiv1.tittel ?: "Tittel ikke funnet i SAF"
+                        )
+                    }
+                }
+
         return DokumentEnhetWithDokumentreferanserInput(
-            brevMottakere = mapBrevmottakerIdentToBrevmottakerInput(behandling, hovedDokument.brevmottakerIdents, hovedDokument.dokumentType!!),
+            brevMottakere = mapBrevmottakerIdentToBrevmottakerInput(
+                behandling,
+                hovedDokument.brevmottakerIdents,
+                hovedDokument.dokumentType!!
+            ),
             journalfoeringData = JournalfoeringDataInput(
                 sakenGjelder = PartIdInput(
                     partIdTypeId = behandling.sakenGjelder.partId.type.id,
@@ -85,12 +117,7 @@ class KabalDocumentMapper(
             dokumentreferanser = DokumentEnhetWithDokumentreferanserInput.DokumentInput(
                 hoveddokument = mapDokumentUnderArbeidToDokumentReferanse(hovedDokument),
                 vedlegg = vedleggMapped,
-                journalfoerteVedlegg = vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-                    .sortedByDescending {
-                        val journalpostInDokarkiv =
-                            safClient.getJournalpostAsSystembruker(it.journalfoertDokumentReference!!.journalpostId)
-                        journalpostInDokarkiv.datoOpprettet
-                    }
+                journalfoerteVedlegg = journalfoerteVedlegg
                     .map { currentVedlegg ->
                         DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
                             kildeJournalpostId = currentVedlegg.journalfoertDokumentReference!!.journalpostId,
