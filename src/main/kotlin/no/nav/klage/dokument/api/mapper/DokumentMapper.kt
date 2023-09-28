@@ -45,11 +45,11 @@ class DokumentMapper(
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
-        return dokumenterUnderArbeid.sortedWith(compareBy({ it.created }, { it.name })).reversed()
+        return dokumenterUnderArbeid.sortedByDescending { it.created }
             .map { mapToDokumentView(it) }
             .plus(journalfoerteDokumenterUnderArbeid
                 .map { mapToDokumentView(it) }
-                .sortedWith(compareBy({it.journalfoertDokumentReference?.datoOpprettet}, {it.tittel})).reversed()
+                .sortedWith(compareByDescending<DokumentView> { it.journalfoertDokumentReference?.datoOpprettet }.thenBy { it.tittel })
             )
     }
 
@@ -63,7 +63,7 @@ class DokumentMapper(
             it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
         }
 
-        return dokumenterUnderArbeid.sortedWith(compareBy({ it.created }, { it.name })).reversed()
+        return dokumenterUnderArbeid.sortedByDescending { it.created }
             .map {
                 mapToInnholdsfortegnelseRequestDocumentFromDokumentUnderArbeid(
                     dokumentUnderArbeid = it,
@@ -78,7 +78,7 @@ class DokumentMapper(
                     behandling = behandling
                 )
             }
-            .sortedWith(compareBy({it.opprettet}, {it.tittel})).reversed()
+            .sortedWith(compareByDescending<InnholdsfortegnelseRequest.Document> { it.opprettet }.thenBy { it.tittel })
     }
 
     fun mapToInnholdsfortegnelseRequestDocumentFromJournalfoertDokument(

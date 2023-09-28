@@ -51,7 +51,7 @@ class KabalDocumentMapper(
         } else null
 
         val vedleggMapped = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
-            .sortedWith(compareBy({ it.created }, { it.name })).reversed()
+            .sortedByDescending { it.created }
             .map { currentVedlegg ->
                 mapDokumentUnderArbeidToDokumentReferanse(
                     dokument = currentVedlegg,
@@ -83,8 +83,8 @@ class KabalDocumentMapper(
                     if (dateCompare != 0) {
                         dateCompare
                     } else {
-                        (dokumentInDokarkiv2.tittel ?: "Tittel ikke funnet i SAF").compareTo(
-                            dokumentInDokarkiv1.tittel ?: "Tittel ikke funnet i SAF"
+                        (dokumentInDokarkiv1.tittel ?: "Tittel ikke funnet i SAF").compareTo(
+                            dokumentInDokarkiv2.tittel ?: "Tittel ikke funnet i SAF"
                         )
                     }
                 }
