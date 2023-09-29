@@ -76,12 +76,12 @@ class MockDataController(
                     fagsakId = journalpost.sak?.fagsakId ?: "UKJENT",
                     fagsystem = journalpost.sak?.fagsaksystem?.let {
                         try {
-                            KildeFagsystem.valueOf(it)
+                            Fagsystem.valueOf(it)
                         } catch (e: Exception) {
-                            KildeFagsystem.AO01
+                            Fagsystem.AO01
                         }
                     }
-                        ?: KildeFagsystem.AO01
+                        ?: Fagsystem.AO01
                 ),
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
@@ -99,7 +99,7 @@ class MockDataController(
                 ),
                 brukersHenvendelseMottattNavDato = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = KildeFagsystem.AO01,
+                kilde = Fagsystem.AO01,
                 kommentar = """
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
                     sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
@@ -135,12 +135,12 @@ class MockDataController(
                     fagsakId = journalpost.sak?.fagsakId ?: "UKJENT",
                     fagsystem = journalpost.sak?.fagsaksystem?.let {
                         try {
-                            KildeFagsystem.valueOf(it)
+                            Fagsystem.valueOf(it)
                         } catch (e: Exception) {
-                            KildeFagsystem.AO01
+                            Fagsystem.AO01
                         }
                     }
-                        ?: KildeFagsystem.AO01
+                        ?: Fagsystem.AO01
                 ),
                 kildeReferanse = UUID.randomUUID().toString(),
                 innsynUrl = "https://nav.no",
@@ -158,7 +158,7 @@ class MockDataController(
                 ),
                 brukersHenvendelseMottattNavDato = dato,
                 innsendtTilNav = dato.minusDays(3),
-                kilde = KildeFagsystem.AO01
+                kilde = Fagsystem.AO01
             )
         )
     }
@@ -253,7 +253,7 @@ class MockDataController(
 
         val oversendtSak = OversendtSak(
             fagsakId = Random.nextInt(from = 1, until = 9999).toString(),
-            fagsystem = KildeFagsystem.AO01
+            fagsystem = Fagsystem.AO01
 
         )
 
@@ -274,7 +274,7 @@ class MockDataController(
                         brukersHenvendelseMottattNavDato = dato,
                         sakMottattKaDato = dato,
                         innsendtTilNav = dato.minusDays(3),
-                        kilde = KildeFagsystem.AO01,
+                        kilde = Fagsystem.AO01,
                     )
                 )
             }

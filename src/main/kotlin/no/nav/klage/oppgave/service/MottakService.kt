@@ -8,10 +8,13 @@ import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
 import no.nav.klage.kodeverk.hjemmel.ytelseTilHjemler
-import no.nav.klage.oppgave.api.view.*
+import no.nav.klage.oppgave.api.view.AnkeBasertPaaKlageInput
+import no.nav.klage.oppgave.api.view.OversendtKlageAnkeV3
+import no.nav.klage.oppgave.api.view.OversendtKlageV2
 import no.nav.klage.oppgave.api.view.kabin.CreateAnkeBasedOnCompleteKabinInput
 import no.nav.klage.oppgave.api.view.kabin.CreateAnkeBasedOnKabinInput
 import no.nav.klage.oppgave.api.view.kabin.CreateKlageBasedOnKabinInput
+import no.nav.klage.oppgave.api.view.toMottak
 import no.nav.klage.oppgave.clients.ereg.EregClient
 import no.nav.klage.oppgave.clients.norg2.Norg2Client
 import no.nav.klage.oppgave.clients.pdl.PdlFacade
@@ -332,7 +335,7 @@ class MottakService(
     fun CreateKlageBasedOnKabinInput.validate() {
         validateDocumentNotAlreadyUsed(klageJournalpostId, sakenGjelder.value)
         validateYtelseAndHjemler(Ytelse.of(ytelseId), listOf(Hjemmel.of(hjemmelId)))
-        validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.KLAGE)
+        validateDuplicate(Fagsystem.of(fagsystemId), kildereferanse, Type.KLAGE)
         validateJournalpost(klageJournalpostId)
         klager?.toPartId()?.let { validatePartId(it) }
         validatePartId(sakenGjelder.toPartId())
@@ -346,7 +349,7 @@ class MottakService(
     fun CreateAnkeBasedOnCompleteKabinInput.validate() {
         validateDocumentNotAlreadyUsed(ankeJournalpostId, sakenGjelder.value)
         validateYtelseAndHjemler(Ytelse.of(ytelseId), listOf(Hjemmel.of(hjemmelId)))
-        validateDuplicate(KildeFagsystem.valueOf(Fagsystem.of(fagsystemId).navn), kildereferanse, Type.ANKE)
+        validateDuplicate(Fagsystem.of(fagsystemId), kildereferanse, Type.ANKE)
         validateJournalpost(ankeJournalpostId)
         klager?.toPartId()?.let { validatePartId(it) }
         validatePartId(sakenGjelder.toPartId())
@@ -356,7 +359,7 @@ class MottakService(
         validateEnhet(forrigeBehandlendeEnhet)
     }
 
-    fun isDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type): Boolean {
+    fun isDuplicate(fagsystem: Fagsystem, kildeReferanse: String, type: Type): Boolean {
         return isBehandlingDuplicate(
             fagsystem = fagsystem,
             kildeReferanse = kildeReferanse,
@@ -364,7 +367,7 @@ class MottakService(
         )
     }
 
-    private fun validateDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type) {
+    private fun validateDuplicate(fagsystem: Fagsystem, kildeReferanse: String, type: Type) {
         if (isBehandlingDuplicate(
                 fagsystem = fagsystem,
                 kildeReferanse = kildeReferanse,
@@ -378,9 +381,9 @@ class MottakService(
         }
     }
 
-    private fun isBehandlingDuplicate(fagsystem: KildeFagsystem, kildeReferanse: String, type: Type): Boolean {
+    private fun isBehandlingDuplicate(fagsystem: Fagsystem, kildeReferanse: String, type: Type): Boolean {
         return behandlingRepository.findByFagsystemAndKildeReferanseAndFeilregistreringIsNullAndType(
-            fagsystem = fagsystem.mapFagsystem(),
+            fagsystem = fagsystem,
             kildeReferanse = kildeReferanse,
             type = type,
         ).isNotEmpty()
