@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
 import no.nav.klage.oppgave.api.view.ExternalFeilregistreringInput
-import no.nav.klage.oppgave.api.view.mapFagsystem
 import no.nav.klage.oppgave.service.AdminService
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.util.TokenUtil
@@ -118,7 +117,7 @@ class DevOnlyAdminController(
             type = feilregistrering.type,
             reason = feilregistrering.reason,
             navIdent = feilregistrering.navIdent,
-            fagsystem = feilregistrering.fagsystem.mapFagsystem(),
+            fagsystem = feilregistrering.fagsystem,
             kildereferanse = feilregistrering.kildereferanse,
         )
     }

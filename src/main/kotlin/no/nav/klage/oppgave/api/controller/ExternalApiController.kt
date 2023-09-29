@@ -7,7 +7,6 @@ import jakarta.validation.Valid
 import no.nav.klage.oppgave.api.view.ExternalFeilregistreringInput
 import no.nav.klage.oppgave.api.view.OversendtKlageAnkeV3
 import no.nav.klage.oppgave.api.view.OversendtKlageV2
-import no.nav.klage.oppgave.api.view.mapFagsystem
 import no.nav.klage.oppgave.config.SecurityConfiguration
 import no.nav.klage.oppgave.service.BehandlingService
 import no.nav.klage.oppgave.service.MottakService
@@ -74,7 +73,7 @@ class ExternalApiController(
             type = feilregistrering.type,
             reason = feilregistrering.reason,
             navIdent = feilregistrering.navIdent,
-            fagsystem = feilregistrering.fagsystem.mapFagsystem(),
+            fagsystem = feilregistrering.fagsystem,
             kildereferanse = feilregistrering.kildereferanse,
         )
     }

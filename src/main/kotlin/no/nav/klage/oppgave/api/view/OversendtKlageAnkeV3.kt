@@ -2,6 +2,7 @@ package no.nav.klage.oppgave.api.view
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.PastOrPresent
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.kodeverk.hjemmel.Hjemmel
@@ -92,7 +93,7 @@ data class OversendtKlageAnkeV3(
         required = true,
         example = "K9"
     )
-    val kilde: KildeFagsystem,
+    val kilde: Fagsystem,
     @Schema(
         example = "OMS_OMP",
         description = "Ytelse",
@@ -112,7 +113,7 @@ fun OversendtKlageAnkeV3.toMottak(forrigeBehandlingId: UUID? = null) = Mottak(
     klager = klager.toKlagepart(),
     sakenGjelder = sakenGjelder?.toSakenGjelder(),
     innsynUrl = innsynUrl,
-    fagsystem = kilde.mapFagsystem(),
+    fagsystem = kilde,
     fagsakId = fagsak.fagsakId,
     kildeReferanse = kildeReferanse,
     dvhReferanse = dvhReferanse,
