@@ -5,28 +5,6 @@ import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.domain.klage.*
 
-
-fun KildeFagsystem.mapFagsystem(): Fagsystem =
-    when (this) {
-        KildeFagsystem.AO01 -> Fagsystem.AO01
-        KildeFagsystem.FS36 -> Fagsystem.FS36
-        KildeFagsystem.AO11 -> Fagsystem.AO11
-        KildeFagsystem.BISYS -> Fagsystem.BISYS
-        KildeFagsystem.FS38 -> Fagsystem.FS38
-        KildeFagsystem.IT01 -> Fagsystem.IT01
-        KildeFagsystem.K9 -> Fagsystem.K9
-        KildeFagsystem.OB36 -> Fagsystem.OB36
-        KildeFagsystem.OEBS -> Fagsystem.OEBS
-        KildeFagsystem.PP01 -> Fagsystem.PP01
-        KildeFagsystem.UFM -> Fagsystem.UFM
-        KildeFagsystem.BA -> Fagsystem.BA
-        KildeFagsystem.EF -> Fagsystem.EF
-        KildeFagsystem.KONT -> Fagsystem.KONT
-        KildeFagsystem.SUPSTONAD -> Fagsystem.SUPSTONAD
-        KildeFagsystem.OMSORGSPENGER -> Fagsystem.OMSORGSPENGER
-        KildeFagsystem.MANUELL -> Fagsystem.MANUELL
-    }
-
 data class OversendtSakenGjelder(
     @Schema(
         required = true
@@ -128,30 +106,8 @@ data class OversendtSak(
         required = true,
         example = "K9"
     )
-    val fagsystem: KildeFagsystem
+    val fagsystem: Fagsystem
 )
-
-@Schema
-enum class KildeFagsystem {
-    FS36,
-    AO01,
-    AO11,
-    BISYS,
-    FS38,
-    IT01,
-    K9,
-    OB36,
-    OEBS,
-    PP01,
-    UFM,
-    BA,
-    EF,
-    KONT,
-    SUPSTONAD,
-    OMSORGSPENGER,
-    MANUELL
-}
-
 
 fun OversendtPartIdType.toPartIdType(): PartIdType =
     when (this) {

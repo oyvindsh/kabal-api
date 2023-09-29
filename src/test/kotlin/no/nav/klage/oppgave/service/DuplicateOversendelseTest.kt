@@ -3,6 +3,7 @@ package no.nav.klage.oppgave.service
 import com.ninjasquad.springmockk.MockkBean
 import io.micrometer.core.instrument.MeterRegistry
 import io.mockk.every
+import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Type
 import no.nav.klage.kodeverk.Ytelse
 import no.nav.klage.oppgave.api.view.*
@@ -99,11 +100,11 @@ internal class DuplicateOversendelseTest {
                     verdi = "01043137677"
                 )
             ),
-            kilde = KildeFagsystem.K9,
+            kilde = Fagsystem.K9,
             kildeReferanse = "abc",
             fagsak = OversendtSak(
                 fagsakId = "123",
-                fagsystem = KildeFagsystem.K9
+                fagsystem = Fagsystem.K9
             )
         )
 
