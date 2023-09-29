@@ -44,8 +44,6 @@ class KabalDocumentMapper(
         val innholdsfortegnelseDocument = if (vedlegg.size > 1) {
             DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
                 mellomlagerId = innholdsfortegnelse?.mellomlagerId!!,
-                opplastet = innholdsfortegnelse.modified,
-                size = 0,
                 name = "Innholdsfortegnelse"
             )
         } else null
@@ -133,8 +131,6 @@ class KabalDocumentMapper(
     private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
         return DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
             mellomlagerId = dokument.mellomlagerId!!,
-            opplastet = dokument.opplastet!!,
-            size = dokument.size!!,
             name = dokument.name,
         )
     }
