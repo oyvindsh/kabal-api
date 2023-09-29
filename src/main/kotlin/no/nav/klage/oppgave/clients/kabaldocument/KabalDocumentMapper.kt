@@ -31,7 +31,7 @@ class KabalDocumentMapper(
         private const val BREVKODE = "BREV_FRA_KLAGEINSTANS"
         private const val BREVKODE_NOTAT = "NOTAT_FRA_KLAGEINSTANS"
         private const val BEHANDLINGSTEMA_KLAGE_KLAGEINSTANS = "ab0164"
-        private const val KLAGEBEHANDLING_ID_KEY = "klagebehandling_id"
+        private const val BEHANDLING_ID_KEY = "behandling_id"
     }
 
     fun mapBehandlingToDokumentEnhetWithDokumentreferanser(
@@ -111,7 +111,7 @@ class KabalDocumentMapper(
                 tittel = hovedDokument.dokumentType!!.beskrivelse,
                 brevKode = if (hovedDokument.dokumentType == DokumentType.NOTAT) BREVKODE_NOTAT else BREVKODE,
                 tilleggsopplysning = TilleggsopplysningInput(
-                    key = KLAGEBEHANDLING_ID_KEY,
+                    key = BEHANDLING_ID_KEY,
                     value = behandling.id.toString()
                 )
             ),
