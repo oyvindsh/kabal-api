@@ -73,7 +73,7 @@ class SafGraphQlClient(
         }
     }
 
-    @Cacheable(CacheWithJCacheConfiguration.GROUPMEMBERS_CACHE)
+    @Cacheable(CacheWithJCacheConfiguration.JOURNALPOST_CACHE)
     @Retryable
     fun getCacheableJournalpostAsSystembruker(journalpostId: String): Journalpost {
         return runWithTimingAndLogging {
