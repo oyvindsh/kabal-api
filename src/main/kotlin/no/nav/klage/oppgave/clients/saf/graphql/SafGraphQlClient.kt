@@ -1,8 +1,10 @@
 package no.nav.klage.oppgave.clients.saf.graphql
 
+import no.nav.klage.oppgave.config.CacheWithJCacheConfiguration
 import no.nav.klage.oppgave.util.TokenUtil
 import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getSecureLogger
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.HttpHeaders
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
@@ -70,6 +72,17 @@ class SafGraphQlClient(
             getJournalpostWithToken(journalpostId, token)
         }
     }
+
+    @Cacheable(CacheWithJCacheConfiguration.GROUPMEMBERS_CACHE)
+    @Retryable
+    fun getCacheableJournalpostAsSystembruker(journalpostId: String): Journalpost {
+        return runWithTimingAndLogging {
+            //TODO: Vurder enklere query
+            val token = tokenUtil.getAppAccessTokenWithSafScope()
+            getJournalpostWithToken(journalpostId, token)
+        }
+    }
+
 
     private fun getJournalpostWithToken(journalpostId: String, token: String) = safWebClient.post()
         .uri("graphql")

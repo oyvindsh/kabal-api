@@ -65,24 +65,25 @@ class KabalDocumentMapper(
             vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
                 .sortedWith { document1, document2 ->
                     val journalpostInDokarkiv1 =
-                        safClient.getJournalpostAsSystembruker(document1.journalfoertDokumentReference!!.journalpostId)
+                        safClient.getCacheableJournalpostAsSystembruker(document1.journalfoertDokumentReference!!.journalpostId)
 
                     val journalpostInDokarkiv2 =
-                        safClient.getJournalpostAsSystembruker(document2.journalfoertDokumentReference!!.journalpostId)
-
-                    val dokumentInDokarkiv1 =
-                        journalpostInDokarkiv1.dokumenter?.find { it.dokumentInfoId == document1.journalfoertDokumentReference.dokumentInfoId }
-                            ?: throw RuntimeException("Document not found in Dokarkiv")
-
-                    val dokumentInDokarkiv2 =
-                        journalpostInDokarkiv2.dokumenter?.find { it.dokumentInfoId == document2.journalfoertDokumentReference.dokumentInfoId }
-                            ?: throw RuntimeException("Document not found in Dokarkiv")
+                        safClient.getCacheableJournalpostAsSystembruker(document2.journalfoertDokumentReference!!.journalpostId)
 
                     val dateCompare =
                         journalpostInDokarkiv2.datoOpprettet.compareTo(journalpostInDokarkiv1.datoOpprettet)
+
                     if (dateCompare != 0) {
                         dateCompare
                     } else {
+                        val dokumentInDokarkiv1 =
+                            journalpostInDokarkiv1.dokumenter?.find { it.dokumentInfoId == document1.journalfoertDokumentReference.dokumentInfoId }
+                                ?: throw RuntimeException("Document not found in Dokarkiv")
+
+                        val dokumentInDokarkiv2 =
+                            journalpostInDokarkiv2.dokumenter?.find { it.dokumentInfoId == document2.journalfoertDokumentReference.dokumentInfoId }
+                                ?: throw RuntimeException("Document not found in Dokarkiv")
+
                         (dokumentInDokarkiv1.tittel ?: "Tittel ikke funnet i SAF").compareTo(
                             dokumentInDokarkiv2.tittel ?: "Tittel ikke funnet i SAF"
                         )

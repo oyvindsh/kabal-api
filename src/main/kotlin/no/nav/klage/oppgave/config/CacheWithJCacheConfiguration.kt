@@ -24,9 +24,10 @@ class CacheWithJCacheConfiguration(private val environment: Environment) : JCach
         const val SAKSBEHANDLERE_I_ENHET_CACHE = "saksbehandlereienhet"
         const val ANSATTE_I_ENHET_CACHE = "ansatteienhet"
         const val GROUPMEMBERS_CACHE = "groupmembers"
+        const val JOURNALPOST_CACHE = "journalpost"
 
         val cacheKeys =
-            listOf(ENHET_CACHE, TILGANGER_CACHE, ROLLER_CACHE, SAKSBEHANDLERE_I_ENHET_CACHE, GROUPMEMBERS_CACHE)
+            listOf(ENHET_CACHE, TILGANGER_CACHE, ROLLER_CACHE, SAKSBEHANDLERE_I_ENHET_CACHE, GROUPMEMBERS_CACHE, JOURNALPOST_CACHE)
 
         @Suppress("JAVA_CLASS_ON_COMPANION")
         private val logger = getLogger(javaClass.enclosingClass)
@@ -35,10 +36,16 @@ class CacheWithJCacheConfiguration(private val environment: Environment) : JCach
     override fun customize(cacheManager: CacheManager) {
         cacheKeys.forEach { cacheName ->
             //Always cache for a long time.
-            if (cacheName == ENHET_CACHE) {
-                cacheManager.createCache(cacheName, cacheConfiguration(Duration(TimeUnit.HOURS, 8L)))
-            } else {
-                cacheManager.createCache(cacheName, cacheConfiguration(standardDuration()))
+            when (cacheName) {
+                ENHET_CACHE -> {
+                    cacheManager.createCache(cacheName, cacheConfiguration(Duration(TimeUnit.HOURS, 8L)))
+                }
+                JOURNALPOST_CACHE -> {
+                    cacheManager.createCache(cacheName, cacheConfiguration(Duration(TimeUnit.MINUTES, 5L)))
+                }
+                else -> {
+                    cacheManager.createCache(cacheName, cacheConfiguration(standardDuration()))
+                }
             }
         }
     }
