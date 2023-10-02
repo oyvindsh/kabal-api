@@ -330,6 +330,8 @@ class BehandlingMapper(
     fun Behandling.mapToVedtakView(): VedtakView {
         return VedtakView(
             id = id,
+            //TODO remove "first()"
+            utfallId = if (utfallSet.isEmpty()) null else utfallSet.first().id,
             utfallIdSet = utfallSet.map { it.id }.toSet(),
             hjemmelIdSet = registreringshjemler.map { it.id }.toSet(),
         )
