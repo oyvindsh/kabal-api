@@ -15,14 +15,14 @@ import java.util.*
 @DiscriminatorValue("smartdokument")
 class SmartdokumentUnderArbeid(
     @Column(name = "size")
-    var size: Long?,
+    override var size: Long?,
     @Column(name = "smarteditor_id")
-    var smartEditorId: UUID?,
+    override val smartEditorId: UUID,
     @Column(name = "smarteditor_template_id")
-    var smartEditorTemplateId: String?,
+    override var smartEditorTemplateId: String,
     @Column(name = "dokument_type_id")
     @Convert(converter = DokumentTypeConverter::class)
-    var dokumentType: DokumentType?,
+    override var dokumentType: DokumentType,
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
     @ElementCollection
@@ -32,16 +32,17 @@ class SmartdokumentUnderArbeid(
         joinColumns = [JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)]
     )
     @Column(name="identifikator")
-    var brevmottakerIdents: Set<String> = setOf(),
+    override var brevmottakerIdents: Set<String> = setOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
     val journalposter: MutableSet<DokumentUnderArbeidJournalpostId> = mutableSetOf(),
+    @Column(name = "mellomlager_id")
+    override var mellomlagerId: String?,
 
     //Common properties
     id: UUID = UUID.randomUUID(),
-    mellomlagerId: String?,
     name: String,
     behandlingId: UUID,
     created: LocalDateTime,
@@ -49,12 +50,10 @@ class SmartdokumentUnderArbeid(
     markertFerdig: LocalDateTime?,
     markertFerdigBy: String?,
     ferdigstilt: LocalDateTime?,
-    parentId: UUID?,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-) : DokumentUnderArbeid(
+) : DokumentUnderArbeidAsSmartdokument, DokumentUnderArbeidWithHoveddokumentCharacteristics, DokumentUnderArbeid(
     id = id,
-    mellomlagerId = mellomlagerId,
     name = name,
     behandlingId = behandlingId,
     created = created,
@@ -62,7 +61,6 @@ class SmartdokumentUnderArbeid(
     markertFerdig = markertFerdig,
     markertFerdigBy = markertFerdigBy,
     ferdigstilt = ferdigstilt,
-    parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
 )

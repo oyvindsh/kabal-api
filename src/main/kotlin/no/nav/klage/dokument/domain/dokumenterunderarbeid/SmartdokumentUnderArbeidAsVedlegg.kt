@@ -1,25 +1,25 @@
 package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
-import jakarta.persistence.Column
-import jakarta.persistence.DiscriminatorValue
-import jakarta.persistence.Entity
+import jakarta.persistence.*
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import java.time.LocalDateTime
 import java.util.*
 
+
 @Entity
-@DiscriminatorValue("journalfoertdokument")
-class JournalfoertDokumentUnderArbeid (
-    @Column(name = "opprettet")
-    var opprettet: LocalDateTime,
-    @Column(name = "journalfoert_dokument_journalpost_id")
-    val journalpostId: String,
-    @Column(name = "journalfoert_dokument_dokument_info_id")
-    val dokumentInfoId: String,
+@DiscriminatorValue("smartdokument_vedlegg")
+class SmartdokumentUnderArbeidAsVedlegg(
+    @Column(name = "size")
+    override var size: Long?,
+    @Column(name = "smarteditor_id")
+    override val smartEditorId: UUID,
+    @Column(name = "smarteditor_template_id")
+    override var smartEditorTemplateId: String,
+    @Column(name = "mellomlager_id")
+    override var mellomlagerId: String?,
 
     //Common properties
     id: UUID = UUID.randomUUID(),
-    mellomlagerId: String?,
     name: String,
     behandlingId: UUID,
     created: LocalDateTime,
@@ -27,12 +27,11 @@ class JournalfoertDokumentUnderArbeid (
     markertFerdig: LocalDateTime?,
     markertFerdigBy: String?,
     ferdigstilt: LocalDateTime?,
-    parentId: UUID?,
+    parentId: UUID,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-) : DokumentUnderArbeid(
+) : DokumentUnderArbeidAsSmartdokument, DokumentUnderArbeidAsVedlegg(
     id = id,
-    mellomlagerId = mellomlagerId,
     name = name,
     behandlingId = behandlingId,
     created = created,

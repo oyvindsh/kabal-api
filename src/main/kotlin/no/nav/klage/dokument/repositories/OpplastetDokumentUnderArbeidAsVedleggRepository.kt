@@ -1,0 +1,17 @@
+package no.nav.klage.dokument.repositories
+
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.OpplastetDokumentUnderArbeidAsVedlegg
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
+
+@Transactional
+interface OpplastetDokumentUnderArbeidAsVedleggRepository : JpaRepository<OpplastetDokumentUnderArbeidAsVedlegg, UUID> {
+
+    fun findByParentIdOrderByCreated(dokumentId: UUID): SortedSet<OpplastetDokumentUnderArbeidAsVedlegg>
+
+    fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<OpplastetDokumentUnderArbeidAsVedlegg>
+
+    fun findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId: UUID): SortedSet<OpplastetDokumentUnderArbeidAsVedlegg>
+}
+

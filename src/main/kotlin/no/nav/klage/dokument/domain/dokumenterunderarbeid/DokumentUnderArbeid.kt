@@ -11,11 +11,9 @@ import java.util.*
 @Table(name = "dokument_under_arbeid", schema = "klage")
 @DynamicUpdate
 @DiscriminatorColumn(name = "dokument_under_arbeid_type")
-open class DokumentUnderArbeid(
+abstract class DokumentUnderArbeid(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(name = "mellomlager_id")
-    open var mellomlagerId: String?,
     @Column(name = "name")
     open var name: String,
     @Column(name = "behandling_id")
@@ -30,8 +28,6 @@ open class DokumentUnderArbeid(
     open var markertFerdigBy: String? = null,
     @Column(name = "ferdigstilt")
     open var ferdigstilt: LocalDateTime? = null,
-    @Column(name = "parent_id")
-    open var parentId: UUID? = null,
     @Column(name = "creator_ident")
     open var creatorIdent: String,
     @Column(name = "creator_role")

@@ -190,7 +190,7 @@ class DokumentUnderArbeidController(
             return if (input.dokumentId == null) {
                 dokumentMapper.mapToDokumentListView(
                     dokumentUnderArbeidList = listOf(
-                        dokumentUnderArbeidService.frikobleVedlegg(
+                        dokumentUnderArbeidService.setAsHoveddokument(
                             behandlingId = behandlingId,
                             dokumentId = persistentDokumentId,
                             innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -200,7 +200,7 @@ class DokumentUnderArbeidController(
                 )
             } else {
                 val (alteredDocuments, duplicateJournalfoerteDokumenter) =
-                    dokumentUnderArbeidService.setParentDocument(
+                    dokumentUnderArbeidService.setAsVedlegg(
                         parentId = input.dokumentId,
                         dokumentId = persistentDokumentId,
                         innloggetIdent = innloggetSaksbehandlerService.getInnloggetIdent()
@@ -239,6 +239,7 @@ class DokumentUnderArbeidController(
         @PathVariable("behandlingId") behandlingId: UUID,
         @PathVariable("dokumentid") dokumentId: UUID,
     ): List<DocumentValidationResponse> {
+        //TODO only called for hoveddokumenter?
         return dokumentUnderArbeidService.validateSmartDokument(dokumentId)
     }
 

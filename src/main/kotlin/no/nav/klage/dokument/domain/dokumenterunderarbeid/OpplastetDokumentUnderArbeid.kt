@@ -18,7 +18,7 @@ class OpplastetDokumentUnderArbeid(
     var size: Long?,
     @Column(name = "dokument_type_id")
     @Convert(converter = DokumentTypeConverter::class)
-    var dokumentType: DokumentType?,
+    override var dokumentType: DokumentType,
 
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
@@ -29,16 +29,17 @@ class OpplastetDokumentUnderArbeid(
         joinColumns = [JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)]
     )
     @Column(name="identifikator")
-    var brevmottakerIdents: Set<String> = setOf(),
+    override var brevmottakerIdents: Set<String> = setOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
     val journalposter: MutableSet<DokumentUnderArbeidJournalpostId> = mutableSetOf(),
+    @Column(name = "mellomlager_id")
+    override var mellomlagerId: String?,
 
     //Common properties
     id: UUID = UUID.randomUUID(),
-    mellomlagerId: String?,
     name: String,
     behandlingId: UUID,
     created: LocalDateTime,
@@ -46,12 +47,10 @@ class OpplastetDokumentUnderArbeid(
     markertFerdig: LocalDateTime?,
     markertFerdigBy: String?,
     ferdigstilt: LocalDateTime?,
-    parentId: UUID?,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-) : DokumentUnderArbeid(
+) : DokumentUnderArbeidAsMellomlagret, DokumentUnderArbeidWithHoveddokumentCharacteristics, DokumentUnderArbeid(
     id = id,
-    mellomlagerId = mellomlagerId,
     name = name,
     behandlingId = behandlingId,
     created = created,
@@ -59,7 +58,6 @@ class OpplastetDokumentUnderArbeid(
     markertFerdig = markertFerdig,
     markertFerdigBy = markertFerdigBy,
     ferdigstilt = ferdigstilt,
-    parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
 )

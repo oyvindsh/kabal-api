@@ -7,11 +7,10 @@ import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.DefaultKabalSmartEditorApiGateway
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.PDFDocument
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidJournalpostId
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.*
 import no.nav.klage.dokument.exceptions.DokumentValidationException
 import no.nav.klage.dokument.exceptions.JsonToPdfValidationException
-import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
+import no.nav.klage.dokument.repositories.*
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.kodeverk.Template
@@ -42,6 +41,11 @@ import java.util.*
 @Transactional
 class DokumentUnderArbeidService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
+    private val opplastetDokumentUnderArbeidRepository: OpplastetDokumentUnderArbeidRepository,
+    private val opplastetDokumentUnderArbeidAsVedleggRepository: OpplastetDokumentUnderArbeidAsVedleggRepository,
+    private val smartDokumentUnderArbeidRepository: SmartdokumentUnderArbeidRepository,
+    private val smartDokumentUnderArbeidAsVedleggRepository: SmartdokumentUnderArbeidAsVedleggRepository,
+    private val journalfoertDokumentUnderArbeidRepository: JournalfoertDokumentUnderArbeidAsVedleggRepository,
     private val attachmentValidator: MellomlagretDokumentValidatorService,
     private val mellomlagerService: MellomlagerService,
     private val smartEditorApiGateway: DefaultKabalSmartEditorApiGateway,
@@ -87,22 +91,43 @@ class DokumentUnderArbeidService(
         attachmentValidator.validateAttachment(opplastetFil)
         val mellomlagerId = mellomlagerService.uploadDocument(opplastetFil)
 
-        val document = dokumentUnderArbeidRepository.save(
-            DokumentUnderArbeid(
-                mellomlagerId = mellomlagerId,
-                opplastet = LocalDateTime.now(),
-                size = opplastetFil.content.size.toLong(),
-                name = tittel,
-                dokumentType = dokumentType,
-                behandlingId = behandlingId,
-                smartEditorId = null,
-                smartEditorTemplateId = null,
-                journalfoertDokumentReference = null,
-                creatorIdent = innloggetIdent,
-                creatorRole = behandlingRole,
-                parentId = parentId,
+        val now = LocalDateTime.now()
+
+        val document = if (parentId == null) {
+            opplastetDokumentUnderArbeidRepository.save(
+                OpplastetDokumentUnderArbeid(
+                    mellomlagerId = mellomlagerId,
+                    size = opplastetFil.content.size.toLong(),
+                    name = tittel,
+                    dokumentType = dokumentType,
+                    behandlingId = behandlingId,
+                    creatorIdent = innloggetIdent,
+                    creatorRole = behandlingRole,
+                    created = now,
+                    modified = now,
+                    markertFerdig = null,
+                    markertFerdigBy = null,
+                    ferdigstilt = null,
+                )
             )
-        )
+        } else {
+            opplastetDokumentUnderArbeidAsVedleggRepository.save(
+                OpplastetDokumentUnderArbeidAsVedlegg(
+                    mellomlagerId = mellomlagerId,
+                    size = opplastetFil.content.size.toLong(),
+                    name = tittel,
+                    behandlingId = behandlingId,
+                    creatorIdent = innloggetIdent,
+                    creatorRole = behandlingRole,
+                    parentId = parentId,
+                    created = now,
+                    modified = now,
+                    markertFerdig = null,
+                    markertFerdigBy = null,
+                    ferdigstilt = null,
+                )
+            )
+        }
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
@@ -119,7 +144,7 @@ class DokumentUnderArbeidService(
         behandlingId: UUID,
         dokumentType: DokumentType,
         json: String?,
-        smartEditorTemplateId: String?,
+        smartEditorTemplateId: String,
         innloggetIdent: String,
         tittel: String,
         parentId: UUID?,
@@ -145,32 +170,57 @@ class DokumentUnderArbeidService(
                 documentTitle = tittel
             )
 
-        val hovedDokument = dokumentUnderArbeidRepository.save(
-            DokumentUnderArbeid(
-                mellomlagerId = null,
-                opplastet = null,
-                size = null,
-                name = tittel,
-                dokumentType = dokumentType,
-                behandlingId = behandlingId,
-                smartEditorId = smartEditorDocumentId,
-                smartEditorTemplateId = smartEditorTemplateId,
-                journalfoertDokumentReference = null,
-                creatorIdent = innloggetIdent,
-                creatorRole = behandlingRole,
-                parentId = parentId,
+        val now = LocalDateTime.now()
+
+        val document = if (parentId == null) {
+            smartDokumentUnderArbeidRepository.save(
+                SmartdokumentUnderArbeid(
+                    mellomlagerId = null,
+                    size = null,
+                    name = tittel,
+                    dokumentType = dokumentType,
+                    behandlingId = behandlingId,
+                    smartEditorId = smartEditorDocumentId,
+                    smartEditorTemplateId = smartEditorTemplateId,
+                    creatorIdent = innloggetIdent,
+                    creatorRole = behandlingRole,
+                    created = now,
+                    modified = now,
+                    markertFerdig = null,
+                    markertFerdigBy = null,
+                    ferdigstilt = null,
+                )
             )
-        )
+        } else {
+            smartDokumentUnderArbeidAsVedleggRepository.save(
+                SmartdokumentUnderArbeidAsVedlegg(
+                    mellomlagerId = null,
+                    size = null,
+                    name = tittel,
+                    behandlingId = behandlingId,
+                    smartEditorId = smartEditorDocumentId,
+                    smartEditorTemplateId = smartEditorTemplateId,
+                    creatorIdent = innloggetIdent,
+                    creatorRole = behandlingRole,
+                    parentId = parentId,
+                    created = now,
+                    modified = now,
+                    markertFerdig = null,
+                    markertFerdigBy = null,
+                    ferdigstilt = null,
+                )
+            )
+        }
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.SMARTDOKUMENT_OPPRETTET,
             fraVerdi = null,
-            tilVerdi = hovedDokument.created.toString(),
-            tidspunkt = hovedDokument.created,
-            dokumentId = hovedDokument.id,
+            tilVerdi = document.created.toString(),
+            tidspunkt = document.created,
+            dokumentId = document.id,
         )
 
-        return hovedDokument
+        return document
     }
 
     fun createJournalfoerteDokumenter(
@@ -201,12 +251,13 @@ class DokumentUnderArbeidService(
         }
 
         val alreadyAddedDocuments =
-            dokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceIsNotNull(parentId).map {
-                JournalfoertDokumentReference(
-                    journalpostId = it.journalfoertDokumentReference!!.journalpostId,
-                    dokumentInfoId = it.journalfoertDokumentReference.dokumentInfoId
-                )
-            }.toSet()
+            journalfoertDokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceIsNotNull(parentId)
+                .map {
+                    JournalfoertDokumentReference(
+                        journalpostId = it.journalpostId,
+                        dokumentInfoId = it.dokumentInfoId
+                    )
+                }.toSet()
 
         val (toAdd, duplicates) = journalfoerteDokumenter.partition { it !in alreadyAddedDocuments }
 
@@ -217,26 +268,26 @@ class DokumentUnderArbeidService(
             parentDocument = parentDocument
         )
 
+        val now = LocalDateTime.now()
+
         val resultingDocuments = toAdd.map { journalfoertDokumentReference ->
             val journalpostInDokarkiv =
                 safClient.getJournalpostAsSaksbehandler(journalfoertDokumentReference.journalpostId)
 
-            val document = DokumentUnderArbeid(
-                mellomlagerId = null,
-                opplastet = journalpostInDokarkiv.datoOpprettet,
-                size = null,
-                name = "Hentes fra SAF",
-                dokumentType = null,
+            val document = JournalfoertDokumentUnderArbeidAsVedlegg(
+                name = "TODO / Hentes fra SAF",
                 behandlingId = behandlingId,
-                smartEditorId = null,
-                smartEditorTemplateId = null,
                 parentId = parentId,
-                journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
-                    journalpostId = journalfoertDokumentReference.journalpostId,
-                    dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
-                ),
+                journalpostId = journalfoertDokumentReference.journalpostId,
+                dokumentInfoId = journalfoertDokumentReference.dokumentInfoId,
                 creatorIdent = innloggetIdent,
-                creatorRole = behandlingRole
+                creatorRole = behandlingRole,
+                opprettet = journalpostInDokarkiv.datoOpprettet,
+                created = now,
+                modified = now,
+                markertFerdig = null,
+                markertFerdigBy = null,
+                ferdigstilt = null,
             )
 
             behandling.publishEndringsloggEvent(
@@ -248,7 +299,7 @@ class DokumentUnderArbeidService(
                 dokumentId = document.id,
             )
 
-            dokumentUnderArbeidRepository.save(
+            journalfoertDokumentUnderArbeidRepository.save(
                 document
             )
         }
@@ -274,7 +325,7 @@ class DokumentUnderArbeidService(
         }
 
         if (parentDocument != null && behandlingRole == BehandlingRole.KABAL_ROL) {
-            if (parentDocument.smartEditorTemplateId != Template.ROL_QUESTIONS.id) {
+            if (!(parentDocument is SmartdokumentUnderArbeidAsVedlegg && parentDocument.smartEditorTemplateId == Template.ROL_QUESTIONS.id)) {
                 throw MissingTilgangException("ROL kan ikke opprette vedlegg til dette hoveddokumentet.")
             }
         }
@@ -294,7 +345,7 @@ class DokumentUnderArbeidService(
         //Sjekker tilgang på behandlingsnivå:
         val behandling = behandlingService.getBehandlingForUpdate(dokumentUnderArbeid.behandlingId)
 
-        if (dokumentUnderArbeid.parentId != null) {
+        if (dokumentUnderArbeid.isVedlegg()) {
             //Vi skal ikke kunne endre dokumentType på vedlegg
             throw DokumentValidationException("Man kan ikke endre dokumentType på vedlegg")
         }
@@ -303,19 +354,31 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
         }
 
+        if (dokumentUnderArbeid !is DokumentUnderArbeidWithHoveddokumentCharacteristics) {
+            throw RuntimeException("dokumentType cannot be set for this type of document.")
+        }
+
         val previousValue = dokumentUnderArbeid.dokumentType
         dokumentUnderArbeid.dokumentType = dokumentType
+
         dokumentUnderArbeid.modified = LocalDateTime.now()
+
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_TYPE,
-            fraVerdi = previousValue?.id,
+            fraVerdi = previousValue.id,
             tilVerdi = dokumentUnderArbeid.modified.toString(),
             tidspunkt = dokumentUnderArbeid.modified,
             dokumentId = dokumentUnderArbeid.id,
         )
 
         return dokumentUnderArbeid
+    }
+
+    private fun DokumentUnderArbeid.isVedlegg(): Boolean {
+        return this is SmartdokumentUnderArbeidAsVedlegg ||
+                this is OpplastetDokumentUnderArbeidAsVedlegg ||
+                this is JournalfoertDokumentUnderArbeidAsVedlegg
     }
 
     fun updateDokumentTitle(
@@ -405,6 +468,10 @@ class DokumentUnderArbeidService(
     ): DokumentUnderArbeid {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
+        if (dokument !is DokumentUnderArbeidAsSmartdokument) {
+            throw RuntimeException("Not a smartdocument")
+        }
+
         if (dokument.smartEditorTemplateId == templateId) {
             return dokument
         }
@@ -437,6 +504,10 @@ class DokumentUnderArbeidService(
     ): DokumentUnderArbeid {
         val dokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
 
+        if (dokument !is DokumentUnderArbeidWithJournalposter) {
+            throw RuntimeException("this document does not support journalposter.")
+        }
+
         val behandling = behandlingService.getBehandlingForUpdateBySystembruker(behandlingId)
 
         val oldValue = dokument.journalposter
@@ -460,23 +531,23 @@ class DokumentUnderArbeidService(
     ): List<DocumentValidationResponse> {
         val documentValidationResults = mutableListOf<DocumentValidationResponse>()
 
-        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        val hovedDokument = smartDokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
-        if (hovedDokument.smartEditorId != null) {
-            documentValidationResults += validateSingleDocument(hovedDokument)
-        }
+
+        documentValidationResults += validateSingleSmartdocument(hovedDokument)
+
         vedlegg.forEach {
-            if (it.smartEditorId != null) {
-                documentValidationResults += validateSingleDocument(it)
+            if (it is SmartdokumentUnderArbeidAsVedlegg) {
+                documentValidationResults += validateSingleSmartdocument(it)
             }
         }
 
         return documentValidationResults
     }
 
-    private fun validateSingleDocument(dokument: DokumentUnderArbeid): DocumentValidationResponse {
+    private fun validateSingleSmartdocument(dokument: DokumentUnderArbeidAsSmartdokument): DocumentValidationResponse {
         logger.debug("Getting json document, dokumentId: {}", dokument.id)
-        val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
+        val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId)
         logger.debug("Validating json document in kabalJsontoPdf, dokumentId: {}", dokument.id)
         val response = kabalJsonToPdfClient.validateJsonDocument(documentJson)
         return DocumentValidationResponse(
@@ -497,20 +568,25 @@ class DokumentUnderArbeidService(
         brevmottakerIdents: Set<String>?,
     ): DokumentUnderArbeid {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
+
+        if (hovedDokument !is DokumentUnderArbeidWithHoveddokumentCharacteristics) {
+            throw RuntimeException("document is not hoveddokument")
+        }
+
         val behandling = behandlingService.getBehandlingForUpdate(hovedDokument.behandlingId)
 
-        validateBeforeFerdig(
+        validateHoveddokumentBeforeFerdig(
             brevmottakerIdents = brevmottakerIdents,
             hovedDokument = hovedDokument,
             behandling = behandling,
         )
         val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
 
-        if (hovedDokument.smartEditorId != null && hovedDokument.isStaleSmartEditorDokument()) {
+        if (hovedDokument is SmartdokumentUnderArbeid && hovedDokument.isStaleSmartEditorDokument()) {
             mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(hovedDokument)
         }
         vedlegg.forEach {
-            if (it.smartEditorId != null && it.isStaleSmartEditorDokument()) {
+            if (it is SmartdokumentUnderArbeidAsVedlegg && it.isStaleSmartEditorDokument()) {
                 mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(it)
             }
         }
@@ -520,7 +596,7 @@ class DokumentUnderArbeidService(
         val mapBrevmottakerIdentToBrevmottakerInput = kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
             behandling = behandling,
             brevmottakerIdents = brevmottakerIdents,
-            dokumentType = hovedDokument.dokumentType!!
+            dokumentType = hovedDokument.dokumentType
         )
         hovedDokument.brevmottakerIdents = mapBrevmottakerIdentToBrevmottakerInput.map {
             it.partId.value
@@ -555,11 +631,19 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
-    private fun validateBeforeFerdig(
+    private fun validateHoveddokumentBeforeFerdig(
         brevmottakerIdents: Set<String>?,
         hovedDokument: DokumentUnderArbeid,
         behandling: Behandling,
     ) {
+        if (hovedDokument !is DokumentUnderArbeidWithHoveddokumentCharacteristics) {
+            throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
+        }
+
+        if (hovedDokument.erMarkertFerdig() || hovedDokument.erFerdigstilt()) {
+            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
+        }
+
         val documentValidationErrors = validateSmartDokument(hovedDokument.id)
         if (documentValidationErrors.any { it.errors.isNotEmpty() }) {
             throw JsonToPdfValidationException(
@@ -568,26 +652,17 @@ class DokumentUnderArbeidService(
             )
         }
 
+        val invalidProperties = mutableListOf<InvalidProperty>()
+
         if (hovedDokument.dokumentType != DokumentType.NOTAT && brevmottakerIdents.isNullOrEmpty()) {
             throw DokumentValidationException("Brevmottakere må være satt")
         }
 
-        if (hovedDokument.erMarkertFerdig() || hovedDokument.erFerdigstilt()) {
-            throw DokumentValidationException("Kan ikke endre dokumenttype på et dokument som er ferdigstilt")
-        }
-
-        if (hovedDokument.parentId != null) {
-            throw DokumentValidationException("Kan ikke markere et vedlegg som ferdig")
-        }
-
-
         val mottakere = kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
             behandling = behandling,
             brevmottakerIdents = brevmottakerIdents,
-            dokumentType = hovedDokument.dokumentType!!
+            dokumentType = hovedDokument.dokumentType
         )
-
-        val invalidProperties = mutableListOf<InvalidProperty>()
 
         //Could ignore NOTAT here. We'll see.
         mottakere.forEach { mottaker ->
@@ -646,23 +721,31 @@ class DokumentUnderArbeidService(
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(dokument.behandlingId)
 
-        val (content, title) = when (dokument.getType()) {
-            DokumentUnderArbeid.DokumentUnderArbeidType.UPLOADED -> {
+        val (content, title) = when (dokument) {
+            is OpplastetDokumentUnderArbeid -> {
                 mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!) to dokument.name
             }
 
-            DokumentUnderArbeid.DokumentUnderArbeidType.SMART -> {
+            is OpplastetDokumentUnderArbeidAsVedlegg -> {
+                mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!) to dokument.name
+            }
+
+            is DokumentUnderArbeidAsSmartdokument -> {
                 if (dokument.isStaleSmartEditorDokument()) {
                     mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(dokument).bytes to dokument.name
                 } else mellomlagerService.getUploadedDocument(dokument.mellomlagerId!!) to dokument.name
             }
 
-            DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT -> {
+            is JournalfoertDokumentUnderArbeidAsVedlegg -> {
                 val fysiskDokument = dokumentService.getFysiskDokument(
-                    journalpostId = dokument.journalfoertDokumentReference!!.journalpostId,
-                    dokumentInfoId = dokument.journalfoertDokumentReference.dokumentInfoId,
+                    journalpostId = dokument.journalpostId,
+                    dokumentInfoId = dokument.dokumentInfoId,
                 )
                 fysiskDokument.content to fysiskDokument.title
+            }
+
+            else -> {
+                error("can't come here")
             }
         }
 
@@ -684,53 +767,67 @@ class DokumentUnderArbeidService(
             behandlingId = document.behandlingId,
         )
 
-        val descendants = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(document.id)
-
-        val documents = descendants.plus(document)
-
-        val behandlingRole = behandling.getRoleInBehandling(innloggetIdent)
-
-        documents.forEach { currentDocument ->
-            if (currentDocument.creatorRole != behandlingRole) {
-                throw MissingTilgangException("$behandlingRole har ikke anledning til å slette dokumentet eiet av ${currentDocument.creatorRole}.")
+        smartDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(dokumentId)
+            .plus(opplastetDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(dokumentId))
+            .plus(journalfoertDokumentUnderArbeidRepository.findByParentIdOrderByCreated(dokumentId))
+            .plus(document)
+            .map {
+                if (document.erMarkertFerdig()) {
+                    throw MissingTilgangException("Attempting to delete finalized document ${document.id}")
+                }
+                document
             }
+            .forEach { dokumentUnderArbeid ->
+                slettEnkeltdokument(
+                    document = dokumentUnderArbeid,
+                    innloggetIdent = innloggetIdent,
+                    behandlingRole = behandling.getRoleInBehandling(innloggetIdent),
+                    behandling = behandling,
+                )
+            }
+    }
+
+    private fun slettEnkeltdokument(
+        document: DokumentUnderArbeid,
+        innloggetIdent: String,
+        behandlingRole: BehandlingRole,
+        behandling: Behandling,
+    ) {
+        if (document.creatorRole != behandlingRole) {
+            throw MissingTilgangException("$behandlingRole har ikke anledning til å slette dokumentet eiet av ${document.creatorRole}.")
         }
 
-        documents.forEach { currentDocument ->
-            if (currentDocument.erMarkertFerdig()) {
-                logger.warn("Attempting to delete finalized document {}", currentDocument.id)
-            }
-
+        if (document is DokumentUnderArbeidAsMellomlagret) {
             try {
-                if (currentDocument.smartEditorId != null) {
-                    smartEditorApiGateway.deleteDocument(currentDocument.smartEditorId!!)
-                }
-            } catch (e: Exception) {
-                logger.warn("Couldn't delete smartEditor document", e)
-            }
-
-            try {
-                if (currentDocument.mellomlagerId != null) {
-                    mellomlagerService.deleteDocument(currentDocument.mellomlagerId!!)
+                if (document.mellomlagerId != null) {
+                    mellomlagerService.deleteDocument(document.mellomlagerId!!)
                 }
             } catch (e: Exception) {
                 logger.warn("Couldn't delete mellomlager document", e)
             }
-
-            dokumentUnderArbeidRepository.delete(currentDocument)
-
-            behandling.publishEndringsloggEvent(
-                saksbehandlerident = innloggetIdent,
-                felt = Felt.DOKUMENT_UNDER_ARBEID_OPPLASTET,
-                fraVerdi = currentDocument.opplastet.toString(),
-                tilVerdi = null,
-                tidspunkt = LocalDateTime.now(),
-                dokumentId = currentDocument.id,
-            )
         }
+
+        if (document is DokumentUnderArbeidAsSmartdokument) {
+            try {
+                smartEditorApiGateway.deleteDocument(document.smartEditorId)
+            } catch (e: Exception) {
+                logger.warn("Couldn't delete smartEditor document", e)
+            }
+        }
+
+        dokumentUnderArbeidRepository.delete(document)
+
+        behandling.publishEndringsloggEvent(
+            saksbehandlerident = innloggetIdent,
+            felt = Felt.DOKUMENT_UNDER_ARBEID_SLETTET,
+            fraVerdi = document.modified.toString(),
+            tilVerdi = null,
+            tidspunkt = LocalDateTime.now(),
+            dokumentId = document.id,
+        )
     }
 
-    fun setParentDocument(
+    fun setAsVedlegg(
         parentId: UUID,
         dokumentId: UUID,
         innloggetIdent: String
@@ -807,7 +904,7 @@ class DokumentUnderArbeidService(
         }
     }
 
-    fun frikobleVedlegg(
+    fun setAsHoveddokument(
         behandlingId: UUID,
         dokumentId: UUID,
         innloggetIdent: String
@@ -824,9 +921,63 @@ class DokumentUnderArbeidService(
             throw DokumentValidationException("Kan ikke frikoble et dokument som er ferdigstilt")
         }
 
-        vedlegg.parentId = null
+        val savedDocument = when (vedlegg) {
+            is OpplastetDokumentUnderArbeidAsVedlegg -> {
+                val new = opplastetDokumentUnderArbeidRepository.save(
+                    OpplastetDokumentUnderArbeid(
+                        size = vedlegg.size,
+                        dokumentType = DokumentType.BREV, //TODO default? UI fix?
+                        dokumentEnhetId = null,
+                        brevmottakerIdents = setOf(),
+                        journalposter = mutableSetOf(),
+                        mellomlagerId = vedlegg.mellomlagerId,
+                        name = vedlegg.name,
+                        behandlingId = vedlegg.behandlingId,
+                        created = vedlegg.created,
+                        modified = vedlegg.modified,
+                        markertFerdig = null,
+                        markertFerdigBy = null,
+                        ferdigstilt = null,
+                        creatorIdent = vedlegg.creatorIdent,
+                        creatorRole = vedlegg.creatorRole,
+                    )
+                )
+                opplastetDokumentUnderArbeidAsVedleggRepository.delete(vedlegg)
+                new
+            }
 
-        return vedlegg
+            is SmartdokumentUnderArbeidAsVedlegg -> {
+                val new = smartDokumentUnderArbeidRepository.save(
+                    SmartdokumentUnderArbeid(
+                        size = vedlegg.size,
+                        smartEditorId = vedlegg.smartEditorId,
+                        smartEditorTemplateId = vedlegg.smartEditorTemplateId,
+                        dokumentType = DokumentType.BREV, //TODO default or UI fix?
+                        dokumentEnhetId = null,
+                        brevmottakerIdents = setOf(),
+                        journalposter = mutableSetOf(),
+                        mellomlagerId = vedlegg.mellomlagerId,
+                        name = vedlegg.name,
+                        behandlingId = vedlegg.behandlingId,
+                        created = vedlegg.created,
+                        modified = vedlegg.modified,
+                        markertFerdig = null,
+                        markertFerdigBy = null,
+                        ferdigstilt = null,
+                        creatorIdent = vedlegg.creatorIdent,
+                        creatorRole = vedlegg.creatorRole,
+                    )
+                )
+                smartDokumentUnderArbeidAsVedleggRepository.delete(vedlegg)
+                new
+            }
+
+            else -> {
+                error("Document could not be set as hoveddokument")
+            }
+        }
+
+        return savedDocument
     }
 
     fun findDokumenterNotFinished(behandlingId: UUID, checkReadAccess: Boolean = true): List<DokumentUnderArbeid> {
@@ -842,7 +993,7 @@ class DokumentUnderArbeidService(
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 
-        return dokumentUnderArbeidRepository.findByBehandlingIdAndSmartEditorIdNotNullAndMarkertFerdigIsNullOrderByCreated(
+        return smartDokumentUnderArbeidRepository.findByBehandlingIdAndSmartEditorIdNotNullAndMarkertFerdigIsNullOrderByCreated(
             behandlingId
         )
     }
@@ -916,6 +1067,10 @@ class DokumentUnderArbeidService(
         val dokumentUnderArbeid = dokumentUnderArbeidRepository.getReferenceById(dokumentId)
         val ident = innloggetSaksbehandlerService.getInnloggetIdent()
 
+        if (dokumentUnderArbeid !is DokumentUnderArbeidAsSmartdokument) {
+            throw RuntimeException("dokument is not smartdokument")
+        }
+
         //Sjekker tilgang på behandlingsnivå:
         if (readOnly) {
             behandlingService.getBehandling(dokumentUnderArbeid.behandlingId)
@@ -927,12 +1082,17 @@ class DokumentUnderArbeidService(
         }
 
         return dokumentUnderArbeid.smartEditorId
-            ?: throw DokumentValidationException("$dokumentId er ikke et smarteditor dokument")
     }
 
     private fun mellomlagreNyVersjonAvSmartEditorDokumentAndGetPdf(dokument: DokumentUnderArbeid): PDFDocument {
-        val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId!!)
+
+        if (dokument !is DokumentUnderArbeidAsSmartdokument) {
+            throw RuntimeException("dokument is not smartdokument")
+        }
+
+        val documentJson = smartEditorApiGateway.getDocumentAsJson(dokument.smartEditorId)
         val pdfDocument = kabalJsonToPdfClient.getPDFDocument(documentJson)
+
         val mellomlagerId =
             mellomlagerService.uploadByteArray(
                 tittel = dokument.name,
@@ -945,15 +1105,15 @@ class DokumentUnderArbeidService(
 
         dokument.mellomlagerId = mellomlagerId
         dokument.size = pdfDocument.bytes.size.toLong()
-        dokument.opplastet = LocalDateTime.now()
+        dokument.modified = LocalDateTime.now()
 
         return pdfDocument
     }
 
-    private fun DokumentUnderArbeid.isStaleSmartEditorDokument() =
-        this.smartEditorId != null && smartEditorApiGateway.isMellomlagretDokumentStale(
-            smartEditorId = this.smartEditorId!!,
-            sistOpplastet = this.opplastet
+    private fun DokumentUnderArbeidAsSmartdokument.isStaleSmartEditorDokument() =
+        smartEditorApiGateway.isMellomlagretDokumentStale(
+            smartEditorId = this.smartEditorId,
+            sistOpplastet = this.modified, //TODO changed from opplastet. Verify.
         )
 
     private fun Behandling.endringslogg(
