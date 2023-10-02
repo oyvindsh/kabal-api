@@ -6,7 +6,10 @@ import no.nav.klage.oppgave.api.mapper.BehandlingMapper
 import no.nav.klage.oppgave.api.view.kabin.CompletedKlagebehandling
 import no.nav.klage.oppgave.clients.kaka.KakaApiGateway
 import no.nav.klage.oppgave.domain.events.BehandlingEndretEvent
-import no.nav.klage.oppgave.domain.klage.*
+import no.nav.klage.oppgave.domain.klage.Klagebehandling
+import no.nav.klage.oppgave.domain.klage.Mottak
+import no.nav.klage.oppgave.domain.klage.MottakHjemmel
+import no.nav.klage.oppgave.domain.klage.MuligAnke
 import no.nav.klage.oppgave.exceptions.BehandlingNotFoundException
 import no.nav.klage.oppgave.exceptions.PDLErrorException
 import no.nav.klage.oppgave.repositories.KlagebehandlingRepository
@@ -79,7 +82,8 @@ class KlagebehandlingService(
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
         behandlingId = id,
         ytelseId = ytelse.id,
-        utfallId = utfall!!.id,
+        //TODO remove "first()"
+        utfallId = utfallSet.first().id,
         hjemmelId = hjemler.first().id,
         vedtakDate = avsluttetAvSaksbehandler!!,
         sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
@@ -99,7 +103,8 @@ class KlagebehandlingService(
         klagebehandlingRepository.findByAvsluttetIsNotNullAndFeilregistreringIsNull()
             .filter {
                 it.klager.partId.value == partId &&
-                        muligAnkeUtfall.contains(it.utfall)
+                        //TODO remove "first()"
+                        muligAnkeUtfall.contains(it.utfallSet.first())
             }
             .map { it.toMuligAnke() }
 
@@ -110,7 +115,8 @@ class KlagebehandlingService(
         val klagebehandling =
             klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
-            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.utfall)
+            //TODO remove "first()"
+            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.utfallSet.first())
         ) {
             klagebehandling.toMuligAnke()
         } else {
@@ -179,7 +185,8 @@ class KlagebehandlingService(
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,
         this.ytelse.toTema(),
-        this.utfall!!,
+        //TODO remove "first()"
+        this.utfallSet.first(),
         this.innsendt!!,
         this.avsluttetAvSaksbehandler!!,
         this.klager.partId.value

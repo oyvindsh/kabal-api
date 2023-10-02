@@ -114,7 +114,8 @@ class BehandlingService(
 
         if (nyBehandling) {
             if (behandling is AnkeITrygderettenbehandling) {
-                if (behandling.utfall != Utfall.OPPHEVET) {
+                //TODO remove "first()"
+                if (behandling.utfallSet.first() != Utfall.OPPHEVET) {
                     throw IllegalOperation("Ny ankebehandling kan kun opprettes hvis utfall er 'Opphevet'.")
                 }
             } else {
@@ -143,7 +144,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfall == null) {
+        if (behandling.utfallSet.isEmpty()) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -153,7 +154,8 @@ class BehandlingService(
         }
 
         //TODO: Create test for invalid utfall when such are added
-        if (behandling.utfall != null && behandling.utfall !in typeTilUtfall[behandling.type]!!) {
+        //TODO remove "first()"
+        if (behandling.utfallSet.isNotEmpty() && behandling.utfallSet.first() !in typeTilUtfall[behandling.type]!!) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -162,7 +164,8 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfall !in noRegistringshjemmelNeeded) {
+        //TODO remove "first()"
+        if (behandling.utfallSet.firstOrNull() !in noRegistringshjemmelNeeded) {
             if (behandling.registreringshjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -173,7 +176,8 @@ class BehandlingService(
             }
         }
 
-        if (behandling !is AnkeITrygderettenbehandling && behandling.utfall !in noKvalitetsvurderingNeeded) {
+        //TODO remove "first()"
+        if (behandling !is AnkeITrygderettenbehandling && behandling.utfallSet.firstOrNull() !in noKvalitetsvurderingNeeded) {
             val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
 
             if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
@@ -286,8 +290,9 @@ class BehandlingService(
         fun getErrorText(prop: String) =
             "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
 
-        if (behandling.utfall != null) {
-            when (behandling.utfall) {
+        if (behandling.utfallSet.isNotEmpty()) {
+            //TODO remove "first()"
+            when (behandling.utfallSet.first()) {
                 Utfall.HENVIST -> {
                     behandlingValidationErrors.add(
                         InvalidProperty(
@@ -1059,14 +1064,17 @@ class BehandlingService(
 
     fun setUtfall(
         behandlingId: UUID,
-        utfall: Utfall?,
+        utfallList: List<Utfall>,
         utfoerendeSaksbehandlerIdent: String
     ): Behandling {
         val behandling = getBehandlingForUpdate(
             behandlingId
         )
         val event =
-            behandling.setUtfall(utfall, utfoerendeSaksbehandlerIdent)
+            behandling.setUtfall(
+                nyVerdi = utfallList,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
         applicationEventPublisher.publishEvent(event)
         return behandling
     }

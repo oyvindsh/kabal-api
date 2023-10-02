@@ -108,7 +108,8 @@ class KakaApiGateway(private val kakaApiClient: KakaApiClient) {
             mottattKlageinstans = mottattKlageinstans.toLocalDate(),
             vedtaksinstansEnhet = vedtaksinstansEnhet,
             mottattVedtaksinstans = if (this is Klagebehandling) mottattVedtaksinstans else null,
-            utfall = utfall!!.id,
+            //TODO remove "first()"
+            utfall = utfallSet.first().id,
             registreringshjemler = registreringshjemler.map { it.id },
             kvalitetsvurderingId = kvalitetsvurderingId!!,
             avsluttetAvSaksbehandler = avsluttetAvSaksbehandler!!,

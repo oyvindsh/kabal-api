@@ -431,9 +431,34 @@ class BehandlingController(
             logger
         )
 
+        val utfallList = if (input.utfallId != null) {
+            listOf(Utfall.of(input.utfallId))
+        } else emptyList()
+
         val modified = behandlingService.setUtfall(
             behandlingId = behandlingId,
-            utfall = input.utfallId?.let { Utfall.of(it) } ?: input.utfall?.let { Utfall.of(it) },
+            utfallList = utfallList,
+            utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
+        ).modified
+
+        return BehandlingEditedView(modified = modified)
+    }
+
+    @PutMapping("/{behandlingId}/resultat/utfall-set")
+    fun setUtfallSet(
+        @PathVariable("behandlingId") behandlingId: UUID,
+        @RequestBody input: VedtakUtfallSetInput
+    ): BehandlingEditedView {
+        logBehandlingMethodDetails(
+            ::setUtfallSet.name,
+            innloggetSaksbehandlerService.getInnloggetIdent(),
+            behandlingId,
+            logger
+        )
+
+        val modified = behandlingService.setUtfall(
+            behandlingId = behandlingId,
+            utfallList = input.utfallIdSet.map { Utfall.of(it) },
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).modified
 

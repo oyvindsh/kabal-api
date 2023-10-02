@@ -75,7 +75,8 @@ class StatistikkTilDVHService(
         val endringslogginnslag: List<Endringslogginnslag> = behandlingEndretEvent.endringslogginnslag
         val behandling = behandlingEndretEvent.behandling
         val type = behandling.type
-        val utfall = behandling.utfall
+        //TODO remove "first()"
+        val utfall = behandling.utfallSet.first()
 
         return when {
             endringslogginnslag.isEmpty() && type != Type.ANKE_I_TRYGDERETTEN -> BehandlingState.MOTTATT
@@ -187,7 +188,8 @@ class StatistikkTilDVHService(
         if (behandling.feilregistrering != null) {
             ExternalUtfall.FEILREGISTRERT.navn
         } else if (behandling.avsluttetAvSaksbehandler != null) {
-            behandling.utfall?.name?.let { ExternalUtfall.valueOf(it).navn }
+            //TODO remove "first()"
+            behandling.utfallSet.first().name.let { ExternalUtfall.valueOf(it).navn }
         } else {
             null
         }

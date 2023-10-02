@@ -330,7 +330,7 @@ class BehandlingMapper(
     fun Behandling.mapToVedtakView(): VedtakView {
         return VedtakView(
             id = id,
-            utfallId = utfall?.id,
+            utfallIdSet = utfallSet.map { it.id }.toSet(),
             hjemmelIdSet = registreringshjemler.map { it.id }.toSet(),
         )
     }

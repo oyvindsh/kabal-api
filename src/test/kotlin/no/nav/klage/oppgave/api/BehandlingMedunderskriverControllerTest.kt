@@ -62,7 +62,7 @@ class BehandlingMedunderskriverControllerTest {
         fagsystem = Fagsystem.K9,
         kildeReferanse = "abc",
         mottakId = UUID.randomUUID(),
-        utfall = Utfall.AVVIST,
+        utfallSet = setOf(Utfall.AVVIST),
         registreringshjemler = mutableSetOf(
             Registreringshjemmel.ARBML_13
         ),

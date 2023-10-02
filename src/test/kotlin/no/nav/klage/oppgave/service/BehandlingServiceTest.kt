@@ -427,10 +427,10 @@ class BehandlingServiceTest {
             avsenderEnhetFoersteinstans = "enhet",
             kakaKvalitetsvurderingId = UUID.randomUUID(),
             kakaKvalitetsvurderingVersion = 2,
-            utfall = when {
-                trukket -> Utfall.TRUKKET
-                utfall -> Utfall.AVVIST
-                else -> null
+            utfallSet = when {
+                trukket -> setOf(Utfall.TRUKKET)
+                utfall -> setOf(Utfall.AVVIST)
+                else -> emptySet()
             },
             registreringshjemler = if (hjemler) mutableSetOf(
                 Registreringshjemmel.ANDRE_TRYGDEAVTALER

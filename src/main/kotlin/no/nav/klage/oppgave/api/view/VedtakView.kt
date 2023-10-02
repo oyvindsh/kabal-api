@@ -4,6 +4,6 @@ import java.util.*
 
 data class VedtakView(
     val id: UUID,
-    val utfallId: String? = null,
-    val hjemmelIdSet: Set<String> = setOf(),
+    val utfallIdSet: Set<String>,
+    val hjemmelIdSet: Set<String>,
 )

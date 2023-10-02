@@ -121,7 +121,8 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = BehandlingSkjemaV2.Vedtak(
-            utfall = utfall?.mapToSkjemaV2(),
+            //TODO remove "first()"
+            utfall = utfallSet.firstOrNull()?.mapToSkjemaV2(),
             hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
         ),
         sattPaaVent = sattPaaVent?.from,
@@ -173,7 +174,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak =
         BehandlingSkjemaV2.Vedtak(
-            utfall = utfall?.mapToSkjemaV2(),
+            utfall = utfallSet.firstOrNull()?.mapToSkjemaV2(),
             hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
         ),
         sattPaaVent = sattPaaVent?.from,
@@ -214,7 +215,7 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak =
         BehandlingSkjemaV2.Vedtak(
-            utfall = utfall?.mapToSkjemaV2(),
+            utfall = utfallSet.firstOrNull()?.mapToSkjemaV2(),
             hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
         ),
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),

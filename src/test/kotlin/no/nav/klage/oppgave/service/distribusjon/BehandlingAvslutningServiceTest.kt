@@ -188,7 +188,7 @@ internal class BehandlingAvslutningServiceTest {
         mottattVedtaksinstans = LocalDate.now(),
         kakaKvalitetsvurderingId = UUID.randomUUID(),
         kakaKvalitetsvurderingVersion = 2,
-        utfall = Utfall.MEDHOLD,
+        utfallSet = setOf(Utfall.MEDHOLD),
     )
 
     @Test

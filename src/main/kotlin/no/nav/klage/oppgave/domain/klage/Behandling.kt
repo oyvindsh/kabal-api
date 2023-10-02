@@ -95,9 +95,20 @@ abstract class Behandling(
     )
     open var feilregistrering: Feilregistrering?,
 
-    @Column(name = "utfall_id")
+//    @Column(name = "utfall_id")
+//    @Convert(converter = UtfallConverter::class)
+//    var utfall: Utfall? = null,
+
+    @ElementCollection(targetClass = Utfall::class, fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "behandling_utfall",
+        schema = "klage",
+        joinColumns = [JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)]
+    )
     @Convert(converter = UtfallConverter::class)
-    var utfall: Utfall? = null,
+    @Column(name = "id")
+    var utfallSet: Set<Utfall> = setOf(),
+
     //Overføres til neste behandling.
     @ElementCollection(targetClass = Registreringshjemmel::class, fetch = FetchType.EAGER)
     @CollectionTable(
@@ -160,12 +171,14 @@ abstract class Behandling(
     }
 
     fun shouldBeSentToTrygderetten(): Boolean {
-        return utfall in utfallToTrygderetten
+        //TODO remove "first()"
+        return utfallSet.first() in utfallToTrygderetten
     }
 
     fun shouldCreateNewAnkebehandling(): Boolean {
         return if (this is AnkeITrygderettenbehandling) {
-            nyBehandlingKA != null || utfall in utfallToNewAnkebehandling
+            //TODO remove "first()"
+            nyBehandlingKA != null || utfallSet.first() in utfallToNewAnkebehandling
         } else {
             false
         }
