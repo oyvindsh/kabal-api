@@ -431,13 +431,9 @@ class BehandlingController(
             logger
         )
 
-        val utfallList = if (input.utfallId != null) {
-            listOf(Utfall.of(input.utfallId))
-        } else emptyList()
-
         val modified = behandlingService.setUtfall(
             behandlingId = behandlingId,
-            utfallList = utfallList,
+            utfall = if (input.utfallId != null) Utfall.of(input.utfallId) else null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).modified
 
@@ -456,9 +452,9 @@ class BehandlingController(
             logger
         )
 
-        val modified = behandlingService.setUtfall(
+        val modified = behandlingService.setUtfallSet(
             behandlingId = behandlingId,
-            utfallList = input.utfallIdSet.map { Utfall.of(it) },
+            utfallSet = input.utfallIdSet.map { Utfall.of(it) }.toSet(),
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).modified
 

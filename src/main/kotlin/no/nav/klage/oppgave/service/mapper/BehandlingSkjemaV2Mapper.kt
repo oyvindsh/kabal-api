@@ -121,8 +121,7 @@ fun Klagebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         kildesystem = fagsystem.mapToSkjemaV2(),
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak = BehandlingSkjemaV2.Vedtak(
-            //TODO remove "first()"
-            utfall = utfallSet.firstOrNull()?.mapToSkjemaV2(),
+            utfall = utfall?.mapToSkjemaV2(),
             hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
         ),
         sattPaaVent = sattPaaVent?.from,

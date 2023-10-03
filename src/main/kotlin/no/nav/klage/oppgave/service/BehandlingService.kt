@@ -37,6 +37,7 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjeml
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfall
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfallList
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtaksinstans
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -114,8 +115,7 @@ class BehandlingService(
 
         if (nyBehandling) {
             if (behandling is AnkeITrygderettenbehandling) {
-                //TODO remove "first()"
-                if (behandling.utfallSet.first() != Utfall.OPPHEVET) {
+                if (behandling.utfall != Utfall.OPPHEVET) {
                     throw IllegalOperation("Ny ankebehandling kan kun opprettes hvis utfall er 'Opphevet'.")
                 }
             } else {
@@ -154,8 +154,7 @@ class BehandlingService(
         }
 
         //TODO: Create test for invalid utfall when such are added
-        //TODO remove "first()"
-        if (behandling.utfallSet.isNotEmpty() && behandling.utfallSet.first() !in typeTilUtfall[behandling.type]!!) {
+        if (behandling.utfall != null && behandling.utfall !in typeTilUtfall[behandling.type]!!) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -164,8 +163,7 @@ class BehandlingService(
             )
         }
 
-        //TODO remove "first()"
-        if (behandling.utfallSet.firstOrNull() !in noRegistringshjemmelNeeded) {
+        if (behandling.utfall !in noRegistringshjemmelNeeded) {
             if (behandling.registreringshjemler.isEmpty()) {
                 behandlingValidationErrors.add(
                     InvalidProperty(
@@ -176,8 +174,7 @@ class BehandlingService(
             }
         }
 
-        //TODO remove "first()"
-        if (behandling !is AnkeITrygderettenbehandling && behandling.utfallSet.firstOrNull() !in noKvalitetsvurderingNeeded) {
+        if (behandling !is AnkeITrygderettenbehandling && behandling.utfall !in noKvalitetsvurderingNeeded) {
             val kvalitetsvurderingValidationErrors = kakaApiGateway.getValidationErrors(behandling)
 
             if (kvalitetsvurderingValidationErrors.isNotEmpty()) {
@@ -290,9 +287,8 @@ class BehandlingService(
         fun getErrorText(prop: String) =
             "Kan ikke lukke behandling. Fjern $prop. Dersom Trygderetten har behandlet saken, kan du ikke starte ny behandling av samme sak."
 
-        if (behandling.utfallSet.isNotEmpty()) {
-            //TODO remove "first()"
-            when (behandling.utfallSet.first()) {
+        if (behandling.utfall != null) {
+            when (behandling.utfall) {
                 Utfall.HENVIST -> {
                     behandlingValidationErrors.add(
                         InvalidProperty(
@@ -1064,7 +1060,7 @@ class BehandlingService(
 
     fun setUtfall(
         behandlingId: UUID,
-        utfallList: List<Utfall>,
+        utfall: Utfall?,
         utfoerendeSaksbehandlerIdent: String
     ): Behandling {
         val behandling = getBehandlingForUpdate(
@@ -1072,7 +1068,24 @@ class BehandlingService(
         )
         val event =
             behandling.setUtfall(
-                nyVerdi = utfallList,
+                nyVerdi = utfall,
+                saksbehandlerident = utfoerendeSaksbehandlerIdent
+            )
+        applicationEventPublisher.publishEvent(event)
+        return behandling
+    }
+
+    fun setUtfallSet(
+        behandlingId: UUID,
+        utfallSet: Set<Utfall>,
+        utfoerendeSaksbehandlerIdent: String
+    ): Behandling {
+        val behandling = getBehandlingForUpdate(
+            behandlingId
+        )
+        val event =
+            behandling.setUtfallList(
+                nyVerdi = utfallSet,
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)

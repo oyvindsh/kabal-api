@@ -88,8 +88,7 @@ class BehandlingAvslutningService(
                         status = SakFinishedInput.Status.VIDERESENDT_TR,
                         nivaa = SakFinishedInput.Nivaa.KA,
                         typeResultat = SakFinishedInput.TypeResultat.INNSTILLING_2,
-                        //TODO remove "first()"
-                        utfall = SakFinishedInput.Utfall.valueOf(ankeutfallToInfotrygdutfall[behandling.utfallSet.first()]!!),
+                        utfall = SakFinishedInput.Utfall.valueOf(ankeutfallToInfotrygdutfall[behandling.utfall]!!),
                         mottaker = SakFinishedInput.Mottaker.TRYGDERETTEN,
                         saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
                     )
@@ -145,8 +144,7 @@ class BehandlingAvslutningService(
                         nivaa = SakFinishedInput.Nivaa.KA,
                         typeResultat = SakFinishedInput.TypeResultat.RESULTAT,
                         utfall = SakFinishedInput.Utfall.valueOf(infotrygdKlageutfallToUtfall.entries.find { entry ->
-                            //TODO remove "first()"
-                            entry.value == behandling.utfallSet.first()
+                            entry.value == behandling.utfall
                         }!!.key),
                         mottaker = SakFinishedInput.Mottaker.TRYGDEKONTOR,
                         saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
@@ -183,8 +181,7 @@ class BehandlingAvslutningService(
                 BehandlingDetaljer(
                     klagebehandlingAvsluttet = KlagebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
-                        //TODO remove "first()"
-                        utfall = ExternalUtfall.valueOf(behandling.utfallSet.first().name),
+                        utfall = ExternalUtfall.valueOf(behandling.utfall!!.name),
                         journalpostReferanser = hoveddokumenter.flatMap { it.journalposter }.map { it.journalpostId }
                     )
                 )
@@ -194,8 +191,7 @@ class BehandlingAvslutningService(
                 BehandlingDetaljer(
                     ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
-                        //TODO remove "first()"
-                        utfall = ExternalUtfall.valueOf(behandling.utfallSet.first().name),
+                        utfall = ExternalUtfall.valueOf(behandling.utfall!!.name),
                         journalpostReferanser = hoveddokumenter.flatMap { it.journalposter }.map { it.journalpostId }
                     )
                 )
@@ -206,8 +202,7 @@ class BehandlingAvslutningService(
                     ankebehandlingAvsluttet = AnkebehandlingAvsluttetDetaljer(
                         avsluttet = behandling.avsluttetAvSaksbehandler!!,
                         //TODO: Se på utfallsliste når vi har den endelige for ankeITrygderetten
-                        //TODO remove "first()"
-                        utfall = ExternalUtfall.valueOf(behandling.utfallSet.first().name),
+                        utfall = ExternalUtfall.valueOf(behandling.utfall!!.name),
                         journalpostReferanser = hoveddokumenter.flatMap { it.journalposter }.map { it.journalpostId }
                     )
                 )

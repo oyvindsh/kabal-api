@@ -82,8 +82,7 @@ class KlagebehandlingService(
     private fun Klagebehandling.toCompletedKlagebehandling(): CompletedKlagebehandling = CompletedKlagebehandling(
         behandlingId = id,
         ytelseId = ytelse.id,
-        //TODO remove "first()"
-        utfallId = utfallSet.first().id,
+        utfallId = utfall!!.id,
         hjemmelId = hjemler.first().id,
         vedtakDate = avsluttetAvSaksbehandler!!,
         sakenGjelder = behandlingMapper.getSakenGjelderView(sakenGjelder),
@@ -103,8 +102,7 @@ class KlagebehandlingService(
         klagebehandlingRepository.findByAvsluttetIsNotNullAndFeilregistreringIsNull()
             .filter {
                 it.klager.partId.value == partId &&
-                        //TODO remove "first()"
-                        muligAnkeUtfall.contains(it.utfallSet.first())
+                        muligAnkeUtfall.contains(it.utfall)
             }
             .map { it.toMuligAnke() }
 
@@ -115,8 +113,7 @@ class KlagebehandlingService(
         val klagebehandling =
             klagebehandlingRepository.findByIdAndAvsluttetIsNotNull(klagebehandlingId) ?: return null
         return if (
-            //TODO remove "first()"
-            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.utfallSet.first())
+            klagebehandling.klager.partId.value == partId && muligAnkeUtfall.contains(klagebehandling.utfall)
         ) {
             klagebehandling.toMuligAnke()
         } else {
@@ -185,8 +182,7 @@ class KlagebehandlingService(
     private fun Klagebehandling.toMuligAnke(): MuligAnke = MuligAnke(
         this.id,
         this.ytelse.toTema(),
-        //TODO remove "first()"
-        this.utfallSet.first(),
+        this.utfall!!,
         this.innsendt!!,
         this.avsluttetAvSaksbehandler!!,
         this.klager.partId.value
