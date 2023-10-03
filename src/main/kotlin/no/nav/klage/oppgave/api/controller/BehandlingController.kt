@@ -431,9 +431,11 @@ class BehandlingController(
             logger
         )
 
+        val utfallId = input.utfallId ?: input.utfall
+
         val modified = behandlingService.setUtfall(
             behandlingId = behandlingId,
-            utfall = if (input.utfallId != null) Utfall.of(input.utfallId) else null,
+            utfall = if (utfallId != null) Utfall.of(utfallId) else null,
             utfoerendeSaksbehandlerIdent = innloggetSaksbehandlerService.getInnloggetIdent()
         ).modified
 
