@@ -10,16 +10,11 @@ import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 import java.util.*
 
-
 @Entity
-@DiscriminatorValue("opplastetdokument")
-class OpplastetDokumentUnderArbeid(
-    @Column(name = "size")
-    var size: Long?,
+abstract class DokumentUnderArbeidAsHoveddokument(
     @Column(name = "dokument_type_id")
     @Convert(converter = DokumentTypeConverter::class)
-    override var dokumentType: DokumentType,
-
+    var dokumentType: DokumentType,
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
     @ElementCollection
@@ -28,15 +23,13 @@ class OpplastetDokumentUnderArbeid(
         name = "dokument_under_arbeid_brevmottaker_ident",
         joinColumns = [JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)]
     )
-    @Column(name="identifikator")
-    override var brevmottakerIdents: Set<String> = setOf(),
+    @Column(name = "identifikator")
+    var brevmottakerIdents: Set<String> = setOf(),
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "dokument_under_arbeid_id", referencedColumnName = "id", nullable = false)
     @Fetch(FetchMode.SELECT)
     @BatchSize(size = 5)
-    val journalposter: MutableSet<DokumentUnderArbeidJournalpostId> = mutableSetOf(),
-    @Column(name = "mellomlager_id")
-    override var mellomlagerId: String?,
+    var journalposter: Set<DokumentUnderArbeidJournalpostId> = emptySet(),
 
     //Common properties
     id: UUID = UUID.randomUUID(),
@@ -49,7 +42,8 @@ class OpplastetDokumentUnderArbeid(
     ferdigstilt: LocalDateTime?,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-) : DokumentUnderArbeidAsMellomlagret, DokumentUnderArbeidWithHoveddokumentCharacteristics, DokumentUnderArbeid(
+
+    ) : DokumentUnderArbeid(
     id = id,
     name = name,
     behandlingId = behandlingId,

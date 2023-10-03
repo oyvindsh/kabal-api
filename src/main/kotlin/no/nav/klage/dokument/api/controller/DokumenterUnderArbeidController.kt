@@ -61,7 +61,7 @@ class DokumentUnderArbeidController(
             dokumentType = DokumentType.of(input.dokumentTypeId),
         )
         return dokumentMapper.mapToDokumentView(
-            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
+            dokumentUnderArbeidService.createOpplastetDokumentUnderArbeid(
                 behandlingId = behandlingId,
                 dokumentType = DokumentType.of(input.dokumentTypeId),
                 opplastetFil = opplastetFil,

@@ -3,20 +3,17 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
+import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import java.time.LocalDateTime
 import java.util.*
 
 
 @Entity
-@DiscriminatorValue("smartdokument_vedlegg")
-class SmartdokumentUnderArbeidAsVedlegg(
+@DiscriminatorValue("opplastetdokument")
+class OpplastetDokumentUnderArbeidAsHoveddokument(
     @Column(name = "size")
-    override var size: Long?,
-    @Column(name = "smarteditor_id")
-    override val smartEditorId: UUID,
-    @Column(name = "smarteditor_template_id")
-    override var smartEditorTemplateId: String,
+    var size: Long?,
     @Column(name = "mellomlager_id")
     override var mellomlagerId: String?,
 
@@ -29,10 +26,13 @@ class SmartdokumentUnderArbeidAsVedlegg(
     markertFerdig: LocalDateTime? = null,
     markertFerdigBy: String? = null,
     ferdigstilt: LocalDateTime? = null,
-    parentId: UUID,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-) : DokumentUnderArbeidAsMellomlagret, DokumentUnderArbeidAsSmartdokument, DokumentUnderArbeidAsVedlegg(
+    dokumentType: DokumentType,
+    dokumentEnhetId: UUID? = null,
+    brevmottakerIdents: Set<String> = emptySet(),
+    journalposter: Set<DokumentUnderArbeidJournalpostId> = emptySet(),
+) : DokumentUnderArbeidAsMellomlagret, DokumentUnderArbeidAsHoveddokument(
     id = id,
     name = name,
     behandlingId = behandlingId,
@@ -41,7 +41,10 @@ class SmartdokumentUnderArbeidAsVedlegg(
     markertFerdig = markertFerdig,
     markertFerdigBy = markertFerdigBy,
     ferdigstilt = ferdigstilt,
-    parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
+    dokumentType = dokumentType,
+    dokumentEnhetId = dokumentEnhetId,
+    brevmottakerIdents = brevmottakerIdents,
+    journalposter = journalposter,
 )

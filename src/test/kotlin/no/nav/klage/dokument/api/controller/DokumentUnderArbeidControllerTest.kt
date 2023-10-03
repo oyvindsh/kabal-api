@@ -78,7 +78,7 @@ internal class DokumentUnderArbeidControllerTest {
 
         every { innloggetSaksbehandlerService.getInnloggetIdent() } returns "IDENT"
         every {
-            dokumentUnderArbeidService.opprettOgMellomlagreNyttHoveddokument(
+            dokumentUnderArbeidService.createOpplastetDokumentUnderArbeid(
                 any(),
                 any(),
                 any(),
