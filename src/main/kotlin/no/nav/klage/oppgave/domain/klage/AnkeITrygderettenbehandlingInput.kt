@@ -40,6 +40,6 @@ fun Behandling.createAnkeITrygderettenbehandlingInput(): AnkeITrygderettenbehand
         innsendingsHjemler = hjemler,
         sendtTilTrygderetten = avsluttetAvSaksbehandler!!,
         registreringsHjemmelSet = registreringshjemler,
-        ankebehandlingUtfall = ExternalUtfall.valueOf(utfall!!.id),
+        ankebehandlingUtfall = ExternalUtfall.valueOf(utfall!!.name),
     )
 }
