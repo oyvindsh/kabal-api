@@ -51,4 +51,24 @@ class SmartdokumentUnderArbeidAsHoveddokument(
     dokumentEnhetId = dokumentEnhetId,
     brevmottakerIdents = brevmottakerIdents,
     journalposter = journalposter,
-)
+) {
+    fun asVedlegg(parentId: UUID): SmartdokumentUnderArbeidAsVedlegg {
+        return SmartdokumentUnderArbeidAsVedlegg(
+            size = size,
+            smartEditorId = smartEditorId,
+            smartEditorTemplateId = smartEditorTemplateId,
+            mellomlagerId = mellomlagerId,
+            id = id,
+            name = name,
+            behandlingId = behandlingId,
+            created = created,
+            modified = modified,
+            markertFerdig = markertFerdig,
+            markertFerdigBy = markertFerdigBy,
+            ferdigstilt = ferdigstilt,
+            creatorIdent = creatorIdent,
+            creatorRole = creatorRole,
+            parentId = parentId,
+        )
+    }
+}

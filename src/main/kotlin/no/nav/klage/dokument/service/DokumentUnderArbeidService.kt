@@ -41,9 +41,11 @@ import java.util.*
 @Transactional
 class DokumentUnderArbeidService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
-    private val opplastetDokumentUnderArbeidRepository: OpplastetDokumentUnderArbeidRepository,
+    private val dokumentUnderArbeidAsHoveddokumentRepository: DokumentUnderArbeidAsHoveddokumentRepository,
+    private val dokumentUnderArbeidAsVedleggRepository: DokumentUnderArbeidAsVedleggRepository,
+    private val opplastetDokumentUnderArbeidAsHoveddokumentRepository: OpplastetDokumentUnderArbeidAsHoveddokumentRepository,
     private val opplastetDokumentUnderArbeidAsVedleggRepository: OpplastetDokumentUnderArbeidAsVedleggRepository,
-    private val smartDokumentUnderArbeidRepository: SmartdokumentUnderArbeidRepository,
+    private val smartDokumentUnderArbeidAsHoveddokumentRepository: SmartdokumentUnderArbeidAsHoveddokumentRepository,
     private val smartDokumentUnderArbeidAsVedleggRepository: SmartdokumentUnderArbeidAsVedleggRepository,
     private val journalfoertDokumentUnderArbeidRepository: JournalfoertDokumentUnderArbeidAsVedleggRepository,
     private val attachmentValidator: MellomlagretDokumentValidatorService,
@@ -94,7 +96,7 @@ class DokumentUnderArbeidService(
         val now = LocalDateTime.now()
 
         val document = if (parentId == null) {
-            opplastetDokumentUnderArbeidRepository.save(
+            opplastetDokumentUnderArbeidAsHoveddokumentRepository.save(
                 OpplastetDokumentUnderArbeidAsHoveddokument(
                     mellomlagerId = mellomlagerId,
                     size = opplastetFil.content.size.toLong(),
@@ -167,7 +169,7 @@ class DokumentUnderArbeidService(
         val now = LocalDateTime.now()
 
         val document = if (parentId == null) {
-            smartDokumentUnderArbeidRepository.save(
+            smartDokumentUnderArbeidAsHoveddokumentRepository.save(
                 SmartdokumentUnderArbeidAsHoveddokument(
                     mellomlagerId = null,
                     size = null,
@@ -518,7 +520,7 @@ class DokumentUnderArbeidService(
     ): List<DocumentValidationResponse> {
         val documentValidationResults = mutableListOf<DocumentValidationResponse>()
 
-        val hovedDokument = smartDokumentUnderArbeidRepository.getReferenceById(dokumentId)
+        val hovedDokument = smartDokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(dokumentId)
         val vedlegg = getVedlegg(hovedDokument.id)
 
         documentValidationResults += validateSingleSmartdocument(hovedDokument)
@@ -892,7 +894,21 @@ class DokumentUnderArbeidService(
                 dokumentUnderArbeid to null
             }
         } else {
-            dokumentUnderArbeid.parentId = parentId
+            when (dokumentUnderArbeid) {
+                is SmartdokumentUnderArbeidAsHoveddokument -> {
+                    smartDokumentUnderArbeidAsHoveddokumentRepository.delete(dokumentUnderArbeid)
+                    smartDokumentUnderArbeidAsVedleggRepository.save(
+                        dokumentUnderArbeid.asVedlegg(parentId = parentId)
+                    )
+                }
+
+                is OpplastetDokumentUnderArbeidAsHoveddokument -> {
+                    opplastetDokumentUnderArbeidAsHoveddokumentRepository.delete(dokumentUnderArbeid)
+                    opplastetDokumentUnderArbeidAsVedleggRepository.save(
+                        dokumentUnderArbeid.asVedlegg(parentId = parentId)
+                    )
+                }
+            }
             dokumentUnderArbeid to null
         }
     }
@@ -919,25 +935,8 @@ class DokumentUnderArbeidService(
                 //delete first so we can reuse the id
                 opplastetDokumentUnderArbeidAsVedleggRepository.delete(vedlegg)
 
-                opplastetDokumentUnderArbeidRepository.save(
-                    OpplastetDokumentUnderArbeidAsHoveddokument(
-                        id = vedlegg.id,
-                        size = vedlegg.size,
-                        dokumentType = DokumentType.BREV, //TODO default? UI fix?
-                        dokumentEnhetId = null,
-                        brevmottakerIdents = setOf(),
-                        journalposter = mutableSetOf(),
-                        mellomlagerId = vedlegg.mellomlagerId,
-                        name = vedlegg.name,
-                        behandlingId = vedlegg.behandlingId,
-                        created = vedlegg.created,
-                        modified = vedlegg.modified,
-                        markertFerdig = null,
-                        markertFerdigBy = null,
-                        ferdigstilt = null,
-                        creatorIdent = vedlegg.creatorIdent,
-                        creatorRole = vedlegg.creatorRole,
-                    )
+                opplastetDokumentUnderArbeidAsHoveddokumentRepository.save(
+                    vedlegg.asHoveddokument()
                 )
             }
 
@@ -945,27 +944,8 @@ class DokumentUnderArbeidService(
                 //delete first so we can reuse the id
                 smartDokumentUnderArbeidAsVedleggRepository.delete(vedlegg)
 
-                smartDokumentUnderArbeidRepository.save(
-                    SmartdokumentUnderArbeidAsHoveddokument(
-                        id = vedlegg.id,
-                        size = vedlegg.size,
-                        smartEditorId = vedlegg.smartEditorId,
-                        smartEditorTemplateId = vedlegg.smartEditorTemplateId,
-                        dokumentType = DokumentType.BREV, //TODO default or UI fix?
-                        dokumentEnhetId = null,
-                        brevmottakerIdents = setOf(),
-                        journalposter = mutableSetOf(),
-                        mellomlagerId = vedlegg.mellomlagerId,
-                        name = vedlegg.name,
-                        behandlingId = vedlegg.behandlingId,
-                        created = vedlegg.created,
-                        modified = vedlegg.modified,
-                        markertFerdig = null,
-                        markertFerdigBy = null,
-                        ferdigstilt = null,
-                        creatorIdent = vedlegg.creatorIdent,
-                        creatorRole = vedlegg.creatorRole,
-                    )
+                smartDokumentUnderArbeidAsHoveddokumentRepository.save(
+                    vedlegg.asHoveddokument()
                 )
             }
 
@@ -986,18 +966,24 @@ class DokumentUnderArbeidService(
         return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
     }
 
-    fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeid> {
+    fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeidAsSmartdokument> {
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 
-        return smartDokumentUnderArbeidRepository.findByBehandlingIdAndSmartEditorIdNotNullAndMarkertFerdigIsNullOrderByCreated(
+        val hoveddokumenter =
+            smartDokumentUnderArbeidAsHoveddokumentRepository.findByBehandlingIdAndMarkertFerdigIsNullOrderByCreated(
+                behandlingId
+            )
+
+        val vedlegg = smartDokumentUnderArbeidAsVedleggRepository.findByBehandlingIdAndMarkertFerdigIsNullOrderByCreated(
             behandlingId
         )
+        return hoveddokumenter + vedlegg
     }
 
     fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
-        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
+        val hovedDokument = dokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(hovedDokumentId)
+        val vedlegg = dokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
         //Denne er alltid sann
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
@@ -1014,8 +1000,8 @@ class DokumentUnderArbeidService(
     }
 
     fun ferdigstillDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
-        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId)
-        val vedlegg = dokumentUnderArbeidRepository.findByParentIdOrderByCreated(hovedDokument.id)
+        val hovedDokument = dokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(hovedDokumentId)
+        val vedlegg = dokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
         val documentInfoList =
             kabalDocumentGateway.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
@@ -1040,9 +1026,9 @@ class DokumentUnderArbeidService(
         val now = LocalDateTime.now()
 
         hovedDokument.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
-        if (hovedDokument.smartEditorId != null) {
+        if (hovedDokument is DokumentUnderArbeidAsSmartdokument) {
             try {
-                smartEditorApiGateway.deleteDocumentAsSystemUser(hovedDokument.smartEditorId!!)
+                smartEditorApiGateway.deleteDocumentAsSystemUser(hovedDokument.smartEditorId)
             } catch (e: Exception) {
                 logger.warn("Couldn't delete hoveddokument from smartEditorApi", e)
             }
@@ -1050,10 +1036,12 @@ class DokumentUnderArbeidService(
 
         vedlegg.forEach {
             it.ferdigstillHvisIkkeAlleredeFerdigstilt(now)
-            try {
-                smartEditorApiGateway.deleteDocumentAsSystemUser(it.smartEditorId!!)
-            } catch (e: Exception) {
-                logger.warn("Couldn't delete vedlegg from smartEditorApi", e)
+            if (it is DokumentUnderArbeidAsSmartdokument) {
+                try {
+                    smartEditorApiGateway.deleteDocumentAsSystemUser(it.smartEditorId!!)
+                } catch (e: Exception) {
+                    logger.warn("Couldn't delete vedlegg from smartEditorApi", e)
+                }
             }
         }
 

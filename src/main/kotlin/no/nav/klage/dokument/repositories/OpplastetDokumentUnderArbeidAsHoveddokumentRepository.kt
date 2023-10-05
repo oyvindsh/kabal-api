@@ -6,4 +6,4 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Transactional
-interface OpplastetDokumentUnderArbeidRepository : JpaRepository<OpplastetDokumentUnderArbeidAsHoveddokument, UUID>
+interface OpplastetDokumentUnderArbeidAsHoveddokumentRepository : JpaRepository<OpplastetDokumentUnderArbeidAsHoveddokument, UUID>

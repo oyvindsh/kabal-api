@@ -3,7 +3,7 @@ package no.nav.klage.oppgave.service.distribusjon
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
@@ -174,7 +174,7 @@ class BehandlingAvslutningService(
 
     private fun getBehandlingDetaljer(
         behandling: Behandling,
-        hoveddokumenter: List<DokumentUnderArbeid>
+        hoveddokumenter: List<DokumentUnderArbeidAsHoveddokument>
     ): BehandlingDetaljer {
         return when (behandling.type) {
             Type.KLAGE -> {

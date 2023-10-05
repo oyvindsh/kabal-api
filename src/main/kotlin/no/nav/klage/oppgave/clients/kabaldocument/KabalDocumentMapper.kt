@@ -1,6 +1,8 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsVedlegg
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
@@ -36,8 +38,8 @@ class KabalDocumentMapper(
 
     fun mapBehandlingToDokumentEnhetWithDokumentreferanser(
         behandling: Behandling,
-        hovedDokument: DokumentUnderArbeid,
-        vedlegg: SortedSet<DokumentUnderArbeid>,
+        hovedDokument: DokumentUnderArbeidAsHoveddokument,
+        vedlegg: Set<DokumentUnderArbeidAsVedlegg>,
         innholdsfortegnelse: Innholdsfortegnelse?,
     ): DokumentEnhetWithDokumentreferanserInput {
 

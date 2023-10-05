@@ -3,6 +3,7 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
+import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import java.time.LocalDateTime
 import java.util.*
@@ -44,4 +45,25 @@ class SmartdokumentUnderArbeidAsVedlegg(
     parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
-)
+){
+    fun asHoveddokument(): SmartdokumentUnderArbeidAsHoveddokument {
+        return SmartdokumentUnderArbeidAsHoveddokument(
+            size = size,
+            smartEditorId = smartEditorId,
+            smartEditorTemplateId = smartEditorTemplateId,
+            mellomlagerId = mellomlagerId,
+            id = id,
+            name = name,
+            behandlingId = behandlingId,
+            created = created,
+            modified = modified,
+            markertFerdig = markertFerdig,
+            markertFerdigBy = markertFerdigBy,
+            ferdigstilt = ferdigstilt,
+            creatorIdent = creatorIdent,
+            creatorRole = creatorRole,
+            dokumentType = DokumentType.BREV, //TODO default?
+            dokumentEnhetId = null,
+        )
+    }
+}

@@ -17,4 +17,6 @@ interface SmartdokumentUnderArbeidAsVedleggRepository : JpaRepository<Smartdokum
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<SmartdokumentUnderArbeidAsVedlegg>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId: UUID): SortedSet<SmartdokumentUnderArbeidAsVedlegg>
+
+    fun findByBehandlingIdAndMarkertFerdigIsNullOrderByCreated(behandlingId: UUID): SortedSet<SmartdokumentUnderArbeidAsVedlegg>
 }

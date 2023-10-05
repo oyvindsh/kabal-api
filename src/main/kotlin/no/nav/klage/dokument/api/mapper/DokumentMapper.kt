@@ -8,6 +8,7 @@ import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRe
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentUnderArbeidAsVedlegg
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.Fagsystem
 import no.nav.klage.kodeverk.Tema
@@ -42,7 +43,7 @@ class DokumentMapper(
 
     fun getSortedDokumentViewList(allDokumenterUnderArbeid: List<DokumentUnderArbeid>): List<DokumentView> {
         val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
-            it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
+            it !is JournalfoertDokumentUnderArbeidAsVedlegg
         }
 
         return dokumenterUnderArbeid.sortedByDescending { it.created }
@@ -60,7 +61,7 @@ class DokumentMapper(
         hoveddokument: DokumentUnderArbeid,
     ): Pair<List<InnholdsfortegnelseRequest.Document>, List<InnholdsfortegnelseRequest.Document>> {
         val (dokumenterUnderArbeid, journalfoerteDokumenterUnderArbeid) = allDokumenterUnderArbeid.partition {
-            it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT
+            it !is JournalfoertDokumentUnderArbeidAsVedlegg
         }
 
         return dokumenterUnderArbeid.sortedByDescending { it.created }
@@ -86,13 +87,13 @@ class DokumentMapper(
         mottakere: List<String> = emptyList(),
         behandling: Behandling,
     ): InnholdsfortegnelseRequest.Document {
-        if (dokumentUnderArbeid.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
+        if (dokumentUnderArbeid !is JournalfoertDokumentUnderArbeidAsVedlegg) {
             error("Document must be JOURNALFOERT")
         }
         val journalpost =
-            safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
+            safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalpostId)
         val dokumentInDokarkiv =
-            journalpost.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
+            journalpost.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.dokumentInfoId }
                 ?: throw RuntimeException("Document not found in Dokarkiv")
 
         return InnholdsfortegnelseRequest.Document(

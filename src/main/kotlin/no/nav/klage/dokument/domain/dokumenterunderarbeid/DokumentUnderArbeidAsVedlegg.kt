@@ -9,7 +9,7 @@ import java.util.*
 @Entity
 abstract class DokumentUnderArbeidAsVedlegg(
     @Column(name = "parent_id")
-    val parentId: UUID? = null,
+    var parentId: UUID? = null,
 
     //Common properties
     id: UUID = UUID.randomUUID(),

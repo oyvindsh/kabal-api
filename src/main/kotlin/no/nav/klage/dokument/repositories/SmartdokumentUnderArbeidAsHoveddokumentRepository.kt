@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Transactional
-interface SmartdokumentUnderArbeidRepository : JpaRepository<SmartdokumentUnderArbeidAsHoveddokument, UUID> {
+interface SmartdokumentUnderArbeidAsHoveddokumentRepository : JpaRepository<SmartdokumentUnderArbeidAsHoveddokument, UUID> {
 
-    fun findByBehandlingIdAndSmartEditorIdNotNullAndMarkertFerdigIsNullOrderByCreated(behandlingId: UUID): SortedSet<SmartdokumentUnderArbeidAsHoveddokument>
+    fun findByBehandlingIdAndMarkertFerdigIsNullOrderByCreated(behandlingId: UUID): SortedSet<SmartdokumentUnderArbeidAsHoveddokument>
 
     fun findByMarkertFerdigIsNullAndSmartEditorIdNotNull(): List<SmartdokumentUnderArbeidAsHoveddokument>
 }

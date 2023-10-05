@@ -47,4 +47,22 @@ class OpplastetDokumentUnderArbeidAsHoveddokument(
     dokumentEnhetId = dokumentEnhetId,
     brevmottakerIdents = brevmottakerIdents,
     journalposter = journalposter,
-)
+){
+    fun asVedlegg(parentId: UUID): OpplastetDokumentUnderArbeidAsVedlegg {
+        return OpplastetDokumentUnderArbeidAsVedlegg(
+            size = size,
+            mellomlagerId = mellomlagerId,
+            id = id,
+            name = name,
+            behandlingId = behandlingId,
+            created = created,
+            modified = modified,
+            markertFerdig = markertFerdig,
+            markertFerdigBy = markertFerdigBy,
+            ferdigstilt = ferdigstilt,
+            creatorIdent = creatorIdent,
+            creatorRole = creatorRole,
+            parentId = parentId,
+        )
+    }
+}
