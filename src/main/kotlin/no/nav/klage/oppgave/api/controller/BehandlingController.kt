@@ -449,7 +449,7 @@ class BehandlingController(
     @PutMapping("/{behandlingId}/resultat/extra-utfall-set")
     fun setUtfallSet(
         @PathVariable("behandlingId") behandlingId: UUID,
-        @RequestBody input: VedtakUtfallSetInput
+        @RequestBody input: VedtakExtraUtfallSetInput
     ): ExtraUtfallEditedView {
         logBehandlingMethodDetails(
             ::setUtfallSet.name,
