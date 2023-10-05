@@ -88,7 +88,7 @@ class BehandlingAvslutningService(
                         status = SakFinishedInput.Status.VIDERESENDT_TR,
                         nivaa = SakFinishedInput.Nivaa.KA,
                         typeResultat = SakFinishedInput.TypeResultat.INNSTILLING_2,
-                        utfall = SakFinishedInput.Utfall.valueOf(ankeutfallToInfotrygdutfall[behandling.utfall]!!),
+                        utfall = SakFinishedInput.Utfall.valueOf(ankeutfallToInfotrygdutfall[behandling.utfall!!]!!),
                         mottaker = SakFinishedInput.Mottaker.TRYGDERETTEN,
                         saksbehandlerIdent = behandling.tildeling!!.saksbehandlerident!!
                     )
