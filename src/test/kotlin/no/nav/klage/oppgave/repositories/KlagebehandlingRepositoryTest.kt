@@ -122,21 +122,21 @@ class KlagebehandlingRepositoryTest {
         )
         klageWithNoAnke.avsluttet = LocalDateTime.now()
         klageWithNoAnke.utfall = Utfall.STADFESTELSE
-        klageWithNoAnke.utfallSet = setOf(Utfall.STADFESTELSE)
+        klageWithNoAnke.extraUtfallSet = setOf(Utfall.STADFESTELSE)
 
         val klageWithNoAnkeButNoAnkemulighet = getKlagebehandling(
             mottakId = mottak1.id
         )
         klageWithNoAnkeButNoAnkemulighet.avsluttet = LocalDateTime.now()
         klageWithNoAnkeButNoAnkemulighet.utfall = Utfall.RETUR
-        klageWithNoAnkeButNoAnkemulighet.utfallSet = setOf(Utfall.RETUR)
+        klageWithNoAnkeButNoAnkemulighet.extraUtfallSet = setOf(Utfall.RETUR)
 
         val klageWithAnke = getKlagebehandling(
             mottakId = mottak2.id
         )
         klageWithAnke.avsluttet = LocalDateTime.now()
         klageWithAnke.utfall = Utfall.STADFESTELSE
-        klageWithAnke.utfallSet = setOf(Utfall.STADFESTELSE)
+        klageWithAnke.extraUtfallSet = setOf(Utfall.STADFESTELSE)
 
         klagebehandlingRepository.saveAll(listOf(klageWithNoAnke, klageWithNoAnkeButNoAnkemulighet, klageWithAnke))
 

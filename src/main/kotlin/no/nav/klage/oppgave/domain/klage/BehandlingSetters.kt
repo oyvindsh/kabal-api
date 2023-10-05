@@ -357,21 +357,21 @@ object BehandlingSetters {
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))
     }
 
-    fun Behandling.setUtfallList(
+    fun Behandling.setExtraUtfallSet(
         nyVerdi: Set<Utfall>,
         saksbehandlerident: String
     ): BehandlingEndretEvent {
-        val gammelVerdi = utfallSet
+        val gammelVerdi = extraUtfallSet
         val tidspunkt = LocalDateTime.now()
-        utfallSet = nyVerdi
+        extraUtfallSet = nyVerdi
         modified = tidspunkt
         modified = tidspunkt
         val endringslogg =
             endringslogg(
                 saksbehandlerident = saksbehandlerident,
-                felt = Felt.UTFALL_LIST,
+                felt = Felt.EXTRA_UTFALL_SET,
                 fraVerdi = gammelVerdi.joinToString { it.id },
-                tilVerdi = utfallSet.joinToString { it.id },
+                tilVerdi = extraUtfallSet.joinToString { it.id },
                 tidspunkt = tidspunkt
             )
         return BehandlingEndretEvent(behandling = this, endringslogginnslag = listOfNotNull(endringslogg))

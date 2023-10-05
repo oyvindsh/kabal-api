@@ -173,7 +173,7 @@ fun Ankebehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak =
         BehandlingSkjemaV2.Vedtak(
-            utfall = utfallSet.firstOrNull()?.mapToSkjemaV2(),
+            utfall = utfall?.mapToSkjemaV2(),
             hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
         ),
         sattPaaVent = sattPaaVent?.from,
@@ -214,7 +214,7 @@ fun AnkeITrygderettenbehandling.mapToSkjemaV2(): BehandlingSkjemaV2 {
         saksdokumenter = saksdokumenter.mapToSkjemaV2(),
         vedtak =
         BehandlingSkjemaV2.Vedtak(
-            utfall = utfallSet.firstOrNull()?.mapToSkjemaV2(),
+            utfall = utfall?.mapToSkjemaV2(),
             hjemler = registreringshjemler.map { it.mapToSkjemaV2() },
         ),
         status = BehandlingSkjemaV2.StatusType.valueOf(getStatus().name),

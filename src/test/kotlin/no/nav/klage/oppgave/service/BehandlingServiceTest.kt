@@ -432,7 +432,7 @@ class BehandlingServiceTest {
                 utfall -> Utfall.AVVIST
                 else -> null
             },
-            utfallSet = when {
+            extraUtfallSet = when {
                 trukket -> setOf(Utfall.TRUKKET)
                 utfall -> setOf(Utfall.AVVIST)
                 else -> emptySet()

@@ -1,4 +1,4 @@
-CREATE TABLE klage.behandling_utfall
+CREATE TABLE klage.behandling_extra_utfall
 (
     id            TEXT NOT NULL,
     behandling_id UUID NOT NULL,
@@ -7,9 +7,3 @@ CREATE TABLE klage.behandling_utfall
         FOREIGN KEY (behandling_id)
             REFERENCES klage.behandling (id)
 );
-
-INSERT INTO klage.behandling_utfall (id, behandling_id)
-SELECT b.utfall_id, b.id FROM klage.behandling b
-WHERE utfall_id IS NOT NULL;
-
---Don't delete old field yet.

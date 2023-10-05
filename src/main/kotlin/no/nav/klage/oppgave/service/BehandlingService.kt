@@ -22,6 +22,7 @@ import no.nav.klage.oppgave.domain.klage.AnkeITrygderettenbehandlingSetters.setS
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.addSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.removeSaksdokument
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setAvsluttetAvSaksbehandler
+import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setExtraUtfallSet
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFeilregistrering
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFrist
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setFullmektig
@@ -37,7 +38,6 @@ import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setRegistreringshjeml
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setSattPaaVent
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setTildeling
 import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfall
-import no.nav.klage.oppgave.domain.klage.BehandlingSetters.setUtfallList
 import no.nav.klage.oppgave.domain.klage.KlagebehandlingSetters.setMottattVedtaksinstans
 import no.nav.klage.oppgave.exceptions.*
 import no.nav.klage.oppgave.repositories.BehandlingRepository
@@ -144,7 +144,7 @@ class BehandlingService(
             )
         }
 
-        if (behandling.utfallSet.isEmpty()) {
+        if (behandling.utfall == null) {
             behandlingValidationErrors.add(
                 InvalidProperty(
                     field = "utfall",
@@ -297,6 +297,7 @@ class BehandlingService(
                         )
                     )
                 }
+
                 Utfall.OPPHEVET -> {
                     behandlingValidationErrors.add(
                         InvalidProperty(
@@ -305,6 +306,7 @@ class BehandlingService(
                         )
                     )
                 }
+
                 else -> {
                     behandlingValidationErrors.add(
                         InvalidProperty(
@@ -1066,26 +1068,52 @@ class BehandlingService(
         val behandling = getBehandlingForUpdate(
             behandlingId
         )
+
+        val endringslogginnslag = mutableListOf<Endringslogginnslag>()
+
+        if (utfall != null) {
+            if (utfall in behandling.extraUtfallSet) {
+                val event =
+                    behandling.setExtraUtfallSet(
+                        nyVerdi = behandling.extraUtfallSet.minus(utfall),
+                        saksbehandlerident = utfoerendeSaksbehandlerIdent
+                    )
+                endringslogginnslag += event.endringslogginnslag
+            }
+        }
+
         val event =
             behandling.setUtfall(
                 nyVerdi = utfall,
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
-        applicationEventPublisher.publishEvent(event)
+        endringslogginnslag += event.endringslogginnslag
+
+        val groupedEvent = BehandlingEndretEvent(
+            behandling = behandling,
+            endringslogginnslag = endringslogginnslag,
+        )
+        applicationEventPublisher.publishEvent(groupedEvent)
+
         return behandling
     }
 
-    fun setUtfallSet(
+    fun setExtraUtfallSet(
         behandlingId: UUID,
-        utfallSet: Set<Utfall>,
+        extraUtfallSet: Set<Utfall>,
         utfoerendeSaksbehandlerIdent: String
     ): Behandling {
         val behandling = getBehandlingForUpdate(
             behandlingId
         )
+
+        val curatedExtraUtfallSet = if (behandling.utfall != null && behandling.utfall in extraUtfallSet) {
+            extraUtfallSet.minus(behandling.utfall!!)
+        } else extraUtfallSet
+
         val event =
-            behandling.setUtfallList(
-                nyVerdi = utfallSet,
+            behandling.setExtraUtfallSet(
+                nyVerdi = curatedExtraUtfallSet,
                 saksbehandlerident = utfoerendeSaksbehandlerIdent
             )
         applicationEventPublisher.publishEvent(event)

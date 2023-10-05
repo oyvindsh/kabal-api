@@ -6,7 +6,7 @@ data class VedtakUtfallInput(
 )
 
 data class VedtakUtfallSetInput(
-    val utfallIdSet: Set<String>,
+    val extraUtfallIdSet: Set<String>,
 )
 
 data class VedtakHjemlerInput(

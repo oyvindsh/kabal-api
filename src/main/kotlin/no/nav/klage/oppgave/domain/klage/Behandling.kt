@@ -101,13 +101,13 @@ abstract class Behandling(
 
     @ElementCollection(targetClass = Utfall::class, fetch = FetchType.EAGER)
     @CollectionTable(
-        name = "behandling_utfall",
+        name = "behandling_extra_utfall",
         schema = "klage",
         joinColumns = [JoinColumn(name = "behandling_id", referencedColumnName = "id", nullable = false)]
     )
     @Convert(converter = UtfallConverter::class)
     @Column(name = "id")
-    var utfallSet: Set<Utfall> = setOf(),
+    var extraUtfallSet: Set<Utfall> = setOf(),
 
     //Overføres til neste behandling.
     @ElementCollection(targetClass = Registreringshjemmel::class, fetch = FetchType.EAGER)

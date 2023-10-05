@@ -18,9 +18,8 @@ class KlagebehandlingRepositoryCustomImpl : KlagebehandlingRepositoryCustom {
             """
             SELECT k
             FROM Klagebehandling k
-            join k.utfallSet u
             WHERE k.avsluttet != null
-            AND u NOT IN :utfallWithoutAnkemulighet
+            AND k.utfall NOT IN :utfallWithoutAnkemulighet
             AND k.fagsystem != :infotrygdFagsystem
             AND k.sakenGjelder.partId.value = :sakenGjelder
             AND (SELECT COUNT(a) FROM Ankebehandling a WHERE a.klagebehandlingId = k.id AND a.feilregistrering = null) = 0
