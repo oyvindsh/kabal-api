@@ -3,6 +3,7 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
+import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import java.time.LocalDateTime
 import java.util.*
@@ -29,6 +30,7 @@ class JournalfoertDokumentUnderArbeidAsVedlegg (
     parentId: UUID?,
     creatorIdent: String,
     creatorRole: BehandlingRole,
+    dokumentType: DokumentType?,
 ) : DokumentUnderArbeidAsVedlegg(
     id = id,
     name = name,
@@ -41,4 +43,5 @@ class JournalfoertDokumentUnderArbeidAsVedlegg (
     parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
+    dokumentType = dokumentType,
 )

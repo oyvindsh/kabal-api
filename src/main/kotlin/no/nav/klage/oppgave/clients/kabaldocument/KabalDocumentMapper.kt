@@ -1,9 +1,6 @@
 package no.nav.klage.oppgave.clients.kabaldocument
 
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsVedlegg
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.*
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.PartIdType
 import no.nav.klage.oppgave.clients.ereg.EregClient
@@ -16,7 +13,6 @@ import no.nav.klage.oppgave.util.getLogger
 import no.nav.klage.oppgave.util.getPartIdFromIdentifikator
 import no.nav.klage.oppgave.util.getSecureLogger
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class KabalDocumentMapper(
@@ -50,7 +46,7 @@ class KabalDocumentMapper(
             )
         } else null
 
-        val vedleggMapped = vedlegg.filter { it.getType() != DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+        val vedleggMapped = vedlegg.filter { it !is JournalfoertDokumentUnderArbeidAsVedlegg }
             .sortedByDescending { it.created }
             .map { currentVedlegg ->
                 mapDokumentUnderArbeidToDokumentReferanse(
@@ -62,29 +58,15 @@ class KabalDocumentMapper(
         }
 
         val journalfoerteVedlegg =
-            vedlegg.filter { it.getType() == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT }
+            vedlegg.filterIsInstance<JournalfoertDokumentUnderArbeidAsVedlegg>()
                 .sortedWith { document1, document2 ->
-                    val journalpostInDokarkiv1 =
-                        safClient.getJournalpostAsSystembruker(document1.journalfoertDokumentReference!!.journalpostId)
-
-                    val journalpostInDokarkiv2 =
-                        safClient.getJournalpostAsSystembruker(document2.journalfoertDokumentReference!!.journalpostId)
-
-                    val dokumentInDokarkiv1 =
-                        journalpostInDokarkiv1.dokumenter?.find { it.dokumentInfoId == document1.journalfoertDokumentReference.dokumentInfoId }
-                            ?: throw RuntimeException("Document not found in Dokarkiv")
-
-                    val dokumentInDokarkiv2 =
-                        journalpostInDokarkiv2.dokumenter?.find { it.dokumentInfoId == document2.journalfoertDokumentReference.dokumentInfoId }
-                            ?: throw RuntimeException("Document not found in Dokarkiv")
-
                     val dateCompare =
-                        journalpostInDokarkiv2.datoOpprettet.compareTo(journalpostInDokarkiv1.datoOpprettet)
+                        document2.opprettet.compareTo(document1.opprettet)
                     if (dateCompare != 0) {
                         dateCompare
                     } else {
-                        (dokumentInDokarkiv1.tittel ?: "Tittel ikke funnet i SAF").compareTo(
-                            dokumentInDokarkiv2.tittel ?: "Tittel ikke funnet i SAF"
+                        (document1.name).compareTo(
+                            document2.name
                         )
                     }
                 }
@@ -120,8 +102,8 @@ class KabalDocumentMapper(
                 journalfoerteVedlegg = journalfoerteVedlegg
                     .map { currentVedlegg ->
                         DokumentEnhetWithDokumentreferanserInput.DokumentInput.JournalfoertDokument(
-                            kildeJournalpostId = currentVedlegg.journalfoertDokumentReference!!.journalpostId,
-                            dokumentInfoId = currentVedlegg.journalfoertDokumentReference.dokumentInfoId,
+                            kildeJournalpostId = currentVedlegg.journalpostId,
+                            dokumentInfoId = currentVedlegg.dokumentInfoId,
                         )
                     },
             ),
@@ -131,6 +113,9 @@ class KabalDocumentMapper(
     }
 
     private fun mapDokumentUnderArbeidToDokumentReferanse(dokument: DokumentUnderArbeid): DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument {
+        if (dokument !is DokumentUnderArbeidAsMellomlagret) {
+            error("Must be mellomlagret document")
+        }
         return DokumentEnhetWithDokumentreferanserInput.DokumentInput.Dokument(
             mellomlagerId = dokument.mellomlagerId!!,
             name = dokument.name,

@@ -33,6 +33,7 @@ class SmartdokumentUnderArbeidAsVedlegg(
     parentId: UUID,
     creatorIdent: String,
     creatorRole: BehandlingRole,
+    dokumentType: DokumentType?,
 ) : DokumentUnderArbeidAsMellomlagret, DokumentUnderArbeidAsSmartdokument, DokumentUnderArbeidAsVedlegg(
     id = id,
     name = name,
@@ -45,6 +46,7 @@ class SmartdokumentUnderArbeidAsVedlegg(
     parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
+    dokumentType = dokumentType,
 ){
     fun asHoveddokument(): SmartdokumentUnderArbeidAsHoveddokument {
         return SmartdokumentUnderArbeidAsHoveddokument(
@@ -62,7 +64,7 @@ class SmartdokumentUnderArbeidAsVedlegg(
             ferdigstilt = ferdigstilt,
             creatorIdent = creatorIdent,
             creatorRole = creatorRole,
-            dokumentType = DokumentType.BREV, //TODO default?
+            dokumentType = dokumentType,
             dokumentEnhetId = null,
         )
     }

@@ -121,6 +121,7 @@ class DokumentUnderArbeidService(
                     parentId = parentId,
                     created = now,
                     modified = now,
+                    dokumentType = dokumentType,
                 )
             )
         }
@@ -198,6 +199,7 @@ class DokumentUnderArbeidService(
                     parentId = parentId,
                     created = now,
                     modified = now,
+                    dokumentType = dokumentType,
                 )
             )
         }
@@ -278,6 +280,7 @@ class DokumentUnderArbeidService(
                 markertFerdig = null,
                 markertFerdigBy = null,
                 ferdigstilt = null,
+                dokumentType = null,
             )
 
             behandling.publishEndringsloggEvent(
@@ -356,8 +359,8 @@ class DokumentUnderArbeidService(
         behandling.publishEndringsloggEvent(
             saksbehandlerident = innloggetIdent,
             felt = Felt.DOKUMENT_UNDER_ARBEID_TYPE,
-            fraVerdi = previousValue.id,
-            tilVerdi = dokumentUnderArbeid.modified.toString(),
+            fraVerdi = previousValue?.id,
+            tilVerdi = dokumentUnderArbeid.dokumentType.toString(),
             tidspunkt = dokumentUnderArbeid.modified,
             dokumentId = dokumentUnderArbeid.id,
         )
@@ -589,7 +592,7 @@ class DokumentUnderArbeidService(
         val mapBrevmottakerIdentToBrevmottakerInput = kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
             behandling = behandling,
             brevmottakerIdents = brevmottakerIdents,
-            dokumentType = hovedDokument.dokumentType
+            dokumentType = hovedDokument.dokumentType!!
         )
         hovedDokument.brevmottakerIdents = mapBrevmottakerIdentToBrevmottakerInput.map {
             it.partId.value
@@ -654,7 +657,7 @@ class DokumentUnderArbeidService(
         val mottakere = kabalDocumentMapper.mapBrevmottakerIdentToBrevmottakerInput(
             behandling = behandling,
             brevmottakerIdents = brevmottakerIdents,
-            dokumentType = hovedDokument.dokumentType
+            dokumentType = hovedDokument.dokumentType!!
         )
 
         //Could ignore NOTAT here. We'll see.
@@ -966,7 +969,7 @@ class DokumentUnderArbeidService(
         return dokumentUnderArbeidRepository.findByBehandlingIdAndFerdigstiltIsNullOrderByCreatedDesc(behandlingId)
     }
 
-    fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): SortedSet<DokumentUnderArbeidAsSmartdokument> {
+    fun getSmartDokumenterUnderArbeid(behandlingId: UUID, ident: String): List<DokumentUnderArbeid> {
         //Sjekker tilgang på behandlingsnivå:
         behandlingService.getBehandling(behandlingId)
 
@@ -978,10 +981,15 @@ class DokumentUnderArbeidService(
         val vedlegg = smartDokumentUnderArbeidAsVedleggRepository.findByBehandlingIdAndMarkertFerdigIsNullOrderByCreated(
             behandlingId
         )
-        return hoveddokumenter + vedlegg
+
+        val duaList = mutableListOf<DokumentUnderArbeid>()
+        duaList += hoveddokumenter
+        duaList += vedlegg
+
+        return duaList.sortedBy { it.created }
     }
 
-    fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
+    fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeidAsHoveddokument {
         val hovedDokument = dokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
         //Denne er alltid sann
@@ -999,7 +1007,7 @@ class DokumentUnderArbeidService(
         return hovedDokument
     }
 
-    fun ferdigstillDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeid {
+    fun ferdigstillDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeidAsHoveddokument {
         val hovedDokument = dokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(hovedDokumentId)
         val vedlegg = dokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)

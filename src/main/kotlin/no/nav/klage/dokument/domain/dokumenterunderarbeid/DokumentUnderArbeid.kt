@@ -1,6 +1,8 @@
 package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import jakarta.persistence.*
+import no.nav.klage.kodeverk.DokumentType
+import no.nav.klage.kodeverk.DokumentTypeConverter
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import org.hibernate.annotations.DynamicUpdate
 import java.time.LocalDateTime
@@ -14,6 +16,9 @@ import java.util.*
 abstract class DokumentUnderArbeid(
     @Id
     val id: UUID = UUID.randomUUID(),
+    @Column(name = "dokument_type_id")
+    @Convert(converter = DokumentTypeConverter::class)
+    var dokumentType: DokumentType?,
     @Column(name = "name")
     open var name: String,
     @Column(name = "behandling_id")
@@ -84,5 +89,27 @@ abstract class DokumentUnderArbeid(
         UPLOADED,
         SMART,
         JOURNALFOERT
+    }
+
+    fun getType(): DokumentUnderArbeidType {
+        return when (this) {
+            is DokumentUnderArbeidAsSmartdokument -> {
+                DokumentUnderArbeidType.SMART
+            }
+
+            is JournalfoertDokumentUnderArbeidAsVedlegg -> {
+                DokumentUnderArbeidType.JOURNALFOERT
+            }
+
+            is OpplastetDokumentUnderArbeidAsVedlegg -> {
+                DokumentUnderArbeidType.UPLOADED
+            }
+
+            is OpplastetDokumentUnderArbeidAsHoveddokument -> {
+                DokumentUnderArbeidType.UPLOADED
+            }
+
+            else -> error("unknown type: ${this::class.java.name}")
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
+import no.nav.klage.dokument.repositories.DokumentUnderArbeidAsHoveddokumentRepository
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.kodeverk.*
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
@@ -34,6 +35,7 @@ class BehandlingAvslutningService(
     private val behandlingService: BehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
+    private val dokumentUnderArbeidAsHoveddokumentRepository: DokumentUnderArbeidAsHoveddokumentRepository,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val ankebehandlingService: AnkebehandlingService,
     private val fssProxyClient: KlageFssProxyClient,
@@ -102,7 +104,7 @@ class BehandlingAvslutningService(
             createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
         } else {
             val hoveddokumenter =
-                dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(
+                dokumentUnderArbeidAsHoveddokumentRepository.findByMarkertFerdigNotNullAndFerdigstiltNotNullAndBehandlingId(
                     behandlingId
                 ).filter {
                     it.dokumentType in listOf(

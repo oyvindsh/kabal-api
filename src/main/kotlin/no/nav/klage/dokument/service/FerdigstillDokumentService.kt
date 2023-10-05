@@ -1,7 +1,7 @@
 package no.nav.klage.dokument.service
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
 import no.nav.klage.oppgave.domain.kafka.Event
@@ -33,7 +33,7 @@ class FerdigstillDokumentService(
         val hovedDokumenterIkkeFerdigstilte =
             dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
         for (it in hovedDokumenterIkkeFerdigstilte) {
-            ferdigstill(it)
+            ferdigstill(it as DokumentUnderArbeidAsHoveddokument)
         }
     }
 
@@ -42,11 +42,11 @@ class FerdigstillDokumentService(
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun listenToFerdigstilteDokumenterAvSaksbehandler(dokumentFerdigstiltAvSaksbehandler: DokumentFerdigstiltAvSaksbehandler) {
         logger.debug("listenToFerdigstilteDokumenterAvSaksbehandler called")
-        val dua = Hibernate.unproxy(dokumentFerdigstiltAvSaksbehandler.dokumentUnderArbeid) as DokumentUnderArbeid
+        val dua = Hibernate.unproxy(dokumentFerdigstiltAvSaksbehandler.dokumentUnderArbeid) as DokumentUnderArbeidAsHoveddokument
         ferdigstill(dua)
     }
 
-    private fun ferdigstill(it: DokumentUnderArbeid) {
+    private fun ferdigstill(it: DokumentUnderArbeidAsHoveddokument) {
         var updatedDokument = it
         try {
             if (updatedDokument.dokumentEnhetId == null) {

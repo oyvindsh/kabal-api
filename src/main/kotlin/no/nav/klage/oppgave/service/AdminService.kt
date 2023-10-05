@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.KabalSmartEditorApiClient
 import no.nav.klage.dokument.clients.klagefileapi.FileApiClient
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsMellomlagret
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.service.InnholdsfortegnelseService
 import no.nav.klage.kodeverk.Type
@@ -89,13 +91,15 @@ class AdminService(
 
         for (dua in dokumenterUnderArbeid) {
             try {
-                fileApiClient.deleteDocument(id = dua.mellomlagerId!!, systemUser = true)
+                if (dua is DokumentUnderArbeidAsMellomlagret && dua.mellomlagerId != null) {
+                    fileApiClient.deleteDocument(id = dua.mellomlagerId!!, systemUser = true)
+                }
             } catch (e: Exception) {
                 logger.warn("Delete test data in dev: Could not delete from file api")
             }
 
             try {
-                if (dua.parentId == null) {
+                if (dua is DokumentUnderArbeidAsHoveddokument) {
                     innholdsfortegnelseService.deleteInnholdsfortegnelse(dua.id)
                 }
             } catch (e: Exception) {
@@ -227,30 +231,6 @@ class AdminService(
                     it.jsonPayload
                 )
             }
-        }
-    }
-
-    fun migrateTablesInSmartdocuments() {
-        val documents =
-            dokumentUnderArbeidRepository.findByMarkertFerdigIsNullAndSmartEditorIdNotNull()
-
-        secureLogger.debug("found ${documents.size} dokumenterUnderArbeid")
-
-        val candidates = documents.map {
-            kabalSmartEditorApiClient.getDocument(it.smartEditorId!!)
-        }.filter { smartDocument ->
-            smartDocument.json?.contains("table") ?: false
-        }
-
-        secureLogger.debug("found ${candidates.size} candidates for migration of table")
-
-        candidates.forEach { smartDocument ->
-            kabalSmartEditorApiClient.updateDocument(
-                smartDocument.id, migrateTables(
-                    fromJsonString = smartDocument.json,
-                    secureLogger = secureLogger
-                )
-            )
         }
     }
 

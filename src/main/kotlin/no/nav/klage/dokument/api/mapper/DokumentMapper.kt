@@ -8,6 +8,8 @@ import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRe
 import no.nav.klage.dokument.clients.kabalsmarteditorapi.model.response.DocumentOutput
 import no.nav.klage.dokument.domain.FysiskDokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeid
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsSmartdokument
+import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsVedlegg
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentUnderArbeidAsVedlegg
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.kodeverk.Fagsystem
@@ -123,43 +125,30 @@ class DokumentMapper(
     }
 
     fun mapToDokumentView(dokumentUnderArbeid: DokumentUnderArbeid): DokumentView {
-        val type = dokumentUnderArbeid.getType()
-
         var journalfoertDokumentReference: DokumentView.JournalfoertDokumentReference? = null
 
-        val dokumentInDokarkiv = if (type == DokumentUnderArbeid.DokumentUnderArbeidType.JOURNALFOERT) {
-            val journalpostInDokarkiv =
-                safClient.getJournalpostAsSaksbehandler(dokumentUnderArbeid.journalfoertDokumentReference!!.journalpostId)
-            val dokumentInDokarkiv =
-                journalpostInDokarkiv.dokumenter?.find { it.dokumentInfoId == dokumentUnderArbeid.journalfoertDokumentReference.dokumentInfoId }
-                    ?: throw RuntimeException("Document not found in Dokarkiv")
-
-            journalfoertDokumentReference =
-                DokumentView.JournalfoertDokumentReference(
-                    journalpostId = journalpostInDokarkiv.journalpostId,
-                    dokumentInfoId = dokumentInDokarkiv.dokumentInfoId,
-                    harTilgangTilArkivvariant = harTilgangTilArkivvariant(dokumentInDokarkiv),
-                    datoOpprettet = journalpostInDokarkiv.datoOpprettet,
-                )
-            dokumentInDokarkiv
-        } else null
-
-        val tittel = if (dokumentInDokarkiv != null) {
-            (dokumentInDokarkiv.tittel ?: "Tittel ikke funnet i SAF")
-        } else dokumentUnderArbeid.name
+        if (dokumentUnderArbeid is JournalfoertDokumentUnderArbeidAsVedlegg) {
+            journalfoertDokumentReference = DokumentView.JournalfoertDokumentReference(
+                journalpostId = dokumentUnderArbeid.journalpostId,
+                dokumentInfoId = dokumentUnderArbeid.dokumentInfoId,
+                //TODO?
+                harTilgangTilArkivvariant = true,
+                datoOpprettet = dokumentUnderArbeid.opprettet,
+            )
+        }
 
         return DokumentView(
             id = dokumentUnderArbeid.id,
-            tittel = tittel,
+            tittel = dokumentUnderArbeid.name,
             dokumentTypeId = dokumentUnderArbeid.dokumentType?.id,
             created = dokumentUnderArbeid.created,
             modified = dokumentUnderArbeid.modified,
-            isSmartDokument = dokumentUnderArbeid.smartEditorId != null,
-            templateId = dokumentUnderArbeid.smartEditorTemplateId,
+            isSmartDokument = dokumentUnderArbeid is DokumentUnderArbeidAsSmartdokument,
+            templateId = if (dokumentUnderArbeid is DokumentUnderArbeidAsSmartdokument) dokumentUnderArbeid.smartEditorTemplateId else null,
             isMarkertAvsluttet = dokumentUnderArbeid.markertFerdig != null,
-            parent = dokumentUnderArbeid.parentId,
-            parentId = dokumentUnderArbeid.parentId,
-            type = type,
+            parent = if (dokumentUnderArbeid is DokumentUnderArbeidAsVedlegg) dokumentUnderArbeid.parentId else null,
+            parentId = if (dokumentUnderArbeid is DokumentUnderArbeidAsVedlegg) dokumentUnderArbeid.parentId else null,
+            type = dokumentUnderArbeid.getType(),
             journalfoertDokumentReference = journalfoertDokumentReference,
             creatorIdent = dokumentUnderArbeid.creatorIdent,
             creatorRole = dokumentUnderArbeid.creatorRole,
@@ -201,9 +190,9 @@ class DokumentMapper(
             id = dokumentUnderArbeid.id,
             tittel = dokumentUnderArbeid.name,
             dokumentTypeId = dokumentUnderArbeid.dokumentType!!.id,
-            templateId = dokumentUnderArbeid.smartEditorTemplateId,
-            parent = dokumentUnderArbeid.parentId,
-            parentId = dokumentUnderArbeid.parentId,
+            templateId = if (dokumentUnderArbeid is DokumentUnderArbeidAsSmartdokument) dokumentUnderArbeid.smartEditorTemplateId else null,
+            parent = if (dokumentUnderArbeid is DokumentUnderArbeidAsVedlegg) dokumentUnderArbeid.parentId else null,
+            parentId = if (dokumentUnderArbeid is DokumentUnderArbeidAsVedlegg) dokumentUnderArbeid.parentId else null,
             content = jacksonObjectMapper().readTree(smartEditorDocument.json),
             created = smartEditorDocument.created,
             modified = smartEditorDocument.modified,

@@ -28,7 +28,7 @@ class OpplastetDokumentUnderArbeidAsHoveddokument(
     ferdigstilt: LocalDateTime? = null,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-    dokumentType: DokumentType,
+    dokumentType: DokumentType?,
     dokumentEnhetId: UUID? = null,
     brevmottakerIdents: Set<String> = emptySet(),
     journalposter: Set<DokumentUnderArbeidJournalpostId> = emptySet(),
@@ -63,6 +63,7 @@ class OpplastetDokumentUnderArbeidAsHoveddokument(
             creatorIdent = creatorIdent,
             creatorRole = creatorRole,
             parentId = parentId,
+            dokumentType = dokumentType,
         )
     }
 }

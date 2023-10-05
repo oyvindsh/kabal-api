@@ -6,4 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Transactional
-interface DokumentUnderArbeidAsHoveddokumentRepository : JpaRepository<DokumentUnderArbeidAsHoveddokument, UUID>
+interface DokumentUnderArbeidAsHoveddokumentRepository : JpaRepository<DokumentUnderArbeidAsHoveddokument, UUID> {
+
+    fun findByMarkertFerdigNotNullAndFerdigstiltNotNullAndBehandlingId(behandlingId: UUID): List<DokumentUnderArbeidAsHoveddokument>
+}

@@ -2,6 +2,7 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import java.time.LocalDateTime
 import java.util.*
@@ -22,6 +23,7 @@ abstract class DokumentUnderArbeidAsVedlegg(
     ferdigstilt: LocalDateTime?,
     creatorIdent: String,
     creatorRole: BehandlingRole,
+    dokumentType: DokumentType?,
 ) : DokumentUnderArbeid(
     id = id,
     name = name,
@@ -33,4 +35,5 @@ abstract class DokumentUnderArbeidAsVedlegg(
     ferdigstilt = ferdigstilt,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
+    dokumentType = dokumentType,
 )

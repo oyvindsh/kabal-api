@@ -32,7 +32,7 @@ class SmartdokumentUnderArbeidAsHoveddokument(
     ferdigstilt: LocalDateTime? = null,
     creatorIdent: String,
     creatorRole: BehandlingRole,
-    dokumentType: DokumentType,
+    dokumentType: DokumentType?,
     dokumentEnhetId: UUID? = null,
     brevmottakerIdents: Set<String> = emptySet(),
     journalposter: Set<DokumentUnderArbeidJournalpostId> = emptySet(),
@@ -69,6 +69,7 @@ class SmartdokumentUnderArbeidAsHoveddokument(
             creatorIdent = creatorIdent,
             creatorRole = creatorRole,
             parentId = parentId,
+            dokumentType = dokumentType,
         )
     }
 }

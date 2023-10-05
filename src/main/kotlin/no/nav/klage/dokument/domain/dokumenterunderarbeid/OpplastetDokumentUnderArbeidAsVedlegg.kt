@@ -29,6 +29,7 @@ class OpplastetDokumentUnderArbeidAsVedlegg(
     parentId: UUID,
     creatorIdent: String,
     creatorRole: BehandlingRole,
+    dokumentType: DokumentType?,
 ) : DokumentUnderArbeidAsMellomlagret, DokumentUnderArbeidAsVedlegg(
     id = id,
     name = name,
@@ -41,6 +42,7 @@ class OpplastetDokumentUnderArbeidAsVedlegg(
     parentId = parentId,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
+    dokumentType = dokumentType,
 ){
     fun asHoveddokument(): OpplastetDokumentUnderArbeidAsHoveddokument {
         return OpplastetDokumentUnderArbeidAsHoveddokument(
@@ -56,7 +58,7 @@ class OpplastetDokumentUnderArbeidAsVedlegg(
             ferdigstilt = ferdigstilt,
             creatorIdent = creatorIdent,
             creatorRole = creatorRole,
-            dokumentType = DokumentType.BREV, //TODO default?
+            dokumentType = dokumentType,
         )
     }
 }

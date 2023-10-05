@@ -2,7 +2,6 @@ package no.nav.klage.dokument.domain.dokumenterunderarbeid
 
 import jakarta.persistence.*
 import no.nav.klage.kodeverk.DokumentType
-import no.nav.klage.kodeverk.DokumentTypeConverter
 import no.nav.klage.oppgave.domain.klage.BehandlingRole
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.Fetch
@@ -12,9 +11,6 @@ import java.util.*
 
 @Entity
 abstract class DokumentUnderArbeidAsHoveddokument(
-    @Column(name = "dokument_type_id")
-    @Convert(converter = DokumentTypeConverter::class)
-    var dokumentType: DokumentType,
     @Column(name = "dokument_enhet_id")
     var dokumentEnhetId: UUID? = null,
     @ElementCollection
@@ -42,6 +38,7 @@ abstract class DokumentUnderArbeidAsHoveddokument(
     ferdigstilt: LocalDateTime?,
     creatorIdent: String,
     creatorRole: BehandlingRole,
+    dokumentType: DokumentType?,
 
     ) : DokumentUnderArbeid(
     id = id,
@@ -54,4 +51,5 @@ abstract class DokumentUnderArbeidAsHoveddokument(
     ferdigstilt = ferdigstilt,
     creatorIdent = creatorIdent,
     creatorRole = creatorRole,
+    dokumentType = dokumentType,
 )
