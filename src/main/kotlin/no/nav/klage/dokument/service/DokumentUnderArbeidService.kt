@@ -41,8 +41,7 @@ import java.util.*
 @Transactional
 class DokumentUnderArbeidService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
-    private val dokumentUnderArbeidAsHoveddokumentRepository: DokumentUnderArbeidAsHoveddokumentRepository,
-    private val dokumentUnderArbeidAsVedleggRepository: DokumentUnderArbeidAsVedleggRepository,
+    private val dokumentUnderArbeidCommonRepository: DokumentUnderArbeidCommonRepository,
     private val opplastetDokumentUnderArbeidAsHoveddokumentRepository: OpplastetDokumentUnderArbeidAsHoveddokumentRepository,
     private val opplastetDokumentUnderArbeidAsVedleggRepository: OpplastetDokumentUnderArbeidAsVedleggRepository,
     private val smartDokumentUnderArbeidAsHoveddokumentRepository: SmartdokumentUnderArbeidAsHoveddokumentRepository,
@@ -537,8 +536,8 @@ class DokumentUnderArbeidService(
         return documentValidationResults
     }
 
-    private fun getVedlegg(hoveddokumentId: UUID): List<DokumentUnderArbeidAsVedlegg> {
-        TODO()
+    private fun getVedlegg(hoveddokumentId: UUID): Set<DokumentUnderArbeidAsVedlegg> {
+        return dokumentUnderArbeidCommonRepository.findVedleggByParentId(hoveddokumentId)
     }
 
     private fun validateSingleSmartdocument(dokument: DokumentUnderArbeidAsSmartdokument): DocumentValidationResponse {
@@ -972,7 +971,7 @@ class DokumentUnderArbeidService(
         behandlingService.getBehandling(behandlingId)
 
         val hoveddokumenter =
-            smartDokumentUnderArbeidAsHoveddokumentRepository.findByBehandlingIdAndMarkertFerdigIsNullOrderByCreated(
+            smartDokumentUnderArbeidAsHoveddokumentRepository.findByBehandlingIdAndMarkertFerdigIsNull(
                 behandlingId
             )
 
@@ -988,8 +987,8 @@ class DokumentUnderArbeidService(
     }
 
     fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeidAsHoveddokument {
-        val hovedDokument = dokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(hovedDokumentId)
-        val vedlegg = dokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId) as DokumentUnderArbeidAsHoveddokument
+        val vedlegg = dokumentUnderArbeidCommonRepository.findVedleggByParentId(hovedDokument.id)
         //Denne er alltid sann
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
@@ -1006,8 +1005,8 @@ class DokumentUnderArbeidService(
     }
 
     fun ferdigstillDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeidAsHoveddokument {
-        val hovedDokument = dokumentUnderArbeidAsHoveddokumentRepository.getReferenceById(hovedDokumentId)
-        val vedlegg = dokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
+        val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId) as DokumentUnderArbeidAsHoveddokument
+        val vedlegg = dokumentUnderArbeidCommonRepository.findVedleggByParentId(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
         val documentInfoList =
             kabalDocumentGateway.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)
