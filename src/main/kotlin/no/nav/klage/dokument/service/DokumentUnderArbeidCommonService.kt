@@ -1,12 +1,13 @@
-package no.nav.klage.dokument.repositories
+package no.nav.klage.dokument.service
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsVedlegg
-import org.springframework.stereotype.Repository
+import no.nav.klage.dokument.repositories.*
+import org.springframework.stereotype.Service
 import java.util.*
 
-@Repository
-class DokumentUnderArbeidCommonRepository(
+@Service
+class DokumentUnderArbeidCommonService(
     private val opplastetDokumentUnderArbeidAsVedleggRepository: OpplastetDokumentUnderArbeidAsVedleggRepository,
     private val journalfoertDokumentUnderArbeidAsVedleggRepository: JournalfoertDokumentUnderArbeidAsVedleggRepository,
     private val smartdokumentUnderArbeidAsVedleggRepository: SmartdokumentUnderArbeidAsVedleggRepository,

@@ -5,7 +5,6 @@ import no.nav.klage.dokument.clients.kabaljsontopdf.KabalJsonToPdfClient
 import no.nav.klage.dokument.clients.kabaljsontopdf.domain.InnholdsfortegnelseRequest
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsVedlegg
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.Innholdsfortegnelse
-import no.nav.klage.dokument.repositories.DokumentUnderArbeidCommonRepository
 import no.nav.klage.dokument.repositories.DokumentUnderArbeidRepository
 import no.nav.klage.dokument.repositories.InnholdsfortegnelseRepository
 import no.nav.klage.oppgave.service.BehandlingService
@@ -19,7 +18,7 @@ import java.util.*
 @Transactional
 class InnholdsfortegnelseService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
-    private val dokumentUnderArbeidCommonRepository: DokumentUnderArbeidCommonRepository,
+    private val dokumentUnderArbeidCommonService: DokumentUnderArbeidCommonService,
     private val dokumentMapper: DokumentMapper,
     private val mellomlagerService: MellomlagerService,
     private val kabalJsonToPdfClient: KabalJsonToPdfClient,
@@ -66,7 +65,7 @@ class InnholdsfortegnelseService(
             throw IllegalArgumentException("must be hoveddokument")
         }
 
-        val vedlegg = dokumentUnderArbeidCommonRepository.findVedleggByParentId(dokumentUnderArbeidId)
+        val vedlegg = dokumentUnderArbeidCommonService.findVedleggByParentId(dokumentUnderArbeidId)
 
         val (dokumenterUnderArbeid, journalfoerteDokumenter) = dokumentMapper.getSortedDokumentViewListForInnholdsfortegnelse(
             allDokumenterUnderArbeid = vedlegg.toList(),

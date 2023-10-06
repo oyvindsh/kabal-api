@@ -41,7 +41,7 @@ import java.util.*
 @Transactional
 class DokumentUnderArbeidService(
     private val dokumentUnderArbeidRepository: DokumentUnderArbeidRepository,
-    private val dokumentUnderArbeidCommonRepository: DokumentUnderArbeidCommonRepository,
+    private val dokumentUnderArbeidCommonService: DokumentUnderArbeidCommonService,
     private val opplastetDokumentUnderArbeidAsHoveddokumentRepository: OpplastetDokumentUnderArbeidAsHoveddokumentRepository,
     private val opplastetDokumentUnderArbeidAsVedleggRepository: OpplastetDokumentUnderArbeidAsVedleggRepository,
     private val smartDokumentUnderArbeidAsHoveddokumentRepository: SmartdokumentUnderArbeidAsHoveddokumentRepository,
@@ -537,7 +537,7 @@ class DokumentUnderArbeidService(
     }
 
     private fun getVedlegg(hoveddokumentId: UUID): Set<DokumentUnderArbeidAsVedlegg> {
-        return dokumentUnderArbeidCommonRepository.findVedleggByParentId(hoveddokumentId)
+        return dokumentUnderArbeidCommonService.findVedleggByParentId(hoveddokumentId)
     }
 
     private fun validateSingleSmartdocument(dokument: DokumentUnderArbeidAsSmartdokument): DocumentValidationResponse {
@@ -988,7 +988,7 @@ class DokumentUnderArbeidService(
 
     fun opprettDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeidAsHoveddokument {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId) as DokumentUnderArbeidAsHoveddokument
-        val vedlegg = dokumentUnderArbeidCommonRepository.findVedleggByParentId(hovedDokument.id)
+        val vedlegg = dokumentUnderArbeidCommonService.findVedleggByParentId(hovedDokument.id)
         //Denne er alltid sann
         if (hovedDokument.dokumentEnhetId == null) {
             //Vi vet at smartEditor-dokumentene har en oppdatert snapshot i mellomlageret fordi det ble fikset i finnOgMarkerFerdigHovedDokument
@@ -1006,7 +1006,7 @@ class DokumentUnderArbeidService(
 
     fun ferdigstillDokumentEnhet(hovedDokumentId: UUID): DokumentUnderArbeidAsHoveddokument {
         val hovedDokument = dokumentUnderArbeidRepository.getReferenceById(hovedDokumentId) as DokumentUnderArbeidAsHoveddokument
-        val vedlegg = dokumentUnderArbeidCommonRepository.findVedleggByParentId(hovedDokument.id)
+        val vedlegg = dokumentUnderArbeidCommonService.findVedleggByParentId(hovedDokument.id)
         val behandling: Behandling = behandlingService.getBehandlingForUpdateBySystembruker(hovedDokument.behandlingId)
         val documentInfoList =
             kabalDocumentGateway.fullfoerDokumentEnhet(dokumentEnhetId = hovedDokument.dokumentEnhetId!!)

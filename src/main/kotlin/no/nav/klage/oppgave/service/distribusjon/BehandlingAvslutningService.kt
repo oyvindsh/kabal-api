@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
-import no.nav.klage.dokument.repositories.DokumentUnderArbeidCommonRepository
+import no.nav.klage.dokument.service.DokumentUnderArbeidCommonService
 import no.nav.klage.kodeverk.*
 import no.nav.klage.oppgave.clients.klagefssproxy.KlageFssProxyClient
 import no.nav.klage.oppgave.clients.klagefssproxy.domain.SakFinishedInput
@@ -33,7 +33,7 @@ class BehandlingAvslutningService(
     private val kafkaEventRepository: KafkaEventRepository,
     private val behandlingService: BehandlingService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val dokumentUnderArbeidCommonRepository: DokumentUnderArbeidCommonRepository,
+    private val dokumentUnderArbeidCommonService: DokumentUnderArbeidCommonService,
     private val ankeITrygderettenbehandlingService: AnkeITrygderettenbehandlingService,
     private val ankebehandlingService: AnkebehandlingService,
     private val fssProxyClient: KlageFssProxyClient,
@@ -52,7 +52,7 @@ class BehandlingAvslutningService(
     @Transactional
     fun avsluttBehandling(behandlingId: UUID) {
         try {
-            val hovedDokumenterIkkeFerdigstilte = dokumentUnderArbeidCommonRepository.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNull()
+            val hovedDokumenterIkkeFerdigstilte = dokumentUnderArbeidCommonService.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNull()
             if (hovedDokumenterIkkeFerdigstilte.isNotEmpty()) {
                 logger.warn(
                     "Kunne ikke avslutte behandling {} fordi noen dokumenter mangler ferdigstilling. Prøver på nytt senere.",
@@ -101,7 +101,7 @@ class BehandlingAvslutningService(
             createNewAnkebehandlingFromAnkeITrygderettenbehandling(ankeITrygderettenbehandling)
         } else {
             val hoveddokumenter =
-                dokumentUnderArbeidCommonRepository.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNotNullAndBehandlingId(
+                dokumentUnderArbeidCommonService.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNotNullAndBehandlingId(
                     behandlingId
                 ).filter {
                     it.dokumentType in listOf(

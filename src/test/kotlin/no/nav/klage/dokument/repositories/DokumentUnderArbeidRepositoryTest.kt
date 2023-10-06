@@ -2,6 +2,7 @@ package no.nav.klage.dokument.repositories
 
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.OpplastetDokumentUnderArbeidAsHoveddokument
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.OpplastetDokumentUnderArbeidAsVedlegg
+import no.nav.klage.dokument.service.DokumentUnderArbeidCommonService
 import no.nav.klage.kodeverk.DokumentType
 import no.nav.klage.oppgave.db.TestPostgresqlContainer
 import no.nav.klage.oppgave.domain.klage.BehandlingRole.KABAL_SAKSBEHANDLING
@@ -36,7 +37,7 @@ class DokumentUnderArbeidRepositoryTest {
     lateinit var dokumentUnderArbeidRepository: DokumentUnderArbeidRepository
 
     @Autowired
-    lateinit var dokumentUnderArbeidCommonRepository: DokumentUnderArbeidCommonRepository
+    lateinit var dokumentUnderArbeidCommonService: DokumentUnderArbeidCommonService
 
     @Autowired
     lateinit var opplastetDokumentUnderArbeidAsVedleggRepository: OpplastetDokumentUnderArbeidAsVedleggRepository
@@ -66,7 +67,7 @@ class DokumentUnderArbeidRepositoryTest {
         val byId = dokumentUnderArbeidRepository.getReferenceById(hovedDokument.id)
         assertThat(byId).isEqualTo(hovedDokument)
 
-        assertThat(dokumentUnderArbeidCommonRepository.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNull()).isEqualTo(hovedDokument)
+        assertThat(dokumentUnderArbeidCommonService.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNull()).isEqualTo(hovedDokument)
     }
 
     @Test

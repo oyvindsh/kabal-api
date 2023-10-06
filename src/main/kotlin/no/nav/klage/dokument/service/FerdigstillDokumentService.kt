@@ -2,7 +2,6 @@ package no.nav.klage.dokument.service
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.klage.dokument.domain.dokumenterunderarbeid.DokumentUnderArbeidAsHoveddokument
-import no.nav.klage.dokument.repositories.DokumentUnderArbeidCommonRepository
 import no.nav.klage.oppgave.domain.events.DokumentFerdigstiltAvSaksbehandler
 import no.nav.klage.oppgave.domain.kafka.Event
 import no.nav.klage.oppgave.service.KafkaInternalEventService
@@ -18,7 +17,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Service
 class FerdigstillDokumentService(
     private val dokumentUnderArbeidService: DokumentUnderArbeidService,
-    private val dokumentUnderArbeidCommonRepository: DokumentUnderArbeidCommonRepository,
+    private val dokumentUnderArbeidCommonService: DokumentUnderArbeidCommonService,
     private val kafkaInternalEventService: KafkaInternalEventService,
 ) {
     companion object {
@@ -30,7 +29,7 @@ class FerdigstillDokumentService(
     @Scheduled(fixedDelayString = "\${FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS}", initialDelay = 45000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
-        val hovedDokumenterIkkeFerdigstilte = dokumentUnderArbeidCommonRepository.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNull()
+        val hovedDokumenterIkkeFerdigstilte = dokumentUnderArbeidCommonService.findHoveddokumenterByMarkertFerdigNotNullAndFerdigstiltNull()
         for (it in hovedDokumenterIkkeFerdigstilte) {
             ferdigstill(it)
         }
