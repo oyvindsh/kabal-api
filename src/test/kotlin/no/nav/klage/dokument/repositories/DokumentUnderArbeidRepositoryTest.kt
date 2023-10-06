@@ -9,9 +9,11 @@ import no.nav.klage.oppgave.domain.klage.BehandlingRole.KABAL_SAKSBEHANDLING
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -21,6 +23,8 @@ import java.util.*
 @ActiveProfiles("local")
 @DataJpaTest
 @Testcontainers
+@EnableJpaRepositories(basePackages = ["no.nav.klage.dokument.repositories"])
+@EntityScan(basePackages = ["no.nav.klage.oppgave.domain", "no.nav.klage.dokument.domain"])
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DokumentUnderArbeidRepositoryTest {
 
