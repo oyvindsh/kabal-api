@@ -30,8 +30,9 @@ class FerdigstillDokumentService(
     @Scheduled(fixedDelayString = "\${FERDIGSTILLE_DOKUMENTER_DELAY_MILLIS}", initialDelay = 45000)
     @SchedulerLock(name = "ferdigstillDokumenter")
     fun ferdigstillHovedDokumenter() {
-        val hovedDokumenterIkkeFerdigstilte =
-            dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
+        val hovedDokumenterIkkeFerdigstilte = emptyList<DokumentUnderArbeidAsHoveddokument>()
+        //TODO FIXME
+//            dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
         for (it in hovedDokumenterIkkeFerdigstilte) {
             ferdigstill(it as DokumentUnderArbeidAsHoveddokument)
         }

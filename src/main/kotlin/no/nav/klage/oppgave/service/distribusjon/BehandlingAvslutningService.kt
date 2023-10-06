@@ -54,8 +54,9 @@ class BehandlingAvslutningService(
     @Transactional
     fun avsluttBehandling(behandlingId: UUID) {
         try {
-            val hovedDokumenterIkkeFerdigstilte =
-                dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
+            val hovedDokumenterIkkeFerdigstilte = emptyList<DokumentUnderArbeidAsHoveddokument>()
+            //TODO FIXME
+//                dokumentUnderArbeidRepository.findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull()
             if (hovedDokumenterIkkeFerdigstilte.isNotEmpty()) {
                 logger.warn(
                     "Kunne ikke avslutte behandling {} fordi noen dokumenter mangler ferdigstilling. Prøver på nytt senere.",

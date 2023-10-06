@@ -243,7 +243,7 @@ class DokumentUnderArbeidService(
         }
 
         val alreadyAddedDocuments =
-            journalfoertDokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceIsNotNull(parentId)
+            journalfoertDokumentUnderArbeidRepository.findByParentId(parentId)
                 .map {
                     JournalfoertDokumentReference(
                         journalpostId = it.journalpostId,
@@ -881,12 +881,10 @@ class DokumentUnderArbeidService(
         }
 
         return if (dokumentUnderArbeid is JournalfoertDokumentUnderArbeidAsVedlegg) {
-            if (journalfoertDokumentUnderArbeidRepository.findByParentIdAndJournalfoertDokumentReferenceAndIdNot(
+            if (journalfoertDokumentUnderArbeidRepository.findByParentIdAndJournalpostIdNotAndDokumentInfoIdNotAndIdNot(
                     parentId = parentId,
-                    journalfoertDokumentReference = no.nav.klage.dokument.domain.dokumenterunderarbeid.JournalfoertDokumentReference(
-                        journalpostId = dokumentUnderArbeid.journalpostId,
-                        dokumentInfoId = dokumentUnderArbeid.dokumentInfoId,
-                    ),
+                    journalpostId = dokumentUnderArbeid.journalpostId,
+                    dokumentInfoId = dokumentUnderArbeid.dokumentInfoId,
                     id = currentDokumentId,
                 ).isNotEmpty()
             ) {
