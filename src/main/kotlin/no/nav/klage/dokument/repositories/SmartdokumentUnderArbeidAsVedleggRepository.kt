@@ -8,11 +8,9 @@ import java.util.*
 @Transactional
 interface SmartdokumentUnderArbeidAsVedleggRepository : JpaRepository<SmartdokumentUnderArbeidAsVedlegg, UUID> {
 
-    fun findByBehandlingIdAndSmartEditorIdNotNullAndMarkertFerdigIsNullOrderByCreated(behandlingId: UUID): SortedSet<SmartdokumentUnderArbeidAsVedlegg>
-
     fun findByMarkertFerdigIsNullAndSmartEditorIdNotNull(): List<SmartdokumentUnderArbeidAsVedlegg>
 
-    fun findByParentIdOrderByCreated(dokumentId: UUID): SortedSet<SmartdokumentUnderArbeidAsVedlegg>
+    fun findByParentId(dokumentId: UUID): Set<SmartdokumentUnderArbeidAsVedlegg>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<SmartdokumentUnderArbeidAsVedlegg>
 

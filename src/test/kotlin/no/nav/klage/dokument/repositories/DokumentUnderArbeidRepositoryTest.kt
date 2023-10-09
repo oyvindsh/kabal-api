@@ -101,7 +101,7 @@ class DokumentUnderArbeidRepositoryTest {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val vedlegg = opplastetDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(hovedDokument.id)
+        val vedlegg = opplastetDokumentUnderArbeidAsVedleggRepository.findByParentId(hovedDokument.id)
         assertThat(vedlegg).hasSize(1)
     }
 

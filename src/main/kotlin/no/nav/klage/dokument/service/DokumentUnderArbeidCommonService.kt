@@ -16,9 +16,9 @@ class DokumentUnderArbeidCommonService(
 ) {
 
     fun findVedleggByParentId(parentId: UUID): Set<DokumentUnderArbeidAsVedlegg> {
-        return opplastetDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(parentId) +
-                journalfoertDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(parentId) +
-                smartdokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(parentId)
+        return opplastetDokumentUnderArbeidAsVedleggRepository.findByParentId(parentId) +
+                journalfoertDokumentUnderArbeidAsVedleggRepository.findByParentId(parentId) +
+                smartdokumentUnderArbeidAsVedleggRepository.findByParentId(parentId)
     }
 
 //    fun findHoveddokumenterByBehandlingId(behandlingId: UUID): Set<DokumentUnderArbeid> {

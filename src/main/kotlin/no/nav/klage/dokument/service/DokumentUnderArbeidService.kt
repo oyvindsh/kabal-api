@@ -762,9 +762,7 @@ class DokumentUnderArbeidService(
             behandlingId = document.behandlingId,
         )
 
-        smartDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(dokumentId)
-            .plus(opplastetDokumentUnderArbeidAsVedleggRepository.findByParentIdOrderByCreated(dokumentId))
-            .plus(journalfoertDokumentUnderArbeidRepository.findByParentIdOrderByCreated(dokumentId))
+        dokumentUnderArbeidCommonService.findVedleggByParentId(dokumentId)
             .plus(document)
             .map {
                 if (document.erMarkertFerdig()) {

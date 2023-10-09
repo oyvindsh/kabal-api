@@ -12,8 +12,6 @@ interface JournalfoertDokumentUnderArbeidAsVedleggRepository : JpaRepository<Jou
 
     fun findByParentIdAndJournalpostIdNotAndDokumentInfoIdNotAndIdNot(parentId: UUID, journalpostId: String, dokumentInfoId: String, id: UUID): List<JournalfoertDokumentUnderArbeidAsVedlegg>
 
-    fun findByParentIdOrderByCreated(dokumentId: UUID): SortedSet<JournalfoertDokumentUnderArbeidAsVedlegg>
-
     fun findByMarkertFerdigNotNullAndFerdigstiltNullAndParentIdIsNull(): List<JournalfoertDokumentUnderArbeidAsVedlegg>
 
     fun findByMarkertFerdigNotNullAndFerdigstiltNotNullAndParentIdIsNullAndBehandlingId(behandlingId: UUID): SortedSet<JournalfoertDokumentUnderArbeidAsVedlegg>

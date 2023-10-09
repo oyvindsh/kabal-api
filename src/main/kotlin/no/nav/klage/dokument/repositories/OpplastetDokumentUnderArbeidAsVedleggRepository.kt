@@ -7,5 +7,5 @@ import java.util.*
 
 @Transactional
 interface OpplastetDokumentUnderArbeidAsVedleggRepository : JpaRepository<OpplastetDokumentUnderArbeidAsVedlegg, UUID> {
-    fun findByParentIdOrderByCreated(dokumentId: UUID): SortedSet<OpplastetDokumentUnderArbeidAsVedlegg>
+    fun findByParentId(dokumentId: UUID): Set<OpplastetDokumentUnderArbeidAsVedlegg>
 }
